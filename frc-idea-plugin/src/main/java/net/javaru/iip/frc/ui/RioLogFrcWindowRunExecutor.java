@@ -26,10 +26,10 @@ import com.intellij.openapi.util.IconLoader;
 
 
 // This class is registered in the plugin.xml file in the extensions element
-public class RioLogRunExecutor extends Executor
+public class RioLogFrcWindowRunExecutor extends Executor
 {
     public static final Icon TOOL_WINDOW_ICON = IconLoader.getIcon("/net/javaru/iip/frc/ui/images/FIRST_icon_13x13.png"); // 13x13
-    public static final String TOOL_WINDOW_ID = "RIO Log";
+    public static final String TOOL_WINDOW_ID = "FRC";
     // The executor ID must match the id attribute of the <extensions>/<executor> element in the plugin.xml file
     public static final String EXECUTOR_ID = "FrcRioLog";
 
@@ -51,7 +51,7 @@ public class RioLogRunExecutor extends Executor
 
 
     @Override
-    public String getDescription() { return "FRC RIOLog"; }
+    public String getDescription() { return "FRC RIOLog Console"; }
 
 
     @NotNull

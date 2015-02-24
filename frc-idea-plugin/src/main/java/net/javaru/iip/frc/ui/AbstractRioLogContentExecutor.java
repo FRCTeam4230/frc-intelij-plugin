@@ -18,7 +18,6 @@ package net.javaru.iip.frc.ui;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
@@ -59,45 +58,60 @@ import com.intellij.openapi.wm.ToolWindowManager;
 
 
 //Based on the IntelliJ IDEA com.intellij.execution.RunContentExecutor class
-public class RioLogContentExecutor implements Disposable
+public abstract class AbstractRioLogContentExecutor implements Disposable
 {
-
-    private static final Logger LOG = Logger.getInstance(RioLogContentExecutor.class);
-
-    private final Project myProject;
-    private final ProcessHandler myProcess;
-    private final List<Filter> myFilterList = new ArrayList<Filter>();
+    private static final Logger LOG = Logger.getInstance(RioLogFrcWindowContentExecutor.class);
+    protected final Project myProject;
+    protected final ProcessHandler myProcess;
+    private final java.util.List<Filter> myFilterList = new ArrayList<Filter>();
     private Runnable myRerunAction;
     private Runnable myStopAction;
     private Runnable myAfterCompletion;
     private Computable<Boolean> myStopEnabled;
-    private String myTitle = "roboRIO Console";
+    private String myTitle = "roboRIO";
     private String myHelpId = null;
     private boolean myActivateToolWindow = true;
 
 
-    public RioLogContentExecutor(@NotNull Project project, @NotNull ProcessHandler process)
+    public AbstractRioLogContentExecutor(@NotNull Project project, @NotNull ProcessHandler process)
     {
         myProject = project;
         myProcess = process;
     }
 
 
-    public RioLogContentExecutor withFilter(Filter filter)
+    private static JComponent createConsolePanel(ConsoleView view, ActionGroup actions)
+    {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.add(view.getComponent(), BorderLayout.CENTER);
+        panel.add(createToolbar(actions), BorderLayout.WEST);
+        return panel;
+    }
+
+
+    private static JComponent createToolbar(ActionGroup actions)
+    {
+        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, false);
+        return actionToolbar.getComponent();
+    }
+
+
+    public AbstractRioLogContentExecutor withFilter(Filter filter)
     {
         myFilterList.add(filter);
         return this;
     }
 
 
-    public RioLogContentExecutor withTitle(String title)
+    public AbstractRioLogContentExecutor withTitle(String title)
     {
         myTitle = title;
         return this;
     }
 
 
-    public RioLogContentExecutor withStop(@NotNull Runnable stop, @NotNull Computable<Boolean> stopEnabled)
+    public AbstractRioLogContentExecutor withStop(@NotNull Runnable stop, @NotNull Computable<Boolean> stopEnabled)
     {
         myStopAction = stop;
         myStopEnabled = stopEnabled;
@@ -105,28 +119,28 @@ public class RioLogContentExecutor implements Disposable
     }
 
 
-    public RioLogContentExecutor withRerun(Runnable rerun)
+    public AbstractRioLogContentExecutor withRerun(Runnable rerun)
     {
         myRerunAction = rerun;
         return this;
     }
 
 
-    public RioLogContentExecutor withAfterCompletion(Runnable afterCompletion)
+    public AbstractRioLogContentExecutor withAfterCompletion(Runnable afterCompletion)
     {
         myAfterCompletion = afterCompletion;
         return this;
     }
 
 
-    public RioLogContentExecutor withHelpId(String helpId)
+    public AbstractRioLogContentExecutor withHelpId(String helpId)
     {
         myHelpId = helpId;
         return this;
     }
 
 
-    public RioLogContentExecutor withActivateToolWindow(boolean activateToolWindow)
+    public AbstractRioLogContentExecutor withActivateToolWindow(boolean activateToolWindow)
     {
         myActivateToolWindow = activateToolWindow;
         return this;
@@ -153,7 +167,7 @@ public class RioLogContentExecutor implements Disposable
         }
 
         //Executor executor = DefaultRunExecutor.getRunExecutorInstance(); //Gets the Run Window I believe
-        Executor executor = net.javaru.iip.frc.ui.RioLogRunExecutor.getRunExecutorInstance();
+        Executor executor = createExecutor();
         DefaultActionGroup actions = new DefaultActionGroup();
 
         final JComponent consolePanel = createConsolePanel(view, actions);
@@ -199,6 +213,10 @@ public class RioLogContentExecutor implements Disposable
         myProcess.startNotify();
     }
 
+
+    protected abstract Executor createExecutor();
+
+
     public void activateToolWindow()
     {
         ApplicationManager.getApplication().invokeLater(new Runnable()
@@ -206,27 +224,13 @@ public class RioLogContentExecutor implements Disposable
             @Override
             public void run()
             {
-                ToolWindowManager.getInstance(myProject).getToolWindow(RioLogRunExecutor.TOOL_WINDOW_ID).activate(null);
+                ToolWindowManager.getInstance(myProject).getToolWindow(getToolWindowId()).activate(null);
             }
         });
     }
 
 
-    private static JComponent createConsolePanel(ConsoleView view, ActionGroup actions)
-    {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-        panel.add(view.getComponent(), BorderLayout.CENTER);
-        panel.add(createToolbar(actions), BorderLayout.WEST);
-        return panel;
-    }
-
-
-    private static JComponent createToolbar(ActionGroup actions)
-    {
-        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, false);
-        return actionToolbar.getComponent();
-    }
+    protected abstract String getToolWindowId();
 
 
     @Override
@@ -235,53 +239,6 @@ public class RioLogContentExecutor implements Disposable
         Disposer.dispose(this);
     }
 
-
-    private class StopAction extends DumbAwareAction
-    {
-        public StopAction()
-        {
-            super(ExecutionBundle.message("run.configuration.stop.action.name"), "This will stop all future logging.", AllIcons.Actions.Suspend);
-        }
-
-
-        @Override
-        public void actionPerformed(AnActionEvent e)
-        {
-            myStopAction.run();
-        }
-
-
-        @Override
-        public void update(AnActionEvent e)
-        {
-            e.getPresentation().setVisible(myStopAction != null);
-            e.getPresentation().setEnabled(myStopEnabled != null && myStopEnabled.compute());
-        }
-    }
-
-    private class RerunAction extends DumbAwareAction
-    {
-        public RerunAction(JComponent consolePanel)
-        {
-            super("Rerun", "Rerun",
-                  AllIcons.Actions.Restart);
-            registerCustomShortcutSet(CommonShortcuts.getRerun(), consolePanel);
-        }
-
-
-        @Override
-        public void actionPerformed(AnActionEvent e)
-        {
-            myRerunAction.run();
-        }
-
-
-        @Override
-        public void update(AnActionEvent e)
-        {
-            e.getPresentation().setVisible(myRerunAction != null);
-        }
-    }
 
     //Taken from com.intellij.execution.configurations.CommandLineState - need to modify to use in this class
     protected static class PauseOutputAction extends ToggleAction implements DumbAware
@@ -357,4 +314,51 @@ public class RioLogContentExecutor implements Disposable
         }
     }
 
+
+    private class StopAction extends DumbAwareAction
+    {
+        public StopAction()
+        {
+            super(ExecutionBundle.message("run.configuration.stop.action.name"), "This will stop all future logging.", AllIcons.Actions.Suspend);
+        }
+
+
+        @Override
+        public void actionPerformed(AnActionEvent e)
+        {
+            myStopAction.run();
+        }
+
+
+        @Override
+        public void update(AnActionEvent e)
+        {
+            e.getPresentation().setVisible(myStopAction != null);
+            e.getPresentation().setEnabled(myStopEnabled != null && myStopEnabled.compute());
+        }
+    }
+
+    private class RerunAction extends DumbAwareAction
+    {
+        public RerunAction(JComponent consolePanel)
+        {
+            super("Rerun", "Rerun",
+                  AllIcons.Actions.Restart);
+            registerCustomShortcutSet(CommonShortcuts.getRerun(), consolePanel);
+        }
+
+
+        @Override
+        public void actionPerformed(AnActionEvent e)
+        {
+            myRerunAction.run();
+        }
+
+
+        @Override
+        public void update(AnActionEvent e)
+        {
+            e.getPresentation().setVisible(myRerunAction != null);
+        }
+    }
 }

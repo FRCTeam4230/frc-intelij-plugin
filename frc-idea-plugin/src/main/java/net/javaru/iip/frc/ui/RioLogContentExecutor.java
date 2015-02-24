@@ -1,0 +1,360 @@
+/*
+ * Copyright 2015 Mark Vedder
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package net.javaru.iip.frc.ui;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.*;
+
+import org.jetbrains.annotations.NotNull;
+import com.intellij.execution.ExecutionBundle;
+import com.intellij.execution.ExecutionManager;
+import com.intellij.execution.Executor;
+import com.intellij.execution.filters.Filter;
+import com.intellij.execution.filters.TextConsoleBuilder;
+import com.intellij.execution.filters.TextConsoleBuilderFactory;
+import com.intellij.execution.process.ProcessAdapter;
+import com.intellij.execution.process.ProcessEvent;
+import com.intellij.execution.process.ProcessHandler;
+import com.intellij.execution.ui.ConsoleView;
+import com.intellij.execution.ui.RunContentDescriptor;
+import com.intellij.execution.ui.actions.CloseAction;
+import com.intellij.icons.AllIcons;
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonShortcuts;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.project.DumbAware;
+import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
+import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.wm.ToolWindowManager;
+
+
+
+//Based on the IntelliJ IDEA com.intellij.execution.RunContentExecutor class
+public class RioLogContentExecutor implements Disposable
+{
+
+    private static final Logger LOG = Logger.getInstance(RioLogContentExecutor.class);
+
+    private final Project myProject;
+    private final ProcessHandler myProcess;
+    private final List<Filter> myFilterList = new ArrayList<Filter>();
+    private Runnable myRerunAction;
+    private Runnable myStopAction;
+    private Runnable myAfterCompletion;
+    private Computable<Boolean> myStopEnabled;
+    private String myTitle = "roboRIO Console";
+    private String myHelpId = null;
+    private boolean myActivateToolWindow = true;
+
+
+    public RioLogContentExecutor(@NotNull Project project, @NotNull ProcessHandler process)
+    {
+        myProject = project;
+        myProcess = process;
+    }
+
+
+    public RioLogContentExecutor withFilter(Filter filter)
+    {
+        myFilterList.add(filter);
+        return this;
+    }
+
+
+    public RioLogContentExecutor withTitle(String title)
+    {
+        myTitle = title;
+        return this;
+    }
+
+
+    public RioLogContentExecutor withStop(@NotNull Runnable stop, @NotNull Computable<Boolean> stopEnabled)
+    {
+        myStopAction = stop;
+        myStopEnabled = stopEnabled;
+        return this;
+    }
+
+
+    public RioLogContentExecutor withRerun(Runnable rerun)
+    {
+        myRerunAction = rerun;
+        return this;
+    }
+
+
+    public RioLogContentExecutor withAfterCompletion(Runnable afterCompletion)
+    {
+        myAfterCompletion = afterCompletion;
+        return this;
+    }
+
+
+    public RioLogContentExecutor withHelpId(String helpId)
+    {
+        myHelpId = helpId;
+        return this;
+    }
+
+
+    public RioLogContentExecutor withActivateToolWindow(boolean activateToolWindow)
+    {
+        myActivateToolWindow = activateToolWindow;
+        return this;
+    }
+
+
+    private ConsoleView createConsole(@NotNull Project project, @NotNull ProcessHandler processHandler)
+    {
+        TextConsoleBuilder consoleBuilder = TextConsoleBuilderFactory.getInstance().createBuilder(project);
+        consoleBuilder.filters(myFilterList);
+        ConsoleView console = consoleBuilder.getConsole();
+        console.attachToProcess(processHandler);
+        return console;
+    }
+
+
+    public void run()
+    {
+        FileDocumentManager.getInstance().saveAllDocuments();
+        ConsoleView view = createConsole(myProject, myProcess);
+        if (myHelpId != null)
+        {
+            view.setHelpId(myHelpId);
+        }
+
+        //Executor executor = DefaultRunExecutor.getRunExecutorInstance(); //Gets the Run Window I believe
+        Executor executor = net.javaru.iip.frc.ui.RioLogRunExecutor.getRunExecutorInstance();
+        DefaultActionGroup actions = new DefaultActionGroup();
+
+        final JComponent consolePanel = createConsolePanel(view, actions);
+        RunContentDescriptor descriptor = new RunContentDescriptor(view, myProcess, consolePanel, myTitle, AllIcons.General.MessageHistory);
+
+        Disposer.register(this, descriptor);
+
+
+        for (AnAction action : view.createConsoleActions())
+        {
+            LOG.info("FRC: Adding console Action: " + action + "  [" + action.getClass().getName() + "].");
+            actions.add(action);
+        }
+
+
+        actions.add(new PauseOutputAction(view, myProcess));
+        actions.add(new StopAction());
+        actions.add(new RerunAction(consolePanel));
+        actions.add(new CloseAction(executor, descriptor, myProject));
+        //See what this FocusOnStartAction does
+        //actions.add(new FocusOnStartAction());
+        //TODO - need to add Pause action
+
+        ExecutionManager.getInstance(myProject).getContentManager().showRunContent(executor, descriptor);
+
+        if (myActivateToolWindow)
+        {
+            activateToolWindow();
+        }
+
+        if (myAfterCompletion != null)
+        {
+            myProcess.addProcessListener(new ProcessAdapter()
+            {
+                @Override
+                public void processTerminated(ProcessEvent event)
+                {
+                    SwingUtilities.invokeLater(myAfterCompletion);
+                }
+            });
+        }
+
+        myProcess.startNotify();
+    }
+
+    public void activateToolWindow()
+    {
+        ApplicationManager.getApplication().invokeLater(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                ToolWindowManager.getInstance(myProject).getToolWindow(RioLogRunExecutor.TOOL_WINDOW_ID).activate(null);
+            }
+        });
+    }
+
+
+    private static JComponent createConsolePanel(ConsoleView view, ActionGroup actions)
+    {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.add(view.getComponent(), BorderLayout.CENTER);
+        panel.add(createToolbar(actions), BorderLayout.WEST);
+        return panel;
+    }
+
+
+    private static JComponent createToolbar(ActionGroup actions)
+    {
+        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, false);
+        return actionToolbar.getComponent();
+    }
+
+
+    @Override
+    public void dispose()
+    {
+        Disposer.dispose(this);
+    }
+
+
+    private class StopAction extends DumbAwareAction
+    {
+        public StopAction()
+        {
+            super(ExecutionBundle.message("run.configuration.stop.action.name"), "This will stop all future logging.", AllIcons.Actions.Suspend);
+        }
+
+
+        @Override
+        public void actionPerformed(AnActionEvent e)
+        {
+            myStopAction.run();
+        }
+
+
+        @Override
+        public void update(AnActionEvent e)
+        {
+            e.getPresentation().setVisible(myStopAction != null);
+            e.getPresentation().setEnabled(myStopEnabled != null && myStopEnabled.compute());
+        }
+    }
+
+    private class RerunAction extends DumbAwareAction
+    {
+        public RerunAction(JComponent consolePanel)
+        {
+            super("Rerun", "Rerun",
+                  AllIcons.Actions.Restart);
+            registerCustomShortcutSet(CommonShortcuts.getRerun(), consolePanel);
+        }
+
+
+        @Override
+        public void actionPerformed(AnActionEvent e)
+        {
+            myRerunAction.run();
+        }
+
+
+        @Override
+        public void update(AnActionEvent e)
+        {
+            e.getPresentation().setVisible(myRerunAction != null);
+        }
+    }
+
+    //Taken from com.intellij.execution.configurations.CommandLineState - need to modify to use in this class
+    protected static class PauseOutputAction extends ToggleAction implements DumbAware
+    {
+        private final ConsoleView myConsole;
+        private final ProcessHandler myProcessHandler;
+
+
+        public PauseOutputAction(final ConsoleView console, final ProcessHandler processHandler)
+        {
+            super(ExecutionBundle.message("run.configuration.pause.output.action.name"), null, AllIcons.Actions.Pause);
+            myConsole = console;
+            myProcessHandler = processHandler;
+        }
+
+
+        @Override
+        public boolean isSelected(final AnActionEvent event)
+        {
+            return myConsole.isOutputPaused();
+        }
+
+
+        @Override
+        public void setSelected(final AnActionEvent event, final boolean flag)
+        {
+            myConsole.setOutputPaused(flag);
+            ApplicationManager.getApplication().invokeLater(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    update(event);
+                }
+            });
+        }
+
+
+        @Override
+        public void update(@NotNull final AnActionEvent event)
+        {
+            super.update(event);
+            final Presentation presentation = event.getPresentation();
+            final boolean isRunning = myProcessHandler != null && !myProcessHandler.isProcessTerminated();
+            if (isRunning)
+            {
+                presentation.setEnabled(true);
+            }
+            else
+            {
+                if (!myConsole.canPause())
+                {
+                    presentation.setEnabled(false);
+                    return;
+                }
+                if (!myConsole.hasDeferredOutput())
+                {
+                    presentation.setEnabled(false);
+                }
+                else
+                {
+                    presentation.setEnabled(true);
+                    myConsole.performWhenNoDeferredOutput(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            update(event);
+                        }
+                    });
+                }
+            }
+        }
+    }
+
+}

@@ -1,0 +1,35 @@
+syntax: regexp
+# Exclude files beginning with "~"
+([\\/]~|^~)
+
+# Exclude build targets
+([\\/]o|^o)ut$
+([\\/]o|^o)utput$
+([\\/]t|^t)arget$
+([\\/]c|^c)lasses$
+
+# Exclude other resources
+\.orig
+\.log.*
+release\.properties$
+runtime\.properties$
+\.releaseBackup$
+.*dist\.zip$
+.*workspace\.xml$
+.*[\.-]?HOLD.*
+
+
+syntax: glob
+# Exclude IDE files
+*.bak
+*.project
+*.classpath
+*.settings
+*.iml
+*.iws
+*.ipr
+.idea/
+atlassian-ide-plugin.xml
+
+# Exclude Misc development time files
+developer-notes.txt

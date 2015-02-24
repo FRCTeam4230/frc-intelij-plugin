@@ -1,0 +1,224 @@
+<!--
+  ~ Copyright 2015 Mark Vedder
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<idea-plugin version="2">
+    <id>net.javaru.intellijIdeaPlugins.frc</id>
+    <name>FRC</name>
+    <version>2015.0.1</version>
+    <vendor email="issues@frc-intellij-idea.java.net" url="https://frc-intellij-idea.java.net">Javaru</vendor>
+
+    <description><![CDATA[
+      <p>
+      A plug-in to allow FRC development using IntelliJ IDEA rather than Eclipse. It will work with either the
+      free open-sourced <em>Community Edition</em> or the licensed Ultimate Edition of IntelliJ IDEA.
+      <strong>This plug-in requires IntelliJ IDEA 14.1 or later, and that you run IntelliJ IDEA via a Java 8 JRE/JDK.</strong> TODO: Add details
+      </p>
+
+      <h2>Plug-in Version Numbering</h2>
+      <p>
+      This plug-in is versioned via a three number version: <tt>&lt;frc-year&gt;.&lt;major&gt;.&lt;minor&gt;</tt> The first number is the
+      FRC competition year.
+      </p>
+      <p>
+      The second number indicates a major release for that year. <em>If the second number is a 0, it indicates the
+      plug-in is in the beta phase for that year.</em> It will be in beta phase during the pre-season until and remain that way until
+      shortly after kickoff when the new development tools are released. I will do my best to update and make available the plug-in the
+      evening of kickoff or the next day. However, if there are major changes to the development tools or the Eclipse plug-in
+      (from which this plug-in extracts various library and tools), it may take longer to update this plug-in. Given that I use this
+      plug-in myself to support my FRC Team, I will do such as quickly as possible. I may re;lease additional beta versions while I
+      polish the plug-in with new changes needed for that year. I ask for your patience in such cases ;)
+      </p>
+      <p>
+      Finally, the third number indicates a minor release. In other words, a bug fix patch.
+      </p>
+
+      <h2>Features</h2>
+      <ol>
+
+        <li>
+          <strong>Robot Project Templates</strong>
+          <ul>
+            <li>Project templates that exactly duplicate all the robot templates included in the Eclipse release are included.</li>
+            <li>Automatic downloading and configuration of the WPI Library (WPILib) is provided</li>
+          </ul>
+        </li>
+
+        <li>
+          <strong>Class Templates</strong>
+          <ul>
+            <li>Class templates that exactly duplicate all the templates included in the Eclipse release are included as <em>File Templates</em>.</li>
+            <li>Some additional class <em>File Templates</em> are included.</li>
+            <li>Use IDEA's awesome <em>File Templates</em> feature to add your own <em>File Templates</em>.</li>
+          </ul>
+        </li>
+
+        <li>
+          <strong>NetConsole/RioLog viewing</strong>
+          <ul>
+            <li>View console/logging output from the robot directly in IntelliJ IDEA</li>
+            <li>You can view either in the standard Run ToolWindow or in a dedicated ToolWindow</li>
+            <li>Clear the output:
+              <ul>
+                <li>at will</li>
+                <li>automatically on a redeploy of the code</li>
+                <li>automatically on a restart of the robot</li>
+                <li>automatically on the logging of any configurable console/log message</li>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <strong>WPI Library (WPILib) update checking and downloading</strong>
+          <ul>
+            <li>Get notifications if the WPILib has been updated. No need to open Eclipse to check.</li>
+          </ul>
+        </li>
+
+        <li>
+          <strong>Support for Maven based projects</strong>
+          <ul>
+            <li>Add additional dependencies more easily then you can with the default ant build.</li>
+            <li>Allow for automatic running of unit tests.</li>
+            <li>Allow for use of the release plug-in to cut numbered builds/releases of your code including automatic VCS tagging.</li>
+          </ul>
+        </li>
+
+        <li>
+          <strong>Future support for Gradle based projects</strong>
+          <ul>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+
+        <li>
+          <strong>Inspections</strong>
+          <ul>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+
+        <li>
+          <strong></strong>
+          <ul>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+
+        <li>
+          <strong></strong>
+          <ul>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+
+      </ol>
+
+    ]]></description>
+    <!--  TODO: Add details in description on how to change version of JRE for IDEA and if IDEA 14 already uses JRE 8-->
+
+    <change-notes><![CDATA[
+      <strong>2015.0.1</strong> <br>
+      &nbsp;&nbsp;&bull; Initial beta release of plug-in for FRC 2015.<br>
+    ]]>
+    </change-notes>
+
+    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+    <!-- TODO: Update to 141 once v14.1 has been released (Release branches always have odd numbers per above document) -->
+    <idea-version since-build="140" />
+
+
+    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products -->
+    <depends>com.intellij.modules.lang</depends>
+
+
+    <extensions defaultExtensionNs="com.intellij">
+        <executor implementation="net.javaru.iip.frc.ui.RioLogRunExecutor" id="FrcRioLog" />
+    </extensions>
+
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
+
+    <project-components>
+        <!-- Add your project components here -->
+    </project-components>
+
+    <actions>
+        <!--   See  https://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Action+System  -->
+        <!--
+            The <action> element defines an action to register.
+                    The mandatory "id" attribute specifies an unique identifier for the action.
+                    The mandatory "class" attribute specifies the full-qualified name of the class implementing the action.
+                    The mandatory "text" attribute specifies the text of the action (tooltip for toolbar button or text for menu item).
+                    The optional "use-shortcut-of" attribute specifies the ID of the action whose keyboard shortcut this action will use.
+                    The optional "description" attribute specifies the text which is displayed in the status bar when the action is focused.
+                    The optional "icon" attribute specifies the icon which is displayed on the toolbar button or next to the menu item.
+
+            The <add-to-group> node specifies that the action should be added to an existing group. An action can be added to several groups.
+                    The mandatory "group-id" attribute specifies the ID of the group to which the action is added.
+                    The group must be implemented by an instance of the DefaultActionGroup class.
+                    The mandatory "anchor" attribute specifies the position of the action in the group relative to other actions. It can have the values
+                        "first", "last", "before" and "after".
+                    The "relative-to-action" attribute is mandatory if the anchor is set to "before" and "after", and specifies the action before or after which
+                        the current action is inserted.
+
+            The <keyboard-shortcut> node specifies the keyboard shortcut for the action. An action can have several keyboard shortcuts.
+                    The mandatory "first-keystroke" attribute specifies the first keystroke of the action. The key strokes are specified according to the regular Swing rules.
+                    The optional "second-keystroke" attribute specifies the second keystroke of the action.
+                    The mandatory "keymap" attribute specifies the keymap for which the action is active. IDs of the standard keymaps are defined as
+                        constants in the com.intellij.openapi.keymap.KeymapManager class
+
+            The <mouse-shortcut> node specifies the mouse shortcut for the action. An action can have several mouse shortcuts.
+                    The mandatory "keystroke" attribute specifies the clicks and modifiers for the action. It is defined as a sequence of words separated by spaces:
+                        "button1", "button2", "button3" for the mouse buttons; "shift", "control", "meta", "alt", "altGraph" for the modifier keys;
+                        "doubleClick" if the action is activated by a double-click of the button.
+                    The mandatory "keymap" attribute specifies the keymap for which the action is active. IDs of the standard keymaps are defined as
+                        constants in the com.intellij.openapi.keymap.KeymapManager class.
+
+           The <group> element defines an action group. <action>, <group> and <separator> elements defined within it are automatically included in the group.
+                   The mandatory "id" attribute specifies an unique identifier for the action.
+                   The optional "class" attribute specifies the full-qualified name of the class implementing the group. If not specified,
+                        com.intellij.openapi.actionSystem.DefaultActionGroup is used.
+                   The optional "text" attribute specifies the text of the group (text for the menu item showing the submenu).
+                   The optional "description" attribute specifies the text which is displayed in the status bar when the group is focused.
+                   The optional "icon" attribute specifies the icon which is displayed on the toolbar button or next to the group.
+                   The optional "popup" attribute specifies how the group is presented in the menu. If a group has popup="true", actions in it
+                        are placed in a submenu; for popup="false", actions are displayed as a section of the same menu delimited by separators.
+
+            The <separator> element defines a separator between actions. It can also have an <add-to-group> child element.
+
+            The <reference> element allows to add an existing action to the group. The mandatory "ref" attribute specifies the ID of the action to add.
+        -->
+        <action class="net.javaru.iip.frc.actions.TestOpeningWindowAction" id="FRC_TestOpeningWindowAction" text="Test FRC Window">
+            <add-to-group group-id="ToolsMenu" anchor="last" />
+        </action>
+    </actions>
+
+</idea-plugin>

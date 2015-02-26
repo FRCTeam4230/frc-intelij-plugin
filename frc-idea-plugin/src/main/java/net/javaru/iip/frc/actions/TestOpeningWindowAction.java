@@ -31,6 +31,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 
 import net.javaru.iip.frc.io.TestLogDataGenerator;
+import net.javaru.iip.frc.settings.FrcApplicationComponent;
+import net.javaru.iip.frc.settings.FrcSettings;
 import net.javaru.iip.frc.ui.AbstractRioLogContentExecutor;
 import net.javaru.iip.frc.ui.RioLogFrcWindowContentExecutor;
 import net.javaru.iip.frc.ui.RioLogRunWindowContentExecutor;
@@ -40,9 +42,6 @@ import net.javaru.iip.frc.ui.RioLogRunWindowContentExecutor;
 public class TestOpeningWindowAction extends DumbAwareAction
 {
     private static final Logger LOG = Logger.getInstance(TestOpeningWindowAction.class);
-
-    //TODO: put this in settings dialog and use from there
-    private boolean useRunWindow = false;
 
     @Override
     public void actionPerformed(AnActionEvent actionEvent)
@@ -70,6 +69,10 @@ public class TestOpeningWindowAction extends DumbAwareAction
                 //php storm does not have it
             }
 
+
+            final FrcSettings settings = FrcApplicationComponent.getInstance().getState();
+
+            boolean useRunWindow = (settings != null && !settings.isRioLogTargetWindowIsFrcToolWindow());
             final AbstractRioLogContentExecutor contentExecutor = useRunWindow ?
                                                             new RioLogRunWindowContentExecutor(project, processHandler) :
                                                             new RioLogFrcWindowContentExecutor(project, processHandler);

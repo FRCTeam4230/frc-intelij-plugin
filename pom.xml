@@ -538,6 +538,16 @@
                 <systemPath>${idea.home}/lib/guava-17.0.jar</systemPath>
                 <scope>system</scope>
             </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.3.2</version>
+            </dependency>
+            <dependency>
+                <groupId>uk.com.robust-it</groupId>
+                <artifactId>cloning</artifactId>
+                <version>1.9.1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

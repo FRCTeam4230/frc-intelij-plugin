@@ -164,6 +164,10 @@
 
     <application-components>
         <!-- Add your application components here -->
+        <component>
+            <implementation-class>net.javaru.iip.frc.settings.FrcApplicationComponent</implementation-class>
+            <interface-class>net.javaru.iip.frc.settings.FrcApplicationComponent</interface-class>
+        </component>
     </application-components>
 
     <project-components>

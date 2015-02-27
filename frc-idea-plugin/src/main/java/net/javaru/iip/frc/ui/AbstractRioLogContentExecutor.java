@@ -64,9 +64,9 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     protected final Project myProject;
     protected final ProcessHandler myProcess;
     private final java.util.List<Filter> myFilterList = new ArrayList<Filter>();
-    private Runnable myRerunAction;
-    private Runnable myStopAction;
-    private Runnable myAfterCompletion;
+    private Runnable myRerunRunnable;
+    private Runnable myStopRunnable;
+    private Runnable myAfterCompletionRunnable;
     private Computable<Boolean> myStopEnabled;
     private String myTitle = "roboRIO";
     private String myHelpId = null;
@@ -113,7 +113,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
     public AbstractRioLogContentExecutor withStop(@NotNull Runnable stop, @NotNull Computable<Boolean> stopEnabled)
     {
-        myStopAction = stop;
+        myStopRunnable = stop;
         myStopEnabled = stopEnabled;
         return this;
     }
@@ -121,14 +121,14 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
     public AbstractRioLogContentExecutor withRerun(Runnable rerun)
     {
-        myRerunAction = rerun;
+        myRerunRunnable = rerun;
         return this;
     }
 
 
     public AbstractRioLogContentExecutor withAfterCompletion(Runnable afterCompletion)
     {
-        myAfterCompletion = afterCompletion;
+        myAfterCompletionRunnable = afterCompletion;
         return this;
     }
 
@@ -198,14 +198,14 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             activateToolWindow();
         }
 
-        if (myAfterCompletion != null)
+        if (myAfterCompletionRunnable != null)
         {
             myProcess.addProcessListener(new ProcessAdapter()
             {
                 @Override
                 public void processTerminated(ProcessEvent event)
                 {
-                    SwingUtilities.invokeLater(myAfterCompletion);
+                    SwingUtilities.invokeLater(myAfterCompletionRunnable);
                 }
             });
         }
@@ -326,14 +326,14 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         @Override
         public void actionPerformed(AnActionEvent e)
         {
-            myStopAction.run();
+            myStopRunnable.run();
         }
 
 
         @Override
         public void update(AnActionEvent e)
         {
-            e.getPresentation().setVisible(myStopAction != null);
+            e.getPresentation().setVisible(myStopRunnable != null);
             e.getPresentation().setEnabled(myStopEnabled != null && myStopEnabled.compute());
         }
     }
@@ -351,14 +351,14 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         @Override
         public void actionPerformed(AnActionEvent e)
         {
-            myRerunAction.run();
+            myRerunRunnable.run();
         }
 
 
         @Override
         public void update(AnActionEvent e)
         {
-            e.getPresentation().setVisible(myRerunAction != null);
+            e.getPresentation().setVisible(myRerunRunnable != null);
         }
     }
 }

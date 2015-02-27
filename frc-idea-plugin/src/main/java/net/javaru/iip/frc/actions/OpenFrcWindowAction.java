@@ -76,9 +76,9 @@ public class OpenFrcWindowAction extends DumbAwareAction
 
 
             // see com/jetbrains/python/run/PythonTask.java:221 for example
-//            contentExecutor.withStop(
-//                processHandler::destroyProcess,
-//                () -> !processHandler.isProcessTerminated());
+            contentExecutor.withStop(
+                processHandler::destroyProcess,
+                () -> !processHandler.isProcessTerminated());
 //            contentExecutor.withRerun(process::restart);
 
             Disposer.register(project, contentExecutor);

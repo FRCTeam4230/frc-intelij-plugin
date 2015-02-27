@@ -220,7 +220,7 @@
 
             The <reference> element allows to add an existing action to the group. The mandatory "ref" attribute specifies the ID of the action to add.
         -->
-        <action class="net.javaru.iip.frc.actions.TestOpeningWindowAction" id="FRC_TestOpeningWindowAction" text="Test FRC Window">
+        <action class="net.javaru.iip.frc.actions.OpenFrcWindowAction" id="FRC_TestOpeningWindowAction" text="Test FRC Window">
             <add-to-group group-id="ToolsMenu" anchor="last" />
         </action>
     </actions>

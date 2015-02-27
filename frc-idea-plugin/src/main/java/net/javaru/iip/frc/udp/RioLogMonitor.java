@@ -31,6 +31,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.base.Charsets;
 import com.intellij.openapi.diagnostic.Logger;
 
 
@@ -86,7 +87,7 @@ public class RioLogMonitor extends Process implements AutoCloseable
         try
         {
             in = new PipedInputStream();
-            writer = new PrintWriter(new OutputStreamWriter(new PipedOutputStream(in)));
+            writer = new PrintWriter(new OutputStreamWriter(new PipedOutputStream(in), Charsets.UTF_8));
         }
         catch (IOException e)
         {
@@ -187,7 +188,7 @@ public class RioLogMonitor extends Process implements AutoCloseable
         {
             //TODO: remove this once basic development work has completed
             writer.println("Monitoring RioLog on port " + port + "...");
-
+            writer.flush();
 
             isRunning = true;
             byte[] buffer = new byte[bufferSize];
@@ -205,12 +206,14 @@ public class RioLogMonitor extends Process implements AutoCloseable
                         socket.receive(incomingPacket);
                         final String received = new String(incomingPacket.getData(), 0, incomingPacket.getLength());
                         writer.println(received);
+                        writer.flush();
                     }
                     catch (SocketTimeoutException ignore)
                     {
                         if (!enabled)
                         {
                             isRunning = false;
+                            writer.flush();
                             return;
                         }
                     }

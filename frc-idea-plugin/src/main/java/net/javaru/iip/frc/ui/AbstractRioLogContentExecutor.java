@@ -44,6 +44,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonShortcuts;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -166,6 +167,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             view.setHelpId(myHelpId);
         }
 
+
         //Executor executor = DefaultRunExecutor.getRunExecutorInstance(); //Gets the Run Window I believe
         Executor executor = createExecutor();
         DefaultActionGroup actions = new DefaultActionGroup();
@@ -175,6 +177,10 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
         Disposer.register(this, descriptor);
 
+        actions.add(new RerunAction(consolePanel));
+        actions.add(new StopAction());
+        actions.add(new PauseOutputAction(view, myProcess));
+        actions.add(new Separator());
 
         for (AnAction action : view.createConsoleActions())
         {
@@ -183,13 +189,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         }
 
 
-        actions.add(new PauseOutputAction(view, myProcess));
-        actions.add(new StopAction());
-        actions.add(new RerunAction(consolePanel));
+        actions.add(new Separator());
         actions.add(new CloseAction(executor, descriptor, myProject));
-        //See what this FocusOnStartAction does
-        //actions.add(new FocusOnStartAction());
-        //TODO - need to add Pause action
 
         ExecutionManager.getInstance(myProject).getContentManager().showRunContent(executor, descriptor);
 
@@ -249,7 +250,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
         public PauseOutputAction(final ConsoleView console, final ProcessHandler processHandler)
         {
-            super(ExecutionBundle.message("run.configuration.pause.output.action.name"), null, AllIcons.Actions.Pause);
+            super(ExecutionBundle.message("run.configuration.pause.output.action.name"), "Pauses the output which will be buffered and then displayed when the output is un-paused. Note that scrolling up will pause scrolling.",
+                  AllIcons.Actions.Pause);
             myConsole = console;
             myProcessHandler = processHandler;
         }
@@ -319,7 +321,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     {
         public StopAction()
         {
-            super(ExecutionBundle.message("run.configuration.stop.action.name"), "This will stop all future logging.", AllIcons.Actions.Suspend);
+            super(ExecutionBundle.message("run.configuration.stop.action.name"), "Stops monitoring of the roboRIO log output.", AllIcons.Actions.Suspend);
         }
 
 
@@ -342,7 +344,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     {
         public RerunAction(JComponent consolePanel)
         {
-            super("Rerun", "Rerun",
+            super("Restart", "Clears the console and restarts the roboRIO Log monitoring",
                   AllIcons.Actions.Restart);
             registerCustomShortcutSet(CommonShortcuts.getRerun(), consolePanel);
         }

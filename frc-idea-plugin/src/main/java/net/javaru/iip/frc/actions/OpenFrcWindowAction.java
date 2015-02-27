@@ -40,10 +40,18 @@ public class OpenFrcWindowAction extends DumbAwareAction
 {
     private static final Logger LOG = Logger.getInstance(OpenFrcWindowAction.class);
 
+
     @Override
     public void actionPerformed(AnActionEvent actionEvent)
     {
         final Project project = actionEvent.getProject();
+        monitorRioLog(project);
+
+    }
+
+
+    private void monitorRioLog(final Project project)
+    {
         if (project != null)
         {
             final RioLogMonitor process = new RioLogMonitor();
@@ -71,21 +79,27 @@ public class OpenFrcWindowAction extends DumbAwareAction
 
             boolean useRunWindow = (settings != null && !settings.isRioLogTargetWindowIsFrcToolWindow());
             final AbstractRioLogContentExecutor contentExecutor = useRunWindow ?
-                                                            new RioLogRunWindowContentExecutor(project, processHandler) :
-                                                            new RioLogFrcWindowContentExecutor(project, processHandler);
+                                                                  new RioLogRunWindowContentExecutor(project, processHandler) :
+                                                                  new RioLogFrcWindowContentExecutor(project, processHandler);
 
 
             // see com/jetbrains/python/run/PythonTask.java:221 for example
             contentExecutor.withStop(
                 processHandler::destroyProcess,
                 () -> !processHandler.isProcessTerminated());
-//            contentExecutor.withRerun(process::restart);
+            contentExecutor.withRerun(
+                () ->
+                {
+                    processHandler.destroyProcess();
+                    processHandler.waitFor(2000L);
+                    monitorRioLog(project);
+                }
+            );
 
             Disposer.register(project, contentExecutor);
 
             contentExecutor.run();
 
         }
-
     }
 }

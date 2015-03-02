@@ -34,6 +34,8 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.base.Charsets;
 import com.intellij.openapi.diagnostic.Logger;
 
+import net.javaru.iip.frc.settings.FrcApplicationComponent;
+
 
 
 public class RioLogMonitor extends Process implements AutoCloseable
@@ -55,8 +57,8 @@ public class RioLogMonitor extends Process implements AutoCloseable
 
     public RioLogMonitor() throws IllegalStateException
     {
-        //TODO: Ultimately  these values need to come from the settings (and should be validated there)
-        this(MAX_PACKET_SIZE, DEFAULT_RIO_LOG_PORT);
+        //noinspection ConstantConditions
+        this(MAX_PACKET_SIZE, ((FrcApplicationComponent.getInstance().getState() != null) ? FrcApplicationComponent.getInstance().getState().getRioLogPort() : DEFAULT_RIO_LOG_PORT));
 
     }
 

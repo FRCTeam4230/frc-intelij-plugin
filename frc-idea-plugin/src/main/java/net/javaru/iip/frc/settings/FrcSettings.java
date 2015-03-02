@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.settings;
 
+import net.javaru.iip.frc.udp.RioLogMonitor;
 import net.javaru.iip.frc.util.ClonerImpl;
 
 
@@ -26,7 +27,9 @@ public class FrcSettings implements Cloneable
 
     public FrcSettings() { }
 
-    private boolean rioLogTargetWindowIsFrcToolWindow = true;
+    private boolean useFrcToolWindow = true;
+    private int rioLogPort = RioLogMonitor.DEFAULT_RIO_LOG_PORT;
+
 
     @SuppressWarnings({"CloneDoesntCallSuperClone", "CloneDoesntDeclareCloneNotSupportedException"})
     @Override
@@ -36,10 +39,22 @@ public class FrcSettings implements Cloneable
     }
 
 
-    public boolean isRioLogTargetWindowIsFrcToolWindow() { return rioLogTargetWindowIsFrcToolWindow; }
+    public boolean isUseFrcToolWindow() { return useFrcToolWindow; }
 
 
-    public void setRioLogTargetWindowIsFrcToolWindow(boolean rioLogTargetWindowIsFrcToolWindow) { this.rioLogTargetWindowIsFrcToolWindow = rioLogTargetWindowIsFrcToolWindow; }
+    public void setUseFrcToolWindow(boolean useFrcToolWindow) { this.useFrcToolWindow = useFrcToolWindow; }
+
+
+    public int getRioLogPort()
+    {
+        return rioLogPort;
+    }
+
+
+    public void setRioLogPort(int rioLogPort)
+    {
+        this.rioLogPort = rioLogPort;
+    }
 
 
     @Override
@@ -52,7 +67,8 @@ public class FrcSettings implements Cloneable
         FrcSettings that = (FrcSettings) o;
 
         return new org.apache.commons.lang3.builder.EqualsBuilder()
-            .append(rioLogTargetWindowIsFrcToolWindow, that.rioLogTargetWindowIsFrcToolWindow)
+            .append(useFrcToolWindow, that.useFrcToolWindow)
+            .append(rioLogPort, that.rioLogPort)
             .isEquals();
     }
 
@@ -61,7 +77,8 @@ public class FrcSettings implements Cloneable
     public int hashCode()
     {
         return new org.apache.commons.lang3.builder.HashCodeBuilder(17, 37)
-            .append(rioLogTargetWindowIsFrcToolWindow)
+            .append(useFrcToolWindow)
+            .append(rioLogPort)
             .toHashCode();
     }
 }

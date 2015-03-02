@@ -77,7 +77,7 @@ public class OpenFrcWindowAction extends DumbAwareAction
 
             final FrcSettings settings = FrcApplicationComponent.getInstance().getState();
 
-            boolean useRunWindow = (settings != null && !settings.isRioLogTargetWindowIsFrcToolWindow());
+            boolean useRunWindow = (settings != null && !settings.isUseFrcToolWindow());
             final AbstractRioLogContentExecutor contentExecutor = useRunWindow ?
                                                                   new RioLogRunWindowContentExecutor(project, processHandler) :
                                                                   new RioLogFrcWindowContentExecutor(project, processHandler);

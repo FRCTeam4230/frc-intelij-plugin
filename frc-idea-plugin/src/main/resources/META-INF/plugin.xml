@@ -17,7 +17,7 @@
 <idea-plugin version="2">
     <id>net.javaru.intellijIdeaPlugins.frc</id>
     <name>FRC</name>
-    <version>2015.0.1</version>
+    <version>2015.0.6</version>
     <vendor email="issues@frc-intellij-idea.java.net" url="https://frc-intellij-idea.java.net">Javaru</vendor>
 
     <description><![CDATA[
@@ -220,8 +220,8 @@
 
             The <reference> element allows to add an existing action to the group. The mandatory "ref" attribute specifies the ID of the action to add.
         -->
-        <action class="net.javaru.iip.frc.actions.OpenFrcWindowAction" id="FRC_TestOpeningWindowAction" text="Test FRC Window">
-            <add-to-group group-id="ToolsMenu" anchor="last" />
+        <action class="net.javaru.iip.frc.actions.OpenFrcWindowAction" id="FRC_StartTailingRioLogAction" text="Start FRC _RioLog Tailing">
+            <add-to-group group-id="ToolsMenu" anchor="first" />
         </action>
     </actions>
 

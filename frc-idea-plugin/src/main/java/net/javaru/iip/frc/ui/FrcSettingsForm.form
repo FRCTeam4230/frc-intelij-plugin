@@ -8,7 +8,7 @@
     <properties/>
     <border type="none"/>
     <children>
-      <grid id="f9569" layout-manager="GridLayoutManager" row-count="5" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="f9569" layout-manager="GridLayoutManager" row-count="6" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -22,7 +22,7 @@
             </constraints>
             <properties>
               <text value="&amp;FRC Tool Window"/>
-              <toolTipText value="RIO Log output qill appear in a dedicated FRC Tool Window" noi18n="true"/>
+              <toolTipText value="RIO Log output will appear in a dedicated FRC Tool Window" noi18n="true"/>
             </properties>
           </component>
           <component id="ccbdc" class="javax.swing.JRadioButton" binding="targetWindowIsRunWindowRadioButton">
@@ -31,7 +31,7 @@
             </constraints>
             <properties>
               <text value="&amp;Run Window"/>
-              <toolTipText value="RIO LOg output will appear as a tab in the IDEA Run tool window." noi18n="true"/>
+              <toolTipText value="RIO Log output will appear as a tab in the IDEA Run tool window." noi18n="true"/>
             </properties>
           </component>
           <component id="8e982" class="javax.swing.JLabel">
@@ -98,6 +98,14 @@
               </grid>
             </constraints>
           </vspacer>
+          <component id="68bd5" class="javax.swing.JCheckBox" binding="clearOnRestartCheckBox">
+            <constraints>
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="1" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Clear Console on Robot Restart"/>
+            </properties>
+          </component>
         </children>
       </grid>
       <vspacer id="29c23">

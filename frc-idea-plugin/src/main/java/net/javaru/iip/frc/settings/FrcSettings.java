@@ -16,7 +16,10 @@
 
 package net.javaru.iip.frc.settings;
 
-import net.javaru.iip.frc.udp.RioLogMonitor;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.regex.Pattern;
+
 import net.javaru.iip.frc.util.ClonerImpl;
 
 
@@ -25,10 +28,32 @@ import net.javaru.iip.frc.util.ClonerImpl;
 public class FrcSettings implements Cloneable
 {
 
-    public FrcSettings() { }
+    // Actual Full Statement logged by roboRIO is as follows. It starts with the
+    // arrow flush left and ends with the closing/right-pointing guillemet flush right:
+    //    ➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
+    public static final Pattern DEFAULT_RIO_RESTART_REGEX = Pattern.compile(".*FRCUserProgram.jar.*", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.MULTILINE);
+    //TODO: change the default to the FRC installation directory or such
+    public static final Path DEFAULT_LOG_DIRECTORY = Paths.get("/").resolve("tmp").resolve("frc").toAbsolutePath();
+    public static final String DEFAULT_LOG_FILE_BASENAME = "rioLog-${time}.log";
+    public static final int DEFAULT_RIO_LOG_PORT = 6666;
+
 
     private boolean useFrcToolWindow = true;
-    private int rioLogPort = RioLogMonitor.DEFAULT_RIO_LOG_PORT;
+    private int rioLogPort = DEFAULT_RIO_LOG_PORT;
+
+    private Pattern rioRestartRegex = DEFAULT_RIO_RESTART_REGEX;
+
+    private boolean clearOnRobotRestart = true;
+
+    private boolean logToFile = true;
+
+    private boolean logFileAppend = true;
+
+    private Path logFileDirectory = DEFAULT_LOG_DIRECTORY;
+
+    private String logFileBaseName = DEFAULT_LOG_FILE_BASENAME;
+
+    public FrcSettings() { }
 
 
     @SuppressWarnings({"CloneDoesntCallSuperClone", "CloneDoesntDeclareCloneNotSupportedException"})
@@ -57,6 +82,78 @@ public class FrcSettings implements Cloneable
     }
 
 
+    public Pattern getRioRestartRegex()
+    {
+        return rioRestartRegex;
+    }
+
+
+    public void setRioRestartRegex(Pattern rioRestartRegex)
+    {
+        this.rioRestartRegex = rioRestartRegex;
+    }
+
+
+    public boolean isLogFileAppend()
+    {
+        return logFileAppend;
+    }
+
+
+    public void setLogFileAppend(boolean logFileAppend)
+    {
+        this.logFileAppend = logFileAppend;
+    }
+
+
+    public Path getLogFileDirectory()
+    {
+        return logFileDirectory;
+    }
+
+
+    public void setLogFileDirectory(Path logFileDirectory)
+    {
+        this.logFileDirectory = logFileDirectory;
+    }
+
+
+    public String getLogFileBaseName()
+    {
+        return logFileBaseName;
+    }
+
+
+    public void setLogFileBaseName(String logFileBaseName)
+    {
+        this.logFileBaseName = logFileBaseName;
+    }
+
+
+    public boolean isLogToFile()
+    {
+        return logToFile;
+    }
+
+
+    public void setLogToFile(boolean logToFile)
+    {
+        this.logToFile = logToFile;
+    }
+
+
+    public boolean isClearOnRobotRestart()
+    {
+        return clearOnRobotRestart;
+    }
+
+
+    public void setClearOnRobotRestart(boolean clearOnRobotRestart)
+    {
+        this.clearOnRobotRestart = clearOnRobotRestart;
+    }
+
+
     @Override
     public boolean equals(Object o)
     {
@@ -69,6 +166,12 @@ public class FrcSettings implements Cloneable
         return new org.apache.commons.lang3.builder.EqualsBuilder()
             .append(useFrcToolWindow, that.useFrcToolWindow)
             .append(rioLogPort, that.rioLogPort)
+            .append(rioRestartRegex, that.rioRestartRegex)
+            .append(logToFile, that.logToFile)
+            .append(logFileAppend, that.logFileAppend)
+            .append(logFileDirectory, that.logFileDirectory)
+            .append(logFileBaseName, that.logFileBaseName)
+            .append(clearOnRobotRestart, that.clearOnRobotRestart)
             .isEquals();
     }
 
@@ -79,6 +182,12 @@ public class FrcSettings implements Cloneable
         return new org.apache.commons.lang3.builder.HashCodeBuilder(17, 37)
             .append(useFrcToolWindow)
             .append(rioLogPort)
+            .append(rioRestartRegex)
+            .append(logToFile)
+            .append(logFileAppend)
+            .append(logFileDirectory)
+            .append(logFileBaseName)
+            .append(clearOnRobotRestart)
             .toHashCode();
     }
 }

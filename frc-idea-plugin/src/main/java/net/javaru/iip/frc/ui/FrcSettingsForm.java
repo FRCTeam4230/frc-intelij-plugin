@@ -17,8 +17,6 @@
 package net.javaru.iip.frc.ui;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -36,7 +34,6 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 
 import net.javaru.iip.frc.settings.FrcSettings;
-import net.javaru.iip.frc.udp.RioLogMonitor;
 
 
 
@@ -49,6 +46,7 @@ public class FrcSettingsForm
     private JRadioButton targetWindowIsRunWindowRadioButton;
     private JTextField rioLogPortTextField;
     private JButton portToDefaultValueButton;
+    private JCheckBox clearOnRestartCheckBox;
     private ButtonGroup rioLogTargetWindowButtonGroup;
 
 
@@ -66,15 +64,15 @@ public class FrcSettingsForm
         configurePortTextField();
 
         portToDefaultValueButton.addActionListener(e -> setPortToDefault());
-
-
+        clearOnRestartCheckBox.setSelected(frcSettings.isClearOnRobotRestart());
+        clearOnRestartCheckBox.addActionListener(e -> {frcSettings.setClearOnRobotRestart(clearOnRestartCheckBox.isSelected());});
     }
 
 
     private void setPortToDefault()
     {
-        rioLogPortTextField.setText(DecimalFormat.getIntegerInstance().format(RioLogMonitor.DEFAULT_RIO_LOG_PORT));
-        frcSettings.setRioLogPort(RioLogMonitor.DEFAULT_RIO_LOG_PORT);
+        rioLogPortTextField.setText(DecimalFormat.getIntegerInstance().format(FrcSettings.DEFAULT_RIO_LOG_PORT));
+        frcSettings.setRioLogPort(FrcSettings.DEFAULT_RIO_LOG_PORT);
     }
 
 
@@ -95,24 +93,19 @@ public class FrcSettingsForm
         while (buttons.hasMoreElements())
         {
             AbstractButton button = buttons.nextElement();
-            button.addActionListener(new ActionListener()
-            {
-                @Override
-                public void actionPerformed(ActionEvent e)
+            button.addActionListener(e -> {
+                final ButtonModel selectedModel = rioLogTargetWindowButtonGroup.getSelection();
+                final String actionCommandString = selectedModel.getActionCommand();
+                final RioLogTargetWindowActionCommands actionCommand = RioLogTargetWindowActionCommands.valueOf(actionCommandString);
+                switch (actionCommand)
                 {
-                    final ButtonModel selectedModel = rioLogTargetWindowButtonGroup.getSelection();
-                    final String actionCommandString = selectedModel.getActionCommand();
-                    final RioLogTargetWindowActionCommands actionCommand = RioLogTargetWindowActionCommands.valueOf(actionCommandString);
-                    switch (actionCommand)
-                    {
-                        case FrcWindow:
-                            frcSettings.setUseFrcToolWindow(true);
-                            break;
-                        case RunWindow:
-                            frcSettings.setUseFrcToolWindow(false);
-                    }
-
+                    case FrcWindow:
+                        frcSettings.setUseFrcToolWindow(true);
+                        break;
+                    case RunWindow:
+                        frcSettings.setUseFrcToolWindow(false);
                 }
+
             });
         }
     }
@@ -250,7 +243,7 @@ public class FrcSettingsForm
         rootPanel = new JPanel();
         rootPanel.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
         final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(5, 2, new Insets(0, 0, 0, 0), -1, -1));
+        panel1.setLayout(new GridLayoutManager(6, 2, new Insets(0, 0, 0, 0), -1, -1));
         rootPanel.add(panel1,
                       new GridConstraints(0,
                                           0,
@@ -270,7 +263,7 @@ public class FrcSettingsForm
         targetWindowIsFrcToolWindowRadioButton.setText("FRC Tool Window");
         targetWindowIsFrcToolWindowRadioButton.setMnemonic('F');
         targetWindowIsFrcToolWindowRadioButton.setDisplayedMnemonicIndex(0);
-        targetWindowIsFrcToolWindowRadioButton.setToolTipText("RIO Log output qill appear in a dedicated FRC Tool Window");
+        targetWindowIsFrcToolWindowRadioButton.setToolTipText("RIO Log output will appear in a dedicated FRC Tool Window");
         panel1.add(targetWindowIsFrcToolWindowRadioButton,
                    new GridConstraints(2,
                                        0,
@@ -289,7 +282,7 @@ public class FrcSettingsForm
         targetWindowIsRunWindowRadioButton.setText("Run Window");
         targetWindowIsRunWindowRadioButton.setMnemonic('R');
         targetWindowIsRunWindowRadioButton.setDisplayedMnemonicIndex(0);
-        targetWindowIsRunWindowRadioButton.setToolTipText("RIO LOg output will appear as a tab in the IDEA Run tool window.");
+        targetWindowIsRunWindowRadioButton.setToolTipText("RIO Log output will appear as a tab in the IDEA Run tool window.");
         panel1.add(targetWindowIsRunWindowRadioButton,
                    new GridConstraints(3,
                                        0,
@@ -421,6 +414,22 @@ public class FrcSettingsForm
                                        new Dimension(-1, 5),
                                        new Dimension(-1, 5),
                                        0,
+                                       false));
+        clearOnRestartCheckBox = new JCheckBox();
+        clearOnRestartCheckBox.setText("Clear Console on Robot Restart");
+        panel1.add(clearOnRestartCheckBox,
+                   new GridConstraints(5,
+                                       0,
+                                       1,
+                                       1,
+                                       GridConstraints.ANCHOR_WEST,
+                                       GridConstraints.FILL_NONE,
+                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                       GridConstraints.SIZEPOLICY_FIXED,
+                                       null,
+                                       null,
+                                       null,
+                                       1,
                                        false));
         final Spacer spacer3 = new Spacer();
         rootPanel.add(spacer3,

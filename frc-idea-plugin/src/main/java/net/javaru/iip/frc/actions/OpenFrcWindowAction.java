@@ -18,9 +18,13 @@ package net.javaru.iip.frc.actions;
 
 import java.nio.charset.Charset;
 
+import org.jetbrains.annotations.NotNull;
 import com.intellij.compiler.server.BuildManager;
+import com.intellij.execution.filters.TextConsoleBuilder;
+import com.intellij.execution.filters.TextConsoleBuilderFactory;
 import com.intellij.execution.process.BaseOSProcessHandler;
 import com.intellij.execution.process.ProcessHandler;
+import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -65,6 +69,10 @@ public class OpenFrcWindowAction extends DumbAwareAction
                 }
             };
 
+            final ConsoleView consoleView = createConsole(project, processHandler);
+
+
+
             try
             {
                 processHandler.putUserDataIfAbsent(BuildManager.ALLOW_AUTOMAKE, true);
@@ -79,8 +87,8 @@ public class OpenFrcWindowAction extends DumbAwareAction
 
             boolean useRunWindow = (settings != null && !settings.isUseFrcToolWindow());
             final AbstractRioLogContentExecutor contentExecutor = useRunWindow ?
-                                                                  new RioLogRunWindowContentExecutor(project, processHandler) :
-                                                                  new RioLogFrcWindowContentExecutor(project, processHandler);
+                                                                  new RioLogRunWindowContentExecutor(project, processHandler, consoleView) :
+                                                                  new RioLogFrcWindowContentExecutor(project, processHandler, consoleView);
 
 
             // see com/jetbrains/python/run/PythonTask.java:221 for example
@@ -98,8 +106,36 @@ public class OpenFrcWindowAction extends DumbAwareAction
 
             Disposer.register(project, contentExecutor);
 
+//            if (contentExecutor.getClearAllAction() != null)
+//            {
+//                process.setClearConsoleRunnable(new Runnable() {
+//                    @Override
+//                    public void run()
+//                    {
+//                        final AnAction clearAllAction = contentExecutor.getClearAllAction();
+//                        clearAllAction.
+//                        AnActionEvent anActionEvent = AnActionEvent.createFromDataContext("unknown", clearAllAction.getTemplatePresentation(), )
+//
+//                    }
+//                });
+//            }
+//            else
+            {
+//                process.setClearConsoleRunnable(consoleView::clear);
+                process.setClearConsoleRunnable(contentExecutor::invokeClearAll);
+            }
+
             contentExecutor.run();
 
         }
+    }
+
+
+    private ConsoleView createConsole(@NotNull Project project, @NotNull ProcessHandler processHandler)
+    {
+        TextConsoleBuilder consoleBuilder = TextConsoleBuilderFactory.getInstance().createBuilder(project);
+        ConsoleView console = consoleBuilder.getConsole();
+        console.attachToProcess(processHandler);
+        return console;
     }
 }

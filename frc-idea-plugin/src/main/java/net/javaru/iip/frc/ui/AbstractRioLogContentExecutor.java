@@ -17,16 +17,13 @@
 package net.javaru.iip.frc.ui;
 
 import java.awt.*;
-import java.util.ArrayList;
 import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.execution.ExecutionBundle;
 import com.intellij.execution.ExecutionManager;
 import com.intellij.execution.Executor;
-import com.intellij.execution.filters.Filter;
-import com.intellij.execution.filters.TextConsoleBuilder;
-import com.intellij.execution.filters.TextConsoleBuilderFactory;
+import com.intellij.execution.impl.ConsoleViewImpl;
 import com.intellij.execution.process.ProcessAdapter;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessHandler;
@@ -42,6 +39,7 @@ import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonShortcuts;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.Separator;
@@ -64,7 +62,12 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     private static final Logger LOG = Logger.getInstance(RioLogFrcWindowContentExecutor.class);
     protected final Project myProject;
     protected final ProcessHandler myProcess;
-    private final java.util.List<Filter> myFilterList = new ArrayList<Filter>();
+    private final ConsoleView consoleView;
+
+    private JComponent consolePanel;
+    private ActionToolbar actionToolbar;
+    private AnAction clearAllAction;
+
     private Runnable myRerunRunnable;
     private Runnable myStopRunnable;
     private Runnable myAfterCompletionRunnable;
@@ -74,35 +77,30 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     private boolean myActivateToolWindow = true;
 
 
-    public AbstractRioLogContentExecutor(@NotNull Project project, @NotNull ProcessHandler process)
+    protected AbstractRioLogContentExecutor(@NotNull Project project, @NotNull ProcessHandler process, @NotNull ConsoleView consoleView)
     {
         myProject = project;
         myProcess = process;
+        this.consoleView = consoleView;
     }
 
 
-    private static JComponent createConsolePanel(ConsoleView view, ActionGroup actions)
+    private JComponent createConsolePanel(ConsoleView view, ActionGroup actions)
     {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.add(view.getComponent(), BorderLayout.CENTER);
-        panel.add(createToolbar(actions), BorderLayout.WEST);
+        actionToolbar = createToolbar(actions);
+        panel.add(actionToolbar.getComponent(), BorderLayout.WEST);
         return panel;
     }
 
 
-    private static JComponent createToolbar(ActionGroup actions)
+    private static ActionToolbar createToolbar(ActionGroup actions)
     {
-        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, false);
-        return actionToolbar.getComponent();
+        return ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, false);
     }
 
-
-    public AbstractRioLogContentExecutor withFilter(Filter filter)
-    {
-        myFilterList.add(filter);
-        return this;
-    }
 
 
     public AbstractRioLogContentExecutor withTitle(String title)
@@ -148,46 +146,42 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     }
 
 
-    private ConsoleView createConsole(@NotNull Project project, @NotNull ProcessHandler processHandler)
-    {
-        TextConsoleBuilder consoleBuilder = TextConsoleBuilderFactory.getInstance().createBuilder(project);
-        consoleBuilder.filters(myFilterList);
-        ConsoleView console = consoleBuilder.getConsole();
-        console.attachToProcess(processHandler);
-        return console;
-    }
+
 
 
     public void run()
     {
         FileDocumentManager.getInstance().saveAllDocuments();
-        ConsoleView view = createConsole(myProject, myProcess);
+
         if (myHelpId != null)
         {
-            view.setHelpId(myHelpId);
+            consoleView.setHelpId(myHelpId);
         }
-
 
         //Executor executor = DefaultRunExecutor.getRunExecutorInstance(); //Gets the Run Window I believe
         Executor executor = createExecutor();
         DefaultActionGroup actions = new DefaultActionGroup();
 
-        final JComponent consolePanel = createConsolePanel(view, actions);
-        RunContentDescriptor descriptor = new RunContentDescriptor(view, myProcess, consolePanel, myTitle, AllIcons.General.MessageHistory);
+        consolePanel = createConsolePanel(consoleView, actions);
+        RunContentDescriptor descriptor = new RunContentDescriptor(consoleView, myProcess, consolePanel, myTitle, AllIcons.General.MessageHistory);
 
         Disposer.register(this, descriptor);
 
         actions.add(new RerunAction(consolePanel));
         actions.add(new StopAction());
-        actions.add(new PauseOutputAction(view, myProcess));
+        actions.add(new PauseOutputAction(consoleView, myProcess));
         actions.add(new Separator());
 
-        for (AnAction action : view.createConsoleActions())
+        for (AnAction action : consoleView.createConsoleActions())
         {
+            //TODO: Change to DEBUG Level
             LOG.info("FRC: Adding console Action: " + action + "  [" + action.getClass().getName() + "].");
             actions.add(action);
+            if (action instanceof ConsoleViewImpl.ClearAllAction || action.toString().contains("Clear All"))
+            {
+                clearAllAction = action;
+            }
         }
-
 
         actions.add(new Separator());
         actions.add(new CloseAction(executor, descriptor, myProject));
@@ -214,7 +208,6 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         myProcess.startNotify();
     }
 
-
     protected abstract Executor createExecutor();
 
 
@@ -230,6 +223,23 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         });
     }
 
+
+    public void invokeClearAll()
+    {
+
+        if(clearAllAction != null)
+        {
+            // As recommended by Dmitry Jemerov in https://devnet.jetbrains.com/message/5281469#5195728
+            //     Indicates an example of programmatically triggering AnAction can be found in com.intellij.openapi.actionSystem.ex.CheckboxAction.createCustomComponent()
+
+            final DataContext dataContext = actionToolbar.getToolbarDataContext();
+            clearAllAction.actionPerformed(new AnActionEvent(null, dataContext, ActionPlaces.UNKNOWN, clearAllAction.getTemplatePresentation(), ActionManager.getInstance(), 0));
+        }
+        else
+        {
+            consoleView.clear();
+        }
+    }
 
     protected abstract String getToolWindowId();
 

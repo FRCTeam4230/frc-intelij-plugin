@@ -148,8 +148,7 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <!-- TODO: Update to 141 once v14.1 has been released (Release branches always have odd numbers per above document) -->
-    <idea-version since-build="140" />
+    <idea-version since-build="141" />
 
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products

@@ -147,12 +147,12 @@
     ]]>
     </change-notes>
 
-    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="141" />
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="141.0" />
 
 
-    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
-         on how to target different products -->
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
     <!-- uncomment to enable plugin in all products -->
     <depends>com.intellij.modules.lang</depends>
 
@@ -174,7 +174,7 @@
     </project-components>
 
     <actions>
-        <!--   See  https://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Action+System  -->
+        <!--   See  http://www.jetbrains.org/intellij/sdk/docs/basics/action_system.html  -->
         <!--
             The <action> element defines an action to register.
                     The mandatory "id" attribute specifies an unique identifier for the action.

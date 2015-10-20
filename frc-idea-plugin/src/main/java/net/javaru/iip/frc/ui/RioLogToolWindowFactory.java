@@ -24,6 +24,7 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 
 
 // https://confluence.jetbrains.com/display/IDEADEV/Creation+of+Tool+Windows
+// http://www.jetbrains.org/intellij/sdk/docs/user_interface_components/tool_windows.html
 public class RioLogToolWindowFactory implements ToolWindowFactory,
                                                 DumbAware
 {

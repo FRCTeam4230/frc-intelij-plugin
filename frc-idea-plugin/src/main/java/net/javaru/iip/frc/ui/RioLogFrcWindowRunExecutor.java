@@ -22,13 +22,14 @@ import org.jetbrains.annotations.NotNull;
 import com.intellij.execution.Executor;
 import com.intellij.execution.ExecutorRegistry;
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.util.IconLoader;
+
+import net.javaru.iip.frc.FrcIcons;
+
 
 
 // This class is registered in the plugin.xml file in the extensions element
 public class RioLogFrcWindowRunExecutor extends Executor
 {
-    public static final Icon TOOL_WINDOW_ICON = IconLoader.getIcon("/net/javaru/iip/frc/ui/images/FIRST_icon_13x13.png"); // 13x13
     public static final String TOOL_WINDOW_ID = "FRC";
     // The executor ID must match the id attribute of the <extensions>/<executor> element in the plugin.xml file
     public static final String EXECUTOR_ID = "FrcRioLog";
@@ -38,7 +39,7 @@ public class RioLogFrcWindowRunExecutor extends Executor
 
 
     @Override
-    public Icon getToolWindowIcon() { return TOOL_WINDOW_ICON; }
+    public Icon getToolWindowIcon() { return FrcIcons.FIRST_ICON_SMALL; }
 
 
     @NotNull

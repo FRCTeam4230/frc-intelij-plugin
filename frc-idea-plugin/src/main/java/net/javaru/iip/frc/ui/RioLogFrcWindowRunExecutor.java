@@ -39,7 +39,7 @@ public class RioLogFrcWindowRunExecutor extends Executor
 
 
     @Override
-    public Icon getToolWindowIcon() { return FrcIcons.FIRST_ICON_SMALL; }
+    public Icon getToolWindowIcon() { return FrcIcons.FIRST_ICON_SMALL_ELEVATED; }
 
 
     @NotNull

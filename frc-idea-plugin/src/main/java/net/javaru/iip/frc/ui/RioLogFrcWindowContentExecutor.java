@@ -24,10 +24,12 @@ import com.intellij.openapi.project.Project;
 
 
 
-
 public class RioLogFrcWindowContentExecutor extends AbstractRioLogContentExecutor
 {
-    public RioLogFrcWindowContentExecutor(@NotNull Project project, @NotNull ProcessHandler process, @NotNull ConsoleView consoleView) { super(project, process, consoleView); }
+    public RioLogFrcWindowContentExecutor(@NotNull Project project, @NotNull ProcessHandler process, @NotNull ConsoleView consoleView)
+    {
+        super(project, process, consoleView);
+    }
 
 
     @Override

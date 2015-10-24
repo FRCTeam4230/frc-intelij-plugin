@@ -25,9 +25,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowId;
 
 
+
 public class RioLogRunWindowContentExecutor extends AbstractRioLogContentExecutor
 {
-    public RioLogRunWindowContentExecutor(@NotNull Project project, @NotNull ProcessHandler process, @NotNull ConsoleView consoleView) { super(project, process, consoleView); }
+    public RioLogRunWindowContentExecutor(@NotNull Project project, @NotNull ProcessHandler process, @NotNull ConsoleView consoleView)
+    {
+        super(project, process, consoleView);
+    }
 
 
     @Override

@@ -59,7 +59,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 //Based on the IntelliJ IDEA com.intellij.execution.RunContentExecutor class
 public abstract class AbstractRioLogContentExecutor implements Disposable
 {
-    private static final Logger LOG = Logger.getInstance(RioLogFrcWindowContentExecutor.class);
+    private static final Logger LOG = Logger.getInstance(AbstractRioLogContentExecutor.class);
     protected final Project myProject;
     protected final ProcessHandler myProcess;
     private final ConsoleView consoleView;

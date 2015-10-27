@@ -9,8 +9,7 @@ Always remember you're unique, just like everyone else.
 "More hay, Trigger?" "No thanks, Roy, I'm stuffed!"
 A flashlight is a case for holding dead batteries.
 Lottery: A tax on people who are bad at math.
-➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
-Error, no keyboard - press F1 to continue.
+No keyboard - press F1 to continue.
 There's too much blood in my caffeine system.
 Artificial Intelligence usually beats real stupidity.
 Hard work has a future payoff. Laziness pays off now.
@@ -20,7 +19,6 @@ Consciousness: that annoying time between naps.
 Don't take life too seriously, you won't get out alive.
 I don't suffer from insanity. I enjoy every minute of it.
 Better to understand a little than to misunderstand a lot.
-➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
 The gene pool could use a little chlorine.
 When there's a will, I want to be in it.
 Okay, who put a "stop payment" on my reality check?
@@ -31,7 +29,6 @@ All wiyht. Rho sritched mg kegtops awound?
 My mail reader can beat up your mail reader.
 Never forget: 2 + 2 = 5 for extremely large values of 2.
 Nobody has ever, ever, EVER learned all of WordPerfect.
-➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
 To define recursion, we must first define recursion.
 Good programming is 99% sweat and 1% coffee.
 Home is where you hang your @
@@ -42,7 +39,6 @@ Great groups from little icons grow.
 Speak softly and carry a cellular phone.
 C:\ is the root of all directories.
 Don't put all your hypes in one home page.
-➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
 Pentium wise; pen and paper foolish.
 The modem is the message.
 Too many clicks spoil the browse.
@@ -53,7 +49,6 @@ Fax is stranger than fiction.
 What boots up must come down.
 Windows will never cease.   (ed. oh sure...)
 In Gates we trust.    (ed.  yeah right....)
-➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
 Virtual reality is its own reward.
 Modulation in all things.
 A user and his leisure time are soon parted.
@@ -62,4 +57,3 @@ Know what to expect before you connect.
 Oh, what a tangled website we weave when first we practice.
 Speed thrills.
 Give a man a fish and you feed him for a day; teach him to use the Net and he won't bother you for weeks.
-➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»

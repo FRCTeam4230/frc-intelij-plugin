@@ -38,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.jetbrains.annotations.NotNull;
 import com.google.common.base.Charsets;
 import com.intellij.openapi.diagnostic.Logger;
@@ -47,11 +48,23 @@ import net.javaru.iip.frc.settings.FrcSettings;
 
 
 
-public class RioLogMonitor extends Process implements AutoCloseable
+public class RioLogMonitor extends Process
 {
     private static final Logger LOG = Logger.getInstance(RioLogMonitor.class);
 
     public final static int MAX_PACKET_SIZE = 65507;
+
+    /**
+     * Set this System property to 'on' or 'true' to turn on the testing server that will send a constant output of
+     * mock log messages to the rioLog port. Used for testing without being attached to a RoboRIO.
+     */
+    public static final String SIMULATED_LOG_SERVICE_PROP_KEY_BASE = "frc.simulated.log.service";
+    public static final String SIMULATED_LOG_SERVICE_ENABLED_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".enabled";
+    public static final String SIMULATED_LOG_SERVICE_PORT_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".port";
+    public static final int SIMULATED_LOG_SERVICE_PORT_DEFAULT = 4248; //arbitrarily chosen port not listed at https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
+    
+    private static final boolean USE_DEBUGGING_SERVER = BooleanUtils.toBoolean(System.getProperty(SIMULATED_LOG_SERVICE_ENABLED_PROP_KEY, Boolean.FALSE.toString()));
+    
 
     private boolean enabled = true;
 
@@ -75,20 +88,15 @@ public class RioLogMonitor extends Process implements AutoCloseable
     private static FrcSettings getSettings() {return FrcApplicationComponent.getInstance().getState();}
 
 
-
     public void restart()
     {
-        try
-        {
-            close();
-        }
-        catch (Exception e)
-        {
-            final String msg = "Could not stop the current monitoring thread. Cause Details: " + e.toString();
-            throw new IllegalStateException(msg);
-        }
+        stop();
+        start();
+    }
 
 
+    public void start()
+    {
         try
         {
             in = new PipedInputStream();
@@ -105,13 +113,22 @@ public class RioLogMonitor extends Process implements AutoCloseable
             throw new IllegalStateException("Could not create necessary io streams.", e);
         }
 
-        enabled  = true;
-        //TODO: Change to new MonitorRunnable() once initial development is completed
-//        monitorRunnable = new MonitorRunnable();
-        monitorRunnable = new MultiCastTestingMonitor();
+        enabled = true;
+        monitorRunnable = USE_DEBUGGING_SERVER ? new MultiCastTestingMonitor() : new MonitorRunnable();
+        LOG.info(String.format("[FRC] System Property '%s set '%s'. Using '%s' for monitoring on port '%d'.",
+                               SIMULATED_LOG_SERVICE_PROP_KEY_BASE,
+                               USE_DEBUGGING_SERVER,
+                               monitorRunnable.getClass().getSimpleName(),
+                               monitorRunnable.port));
         Thread thread = new Thread(monitorRunnable);
         thread.setName("RioLogMonitor");
         thread.start();
+    }
+
+
+    public void stop()
+    {
+        destroy();
     }
 
 
@@ -132,6 +149,7 @@ public class RioLogMonitor extends Process implements AutoCloseable
         return directory.resolve(name);
     }
 
+
     private void rollFileWriter() throws IOException
     {
         if (fileWriter != null)
@@ -141,6 +159,7 @@ public class RioLogMonitor extends Process implements AutoCloseable
             fileWriter = createFilePrintWriter();
         }
     }
+
 
     @Override
     public InputStream getInputStream() { return in; }
@@ -192,13 +211,6 @@ public class RioLogMonitor extends Process implements AutoCloseable
     }
 
 
-    @Override
-    public void close() throws Exception
-    {
-        destroy();
-    }
-
-
     public void setClearConsoleRunnable(Runnable clearConsoleRunnable)
     {
         this.clearConsoleRunnable = clearConsoleRunnable;
@@ -225,11 +237,13 @@ public class RioLogMonitor extends Process implements AutoCloseable
         try { if (fileWriter != null) {fileWriter.close();} } catch (Exception ignore) {}
     }
 
+
     private class MonitorRunnable implements Runnable
     {
         protected boolean isRunning = true;
 
         protected final int port = getSettings().getRioLogPort();
+
 
         @Override
         public void run()
@@ -340,6 +354,7 @@ public class RioLogMonitor extends Process implements AutoCloseable
             //no op - here mostly for the testing version of this class
         }
 
+
         protected boolean addLineBreak()
         {
             //TODO: add to settings
@@ -348,11 +363,10 @@ public class RioLogMonitor extends Process implements AutoCloseable
     }
 
 
-
     private class MultiCastTestingMonitor extends MonitorRunnable
     {
         private final InetAddress groupAddress;
-        private final int multicastPort = 4446;
+        private final int multicastPort = determineSimulatedLogPort();
 
 
         public MultiCastTestingMonitor()
@@ -363,7 +377,9 @@ public class RioLogMonitor extends Process implements AutoCloseable
             }
             catch (UnknownHostException e)
             {
-                throw new IllegalStateException("Cannot create group InetAddress due to an exception.", e);
+                final String message = "Cannot create group InetAddress due to an exception.";
+                LOG.error("[FRC] " + message);
+                throw new IllegalStateException(message, e);
             }
         }
 
@@ -376,6 +392,7 @@ public class RioLogMonitor extends Process implements AutoCloseable
             return socket;
         }
 
+
         @Override
         protected void cleanUpSocket(DatagramSocket socket) throws IOException
         {
@@ -384,6 +401,7 @@ public class RioLogMonitor extends Process implements AutoCloseable
                 ((MulticastSocket) socket).leaveGroup(groupAddress);
             }
         }
+
 
         @NotNull
         @Override
@@ -394,6 +412,22 @@ public class RioLogMonitor extends Process implements AutoCloseable
         protected boolean addLineBreak()
         {
             return true;
+        }
+        
+        
+    }
+
+    public static int determineSimulatedLogPort()
+    {
+        try
+        {
+            return Integer.valueOf(System.getProperty(SIMULATED_LOG_SERVICE_PORT_PROP_KEY, Integer.toString(SIMULATED_LOG_SERVICE_PORT_DEFAULT)));
+        }
+        catch (Exception e)
+        {
+            final String message = "Could not determine the port for the simulated log service due to an exception: " + e.toString();
+            LOG.error("[FRC] " + message);
+            throw new IllegalArgumentException(message, e);
         }
     }
 }

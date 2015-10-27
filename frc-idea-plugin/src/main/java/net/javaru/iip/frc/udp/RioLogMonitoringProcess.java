@@ -74,14 +74,14 @@ public class RioLogMonitoringProcess extends Process
     private MonitorRunnable monitorRunnable;
 
 
-    private Runnable clearConsoleRunnable;
+    private final Runnable clearConsoleRunnable;
 
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 
 
-    public RioLogMonitoringProcess() throws IllegalStateException
+    public RioLogMonitoringProcess(Runnable clearConsoleRunnable) throws IllegalStateException
     {
-        restart();
+        this.clearConsoleRunnable = clearConsoleRunnable;
     }
 
 
@@ -209,13 +209,7 @@ public class RioLogMonitoringProcess extends Process
     {
         return 0;
     }
-
-
-    public void setClearConsoleRunnable(Runnable clearConsoleRunnable)
-    {
-        this.clearConsoleRunnable = clearConsoleRunnable;
-    }
-
+    
 
     @Override
     public void destroy()

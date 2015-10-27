@@ -126,9 +126,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     {
         FileDocumentManager.getInstance().saveAllDocuments();
 
-        final RioLogMonitoringProcess process = new RioLogMonitoringProcess();
-        process.setClearConsoleRunnable(this::invokeClearAll);
-
+        final RioLogMonitoringProcess process = new RioLogMonitoringProcess(this::invokeClearAll);
+        
         myProcessHandler = new BaseOSProcessHandler(process, null, Charset.defaultCharset())
         {
             @Override
@@ -187,6 +186,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             });
         }
 
+        process.start();
         myProcessHandler.startNotify();
     }
 

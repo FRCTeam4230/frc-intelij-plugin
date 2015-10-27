@@ -16,15 +16,6 @@
 
 package net.javaru.iip.frc.actions;
 
-import java.nio.charset.Charset;
-
-import org.jetbrains.annotations.NotNull;
-import com.intellij.compiler.server.BuildManager;
-import com.intellij.execution.filters.TextConsoleBuilder;
-import com.intellij.execution.filters.TextConsoleBuilderFactory;
-import com.intellij.execution.process.BaseOSProcessHandler;
-import com.intellij.execution.process.ProcessHandler;
-import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -33,7 +24,6 @@ import com.intellij.openapi.util.Disposer;
 
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
 import net.javaru.iip.frc.settings.FrcSettings;
-import net.javaru.iip.frc.udp.RioLogMonitoringProcess;
 import net.javaru.iip.frc.ui.AbstractRioLogContentExecutor;
 import net.javaru.iip.frc.ui.RioLogFrcWindowContentExecutor;
 import net.javaru.iip.frc.ui.RioLogRunWindowContentExecutor;
@@ -58,84 +48,13 @@ public class OpenFrcWindowAction extends DumbAwareAction
     {
         if (project != null)
         {
-            final RioLogMonitoringProcess process = new RioLogMonitoringProcess();
-
-            final ProcessHandler processHandler = new BaseOSProcessHandler(process, null, Charset.defaultCharset())
-            {
-                @Override
-                public boolean isSilentlyDestroyOnClose()
-                {
-                    return true;
-                }
-            };
-
-            final ConsoleView consoleView = createConsole(project, processHandler);
-
-
-
-            try
-            {
-                processHandler.putUserDataIfAbsent(BuildManager.ALLOW_AUTOMAKE, true);
-            }
-            catch (NoClassDefFoundError ignore)
-            {
-                //php storm does not have it
-            }
-
-
             final FrcSettings settings = FrcApplicationComponent.getInstance().getState();
-
             boolean useRunWindow = (settings != null && !settings.isUseFrcToolWindow());
             final AbstractRioLogContentExecutor contentExecutor = useRunWindow ?
-                                                                  new RioLogRunWindowContentExecutor(project, processHandler, consoleView) :
-                                                                  new RioLogFrcWindowContentExecutor(project, processHandler, consoleView);
-
-
-            // see com/jetbrains/python/run/PythonTask.java:221 for example
-            contentExecutor.withStop(
-                processHandler::destroyProcess,
-                () -> !processHandler.isProcessTerminated());
-            contentExecutor.withRerun(
-                () ->
-                {
-                    processHandler.destroyProcess();
-                    processHandler.waitFor(2000L);
-                    monitorRioLog(project);
-                }
-            );
-
+                                                                  new RioLogRunWindowContentExecutor(project, true) :
+                                                                  new RioLogFrcWindowContentExecutor(project, true);
             Disposer.register(project, contentExecutor);
-
-//            if (contentExecutor.getClearAllAction() != null)
-//            {
-//                process.setClearConsoleRunnable(new Runnable() {
-//                    @Override
-//                    public void run()
-//                    {
-//                        final AnAction clearAllAction = contentExecutor.getClearAllAction();
-//                        clearAllAction.
-//                        AnActionEvent anActionEvent = AnActionEvent.createFromDataContext("unknown", clearAllAction.getTemplatePresentation(), )
-//
-//                    }
-//                });
-//            }
-//            else
-            {
-//                process.setClearConsoleRunnable(consoleView::clear);
-                process.setClearConsoleRunnable(contentExecutor::invokeClearAll);
-            }
-
             contentExecutor.run();
-
         }
-    }
-
-
-    private ConsoleView createConsole(@NotNull Project project, @NotNull ProcessHandler processHandler)
-    {
-        TextConsoleBuilder consoleBuilder = TextConsoleBuilderFactory.getInstance().createBuilder(project);
-        ConsoleView console = consoleBuilder.getConsole();
-        console.attachToProcess(processHandler);
-        return console;
     }
 }

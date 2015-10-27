@@ -17,10 +17,9 @@
 package net.javaru.iip.frc.ui;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import com.intellij.execution.Executor;
 import com.intellij.execution.executors.DefaultRunExecutor;
-import com.intellij.execution.process.ProcessHandler;
-import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowId;
 
@@ -28,9 +27,14 @@ import com.intellij.openapi.wm.ToolWindowId;
 
 public class RioLogRunWindowContentExecutor extends AbstractRioLogContentExecutor
 {
-    public RioLogRunWindowContentExecutor(@NotNull Project project, @NotNull ProcessHandler process, @NotNull ConsoleView consoleView)
+    public RioLogRunWindowContentExecutor(@NotNull Project project, boolean activateToolWindow)
     {
-        super(project, process, consoleView);
+        this(project, activateToolWindow, null);
+    }
+    
+    public RioLogRunWindowContentExecutor(@NotNull Project project, boolean activateToolWindow, @Nullable Runnable afterCompletionRunnable)
+    {
+        super(project, activateToolWindow, afterCompletionRunnable);
     }
 
 

@@ -159,6 +159,10 @@
     <extensions defaultExtensionNs="com.intellij">
         <facetType id="FRC_FACET" implementation="net.javaru.iip.frc.facet.FrcFacetType" />
         <executor id="FrcRioLog" implementation="net.javaru.iip.frc.ui.RioLogFrcWindowRunExecutor" />
+        
+        <projectService id="rioLogConsoleProjectService" 
+                        serviceInterface="net.javaru.iip.frc.ui.RioLogConsoleProjectService" 
+                        serviceImplementation="net.javaru.iip.frc.ui.RioLogConsoleProjectService"/>
     </extensions>
 
     <application-components>

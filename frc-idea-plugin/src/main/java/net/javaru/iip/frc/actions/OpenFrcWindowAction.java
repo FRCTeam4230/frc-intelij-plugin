@@ -17,16 +17,12 @@
 package net.javaru.iip.frc.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
 
-import net.javaru.iip.frc.settings.FrcApplicationComponent;
-import net.javaru.iip.frc.settings.FrcSettings;
-import net.javaru.iip.frc.ui.AbstractRioLogContentExecutor;
-import net.javaru.iip.frc.ui.RioLogFrcWindowContentExecutor;
-import net.javaru.iip.frc.ui.RioLogRunWindowContentExecutor;
+import net.javaru.iip.frc.ui.RioLogConsoleProjectService;
 
 
 
@@ -39,22 +35,10 @@ public class OpenFrcWindowAction extends DumbAwareAction
     public void actionPerformed(AnActionEvent actionEvent)
     {
         final Project project = actionEvent.getProject();
-        monitorRioLog(project);
-
-    }
-
-
-    private void monitorRioLog(final Project project)
-    {
         if (project != null)
         {
-            final FrcSettings settings = FrcApplicationComponent.getInstance().getState();
-            boolean useRunWindow = (settings != null && !settings.isUseFrcToolWindow());
-            final AbstractRioLogContentExecutor contentExecutor = useRunWindow ?
-                                                                  new RioLogRunWindowContentExecutor(project, true) :
-                                                                  new RioLogFrcWindowContentExecutor(project, true);
-            Disposer.register(project, contentExecutor);
-            contentExecutor.run();
+            final RioLogConsoleProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogConsoleProjectService.class);
+            rioLogConsoleProjectService.openRioLogConsole();
         }
     }
 }

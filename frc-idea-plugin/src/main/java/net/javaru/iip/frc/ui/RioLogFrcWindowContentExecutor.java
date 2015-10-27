@@ -25,12 +25,12 @@ import com.intellij.openapi.project.Project;
 
 public class RioLogFrcWindowContentExecutor extends AbstractRioLogContentExecutor
 {
-    public RioLogFrcWindowContentExecutor(@NotNull Project project, boolean activateToolWindow)
+    RioLogFrcWindowContentExecutor(@NotNull Project project, boolean activateToolWindow)
     {
         this(project, activateToolWindow, null);
     }
     
-    public RioLogFrcWindowContentExecutor(@NotNull Project project, boolean activateToolWindow, @Nullable Runnable afterCompletionRunnable)
+    RioLogFrcWindowContentExecutor(@NotNull Project project, boolean activateToolWindow, @Nullable Runnable afterCompletionRunnable)
     {
         super(project, activateToolWindow, afterCompletionRunnable);
     }

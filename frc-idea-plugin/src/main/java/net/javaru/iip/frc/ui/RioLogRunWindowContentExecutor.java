@@ -27,12 +27,12 @@ import com.intellij.openapi.wm.ToolWindowId;
 
 public class RioLogRunWindowContentExecutor extends AbstractRioLogContentExecutor
 {
-    public RioLogRunWindowContentExecutor(@NotNull Project project, boolean activateToolWindow)
+    RioLogRunWindowContentExecutor(@NotNull Project project, boolean activateToolWindow)
     {
         this(project, activateToolWindow, null);
     }
     
-    public RioLogRunWindowContentExecutor(@NotNull Project project, boolean activateToolWindow, @Nullable Runnable afterCompletionRunnable)
+    RioLogRunWindowContentExecutor(@NotNull Project project, boolean activateToolWindow, @Nullable Runnable afterCompletionRunnable)
     {
         super(project, activateToolWindow, afterCompletionRunnable);
     }

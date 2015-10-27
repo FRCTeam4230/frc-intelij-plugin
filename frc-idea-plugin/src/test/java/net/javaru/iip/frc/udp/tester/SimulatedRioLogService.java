@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.collect.ImmutableList;
 
 import net.javaru.iip.frc.FrcPluginGlobals;
-import net.javaru.iip.frc.udp.RioLogMonitor;
+import net.javaru.iip.frc.udp.RioLogMonitoringProcess;
 
 import static com.google.common.base.Charsets.UTF_8;
 
@@ -61,7 +61,7 @@ import static com.google.common.base.Charsets.UTF_8;
 /**
  * <p>
  * A testing utility that will send simulated roboRIO Log messages via UDP (a.k.a. Multicast Sever). To use when testing/debugging the plugin,
- * run this class and then set the system property (i.e. {@code -D} switch) {@value RioLogMonitor#SIMULATED_LOG_SERVICE_ENABLED_PROP_KEY}
+ * run this class and then set the system property (i.e. {@code -D} switch) {@value RioLogMonitoringProcess#SIMULATED_LOG_SERVICE_ENABLED_PROP_KEY}
  * to "<tt>true</tt>" or "<tt>on</tt>" in the <em>VM Options</em> field of the <strong>Plugin</strong> Run/Debug Configuration. Launch
  * the plugin Run/Debug configuration.
  * </p>
@@ -75,7 +75,7 @@ import static com.google.common.base.Charsets.UTF_8;
  * <li>{@value #PAUSE_DURATION_PROP_KEY} : [long] - sets the duration of the pause between messages. Default: <tt>2</tt></li>
  * <li>{@value #PAUSE_TIMEUNIT_PROP_KEY} : [{@link TimeUnit} enum] - sets the TimeUnit of the pause between messages. Default: <tt>SECONDS</tt></li>
  * <li>
- * {@value RioLogMonitor#SIMULATED_LOG_SERVICE_PORT_PROP_KEY} : [int] - sets the multicast port the service "broadcasts" the simulated log messages on.
+ * {@value RioLogMonitoringProcess#SIMULATED_LOG_SERVICE_PORT_PROP_KEY} : [int] - sets the multicast port the service "broadcasts" the simulated log messages on.
  * <em>If setting this value, you must <strong>set it on both Run/Debug Configurations</strong>; that the one for this class and
  * the one for the Plugin. This should need to be set only if the default value conflicts with another service on your system.</em>
  * </li>
@@ -92,21 +92,21 @@ import static com.google.common.base.Charsets.UTF_8;
 public class SimulatedRioLogService extends Thread implements Runnable
 {
     //frc.simulated.log.service.message.type
-    public static final String MESSAGE_TYPE_PROP_KEY = RioLogMonitor.SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".message.type";
+    public static final String MESSAGE_TYPE_PROP_KEY = RioLogMonitoringProcess.SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".message.type";
 
     //frc.simulated.log.service.simulated.restart.frequency
-    public static final String SIMULATED_RESTART_FREQUENCY_PROP_KEY = RioLogMonitor.SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".simulated.restart.frequency";
+    public static final String SIMULATED_RESTART_FREQUENCY_PROP_KEY = RioLogMonitoringProcess.SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".simulated.restart.frequency";
 
-    public static final String PAUSE_DURATION_PROP_KEY = RioLogMonitor.SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".pause.duration";
+    public static final String PAUSE_DURATION_PROP_KEY = RioLogMonitoringProcess.SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".pause.duration";
 
-    public static final String PAUSE_TIMEUNIT_PROP_KEY = RioLogMonitor.SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".pause.timeunit";
+    public static final String PAUSE_TIMEUNIT_PROP_KEY = RioLogMonitoringProcess.SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".pause.timeunit";
 
-    public static final String SOCKET_PORT_PROP_KEY = RioLogMonitor.SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".socket.port";
-    public static final int DEFAULT_SOCKET_PORT = RioLogMonitor.SIMULATED_LOG_SERVICE_PORT_DEFAULT + 1;
+    public static final String SOCKET_PORT_PROP_KEY = RioLogMonitoringProcess.SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".socket.port";
+    public static final int DEFAULT_SOCKET_PORT = RioLogMonitoringProcess.SIMULATED_LOG_SERVICE_PORT_DEFAULT + 1;
 
 
     protected int socketPort = DEFAULT_SOCKET_PORT; //default arbitrarily chosen
-    private int multicastPort = RioLogMonitor.SIMULATED_LOG_SERVICE_PORT_DEFAULT; // i.e. the "Broadcast" Port 
+    private int multicastPort = RioLogMonitoringProcess.SIMULATED_LOG_SERVICE_PORT_DEFAULT; // i.e. the "Broadcast" Port 
 
     protected DatagramSocket socket = null;
 
@@ -199,7 +199,7 @@ public class SimulatedRioLogService extends Thread implements Runnable
     {
         try
         {
-            multicastPort = RioLogMonitor.determineSimulatedLogPort();
+            multicastPort = RioLogMonitoringProcess.determineSimulatedLogPort();
         }
         catch (Exception e)
         {

@@ -33,7 +33,7 @@ import com.intellij.openapi.util.Disposer;
 
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
 import net.javaru.iip.frc.settings.FrcSettings;
-import net.javaru.iip.frc.udp.RioLogMonitor;
+import net.javaru.iip.frc.udp.RioLogMonitoringProcess;
 import net.javaru.iip.frc.ui.AbstractRioLogContentExecutor;
 import net.javaru.iip.frc.ui.RioLogFrcWindowContentExecutor;
 import net.javaru.iip.frc.ui.RioLogRunWindowContentExecutor;
@@ -58,7 +58,7 @@ public class OpenFrcWindowAction extends DumbAwareAction
     {
         if (project != null)
         {
-            final RioLogMonitor process = new RioLogMonitor();
+            final RioLogMonitoringProcess process = new RioLogMonitoringProcess();
 
             final ProcessHandler processHandler = new BaseOSProcessHandler(process, null, Charset.defaultCharset())
             {

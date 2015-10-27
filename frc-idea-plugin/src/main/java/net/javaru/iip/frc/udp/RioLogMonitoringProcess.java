@@ -48,9 +48,9 @@ import net.javaru.iip.frc.settings.FrcSettings;
 
 
 
-public class RioLogMonitor extends Process
+public class RioLogMonitoringProcess extends Process
 {
-    private static final Logger LOG = Logger.getInstance(RioLogMonitor.class);
+    private static final Logger LOG = Logger.getInstance(RioLogMonitoringProcess.class);
 
     public final static int MAX_PACKET_SIZE = 65507;
 
@@ -79,7 +79,7 @@ public class RioLogMonitor extends Process
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 
 
-    public RioLogMonitor() throws IllegalStateException
+    public RioLogMonitoringProcess() throws IllegalStateException
     {
         restart();
     }
@@ -121,7 +121,7 @@ public class RioLogMonitor extends Process
                                monitorRunnable.getClass().getSimpleName(),
                                monitorRunnable.port));
         Thread thread = new Thread(monitorRunnable);
-        thread.setName("RioLogMonitor");
+        thread.setName("RioLogMonitoringProcess");
         thread.start();
     }
 

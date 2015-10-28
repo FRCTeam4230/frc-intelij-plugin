@@ -169,7 +169,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         RunContentDescriptor descriptor = new RunContentDescriptor(myConsoleView, myProcessHandler, consolePanel, myTitle, AllIcons.General.MessageHistory);
 
         Disposer.register(this, descriptor);
-        addActionsToActionGroup(executor, actions, descriptor);
+        addActionsToActionGroup(actions);
 
         myCloseRunnable = () ->
         {
@@ -206,7 +206,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     }
 
 
-    private void addActionsToActionGroup(Executor executor, DefaultActionGroup actions, RunContentDescriptor descriptor)
+    private void addActionsToActionGroup(DefaultActionGroup actions)
     {
         // We need to grab some actions that are created in the ConsoleView itself.
         // This is a bit hackish but works. 

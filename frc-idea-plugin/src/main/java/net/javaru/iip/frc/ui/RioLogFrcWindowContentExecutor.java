@@ -25,11 +25,15 @@ import com.intellij.openapi.project.Project;
 
 public class RioLogFrcWindowContentExecutor extends AbstractRioLogContentExecutor
 {
+    public static final String TOOL_WINDOW_ID = RioLogFrcWindowRunExecutor.TOOL_WINDOW_ID;
+
+
     RioLogFrcWindowContentExecutor(@NotNull Project project, boolean activateToolWindow)
     {
         this(project, activateToolWindow, null);
     }
-    
+
+
     RioLogFrcWindowContentExecutor(@NotNull Project project, boolean activateToolWindow, @Nullable Runnable afterCompletionRunnable)
     {
         super(project, activateToolWindow, afterCompletionRunnable);
@@ -37,7 +41,7 @@ public class RioLogFrcWindowContentExecutor extends AbstractRioLogContentExecuto
 
 
     @Override
-    protected String getToolWindowId() { return RioLogFrcWindowRunExecutor.TOOL_WINDOW_ID; }
+    protected String getToolWindowId() { return TOOL_WINDOW_ID; }
 
 
     @Override

@@ -80,6 +80,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     private ConsoleView myConsoleView;
     private Runnable myRerunRunnable;
     private Runnable myStopRunnable;
+    private Runnable myCloseRunnable;
     @Nullable
     private Runnable myAfterCompletionRunnable;
     private Computable<Boolean> myStopEnabled;
@@ -141,6 +142,9 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
 
         myConsoleView = createConsole(myProject, myProcessHandler);
+        
+        
+        
         myStopRunnable = myProcessHandler::destroyProcess;
         myStopEnabled = () -> !myProcessHandler.isProcessTerminated();
         myRerunRunnable = () ->
@@ -150,6 +154,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             myProcessHandler.waitFor(2000L);
             run();
         };
+        
 
         if (myHelpId != null)
         {
@@ -166,6 +171,16 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         Disposer.register(this, descriptor);
         addActionsToActionGroup(executor, actions, descriptor);
 
+        myCloseRunnable = () ->
+        {
+            final boolean removedOk = ExecutionManager.getInstance(myProject).getContentManager().removeRunContent(executor, descriptor);
+            if (removedOk)
+            {
+                process.stop();
+                myProcessHandler.destroyProcess();
+                myProcessHandler = null;
+            }
+        };
 
         ExecutionManager.getInstance(myProject).getContentManager().showRunContent(executor, descriptor);
 
@@ -247,7 +262,10 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
         actions.add(new RioLogClearAllAction());
         actions.add(new Separator());
-        actions.add(new com.intellij.execution.ui.actions.CloseAction(executor, descriptor, myProject));
+        // We no longer provide a close button. As long as a FRC Facet is present, we want a RioLog console. 
+        // The 'work' of the close action was moved to myCloseRunnable and closing is managed by the RioLogConsoleProjectService
+        // Leaving this line of code here commented out in case in the future we need to remember how we did include a close button.
+        //actions.add(new com.intellij.execution.ui.actions.CloseAction(executor, descriptor, myProject));
     }
 
 
@@ -278,6 +296,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     @Override
     public void dispose()
     {
+        myCloseRunnable.run();
         Disposer.dispose(this);
     }
 

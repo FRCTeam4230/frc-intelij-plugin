@@ -38,7 +38,7 @@ public class OpenFrcWindowAction extends DumbAwareAction
         if (project != null)
         {
             final RioLogConsoleProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogConsoleProjectService.class);
-            rioLogConsoleProjectService.openRioLogConsole();
+            rioLogConsoleProjectService.update();
         }
     }
 }

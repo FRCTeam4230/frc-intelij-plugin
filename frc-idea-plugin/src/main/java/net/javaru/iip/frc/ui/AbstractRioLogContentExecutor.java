@@ -206,7 +206,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         {
             final Class<? extends AnAction> actionClass = action.getClass();
             
-            LOG.info(String.format("[FRC] Adding console Action: Text='%s'; Desc='%s'; class='%s'; enclosingClass='%s'; declaringClass='%s'",
+            LOG.debug(String.format("[FRC] Adding console Action: Text='%s'; Desc='%s'; class='%s'; enclosingClass='%s'; declaringClass='%s'",
                                    action.getTemplatePresentation().getText(),
                                    action.getTemplatePresentation().getDescription(),
                                    actionClass,

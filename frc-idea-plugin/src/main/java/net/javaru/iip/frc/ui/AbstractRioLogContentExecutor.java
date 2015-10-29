@@ -205,13 +205,16 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         for (AnAction action : myConsoleView.createConsoleActions())
         {
             final Class<? extends AnAction> actionClass = action.getClass();
-            
-            LOG.debug(String.format("[FRC] Adding console Action: Text='%s'; Desc='%s'; class='%s'; enclosingClass='%s'; declaringClass='%s'",
-                                   action.getTemplatePresentation().getText(),
-                                   action.getTemplatePresentation().getDescription(),
-                                   actionClass,
-                                   actionClass.getEnclosingClass(),
-                                   actionClass.getDeclaringClass()));
+
+            if (LOG.isDebugEnabled())
+            {
+                LOG.debug(String.format("[FRC] Adding console Action: Text='%s'; Desc='%s'; class='%s'; enclosingClass='%s'; declaringClass='%s'",
+                                       action.getTemplatePresentation().getText(),
+                                       action.getTemplatePresentation().getDescription(),
+                                       actionClass,
+                                       actionClass.getEnclosingClass(),
+                                       actionClass.getDeclaringClass()));
+            }
             if (actionClass.getName().equals("krasa.grepconsole.action.OpenConsoleSettingsAction"))
             {
                 grepConsoleAction = action;

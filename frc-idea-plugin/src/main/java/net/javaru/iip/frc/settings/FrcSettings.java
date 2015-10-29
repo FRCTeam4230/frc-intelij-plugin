@@ -22,16 +22,29 @@ import java.util.regex.Pattern;
 
 import net.javaru.iip.frc.util.ClonerImpl;
 
+/*
+     ___                     _            _   
+    |_ _|_ __  _ __  ___ _ _| |_ __ _ _ _| |_ 
+     | || '  \| '_ \/ _ \ '_|  _/ _` | ' \  _|
+    |___|_|_|_| .__/\___/_|  \__\__,_|_||_\__|
+              |_|                             
+    **IMPORTANT** All settings/properties must have a default value upon construction.
+                  Be sure to add any new properties/settings to the equals & hashcode methods
 
+ */
 
 // Example:  org.intellij.plugins.intelliLang.AdvancedSettingsUI
+@SuppressWarnings({"ClassWithoutLogger", "unused"})
 public class FrcSettings implements Cloneable
 {
+    // **IMPORTANT** All settings/properties must have a default value upon construction.
+    //               Be sure to add any new properties/settings to the equals & hashcode methods
 
     // Actual Full Statement logged by roboRIO is as follows. It starts with the
     // arrow flush left and ends with the closing/right-pointing guillemet flush right:
     //    ➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
-    public static final Pattern DEFAULT_RIO_RESTART_REGEX = Pattern.compile(".*FRCUserProgram.jar.*", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.MULTILINE);
+    public static final Pattern DEFAULT_RIO_RESTART_REGEX = Pattern.compile(".*FRCUserProgram.jar.*",
+                                                                            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.MULTILINE);
     //TODO: change the default to the FRC installation directory or such
     public static final Path DEFAULT_LOG_DIRECTORY = Paths.get("/").resolve("tmp").resolve("frc").toAbsolutePath();
     public static final String DEFAULT_LOG_FILE_BASENAME = "rioLog-${time}.log";
@@ -53,6 +66,9 @@ public class FrcSettings implements Cloneable
 
     private String logFileBaseName = DEFAULT_LOG_FILE_BASENAME;
 
+
+    // **IMPORTANT** All settings/properties must have a default value upon construction.
+    //               Be sure to add any new properties/settings to the equals & hashcode methods
     public FrcSettings() { }
 
 
@@ -190,4 +206,15 @@ public class FrcSettings implements Cloneable
             .append(clearOnRobotRestart)
             .toHashCode();
     }
+    
+/*
+     ___                     _            _   
+    |_ _|_ __  _ __  ___ _ _| |_ __ _ _ _| |_ 
+     | || '  \| '_ \/ _ \ '_|  _/ _` | ' \  _|
+    |___|_|_|_| .__/\___/_|  \__\__,_|_||_\__|
+              |_|                             
+    **IMPORTANT** All settings/properties must have a default value upon construction.
+                  Be sure to add any new properties/settings to the equals & hashcode methods
+
+ */
 }

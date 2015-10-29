@@ -27,7 +27,6 @@ import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.ExportableApplicationComponent;
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.components.StoragePathMacros;
@@ -42,11 +41,12 @@ import net.javaru.iip.frc.ui.FrcSettingsForm;
 
 
 
+// @State persistence documentation: http://www.jetbrains.org/intellij/sdk/docs/basics/persisting_state_of_components.html
 @State(
-    name = FrcPluginGlobals.FRC_PLUGIN_COMPONENT_NAME,
-    storages = {@Storage(id = FrcPluginGlobals.FRC_PLUGIN_COMPONENT_NAME, file = StoragePathMacros.APP_CONFIG + "/FRC/FrcPlugin.xml")})
+        name = FrcPluginGlobals.FRC_PLUGIN_BASE_NAME,
+        storages = {@Storage(id = FrcPluginGlobals.FRC_PLUGIN_BASE_NAME, file = StoragePathMacros.APP_CONFIG + "frc.xml")}
+    )
 public class FrcApplicationComponent extends SimpleModificationTracker implements Configurable,
-                                                                                  ProjectComponent,
                                                                                   ApplicationComponent,
                                                                                   ExportableApplicationComponent,
                                                                                   PersistentStateComponent<FrcSettings>,
@@ -62,7 +62,11 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
     public FrcApplicationComponent() { }
 
     @NotNull
-    public static FrcApplicationComponent getInstance() {return ApplicationManager.getApplication().getComponent(FrcApplicationComponent.class); }
+    public static FrcApplicationComponent getInstance() 
+    {
+        final FrcApplicationComponent component = ApplicationManager.getApplication().getComponent(FrcApplicationComponent.class);
+        return component != null ? component : new FrcApplicationComponent();
+    }
 
     // ==== BaseComponent
 
@@ -70,14 +74,14 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
     @Override
     public void initComponent()
     {
-        //TODO: Write this 'initComponent' implemented method in the 'FrcApplicationComponent' class
+        LOG.debug("[FRC] FrcApplicationComponent.initComponent() has been called");
     }
 
 
     @Override
     public void disposeComponent()
     {
-        //TODO: Write this 'disposeComponent' implemented method in the 'FrcApplicationComponent' class
+        LOG.debug("[FRC] FrcApplicationComponent.initComponent() has been called");
     }
 
 
@@ -88,8 +92,7 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
     @Override
     public File[] getExportFiles()
     {
-        //TODO; Need to verify this works / is correct
-        return new File[] {PathManager.getOptionsFile("/FRC/FrcPlugin")};
+        return new File[] {PathManager.getOptionsFile("frc")};
     }
 
 
@@ -111,7 +114,6 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
         if (settings == null)
         {
             settings = new FrcSettings();
-            //TODO: may possibly need to set defaults here
         }
         return settings;
     }
@@ -121,28 +123,13 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
     public void loadState(FrcSettings frcSettings) { this.settings = frcSettings; }
 
 
-    // ==== ProjectComponent
-
-
-    @Override
-    public void projectOpened()
-    {
-        //TODO: Write this 'projectOpened' implemented method in the 'FrcApplicationComponent' class
-    }
-
-
-    @Override
-    public void projectClosed()
-    {
-        //TODO: Write this 'projectClosed' implemented method in the 'FrcApplicationComponent' class
-    }
 
     // ==== NamedComponent
 
 
     @NotNull
     @Override
-    public String getComponentName() { return FrcPluginGlobals.FRC_PLUGIN_COMPONENT_NAME; }
+    public String getComponentName() { return getClass().getSimpleName(); }
 
     // ==== Configurable
 
@@ -184,8 +171,6 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
     {
         final FrcSettings newSettings = settingsForm.getFrcSettings();
         this.settings = newSettings.clone();
-        //TODO: if we implement an service manager, we need to call FrcServiceManager.resetSettings()
-
     }
 
 

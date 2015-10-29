@@ -18,8 +18,7 @@ package net.javaru.iip.frc;
 
 public final class FrcPluginGlobals
 {
-
-    public static final String FRC_PLUGIN_COMPONENT_NAME = "FrcPlugin";
+    public static final String FRC_PLUGIN_BASE_NAME = "FrcPlugin";
     public static final String FRC_PLUGIN_DISPLAY_NAME = "FRC Plugin";
     
     /** The standard log message (line) output by the robRIO on startup. */

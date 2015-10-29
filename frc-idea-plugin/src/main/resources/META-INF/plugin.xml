@@ -168,13 +168,17 @@
     <application-components>
         <!-- Add your application components here -->
         <component>
-            <implementation-class>net.javaru.iip.frc.settings.FrcApplicationComponent</implementation-class>
             <interface-class>net.javaru.iip.frc.settings.FrcApplicationComponent</interface-class>
+            <implementation-class>net.javaru.iip.frc.settings.FrcApplicationComponent</implementation-class>
         </component>
     </application-components>
 
     <project-components>
         <!-- Add your project components here -->
+        <component>
+            <interface-class>net.javaru.iip.frc.ui.RioLogConsoleProjectService</interface-class>
+            <implementation-class>net.javaru.iip.frc.ui.RioLogConsoleProjectService</implementation-class>
+        </component>
     </project-components>
 
     <actions>

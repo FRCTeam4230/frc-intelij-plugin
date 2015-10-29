@@ -20,7 +20,10 @@ import java.util.Collection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
+import com.intellij.openapi.components.ProjectComponent;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -36,36 +39,127 @@ import net.javaru.iip.frc.settings.FrcSettings;
 
 
 /**
- * Access as a Project Service via the IntelliJ 
+ * Class that manages the displaying of the RioLog console window. It {@link #update() updates} the RioLog Console 
+ * view creating/opening, destroying/closing, or moving it as needed based on the state of the UI and on the current
+ * configuration of the project and the presence of any FRC facets.
+ * Access as a Project Service via the IntelliJ
  * <a href="http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_services.html">Plugin Services</a>.
  * For example:
  * <pre>
  * final RioLogConsoleProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogConsoleProjectService.class);
  * </pre>
+ * There are also three static {@code update} methods that can be used when the caller has access to a facet, a module, or a project.
  */
-public class RioLogConsoleProjectService 
+public class RioLogConsoleProjectService implements ProjectComponent
 {
     private static final Logger LOG = Logger.getInstance(RioLogConsoleProjectService.class);
-    
+
     @NotNull
     private final Project myProject;
 
     @Nullable
     private AbstractRioLogContentExecutor contentExecutor;
 
-    
+    /*
+        Use cases we want to be sure the RioLog Console status is updated, and where they are handled:
+        
+        1) Project Open
+            Handled via: This classes implementation of ProjectComponent.projectOpened()
+        2) Facet Added to Project
+            Handled via: TODO
+        3) Facet Removed from Project
+            a) was only facet and  we want to close the console
+            b) there are other FRC facets still configured on the project
+            Handled via: TODO
+        4) New module created and facet was Added - likely dup of #2, but we want t test it
+            Handled via: TODO
+        5) Module imported (with FRC facet)
+            Handled via: TODO
+        6) Module Removed from project
+            a) was only module with an FRC facet and  we want to close the console
+            b) there are other modules with FRC facets still configured on the project
+            Handled via: TODO
+        
+     */
+
+    /**
+     * A null safe convenience static utility method for {@link #update() updating} the RioLog Condole for a facet.
+     * Equivalent to calling:<br/><br/>
+     * <pre>
+     * ServiceManager.getService(facet.getModule().getProject(), RioLogConsoleProjectService.class).update();
+     * </pre>
+     * but with full null safety
+     *
+     * @param facet the facet
+     */
+    public static void update(@Nullable Facet facet)
+    {
+        if (facet != null)
+        {
+            final Module module = facet.getModule();
+            update(module);
+        }
+    }
+
+
+    /**
+     * A null safe convenience static utility method for {@link #update() updating} the RioLog Condole for a module.
+     * Equivalent to calling:<br/><br/>
+     * <pre>
+     * ServiceManager.getService(module.getProject(), RioLogConsoleProjectService.class).update();
+     * </pre>
+     * but with full null safety
+     *
+     * @param module the module
+     */
+    public static void update(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final Project project = module.getProject();
+            update(project);
+        }
+    }
+
+
+    /**
+     * A null safe convenience static utility method for {@link #update() updating} the RioLog Condole for a project.
+     * Equivalent to calling:<br/><br/>
+     * <pre>
+     * ServiceManager.getService(project, RioLogConsoleProjectService.class).update();
+     * </pre>
+     * but with full null safety
+     *
+     * @param project the project
+     */
+    public static void update(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            ServiceManager.getService(project, RioLogConsoleProjectService.class).update();
+        }
+    }
+
+
     /**
      * Do not call the constructor directly. Use as a project service:<br/>
      * <pre>
      * final RioLogConsoleProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogConsoleProjectService.class);
      * </pre>
+     *
      * @param myProject the project
      */
     private RioLogConsoleProjectService(@NotNull Project myProject)
     {
+        LOG.debug("[FRC] RioLogConsoleProjectService constructor called.");
         this.myProject = myProject;
     }
-    
+
+
+    /**
+     * Updates the RioLog Console view creating/opening, destroying/closing, or moving it as needed, or moving it 
+     * as needed based on the state of the UI and the current configuration of the project and the presence of any FRC facets.
+     */
     public void update()
     {
         final Module[] modules = ModuleManager.getInstance(myProject).getModules();
@@ -82,12 +176,12 @@ public class RioLogConsoleProjectService
 
         final FrcSettings frcSettings = FrcApplicationComponent.getInstance().getState();
         final boolean useRunWindow = (frcSettings != null && !frcSettings.isUseFrcToolWindow());
-        
+
         LOG.debug("[FRC] needConsole:  " + needConsole);
         LOG.debug("[FRC] haveConsole:  " + (contentExecutor != null));
         LOG.debug("[FRC] useRunWindow: " + useRunWindow);
-        
-        
+
+
         // Case 1 - we have and need it, but we need to check if we have the right type (i.e. settings change)
         if (needConsole && contentExecutor != null)
         {
@@ -108,7 +202,7 @@ public class RioLogConsoleProjectService
                 closeContentExecutor();
                 createContentExecutor(false);
             }
-            else 
+            else
             {
                 LOG.debug("[FRC] Case 1.3: have console, need it, and it is the right type. No action needed.");
             }
@@ -125,10 +219,10 @@ public class RioLogConsoleProjectService
             LOG.debug("[FRC] Case 3: We have a console, but don't need it. Closing it.");
             closeContentExecutor();
         }
-        else 
-        {   
+        else
+        {
             //Case 4, we don't have it and don't need it... so do nothing
-            LOG.debug("[FRC] Case 4: We don't have a console window an we don't need one. No action needed."); 
+            LOG.debug("[FRC] Case 4: We don't have a console window an we don't need one. No action needed.");
         }
     }
 
@@ -140,9 +234,10 @@ public class RioLogConsoleProjectService
             contentExecutor.dispose();
             contentExecutor = null;
         }
-        
+
     }
-    
+
+
     private void createContentExecutor(final boolean useRunWindow)
     {
         LOG.debug("[FRC] Creating AbstractRioLogContentExecutor");
@@ -173,4 +268,25 @@ public class RioLogConsoleProjectService
             return facetsByType.iterator().next();
         }
     }
+
+
+    @Override
+    public void projectOpened() { update(); }
+
+
+    @Override
+    public void projectClosed() { /* no op */ }
+
+
+    @Override
+    public void initComponent() { /* no op */ }
+
+
+    @Override
+    public void disposeComponent() { /* no op */ }
+
+
+    @NotNull
+    @Override
+    public String getComponentName() { return getClass().getSimpleName(); }
 }

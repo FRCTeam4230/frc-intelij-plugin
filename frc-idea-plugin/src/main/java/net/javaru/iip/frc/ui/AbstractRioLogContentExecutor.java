@@ -80,7 +80,6 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     private ConsoleView myConsoleView;
     private Runnable myRerunRunnable;
     private Runnable myStopRunnable;
-    private Runnable myCloseRunnable;
     @Nullable
     private Runnable myAfterCompletionRunnable;
     private Computable<Boolean> myStopEnabled;
@@ -172,17 +171,6 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         Disposer.register(this, descriptor);
         addActionsToActionGroup(actions);
 
-        myCloseRunnable = () ->
-        {
-            myStopRunnable.run();
-            final boolean removedOk = ExecutionManager.getInstance(myProject).getContentManager().removeRunContent(executor, descriptor);
-            if (removedOk)
-            {
-                process.stop();
-                myProcessHandler.destroyProcess();
-                myProcessHandler = null;
-            }
-        };
 
         ExecutionManager.getInstance(myProject).getContentManager().showRunContent(executor, descriptor);
 
@@ -298,8 +286,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     @Override
     public void dispose()
     {
-        myCloseRunnable.run();
         Disposer.dispose(this);
+        LOG.debug("[FRC] Disposing of " + getClass().getSimpleName() + " complete.");
     }
 
 

@@ -199,7 +199,7 @@ public class SimulatedRioLogService extends Thread implements Runnable
     {
         try
         {
-            multicastPort = RioLogMonitoringProcess.determineSimulatedLogPort();
+            multicastPort = determineSimulatedLogPort();
         }
         catch (Exception e)
         {
@@ -219,6 +219,22 @@ public class SimulatedRioLogService extends Thread implements Runnable
             throw new RuntimeException(msg, e);
         }
         System.out.println(">>> INIT: Socket port set to " + socketPort + "; multicast (i.e. the broadcast port) set to " + multicastPort);
+    }
+
+
+    private int determineSimulatedLogPort()
+    {
+        try
+        {
+            return Integer.valueOf(System.getProperty(RioLogMonitoringProcess.SIMULATED_LOG_SERVICE_PORT_PROP_KEY,
+                                                                     Integer.toString(RioLogMonitoringProcess.SIMULATED_LOG_SERVICE_PORT_DEFAULT)));
+        }
+        catch (Exception e)
+        {
+            final String message = "Could not determine the port for the simulated log service due to an exception: " + e.toString();
+            System.err.println("[FRC] " + message);
+            throw new IllegalArgumentException(message, e);
+        }
     }
 
 

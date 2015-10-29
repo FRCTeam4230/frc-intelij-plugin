@@ -62,16 +62,17 @@ public class RioLogMonitoringProcess extends Process
     public static final String SIMULATED_LOG_SERVICE_ENABLED_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".enabled";
     public static final String SIMULATED_LOG_SERVICE_PORT_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".port";
     public static final int SIMULATED_LOG_SERVICE_PORT_DEFAULT = 4248; //arbitrarily chosen port not listed at https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
-    
-    private static final boolean USE_DEBUGGING_SERVER = BooleanUtils.toBoolean(System.getProperty(SIMULATED_LOG_SERVICE_ENABLED_PROP_KEY, Boolean.FALSE.toString()));
-    
+
+    private static final boolean USE_DEBUGGING_SERVER = BooleanUtils.toBoolean(System.getProperty(SIMULATED_LOG_SERVICE_ENABLED_PROP_KEY,
+                                                                                                  Boolean.FALSE.toString()));
+
 
     private boolean enabled = true;
 
     private PipedInputStream in;
     private PrintWriter consoleWriter;
     private PrintWriter fileWriter;
-    private MonitorRunnable monitorRunnable;
+    private RioLogMonitor rioLogMonitor;
 
 
     private final Runnable clearConsoleRunnable;
@@ -114,13 +115,22 @@ public class RioLogMonitoringProcess extends Process
         }
 
         enabled = true;
-        monitorRunnable = USE_DEBUGGING_SERVER ? new MultiCastTestingMonitor() : new MonitorRunnable();
-        LOG.info(String.format("[FRC] System Property '%s set '%s'. Using '%s' for monitoring on port '%d'.",
-                               SIMULATED_LOG_SERVICE_PROP_KEY_BASE,
-                               USE_DEBUGGING_SERVER,
-                               monitorRunnable.getClass().getSimpleName(),
-                               monitorRunnable.port));
-        Thread thread = new Thread(monitorRunnable);
+        if (USE_DEBUGGING_SERVER)
+        {
+            rioLogMonitor = new TestingRioLogMonitor();
+            LOG.warn(String.format("[FRC] System Property '%s is set to 'true'. Using '%s' for monitoring on port '%d'.",
+                                   SIMULATED_LOG_SERVICE_PROP_KEY_BASE,
+                                   rioLogMonitor.getClass().getSimpleName(),
+                                   rioLogMonitor.port));
+        }
+        else
+        {
+            rioLogMonitor = new RioLogMonitor();
+            LOG.info(String.format("[FRC] Using '%s' for monitoring on port '%d'.",
+                                   rioLogMonitor.getClass().getSimpleName(),
+                                   rioLogMonitor.port));
+        }
+        Thread thread = new Thread(rioLogMonitor);
         thread.setName("RioLogMonitoringProcess");
         thread.start();
     }
@@ -209,7 +219,7 @@ public class RioLogMonitoringProcess extends Process
     {
         return 0;
     }
-    
+
 
     @Override
     public void destroy()
@@ -217,9 +227,9 @@ public class RioLogMonitoringProcess extends Process
         enabled = false;
         try
         {
-            if (monitorRunnable != null)
+            if (rioLogMonitor != null)
             {
-                while (monitorRunnable.isRunning)
+                while (rioLogMonitor.isRunning)
                 {
                     try {TimeUnit.MILLISECONDS.sleep(50);} catch (InterruptedException ignore) {}
                 }
@@ -232,7 +242,7 @@ public class RioLogMonitoringProcess extends Process
     }
 
 
-    private class MonitorRunnable implements Runnable
+    private class RioLogMonitor implements Runnable
     {
         protected boolean isRunning = true;
 
@@ -357,14 +367,25 @@ public class RioLogMonitoringProcess extends Process
     }
 
 
-    private class MultiCastTestingMonitor extends MonitorRunnable
+    private class TestingRioLogMonitor extends RioLogMonitor
     {
         private final InetAddress groupAddress;
-        private final int multicastPort = determineSimulatedLogPort();
+        private final int simulatedLoggerPort;
 
 
-        public MultiCastTestingMonitor()
+        public TestingRioLogMonitor()
         {
+            try
+            {
+                simulatedLoggerPort =  Integer.valueOf(System.getProperty(SIMULATED_LOG_SERVICE_PORT_PROP_KEY, Integer.toString(SIMULATED_LOG_SERVICE_PORT_DEFAULT)));
+            }
+            catch (Exception e)
+            {
+                final String message = "Could not determine the port for the simulated log service due to an exception: " + e.toString();
+                LOG.error("[FRC] " + message);
+                throw new IllegalArgumentException(message, e);
+            }
+            
             try
             {
                 groupAddress = InetAddress.getByName("230.0.0.1");
@@ -381,7 +402,7 @@ public class RioLogMonitoringProcess extends Process
         @Override
         protected DatagramSocket createSocket() throws IOException
         {
-            MulticastSocket socket = new MulticastSocket(multicastPort);
+            MulticastSocket socket = new MulticastSocket(simulatedLoggerPort);
             socket.joinGroup(groupAddress);
             return socket;
         }
@@ -399,7 +420,7 @@ public class RioLogMonitoringProcess extends Process
 
         @NotNull
         @Override
-        protected String getStartingMonitoringMessage() { return "«««Monitoring *SIMULATED* RioLog on port " + multicastPort + "»»»"; }
+        protected String getStartingMonitoringMessage() { return "«««Monitoring *SIMULATED* RioLog on port " + simulatedLoggerPort + "»»»"; }
 
 
         @Override
@@ -407,21 +428,7 @@ public class RioLogMonitoringProcess extends Process
         {
             return true;
         }
-        
-        
-    }
 
-    public static int determineSimulatedLogPort()
-    {
-        try
-        {
-            return Integer.valueOf(System.getProperty(SIMULATED_LOG_SERVICE_PORT_PROP_KEY, Integer.toString(SIMULATED_LOG_SERVICE_PORT_DEFAULT)));
-        }
-        catch (Exception e)
-        {
-            final String message = "Could not determine the port for the simulated log service due to an exception: " + e.toString();
-            LOG.error("[FRC] " + message);
-            throw new IllegalArgumentException(message, e);
-        }
+
     }
 }

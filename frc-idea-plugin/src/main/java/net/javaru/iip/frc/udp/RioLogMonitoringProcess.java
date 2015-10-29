@@ -221,7 +221,7 @@ public class RioLogMonitoringProcess extends Process
             {
                 while (monitorRunnable.isRunning)
                 {
-                    try {TimeUnit.MILLISECONDS.sleep(100);} catch (InterruptedException ignore) {}
+                    try {TimeUnit.MILLISECONDS.sleep(50);} catch (InterruptedException ignore) {}
                 }
             }
         }

@@ -168,11 +168,13 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         consolePanel = createConsolePanel(myConsoleView, actions);
         RunContentDescriptor descriptor = new RunContentDescriptor(myConsoleView, myProcessHandler, consolePanel, myTitle, AllIcons.General.MessageHistory);
 
+        Disposer.register(myProject, this);
         Disposer.register(this, descriptor);
         addActionsToActionGroup(actions);
 
         myCloseRunnable = () ->
         {
+            myStopRunnable.run();
             final boolean removedOk = ExecutionManager.getInstance(myProject).getContentManager().removeRunContent(executor, descriptor);
             if (removedOk)
             {

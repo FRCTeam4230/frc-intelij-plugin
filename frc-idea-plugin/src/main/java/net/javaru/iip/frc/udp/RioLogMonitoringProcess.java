@@ -246,7 +246,19 @@ public class RioLogMonitoringProcess extends Process
     {
         protected boolean isRunning = true;
 
-        protected final int port = getSettings().getRioLogPort();
+        protected final int port;
+
+
+        protected RioLogMonitor()
+        {
+            this(getSettings().getRioLogPort());
+        }
+
+
+        public RioLogMonitor(int port)
+        {
+            this.port = port;
+        }
 
 
         @Override
@@ -370,21 +382,12 @@ public class RioLogMonitoringProcess extends Process
     private class TestingRioLogMonitor extends RioLogMonitor
     {
         private final InetAddress groupAddress;
-        private final int simulatedLoggerPort;
+        
 
 
         public TestingRioLogMonitor()
         {
-            try
-            {
-                simulatedLoggerPort =  Integer.valueOf(System.getProperty(SIMULATED_LOG_SERVICE_PORT_PROP_KEY, Integer.toString(SIMULATED_LOG_SERVICE_PORT_DEFAULT)));
-            }
-            catch (Exception e)
-            {
-                final String message = "Could not determine the port for the simulated log service due to an exception: " + e.toString();
-                LOG.error("[FRC] " + message);
-                throw new IllegalArgumentException(message, e);
-            }
+            super(Integer.valueOf(System.getProperty(SIMULATED_LOG_SERVICE_PORT_PROP_KEY, Integer.toString(SIMULATED_LOG_SERVICE_PORT_DEFAULT))));
             
             try
             {
@@ -402,7 +405,7 @@ public class RioLogMonitoringProcess extends Process
         @Override
         protected DatagramSocket createSocket() throws IOException
         {
-            MulticastSocket socket = new MulticastSocket(simulatedLoggerPort);
+            MulticastSocket socket = new MulticastSocket(port);
             socket.joinGroup(groupAddress);
             return socket;
         }
@@ -420,7 +423,7 @@ public class RioLogMonitoringProcess extends Process
 
         @NotNull
         @Override
-        protected String getStartingMonitoringMessage() { return "«««Monitoring *SIMULATED* RioLog on port " + simulatedLoggerPort + "»»»"; }
+        protected String getStartingMonitoringMessage() { return "«««Monitoring *SIMULATED* RioLog on port " + port + "»»»"; }
 
 
         @Override

@@ -33,11 +33,14 @@ import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.ModificationTracker;
 import com.intellij.openapi.util.SimpleModificationTracker;
 
 import net.javaru.iip.frc.FrcPluginGlobals;
 import net.javaru.iip.frc.ui.FrcSettingsForm;
+import net.javaru.iip.frc.ui.RioLogConsoleProjectService;
 
 
 
@@ -171,6 +174,7 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
     {
         final FrcSettings newSettings = settingsForm.getFrcSettings();
         this.settings = newSettings.clone();
+        updateRioLogConsole();
     }
 
 
@@ -184,6 +188,14 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
         }
     }
 
+    protected void updateRioLogConsole()
+    {
+        final Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+        for (Project project : openProjects)
+        {
+            RioLogConsoleProjectService.update(project);
+        }
+    }
 
     @Override
     public void disposeUIResources() { settingsForm = null; }

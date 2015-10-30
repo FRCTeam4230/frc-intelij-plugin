@@ -17,8 +17,6 @@
 package net.javaru.iip.frc.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 
@@ -26,19 +24,16 @@ import net.javaru.iip.frc.ui.RioLogConsoleProjectService;
 
 
 
-public class OpenFrcWindowAction extends DumbAwareAction
+public class ShowRioLogConsole extends DumbAwareAction
 {
-    private static final Logger LOG = Logger.getInstance(OpenFrcWindowAction.class);
-
-
     @Override
     public void actionPerformed(AnActionEvent actionEvent)
     {
         final Project project = actionEvent.getProject();
         if (project != null)
         {
-            final RioLogConsoleProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogConsoleProjectService.class);
-            rioLogConsoleProjectService.update();
+            RioLogConsoleProjectService.update(project);
+            //TODO: call activate on RioLogConsoleProjectService once implemented
         }
     }
 }

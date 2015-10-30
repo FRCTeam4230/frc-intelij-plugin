@@ -154,6 +154,8 @@
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html on how to target different products -->
     <!-- uncomment to enable plugin in all products -->
     <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.java</depends>
+    <!--<depends config-file="">com.intellij.tasks</depends>-->
 
 
     <extensions defaultExtensionNs="com.intellij">
@@ -168,7 +170,6 @@
     <application-components>
         <!-- Add your application components here -->
         <component>
-            <interface-class>net.javaru.iip.frc.settings.FrcApplicationComponent</interface-class>
             <implementation-class>net.javaru.iip.frc.settings.FrcApplicationComponent</implementation-class>
         </component>
     </application-components>
@@ -176,11 +177,16 @@
     <project-components>
         <!-- Add your project components here -->
         <component>
-            <interface-class>net.javaru.iip.frc.ui.RioLogConsoleProjectService</interface-class>
-            <implementation-class>net.javaru.iip.frc.ui.RioLogConsoleProjectService</implementation-class>
+            <implementation-class>net.javaru.iip.frc.components.FrcProjectComponent</implementation-class>
         </component>
     </project-components>
-
+    
+    <module-components>
+        <component>
+            <implementation-class>net.javaru.iip.frc.components.FrcModuleComponent</implementation-class>
+        </component>
+    </module-components>
+    
     <actions>
         <!--   See  http://www.jetbrains.org/intellij/sdk/docs/basics/action_system.html  -->
         <!--
@@ -227,8 +233,8 @@
 
             The <reference> element allows to add an existing action to the group. The mandatory "ref" attribute specifies the ID of the action to add.
         -->
-        <action class="net.javaru.iip.frc.actions.OpenFrcWindowAction" id="FRC_StartTailingRioLogAction" text="Start FRC _RioLog Tailing">
-            <add-to-group group-id="ToolsMenu" anchor="first" />
+        <action class="net.javaru.iip.frc.actions.ShowRioLogConsole" id="FRC_StartTailingRioLogAction" text="Show FRC _RioLog Console" icon="/frc/icons/FIRST_icon_16x16.png" >
+            <add-to-group group-id="ToolsMenu" />
         </action>
     </actions>
 

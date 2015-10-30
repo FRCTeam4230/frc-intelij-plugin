@@ -22,14 +22,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
-import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.wm.ToolWindowId;
 
 import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.facet.FrcFacetType;
@@ -50,8 +48,10 @@ import net.javaru.iip.frc.settings.FrcSettings;
  * </pre>
  * There are also three static {@code update} methods that can be used when the caller has access to a facet, a module, or a project.
  */
-public class RioLogConsoleProjectService implements ProjectComponent
+public class RioLogConsoleProjectService
 {
+    //TODO add activate method and then call it in ShowRioLogConsole
+    
     private static final Logger LOG = Logger.getInstance(RioLogConsoleProjectService.class);
 
     @NotNull
@@ -66,19 +66,21 @@ public class RioLogConsoleProjectService implements ProjectComponent
         1) Project Open
             Handled via: This classes implementation of ProjectComponent.projectOpened()
         2) Facet Added to Project
-            Handled via: TODO
+            Handled via: FrcFacetManagerListener.facetAdded() (inner class in FrcProjectComponent)
         3) Facet Removed from Project
             a) was only facet and  we want to close the console
             b) there are other FRC facets still configured on the project
-            Handled via: TODO
+            Handled via: FrcFacetManagerListener.facetRemoved() (inner class in FrcProjectComponent)
         4) New module created and facet was Added - likely dup of #2, but we want t test it
-            Handled via: TODO
+            Handled via: FrcModuleComponent.moduleAdded()
         5) Module imported (with FRC facet)
-            Handled via: TODO
+            Handled via: FrcModuleComponent.moduleAdded()
         6) Module Removed from project
             a) was only module with an FRC facet and  we want to close the console
             b) there are other modules with FRC facets still configured on the project
-            Handled via: TODO
+            Handled via: FrcModuleComponent.disposeComponent()
+        7) Change to the target window in the FrcSettings
+            Handled via: FrcApplicationComponent's impl of UnnamedConfigurable.apply()
         
      */
 
@@ -182,47 +184,49 @@ public class RioLogConsoleProjectService implements ProjectComponent
         LOG.debug("[FRC] useRunWindow: " + useRunWindow);
 
 
-        // Case 1 - we have and need it, but we need to check if we have the right type (i.e. settings change)
         if (needConsole && contentExecutor != null)
         {
-            LOG.debug("[FRC] Case 1: have console and need it. Checking if correct type.");
+            // Case 1 - we have and need it, but we need to check if we have the right type (i.e. settings change)
+            LOG.debug("[FRC] Case 1: have console and need it. Checking if correct type. Project is: " + myProject.getName());
 
             //do we have the right console?
-            if (useRunWindow && RioLogFrcWindowRunExecutor.TOOL_WINDOW_ID.equals(contentExecutor.getToolWindowId()))
+            if (useRunWindow && RioLogFrcWindowContentExecutor.TOOL_WINDOW_ID.equals(contentExecutor.getToolWindowId()))
             {
                 //We have a FRC Tool Window, but need a Run Window
-                LOG.debug("[FRC] Case 1.1: have a FRC Tool Window, but need a Run Tab. Closing FRC Tool Window and creating Run tab");
+                LOG.debug("[FRC] Case 1.1: have a FRC Tool Window, but need a Run Tab. Closing FRC Tool Window and creating Run tab. Project is: "
+                          + myProject.getName());
                 closeContentExecutor();
                 createContentExecutor(true);
             }
-            else if (!useRunWindow && ToolWindowId.RUN.equals(contentExecutor.getToolWindowId()))
+            else if (!useRunWindow && RioLogRunWindowContentExecutor.TOOL_WINDOW_ID.equals(contentExecutor.getToolWindowId()))
             {
                 //We have a run window, but need a FRC tool window
-                LOG.debug("[FRC] Case 1.2: have a Run tab, but need a FRC Tool Window. Closing Run tab and creating FRC Tool Window");
+                LOG.debug("[FRC] Case 1.2: have a Run tab, but need a FRC Tool Window. Closing Run tab and creating FRC Tool Window. Project is: "
+                          + myProject.getName());
                 closeContentExecutor();
                 createContentExecutor(false);
             }
             else
             {
-                LOG.debug("[FRC] Case 1.3: have console, need it, and it is the right type. No action needed.");
+                LOG.debug("[FRC] Case 1.3: have console, need it, and it is the right type. No action needed. Project is: " + myProject.getName());
             }
         }
-        // Case 2 - we need it, but don't have it
         else if (needConsole)
         {
-            LOG.debug("[FRC] Case 2: need a console, but we don't have one. Creating one.");
+            // Case 2 - we need it, but don't have it
+            LOG.debug("[FRC] Case 2: need a console, but we don't have one. Creating one. Project is: " + myProject.getName());
             createContentExecutor(useRunWindow);
         }
-        // Case 3 we have it, but don't need it
         else if (contentExecutor != null)
         {
-            LOG.debug("[FRC] Case 3: We have a console, but don't need it. Closing it.");
+            // Case 3 we have it, but don't need it
+            LOG.debug("[FRC] Case 3: We have a console, but don't need it. Closing it. Project is: " + myProject.getName());
             closeContentExecutor();
         }
         else
         {
             //Case 4, we don't have it and don't need it... so do nothing
-            LOG.debug("[FRC] Case 4: We don't have a console window an we don't need one. No action needed.");
+            LOG.debug("[FRC] Case 4: We don't have a console window an we don't need one. No action needed. Project is: " + myProject.getName());
         }
     }
 
@@ -231,10 +235,9 @@ public class RioLogConsoleProjectService implements ProjectComponent
     {
         if (contentExecutor != null)
         {
-            contentExecutor.dispose();
+            contentExecutor.close();
             contentExecutor = null;
         }
-
     }
 
 
@@ -250,7 +253,9 @@ public class RioLogConsoleProjectService implements ProjectComponent
     private boolean moduleHasFrcFacet(@NotNull Module module)
     {
         final FrcFacet frcFacet = checkForFrcFacet(module);
-        return frcFacet != null;
+        final boolean moduleHasFrcFacet = frcFacet != null;
+        LOG.debug("The module " + module.getName() + " has FRC Facet: " + frcFacet);
+        return moduleHasFrcFacet;
     }
 
 
@@ -268,25 +273,4 @@ public class RioLogConsoleProjectService implements ProjectComponent
             return facetsByType.iterator().next();
         }
     }
-
-
-    @Override
-    public void projectOpened() { update(); }
-
-
-    @Override
-    public void projectClosed() { /* no op */ }
-
-
-    @Override
-    public void initComponent() { /* no op */ }
-
-
-    @Override
-    public void disposeComponent() { /* no op */ }
-
-
-    @NotNull
-    @Override
-    public String getComponentName() { return getClass().getSimpleName(); }
 }

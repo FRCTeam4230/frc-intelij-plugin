@@ -143,6 +143,32 @@ public class RioLogConsoleProjectService
     }
 
 
+    public static void activate(@Nullable Facet facet)
+    {
+        if (facet!= null)
+        {
+            final Project project = facet.getModule().getProject();
+            ServiceManager.getService(project, RioLogConsoleProjectService.class).activate();
+        }
+    }
+    
+    public static void activate(@Nullable Module module)
+    {
+        if (module!= null)
+        {
+            final Project project = module.getProject();
+            ServiceManager.getService(project, RioLogConsoleProjectService.class).activate();
+        }
+    }
+    
+    public static void activate(@Nullable Project project)
+    {
+        if (project!= null)
+        {
+            ServiceManager.getService(project, RioLogConsoleProjectService.class).activate();
+        }
+    }
+    
     /**
      * Do not call the constructor directly. Use as a project service:<br/>
      * <pre>
@@ -230,6 +256,13 @@ public class RioLogConsoleProjectService
         }
     }
 
+    public void activate()
+    {
+        if (contentExecutor != null)
+        {
+            contentExecutor.activateRioLogConsole();
+        }
+    }
 
     private void closeContentExecutor()
     {

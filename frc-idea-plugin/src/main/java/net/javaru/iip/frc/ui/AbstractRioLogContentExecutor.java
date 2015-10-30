@@ -61,7 +61,10 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.ui.content.Content;
+import com.intellij.ui.content.ContentManager;
 
 import net.javaru.iip.frc.udp.RioLogMonitoringProcess;
 
@@ -181,7 +184,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
         if (myActivateToolWindow)
         {
-            activateToolWindow();
+            activateRioLogConsole();
         }
 
         if (myAfterCompletionRunnable != null)
@@ -270,18 +273,25 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     protected abstract Executor createExecutor();
 
 
-    public void activateToolWindow()
+    public void activateRioLogConsole()
     {
-        ApplicationManager.getApplication().invokeLater(new Runnable()
+        ApplicationManager.getApplication().invokeLater(() -> 
         {
-            @Override
-            public void run()
+            final ToolWindow toolWindow = ToolWindowManager.getInstance(myProject).getToolWindow(getToolWindowId());
+            toolWindow.activate(null);
+            final ContentManager contentManager = toolWindow.getContentManager();
+            final Content content = contentManager.findContent(getTitle());
+            if (content != null)
             {
-                ToolWindowManager.getInstance(myProject).getToolWindow(getToolWindowId()).activate(null);
+                contentManager.setSelectedContent(content, true);
             }
         });
     }
 
+    public String getTitle()
+    {
+        return myTitle;
+    }
 
     public void invokeClearAll()
     {

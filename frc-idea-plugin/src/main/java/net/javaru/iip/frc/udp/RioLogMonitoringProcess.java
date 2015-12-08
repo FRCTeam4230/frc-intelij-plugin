@@ -353,7 +353,7 @@ public class RioLogMonitoringProcess extends Process
 
 
         @NotNull
-        protected String getStartingMonitoringMessage() {return "«««Monitoring RioLog on port " + port + "»»»";}
+        protected String getStartingMonitoringMessage() {return ">>>Monitoring RioLog on port " + port + "<<<";}
 
 
         protected DatagramSocket createSocket() throws IOException

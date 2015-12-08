@@ -30,7 +30,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DateFormat;
@@ -40,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.jetbrains.annotations.NotNull;
-import com.google.common.base.Charsets;
 import com.intellij.openapi.diagnostic.Logger;
 
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
@@ -101,7 +100,7 @@ public class RioLogMonitoringProcess extends Process
         try
         {
             in = new PipedInputStream();
-            consoleWriter = new PrintWriter(new OutputStreamWriter(new PipedOutputStream(in), Charsets.UTF_8), /*AutoFlush*/ true);
+            consoleWriter = new PrintWriter(new OutputStreamWriter(new PipedOutputStream(in), StandardCharsets.UTF_8), /*AutoFlush*/ true);
 
             if (getSettings().isLogToFile())
             {
@@ -147,7 +146,7 @@ public class RioLogMonitoringProcess extends Process
         final boolean append = getSettings().isLogFileAppend();
         Path outputFile = determineOutputFilePath();
         Files.createDirectories(outputFile.getParent());
-        return new PrintWriter(new OutputStreamWriter(new FileOutputStream(outputFile.toFile(), append), Charset.forName("UTF-8")), /*AutoFlush*/ true);
+        return new PrintWriter(new OutputStreamWriter(new FileOutputStream(outputFile.toFile(), append), StandardCharsets.UTF_8), /*AutoFlush*/ true);
     }
 
 

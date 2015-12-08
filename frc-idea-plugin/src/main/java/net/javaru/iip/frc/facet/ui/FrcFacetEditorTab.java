@@ -39,6 +39,7 @@ public class FrcFacetEditorTab extends FacetEditorTab
     private final FrcFacetConfiguration frcFacetConfiguration;
     private JPanel rootPanel;
 
+
     public FrcFacetEditorTab(FacetEditorContext context, FrcFacetConfiguration frcFacetConfiguration)
     {
         this.context = context;
@@ -52,7 +53,6 @@ public class FrcFacetEditorTab extends FacetEditorTab
     }
 
 
-    
     @NotNull
     @Override
     public JComponent createComponent()
@@ -113,7 +113,7 @@ public class FrcFacetEditorTab extends FacetEditorTab
         rootPanel = new JPanel();
         rootPanel.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
         final JLabel label1 = new JLabel();
-        label1.setText("Here you can configure the FRC facet for your project.");
+        label1.setText(" FRC facet");
         rootPanel.add(label1,
                       new GridConstraints(0,
                                           0,
@@ -148,7 +148,4 @@ public class FrcFacetEditorTab extends FacetEditorTab
 
     /** @noinspection ALL */
     public JComponent $$$getRootComponent$$$() { return rootPanel; }
-
-
-    
 }

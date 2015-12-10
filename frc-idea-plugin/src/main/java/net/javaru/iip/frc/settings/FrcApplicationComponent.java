@@ -47,7 +47,10 @@ import net.javaru.iip.frc.ui.RioLogConsoleProjectService;
 // @State persistence documentation: http://www.jetbrains.org/intellij/sdk/docs/basics/persisting_state_of_components.html
 @State(
         name = FrcPluginGlobals.FRC_PLUGIN_BASE_NAME,
-        storages = {@Storage(id = FrcPluginGlobals.FRC_PLUGIN_BASE_NAME, file = StoragePathMacros.APP_CONFIG + "frc.xml")}
+        storages = {
+            @Storage(id = FrcPluginGlobals.FRC_PLUGIN_BASE_NAME, file = StoragePathMacros.APP_CONFIG + "/frc.xml"),
+            @Storage(id = FrcPluginGlobals.FRC_PLUGIN_BASE_NAME, file = StoragePathMacros.APP_CONFIG + "frc.xml", deprecated = true)
+        }
     )
 public class FrcApplicationComponent extends SimpleModificationTracker implements Configurable,
                                                                                   ApplicationComponent,
@@ -110,7 +113,7 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
     // ==== PersistentStateComponent
 
 
-    @Nullable
+    @NotNull
     @Override
     public FrcSettings getState()
     {

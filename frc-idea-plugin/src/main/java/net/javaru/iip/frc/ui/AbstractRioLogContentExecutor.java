@@ -80,6 +80,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     private static final Logger LOG = Logger.getInstance(AbstractRioLogContentExecutor.class);
     private static final Icon AUTO_CLEAR_ON_ICON = AllIcons.Ide.OutgoingChangesOn;
     private static final Icon AUTO_CLEAR_OFF_ICON = AllIcons.General.TodoDefault;
+    private static final Icon START_ICON = AllIcons.Actions.Execute;
+    private static final Icon RESTART_ICON = AllIcons.Actions.Restart;
     protected final Project myProject;
 
     private JComponent consolePanel;
@@ -416,7 +418,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     {
         public RioLogStopAction()
         {
-            super(ExecutionBundle.message("run.configuration.stop.action.name"), "Stops monitoring of the roboRIO log output.", AllIcons.Actions.Suspend);
+            super(ExecutionBundle.message("run.configuration.stop.action.name"), "Stops the monitoring of the roboRIO log output.", AllIcons.Actions.Suspend);
         }
 
 
@@ -441,11 +443,17 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
     private class RioLogRerunAction extends DumbAwareAction
     {
+
+        private static final String startText = "Start Monitoring RioLog";
+        private static final String startDescription = "Starts the roboRIO Log monitoring";
+        private static final String restartText = "Restart";
+        private static final String restartDescription = "Clears the console and restarts the roboRIO Log monitoring";
+        
+
+
         public RioLogRerunAction(JComponent consolePanel)
         {
-            super("Restart", 
-                  "Clears the console and restarts the roboRIO Log monitoring",
-                  AllIcons.Actions.Restart);
+            super(restartText, restartDescription, RESTART_ICON);
             registerCustomShortcutSet(CommonShortcuts.getRerun(), consolePanel);
         }
 
@@ -463,6 +471,23 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         }
 
 
+        @Override
+        public void update(AnActionEvent event)
+        {
+            final Presentation presentation = event.getPresentation();
+            if (myStopEnabled.compute())
+            {
+                presentation.setIcon(RESTART_ICON);
+                presentation.setText(restartText);
+                presentation.setDescription(restartDescription);
+            }
+            else
+            {
+                presentation.setIcon(START_ICON);
+                presentation.setText(startText);
+                presentation.setDescription(startDescription);
+            }
+        }
     }
     
     private class RioLogClearAllAction extends DumbAwareAction

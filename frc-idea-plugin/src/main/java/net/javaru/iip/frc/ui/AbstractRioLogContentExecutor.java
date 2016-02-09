@@ -22,6 +22,7 @@ import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import com.intellij.codeEditor.printing.PrintAction;
 import com.intellij.compiler.server.BuildManager;
 import com.intellij.execution.ExecutionBundle;
 import com.intellij.execution.ExecutionManager;
@@ -54,6 +55,7 @@ import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actions.ScrollToTheEndToolbarAction;
 import com.intellij.openapi.editor.actions.ToggleUseSoftWrapsToolbarAction;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.DumbAware;
@@ -66,6 +68,8 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 
+import net.javaru.iip.frc.settings.FrcApplicationComponent;
+import net.javaru.iip.frc.settings.FrcSettings;
 import net.javaru.iip.frc.udp.RioLogMonitoringProcess;
 
 
@@ -74,15 +78,14 @@ import net.javaru.iip.frc.udp.RioLogMonitoringProcess;
 public abstract class AbstractRioLogContentExecutor implements Disposable
 {
     private static final Logger LOG = Logger.getInstance(AbstractRioLogContentExecutor.class);
+    private static final Icon AUTO_CLEAR_ON_ICON = AllIcons.Ide.OutgoingChangesOn;
+    private static final Icon AUTO_CLEAR_OFF_ICON = AllIcons.General.TodoDefault;
     protected final Project myProject;
 
     private JComponent consolePanel;
-    private ActionToolbar actionToolbar;
     
     protected ProcessHandler myProcessHandler;
     private ConsoleView myConsoleView;
-    private Runnable myRerunRunnable;
-    private Runnable myStopRunnable;
     @Nullable
     private Runnable myAfterCompletionRunnable;
     private Computable<Boolean> myStopEnabled;
@@ -118,7 +121,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.add(view.getComponent(), BorderLayout.CENTER);
-        actionToolbar = createToolbar(actions);
+        ActionToolbar actionToolbar = createToolbar(actions);
         panel.add(actionToolbar.getComponent(), BorderLayout.WEST);
         return panel;
     }
@@ -147,21 +150,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
         myProcessHandler.putUserDataIfAbsent(BuildManager.ALLOW_AUTOMAKE, true);
 
-
         myConsoleView = createConsole(myProject, myProcessHandler);
-        
-        
-        
-        myStopRunnable = myProcessHandler::destroyProcess;
         myStopEnabled = () -> !myProcessHandler.isProcessTerminated();
-        myRerunRunnable = () ->
-        {
-            myProcessHandler.destroyProcess();
-            invokeClearAll();
-            myProcessHandler.waitFor(2000L);
-            run();
-        };
-        
 
         if (myHelpId != null)
         {
@@ -209,14 +199,14 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         // We need to grab some actions that are created in the ConsoleView itself.
         // This is a bit hackish but works. 
 
-        AnAction softWrapAction = null, grepConsoleAction = null;
+        AnAction softWrapAction = null, scrollToEndAction = null, printAction = null, grepConsoleAction = null;
         for (AnAction action : myConsoleView.createConsoleActions())
         {
             final Class<? extends AnAction> actionClass = action.getClass();
 
             if (LOG.isDebugEnabled())
             {
-                LOG.debug(String.format("[FRC] Adding console Action: Text='%s'; Desc='%s'; class='%s'; enclosingClass='%s'; declaringClass='%s'",
+                LOG.debug(String.format("[FRC] Available console action: Text='%s'; Desc='%s'; class='%s'; enclosingClass='%s'; declaringClass='%s'",
                                        action.getTemplatePresentation().getText(),
                                        action.getTemplatePresentation().getDescription(),
                                        actionClass,
@@ -225,11 +215,20 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             }
             if (actionClass.getName().equals("krasa.grepconsole.action.OpenConsoleSettingsAction"))
             {
+                //We use the string equals for this action to prevent an import error if the Grp Console Pulg-in is not avaiable
                 grepConsoleAction = action;
             }
             else if (action instanceof ToggleUseSoftWrapsToolbarAction) 
             {
                 softWrapAction = action;
+            }
+            else if (action instanceof ScrollToTheEndToolbarAction)
+            {
+                scrollToEndAction = action;
+            }
+            else if (action instanceof PrintAction)
+            {
+                printAction = action;
             }
         }
 
@@ -260,9 +259,18 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         {
             actions.add(softWrapAction);
         }
+        if (scrollToEndAction != null)
+        {
+            actions.add(scrollToEndAction);
+        }
+        if (printAction != null)
+        {
+            actions.add(printAction);
+        }
 
         actions.add(new RioLogClearAllAction());
         actions.add(new Separator());
+        actions.add(new RioLogToggleAutoClearAction());
         // We no longer provide a close button. As long as a FRC Facet is present, we want a RioLog console. 
         // The 'work' of the close action was moved to myCloseRunnable and closing is managed by the RioLogConsoleProjectService
         // Leaving this line of code here commented out in case in the future we need to remember how we did include a close button.
@@ -413,17 +421,21 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
 
         @Override
-        public void actionPerformed(AnActionEvent e)
+        public void actionPerformed(AnActionEvent event)
         {
-            myStopRunnable.run();
+            ApplicationManager.getApplication().invokeLater(() -> 
+                                                            {
+                                                                myProcessHandler.destroyProcess(); 
+                                                                update(event);
+                                                            });
         }
 
 
         @Override
-        public void update(AnActionEvent e)
+        public void update(AnActionEvent event)
         {
-            e.getPresentation().setVisible(myStopRunnable != null);
-            e.getPresentation().setEnabled(myStopEnabled != null && myStopEnabled.compute());
+            event.getPresentation().setVisible(true);
+            event.getPresentation().setEnabled(myStopEnabled != null && myStopEnabled.compute());
         }
     }
 
@@ -431,24 +443,26 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     {
         public RioLogRerunAction(JComponent consolePanel)
         {
-            super("Restart", "Clears the console and restarts the roboRIO Log monitoring",
+            super("Restart", 
+                  "Clears the console and restarts the roboRIO Log monitoring",
                   AllIcons.Actions.Restart);
             registerCustomShortcutSet(CommonShortcuts.getRerun(), consolePanel);
         }
 
 
         @Override
-        public void actionPerformed(AnActionEvent e)
+        public void actionPerformed(AnActionEvent event)
         {
-            myRerunRunnable.run();
+            ApplicationManager.getApplication().invokeLater(() ->
+                                                            {
+                                                                myProcessHandler.destroyProcess();
+                                                                invokeClearAll();
+                                                                myProcessHandler.waitFor(2000L);
+                                                                run();
+                                                            });
         }
 
 
-        @Override
-        public void update(AnActionEvent e)
-        {
-            e.getPresentation().setVisible(myRerunRunnable != null);
-        }
     }
     
     private class RioLogClearAllAction extends DumbAwareAction
@@ -481,5 +495,61 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             }
             e.getPresentation().setEnabled(enabled);
         }
+    }
+
+
+    private class RioLogToggleAutoClearAction extends DumbAwareAction
+    {
+        public RioLogToggleAutoClearAction()
+        {
+            super("Toggle Auto Clear", 
+                  "Toggles whether the console output is automatically cleared upon detecting roboRIO startup/restart.",
+                  (FrcApplicationComponent.getInstance().getState().isClearOnRobotRestart() ? AUTO_CLEAR_ON_ICON : AUTO_CLEAR_OFF_ICON));
+        }
+
+
+        @Override
+        public void actionPerformed(final AnActionEvent event)
+        {
+            ApplicationManager.getApplication().invokeLater(
+            new Runnable() 
+            {
+                final AnActionEvent actionEvent = event;
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        final FrcSettings frcSettings = FrcApplicationComponent.getInstance().getState();
+                        frcSettings.setClearOnRobotRestart(!frcSettings.isClearOnRobotRestart());
+                        update(event);
+                    }
+                    catch (Exception ex)
+                    {
+                        LOG.warn("[FRC] An Exception occurred when toggling the AutoClear option. Cause Summary: " + ex.toString(), ex);
+                    }
+                }
+            });
+            
+        }
+
+
+        @Override
+        public void update(AnActionEvent event)
+        {
+            event.getPresentation().setEnabledAndVisible(true);
+            if (FrcApplicationComponent.getInstance().getState().isClearOnRobotRestart())
+            {
+                event.getPresentation().setIcon(AUTO_CLEAR_ON_ICON);
+                event.getPresentation().setText("Toggle Auto Clear Off (is currently on)");
+            }
+            else
+            {
+                event.getPresentation().setIcon(AUTO_CLEAR_OFF_ICON);
+                event.getPresentation().setText("Toggle Auto Clear On (is currently off)");
+            }
+        }
+        
+        
     }
 }

@@ -34,6 +34,7 @@ import net.javaru.iip.frc.util.ClonerImpl;
  */
 
 // Example:  org.intellij.plugins.intelliLang.AdvancedSettingsUI
+// To use:   FrcSettings frcSettings = FrcApplicationComponent.getInstance().getState();
 @SuppressWarnings({"ClassWithoutLogger", "unused"})
 public class FrcSettings implements Cloneable
 {

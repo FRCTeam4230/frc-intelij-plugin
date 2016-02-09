@@ -97,6 +97,9 @@ public class SimulatedRioLogService extends Thread implements Runnable
     //frc.simulated.log.service.simulated.restart.frequency
     public static final String SIMULATED_RESTART_FREQUENCY_PROP_KEY = RioLogMonitoringProcess.SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".simulated.restart.frequency";
 
+    //frc.simulated.log.service.simulated.exception.frequency
+    public static final String SIMULATED_EXCEPTION_FREQUENCY_PROP_KEY = RioLogMonitoringProcess.SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".simulated.exception.frequency";
+
     public static final String PAUSE_DURATION_PROP_KEY = RioLogMonitoringProcess.SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".pause.duration";
 
     public static final String PAUSE_TIMEUNIT_PROP_KEY = RioLogMonitoringProcess.SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".pause.timeunit";
@@ -119,6 +122,7 @@ public class SimulatedRioLogService extends Thread implements Runnable
     @SuppressWarnings("SpellCheckingInspection")
     protected static final DateFormat dateFormatter = new SimpleDateFormat("EEEE d MMMM yyyy kk:mm:ss zzzz");
     protected int simulatedRestartFrequency;
+    protected int simulatedExceptionFrequency;
     protected long pauseDuration = 2L;
     protected TimeUnit pauseTimeUnit = TimeUnit.SECONDS;
 
@@ -154,6 +158,7 @@ public class SimulatedRioLogService extends Thread implements Runnable
         initPauseTime();
         initMessageType();
         initSimulatedRestartFrequency();
+        initSimulatedExceptionFrequency();
         initQuotesList();
         System.out.println("=====================================================================");
         
@@ -261,13 +266,30 @@ public class SimulatedRioLogService extends Thread implements Runnable
         }
         catch (NumberFormatException e)
         {
-            this.simulatedRestartFrequency = 10;
+            this.simulatedRestartFrequency = 20;
             System.err.printf("Could not parse as an integer '%s' system property value of '%s'. Setting to a default value of %d.%n",
                               SIMULATED_RESTART_FREQUENCY_PROP_KEY,
                               System.getProperty(SIMULATED_RESTART_FREQUENCY_PROP_KEY),
                               this.simulatedRestartFrequency);
         }
         System.out.println(">>> INIT: Simulated Restart Frequency set to send startup message after every " + ordinal(simulatedRestartFrequency) + " message");
+    }
+
+    protected void initSimulatedExceptionFrequency()
+    {
+        try
+        {
+            this.simulatedExceptionFrequency = Integer.valueOf(System.getProperty(SIMULATED_EXCEPTION_FREQUENCY_PROP_KEY, "10"));
+        }
+        catch (NumberFormatException e)
+        {
+            this.simulatedExceptionFrequency = Integer.MAX_VALUE;
+            System.err.printf("Could not parse as an integer '%s' system property value of '%s'. Setting to a default value of %d.%n",
+                              SIMULATED_EXCEPTION_FREQUENCY_PROP_KEY,
+                              System.getProperty(SIMULATED_EXCEPTION_FREQUENCY_PROP_KEY),
+                              this.simulatedExceptionFrequency);
+        }
+        System.out.println(">>> INIT: Simulated Exception Frequency set to send exception message after every " + ordinal(simulatedExceptionFrequency) + " message");
     }
 
 
@@ -307,11 +329,16 @@ public class SimulatedRioLogService extends Thread implements Runnable
         {
             try
             {
-                if (messageCount++ % simulatedRestartFrequency == 0)
+                messageCount++;
+                sendMessage(getNextMessage());
+                if (messageCount % simulatedRestartFrequency == 0)
                 {
                     sendMessage(FrcPluginGlobals.ROBO_RIO_STARTUP_LOG_MSG);
                 }
-                sendMessage(getNextMessage());
+                if (messageCount % simulatedExceptionFrequency == 0)
+                {
+                    sendMessage(createSimulatedExceptionMessage());
+                }
                 pause();
 
             }
@@ -413,6 +440,20 @@ public class SimulatedRioLogService extends Thread implements Runnable
     }
 
 
+    protected static String createSimulatedExceptionMessage()
+    {
+        return "SIMULATED exception Log Message with stack trace.\n" +
+               "com.example.foo.bar.SimulatedException: This is a SIMULATED exception (with simulated StackTrace) for testing purposes.\n" +
+               "\tat java.lang.String.isEmpty(String.java:623)\n" + 
+               "\tat java.lang.String.getChars(String.java:807)\n" + 
+               "\tat java.util.concurrent.TimeUnit.timedWait(TimeUit.java:346)\n" +
+               "\tat Main.main(Main.java:11)";
+        
+
+    }
+
+    
+
     protected static String ordinal(int i)
     {
         int mod100 = i % 100;
@@ -433,5 +474,25 @@ public class SimulatedRioLogService extends Thread implements Runnable
         {
             return i + "th";
         }
+    }
+}
+
+class SimulatedException extends RuntimeException
+{
+    public SimulatedException()
+    {
+        this("This is a SIMULATED Exception for testing purposes");
+    }
+
+
+    public SimulatedException(String message)
+    {
+        super(message);
+    }
+
+
+    public SimulatedException(String message, Throwable cause)
+    {
+        super(message, cause);
     }
 }

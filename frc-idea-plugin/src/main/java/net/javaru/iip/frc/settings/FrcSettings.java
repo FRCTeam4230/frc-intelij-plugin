@@ -57,7 +57,7 @@ public class FrcSettings implements Cloneable
 
     private Pattern rioRestartRegex = DEFAULT_RIO_RESTART_REGEX;
 
-    private boolean clearOnRobotRestart = true;
+    private boolean clearOnRobotRestart = false;
 
     private boolean logToFile = true;
 

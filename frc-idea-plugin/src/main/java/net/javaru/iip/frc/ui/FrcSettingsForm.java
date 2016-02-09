@@ -46,7 +46,6 @@ public class FrcSettingsForm
     private JRadioButton targetWindowIsRunWindowRadioButton;
     private JTextField rioLogPortTextField;
     private JButton portToDefaultValueButton;
-    private JCheckBox clearOnRestartCheckBox;
     private ButtonGroup rioLogTargetWindowButtonGroup;
 
 
@@ -64,8 +63,6 @@ public class FrcSettingsForm
         configurePortTextField();
 
         portToDefaultValueButton.addActionListener(e -> setPortToDefault());
-        clearOnRestartCheckBox.setSelected(frcSettings.isClearOnRobotRestart());
-        clearOnRestartCheckBox.addActionListener(e -> {frcSettings.setClearOnRobotRestart(clearOnRestartCheckBox.isSelected());});
     }
 
 
@@ -243,7 +240,7 @@ public class FrcSettingsForm
         rootPanel = new JPanel();
         rootPanel.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
         final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(6, 2, new Insets(0, 0, 0, 0), -1, -1));
+        panel1.setLayout(new GridLayoutManager(5, 2, new Insets(0, 0, 0, 0), -1, -1));
         rootPanel.add(panel1,
                       new GridConstraints(0,
                                           0,
@@ -414,22 +411,6 @@ public class FrcSettingsForm
                                        new Dimension(-1, 5),
                                        new Dimension(-1, 5),
                                        0,
-                                       false));
-        clearOnRestartCheckBox = new JCheckBox();
-        clearOnRestartCheckBox.setText("Clear Console on Robot Restart");
-        panel1.add(clearOnRestartCheckBox,
-                   new GridConstraints(5,
-                                       0,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_FIXED,
-                                       null,
-                                       null,
-                                       null,
-                                       1,
                                        false));
         final Spacer spacer3 = new Spacer();
         rootPanel.add(spacer3,

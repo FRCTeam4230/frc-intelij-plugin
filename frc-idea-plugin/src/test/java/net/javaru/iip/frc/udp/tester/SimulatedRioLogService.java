@@ -330,7 +330,6 @@ public class SimulatedRioLogService extends Thread implements Runnable
             try
             {
                 messageCount++;
-                sendMessage(getNextMessage());
                 if (messageCount % simulatedRestartFrequency == 0)
                 {
                     sendMessage(FrcPluginGlobals.ROBO_RIO_STARTUP_LOG_MSG);
@@ -339,6 +338,7 @@ public class SimulatedRioLogService extends Thread implements Runnable
                 {
                     sendMessage(createSimulatedExceptionMessage());
                 }
+                sendMessage(getNextMessage());
                 pause();
 
             }

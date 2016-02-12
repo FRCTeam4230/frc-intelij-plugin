@@ -78,8 +78,7 @@ import net.javaru.iip.frc.udp.RioLogMonitoringProcess;
 public abstract class AbstractRioLogContentExecutor implements Disposable
 {
     private static final Logger LOG = Logger.getInstance(AbstractRioLogContentExecutor.class);
-    private static final Icon AUTO_CLEAR_ON_ICON = AllIcons.Ide.OutgoingChangesOn;
-    private static final Icon AUTO_CLEAR_OFF_ICON = AllIcons.General.TodoDefault;
+    private static final Icon AUTO_CLEAR_ICON = AllIcons.Ide.OutgoingChangesOn;
     private static final Icon START_ICON = AllIcons.Actions.Execute;
     private static final Icon RESTART_ICON = AllIcons.Actions.Restart;
     protected final Project myProject;
@@ -490,6 +489,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         }
     }
     
+    
     private class RioLogClearAllAction extends DumbAwareAction
     {
         public RioLogClearAllAction()
@@ -523,58 +523,36 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     }
 
 
-    private class RioLogToggleAutoClearAction extends DumbAwareAction
+    private class RioLogToggleAutoClearAction extends ToggleAction
     {
         public RioLogToggleAutoClearAction()
         {
             super("Toggle Auto Clear", 
-                  "Toggles whether the console output is automatically cleared upon detecting roboRIO startup/restart.",
-                  (FrcApplicationComponent.getInstance().getState().isClearOnRobotRestart() ? AUTO_CLEAR_ON_ICON : AUTO_CLEAR_OFF_ICON));
+                  "Toggles whether the console output is automatically cleared upon detecting roboRIO startup/restart via the 'startup' regex which is configurable in the settings.",
+                  AUTO_CLEAR_ICON);
         }
 
 
         @Override
-        public void actionPerformed(final AnActionEvent event)
+        public boolean isSelected(AnActionEvent e)
         {
-            ApplicationManager.getApplication().invokeLater(
-            new Runnable() 
-            {
-                final AnActionEvent actionEvent = event;
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        final FrcSettings frcSettings = FrcApplicationComponent.getInstance().getState();
-                        frcSettings.setClearOnRobotRestart(!frcSettings.isClearOnRobotRestart());
-                        update(event);
-                    }
-                    catch (Exception ex)
-                    {
-                        LOG.warn("[FRC] An Exception occurred when toggling the AutoClear option. Cause Summary: " + ex.toString(), ex);
-                    }
-                }
-            });
-            
+            return FrcApplicationComponent.getInstance().getState().isClearOnRobotRestart();
         }
 
 
         @Override
-        public void update(AnActionEvent event)
+        public void setSelected(AnActionEvent event, boolean state)
         {
-            event.getPresentation().setEnabledAndVisible(true);
-            if (FrcApplicationComponent.getInstance().getState().isClearOnRobotRestart())
+            try
             {
-                event.getPresentation().setIcon(AUTO_CLEAR_ON_ICON);
-                event.getPresentation().setText("Toggle Auto Clear Off (is currently on)");
+                
+                final FrcSettings frcSettings = FrcApplicationComponent.getInstance().getState();
+                frcSettings.setClearOnRobotRestart(state);
             }
-            else
+            catch (Exception ex)
             {
-                event.getPresentation().setIcon(AUTO_CLEAR_OFF_ICON);
-                event.getPresentation().setText("Toggle Auto Clear On (is currently off)");
+                LOG.warn("[FRC] An Exception occurred when toggling the AutoClear option. Cause Summary: " + ex.toString(), ex);
             }
         }
-        
-        
     }
 }

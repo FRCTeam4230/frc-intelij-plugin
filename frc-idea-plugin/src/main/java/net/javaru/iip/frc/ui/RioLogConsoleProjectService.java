@@ -40,7 +40,7 @@ import net.javaru.iip.frc.settings.FrcSettings;
  * Class that manages the displaying of the RioLog console window. It {@link #update() updates} the RioLog Console 
  * view creating/opening, destroying/closing, or moving it as needed based on the state of the UI and on the current
  * configuration of the project and the presence of any FRC facets.
- * Access as a Project Service via the IntelliJ
+ * Access via the {@link #getInstance(Project)} method or as a Project Service via the IntelliJ
  * <a href="http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_services.html">Plugin Services</a>.
  * For example:
  * <pre>
@@ -138,7 +138,7 @@ public class RioLogConsoleProjectService
     {
         if (project != null)
         {
-            ServiceManager.getService(project, RioLogConsoleProjectService.class).update();
+            getInstance(project).update();
         }
     }
 
@@ -148,7 +148,7 @@ public class RioLogConsoleProjectService
         if (facet!= null)
         {
             final Project project = facet.getModule().getProject();
-            ServiceManager.getService(project, RioLogConsoleProjectService.class).activate();
+            getInstance(project).activate();
         }
     }
     
@@ -157,7 +157,7 @@ public class RioLogConsoleProjectService
         if (module!= null)
         {
             final Project project = module.getProject();
-            ServiceManager.getService(project, RioLogConsoleProjectService.class).activate();
+            getInstance(project).activate();
         }
     }
     
@@ -165,12 +165,16 @@ public class RioLogConsoleProjectService
     {
         if (project!= null)
         {
-            ServiceManager.getService(project, RioLogConsoleProjectService.class).activate();
+            getInstance(project).activate();
         }
     }
-    
+
+    // See http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_services.html for more information
+    public static RioLogConsoleProjectService getInstance(@NotNull Project project) {return ServiceManager.getService(project, RioLogConsoleProjectService.class);}
+
+
     /**
-     * Do not call the constructor directly. Use as a project service:<br/>
+     * Do not call the constructor directly. Use as a project service via {@code com.intellij.openapi.components.ServiceManager}:<br/>
      * <pre>
      * final RioLogConsoleProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogConsoleProjectService.class);
      * </pre>
@@ -287,7 +291,7 @@ public class RioLogConsoleProjectService
     {
         final FrcFacet frcFacet = checkForFrcFacet(module);
         final boolean moduleHasFrcFacet = frcFacet != null;
-        LOG.debug("The module " + module.getName() + " has FRC Facet: " + frcFacet);
+        LOG.debug("[FRC] The module " + module.getName() + " has FRC Facet: " + frcFacet);
         return moduleHasFrcFacet;
     }
 

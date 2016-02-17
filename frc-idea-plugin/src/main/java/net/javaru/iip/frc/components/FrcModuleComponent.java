@@ -36,18 +36,36 @@ public class FrcModuleComponent implements ModuleComponent
 
     public FrcModuleComponent(@NotNull Module myModule) {this.myModule = myModule;}
 
+    /*
+        LIFECYCLE METHODS CALL ORDER 
+            When Project is opened
+                1. initComponent()
+                    • Called for each module in the project. All are called sequentially before next method is called
+                2. moduleAdded()
+                    • Called for each module in the project. All are called sequentially before next method is called
+                3. projectOpened()
+                    • Called for each module in the project. All are called sequentially
+                    
+                == User Doing Work in Project ==
+                
+                4. projectClosed()
+                    • Called for each module in the project. All are called sequentially
+                5. disposeComponent()
+                    • Called for each module in the project. All are called sequentially
+                
+            When a Module is Added
+                1. initComponent()
+                    • Called as soon as the module is added in Project Structure, even before Apply or OK is clicked
+                2. moduleAdded()
+                    • Called when Apply/OK is clicked in Project Structure
+        
+     */
 
     @Override
-    public void projectOpened()
+    public void initComponent()
     {
-        LOG.debug(getClass().getSimpleName() + ".projectOpened() called for" + myModule.getName());
-    }
-
-
-    @Override
-    public void projectClosed()
-    {
-        LOG.debug(getClass().getSimpleName() + ".projectClosed() called for" + myModule.getName());
+        LOG.debug(getClass().getSimpleName() + ".initComponent() called for" + myModule.getName());
+        AntManagerModuleService.check(myModule);
     }
 
 
@@ -60,10 +78,16 @@ public class FrcModuleComponent implements ModuleComponent
 
 
     @Override
-    public void initComponent()
+    public void projectOpened()
     {
-        LOG.debug(getClass().getSimpleName() + ".initComponent() called for" + myModule.getName());
-        AntManagerModuleService.check(myModule);
+        LOG.debug(getClass().getSimpleName() + ".projectOpened() called for" + myModule.getName());
+    }
+
+
+    @Override
+    public void projectClosed()
+    {
+        LOG.debug(getClass().getSimpleName() + ".projectClosed() called for" + myModule.getName());
     }
 
 

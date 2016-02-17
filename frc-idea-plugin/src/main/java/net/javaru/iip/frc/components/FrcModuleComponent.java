@@ -21,6 +21,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
 
+import net.javaru.iip.frc.ui.AntManagerModuleService;
 import net.javaru.iip.frc.ui.RioLogConsoleProjectService;
 
 
@@ -62,6 +63,7 @@ public class FrcModuleComponent implements ModuleComponent
     public void initComponent()
     {
         LOG.debug(getClass().getSimpleName() + ".initComponent() called for" + myModule.getName());
+        AntManagerModuleService.check(myModule);
     }
 
 
@@ -69,7 +71,10 @@ public class FrcModuleComponent implements ModuleComponent
     public void disposeComponent()
     {
         LOG.debug(getClass().getSimpleName() + ".disposeComponent()) called for" + myModule.getName());
-        RioLogConsoleProjectService.update(myModule);
+        if (!myModule.isDisposed())
+        {
+            RioLogConsoleProjectService.update(myModule);
+        }
     }
 
 

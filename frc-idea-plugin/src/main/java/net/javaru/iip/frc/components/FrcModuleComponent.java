@@ -21,7 +21,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
 
-import net.javaru.iip.frc.ui.AntManagerModuleService;
 import net.javaru.iip.frc.ui.RioLogConsoleProjectService;
 
 
@@ -39,18 +38,21 @@ public class FrcModuleComponent implements ModuleComponent
     /*
         LIFECYCLE METHODS CALL ORDER 
             When Project is opened
-                1. initComponent()
+                A. [ProjectComponent.initComponent()]
+
+                1. ModuleComponent.initComponent()
                     • Called for each module in the project. All are called sequentially before next method is called
-                2. moduleAdded()
+                2. ModuleComponent.moduleAdded()
                     • Called for each module in the project. All are called sequentially before next method is called
-                3. projectOpened()
-                    • Called for each module in the project. All are called sequentially
+                3. ModuleComponent.projectOpened()
+                    • Called for each module in the project. All are called sequentially\
+                B. [ProjectComponent.projectOpened()]
                     
                 == User Doing Work in Project ==
                 
-                4. projectClosed()
+                4. ModuleComponent.projectClosed()
                     • Called for each module in the project. All are called sequentially
-                5. disposeComponent()
+                5. ModuleComponent.disposeComponent()
                     • Called for each module in the project. All are called sequentially
                 
             When a Module is Added
@@ -65,7 +67,6 @@ public class FrcModuleComponent implements ModuleComponent
     public void initComponent()
     {
         LOG.debug(getClass().getSimpleName() + ".initComponent() called for" + myModule.getName());
-        AntManagerModuleService.check(myModule);
     }
 
 

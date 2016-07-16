@@ -21,7 +21,7 @@
 <!-- 
     Cleans the FRC's directory from the idea plugins-sandbox's plugin directory.
     To use, you must set the environment variable 'idea.plugins.sandbox.dir'
-    to the absolute path of the plugins-sanddox directory. For example:
+    to the absolute path of the plugins-sandbox directory. For example:
         C:\Users\Dilbert\.IntelliJIdea15\system\plugins-sandbox
 -->    
 <target name="clean">

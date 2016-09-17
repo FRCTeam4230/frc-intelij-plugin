@@ -31,6 +31,15 @@ import net.javaru.iip.frc.util.ClonerImpl;
     **IMPORTANT** All settings/properties must have a default value upon construction.
                   Be sure to add any new properties/settings to the equals & hashcode methods
 
+                  
+    The implementation of PersistentStateComponent works by serializing public fields, annotated private 
+    fields and bean properties into an XML format. The following types of values can be persisted:
+      • numbers (both primitive types, such as int, and boxed types, such as Integer)
+      • booleans
+      • strings
+      • collections
+      • maps
+      • enums
  */
 
 // Example:  org.intellij.plugins.intelliLang.AdvancedSettingsUI
@@ -44,7 +53,8 @@ public class FrcSettings implements Cloneable
     // Actual Full Statement logged by roboRIO is as follows. It starts with the
     // arrow flush left and ends with the closing/right-pointing guillemet flush right:
     //    ➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
-    public static final Pattern DEFAULT_RIO_RESTART_REGEX = Pattern.compile(".*FRCUserProgram.jar.*",
+    // See FrcPluginGlobals.ROBO_RIO_STARTUP_LOG_MSG
+    public static final Pattern DEFAULT_RIO_RESTART_REGEX = Pattern.compile(".*FRCUserProgram\\.jar.*",
                                                                             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.MULTILINE);
     //TODO: change the default to the FRC installation directory or such
     public static final Path DEFAULT_LOG_DIRECTORY = Paths.get("/").resolve("tmp").resolve("frc").toAbsolutePath();

@@ -22,7 +22,8 @@ public final class FrcPluginGlobals
     public static final String FRC_PLUGIN_DISPLAY_NAME = "FRC Plugin";
     
     /** The standard log message (line) output by the robRIO on startup. */
-    public static final String ROBO_RIO_STARTUP_LOG_MSG = "➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»";
+    //  ➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
+    public static final String ROBO_RIO_STARTUP_LOG_MSG = "\u2794 Launching \u00AB'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'\u00BB";
 
 
     private FrcPluginGlobals() { }

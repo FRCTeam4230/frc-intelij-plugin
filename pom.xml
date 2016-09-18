@@ -544,9 +544,19 @@
                 <version>3.3.2</version>
             </dependency>
             <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.5</version>
+            </dependency>
+            <dependency>
                 <groupId>uk.com.robust-it</groupId>
                 <artifactId>cloning</artifactId>
                 <version>1.9.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jdom</groupId>
+                <artifactId>jdom2</artifactId>
+                <version>2.0.6</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

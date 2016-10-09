@@ -20,20 +20,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>net.javaru.intellij-idea-plugins.intelliFRC</groupId>
-	    <artifactId>IntelliFRC-project</artifactId>
-	    <version>2015.0.1-SNAPSHOT</version>
+    <parent>
+        <groupId>net.javaru.intellij-idea-plugins.intelliFRC</groupId>
+        <artifactId>IntelliFRC-project</artifactId>
+        <version>2015.0.1-SNAPSHOT</version>
 
-		<relativePath>../</relativePath>
-	</parent>
+        <relativePath>../</relativePath>
+    </parent>
 
     <!--  Change assembly.xml file <includes> if you change the artifact coordinates -->
 
 
     <name>IntelliFRC IDEA PlugIn</name>
-	<artifactId>frc-idea-plugin</artifactId>
-	<packaging>jar</packaging>
+    <artifactId>frc-idea-plugin</artifactId>
+    <packaging>jar</packaging>
 
 
 
@@ -45,47 +45,47 @@
     </description>
 
 
-	<dependencies>
-		<dependency>
-			<groupId>com.intellij.idea</groupId>
-			<artifactId>annotations</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intellij.idea</groupId>
-			<artifactId>extensions</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intellij.idea</groupId>
-			<artifactId>resources</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intellij.idea</groupId>
-			<artifactId>resources_en</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intellij.idea</groupId>
-			<artifactId>idea</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intellij.idea</groupId>
-			<artifactId>openapi</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intellij.idea</groupId>
-			<artifactId>forms_rt</artifactId>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>com.intellij.idea</groupId>
+            <artifactId>annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intellij.idea</groupId>
+            <artifactId>extensions</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intellij.idea</groupId>
+            <artifactId>resources</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intellij.idea</groupId>
+            <artifactId>resources_en</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intellij.idea</groupId>
+            <artifactId>idea</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intellij.idea</groupId>
+            <artifactId>openapi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intellij.idea</groupId>
+            <artifactId>forms_rt</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.intellij.idea</groupId>
             <artifactId>icons</artifactId>
         </dependency>
-		<dependency>
-			<groupId>com.intellij.idea</groupId>
-			<artifactId>util</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intellij.idea</groupId>
-			<artifactId>groovy-plugin</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.intellij.idea</groupId>
+            <artifactId>util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intellij.idea</groupId>
+            <artifactId>groovy-plugin</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -106,54 +106,54 @@
             <groupId>org.jdom</groupId>
             <artifactId>jdom2</artifactId>
         </dependency>
-	</dependencies>
+    </dependencies>
 
 
-		<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<configuration>
-							<descriptors>
-								<descriptor>assembly.xml</descriptor>
-							</descriptors>
-							<attach>true</attach>
-							<outputDirectory>${project.basedir}/../</outputDirectory>
-						</configuration>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>process-classes</phase>
-						<configuration>
-							<tasks>
-								<path id="compile.classpath">
-									<fileset dir="${idea.home}/lib" includes="*.jar" />
-									<fileset dir="${idea.home}/plugins/Groovy/lib" includes="*.jar" />
-								</path>
+        <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                            <attach>true</attach>
+                            <outputDirectory>${project.basedir}/../</outputDirectory>
+                        </configuration>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <tasks>
+                                <path id="compile.classpath">
+                                    <fileset dir="${idea.home}/lib" includes="*.jar" />
+                                    <fileset dir="${idea.home}/plugins/Groovy/lib" includes="*.jar" />
+                                </path>
 
-								<taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="compile.classpath" />
+                                <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="compile.classpath" />
 
-								<javac2 srcdir="${project.build.sourceDirectory}" destdir="${project.build.outputDirectory}" source="1.5" target="1.5" includes="**/*.form" classpathref="compile.classpath" />
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+                                <javac2 srcdir="${project.build.sourceDirectory}" destdir="${project.build.outputDirectory}" source="1.5" target="1.5" includes="**/*.form" classpathref="compile.classpath" />
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 
 </project>

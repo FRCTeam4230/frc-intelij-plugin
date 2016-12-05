@@ -16,9 +16,13 @@
 
 package net.javaru.iip.frc.settings;
 
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
+
+import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.diagnostic.Logger;
 
 import net.javaru.iip.frc.util.ClonerImpl;
 
@@ -50,6 +54,8 @@ public class FrcSettings implements Cloneable
     // **IMPORTANT** All settings/properties must have a default value upon construction.
     //               Be sure to add any new properties/settings to the equals & hashcode methods
 
+    private static final Logger LOG = Logger.getInstance(FrcSettings.class);
+    
     // Actual Full Statement logged by roboRIO is as follows. It starts with the
     // arrow flush left and ends with the closing/right-pointing guillemet flush right:
     //    ➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
@@ -60,9 +66,13 @@ public class FrcSettings implements Cloneable
     public static final Path DEFAULT_LOG_DIRECTORY = Paths.get("/").resolve("tmp").resolve("frc").toAbsolutePath();
     public static final String DEFAULT_LOG_FILE_BASENAME = "rioLog-${time}.log";
     public static final int DEFAULT_RIO_LOG_PORT = 6666;
-
+    
+    //The trailing slash is important so the uri.resolves method sees the last entry as a directory and not the endpoint
+    public static final URI DEFAULT_WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI = createUrlQuietly("http://first.wpi.edu/FRC/roborio/release/eclipse/");
+    public static final URI DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI = createUrlQuietly("http://first.wpi.edu/FRC/roborio/beta/eclipse/");
 
     private boolean useFrcToolWindow = true;
+    
     private int rioLogPort = DEFAULT_RIO_LOG_PORT;
 
     private Pattern rioRestartRegex = DEFAULT_RIO_RESTART_REGEX;
@@ -76,6 +86,13 @@ public class FrcSettings implements Cloneable
     private Path logFileDirectory = DEFAULT_LOG_DIRECTORY;
 
     private String logFileBaseName = DEFAULT_LOG_FILE_BASENAME;
+
+    
+    
+    private URI wpiEclipsePluginReleaseRepoUri = DEFAULT_WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI;
+
+    private URI wpiEclipsePluginBetaRepoUri = DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI;
+    
 
 
     // **IMPORTANT** All settings/properties must have a default value upon construction.
@@ -181,6 +198,27 @@ public class FrcSettings implements Cloneable
     }
 
 
+    public Path getWpiLibDir()
+    {
+        //TODO: need to make configurable
+        final String userHome = System.getProperty("user.home", "C:\\Users\\Public");
+        return Paths.get(userHome).resolve("wpilib").toAbsolutePath();
+    }
+    
+    @Nullable
+    protected static URI createUrlQuietly(String url)
+    {
+        try
+        {
+            return new URI(url);
+        }
+        catch (Exception e)
+        {
+            LOG.warn("[FRC] Could not create URL from '" + url + '\'');
+            return null;
+        }
+    }
+    
     @Override
     public boolean equals(Object o)
     {
@@ -227,5 +265,14 @@ public class FrcSettings implements Cloneable
     **IMPORTANT** All settings/properties must have a default value upon construction.
                   Be sure to add any new properties/settings to the equals & hashcode methods
 
+                  
+    The implementation of PersistentStateComponent works by serializing public fields, annotated private 
+    fields and bean properties into an XML format. The following types of values can be persisted:
+      • numbers (both primitive types, such as int, and boxed types, such as Integer)
+      • booleans
+      • strings
+      • collections
+      • maps
+      • enums
  */
 }

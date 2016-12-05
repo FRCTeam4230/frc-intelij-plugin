@@ -65,7 +65,7 @@ public class FrcFacetEditorTab extends FacetEditorTab
     public boolean isModified()
     {
         //TODO: Write this 'isModified' implemented method in the 'FrcFacetEditorTab' class
-        LOG.debug("Yet to be implemented 'FrcFacetEditorTab.isModified()' method was called ");
+        LOG.debug("[FRC] Yet to be implemented 'FrcFacetEditorTab.isModified()' method was called ");
         return false;
     }
 
@@ -74,7 +74,7 @@ public class FrcFacetEditorTab extends FacetEditorTab
     public void reset()
     {
         //TODO: Write this 'reset' implemented method in the 'FrcFacetEditorTab' class
-        LOG.debug("Yet to be implemented 'FrcFacetEditorTab.reset()' method was called ");
+        LOG.debug("[FRC] Yet to be implemented 'FrcFacetEditorTab.reset()' method was called ");
     }
 
 
@@ -82,7 +82,7 @@ public class FrcFacetEditorTab extends FacetEditorTab
     public void disposeUIResources()
     {
         //TODO: Write this 'disposeUIResources' implemented method in the 'FrcFacetEditorTab' class
-        LOG.debug("Yet to be implemented 'FrcFacetEditorTab.disposeUIResources()' method was called ");
+        LOG.debug("[FRC] Yet to be implemented 'FrcFacetEditorTab.disposeUIResources()' method was called ");
     }
 
 

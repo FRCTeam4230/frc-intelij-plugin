@@ -321,7 +321,7 @@ public class RioLogMonitoringProcess extends Process
                     }
                     catch (IOException e)
                     {
-                        LOG.error("FRC: An IOException occurred while monitoring the RIO Log UDP output", e);
+                        LOG.error("[FRC] An IOException occurred while monitoring the RIO Log UDP output", e);
                         isRunning = false;
                         cleanUpSocket(socket);
                         return;
@@ -330,7 +330,7 @@ public class RioLogMonitoringProcess extends Process
             }
             catch (Exception e)
             {
-                LOG.error("FRC: An Exception occurred while monitoring the RIO Log UDP output", e);
+                LOG.error("[FRC] An Exception occurred while monitoring the RIO Log UDP output", e);
                 isRunning = false;
             }
             isRunning = false;

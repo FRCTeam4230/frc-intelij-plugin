@@ -129,7 +129,7 @@ public class FrcSettingsForm
                 }
                 catch (ParseException e1)
                 {
-                    LOG.warn("Could not parse the value '" + text + "' as an integer. Setting field and port to default value.");
+                    LOG.warn("[FRC] Could not parse the value '" + text + "' as an integer. Setting field and port to default value.");
                     setPortToDefault();
                 }
             }

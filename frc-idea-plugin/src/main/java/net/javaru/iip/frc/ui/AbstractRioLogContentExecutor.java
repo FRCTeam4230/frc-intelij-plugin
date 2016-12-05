@@ -317,14 +317,14 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             final boolean removedOk = ExecutionManager.getInstance(myProject).getContentManager().removeRunContent(myExecutor, myRunContentDescriptor);
             if (removedOk)
             {
-                LOG.debug("RioLogContentExecutor was removed OK");
+                LOG.debug("[FRC] RioLogContentExecutor was removed OK");
                 myRunContentDescriptor = null;
                 myExecutor = null;
                 myRunContentDescriptor = null;
             }
             else 
             {
-                LOG.debug("RioLogContentExecutor was NOT removed");    
+                LOG.debug("[FRC] RioLogContentExecutor was NOT removed");    
             }
         }
     }

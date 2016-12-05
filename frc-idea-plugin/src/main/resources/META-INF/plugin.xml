@@ -122,15 +122,18 @@
                         serviceImplementation="net.javaru.iip.frc.ui.RioLogConsoleProjectService"/>
     </extensions>
 
-    <!-- TODO: "Registering of Configurable via ApplicationComponent was deprecated and removed in latest release." 
-                From: https://intellij-support.jetbrains.com/hc/en-us/community/posts/207379335-Upgrading-old-plugin-how-to-display-ApplicationComponents-JComponent- 
-                I need to use <applicationConfigurable> (and potentially <projectConfigurable> instead. See my "Settings" notes -->
     <application-components>
         <!-- Add your application components here -->
         <component>
             <implementation-class>net.javaru.iip.frc.settings.FrcApplicationComponent</implementation-class>
         </component>
     </application-components>
+    
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable id="frc.plugin.frcApplicationConfigurable" 
+                                 instance="net.javaru.iip.frc.settings.FrcApplicationComponent" 
+                                 groupId="language" />
+    </extensions>
 
     <project-components>
         <!-- Add your project components here -->

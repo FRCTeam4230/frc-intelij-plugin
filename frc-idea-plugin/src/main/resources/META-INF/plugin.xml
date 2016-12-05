@@ -18,14 +18,17 @@
     <id>net.javaru.intellijIdeaPlugins.frc</id>
     <name>FRC</name>
     <version>2016.0.1</version>
-    <vendor email="issues@frc-intellij-idea.java.net" url="https://frc-intellij-idea.java.net">Javaru</vendor>
+    <vendor email="issues@frc-intellij-idea.java.net" url="https://gitlab.com/Javaru/frc-intellij-idea/">Javaru</vendor>
 
     <description><![CDATA[
       <p>
       A plug-in to allow FRC development using IntelliJ IDEA rather than Eclipse. It will work with either the
-      free open-sourced <em>Community Edition</em> or the licensed Ultimate Edition of IntelliJ IDEA.
-      <strong>This plug-in requires IntelliJ IDEA 14.1 or later, and that you run IntelliJ IDEA via a Java 8 JRE/JDK.</strong> TODO: Add details
+      free open-sourced <em>Community Edition</em> or the licensed <em>Ultimate Edition</em> of IntelliJ IDEA.
+      <strong>This plug-in requires IntelliJ IDEA 2016.3 or later, and that you run IntelliJ IDEA via a 
+      Java 8 JRE/JDK.</strong>
       </p>
+      
+      <p>Please report issues or feature requests at <a href='https://gitlab.com/Javaru/frc-intellij-idea/issues'>https://gitlab.com/Javaru/frc-intellij-idea/issues</a></p>
 
       <h2>Plug-in Version Numbering</h2>
       <p>
@@ -87,59 +90,11 @@
           </ul>
         </li>
 
-        <li>
-          <strong>Support for Maven based projects</strong>
-          <ul>
-            <li>Add additional dependencies more easily then you can with the default ant build.</li>
-            <li>Allow for automatic running of unit tests.</li>
-            <li>Allow for use of the release plug-in to cut numbered builds/releases of your code including automatic VCS tagging.</li>
-          </ul>
-        </li>
-
-        <li>
-          <strong>Future support for Gradle based projects</strong>
-          <ul>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-          </ul>
-        </li>
-
-        <li>
-          <strong>Inspections</strong>
-          <ul>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-          </ul>
-        </li>
-
-        <li>
-          <strong></strong>
-          <ul>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-          </ul>
-        </li>
-
-        <li>
-          <strong></strong>
-          <ul>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-          </ul>
-        </li>
-
-      </ol>
+        <h2>Issue Reporting</h2>
+        <p>Please report issues or feature requests at <a href='https://gitlab.com/Javaru/frc-intellij-idea/issues'>https://gitlab.com/Javaru/frc-intellij-idea/issues</a></p>
 
     ]]></description>
-    <!--  TODO: Add details in description on how to change version of JRE for IDEA and if IDEA 14 already uses JRE 8-->
+    <!--  TODO: Add details in description on how to change version of JRE for IDEA and if IDEA 2016.3 already uses JRE 8-->
 
     <change-notes><![CDATA[
       <strong>2015.0.1</strong> <br>
@@ -148,7 +103,7 @@
     </change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="145.0" />
+    <idea-version since-build="163.0" />
 
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html on how to target different products -->
@@ -167,6 +122,9 @@
                         serviceImplementation="net.javaru.iip.frc.ui.RioLogConsoleProjectService"/>
     </extensions>
 
+    <!-- TODO: "Registering of Configurable via ApplicationComponent was deprecated and removed in latest release." 
+                From: https://intellij-support.jetbrains.com/hc/en-us/community/posts/207379335-Upgrading-old-plugin-how-to-display-ApplicationComponents-JComponent- 
+                I need to use <applicationConfigurable> (and potentially <projectConfigurable> instead. See my "Settings" notes -->
     <application-components>
         <!-- Add your application components here -->
         <component>

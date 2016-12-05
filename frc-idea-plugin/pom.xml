@@ -21,31 +21,56 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>net.javaru.intellij-idea-plugins.intelliFRC</groupId>
-        <artifactId>IntelliFRC-project</artifactId>
+        <groupId>net.javaru.intellij-idea-plugins.frc</groupId>
+        <artifactId>frc-intellij-idea-plugin-parent</artifactId>
         <version>2015.0.1-SNAPSHOT</version>
-
         <relativePath>../</relativePath>
     </parent>
 
     <!--  Change assembly.xml file <includes> if you change the artifact coordinates -->
-
-
-    <name>IntelliFRC IDEA PlugIn</name>
+    <name>FRC IntelliJ IDEA PlugIn</name>
     <artifactId>frc-idea-plugin</artifactId>
     <packaging>jar</packaging>
 
 
 
     <description>
-        IntelliFRC is an IntelliJ IDEA plug-in for the US First (http://www.usfirst.org) First Robotics Competition (FRC).
+        An IntelliJ IDEA plug-in for the US First (http://www.usfirst.org) First Robotics Competition (FRC).
         It is provided as an alternative to using the default Eclipse plug-in and programming environment.
-        Best efforts will be made to keep it up to date. However it may lag a day or two behind the official Eclipse
-        plug-in.
     </description>
+
+    <organization>
+        <name>Javaru</name>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <!-- TODO: Update to website once created -->
+    <url>https://gitlab.com/Javaru/frc-intellij-idea</url>
+
+    <scm>
+        <url>https://gitlab.com/Javaru/frc-intellij-idea</url>
+        <connection>scm:git:git@gitlab.com:Javaru/frc-intellij-idea</connection>
+        <!--suppress MavenModelInspection -->
+        <developerConnection>scm:git:ssh://git@gitlab.com:Javaru/frc-intellij-idea</developerConnection>
+    </scm>
+
+    <!--<ciManagement></ciManagement>-->
+
+    <issueManagement>
+        <system>GitLab</system>
+        <url>https://gitlab.com/Javaru/frc-intellij-idea/issues</url>
+    </issueManagement>
 
 
     <dependencies>
+        <!-- region INTELLIJ IDEA -->
         <dependency>
             <groupId>com.intellij.idea</groupId>
             <artifactId>annotations</artifactId>
@@ -86,6 +111,10 @@
             <groupId>com.intellij.idea</groupId>
             <artifactId>groovy-plugin</artifactId>
         </dependency>
+        <!-- endregion IntelliJ IDEA -->
+
+        
+        <!-- region === LANG / COMMONS / UTIL === -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -98,6 +127,8 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
+        <!-- endregion commons / lang / util -->
+        
         <dependency>
             <groupId>uk.com.robust-it</groupId>
             <artifactId>cloning</artifactId>

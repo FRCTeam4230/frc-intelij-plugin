@@ -1,0 +1,5 @@
+All log messages should start with the prefix/flag '[FRC] '
+    For example: LOG.info("[FRC] Starting App");
+    To find log messages not containing these, use the regex:
+        log(ger)?\.(trace|debug|info|warn|error)\((?!("\[FRC|String\.format\("\[FRC))
+    to search the path (Ctrl + Shift + F)

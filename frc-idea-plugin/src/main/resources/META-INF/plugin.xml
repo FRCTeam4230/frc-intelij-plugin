@@ -129,6 +129,7 @@
         </component>
     </application-components>
     
+    <!-- For detailed info on what the various attributes are, see https://sites.google.com/site/malenkov/java/150403 -->
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable id="frc.plugin.frcApplicationConfigurable" 
                                  instance="net.javaru.iip.frc.settings.FrcApplicationComponent" 

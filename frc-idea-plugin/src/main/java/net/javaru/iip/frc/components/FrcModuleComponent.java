@@ -66,14 +66,14 @@ public class FrcModuleComponent implements ModuleComponent
     @Override
     public void initComponent()
     {
-        LOG.debug("[FRC] " + getClass().getSimpleName() + ".initComponent() called for" + myModule.getName());
+        LOG.debug("[FRC] " + getClass().getSimpleName() + ".initComponent() called for " + myModule.getName());
     }
 
 
     @Override
     public void moduleAdded()
     {
-        LOG.debug("[FRC] " + getClass().getSimpleName() + ".moduleAdded() called for" + myModule.getName());
+        LOG.debug("[FRC] " + getClass().getSimpleName() + ".moduleAdded() called for " + myModule.getName());
         RioLogConsoleProjectService.update(myModule);
     }
 
@@ -81,21 +81,21 @@ public class FrcModuleComponent implements ModuleComponent
     @Override
     public void projectOpened()
     {
-        LOG.debug("[FRC] " + getClass().getSimpleName() + ".projectOpened() called for" + myModule.getName());
+        LOG.debug("[FRC] " + getClass().getSimpleName() + ".projectOpened() called for " + myModule.getName());
     }
 
 
     @Override
     public void projectClosed()
     {
-        LOG.debug("[FRC] " + getClass().getSimpleName() + ".projectClosed() called for" + myModule.getName());
+        LOG.debug("[FRC] " + getClass().getSimpleName() + ".projectClosed() called for " + myModule.getName());
     }
 
 
     @Override
     public void disposeComponent()
     {
-        LOG.debug("[FRC] " + getClass().getSimpleName() + ".disposeComponent()) called for" + myModule.getName());
+        LOG.debug("[FRC] " + getClass().getSimpleName() + ".disposeComponent()) called for " + myModule.getName());
         if (!myModule.isDisposed())
         {
             RioLogConsoleProjectService.update(myModule);

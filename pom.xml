@@ -24,7 +24,7 @@
     <!--  Change assembly.xml file <includes> if you change the artifact coordinates -->
     <groupId>net.javaru.intellij-idea-plugins.frc</groupId>
     <artifactId>frc-intellij-idea-plugin-parent</artifactId>
-    <version>2015.0.1-SNAPSHOT</version>
+    <version>2017.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>FRC IntelliJ IDEA Plugin : Parent</name>
 
@@ -601,7 +601,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.3.2</version>
+                <version>3.5</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -643,6 +643,30 @@
             <scope>test</scope>
         </dependency>
         <!-- endregion languages -->
+
+        <!-- region === LANG / COMMONS / UTIL === -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <!-- endregion commons / lang / util -->
+
+        <dependency>
+            <groupId>uk.com.robust-it</groupId>
+            <artifactId>cloning</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom2</artifactId>
+        </dependency>
     </dependencies>
 
 

@@ -140,7 +140,11 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
         final RioLogMonitoringProcess process = new RioLogMonitoringProcess(this::invokeClearAll);
         
-        myProcessHandler = new BaseOSProcessHandler(process, null, Charset.defaultCharset())
+        //Not 100% sure what should be passed in for the commandLine parameter; the example I originally used used null. 
+        //   And null was allowed. But a change was made in Mov 2015 that BaseOSProcessHandler now logs an exception if 
+        //   commandLine is null or empty. We are not actually running a command. Just using the handler to monitor a 
+        //   UDP port. So, for now we are using an innocuous command that is common to unix and windows, specifically 'echo'
+        myProcessHandler = new BaseOSProcessHandler(process, "echo", Charset.defaultCharset())
         {
             @Override
             public boolean isSilentlyDestroyOnClose()

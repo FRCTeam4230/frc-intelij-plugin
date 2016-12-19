@@ -14,11 +14,15 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.facet;
+package net.javaru.iip.frc.facet.detector;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.facet.FacetType;
 import com.intellij.framework.detection.FacetBasedFrameworkDetector;
+
+import net.javaru.iip.frc.facet.FrcFacet;
+import net.javaru.iip.frc.facet.FrcFacetConfiguration;
+import net.javaru.iip.frc.facet.FrcFacetType;
 
 
 

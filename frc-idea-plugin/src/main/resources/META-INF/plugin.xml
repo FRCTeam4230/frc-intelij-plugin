@@ -134,7 +134,7 @@
         <applicationConfigurable id="frc.plugin.frcApplicationConfigurable" 
                                  instance="net.javaru.iip.frc.settings.FrcApplicationComponent" 
                                  groupId="language" />
-        <framework.detector implementation="net.javaru.iip.frc.facet.RobotSubclassFrcFrameworkDetector"/>
+        <framework.detector implementation="net.javaru.iip.frc.facet.detector.RobotSubclassFrcFrameworkDetector"/>
     </extensions>
 
     <project-components>

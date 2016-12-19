@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.facet;
+package net.javaru.iip.frc.facet.detector;
 
 import java.util.ArrayList;
 import java.util.Collection;

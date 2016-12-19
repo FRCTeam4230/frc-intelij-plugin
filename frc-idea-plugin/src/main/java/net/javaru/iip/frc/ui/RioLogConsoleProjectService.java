@@ -50,8 +50,6 @@ import net.javaru.iip.frc.settings.FrcSettings;
  */
 public class RioLogConsoleProjectService
 {
-    //TODO add activate method and then call it in ShowRioLogConsole
-    
     private static final Logger LOG = Logger.getInstance(RioLogConsoleProjectService.class);
 
     @NotNull
@@ -169,6 +167,35 @@ public class RioLogConsoleProjectService
         }
     }
 
+
+    public static void close(@Nullable Facet facet)
+    {
+        if (facet != null)
+        {
+            final Project project = facet.getModule().getProject();
+            getInstance(project).closeContentExecutor();
+        }
+    }
+
+
+    public static void close(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final Project project = module.getProject();
+            getInstance(project).closeContentExecutor();
+        }
+    }
+
+
+    public static void close(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            getInstance(project).closeContentExecutor();
+        }
+    }
+
     // See http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_services.html for more information
     public static RioLogConsoleProjectService getInstance(@NotNull Project project) {return ServiceManager.getService(project, RioLogConsoleProjectService.class);}
 
@@ -272,7 +299,14 @@ public class RioLogConsoleProjectService
     {
         if (contentExecutor != null)
         {
-            contentExecutor.close();
+            try
+            {
+                contentExecutor.close();
+            }
+            catch (Exception e)
+            {
+                LOG.debug("[FRC] An exception occurred when closing the contentExecutor. Cause Summary: " + e.toString(),e);
+            }
             contentExecutor = null;
         }
     }
@@ -281,9 +315,21 @@ public class RioLogConsoleProjectService
     private void createContentExecutor(final boolean useRunWindow)
     {
         LOG.debug("[FRC] Creating AbstractRioLogContentExecutor");
-        contentExecutor = useRunWindow ? new RioLogRunWindowContentExecutor(myProject, true) : new RioLogFrcWindowContentExecutor(myProject, true);
-        Disposer.register(myProject, contentExecutor);
-        contentExecutor.run();
+        try
+        {
+            contentExecutor = useRunWindow ? new RioLogRunWindowContentExecutor(myProject, true) : new RioLogFrcWindowContentExecutor(myProject, true);
+            Disposer.register(myProject, contentExecutor);
+            contentExecutor.run();
+        }
+        catch (Exception e)
+        {
+            LOG.warn("[FRC] An exception occurred when creating the content executor. Cause Summary: " + e.toString(), e);
+            try
+            {
+                closeContentExecutor();
+            }
+            catch (Exception ignore) {}
+        }
     }
 
 

@@ -43,6 +43,12 @@ public class FrcFacetType extends FacetType<FrcFacet, FrcFacetConfiguration>
     }
 
 
+    
+    public static FrcFacetType getInstance()
+    {
+        return findInstance(FrcFacetType.class);
+    }
+
     @Override
     public FrcFacetConfiguration createDefaultConfiguration()
     {

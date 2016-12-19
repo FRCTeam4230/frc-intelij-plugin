@@ -288,18 +288,22 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
     public void activateRioLogConsole()
     {
-        ApplicationManager.getApplication().invokeLater(() -> 
-        {
-            final ToolWindow toolWindow = ToolWindowManager.getInstance(myProject).getToolWindow(getToolWindowId());
-            toolWindow.activate(null);
-            final ContentManager contentManager = toolWindow.getContentManager();
-            final Content content = contentManager.findContent(getTitle());
-            if (content != null)
-            {
-                contentManager.setSelectedContent(content, true);
-            }
-        });
+        ApplicationManager.getApplication().invokeLater(() ->
+                                                        {
+
+                                                            final ToolWindow toolWindow = ToolWindowManager.getInstance(myProject)
+                                                                                                           .getToolWindow(getToolWindowId());
+                                                            toolWindow.activate(null);
+                                                            final ContentManager contentManager = toolWindow.getContentManager();
+                                                            final Content content = contentManager.findContent(getTitle());
+                                                            if (content != null)
+                                                            {
+                                                                contentManager.setSelectedContent(content, true);
+                                                            }
+                                                        },
+                                                        o -> myProject.isInitialized() && myProject.isOpen()); 
     }
+
 
     public String getTitle()
     {

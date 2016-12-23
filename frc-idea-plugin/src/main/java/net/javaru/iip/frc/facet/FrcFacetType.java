@@ -74,6 +74,6 @@ public class FrcFacetType extends FacetType<FrcFacet, FrcFacetConfiguration>
     @Override
     public Icon getIcon()
     {
-        return FrcIcons.FIRST_ICON_MEDIUM;
+        return FrcIcons.FIRST_ICON_MEDIUM_16;
     }
 }

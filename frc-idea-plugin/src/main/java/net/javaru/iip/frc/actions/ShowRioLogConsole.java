@@ -16,10 +16,13 @@
 
 package net.javaru.iip.frc.actions;
 
+import com.intellij.facet.ProjectFacetManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 
+import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.ui.RioLogConsoleProjectService;
 
 
@@ -35,5 +38,15 @@ public class ShowRioLogConsole extends DumbAwareAction
             RioLogConsoleProjectService.update(project);
             RioLogConsoleProjectService.activate(project);
         }
+    }
+
+
+    @Override
+    public void update(AnActionEvent e)
+    {
+        final Project project = e.getData(CommonDataKeys.PROJECT);
+        e.getPresentation().setVisible(project != null && 
+                                       !project.isDisposed() && 
+                                       ProjectFacetManager.getInstance(project).getFacets(FrcFacet.FACET_TYPE_ID).size() > 0);
     }
 }

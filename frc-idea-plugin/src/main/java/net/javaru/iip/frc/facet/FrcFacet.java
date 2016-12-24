@@ -21,13 +21,15 @@ import org.jetbrains.annotations.Nullable;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
+import com.intellij.facet.FacetTypeId;
 import com.intellij.openapi.module.Module;
 
 
 
 public class FrcFacet extends Facet<FrcFacetConfiguration>
 {
-    public static final String FACET_ID = "FRC_FACET";
+    public static final String FACET_TYPE_ID_STRING = "FRC_FACET";
+    public final static FacetTypeId<FrcFacet> FACET_TYPE_ID = new FacetTypeId<>(FrcFacet.FACET_TYPE_ID_STRING);
     public static final String FACET_NAME = "FRC";
     public static final String FULL_NAME = "FRC (FIRST Robotics Competition)";
 
@@ -45,7 +47,7 @@ public class FrcFacet extends Facet<FrcFacetConfiguration>
     @Nullable
     public static FrcFacet getInstance(Module module)
     {
-        return FacetManager.getInstance(module).getFacetByType(FrcFacetType.FACET_TYPE_ID);
+        return FacetManager.getInstance(module).getFacetByType(FACET_TYPE_ID);
     }
 
 }

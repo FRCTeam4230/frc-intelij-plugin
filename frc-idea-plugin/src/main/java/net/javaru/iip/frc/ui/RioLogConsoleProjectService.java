@@ -30,7 +30,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 
 import net.javaru.iip.frc.facet.FrcFacet;
-import net.javaru.iip.frc.facet.FrcFacetType;
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
 import net.javaru.iip.frc.settings.FrcSettings;
 
@@ -346,7 +345,7 @@ public class RioLogConsoleProjectService
     private FrcFacet checkForFrcFacet(@NotNull Module module)
     {
         final FacetManager facetManager = FacetManager.getInstance(module);
-        final Collection<FrcFacet> facetsByType = facetManager.getFacetsByType(FrcFacetType.FACET_TYPE_ID);
+        final Collection<FrcFacet> facetsByType = facetManager.getFacetsByType(FrcFacet.FACET_TYPE_ID);
         if (facetsByType.isEmpty())
         {
             return null;

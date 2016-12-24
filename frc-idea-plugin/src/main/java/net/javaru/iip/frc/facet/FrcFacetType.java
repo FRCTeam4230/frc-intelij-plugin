@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetType;
-import com.intellij.facet.FacetTypeId;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
@@ -33,13 +32,10 @@ import net.javaru.iip.frc.FrcIcons;
 
 public class FrcFacetType extends FacetType<FrcFacet, FrcFacetConfiguration>
 {
-    public final static FacetTypeId<FrcFacet> FACET_TYPE_ID = new FacetTypeId<>(FrcFacet.FACET_ID);
-
-
     public FrcFacetType()
     {
         // id, stringId, presentableName
-        super(FACET_TYPE_ID, FrcFacet.FACET_ID, FrcFacet.FACET_NAME);
+        super(FrcFacet.FACET_TYPE_ID, FrcFacet.FACET_TYPE_ID_STRING, FrcFacet.FACET_NAME);
     }
 
 

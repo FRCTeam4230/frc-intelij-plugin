@@ -122,6 +122,8 @@
         <projectService id="rioLogConsoleProjectService" 
                         serviceInterface="net.javaru.iip.frc.ui.RioLogConsoleProjectService" 
                         serviceImplementation="net.javaru.iip.frc.ui.RioLogConsoleProjectService"/>
+
+        <spellchecker.bundledDictionaryProvider implementation="net.javaru.iip.frc.spellchecker.FrcBundledDictionaryProvider" />
     </extensions>
 
     <application-components>

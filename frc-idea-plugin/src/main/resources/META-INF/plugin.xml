@@ -202,7 +202,7 @@
         <action id="frc.StartTailingRioLogAction"
                 text="Show FRC _RioLog Console" 
                 class="net.javaru.iip.frc.actions.ShowRioLogConsole"
-                icon="/frc/icons/FIRST_icon_16x16.png" >
+                icon="/icons/first/FIRST_icon_16x16.png" >
             <add-to-group group-id="ToolsMenu" />
         </action>
         
@@ -211,7 +211,7 @@
                description="Create New FRC Components"
                class="net.javaru.iip.frc.actions.create.FrcCreateComponentsActionGroup"
                popup="true"
-               icon="/frc/icons/FIRST_icon_16x16.png"
+               icon="/icons/first/FIRST_icon_16x16.png"
                
                >
             <separator />

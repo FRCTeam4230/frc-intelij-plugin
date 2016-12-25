@@ -28,31 +28,31 @@ public final class FrcIcons
     private static final Logger LOG = Logger.getInstance(FrcIcons.class);
     
     /** FIRST Icon sized 10 x 10. */
-    public static final Icon FIRST_ICON_EXTRA_SMALL_10 = loadIcon("/icons/FIRST_icon_10x10.png"); // 10x10
+    public static final Icon FIRST_ICON_EXTRA_SMALL_10 = loadIcon("/icons/first/FIRST_icon_10x10.png"); // 10x10
     
     /** FIRST Icon sized 11 x 11. */
-    public static final Icon FIRST_ICON_EXTRA_SMALL_11 = loadIcon("/icons/FIRST_icon_11x11.png"); // 11x11
+    public static final Icon FIRST_ICON_EXTRA_SMALL_11 = loadIcon("/icons/first/FIRST_icon_11x11.png"); // 11x11
     
     /** FIRST Icon sized 12 x 12. */
-    public static final Icon FIRST_ICON_EXTRA_SMALL_12 = loadIcon("/icons/FIRST_icon_12x12.png"); // 12x12
+    public static final Icon FIRST_ICON_EXTRA_SMALL_12 = loadIcon("/icons/first/FIRST_icon_12x12.png"); // 12x12
     
     /** FIRST Icon sized 13 x 13. */
-    public static final Icon FIRST_ICON_SMALL_13 = loadIcon("/icons/FIRST_icon_13x13.png"); // 13x13
+    public static final Icon FIRST_ICON_SMALL_13 = loadIcon("/icons/first/FIRST_icon_13x13.png"); // 13x13
     
     /** FIRST Icon sized 13 x 13. Elevated to the top of the 'box' to allow clarity when overlays are added.. */
-    public static final Icon FIRST_ICON_SMALL_13_ELEVATED = loadIcon("/icons/FIRST_icon_13x13_elevated.png"); // 13x13
+    public static final Icon FIRST_ICON_SMALL_13_ELEVATED = loadIcon("/icons/first/FIRST_icon_13x13_elevated.png"); // 13x13
 
     /** FIRST Icon sized 14 x 14. */
-    public static final Icon FIRST_ICON_MEDIUM_SMALL_14 = loadIcon("/icons/FIRST_icon_14x14.png"); // 14x14
+    public static final Icon FIRST_ICON_MEDIUM_SMALL_14 = loadIcon("/icons/first/FIRST_icon_14x14.png"); // 14x14
     
     /** FIRST Icon sized 15 x 15. */
-    public static final Icon FIRST_ICON_MEDIUM_SMALL_15 = loadIcon("/icons/FIRST_icon_15x15.png"); // 15x15
+    public static final Icon FIRST_ICON_MEDIUM_SMALL_15 = loadIcon("/icons/first/FIRST_icon_15x15.png"); // 15x15
     
     /** FIRST Icon sized 16 x 16. */
-    public static final Icon FIRST_ICON_MEDIUM_16 = loadIcon("/icons/FIRST_icon_16x16.png"); // 16x16
+    public static final Icon FIRST_ICON_MEDIUM_16 = loadIcon("/icons/first/FIRST_icon_16x16.png"); // 16x16
     
     /** FIRST Icon sized 24 x 24. */
-    public static final Icon FIRST_ICON_MEDIUM_LARGE_24 = loadIcon("/icons/FIRST_icon_24x24.png"); // 24x24
+    public static final Icon FIRST_ICON_MEDIUM_LARGE_24 = loadIcon("/icons/first/FIRST_icon_24x24.png"); // 24x24
 
 
     /** A 16x16 Icon for Command classes. */

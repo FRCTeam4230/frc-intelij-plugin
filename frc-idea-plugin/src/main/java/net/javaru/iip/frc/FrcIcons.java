@@ -18,12 +18,15 @@ package net.javaru.iip.frc;
 
 import javax.swing.*;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.IconLoader;
 
 
 
 public final class FrcIcons 
 {
+    private static final Logger LOG = Logger.getInstance(FrcIcons.class);
+    
     /** FIRST Icon sized 10 x 10. */
     public static final Icon FIRST_ICON_EXTRA_SMALL_10 = loadIcon("/frc/icons/FIRST_icon_10x10.png"); // 10x10
     
@@ -50,11 +53,52 @@ public final class FrcIcons
     
     /** FIRST Icon sized 24 x 24. */
     public static final Icon FIRST_ICON_MEDIUM_LARGE_24 = loadIcon("/frc/icons/FIRST_icon_24x24.png"); // 24x24
+
+
+    /** A 16x16 Icon for Command classes. */
+    public static final Icon COMPONENTS_COMMAND_WPI = loadIcon("/frc/icons/wpi/Command.png"); // 16x16
     
+    /** A 16x16 Icon for Command classes. */
+    public static final Icon COMPONENTS_COMMAND = loadIcon("/frc/icons/components/Command-16.png"); // 16x16
     
+    /** A 16x16 Icon for Command Group classes. */
+    public static final Icon COMPONENTS_COMMAND_GROUP_WPI = loadIcon("/frc/icons/wpi/CommandGroup.png"); // 16x16
+    
+    /** A 16x16 Icon for Command Group classes. */
+    public static final Icon COMPONENTS_COMMAND_GROUP = loadIcon("/frc/icons/components/Command-Group-16.png"); // 16x16
+    
+    /** A 16x16 Icon for Trigger (i.e. Button) classes. */
+    public static final Icon COMPONENTS_BUTTON_WPI = loadIcon("/frc/icons/wpi/Button.png"); // 16x16
+    
+    /** A 16x16 Icon for Trigger (i.e. Button) classes. */
+    public static final Icon COMPONENTS_BUTTON = loadIcon("/frc/icons/components/Button-16.png"); // 16x16
+    
+    /** A 16x16 Icon for Subsystem classes. */
+    public static final Icon COMPONENTS_SUBSYSTEM_WPI = loadIcon("/frc/icons/wpi/Subsystem.png"); // 16x16
+    
+    /** A 16x16 Icon for Subsystem classes. */
+    public static final Icon COMPONENTS_SUBSYSTEM = loadIcon("/frc/icons/components/Subsystem.png"); // 16x16
+    
+    /** A 16x16 Icon for PID Subsystem classes. */
+    public static final Icon COMPONENTS_PID_SUBSYSTEM_WPI = loadIcon("/frc/icons/wpi/PIDSubsystem.png"); // 16x16
+
+    /** A 16x16 Icon for PID Subsystem classes. */
+    public static final Icon COMPONENTS_PID_SUBSYSTEM = loadIcon("/frc/icons/components/PID-Subsystem-16.png"); // 16x16
+
+
     private static Icon loadIcon(String path)
     {
-        return IconLoader.getIcon(path, FrcIcons.class);
+        try
+        {
+            return IconLoader.getIcon(path, FrcIcons.class);
+        }
+        catch (Throwable throwable)
+        {
+            //IntelliJ IDEA will still log an independent error in the Events window, but by loading a replacement icon, it will
+            //prevent things (such as actions) from completely breaking because an icon was not loaded.
+            LOG.error("[FRC] An exception occurred when loading the icon from '" + path + "'. Cause Summary: " + throwable.toString());
+            return IconLoader.getIcon("/frc/icons/InvalidIconPlaceholder-16.png", FrcIcons.class);
+        }
     }
     
     private FrcIcons() { }

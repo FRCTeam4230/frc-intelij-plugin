@@ -113,6 +113,8 @@
     <!--<depends config-file="">com.intellij.tasks</depends>-->
 
 
+    <resource-bundle>messages.FrcBundle</resource-bundle>
+    
     <extensions defaultExtensionNs="com.intellij">
         <facetType id="FRC_FACET" implementation="net.javaru.iip.frc.facet.FrcFacetType" />
         <executor id="FrcRioLog" implementation="net.javaru.iip.frc.ui.RioLogFrcWindowRunExecutor" />
@@ -135,6 +137,7 @@
                                  instance="net.javaru.iip.frc.settings.FrcApplicationComponent" 
                                  groupId="language" />
         <framework.detector implementation="net.javaru.iip.frc.facet.detector.RobotSubclassFrcFrameworkDetector"/>
+        <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
     </extensions>
 
     <project-components>
@@ -196,9 +199,30 @@
 
             The <reference> element allows to add an existing action to the group. The mandatory "ref" attribute specifies the ID of the action to add.
         -->
-        <action class="net.javaru.iip.frc.actions.ShowRioLogConsole" id="FRC_StartTailingRioLogAction" text="Show FRC _RioLog Console" icon="/frc/icons/FIRST_icon_16x16.png" >
+        <action id="frc.StartTailingRioLogAction"
+                text="Show FRC _RioLog Console" 
+                class="net.javaru.iip.frc.actions.ShowRioLogConsole"
+                icon="/frc/icons/FIRST_icon_16x16.png" >
             <add-to-group group-id="ToolsMenu" />
         </action>
+        
+        <group id="frc.NewFileTemplates"
+               text="FRC"
+               description="Create New FRC Components"
+               class="net.javaru.iip.frc.actions.create.FrcCreateComponentsActionGroup"
+               popup="true"
+               icon="/frc/icons/FIRST_icon_16x16.png"
+               
+               >
+            <separator />
+            <action id="frc.action.new.basic.command" class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicCommandClassAction" text="FRC Command"/>
+            <action id="frc.action.new.basic.commandGroup" class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicCommandGroupClassAction" text="FRC Command Group"/>
+            <action id="frc.action.new.basic.subsystem" class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicSubsystemClassAction" text="FRC Subsystem"/>
+            <action id="frc.action.new.basic.pidSubsystem" class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicPidSubsystemClassAction" text="FRC PID Subsystem"/>
+            <action id="frc.action.new.basic.trigger" class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicTriggerClassAction" text="FRC Trigger (i.e. Button)"/>
+            <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewJavaSpecialFile" />
+        </group>
+               
     </actions>
 
 </idea-plugin>

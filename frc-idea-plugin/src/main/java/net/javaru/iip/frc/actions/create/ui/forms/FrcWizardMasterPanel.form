@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="net.javaru.iip.frc.actions.create.ui.forms.FrcWizardMasterPanel">
+  <grid id="27dc6" binding="myRootPanel" layout-manager="BorderLayout" hgap="0" vgap="15">
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="facec" binding="myHeaderPanel" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+        <constraints border-constraint="North"/>
+        <properties/>
+        <border type="empty">
+          <size top="20" left="10" bottom="20" right="10"/>
+        </border>
+        <children>
+          <component id="de3cd" class="net.javaru.iip.frc.ui.components.FrcIconComponent" binding="myIcon">
+            <constraints/>
+            <properties/>
+          </component>
+          <grid id="28495" binding="myTitlePanel" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="c4749" class="com.intellij.ui.components.JBLabel" binding="myProductLabel">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <font style="2"/>
+                  <text value="FIRST Robotics Competition"/>
+                </properties>
+              </component>
+              <component id="570f0" class="com.intellij.ui.components.JBLabel" binding="myTaskTitleLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <font size="22" style="1"/>
+                  <fontColor value="NORMAL"/>
+                  <text value="(Task Title)"/>
+                  <toolTipText value=""/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+        </children>
+      </grid>
+      <grid id="1f3c5" binding="myCenterPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="empty"/>
+        <children/>
+      </grid>
+    </children>
+  </grid>
+</form>

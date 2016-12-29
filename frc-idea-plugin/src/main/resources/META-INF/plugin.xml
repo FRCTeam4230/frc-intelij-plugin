@@ -110,6 +110,9 @@
     <!-- uncomment to enable plugin in all products -->
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
+    <!-- TODO: Make AntSupport Optional ? -->
+    <depends>AntSupport</depends>
+    
     <!--<depends config-file="">com.intellij.tasks</depends>-->
 
 
@@ -222,6 +225,8 @@
             <action id="frc.action.new.basic.subsystem" class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicSubsystemClassAction" text="FRC Subsystem"/>
             <action id="frc.action.new.basic.pidSubsystem" class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicPidSubsystemClassAction" text="FRC PID Subsystem"/>
             <action id="frc.action.new.basic.trigger" class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicTriggerClassAction" text="FRC Trigger (i.e. Button)"/>
+            
+            <action id="frc.action.new.build.file" class="net.javaru.iip.frc.actions.create.build.NewFrcAntBuildFileAction" text="FRC New Ant Build File" />
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewJavaSpecialFile" />
         </group>
                

@@ -27,6 +27,15 @@ public final class FrcIcons
 {
     private static final Logger LOG = Logger.getInstance(FrcIcons.class);
     
+    
+    
+    /** FIRST Icon sized 60 x 42. */
+    public static final Icon FIRST_ICON_60x42 = loadIcon("/icons/first/FIRST_icon_60x42.png"); // 60x42
+    
+    /** FIRST Icon for use with Wizard Panels. */
+    public static final Icon FIRST_ICON_WIZARD_PANELS = FIRST_ICON_60x42;
+    
+    
     /** FIRST Icon sized 10 x 10. */
     public static final Icon FIRST_ICON_EXTRA_SMALL_10 = loadIcon("/icons/first/FIRST_icon_10x10.png"); // 10x10
     

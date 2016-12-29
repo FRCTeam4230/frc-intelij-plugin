@@ -38,7 +38,7 @@ import static net.javaru.iip.frc.util.FrcBundle.message;
 
 public class NewFrcAntBuildFileAction extends CreateElementActionBase implements DumbAware
 {
-    private static final Icon ICON = AntIcons.AntBuildXml;
+    private static final Icon ICON = AntIcons.AntInstallation;
     public static final String NAME = message("frc.new.build.ant.action.name");
     public static final String DEFAULT_WINDOW_TITLE = message("frc.new.component.window.title");
 

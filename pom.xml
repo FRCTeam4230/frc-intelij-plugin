@@ -23,7 +23,7 @@
 
     <!--  Change assembly.xml file <includes> if you change the artifact coordinates -->
     <groupId>net.javaru.intellij-idea-plugins.frc</groupId>
-    <artifactId>frc-intellij-idea-plugin-parent</artifactId>
+    <artifactId>frc-intellij-idea-plugin-plugin-parent</artifactId>
     <version>2017.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>FRC IntelliJ IDEA Plugin : Parent</name>
@@ -48,20 +48,20 @@
     </licenses>
 
     <!-- TODO: Update to website once created -->
-    <url>https://gitlab.com/Javaru/frc-intellij-idea</url>
+    <url>https://gitlab.com/Javaru/frc-intellij-idea-plugin</url>
 
     <scm>
-        <url>https://gitlab.com/Javaru/frc-intellij-idea</url>
-        <connection>scm:git:git@gitlab.com:Javaru/frc-intellij-idea</connection>
+        <url>https://gitlab.com/Javaru/frc-intellij-idea-plugin</url>
+        <connection>scm:git:git@gitlab.com:Javaru/frc-intellij-idea-plugin</connection>
         <!--suppress MavenModelInspection -->
-        <developerConnection>scm:git:ssh://git@gitlab.com:Javaru/frc-intellij-idea</developerConnection>
+        <developerConnection>scm:git:ssh://git@gitlab.com:Javaru/frc-intellij-idea-plugin</developerConnection>
     </scm>
 
     <!--<ciManagement></ciManagement>-->
 
     <issueManagement>
         <system>GitLab</system>
-        <url>https://gitlab.com/Javaru/frc-intellij-idea/issues</url>
+        <url>https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues</url>
     </issueManagement>
 
     <modules>

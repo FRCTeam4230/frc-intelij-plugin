@@ -17,8 +17,8 @@
 <idea-plugin version="2">
     <id>net.javaru.intellijIdeaPlugins.frc</id>
     <name>FRC</name>
-    <version>2016.0.1</version>
-    <vendor email="issues@frc-intellij-idea.java.net" url="https://gitlab.com/Javaru/frc-intellij-idea/">Javaru</vendor>
+    <version>2017.0.beta.1</version>
+    <vendor email="frc.issues@javaru.net" url="https://gitlab.com/Javaru/frc-intellij-idea-plugin/">Javaru</vendor>
 
     <description><![CDATA[
       <p>
@@ -28,7 +28,9 @@
       Java 8 JRE/JDK.</strong>
       </p>
       
-      <p>Please report issues or feature requests at <a href='https://gitlab.com/Javaru/frc-intellij-idea/issues'>https://gitlab.com/Javaru/frc-intellij-idea/issues</a></p>
+      <p>Please report issues or make feature requests at 
+      <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues</a>
+      </p>
 
       <h2>Plug-in Version Numbering</h2>
       <p>
@@ -91,7 +93,7 @@
         </li>
 
         <h2>Issue Reporting</h2>
-        <p>Please report issues or feature requests at <a href='https://gitlab.com/Javaru/frc-intellij-idea/issues'>https://gitlab.com/Javaru/frc-intellij-idea/issues</a></p>
+        <p>Please report issues or feature requests at <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues</a></p>
 
     ]]></description>
     <!--  TODO: Add details in description on how to change version of JRE for IDEA and if IDEA 2016.3 already uses JRE 8-->

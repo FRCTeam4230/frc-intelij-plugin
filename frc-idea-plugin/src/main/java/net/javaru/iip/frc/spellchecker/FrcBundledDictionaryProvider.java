@@ -16,8 +16,6 @@
 
 package net.javaru.iip.frc.spellchecker;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.intellij.spellchecker.BundledDictionaryProvider;
 
 
@@ -27,10 +25,6 @@ import com.intellij.spellchecker.BundledDictionaryProvider;
  */
 public class FrcBundledDictionaryProvider implements BundledDictionaryProvider
 {
-    @SuppressWarnings("unused")
-    private static final Logger logger = LoggerFactory.getLogger(FrcBundledDictionaryProvider.class);
-
-
     @Override
     public String[] getBundledDictionaries()
     {

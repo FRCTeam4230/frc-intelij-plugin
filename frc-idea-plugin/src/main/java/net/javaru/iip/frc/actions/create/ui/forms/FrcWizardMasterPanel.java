@@ -21,23 +21,22 @@ import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.util.ui.UIUtil.FontColor;
 
 import net.javaru.iip.frc.FrcIcons;
+import net.javaru.iip.frc.actions.create.TaskValidator;
+import net.javaru.iip.frc.actions.create.ui.ValidationPanelBean;
 import net.javaru.iip.frc.ui.components.FrcIconComponent;
 
 
 
 public class FrcWizardMasterPanel
 {
-    @SuppressWarnings("unused")
-    private static final Logger logger = LoggerFactory.getLogger(FrcWizardMasterPanel.class);
-
+    private static final Logger LOG = Logger.getInstance(FrcWizardMasterPanel.class);
 
     private JPanel myRootPanel;
     private JPanel myHeaderPanel;
@@ -48,15 +47,25 @@ public class FrcWizardMasterPanel
     private JBLabel myTaskTitleLabel;
 
 
-    public FrcWizardMasterPanel(@NotNull JPanel innerPanel, @NotNull String taskTitle, @Nullable String taskDescription)
+    public FrcWizardMasterPanel(@NotNull JPanel contentPanel,
+                                @NotNull String taskTitle,
+                                @Nullable String taskDescription, 
+                                @Nullable TaskValidator taskValidator)
     {
         Icon icon = FrcIcons.FIRST_ICON_WIZARD_PANELS;
         $$$setupUI$$$();
         myIcon.setPreferredSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
         myIcon.setIcon(icon);
-        myCenterPanel.add(innerPanel);
         myTaskTitleLabel.setText(taskTitle);
 
+        JPanel panelToUse = taskDescription != null ? new DescriptionPanelBean(contentPanel, taskDescription).getRootPanel() : contentPanel;
+        
+        if (taskValidator != null)
+        {
+            panelToUse = new ValidationPanelBean(panelToUse, taskValidator).getRootPanel();
+        }
+        
+        myCenterPanel.add(panelToUse);
     }
 
 

@@ -29,6 +29,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 
 import icons.AntIcons;
+import net.javaru.iip.frc.actions.create.TaskValidatorBase;
 import net.javaru.iip.frc.actions.create.ui.FrcWizardDialog;
 import net.javaru.iip.frc.actions.create.ui.forms.DevWorkPanel;
 
@@ -108,10 +109,11 @@ public class NewFrcAntBuildFileAction extends CreateElementActionBase implements
     {
         final DevWorkPanel panel = new DevWorkPanel();
         
-        return new FrcWizardDialog(project, 
-                                   panel.getMyRootPanel(), 
+        return new FrcWizardDialog(project,
+                                   panel.getMyRootPanel(),
                                    "Create Ant Build Files",
-                                   "Creates FRC specific Ant 'build.xml' and 'build.properties' files.");
+                                   "Creates FRC specific Ant 'build.xml' and 'build.properties' files.", 
+                                   new TaskValidatorBase());
     }
     
 

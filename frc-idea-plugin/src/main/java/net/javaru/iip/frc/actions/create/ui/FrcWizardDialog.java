@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 
+import net.javaru.iip.frc.actions.create.TaskValidator;
 import net.javaru.iip.frc.actions.create.ui.forms.FrcWizardMasterPanel;
 
 
@@ -36,11 +37,15 @@ public class FrcWizardDialog extends DialogWrapper
 
 
     //TODO convert to Builder
-    public FrcWizardDialog(@Nullable Project project, @NotNull JPanel myPanel, @NotNull String taskTitle, @Nullable String taskToolTip)
+    public FrcWizardDialog(@Nullable Project project,
+                           @NotNull JPanel myPanel,
+                           @NotNull String taskTitle,
+                           @Nullable String taskDescription, 
+                           @Nullable TaskValidator taskValidator)
     {
         super(project);
         this.project = project;
-        final FrcWizardMasterPanel masterPanel = new FrcWizardMasterPanel(myPanel, taskTitle, taskToolTip);
+        final FrcWizardMasterPanel masterPanel = new FrcWizardMasterPanel(myPanel, taskTitle, taskDescription, taskValidator);
         this.myPanel = masterPanel.getRootPanel();
         init();
     }

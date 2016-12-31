@@ -38,14 +38,14 @@ public class FrcWizardDialog extends DialogWrapper
 
     //TODO convert to Builder
     public FrcWizardDialog(@Nullable Project project,
-                           @NotNull JPanel myPanel,
+                           @NotNull JPanel contentPanel,
                            @NotNull String taskTitle,
                            @Nullable String taskDescription, 
                            @Nullable TaskValidator taskValidator)
     {
         super(project);
         this.project = project;
-        final FrcWizardMasterPanel masterPanel = new FrcWizardMasterPanel(myPanel, taskTitle, taskDescription, taskValidator);
+        final FrcWizardMasterPanel masterPanel = new FrcWizardMasterPanel(contentPanel, taskTitle, taskDescription, taskValidator);
         this.myPanel = masterPanel.getRootPanel();
         init();
     }

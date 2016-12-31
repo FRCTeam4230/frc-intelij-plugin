@@ -49,7 +49,7 @@ public class FrcWizardMasterPanel
 
     public FrcWizardMasterPanel(@NotNull JPanel contentPanel,
                                 @NotNull String taskTitle,
-                                @Nullable String taskDescription, 
+                                @Nullable String taskDescription,
                                 @Nullable TaskValidator taskValidator)
     {
         Icon icon = FrcIcons.FIRST_ICON_WIZARD_PANELS;
@@ -59,12 +59,12 @@ public class FrcWizardMasterPanel
         myTaskTitleLabel.setText(taskTitle);
 
         JPanel panelToUse = taskDescription != null ? new DescriptionPanelBean(contentPanel, taskDescription).getRootPanel() : contentPanel;
-        
+
         if (taskValidator != null)
         {
             panelToUse = new ValidationPanelBean(panelToUse, taskValidator).getRootPanel();
         }
-        
+
         myCenterPanel.add(panelToUse);
     }
 
@@ -89,6 +89,8 @@ public class FrcWizardMasterPanel
     {
         myRootPanel = new JPanel();
         myRootPanel.setLayout(new BorderLayout(0, 15));
+        myRootPanel.setMinimumSize(new Dimension(350, 200));
+        myRootPanel.setPreferredSize(new Dimension(400, 300));
         myHeaderPanel = new JPanel();
         myHeaderPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         myRootPanel.add(myHeaderPanel, BorderLayout.NORTH);

@@ -16,10 +16,13 @@
 
 package net.javaru.iip.frc.actions.create.ui;
 
+import java.awt.*;
 import javax.swing.*;
+import javax.swing.border.Border;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 
@@ -30,6 +33,8 @@ import net.javaru.iip.frc.actions.create.ui.forms.FrcWizardMasterPanel;
 
 public class FrcWizardDialog extends DialogWrapper
 {
+
+    private static final Logger LOG = Logger.getInstance(FrcWizardDialog.class);
 
     @Nullable
     private final Project project;
@@ -45,6 +50,13 @@ public class FrcWizardDialog extends DialogWrapper
     {
         super(project);
         this.project = project;
+        
+        final Border border = BorderFactory.createEmptyBorder(20, 0, 20, 0);
+        contentPanel.setBorder(border);
+        contentPanel.setPreferredSize(new Dimension(400, 80));
+        contentPanel.revalidate();
+        contentPanel.repaint();
+
         final FrcWizardMasterPanel masterPanel = new FrcWizardMasterPanel(contentPanel, taskTitle, taskDescription, taskValidator);
         this.myPanel = masterPanel.getRootPanel();
         init();

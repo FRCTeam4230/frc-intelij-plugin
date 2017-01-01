@@ -23,10 +23,11 @@ import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
 
 import net.javaru.iip.frc.actions.create.TaskValidator;
+import net.javaru.iip.frc.actions.create.ui.forms.PanelBean;
 
 
 
-public class ValidationPanelBean
+public class ValidationPanelBean implements PanelBean
 {
     private static final Logger LOG = Logger.getInstance(ValidationPanelBean.class);
 
@@ -44,7 +45,8 @@ public class ValidationPanelBean
 
 
     
-
+    @NotNull
+    @Override
     public JPanel getRootPanel() { return myRootPanel; }
 
 

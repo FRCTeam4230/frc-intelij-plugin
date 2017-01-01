@@ -28,12 +28,9 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 
-import net.javaru.iip.frc.actions.create.TaskValidator;
-import net.javaru.iip.frc.actions.create.TaskValidatorBase;
 
 
-
-public class CreateAntBuildPanelBean implements ModelPanelBean
+public class CreateAntBuildPanelBean implements ValidatingModelPanelBean
 {
     private static final Logger LOG = Logger.getInstance(CreateAntBuildPanelBean.class);
 
@@ -53,12 +50,6 @@ public class CreateAntBuildPanelBean implements ModelPanelBean
     public JPanel getRootPanel() { return rootPanel; }
 
 
-    @NotNull
-    @Override
-    public TaskValidator getTaskValidator()
-    {
-        return new TaskValidatorBase();
-    }
 
 
     {

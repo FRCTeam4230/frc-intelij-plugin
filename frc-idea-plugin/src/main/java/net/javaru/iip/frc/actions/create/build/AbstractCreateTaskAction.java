@@ -47,10 +47,9 @@ public abstract class AbstractCreateTaskAction extends CreateElementActionBase
         
 
         return new FrcWizardDialog(project,
-                                   panelBean.getRootPanel(),
+                                   panelBean,
                                    "Create Ant Build Files",
-                                   "Creates FRC specific Ant 'build.xml' and 'build.properties' files.",
-                                   panelBean.getTaskValidator());
+                                   "Creates FRC specific Ant 'build.xml' and 'build.properties' files.");
     }
 
 

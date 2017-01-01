@@ -22,13 +22,13 @@ import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.util.ui.UIUtil.FontColor;
 
 import net.javaru.iip.frc.FrcIcons;
-import net.javaru.iip.frc.actions.create.TaskValidator;
 import net.javaru.iip.frc.actions.create.ui.ValidationPanelBean;
 import net.javaru.iip.frc.ui.components.FrcIconComponent;
 
@@ -47,10 +47,10 @@ public class FrcWizardMasterPanel implements PanelBean
     private JBLabel myTaskTitleLabel;
 
 
-    public FrcWizardMasterPanel(@NotNull JPanel contentPanel,
+    public FrcWizardMasterPanel(@Nullable Project project,
+                                @NotNull ModelPanelBean panelBean,
                                 @NotNull String taskTitle,
-                                @Nullable String taskDescription,
-                                @Nullable TaskValidator taskValidator)
+                                @Nullable String taskDescription)
     {
         Icon icon = FrcIcons.FIRST_ICON_WIZARD_PANELS;
         $$$setupUI$$$();
@@ -58,11 +58,13 @@ public class FrcWizardMasterPanel implements PanelBean
         myIcon.setIcon(icon);
         myTaskTitleLabel.setText(taskTitle);
 
+        final JPanel contentPanel = panelBean.getRootPanel();
         JPanel panelToUse = taskDescription != null ? new DescriptionPanelBean(contentPanel, taskDescription).getRootPanel() : contentPanel;
 
-        if (taskValidator != null)
+        // TODO: create separate constructor?
+        if (panelBean instanceof ValidatingModelPanelBean)
         {
-            panelToUse = new ValidationPanelBean(panelToUse, taskValidator).getRootPanel();
+            panelToUse = new ValidationPanelBean((ValidatingModelPanelBean) panelBean).getRootPanel();
         }
 
         myCenterPanel.add(panelToUse);

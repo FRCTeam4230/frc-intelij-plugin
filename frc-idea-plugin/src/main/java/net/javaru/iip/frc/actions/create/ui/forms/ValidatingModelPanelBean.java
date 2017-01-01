@@ -16,7 +16,7 @@
 
 package net.javaru.iip.frc.actions.create.ui.forms;
 
-public interface ModelPanelBean extends  PanelBean
+public interface ValidatingModelPanelBean extends ModelPanelBean 
 {
     
 }

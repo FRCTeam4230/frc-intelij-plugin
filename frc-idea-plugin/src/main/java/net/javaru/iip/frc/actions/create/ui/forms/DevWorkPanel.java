@@ -19,6 +19,7 @@ package net.javaru.iip.frc.actions.create.ui.forms;
 import java.awt.*;
 import javax.swing.*;
 
+import org.jetbrains.annotations.NotNull;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
@@ -26,13 +27,15 @@ import com.intellij.uiDesigner.core.Spacer;
 
 
 
-public class DevWorkPanel
+public class DevWorkPanel implements PanelBean
 {
 
     private JPanel myRootPanel;
 
 
-    public JPanel getMyRootPanel() { return myRootPanel; }
+    @NotNull
+    @Override
+    public JPanel getRootPanel() { return myRootPanel; }
 
 
     {

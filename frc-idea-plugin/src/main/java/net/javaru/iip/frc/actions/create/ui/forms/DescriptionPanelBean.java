@@ -26,7 +26,7 @@ import com.intellij.uiDesigner.core.Spacer;
 
 
 
-public class DescriptionPanelBean
+public class DescriptionPanelBean implements PanelBean
 {
     private static final Logger LOG = Logger.getInstance(DescriptionPanelBean.class);
 
@@ -38,6 +38,8 @@ public class DescriptionPanelBean
     }
 
 
+    @NotNull
+    @Override
     public JPanel getRootPanel() { return myRootPanel; }
 
 

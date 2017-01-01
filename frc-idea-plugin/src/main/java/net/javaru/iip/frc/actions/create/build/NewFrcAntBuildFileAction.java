@@ -20,8 +20,6 @@ import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.intellij.ide.actions.CreateElementActionBase;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -29,19 +27,18 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 
 import icons.AntIcons;
-import net.javaru.iip.frc.actions.create.TaskValidatorBase;
 import net.javaru.iip.frc.actions.create.ui.FrcWizardDialog;
-import net.javaru.iip.frc.actions.create.ui.forms.DevWorkPanel;
+import net.javaru.iip.frc.actions.create.ui.forms.CreateAntBuildPanelBean;
+import net.javaru.iip.frc.actions.create.ui.forms.ModelPanelBean;
 
 import static net.javaru.iip.frc.util.FrcBundle.message;
 
 
 
-public class NewFrcAntBuildFileAction extends CreateElementActionBase implements DumbAware
+public class NewFrcAntBuildFileAction extends AbstractCreateTaskAction implements DumbAware
 {
     private static final Icon ICON = AntIcons.AntInstallation;
     public static final String NAME = message("frc.new.build.ant.action.name");
-    public static final String DEFAULT_WINDOW_TITLE = message("frc.new.component.window.title");
 
 
     public NewFrcAntBuildFileAction()
@@ -60,62 +57,42 @@ public class NewFrcAntBuildFileAction extends CreateElementActionBase implements
     @Override
     protected PsiElement[] invokeDialog(Project project, PsiDirectory directory)
     {
-        final MyInputValidator validator = new AntFilesInputValidator(project, directory);
-        if (ApplicationManager.getApplication().isUnitTestMode())
-        {
-            try
-            {
-                return validator.create("test");
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-        else
-        {
-//            Messages.showInputDialog(project,
-//                                     "Enter Ant build File name",
-//                                     "New Ant Build File",
-//                                     ICON,
-//                                     "build.xml",
-//                                     validator);
 
-            final DialogWrapper dialog = createDialog(project);
-            dialog.show();
-            
-        }
+        // A basic example
+        // Messages.showInputDialog(project, "Enter Ant build File name", "New Ant Build File", ICON, "build.xml", validator);
+
+        final DialogWrapper dialog = createDialog(project, directory);
+        dialog.show();
         
-        return validator.getCreatedElements();
+        
+
+        // TODO: NEEDS TO BE IMPLEMENTED
+        // return validator.getCreatedElements();
+        return new PsiElement[0];
     }
 
     
-    protected DialogWrapper createDialog(@NotNull final Project project)
+    protected DialogWrapper createDialog(@NotNull final Project project, PsiDirectory directory)
     {
-        return createDialog(project, null);
+        return createDialog(project, directory, null);
     }
     
-    protected DialogWrapper createDialog(@NotNull final Project project, @Nullable String windowTitle)
+    protected DialogWrapper createDialog(@NotNull final Project project, PsiDirectory directory, @Nullable String windowTitle)
     {
         if (windowTitle == null) {windowTitle = DEFAULT_WINDOW_TITLE;}
         
-        final FrcWizardDialog dialog = createWizardDialog(project);
+        final FrcWizardDialog dialog = createWizardDialog(project, directory);
         dialog.setTitle(windowTitle);
         return dialog;
     }
-    
-    //TODO - define as abstract method in abstract super class
-    protected FrcWizardDialog createWizardDialog(@NotNull final Project project)
+
+
+    @NotNull
+    @Override
+    protected ModelPanelBean createPanelBean(@NotNull final Project project, final PsiDirectory directory)
     {
-        final DevWorkPanel panel = new DevWorkPanel();
-        
-        return new FrcWizardDialog(project,
-                                   panel.getMyRootPanel(),
-                                   "Create Ant Build Files",
-                                   "Creates FRC specific Ant 'build.xml' and 'build.properties' files.", 
-                                   new TaskValidatorBase());
+        return new CreateAntBuildPanelBean();
     }
-    
 
     @NotNull
     @Override
@@ -150,12 +127,5 @@ public class NewFrcAntBuildFileAction extends CreateElementActionBase implements
     }
     
     
-    protected class AntFilesInputValidator extends MyInputValidator
-    {
-
-        public AntFilesInputValidator(Project project, PsiDirectory directory)
-        {
-            super(project, directory);
-        }
-    }
+    
 }

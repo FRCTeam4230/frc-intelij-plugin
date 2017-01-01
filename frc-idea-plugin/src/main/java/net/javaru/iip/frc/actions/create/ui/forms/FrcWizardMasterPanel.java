@@ -34,7 +34,7 @@ import net.javaru.iip.frc.ui.components.FrcIconComponent;
 
 
 
-public class FrcWizardMasterPanel
+public class FrcWizardMasterPanel implements PanelBean
 {
     private static final Logger LOG = Logger.getInstance(FrcWizardMasterPanel.class);
 
@@ -69,6 +69,8 @@ public class FrcWizardMasterPanel
     }
 
 
+    @NotNull
+    @Override
     public JPanel getRootPanel() { return myRootPanel; }
 
 

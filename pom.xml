@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2015 Mark Vedder
+  ~ Copyright 2015-2017 Mark Vedder
   ~
   ~    Licensed under the Apache License, Version 2.0 (the "License");
   ~    you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <kotlin.version>1.0.5</kotlin.version>
+        <kotlin.version>1.0.6</kotlin.version>
 
         <slf4j.version>1.7.2</slf4j.version>
         <logback.version>1.0.9</logback.version>
@@ -571,16 +571,19 @@
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-stdlib</artifactId>
                 <version>${kotlin.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-runtime</artifactId>
                 <version>${kotlin.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-reflect</artifactId>
                 <version>${kotlin.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>

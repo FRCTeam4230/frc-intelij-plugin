@@ -33,4 +33,7 @@ atlassian-ide-plugin.xml
 
 # Exclude Misc development time files
 developer-notes.txt
+FRC.jar
 FRC.zip
+frc-*.jar
+frc-*.zip

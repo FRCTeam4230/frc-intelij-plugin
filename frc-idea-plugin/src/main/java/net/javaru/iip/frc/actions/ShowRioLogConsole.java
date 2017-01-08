@@ -36,7 +36,7 @@ public class ShowRioLogConsole extends DumbAwareAction
         if (project != null)
         {
             RioLogConsoleProjectService.update(project);
-            RioLogConsoleProjectService.activate(project);
+            RioLogConsoleProjectService.activateNow(project);
         }
     }
 

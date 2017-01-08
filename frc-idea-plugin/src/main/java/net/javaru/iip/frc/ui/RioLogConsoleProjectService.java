@@ -27,11 +27,13 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Disposer;
 
 import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
 import net.javaru.iip.frc.settings.FrcSettings;
+import net.javaru.iip.frc.udp.RioLogMonitoringProcess;
 
 
 
@@ -81,6 +83,16 @@ public class RioLogConsoleProjectService
         
      */
 
+    public static void updateAllOpenProjects()
+    {
+        final Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+        for (Project project : openProjects)
+        {
+            update(project);
+        }
+    }
+    
+    
     /**
      * A null safe convenience static utility method for {@link #update() updating} the RioLog Condole for a facet.
      * Equivalent to calling:<br/><br/>
@@ -140,29 +152,56 @@ public class RioLogConsoleProjectService
     }
 
 
-    public static void activate(@Nullable Facet facet)
+    public static void activateSafely(@Nullable Facet facet)
     {
         if (facet!= null)
         {
             final Project project = facet.getModule().getProject();
-            getInstance(project).activate();
+            getInstance(project).activateSafely();
         }
     }
     
-    public static void activate(@Nullable Module module)
+    public static void activateSafely(@Nullable Module module)
     {
         if (module!= null)
         {
             final Project project = module.getProject();
-            getInstance(project).activate();
+            getInstance(project).activateSafely();
         }
     }
     
-    public static void activate(@Nullable Project project)
+    public static void activateSafely(@Nullable Project project)
     {
         if (project!= null)
         {
-            getInstance(project).activate();
+            getInstance(project).activateSafely();
+        }
+    }
+
+
+    public static void activateNow(@Nullable Facet facet)
+    {
+        if (facet!= null)
+        {
+            final Project project = facet.getModule().getProject();
+            getInstance(project).activateNow();
+        }
+    }
+    
+    public static void activateNow(@Nullable Module module)
+    {
+        if (module!= null)
+        {
+            final Project project = module.getProject();
+            getInstance(project).activateNow();
+        }
+    }
+    
+    public static void activateNow(@Nullable Project project)
+    {
+        if (project!= null)
+        {
+            getInstance(project).activateNow();
         }
     }
 
@@ -218,7 +257,7 @@ public class RioLogConsoleProjectService
      * Updates the RioLog Console view creating/opening, destroying/closing, or moving it as needed, or moving it 
      * as needed based on the state of the UI and the current configuration of the project and the presence of any FRC facets.
      */
-    public void update()
+    public synchronized void update()
     {
         final Module[] modules = ModuleManager.getInstance(myProject).getModules();
 
@@ -235,15 +274,26 @@ public class RioLogConsoleProjectService
         final FrcSettings frcSettings = FrcApplicationComponent.getInstance().getState();
         final boolean useRunWindow = (frcSettings != null && !frcSettings.isUseFrcToolWindow());
 
-        LOG.debug("[FRC] needConsole:  " + needConsole);
-        LOG.debug("[FRC] haveConsole:  " + (contentExecutor != null));
-        LOG.debug("[FRC] useRunWindow: " + useRunWindow);
+        final int configuredPort = frcSettings.getRioLogPort();
+        final int currentPort = determineCurrentlyMonitoredPort();
+        final boolean portBounceNeeded = currentPort != -1 && currentPort != configuredPort;
 
 
-        if (needConsole && contentExecutor != null)
+        final Thread currentThread = Thread.currentThread();
+        LOG.debug("[FRC] Current thread:   " + currentThread.getId() + " :: " + currentThread.getName());
+        LOG.debug("[FRC] needConsole:      " + needConsole);
+        LOG.debug("[FRC] haveConsole:      " + (contentExecutor != null));
+        LOG.debug("[FRC] useRunWindow:     " + useRunWindow);
+        LOG.debug("[FRC] configuredPort:   " + configuredPort);
+        LOG.debug("[FRC] currentPort:      " + currentPort);
+        LOG.debug("[FRC] portBounceNeeded: " + portBounceNeeded);
+        
+
+
+        if (needConsole && contentExecutor != null && contentExecutor.getRioLogMonitoringProcess() != null && contentExecutor.getRioLogMonitoringProcess().isEnabled())
         {
             // Case 1 - we have and need it, but we need to check if we have the right type (i.e. settings change)
-            LOG.debug("[FRC] Case 1: have console and need it. Checking if correct type. Project is: " + myProject.getName());
+            LOG.debug("[FRC] Case 1: have console and need it. Checking if correct type & port. Project is: " + myProject.getName());
 
             //do we have the right console?
             if (useRunWindow && RioLogFrcWindowContentExecutor.TOOL_WINDOW_ID.equals(contentExecutor.getToolWindowId()))
@@ -264,7 +314,15 @@ public class RioLogConsoleProjectService
             }
             else
             {
-                LOG.debug("[FRC] Case 1.3: have console, need it, and it is the right type. No action needed. Project is: " + myProject.getName());
+                if (portBounceNeeded)
+                {
+                    LOG.debug("[FRC] Case 1.3A: have console, need it, and it is the right type, but port has changed. Triggering 'reRun' action. Project is: " + myProject.getName());
+                    if (contentExecutor != null) {contentExecutor.reRun();}
+                }
+                else
+                {
+                    LOG.debug("[FRC] Case 1.3B: have console, need it, and it is the right type, listening on the correct port. No action needed. Project is: " + myProject.getName());
+                }
             }
         }
         else if (needConsole)
@@ -285,12 +343,34 @@ public class RioLogConsoleProjectService
             LOG.debug("[FRC] Case 4: We don't have a console window an we don't need one. No action needed. Project is: " + myProject.getName());
         }
     }
-
-    public void activate()
+   
+    
+    private int determineCurrentlyMonitoredPort()
     {
         if (contentExecutor != null)
         {
-            contentExecutor.activateRioLogConsole();
+            final RioLogMonitoringProcess rioLogMonitoringProcess = contentExecutor.getRioLogMonitoringProcess();
+            if (rioLogMonitoringProcess != null)
+            {
+                return rioLogMonitoringProcess.getMonitoredPort();
+            }
+        }
+        return -1;
+    }
+
+    public void activateSafely()
+    {
+        if (contentExecutor != null)
+        {
+            contentExecutor.activateRioLogConsoleSafely();
+        }
+    }
+
+    public void activateNow()
+    {
+        if (contentExecutor != null)
+        {
+            contentExecutor.activateRioLogConsoleNow();
         }
     }
 

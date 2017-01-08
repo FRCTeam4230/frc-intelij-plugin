@@ -14,95 +14,38 @@
   ~    limitations under the License.
   -->
 
-<idea-plugin version="2">
-    <id>net.javaru.intellijIdeaPlugins.frc</id>
+<idea-plugin url="https://gitlab.com/Javaru/frc-intellij-idea-plugin">
+    <id>net.javaru.idea.frc</id>
     <name>FRC</name>
-    <version>2017.0.beta.1</version>
+    <version>0.beta.1</version>
     <vendor email="frc.issues@javaru.net" url="https://gitlab.com/Javaru/frc-intellij-idea-plugin/">Javaru</vendor>
 
     <description><![CDATA[
-      <p>
-      A plug-in to allow FRC development using IntelliJ IDEA rather than Eclipse. It will work with either the
-      free open-sourced <em>Community Edition</em> or the licensed <em>Ultimate Edition</em> of IntelliJ IDEA.
-      <strong>This plug-in requires IntelliJ IDEA 2016.3 or later, and that you run IntelliJ IDEA via a 
-      Java 8 JRE/JDK.</strong>
-      </p>
-      
-      <p>Please report issues or make feature requests at 
-      <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues</a>
-      </p>
-
-      <h2>Plug-in Version Numbering</h2>
-      <p>
-      This plug-in is versioned via a three number version: <tt>&lt;frc-year&gt;.&lt;major&gt;.&lt;minor&gt;</tt> The first number is the
-      FRC competition year.
-      </p>
-      <p>
-      The second number indicates a major release for that year. <em>If the second number is a 0, it indicates the
-      plug-in is in the beta phase for that year.</em> It will be in beta phase during the pre-season until and remain that way until
-      shortly after kickoff when the new development tools are released. I will do my best to update and make available the plug-in the
-      evening of kickoff or the next day. However, if there are major changes to the development tools or the Eclipse plug-in
-      (from which this plug-in extracts various library and tools), it may take longer to update this plug-in. Given that I use this
-      plug-in myself to support my FRC Team, I will do such as quickly as possible. I may re;lease additional beta versions while I
-      polish the plug-in with new changes needed for that year. I ask for your patience in such cases ;)
-      </p>
-      <p>
-      Finally, the third number indicates a minor release. In other words, a bug fix patch.
-      </p>
-
-      <h2>Features</h2>
-      <ol>
-
-        <li>
-          <strong>Robot Project Templates</strong>
-          <ul>
-            <li>Project templates that exactly duplicate all the robot templates included in the Eclipse release are included.</li>
-            <li>Automatic downloading and configuration of the WPI Library (WPILib) is provided</li>
-          </ul>
-        </li>
-
-        <li>
-          <strong>Class Templates</strong>
-          <ul>
-            <li>Class templates that exactly duplicate all the templates included in the Eclipse release are included as <em>File Templates</em>.</li>
-            <li>Some additional class <em>File Templates</em> are included.</li>
-            <li>Use IDEA's awesome <em>File Templates</em> feature to add your own <em>File Templates</em>.</li>
-          </ul>
-        </li>
-
-        <li>
-          <strong>NetConsole/RioLog viewing</strong>
-          <ul>
-            <li>View console/logging output from the robot directly in IntelliJ IDEA</li>
-            <li>You can view either in the standard Run ToolWindow or in a dedicated ToolWindow</li>
-            <li>Clear the output:
-              <ul>
-                <li>at will</li>
-                <li>automatically on a redeploy of the code</li>
-                <li>automatically on a restart of the robot</li>
-                <li>automatically on the logging of any configurable console/log message</li>
-            </li>
-          </ul>
-        </li>
-
-        <li>
-          <strong>WPI Library (WPILib) update checking and downloading</strong>
-          <ul>
-            <li>Get notifications if the WPILib has been updated. No need to open Eclipse to check.</li>
-          </ul>
-        </li>
-
-        <h2>Issue Reporting</h2>
-        <p>Please report issues or feature requests at <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues</a></p>
-
+        <p>
+            A plug-in to allow FRC development using IntelliJ IDEA rather than Eclipse. It will work with either the
+            free open-sourced <em>Community Edition</em> or the licensed <em>Ultimate Edition</em> of IntelliJ IDEA.
+            <strong>This plug-in requires IntelliJ IDEA 2016.3 or later. </strong>
+        </p>
+        <p> </p>
+        <p>Please report issues or make feature requests at 
+            <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues</a>
+        </p>
+        <p> </p>
+        <p>
+            <strong>This plug-in is in beta and is not feature complete yet.</strong> I started developing and using this plug-in for my own
+            use during the 2016 FRC build season. I had hoped to have it more feature rich prior to the 2017 FRC season. But time did not allow
+            for such. At this time, the primary feature is the the RiLog tool window which will show the output of the RioLog. There are also a 
+            few file templates for FRC Iterative Robots. I wil try to add features as the 2017 build season progresses. I have many planned, and
+            some partially implemented. Thanks.
+        </p>
+        
     ]]></description>
-    <!--  TODO: Add details in description on how to change version of JRE for IDEA and if IDEA 2016.3 already uses JRE 8-->
-
-    <change-notes><![CDATA[
+    
+    <!--<change-notes><![CDATA[
       <strong>2015.0.1</strong> <br>
       &nbsp;&nbsp;&bull; Initial beta release of plug-in for FRC 2015.<br>
     ]]>
-    </change-notes>
+    </change-notes>-->
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <idea-version since-build="163.0" />
@@ -119,7 +62,8 @@
 
 
     <resource-bundle>messages.FrcBundle</resource-bundle>
-    
+
+    <!-- For detailed info on what the various attributes are, see https://sites.google.com/site/malenkov/java/150403 -->
     <extensions defaultExtensionNs="com.intellij">
         <facetType id="FRC_FACET" implementation="net.javaru.iip.frc.facet.FrcFacetType" />
         <executor id="FrcRioLog" implementation="net.javaru.iip.frc.ui.RioLogFrcWindowRunExecutor" />
@@ -129,6 +73,15 @@
                         serviceImplementation="net.javaru.iip.frc.ui.RioLogConsoleProjectService"/>
 
         <spellchecker.bundledDictionaryProvider implementation="net.javaru.iip.frc.spellchecker.FrcBundledDictionaryProvider" />
+
+        <applicationConfigurable id="frc.plugin.frcApplicationConfigurable"
+                                 instance="net.javaru.iip.frc.settings.FrcApplicationComponent"
+                                 groupId="language" />
+        
+        <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
+
+        <frameworkSupport implementation="net.javaru.iip.frc.facet.FrcFrameworkSupportProvider" />
+        <framework.detector implementation="net.javaru.iip.frc.facet.detector.RobotSubclassFrcFrameworkDetector" />
     </extensions>
 
     <application-components>
@@ -138,14 +91,6 @@
         </component>
     </application-components>
     
-    <!-- For detailed info on what the various attributes are, see https://sites.google.com/site/malenkov/java/150403 -->
-    <extensions defaultExtensionNs="com.intellij">
-        <applicationConfigurable id="frc.plugin.frcApplicationConfigurable" 
-                                 instance="net.javaru.iip.frc.settings.FrcApplicationComponent" 
-                                 groupId="language" />
-        <framework.detector implementation="net.javaru.iip.frc.facet.detector.RobotSubclassFrcFrameworkDetector"/>
-        <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
-    </extensions>
 
     <project-components>
         <!-- Add your project components here -->
@@ -228,7 +173,7 @@
             <action id="frc.action.new.basic.pidSubsystem" class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicPidSubsystemClassAction" text="FRC PID Subsystem"/>
             <action id="frc.action.new.basic.trigger" class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicTriggerClassAction" text="FRC Trigger (i.e. Button)"/>
             
-            <action id="frc.action.new.build.file" class="net.javaru.iip.frc.actions.create.build.NewFrcAntBuildFileAction" text="FRC New Ant Build File" />
+            <!--<action id="frc.action.new.build.file" class="net.javaru.iip.frc.actions.create.build.NewFrcAntBuildFileAction" text="FRC New Ant Build File" />-->
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewJavaSpecialFile" />
         </group>
                

@@ -90,20 +90,20 @@ public class FrcSettingsForm
         while (buttons.hasMoreElements())
         {
             AbstractButton button = buttons.nextElement();
-            button.addActionListener(e -> {
-                final ButtonModel selectedModel = rioLogTargetWindowButtonGroup.getSelection();
-                final String actionCommandString = selectedModel.getActionCommand();
-                final RioLogTargetWindowActionCommands actionCommand = RioLogTargetWindowActionCommands.valueOf(actionCommandString);
-                switch (actionCommand)
-                {
-                    case FrcWindow:
-                        frcSettings.setUseFrcToolWindow(true);
-                        break;
-                    case RunWindow:
-                        frcSettings.setUseFrcToolWindow(false);
-                }
-
-            });
+            button.addActionListener(e ->
+                                     {
+                                         final ButtonModel selectedModel = rioLogTargetWindowButtonGroup.getSelection();
+                                         final String actionCommandString = selectedModel.getActionCommand();
+                                         final RioLogTargetWindowActionCommands actionCommand = RioLogTargetWindowActionCommands.valueOf(actionCommandString);
+                                         switch (actionCommand)
+                                         {
+                                             case FrcWindow:
+                                                 frcSettings.setUseFrcToolWindow(true);
+                                                 break;
+                                             case RunWindow:
+                                                 frcSettings.setUseFrcToolWindow(false);
+                                         }
+                                     });
         }
     }
 
@@ -438,7 +438,7 @@ public class FrcSettingsForm
     public JComponent $$$getRootComponent$$$() { return rootPanel; }
 
 
-    private static enum RioLogTargetWindowActionCommands
+    private enum RioLogTargetWindowActionCommands
     {
         FrcWindow,
         RunWindow

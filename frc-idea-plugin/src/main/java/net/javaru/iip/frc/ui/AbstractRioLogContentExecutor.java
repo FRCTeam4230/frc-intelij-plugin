@@ -17,7 +17,7 @@
 package net.javaru.iip.frc.ui;
 
 import java.awt.*;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +27,7 @@ import com.intellij.compiler.server.BuildManager;
 import com.intellij.execution.ExecutionBundle;
 import com.intellij.execution.ExecutionManager;
 import com.intellij.execution.Executor;
+import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.filters.TextConsoleBuilder;
 import com.intellij.execution.filters.TextConsoleBuilderFactory;
 import com.intellij.execution.process.BaseOSProcessHandler;
@@ -35,6 +36,7 @@ import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.RunContentDescriptor;
+import com.intellij.execution.ui.RunContentManager;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.CommonActionsManager;
 import com.intellij.ide.OccurenceNavigator;
@@ -90,11 +92,12 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     @Nullable
     private Runnable myAfterCompletionRunnable;
     private Computable<Boolean> myStopEnabled;
-    private String myTitle = "roboRIO";
+    private String myTitle = "RioLog";
     private String myHelpId = null;
     private boolean myActivateToolWindow = true;
     private Executor myExecutor;
     private RunContentDescriptor myRunContentDescriptor;
+    private RioLogMonitoringProcess rioLogMonitoringProcess;
 
     
     /*
@@ -134,17 +137,33 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     }
 
 
+    @Nullable
+    public RioLogMonitoringProcess getRioLogMonitoringProcess() { return rioLogMonitoringProcess; }
+
+    
+    public void reRun()
+    {
+        ApplicationManager.getApplication().invokeLater(() ->
+                                                        {
+                                                            myProcessHandler.destroyProcess();
+                                                            invokeClearAll();
+                                                            myProcessHandler.waitFor(2000L);
+                                                            run();
+                                                        });
+    }
+
     public void run()
     {
         FileDocumentManager.getInstance().saveAllDocuments();
 
-        final RioLogMonitoringProcess process = new RioLogMonitoringProcess(this::invokeClearAll);
+        rioLogMonitoringProcess = new RioLogMonitoringProcess(this::invokeClearAll);
         
         //Not 100% sure what should be passed in for the commandLine parameter; the example I originally used used null. 
         //   And null was allowed. But a change was made in Mov 2015 that BaseOSProcessHandler now logs an exception if 
         //   commandLine is null or empty. We are not actually running a command. Just using the handler to monitor a 
-        //   UDP port. So, for now we are using an innocuous command that is common to unix and windows, specifically 'echo'
-        myProcessHandler = new BaseOSProcessHandler(process, "echo", Charset.defaultCharset())
+        //   UDP port. 
+        //   However, what ever we put, gets output on the screen, do for now we are just putting a basic message 
+        myProcessHandler = new BaseOSProcessHandler(rioLogMonitoringProcess, "RioLog Console", StandardCharsets.UTF_8)
         {
             @Override
             public boolean isSilentlyDestroyOnClose()
@@ -165,6 +184,24 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
         //Executor executor = DefaultRunExecutor.getRunExecutorInstance(); //Gets the Run Window I believe
         myExecutor = createExecutor();
+
+        
+        
+        // This is a bit of overkill... but there is a bug that sometimes multiple content tabs are added to the run window. 
+        //    The bug should not happen in real world use as it seems to occur after repeatedly removing and re-adding the facet during testing.
+        //    As near as I can tell, this is what happens...
+        //    For some reason, sometimes the FrcFacetManagerListener.facetAdded() gets called twice (I *think* on separate threads, but have not 100% confirmed yet)
+        //    This results in the RioLogConsoleProjectService.update method getting called twice, the second time before the first one has completed
+        //    This results in this run method getting called twice. So two different RunContentDescriptor instances get created.
+        //    The RunContentManager.removeRunContent(myExecutor, myRunContentDescriptor) method appears to use instance equality
+        //    specifically, the runDescriptor does not match in com.intellij.execution.ui.RunContentManagerImpl#getRunContentByDescriptor does not find a match
+        //    so the content is not properly removed.
+        //    This following removeAllContent iterates over all RunDescriptors and removes any with the myTitle value.
+        removeAllContent(myExecutor, myProject);
+        removeAllContent(DefaultRunExecutor.getRunExecutorInstance(), myProject);
+        
+        
+        
         DefaultActionGroup actions = new DefaultActionGroup();
 
         consolePanel = createConsolePanel(myConsoleView, actions);
@@ -179,7 +216,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
         if (myActivateToolWindow)
         {
-            activateRioLogConsole();
+            activateRioLogConsoleSafely();
         }
 
         if (myAfterCompletionRunnable != null)
@@ -194,7 +231,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             });
         }
 
-        process.start();
+        rioLogMonitoringProcess.start();
         myProcessHandler.startNotify();
     }
 
@@ -286,24 +323,34 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     protected abstract Executor createExecutor();
 
 
-    public void activateRioLogConsole()
+    public void activateRioLogConsoleNow()
     {
-        ApplicationManager.getApplication().invokeLater(() ->
-                                                        {
-
-                                                            final ToolWindow toolWindow = ToolWindowManager.getInstance(myProject)
-                                                                                                           .getToolWindow(getToolWindowId());
-                                                            toolWindow.activate(null);
-                                                            final ContentManager contentManager = toolWindow.getContentManager();
-                                                            final Content content = contentManager.findContent(getTitle());
-                                                            if (content != null)
-                                                            {
-                                                                contentManager.setSelectedContent(content, true);
-                                                            }
-                                                        },
-                                                        o -> myProject.isInitialized() && myProject.isOpen()); 
+        ApplicationManager.getApplication().invokeLater(new ActivateRioLogConsoleRunnable());
+    }
+    
+    public void activateRioLogConsoleSafely()
+    {
+        ApplicationManager.getApplication().invokeLater(new ActivateRioLogConsoleRunnable(), 
+                                                        o -> myProject.isInitialized() && myProject.isOpen());
     }
 
+    private class ActivateRioLogConsoleRunnable implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            LOG.debug("[FRC] ActivateRioLogConsoleRunnable is executing");
+            final ToolWindow toolWindow = ToolWindowManager.getInstance(myProject)
+                                                           .getToolWindow(getToolWindowId());
+            toolWindow.activate(null);
+            final ContentManager contentManager = toolWindow.getContentManager();
+            final Content content = contentManager.findContent(getTitle());
+            if (content != null)
+            {
+                contentManager.setSelectedContent(content, true);
+            }
+        }
+    }
 
     public String getTitle()
     {
@@ -320,22 +367,85 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     public void close()
     {
         LOG.debug("[FRC] Executing " + getClass().getSimpleName() + ".close()");
+
+        try
+        {
+            if (myProcessHandler != null)
+            {
+                myProcessHandler.detachProcess();
+                myProcessHandler.destroyProcess();
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.debug("[FRC] An exception occurred when detaching and destroying processHandler. Cause Summary: " + e.toString());
+        }
+        
+        
         if (myRunContentDescriptor != null)
         {
             final boolean removedOk = ExecutionManager.getInstance(myProject).getContentManager().removeRunContent(myExecutor, myRunContentDescriptor);
+
+            // This is a bit of overkill... but there is a bug that sometimes multiple content tabs are added to the run window. 
+            //    The bug should not happen in real world use as it seems to occur after repeatedly removing and re-adding the facet during testing.
+            //    As near as I can tell, this is what happens...
+            //    For some reason, sometimes the FrcFacetManagerListener.facetAdded() gets called twice (I *think* on separate threads, but have not 100% confirmed yet)
+            //    This results in the RioLogConsoleProjectService.update method getting called twice, the second time before the first one has completed
+            //    This results in this class' run method getting called twice. So two different RunContentDescriptor instances get created.
+            //    The RunContentManager.removeRunContent(myExecutor, myRunContentDescriptor) method appears to use instance equality
+            //    specifically, the runDescriptor does not match in com.intellij.execution.ui.RunContentManagerImpl#getRunContentByDescriptor does not find a match
+            //    so the content is not properly removed.
+            //    This following removeAllContent iterates over all RunDescriptors and removes any with the myTitle value.
+            removeAllContent(myExecutor, myProject);
+
+
             if (removedOk)
             {
                 LOG.debug("[FRC] RioLogContentExecutor was removed OK");
+                myRunContentDescriptor.dispose();
                 myRunContentDescriptor = null;
                 myExecutor = null;
-                myRunContentDescriptor = null;
+                myProcessHandler = null;
             }
             else 
             {
-                LOG.debug("[FRC] RioLogContentExecutor was NOT removed");    
+                LOG.warn("[FRC] RioLogContentExecutor was NOT removed"); 
+                
             }
         }
     }
+
+
+    private void removeAllContent(Executor executor, Project project)
+    {
+        if (executor != null)
+        {
+            try
+            {
+                final RunContentManager contentManager = ExecutionManager.getInstance(project).getContentManager();
+                final java.util.List<RunContentDescriptor> allDescriptors = contentManager.getAllDescriptors();
+                for (RunContentDescriptor runContentDescriptor : allDescriptors)
+                {
+                    if (myTitle.equals(runContentDescriptor.getDisplayName()))
+                    {
+                        try
+                        {
+                            contentManager.removeRunContent(executor, runContentDescriptor);
+                        }
+                        catch (Exception e)
+                        {
+                            LOG.debug("[FRC] Could not dispose of RunContentDescriptor. Cause Summary: " + e.toString(), e);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                LOG.warn("[FRC] An exception occurred when cleaning up content windows. Cause Summary: " + e.toString(), e);
+            }
+        }
+    }
+
 
     @Override
     public void dispose()
@@ -468,13 +578,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         @Override
         public void actionPerformed(AnActionEvent event)
         {
-            ApplicationManager.getApplication().invokeLater(() ->
-                                                            {
-                                                                myProcessHandler.destroyProcess();
-                                                                invokeClearAll();
-                                                                myProcessHandler.waitFor(2000L);
-                                                                run();
-                                                            });
+            reRun();
         }
 
 

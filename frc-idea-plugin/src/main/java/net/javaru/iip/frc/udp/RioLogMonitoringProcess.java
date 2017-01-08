@@ -60,6 +60,7 @@ public class RioLogMonitoringProcess extends Process
     public static final String SIMULATED_LOG_SERVICE_PROP_KEY_BASE = "frc.simulated.log.service";
     public static final String SIMULATED_LOG_SERVICE_ENABLED_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".enabled";
     public static final String SIMULATED_LOG_SERVICE_PORT_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".port";
+    public static final String SIMULATED_LOG_SERVICE_USE_CONFIGURED_PORT_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".use.configured.port";
     public static final int SIMULATED_LOG_SERVICE_PORT_DEFAULT = 4248; //arbitrarily chosen port not listed at https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
 
     private static final boolean USE_DEBUGGING_SERVER = BooleanUtils.toBoolean(System.getProperty(SIMULATED_LOG_SERVICE_ENABLED_PROP_KEY,
@@ -140,6 +141,11 @@ public class RioLogMonitoringProcess extends Process
         destroy();
     }
 
+    
+    public int getMonitoredPort()
+    {
+        return rioLogMonitor == null ? -1 : rioLogMonitor.port;
+    }
 
     private PrintWriter createFilePrintWriter() throws IOException
     {
@@ -239,6 +245,9 @@ public class RioLogMonitoringProcess extends Process
         try { if (consoleWriter != null) {consoleWriter.close();} } catch (Exception ignore) {}
         try { if (fileWriter != null) {fileWriter.close();} } catch (Exception ignore) {}
     }
+
+
+    public boolean isEnabled() { return enabled; }
 
 
     private class RioLogMonitor implements Runnable
@@ -352,11 +361,12 @@ public class RioLogMonitoringProcess extends Process
 
 
         @NotNull
-        protected String getStartingMonitoringMessage() {return ">>>Monitoring RioLog on port " + port + "<<<";}
+        protected String getStartingMonitoringMessage() {return "==Monitoring RioLog on port " + port + "==";}
 
 
         protected DatagramSocket createSocket() throws IOException
         {
+            LOG.debug("[FRC] Creating DatagramSocket with port " + port);
             DatagramSocket socket = new DatagramSocket(port);
             socket.setReuseAddress(true);
             socket.setBroadcast(true);
@@ -386,7 +396,7 @@ public class RioLogMonitoringProcess extends Process
 
         public TestingRioLogMonitor()
         {
-            super(Integer.valueOf(System.getProperty(SIMULATED_LOG_SERVICE_PORT_PROP_KEY, Integer.toString(SIMULATED_LOG_SERVICE_PORT_DEFAULT))));
+            super(determineTestPort());
             
             try
             {
@@ -432,5 +442,19 @@ public class RioLogMonitoringProcess extends Process
         }
 
 
+    }
+
+
+    private static int determineTestPort()
+    {
+        boolean useConfiguredPort = BooleanUtils.toBoolean(System.getProperty(SIMULATED_LOG_SERVICE_USE_CONFIGURED_PORT_PROP_KEY, "false"));
+        if (useConfiguredPort)
+        {
+            return getSettings().getRioLogPort();
+        }
+        else
+        {
+            return Integer.valueOf(System.getProperty(SIMULATED_LOG_SERVICE_PORT_PROP_KEY, Integer.toString(SIMULATED_LOG_SERVICE_PORT_DEFAULT)));
+        }
     }
 }

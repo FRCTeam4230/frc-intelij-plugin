@@ -33,8 +33,6 @@ import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.ModificationTracker;
 import com.intellij.openapi.util.SimpleModificationTracker;
 
@@ -61,17 +59,19 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
 
     private static final Logger LOG = Logger.getInstance(FrcApplicationComponent.class);
 
-    private FrcSettings settings;
+    // TODO: setting settings to static for now to fix issue that arose after changing the configurable settings in the plugin xml
+    private static FrcSettings settings;
     private FrcSettingsForm settingsForm;
 
+    private static final FrcApplicationComponent defaultInstance = new FrcApplicationComponent();
 
     public FrcApplicationComponent() { }
 
     @NotNull
     public static FrcApplicationComponent getInstance() 
     {
-        final FrcApplicationComponent component = ApplicationManager.getApplication().getComponent(FrcApplicationComponent.class);
-        return component != null ? component : new FrcApplicationComponent();
+        final FrcApplicationComponent component = ApplicationManager.getApplication().getComponent(FrcApplicationComponent.class, defaultInstance);
+        return component != null ? component : defaultInstance;
     }
 
     // ==== BaseComponent
@@ -193,11 +193,7 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
 
     protected void updateRioLogConsole()
     {
-        final Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
-        for (Project project : openProjects)
-        {
-            RioLogConsoleProjectService.update(project);
-        }
+        RioLogConsoleProjectService.updateAllOpenProjects();
     }
 
     @Override

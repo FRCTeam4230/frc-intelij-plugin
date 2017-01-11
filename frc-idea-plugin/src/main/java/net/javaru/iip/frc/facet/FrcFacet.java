@@ -16,13 +16,20 @@
 
 package net.javaru.iip.frc.facet;
 
+import java.util.Collection;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
 import com.intellij.facet.FacetTypeId;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 
 
 
@@ -50,4 +57,23 @@ public class FrcFacet extends Facet<FrcFacetConfiguration>
         return FacetManager.getInstance(module).getFacetByType(FACET_TYPE_ID);
     }
 
+    @NotNull
+    public static ImmutableList<FrcFacet> getAllFrcFacetsForAllOpenProjects()
+    {
+        final Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+
+        final Builder<FrcFacet> listBuilder = ImmutableList.builder();
+        
+        for (Project openProject : openProjects)
+        {
+            final Module[] modules = ModuleManager.getInstance(openProject).getModules();
+            for (Module module : modules)
+            {
+                final Collection<FrcFacet> frcFacets = FacetManager.getInstance(module).getFacetsByType(FACET_TYPE_ID);
+                listBuilder.addAll(frcFacets);
+            }
+        }
+
+        return listBuilder.build();
+    }
 }

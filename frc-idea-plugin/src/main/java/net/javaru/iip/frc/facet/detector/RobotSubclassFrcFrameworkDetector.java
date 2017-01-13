@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +42,8 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.util.indexing.FileContent;
 
+import net.javaru.iip.frc.wpilib.attached.WpilibConstants;
+
 
 
 @SuppressWarnings("Duplicates")
@@ -50,12 +51,11 @@ public class RobotSubclassFrcFrameworkDetector extends FrcFrameworkDetector
 {
     private static final Logger LOG = Logger.getInstance(RobotSubclassFrcFrameworkDetector.class);
     
-    private static final Set<String> SUPER_CLASSES_FQN = ImmutableSet.of("edu.wpi.first.wpilibj.IterativeRobot",
-                                                                         "edu.wpi.first.wpilibj.RobotBase");
+    private static final Set<String> SUPER_CLASSES_FQN = ImmutableSet.of(WpilibConstants.ITERATIVE_ROBOT_FQN,
+                                                                         WpilibConstants.ROBOT_BASE_FQN);
 
     private static final Set<String> SUPER_CLASSES_NAMES = initSuperClassNames();
     
-    private static final Pattern EXTENDS_REGEX = Pattern.compile("extends\\s+(edu\\.wpi\\.first\\.wpilibj\\.)?(IterativeRobot|RobotBase)"); 
 
 
     private static Set<String> initSuperClassNames()
@@ -148,7 +148,7 @@ public class RobotSubclassFrcFrameworkDetector extends FrcFrameworkDetector
         try
         {
             final String content = new String(virtualFile.contentsToByteArray());
-            final Matcher matcher = EXTENDS_REGEX.matcher(content);
+            final Matcher matcher = WpilibConstants.EXTENDS_A_ROBOT_REGEX.matcher(content);
             return matcher.find();
 
         }

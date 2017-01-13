@@ -18,14 +18,10 @@ package net.javaru.iip.frc.wpilib.attached;
 
 import java.util.regex.Pattern;
 
-import com.intellij.openapi.diagnostic.Logger;
-
 
 
 public class WpilibConstants
 {
-    private static final Logger LOG = Logger.getInstance(WpilibConstants.class);
-
     public static final String ITERATIVE_ROBOT_FQN = "edu.wpi.first.wpilibj.IterativeRobot";
     public static final String ROBOT_BASE_FQN = "edu.wpi.first.wpilibj.RobotBase";
     public static final String VERSION_CLASS_FQN = "edu.wpi.first.wpilibj.util.WPILibVersion";

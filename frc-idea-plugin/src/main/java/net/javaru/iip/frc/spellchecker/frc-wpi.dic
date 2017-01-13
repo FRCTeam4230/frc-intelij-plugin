@@ -13,6 +13,7 @@ mecanum
 mjpeg
 mjpg
 networktable
+networktables
 opencv
 pid
 rio

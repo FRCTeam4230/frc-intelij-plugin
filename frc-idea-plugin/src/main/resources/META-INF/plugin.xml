@@ -101,6 +101,9 @@
         <component>
             <implementation-class>net.javaru.iip.frc.components.FrcProjectComponent</implementation-class>
         </component>
+        <component>
+            <implementation-class>net.javaru.iip.frc.ui.notify.FrcNotifyProjectComponent</implementation-class>
+        </component>
     </project-components>
     
     <module-components>
@@ -155,12 +158,27 @@
 
             The <reference> element allows to add an existing action to the group. The mandatory "ref" attribute specifies the ID of the action to add.
         -->
-        <action id="frc.StartTailingRioLogAction"
-                text="Show FRC _RioLog Console" 
-                class="net.javaru.iip.frc.actions.ShowRioLogConsole"
-                icon="/icons/first/FIRST_icon_16x16.png" >
-            <add-to-group group-id="ToolsMenu" />
-        </action>
+        
+        <group id="grc.toolsActionsGroup"
+               text="FRC"
+               description="FRC Tools and Actions"
+               class="net.javaru.iip.frc.actions.tools.FrcToolsActionGroup"
+               popup="true"
+               icon="/icons/first/FIRST_icon_16x16.png"
+               >
+            <action id="frc.StartTailingRioLogAction"
+                    text="Show FRC _RioLog Console"
+                    class="net.javaru.iip.frc.actions.tools.ShowRioLogConsole"
+                    icon="/icons/first/FIRST_icon_16x16.png"/>
+            <action id="frc.tools.DownloadLatestWpiLib" 
+                    text="Download Latest WPILib"
+                    description="Downloads the latest WPILib files to the default user directory location, overwriting any existing version."
+                    class="net.javaru.iip.frc.actions.tools.DownloadWpiLibAction"
+                    icon="/icons/wpi/wpi.png"/> 
+            
+            <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after"/>
+        </group>
+        
         
         <group id="frc.NewFileTemplates"
                text="FRC"
@@ -168,7 +186,6 @@
                class="net.javaru.iip.frc.actions.create.FrcCreateComponentsActionGroup"
                popup="true"
                icon="/icons/first/FIRST_icon_16x16.png"
-               
                >
             <separator />
             <action id="frc.action.new.basic.command" class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicCommandClassAction" text="FRC Command"/>

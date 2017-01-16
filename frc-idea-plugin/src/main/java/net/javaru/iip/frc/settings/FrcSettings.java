@@ -21,10 +21,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
-import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.diagnostic.Logger;
 
 import net.javaru.iip.frc.util.ClonerImpl;
+import net.javaru.iip.frc.util.UriUtils;
 
 /*
      ___                     _            _   
@@ -68,8 +68,8 @@ public class FrcSettings implements Cloneable
     public static final int DEFAULT_RIO_LOG_PORT = 6666;
     
     //The trailing slash is important so the uri.resolves method sees the last entry as a directory and not the endpoint
-    public static final URI DEFAULT_WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI = createUrlQuietly("http://first.wpi.edu/FRC/roborio/release/eclipse/");
-    public static final URI DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI = createUrlQuietly("http://first.wpi.edu/FRC/roborio/beta/eclipse/");
+    public static final URI DEFAULT_WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI = UriUtils.createUriQuietly("http://first.wpi.edu/FRC/roborio/release/eclipse/");
+    public static final URI DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI = UriUtils.createUriQuietly("http://first.wpi.edu/FRC/roborio/beta/eclipse/");
 
     private boolean useFrcToolWindow = true;
     
@@ -79,7 +79,7 @@ public class FrcSettings implements Cloneable
 
     private boolean clearOnRobotRestart = false;
 
-    private boolean logToFile = true;
+    private boolean logToFile = false;
 
     private boolean logFileAppend = true;
 
@@ -87,12 +87,13 @@ public class FrcSettings implements Cloneable
 
     private String logFileBaseName = DEFAULT_LOG_FILE_BASENAME;
 
-    
-    
     private URI wpiEclipsePluginReleaseRepoUri = DEFAULT_WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI;
 
     private URI wpiEclipsePluginBetaRepoUri = DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI;
     
+    private Path wpiLibDir = Paths.get(System.getProperty("frc.alt.user.home.dir", System.getProperty("user.home", "C:\\Users\\Public"))).resolve("wpilib").toAbsolutePath();
+    
+    private int teamNumber = -1;
 
 
     // **IMPORTANT** All settings/properties must have a default value upon construction.
@@ -198,27 +199,30 @@ public class FrcSettings implements Cloneable
     }
 
 
-    public Path getWpiLibDir()
-    {
-        //TODO: need to make configurable
-        final String userHome = System.getProperty("user.home", "C:\\Users\\Public");
-        return Paths.get(userHome).resolve("wpilib").toAbsolutePath();
-    }
-    
-    @Nullable
-    protected static URI createUrlQuietly(String url)
-    {
-        try
-        {
-            return new URI(url);
-        }
-        catch (Exception e)
-        {
-            LOG.warn("[FRC] Could not create URL from '" + url + '\'');
-            return null;
-        }
-    }
-    
+    public URI getWpiEclipsePluginReleaseRepoUri() { return wpiEclipsePluginReleaseRepoUri; }
+
+
+    public void setWpiEclipsePluginReleaseRepoUri(URI wpiEclipsePluginReleaseRepoUri) { this.wpiEclipsePluginReleaseRepoUri = wpiEclipsePluginReleaseRepoUri; }
+
+
+    public URI getWpiEclipsePluginBetaRepoUri() { return wpiEclipsePluginBetaRepoUri; }
+
+
+    public void setWpiEclipsePluginBetaRepoUri(URI wpiEclipsePluginBetaRepoUri) { this.wpiEclipsePluginBetaRepoUri = wpiEclipsePluginBetaRepoUri; }
+
+    /** The path to the local wpilib directory. Default/typical value would be: <tt>C:\\Users\\userName\\wpilib</tt>  */
+    public Path getWpiLibDir() { return wpiLibDir; }
+
+
+    public void setWpiLibDir(Path wpiLibDir) { this.wpiLibDir = wpiLibDir; }
+
+
+    public int getTeamNumber() { return teamNumber; }
+
+
+    public void setTeamNumber(int teamNumber) { this.teamNumber = teamNumber; }
+
+
     @Override
     public boolean equals(Object o)
     {
@@ -237,6 +241,10 @@ public class FrcSettings implements Cloneable
             .append(logFileDirectory, that.logFileDirectory)
             .append(logFileBaseName, that.logFileBaseName)
             .append(clearOnRobotRestart, that.clearOnRobotRestart)
+            .append(wpiLibDir, that.wpiLibDir)
+            .append(wpiEclipsePluginReleaseRepoUri, that.wpiEclipsePluginReleaseRepoUri)
+            .append(wpiEclipsePluginBetaRepoUri, that.wpiEclipsePluginBetaRepoUri)
+            .append(teamNumber, that.teamNumber)
             .isEquals();
     }
 
@@ -253,6 +261,10 @@ public class FrcSettings implements Cloneable
             .append(logFileDirectory)
             .append(logFileBaseName)
             .append(clearOnRobotRestart)
+            .append(wpiLibDir)
+            .append(wpiEclipsePluginReleaseRepoUri)
+            .append(wpiEclipsePluginBetaRepoUri)
+            .append(teamNumber)
             .toHashCode();
     }
     

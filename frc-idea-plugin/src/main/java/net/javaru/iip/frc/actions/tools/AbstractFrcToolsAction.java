@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Mark Vedder
+ * Copyright 2015-2017 Mark Vedder
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.actions;
+package net.javaru.iip.frc.actions.tools;
 
 import com.intellij.facet.ProjectFacetManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -23,30 +23,17 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.facet.FrcFacet;
-import net.javaru.iip.frc.ui.RioLogConsoleProjectService;
 
 
 
-public class ShowRioLogConsole extends DumbAwareAction
+public abstract class AbstractFrcToolsAction extends DumbAwareAction
 {
-    @Override
-    public void actionPerformed(AnActionEvent actionEvent)
-    {
-        final Project project = actionEvent.getProject();
-        if (project != null)
-        {
-            RioLogConsoleProjectService.update(project);
-            RioLogConsoleProjectService.activateNow(project);
-        }
-    }
-
-
     @Override
     public void update(AnActionEvent e)
     {
         final Project project = e.getData(CommonDataKeys.PROJECT);
-        e.getPresentation().setVisible(project != null && 
-                                       !project.isDisposed() && 
+        e.getPresentation().setVisible(project != null &&
+                                       !project.isDisposed() &&
                                        ProjectFacetManager.getInstance(project).getFacets(FrcFacet.FACET_TYPE_ID).size() > 0);
     }
 }

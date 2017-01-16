@@ -17,9 +17,9 @@
 <idea-plugin url="https://gitlab.com/Javaru/frc-intellij-idea-plugin">
     <id>net.javaru.idea.frc</id>
     <name>FRC</name>
-    <version>0.beta.1</version>
-    <vendor email="frc.issues@javaru.net" url="https://gitlab.com/Javaru/frc-intellij-idea-plugin/">Javaru</vendor>
-
+    <version>0.1</version>
+    <vendor url="https://gitlab.com/Javaru/frc-intellij-idea-plugin">Javaru</vendor>
+    
     <description><![CDATA[
         <p>
             A plug-in to allow FRC development using IntelliJ IDEA rather than Eclipse. It will work with either the
@@ -35,17 +35,21 @@
             <strong>This plug-in is in beta and is not feature complete yet.</strong> I started developing and using this plug-in for my own
             use during the 2016 FRC build season. I had hoped to have it more feature rich prior to the 2017 FRC season. But time did not allow
             for such. At this time, the primary feature is the the RiLog tool window which will show the output of the RioLog. There are also a 
-            few file templates for FRC Iterative Robots. I wil try to add features as the 2017 build season progresses. I have many planned, and
+            few file templates for FRC Iterative Robots. I will try to add features as the 2017 build season progresses. I have many planned, and
             some partially implemented. Thanks.
         </p>
         
     ]]></description>
     
-    <!--<change-notes><![CDATA[
-      <strong>2015.0.1</strong> <br>
-      &nbsp;&nbsp;&bull; Initial beta release of plug-in for FRC 2015.<br>
+    <change-notes><![CDATA[
+      <strong>0.1</strong> <br>
+      &nbsp;&nbsp;&bull; Initial beta release of plug-in <br>
+      &nbsp;&nbsp;&bull; FRC Facet <br>
+      &nbsp;&nbsp;&bull; RioLog monitoring <br>
+      &nbsp;&nbsp;&bull; Basic FRC templates <br>
+      &nbsp;&nbsp;&bull; Auto discovery of FRC projects to auto add FRC Facet <br>
     ]]>
-    </change-notes>-->
+    </change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <idea-version since-build="163.0" />

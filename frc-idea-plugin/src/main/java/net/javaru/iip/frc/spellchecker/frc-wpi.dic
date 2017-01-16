@@ -6,6 +6,8 @@ firewire
 firstinspires
 frc
 hid
+imgcodecs
+imgproc
 joystick
 kinect
 logitech
@@ -14,6 +16,7 @@ mjpeg
 mjpg
 networktable
 networktables
+objdetect
 opencv
 pid
 rio
@@ -30,4 +33,5 @@ wpi
 wpilib
 wpilibj
 usb
+videoio
 xbox

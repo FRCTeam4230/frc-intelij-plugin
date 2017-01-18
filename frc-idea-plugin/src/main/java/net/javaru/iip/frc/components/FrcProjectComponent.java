@@ -17,17 +17,26 @@
 package net.javaru.iip.frc.components;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetManagerAdapter;
+import com.intellij.notification.Notification;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.facet.FrcFacet;
+import net.javaru.iip.frc.settings.FrcApplicationComponent;
 import net.javaru.iip.frc.ui.RioLogConsoleProjectService;
+import net.javaru.iip.frc.ui.notify.FrcNotifications;
 
 
 
@@ -37,6 +46,8 @@ public class FrcProjectComponent implements ProjectComponent
 
     @NotNull
     private final Project myProject;
+    
+    private final List<Notification> startUpNotifications = new ArrayList<>();
 
 
     public FrcProjectComponent(@NotNull Project project)
@@ -50,11 +61,25 @@ public class FrcProjectComponent implements ProjectComponent
     {
         registerMessageBusListeners();
         RioLogConsoleProjectService.update(myProject);
+        if (isFrcFacetedProject(myProject) && FrcApplicationComponent.getInstance().getState().getTeamNumber() <= 0)
+        {
+            final Notification notification = FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(myProject);
+            startUpNotifications.add(notification);
+        }
     }
 
 
     @Override
-    public void projectClosed() { /* no op */ }
+    public void projectClosed() 
+    {
+        for (Notification notification : startUpNotifications)
+        {
+            if (!notification.isExpired())
+            {
+                notification.expire();
+            }
+        }    
+    }
 
 
     @Override
@@ -115,4 +140,16 @@ public class FrcProjectComponent implements ProjectComponent
         }
     }
 
+    public static boolean isFrcFacetedProject(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            final Module[] modules = ModuleManager.getInstance(project).getModules();
+            for (Module module : modules)
+            {
+                if (FrcModuleComponent.isFrcFacetedModule(module)) {return true;}
+            }
+        }
+        return false;
+    }
 }

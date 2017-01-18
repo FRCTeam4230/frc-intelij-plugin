@@ -18,7 +18,16 @@ package net.javaru.iip.frc.ui.notify;
 
 import javax.swing.*;
 
+import org.jetbrains.annotations.Nullable;
 import com.intellij.icons.AllIcons;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
+import com.intellij.openapi.options.Configurable;
+import com.intellij.openapi.options.ShowSettingsUtil;
+import com.intellij.openapi.project.Project;
+
+import net.javaru.iip.frc.settings.FrcApplicationComponent;
 
 
 
@@ -35,4 +44,32 @@ public final class FrcNotifications
     
     
     private FrcNotifications() { }
+    
+    
+    public static Notification notifyAboutTeamNumberNeedingToBeConfigured(@Nullable Project project)
+    {
+//        final NotificationType notificationType =  project == null ? NotificationType.INFORMATION : NotificationType.WARNING;
+//        final Icon icon = project == null ? FrcNotifications.IconInfo : FrcNotifications.IconWarn;
+        final NotificationType notificationType= NotificationType.INFORMATION;
+        final Icon icon = FrcNotifications.IconInfo;
+        
+        final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+                                                           icon,
+                                                           FrcNotifications.Title,
+                                                           "Configuration Needed",
+                                                           "Please <a href='configure'>configure</a> your FRC Team Number.",
+                                                           notificationType,
+                                                           (theNotification, event) ->
+                                                           {
+                                                               if ("configure".equals(event.getDescription()))
+                                                               {
+                                                                   final Configurable configurable = FrcApplicationComponent.getInstance();
+                                                                   ShowSettingsUtil.getInstance().editConfigurable((Project) null, configurable);
+                                                               }
+                                                               theNotification.expire();
+                                                           }
+        );
+        Notifications.Bus.notify(notification, null);
+        return notification;
+    }
 }

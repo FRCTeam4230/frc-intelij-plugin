@@ -105,10 +105,10 @@
     <project-components>
         <!-- Add your project components here -->
         <component>
-            <implementation-class>net.javaru.iip.frc.components.FrcProjectComponent</implementation-class>
+            <implementation-class>net.javaru.iip.frc.ui.notify.FrcNotifyProjectComponent</implementation-class>
         </component>
         <component>
-            <implementation-class>net.javaru.iip.frc.ui.notify.FrcNotifyProjectComponent</implementation-class>
+            <implementation-class>net.javaru.iip.frc.components.FrcProjectComponent</implementation-class>
         </component>
     </project-components>
     

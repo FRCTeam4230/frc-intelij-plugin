@@ -39,6 +39,7 @@ import com.intellij.openapi.util.SimpleModificationTracker;
 import net.javaru.iip.frc.FrcPluginGlobals;
 import net.javaru.iip.frc.ui.FrcSettingsForm;
 import net.javaru.iip.frc.ui.RioLogConsoleProjectService;
+import net.javaru.iip.frc.ui.notify.FrcNotifications;
 
 
 
@@ -81,6 +82,10 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
     public void initComponent()
     {
         LOG.debug("[FRC] FrcApplicationComponent.initComponent() has been called");
+        if (FrcApplicationComponent.settings.getTeamNumber() <= 0)
+        {
+            FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(null);
+        }
     }
 
 

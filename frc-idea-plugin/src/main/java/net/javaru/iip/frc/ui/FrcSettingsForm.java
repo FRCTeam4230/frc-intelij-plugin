@@ -29,6 +29,8 @@ import javax.swing.*;
 
 import org.apache.commons.lang3.StringUtils;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
@@ -46,6 +48,7 @@ public class FrcSettingsForm
     private JRadioButton targetWindowIsRunWindowRadioButton;
     private JTextField rioLogPortTextField;
     private JButton portToDefaultValueButton;
+    private JBTextField teamNumberTextField;
     private ButtonGroup rioLogTargetWindowButtonGroup;
 
 
@@ -61,10 +64,78 @@ public class FrcSettingsForm
     {
         configureTargetWindowRadioButtons();
         configurePortTextField();
+        configureTeamNumberField();
 
         portToDefaultValueButton.addActionListener(e -> setPortToDefault());
     }
 
+
+    private void configureTeamNumberField()
+    {
+        String teamNum = frcSettings.getTeamNumber() <= 0 ? "" : Integer.toString(frcSettings.getTeamNumber());
+        teamNumberTextField.setText(teamNum);
+        
+        
+        teamNumberTextField.addKeyListener(new KeyListener() {
+
+            private String previousText = teamNumberTextField.getText();
+            
+            @Override
+            public void keyTyped(KeyEvent e) { }
+
+
+            @Override
+            public void keyPressed(KeyEvent e) { }
+
+
+            @Override
+            public void keyReleased(KeyEvent e)
+            {
+                String updatedText = teamNumberTextField.getText();
+                    
+                if (StringUtils.isBlank(updatedText))
+                {
+                    previousText = updatedText;
+                }
+                else
+                {
+                    try
+                    {
+                        final int teamNum = Integer.parseInt(updatedText);
+                        previousText = updatedText;
+                        frcSettings.setTeamNumber(teamNum);
+                    }
+                    catch (NumberFormatException ignore)
+                    {
+                        //not a valid integer....
+                        teamNumberTextField.setText(previousText);
+                    }
+                }
+            
+            }
+        });
+        
+
+        teamNumberTextField.setInputVerifier(new InputVerifier()
+        {
+            @Override
+            public boolean verify(JComponent input)
+            {
+                final JTextField textField = (JTextField) input;
+                final String text = textField.getText();
+                try
+                {
+                    final Number number = DecimalFormat.getIntegerInstance().parse(text);
+                    final int i = number.intValue();
+                    return (i > 0);
+                }
+                catch (ParseException e)
+                {
+                    return false;
+                }
+            }
+        });
+    }
 
     private void setPortToDefault()
     {
@@ -238,11 +309,11 @@ public class FrcSettingsForm
     private void $$$setupUI$$$()
     {
         rootPanel = new JPanel();
-        rootPanel.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
+        rootPanel.setLayout(new GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridLayoutManager(5, 2, new Insets(0, 0, 0, 0), -1, -1));
         rootPanel.add(panel1,
-                      new GridConstraints(0,
+                      new GridConstraints(1,
                                           0,
                                           1,
                                           1,
@@ -357,9 +428,9 @@ public class FrcSettingsForm
                                        GridConstraints.FILL_HORIZONTAL,
                                        GridConstraints.SIZEPOLICY_CAN_GROW,
                                        GridConstraints.SIZEPOLICY_FIXED,
-                                       null,
                                        new Dimension(50, -1),
-                                       new Dimension(100, -1),
+                                       new Dimension(75, -1),
+                                       new Dimension(200, -1),
                                        0,
                                        false));
         portToDefaultValueButton = new JButton();
@@ -414,7 +485,7 @@ public class FrcSettingsForm
                                        false));
         final Spacer spacer3 = new Spacer();
         rootPanel.add(spacer3,
-                      new GridConstraints(1,
+                      new GridConstraints(2,
                                           0,
                                           1,
                                           1,
@@ -427,7 +498,74 @@ public class FrcSettingsForm
                                           null,
                                           0,
                                           false));
+        final JPanel panel3 = new JPanel();
+        panel3.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
+        rootPanel.add(panel3,
+                      new GridConstraints(0,
+                                          0,
+                                          1,
+                                          1,
+                                          GridConstraints.ANCHOR_CENTER,
+                                          GridConstraints.FILL_BOTH,
+                                          GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                          GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                          null,
+                                          null,
+                                          null,
+                                          0,
+                                          false));
+        panel3.setBorder(BorderFactory.createTitledBorder("General"));
+        final JBLabel jBLabel1 = new JBLabel();
+        jBLabel1.setText("Team Number:");
+        jBLabel1.setDisplayedMnemonic('T');
+        jBLabel1.setDisplayedMnemonicIndex(0);
+        jBLabel1.setToolTipText("Enter your FRC team number");
+        panel3.add(jBLabel1,
+                   new GridConstraints(0,
+                                       0,
+                                       1,
+                                       1,
+                                       GridConstraints.ANCHOR_CENTER,
+                                       GridConstraints.FILL_NONE,
+                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                       null,
+                                       null,
+                                       null,
+                                       0,
+                                       false));
+        final Spacer spacer4 = new Spacer();
+        panel3.add(spacer4,
+                   new GridConstraints(0,
+                                       2,
+                                       1,
+                                       1,
+                                       GridConstraints.ANCHOR_CENTER,
+                                       GridConstraints.FILL_HORIZONTAL,
+                                       GridConstraints.SIZEPOLICY_WANT_GROW,
+                                       1,
+                                       null,
+                                       null,
+                                       null,
+                                       0,
+                                       false));
+        teamNumberTextField = new JBTextField();
+        panel3.add(teamNumberTextField,
+                   new GridConstraints(0,
+                                       1,
+                                       1,
+                                       1,
+                                       GridConstraints.ANCHOR_CENTER,
+                                       GridConstraints.FILL_NONE,
+                                       GridConstraints.SIZEPOLICY_CAN_GROW,
+                                       GridConstraints.SIZEPOLICY_FIXED,
+                                       new Dimension(50, -1),
+                                       new Dimension(75, -1),
+                                       new Dimension(150, -1),
+                                       0,
+                                       false));
         label2.setLabelFor(rioLogPortTextField);
+        jBLabel1.setLabelFor(rioLogPortTextField);
         rioLogTargetWindowButtonGroup = new ButtonGroup();
         rioLogTargetWindowButtonGroup.add(targetWindowIsFrcToolWindowRadioButton);
         rioLogTargetWindowButtonGroup.add(targetWindowIsRunWindowRadioButton);

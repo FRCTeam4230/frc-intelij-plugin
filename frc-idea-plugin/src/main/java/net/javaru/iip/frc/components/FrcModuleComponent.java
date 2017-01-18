@@ -17,10 +17,13 @@
 package net.javaru.iip.frc.components;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import com.intellij.facet.FacetManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
 
+import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.ui.RioLogConsoleProjectService;
 
 
@@ -108,5 +111,16 @@ public class FrcModuleComponent implements ModuleComponent
     public String getComponentName()
     {
        return getClass().getSimpleName();
+    }
+
+
+    public static boolean isFrcFacetedModule(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final FrcFacet frcFacet = FacetManager.getInstance(module).getFacetByType(FrcFacet.FACET_TYPE_ID);
+            if (frcFacet != null) { return true; }
+        }
+        return false;
     }
 }

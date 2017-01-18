@@ -60,7 +60,7 @@ public class FrcSettings implements Cloneable
     // arrow flush left and ends with the closing/right-pointing guillemet flush right:
     //    ➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
     // See FrcPluginGlobals.ROBO_RIO_STARTUP_LOG_MSG
-    public static final Pattern DEFAULT_RIO_RESTART_REGEX = Pattern.compile(".*FRCUserProgram\\.jar.*",
+    public static final Pattern DEFAULT_RIO_RESTART_REGEX = Pattern.compile(".*Launching.*FRCUserProgram\\.jar.*",
                                                                             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.MULTILINE);
     //TODO: change the default to the FRC installation directory or such
     public static final Path DEFAULT_LOG_DIRECTORY = Paths.get("/").resolve("tmp").resolve("frc").toAbsolutePath();

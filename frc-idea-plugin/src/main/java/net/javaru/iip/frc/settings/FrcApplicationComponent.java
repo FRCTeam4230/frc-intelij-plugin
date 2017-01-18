@@ -126,7 +126,7 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
 
 
     @Override
-    public void loadState(FrcSettings frcSettings) { this.settings = frcSettings; }
+    public void loadState(FrcSettings frcSettings) { FrcApplicationComponent.settings = frcSettings; }
 
 
 
@@ -176,7 +176,7 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
     public void apply() throws ConfigurationException
     {
         final FrcSettings newSettings = settingsForm.getFrcSettings();
-        this.settings = newSettings.clone();
+        FrcApplicationComponent.settings = newSettings.clone();
         updateRioLogConsole();
     }
 

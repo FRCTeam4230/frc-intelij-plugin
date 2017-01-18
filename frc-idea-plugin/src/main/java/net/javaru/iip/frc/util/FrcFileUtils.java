@@ -96,8 +96,15 @@ public final class FrcFileUtils
         }
     }
     
-    public static boolean doesDirectoryHaveJars(@NotNull final Path directory, final boolean recursive) throws IOException
+    public static boolean directoryDoesNotHaveJars(@NotNull final Path directory, final boolean recursive) throws IOException
     {
+        return !directoryHasJars(directory, recursive);
+        
+    }
+    public static boolean directoryHasJars(@NotNull final Path directory, final boolean recursive) throws IOException
+    {
+        if (!Files.exists(directory)) { return false; }
+        
         final AtomicBoolean foundJar = new AtomicBoolean(false);
         
         class MyFileVisitor extends SimpleFileVisitor<Path>

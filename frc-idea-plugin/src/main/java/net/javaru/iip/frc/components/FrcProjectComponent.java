@@ -26,17 +26,24 @@ import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetManagerAdapter;
 import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.startup.StartupManager;
 
+import net.javaru.iip.frc.actions.tools.AttachUserLibDirAction;
+import net.javaru.iip.frc.actions.tools.AttachWpilibAction;
+import net.javaru.iip.frc.actions.tools.DownloadWpiLibAction;
 import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
 import net.javaru.iip.frc.ui.RioLogConsoleProjectService;
 import net.javaru.iip.frc.ui.notify.FrcNotifications;
+import net.javaru.iip.frc.wpilib.attached.WpiLibrariesUtils;
 
 
 
@@ -61,10 +68,48 @@ public class FrcProjectComponent implements ProjectComponent
     {
         registerMessageBusListeners();
         RioLogConsoleProjectService.update(myProject);
-        if (isFrcFacetedProject(myProject) && FrcApplicationComponent.getInstance().getState().getTeamNumber() <= 0)
+        
+        // For example, see com.intellij.framework.detection.impl.FrameworkDetectionManager#projectOpened
+
+        StartupManager.getInstance(myProject).registerPostStartupActivity(() ->
+                                                                        {
+                                                                            if (isFrcFacetedProject(myProject))
+                                                                            {
+                                                                                checkProjectFrcStatus(myProject);
+                                                                            }
+                                                                        });
+        
+    }
+
+
+    public static void checkProjectFrcStatus(@NotNull Project project)
+    {
+        if (FrcApplicationComponent.getInstance().getState().getTeamNumber() <= 0)
         {
-            final Notification notification = FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(myProject);
-            startUpNotifications.add(notification);
+            final Notification notification = FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(project);
+//                    startUpNotifications.add(notification);
+        }
+
+        if (!WpiLibrariesUtils.isWpilibPresent(project))
+        {
+            if (WpiLibrariesUtils.isWpilibInstalledOnSystem())
+            {
+                final Notification notification = queueAttachWpilibNotification(project);
+//                        startUpNotifications.add(notification);
+            }
+            else
+            {
+                final Notification notification = queueDownloadAndAttachWpilibNotification(project);
+//                        startUpNotifications.add(notification);
+            }
+
+        }
+
+//            if (WpiLibrariesUtils.isUserLibNonEmptyAndNotAttached(project))
+        if (!WpiLibrariesUtils.isUserLibAttached(project))
+        {
+            final Notification notification = queueMissingUserLibNotification(project);
+//                    startUpNotifications.add(notification);
         }
     }
 
@@ -95,6 +140,71 @@ public class FrcProjectComponent implements ProjectComponent
     public String getComponentName() { return getClass().getSimpleName(); }
 
 
+    private static Notification queueDownloadAndAttachWpilibNotification(@NotNull Project project)
+    {
+        final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+                                                           FrcNotifications.IconInfo,
+                                                           FrcNotifications.Title,
+                                                           "WPILib Not Found on System",
+                                                           "Would you like to <a href='download'>download and attach</a> WPILib?",
+                                                           NotificationType.INFORMATION,
+                                                           (theNotification, event) ->
+                                                           {
+                                                               theNotification.expire();
+                                                               if ("download".equals(event.getDescription()))
+                                                               {
+                                                                   DownloadWpiLibAction.downloadLatestInBackground(project, true);
+                                                               }
+                                                           }
+        );
+        Notifications.Bus.notify(notification, null);
+        return notification;
+    }
+    
+    private static Notification queueAttachWpilibNotification(@NotNull Project project)
+    {
+        final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+                                                           FrcNotifications.IconInfo,
+                                                           FrcNotifications.Title,
+                                                           "WPILib not Attached",
+                                                           "Would you like to <a href='attach'>attach</a> WPILib as a library?",
+                                                           NotificationType.INFORMATION,
+                                                           (theNotification, event) ->
+                                                           {
+                                                               theNotification.expire();
+                                                               if ("attach".equals(event.getDescription()))
+                                                               {
+                                                                   AttachWpilibAction.attachWpiLib(project, false);
+                                                               }
+                                                           }
+        );
+        Notifications.Bus.notify(notification, null);
+        return notification;
+    }
+    
+    private static Notification queueMissingUserLibNotification(@NotNull Project project)
+    {
+        final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+                                                           FrcNotifications.IconInfo,
+                                                           FrcNotifications.Title,
+                                                           "User Lib Directory Not Attached",
+                                                           "Would you like to <a href='attach'>attach</a> the User Lib directory as a Library?",
+                                                           NotificationType.INFORMATION,
+                                                           (theNotification, event) ->
+                                                           {
+                                                               theNotification.expire();
+                                                               if ("attach".equals(event.getDescription()))
+                                                               {
+                                                                   AttachUserLibDirAction.attachUserLib(project, false);
+                                                               }
+                                                              
+                                                           }
+        );
+        Notifications.Bus.notify(notification, null);
+        return notification;
+    }
+    
+    
     private static void registerMessageBusListeners()
     {
         try
@@ -114,6 +224,7 @@ public class FrcProjectComponent implements ProjectComponent
         public void facetAdded(@NotNull Facet facet)
         {
             updateForFrcFacet(facet);
+            checkProjectFrcStatus(facet.getModule().getProject());
         }
 
 

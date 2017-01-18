@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.wpilib.attached;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -34,6 +35,7 @@ import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.VirtualFile;
 
+import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.wpilib.WpiLibPaths;
 
 import static net.javaru.iip.frc.util.FindClassUtils.isLibraryPresent;
@@ -128,7 +130,28 @@ public class WpiLibrariesUtils
     {
         return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isWpilibPresent(module));
     }
+    
+    
+    
+    public static boolean isWpilibInstalledOnSystem()
+    {
+        try
+        {
+            return FrcFileUtils.directoryHasJars(WpiLibPaths.getJavaLibDir(), true);
+        }
+        catch (IOException e)
+        {
+            return false;
+        }
+    }
 
+
+    public static boolean isWpilibInstalledOnSystemViaReadAction()
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) WpiLibrariesUtils::isWpilibInstalledOnSystem);
+    }
+    
+    
     @Contract("null -> false")
     public static boolean isCsCorePresent(@Nullable Module module)
     {
@@ -227,5 +250,26 @@ public class WpiLibrariesUtils
     public static boolean isUserLibAttachedViaReadAction(@NotNull Project project)
     {
         return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isUserLibAttached(project));
+    }
+
+
+    public static boolean isUserLibNonEmptyAndNotAttached(@NotNull Project project)
+    {
+        try
+        {
+            return FrcFileUtils.directoryHasJars(WpiLibPaths.getUserLibDir(), true) && !isUserLibAttached(project);
+        }
+        catch (IOException e)
+        {
+            final String message = "An IOException occurred when checkin for user lib attachment. Cause Summary: " + e.toString();
+            LOG.warn(message);
+            throw new IllegalStateException(message, e);
+        }
+    }
+
+
+    public static boolean isUserLibNonEmptyAndAttachedViaReadAction(@NotNull Project project) 
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isUserLibNonEmptyAndNotAttached(project));
     }
 }

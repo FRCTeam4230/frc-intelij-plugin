@@ -67,11 +67,11 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
     public void actionPerformed(AnActionEvent actionEvent)
     {
         final Project project = actionEvent.getProject();
-        attachWpiLib(project);
+        attachWpiLib(project, true);
     }
 
 
-    public static void attachWpiLib(Project project)
+    public static void attachWpiLib(Project project, final boolean notifyOnCompletion)
     {
         if (project != null)
         {
@@ -109,7 +109,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                             LOG.debug("[FRC] Could not create wpiJavaDir. Cause summary: " + e.toString(), e);
                         }
 
-                        if (!(Files.isDirectory(wpiJavaLibDir) && FrcFileUtils.doesDirectoryHaveJars(wpiJavaLibDir, true)))
+                        if (!(Files.isDirectory(wpiJavaLibDir) && FrcFileUtils.directoryHasJars(wpiJavaLibDir, true)))
                         {
                             final int response = Messages.showYesNoCancelDialog(project,
                                                                                 "The WPILib JARs were not found on your system. How do you wish to proceed?",
@@ -136,7 +136,10 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                         }
 
                         LibraryUtils.attachDirectoryBasedLibrary(module, "WPILib Libraries", wpiJavaLibDir.toString());
-                        queueSuccessfulNotification(project);
+                        if (notifyOnCompletion)
+                        {
+                            queueSuccessfulNotification(project);
+                        }
                     }
                 }
             }

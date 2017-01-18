@@ -48,17 +48,12 @@ public final class FrcNotifications
     
     public static Notification notifyAboutTeamNumberNeedingToBeConfigured(@Nullable Project project)
     {
-//        final NotificationType notificationType =  project == null ? NotificationType.INFORMATION : NotificationType.WARNING;
-//        final Icon icon = project == null ? FrcNotifications.IconInfo : FrcNotifications.IconWarn;
-        final NotificationType notificationType= NotificationType.INFORMATION;
-        final Icon icon = FrcNotifications.IconInfo;
-        
         final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
-                                                           icon,
+                                                           FrcNotifications.IconInfo,
                                                            FrcNotifications.Title,
                                                            "Configuration Needed",
                                                            "Please <a href='configure'>configure</a> your FRC Team Number.",
-                                                           notificationType,
+                                                           NotificationType.INFORMATION,
                                                            (theNotification, event) ->
                                                            {
                                                                if ("configure".equals(event.getDescription()))

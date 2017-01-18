@@ -60,51 +60,60 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
         final Project project = actionEvent.getProject();
         if (project != null)
         {
-            try
+            attachUserLib(project, true);
+        }
+    }
+
+
+    public static void attachUserLib(@NotNull Project project, final boolean notifyOnCompletion)
+    {
+        try
+        {
+            final Module[] modules = ModuleManager.getInstance(project).getModules();
+            for (Module module : modules)
             {
-                final Module[] modules = ModuleManager.getInstance(project).getModules();
-                for (Module module : modules)
+                final FacetManager facetManager = FacetManager.getInstance(module);
+                final FrcFacet frcFacet = facetManager.getFacetByType(FrcFacet.FACET_TYPE_ID);
+                if (frcFacet != null)
                 {
-                    final FacetManager facetManager = FacetManager.getInstance(module);
-                    final FrcFacet frcFacet = facetManager.getFacetByType(FrcFacet.FACET_TYPE_ID);
-                    if (frcFacet != null)
+                    final Library existing = WpiLibrariesUtils.findExistingUserLibDirLibrary(module);
+                    if (existing != null)
                     {
-                        final Library existing = WpiLibrariesUtils.findExistingUserLibDirLibrary(module);
-                        if (existing != null)
+                        Notifications.Bus.notify(new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
+                                                                  FrcNotifications.IconInfo,
+                                                                  FrcNotifications.Title,
+                                                                  "User Lib Already Attached",
+                                                                  "The user/java/lib directory is already attached via library '" + existing.getName() + "'.",
+                                                                  NotificationType.INFORMATION,
+                                                                  null
+                        ), project);
+                    }
+                    else
+                    {
+                        LibraryUtils.attachDirectoryBasedLibrary(module, "WPILib User Lib Directory", WpiLibPaths.getUserLibDir().toString());
+                        if (notifyOnCompletion)
                         {
-                            Notifications.Bus.notify(new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
-                                                                      FrcNotifications.IconInfo,
-                                                                      FrcNotifications.Title,
-                                                                      "User Lib Already Attached",
-                                                                      "The user/java/lib directory is already attached via library '" + existing.getName() + "'.",
-                                                                      NotificationType.INFORMATION,
-                                                                      null
-                            ), project);
-                        }
-                        else
-                        {
-                            LibraryUtils.attachDirectoryBasedLibrary(module, "WPILib User Lib Directory", WpiLibPaths.getUserLibDir().toString());
                             queueSuccessfulNotification(project);
                         }
                     }
                 }
             }
-            catch (Exception e)
-            {
-                queueFailureNotification(project, e);
-            }
+        }
+        catch (Exception e)
+        {
+            queueFailureNotification(project, e);
         }
     }
 
 
-    private void queueFailureNotification(@Nullable Project project, @Nullable Exception e)
+    private static void queueFailureNotification(@Nullable Project project, @Nullable Exception e)
     {
         Notifications.Bus.notify(createFailureNotification(e), project);
     }
 
 
     @NotNull
-    private Notification createFailureNotification(@Nullable Exception e)
+    private static Notification createFailureNotification(@Nullable Exception e)
     {
 
 
@@ -125,14 +134,14 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
     }
 
 
-    private void queueSuccessfulNotification(@Nullable Project project)
+    private static void queueSuccessfulNotification(@Nullable Project project)
     {
         Notifications.Bus.notify(createSuccessNotification(), project);
     }
 
 
     @NotNull
-    private Notification createSuccessNotification()
+    private static Notification createSuccessNotification()
     {
         return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
                                 FrcNotifications.IconInfo,

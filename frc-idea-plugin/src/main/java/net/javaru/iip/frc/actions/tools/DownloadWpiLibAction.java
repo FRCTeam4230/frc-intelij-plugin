@@ -45,6 +45,12 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
     {
         @Nullable
         final Project project = actionEvent.getProject();
+        downloadLatestInBackground(project, false);
+    }
+
+
+    public static void downloadLatestInBackground(@Nullable Project project, boolean autoAttach)
+    {
         new Backgroundable(project, "Downloading WPILib Update", false)
         {
             boolean areAttached = false;
@@ -60,34 +66,45 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
             @Override
             public void onSuccess()
             {
-
+                @Nullable
                 final Notification notification;
 
                 if (!areAttached && project != null)
                 {
-                    notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
-                                                    FrcNotifications.IconInfo,
-                                                    FrcNotifications.Title,
-                                                    NOTIFICATIONS_SUBTITLE + " Completed Successfully",
-                                                    "One or more WPILib JARs are not attached. <a href='attach'>Attach as library</a>",
-                                                    NotificationType.INFORMATION,
-                                                    (theNotification, event) ->
-                                                    {
-                                                        if ("attach".equals(event.getDescription()))
+                    if (autoAttach)
+                    {
+                        AttachWpilibAction.attachWpiLib(project, true);
+                        notification = null;
+                    }
+                    else
+                    {
+                        notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+                                                        FrcNotifications.IconInfo,
+                                                        FrcNotifications.Title,
+                                                        NOTIFICATIONS_SUBTITLE + " Completed Successfully",
+                                                        "One or more WPILib JARs are not attached. <a href='attach'>Attach as library</a>",
+                                                        NotificationType.INFORMATION,
+                                                        (theNotification, event) ->
                                                         {
-                                                            Logger.getInstance(DownloadWpiLibAction.class).debug("[FRC] Attaching WPILib library");
-                                                            AttachWpilibAction.attachWpiLib(project);
+                                                            if ("attach".equals(event.getDescription()))
+                                                            {
+                                                                Logger.getInstance(DownloadWpiLibAction.class).debug("[FRC] Attaching WPILib library");
+                                                                AttachWpilibAction.attachWpiLib(project, true);
+                                                            }
+                                                            theNotification.expire();
                                                         }
-                                                        theNotification.expire();
-                                                    }
-                    );
+                        );
+                    }
                 }
                 else
                 {
                     notification = createNoActionSuccessNotification();
                 }
 
-                Notifications.Bus.notify(notification, myProject);
+                if (notification != null)
+                {
+                    Notifications.Bus.notify(notification, myProject);
+                }
 
             }
 
@@ -121,7 +138,7 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
     }
 
 
-    private Notification createNoActionSuccessNotification()
+    private static Notification createNoActionSuccessNotification()
     {
         return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
                                 FrcNotifications.IconInfo,

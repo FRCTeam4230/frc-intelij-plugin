@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -36,6 +37,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.InputValidator;
 import com.intellij.openapi.ui.Messages;
@@ -146,39 +148,47 @@ public class WpiLibDownloader
 
             //TODO: When team number moves to Facet, we need to get it from there
             final FrcSettings frcSettings = FrcApplicationComponent.getInstance().getState();
-            int teamNumber = frcSettings.getTeamNumber();
-            if (teamNumber <= 0)
+            final AtomicInteger teamNumber = new AtomicInteger(frcSettings.getTeamNumber());
+            if (teamNumber.get() <= 0)
             {
-                final String teamNumberInput =
-                    Messages.showInputDialog("FRC Team number:", "Team Number", FrcIcons.FIRST_ICON_MEDIUM_16, null, new InputValidator()
+                ApplicationManager.getApplication().invokeLater(new Runnable() {
+                    @Override
+                    public void run()
                     {
-                        @Override
-                        public boolean checkInput(String inputString)
-                        {
-                            try
+                        final String teamNumberInput =
+                            Messages.showInputDialog("FRC Team number:", "Team Number", FrcIcons.FIRST_ICON_MEDIUM_16, null, new InputValidator()
                             {
-                                final int teamNum = Integer.parseInt(inputString);
-                                return teamNum > 0;
-                            }
-                            catch (NumberFormatException ignore)
-                            {
-                                return false;
-                            }
-                        }
+                                @Override
+                                public boolean checkInput(String inputString)
+                                {
+                                    try
+                                    {
+                                        final int teamNum = Integer.parseInt(inputString);
+                                        return teamNum > 0;
+                                    }
+                                    catch (NumberFormatException ignore)
+                                    {
+                                        return false;
+                                    }
+                                }
 
 
-                        @Override
-                        public boolean canClose(String inputString)
+                                @Override
+                                public boolean canClose(String inputString)
+                                {
+                                    return checkInput(inputString);
+                                }
+                            });
+
+                        if (teamNumberInput != null)
                         {
-                            return checkInput(inputString);
+                            final int num = Integer.parseInt(teamNumberInput);
+                            teamNumber.set(num);
+                            frcSettings.setTeamNumber(num);
                         }
-                    });
-
-                if (teamNumberInput != null)
-                {
-                    teamNumber = Integer.parseInt(teamNumberInput);
-                    frcSettings.setTeamNumber(teamNumber);
-                }
+                    }
+                });
+                
             }
 
 
@@ -194,7 +204,7 @@ public class WpiLibDownloader
                 writer.println("#Don't add new properties, they will be deleted by the eclipse plugin.");
                 writer.println(new SimpleDateFormat("'#'EEE MMM dd HH:mm:ss zzz yyyy").format(new Date()));
                 writer.println("version=current");
-                writer.println("team-number=" + teamNumber);
+                writer.println("team-number=" + teamNumber.get());
             }
         }
     }

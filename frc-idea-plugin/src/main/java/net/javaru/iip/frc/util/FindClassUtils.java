@@ -20,10 +20,12 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
+
 
 
 
@@ -38,12 +40,23 @@ public class FindClassUtils
     {
         if (project == null || fqn == null)  {return new PsiClass[0]; }
         
-        GlobalSearchScope allScope = GlobalSearchScope.allScope(project);
+        GlobalSearchScope scope = GlobalSearchScope.allScope(project);
         JavaPsiFacade facade = JavaPsiFacade.getInstance(project);
-        PsiClass[] possibleClasses = facade.findClasses(fqn, allScope);
+        PsiClass[] possibleClasses = facade.findClasses(fqn, scope);
         return possibleClasses;
     }
-    
+
+
+    @NotNull
+    @Contract("null, _ -> !null; !null, null -> !null")
+    public static PsiClass[] findClass(Module module, String fqn)
+    {
+        if (module == null || fqn == null) {return new PsiClass[0]; }
+        GlobalSearchScope scope = GlobalSearchScope.moduleScope(module);
+        JavaPsiFacade facade = JavaPsiFacade.getInstance(module.getProject());
+        PsiClass[] possibleClasses = facade.findClasses(fqn, scope);
+        return possibleClasses;
+    }
 
 
     @Contract("null, _ -> false; !null, null -> false")
@@ -53,6 +66,16 @@ public class FindClassUtils
         final PsiClass[] possibleClasses = findClass(project, keyClassFqn);
         return possibleClasses.length > 0;
     }
+
+
+    @Contract("null, _ -> false; !null, null -> false")
+    public static boolean isLibraryPresent(@Nullable Module module, @Nullable String keyClassFqn)
+    {
+        if (module == null || keyClassFqn == null) return false;
+        final PsiClass[] possibleClasses = findClass(module, keyClassFqn);
+        return possibleClasses.length > 0;
+    }
+    
 
 
 //    public static boolean isLibrarySourcePresent(@Nullable Project project, @Nullable String keyClassFqn)

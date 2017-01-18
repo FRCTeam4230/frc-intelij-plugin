@@ -38,7 +38,7 @@ public class WpiLibPaths
     }
 
 
-    private static Path getUserLibDir(Path wpiLibDir)
+    public static Path getUserLibDir(Path wpiLibDir)
     {
         final Path userLib = wpiLibDir.resolve("user/java/lib");
         return userLib;
@@ -53,7 +53,7 @@ public class WpiLibPaths
     }
 
 
-    private static Path getUserRootDir(Path wpiLibDir)
+    public static Path getUserRootDir(Path wpiLibDir)
     {
         final Path userRoot = wpiLibDir.resolve("user");
         return userRoot;
@@ -69,7 +69,7 @@ public class WpiLibPaths
     }
 
 
-    private static Path getToolsDir(Path wpiLibDir)
+    public static Path getToolsDir(Path wpiLibDir)
     {
         final Path userLib = wpiLibDir.resolve("tools");
         return userLib;
@@ -83,10 +83,25 @@ public class WpiLibPaths
     }
 
 
-    private static Path getJavaDir(Path wpiLibDir)
+    public static Path getJavaDir(Path wpiLibDir)
     {
         final Path userLib = wpiLibDir.resolve("java");
         return userLib;
+    }
+
+
+    public static Path getJavaLibDir()
+    {
+        FrcSettings settings = FrcApplicationComponent.getInstance().getState();
+        final Path wpiLibDir = settings.getWpiLibDir();
+        return getJavaLibDir(wpiLibDir);
+    }
+
+
+    public static Path getJavaLibDir(Path wpiLibDir)
+    {
+        final Path javaLib = wpiLibDir.resolve("java/lib");
+        return javaLib;
     }
 
 
@@ -98,7 +113,7 @@ public class WpiLibPaths
     }
 
 
-    private static Path getWpilibPropertiesFile(Path wpiLibDir)
+    public static Path getWpilibPropertiesFile(Path wpiLibDir)
     {
         final Path wpiPropertiesFile = wpiLibDir.resolve("wpilib.properties");
         return wpiPropertiesFile;

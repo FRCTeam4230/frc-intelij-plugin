@@ -26,11 +26,15 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.FileUtils;
+import com.intellij.openapi.diagnostic.Logger;
 
 
 
 public class UnzipUtils
 {
+
+    private static final Logger LOG = Logger.getInstance(UnzipUtils.class);
+    
     private static final int EOF = -1;
     private static final int BUFFER_SIZE = 4096;
 
@@ -70,7 +74,14 @@ public class UnzipUtils
         {
             if (deleteDestDirFirst)
             {
-                FileUtils.deleteDirectory(destDir.toFile());
+                try
+                {
+                    FileUtils.deleteDirectory(destDir.toFile());
+                }
+                catch (IOException e)
+                {
+                    LOG.warn("Could not clean a wpilib directory before extracting new version. Cause Summary: " + e.toString(), e);
+                }
             }
             Files.createDirectories(destDir);
             

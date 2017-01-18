@@ -16,6 +16,9 @@
 
 package net.javaru.iip.frc.actions.tools;
 
+import javax.swing.*;
+
+import org.jetbrains.annotations.Nullable;
 import com.intellij.facet.ProjectFacetManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -28,6 +31,26 @@ import net.javaru.iip.frc.facet.FrcFacet;
 
 public abstract class AbstractFrcToolsAction extends DumbAwareAction
 {
+
+    protected AbstractFrcToolsAction()
+    {
+    }
+
+
+    protected AbstractFrcToolsAction(@Nullable String text)
+    {
+        super(text);
+    }
+
+
+    protected AbstractFrcToolsAction(@Nullable String text,
+                                     @Nullable String description,
+                                     @Nullable Icon icon)
+    {
+        super(text, description, icon);
+    }
+
+
     @Override
     public void update(AnActionEvent e)
     {

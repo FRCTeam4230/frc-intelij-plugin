@@ -16,9 +16,22 @@
 
 package net.javaru.iip.frc.wpilib.attached;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.OrderRootType;
+import com.intellij.openapi.roots.libraries.Library;
+import com.intellij.openapi.roots.libraries.LibraryTable;
+import com.intellij.openapi.vfs.VirtualFile;
+
+import net.javaru.iip.frc.wpilib.WpiLibPaths;
 
 import static net.javaru.iip.frc.util.FindClassUtils.isLibraryPresent;
 
@@ -27,19 +40,14 @@ import static net.javaru.iip.frc.util.FindClassUtils.isLibraryPresent;
 public class WpiLibrariesUtils
 {
 
+    private static final Logger LOG = Logger.getInstance(WpiLibrariesUtils.class);
+    
     @Contract("null -> false")
     public static boolean isWpilibPresent(@Nullable Project project)
     {
         return isLibraryPresent(project, WpilibConstants.ROBOT_BASE_FQN) ||
                isLibraryPresent(project, WpilibConstants.ITERATIVE_ROBOT_FQN);
     }
-
-//    @Contract("null -> false")
-//    public static boolean isWpilibSourcePresent(@Nullable Project project)
-//    {
-//        return isLibrarySourcePresent(project, WpilibConstants.ROBOT_BASE_FQN) ||
-//               isLibrarySourcePresent(project, WpilibConstants.ITERATIVE_ROBOT_FQN);
-//    }
 
 
     @Contract("null -> false")
@@ -48,13 +56,7 @@ public class WpiLibrariesUtils
         return isLibraryPresent(project, "edu.wpi.cscore.VideoCamera") ||
                isLibraryPresent(project, "edu.wpi.cscore.CameraServerJNI");
     }
-    
-//    @Contract("null -> false")
-//    public static boolean isCsCoreSourcePresent(@Nullable Project project)
-//    {
-//        return isLibrarySourcePresent(project, "edu.wpi.cscore.VideoCamera") ||
-//               isLibrarySourcePresent(project, "edu.wpi.cscore.CameraServerJNI");
-//    }
+
 
     @Contract("null -> false")
     public static boolean isNetworkTablesPresent(@Nullable Project project)
@@ -62,14 +64,7 @@ public class WpiLibrariesUtils
         return isLibraryPresent(project, "edu.wpi.first.wpilibj.networktables.NetworkTable") ||
                isLibraryPresent(project, "edu.wpi.first.wpilibj.tables.ITable");
     }
-    
-//    @Contract("null -> false")
-//    public static boolean isNetworkTablesSourcePresent(@Nullable Project project)
-//    {
-//        return isLibrarySourcePresent(project, "edu.wpi.first.wpilibj.networktables.NetworkTable") ||
-//               isLibrarySourcePresent(project, "edu.wpi.first.wpilibj.tables.ITable");
-//    }
-    
+
 
     @Contract("null -> false")
     public static boolean isOpenCvPresent(@Nullable Project project)
@@ -79,19 +74,75 @@ public class WpiLibrariesUtils
                isLibraryPresent(project, "org.opencv.videoio.VideoCapture") ||
                isLibraryPresent(project, "org.opencv.objdetect.Objdetect");
     }
-    
-//    @Contract("null -> false")
-//    public static boolean isOpenCvSourcePresent(@Nullable Project project)
-//    {
-//        return isLibrarySourcePresent(project, "org.opencv.core.Core") ||
-//               isLibrarySourcePresent(project, "org.opencv.video.Video") ||
-//               isLibrarySourcePresent(project, "org.opencv.videoio.VideoCapture") ||
-//               isLibrarySourcePresent(project, "org.opencv.objdetect.Objdetect");
-//    }
 
 
     public static boolean areAllPresent(@Nullable Project project)
     {
         return isWpilibPresent(project) && isNetworkTablesPresent(project) && isOpenCvPresent(project) && isCsCorePresent(project);
+    }
+    
+
+    @Contract("null -> false")
+    public static boolean isWpilibPresent(@Nullable Module module)
+    {
+        return isLibraryPresent(module, WpilibConstants.ROBOT_BASE_FQN) ||
+               isLibraryPresent(module, WpilibConstants.ITERATIVE_ROBOT_FQN);
+    }
+
+
+    @Contract("null -> false")
+    public static boolean isCsCorePresent(@Nullable Module module)
+    {
+        return isLibraryPresent(module, "edu.wpi.cscore.VideoCamera") ||
+               isLibraryPresent(module, "edu.wpi.cscore.CameraServerJNI");
+    }
+
+
+    @Contract("null -> false")
+    public static boolean isNetworkTablesPresent(@Nullable Module module)
+    {
+        return isLibraryPresent(module, "edu.wpi.first.wpilibj.networktables.NetworkTable") ||
+               isLibraryPresent(module, "edu.wpi.first.wpilibj.tables.ITable");
+    }
+
+
+    @Contract("null -> false")
+    public static boolean isOpenCvPresent(@Nullable Module module)
+    {
+        return isLibraryPresent(module, "org.opencv.core.Core") ||
+               isLibraryPresent(module, "org.opencv.video.Video") ||
+               isLibraryPresent(module, "org.opencv.videoio.VideoCapture") ||
+               isLibraryPresent(module, "org.opencv.objdetect.Objdetect");
+    }
+
+
+    public static boolean areAllPresent(@Nullable Module module)
+    {
+        return isWpilibPresent(module) && isNetworkTablesPresent(module) && isOpenCvPresent(module) && isCsCorePresent(module);
+    }
+    
+    @Nullable
+    public static Library findExistingUserLibDirLibrary(@NotNull Module module)
+    {
+        final Path userLibDir = WpiLibPaths.getUserLibDir();
+
+        // get the libraries on which it depends
+        final LibraryTable libraryTable = ModuleRootManager.getInstance(module).getModifiableModel().getModuleLibraryTable();
+        final Library[] libraries = libraryTable.getLibraries();
+        for (Library library : libraries)
+        {
+            final VirtualFile[] libraryFiles = library.getFiles(OrderRootType.CLASSES);
+
+            for (VirtualFile virtualFile : libraryFiles)
+            {
+                Path dir = Paths.get(virtualFile.getPresentableUrl());
+                if (userLibDir.equals(dir) || dir.startsWith(userLibDir))
+                {
+                    return library;
+                }
+            }
+        }
+        
+        return null;
     }
 }

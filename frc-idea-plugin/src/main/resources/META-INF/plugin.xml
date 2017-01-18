@@ -166,7 +166,7 @@
                popup="true"
                icon="/icons/first/FIRST_icon_16x16.png"
                >
-            <action id="frc.StartTailingRioLogAction"
+            <action id="frc.tools.StartTailingRioLogAction"
                     text="Show FRC _RioLog Console"
                     class="net.javaru.iip.frc.actions.tools.ShowRioLogConsole"
                     icon="/icons/first/FIRST_icon_16x16.png"/>
@@ -175,6 +175,16 @@
                     description="Downloads the latest WPILib files to the default user directory location, overwriting any existing version."
                     class="net.javaru.iip.frc.actions.tools.DownloadWpiLibAction"
                     icon="/icons/wpi/wpi.png"/> 
+            <action id="frc.tools.AttachWpilib"
+                    text="Attach WPILib JARs as Dependency"
+                    description="Attach WPILib JARs as a Module Dependency (i.e. Library)"
+                    class="net.javaru.iip.frc.actions.tools.AttachWpilibAction"
+                    icon="AllIcons.Modules.Library"/>
+            <action id="frc.tools.AttacheUserLibDir" 
+                    class="net.javaru.iip.frc.actions.tools.AttachUserLibDirAction"
+                    text="Attach User Lib Directory as Dependency"
+                    description="Attach the User Lib directory as a Module Dependency (i.e. Library)"
+                    icon="AllIcons.Modules.Types.UserDefined"/>
             
             <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after"/>
         </group>

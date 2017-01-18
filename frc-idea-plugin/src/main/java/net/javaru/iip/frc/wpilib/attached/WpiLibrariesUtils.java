@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -29,6 +30,7 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import net.javaru.iip.frc.wpilib.WpiLibPaths;
@@ -49,6 +51,12 @@ public class WpiLibrariesUtils
                isLibraryPresent(project, WpilibConstants.ITERATIVE_ROBOT_FQN);
     }
 
+    @Contract("null -> false")
+    public static boolean isWpilibPresentViaReadAction(@Nullable Project project)
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isWpilibPresent(project));
+    }
+
 
     @Contract("null -> false")
     public static boolean isCsCorePresent(@Nullable Project project)
@@ -59,12 +67,24 @@ public class WpiLibrariesUtils
 
 
     @Contract("null -> false")
+    public static boolean isCsCorePresentViaReadAction(@Nullable Project project)
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isCsCorePresent(project));
+    }
+
+    @Contract("null -> false")
     public static boolean isNetworkTablesPresent(@Nullable Project project)
     {
         return isLibraryPresent(project, "edu.wpi.first.wpilibj.networktables.NetworkTable") ||
                isLibraryPresent(project, "edu.wpi.first.wpilibj.tables.ITable");
     }
 
+
+    @Contract("null -> false")
+    public static boolean sNetworkTablesPresentViaReadAction(@Nullable Project project)
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isNetworkTablesPresent(project));
+    }
 
     @Contract("null -> false")
     public static boolean isOpenCvPresent(@Nullable Project project)
@@ -76,11 +96,23 @@ public class WpiLibrariesUtils
     }
 
 
+    @Contract("null -> false")
+    public static boolean isOpenCvPresentViaReadAction(@Nullable Project project)
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isOpenCvPresent(project));
+    }
+
     public static boolean areAllPresent(@Nullable Project project)
     {
         return isWpilibPresent(project) && isNetworkTablesPresent(project) && isOpenCvPresent(project) && isCsCorePresent(project);
     }
-    
+
+
+    @Contract("null -> false")
+    public static boolean areAllPresentViaReadAction(@Nullable Project project)
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> areAllPresent(project));
+    }
 
     @Contract("null -> false")
     public static boolean isWpilibPresent(@Nullable Module module)
@@ -91,6 +123,12 @@ public class WpiLibrariesUtils
 
 
     @Contract("null -> false")
+    public static boolean isWpilibPresentViaReadAction(@Nullable Module module)
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isWpilibPresent(module));
+    }
+
+    @Contract("null -> false")
     public static boolean isCsCorePresent(@Nullable Module module)
     {
         return isLibraryPresent(module, "edu.wpi.cscore.VideoCamera") ||
@@ -99,12 +137,24 @@ public class WpiLibrariesUtils
 
 
     @Contract("null -> false")
+    public static boolean isCsCorePresentViaReadAction(@Nullable Module module)
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isCsCorePresent(module));
+    }
+
+    @Contract("null -> false")
     public static boolean isNetworkTablesPresent(@Nullable Module module)
     {
         return isLibraryPresent(module, "edu.wpi.first.wpilibj.networktables.NetworkTable") ||
                isLibraryPresent(module, "edu.wpi.first.wpilibj.tables.ITable");
     }
 
+
+    @Contract("null -> false")
+    public static boolean isNetworkTablesPresentReadAction(@Nullable Module module)
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isNetworkTablesPresent(module));
+    }
 
     @Contract("null -> false")
     public static boolean isOpenCvPresent(@Nullable Module module)
@@ -116,9 +166,22 @@ public class WpiLibrariesUtils
     }
 
 
+    @Contract("null -> false")
+    public static boolean isOpenCvPresentViaReadAction(@Nullable Module module)
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isOpenCvPresent(module));
+    }
+
     public static boolean areAllPresent(@Nullable Module module)
     {
         return isWpilibPresent(module) && isNetworkTablesPresent(module) && isOpenCvPresent(module) && isCsCorePresent(module);
+    }
+
+
+    @Contract("null -> false")
+    public static boolean areAllPresentViaReadAction(@Nullable Module module)
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> areAllPresent(module));
     }
     
     @Nullable

@@ -22,11 +22,13 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task.Backgroundable;
 import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.ui.notify.FrcNotifications;
+import net.javaru.iip.frc.wpilib.attached.WpiLibrariesUtils;
 import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloadFailedException;
 import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
 
@@ -45,20 +47,13 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
         final Project project = actionEvent.getProject();
         new Backgroundable(project, "Downloading WPILib Update", false)
         {
-            boolean areAttached = true;
+            boolean areAttached = false;
 
             @Override
             public void run(@NotNull ProgressIndicator indicator)
             {
-                if (project == null)
-                {
-                    WpiLibDownloader.downloadLatest();
-                }
-                else
-                {
-                    areAttached = !WpiLibDownloader.downloadLatestAndSeeIfAttached(project);
-
-                }
+                WpiLibDownloader.downloadLatest();
+                areAttached = WpiLibrariesUtils.areAllPresentViaReadAction(project);
             }
 
 
@@ -68,30 +63,29 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
 
                 final Notification notification;
 
-                //TODO: Uncomment once attach libs action has been implemented
-//                if (areAttached)
+                if (!areAttached && project != null)
+                {
+                    notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+                                                    FrcNotifications.IconInfo,
+                                                    FrcNotifications.Title,
+                                                    NOTIFICATIONS_SUBTITLE + " Completed Successfully",
+                                                    "One or more WPILib JARs are not attached. <a href='attach'>Attach as library</a>",
+                                                    NotificationType.INFORMATION,
+                                                    (theNotification, event) ->
+                                                    {
+                                                        if ("attach".equals(event.getDescription()))
+                                                        {
+                                                            Logger.getInstance(DownloadWpiLibAction.class).debug("[FRC] Attaching WPILib library");
+                                                            AttachWpilibAction.attachWpiLib(project);
+                                                        }
+                                                        theNotification.expire();
+                                                    }
+                    );
+                }
+                else
                 {
                     notification = createNoActionSuccessNotification();
                 }
-//                else
-//                {
-//                    notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
-//                                                    FrcNotifications.IconInfo,
-//                                                    FrcNotifications.Title,
-//                                                    NOTIFICATIONS_SUBTITLE + " Completed Successfully",
-//                                                    "One or more WPILib JARs are not attached. <a href='attach'>Attach as library</a>",
-//                                                    NotificationType.INFORMATION,
-//                                                    (theNotification, event) ->
-//                                                    {
-//                                                        if ("attach".equals(event.getDescription()))
-//                                                        {
-//                                                            //TODO: Need to call the attach action once implemented
-//                                                            Logger.getInstance(DownloadWpiLibAction.class).debug("[FRC] Attaching WPILib library");
-//                                                        }
-//                                                        theNotification.expire();
-//                                                    }
-//                    );
-//                }
 
                 Notifications.Bus.notify(notification, myProject);
 

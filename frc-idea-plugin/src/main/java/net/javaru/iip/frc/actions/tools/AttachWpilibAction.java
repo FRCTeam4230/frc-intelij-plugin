@@ -55,6 +55,12 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
     public void actionPerformed(AnActionEvent actionEvent)
     {
         final Project project = actionEvent.getProject();
+        attachWpiLib(project);
+    }
+
+
+    public static void attachWpiLib(Project project)
+    {
         if (project != null)
         {
             try
@@ -129,15 +135,15 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
         }
     }
 
-    
-    private void queueFailureNotification(@Nullable Project project, @Nullable Exception e)
+
+    private static void queueFailureNotification(@Nullable Project project, @Nullable Exception e)
     {
         Notifications.Bus.notify(createFailureNotification(e), project);
     }
 
 
     @NotNull
-    private Notification createFailureNotification(@Nullable Exception e)
+    private static Notification createFailureNotification(@Nullable Exception e)
     {
 
 
@@ -158,14 +164,14 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
     }
 
 
-    private void queueSuccessfulNotification(@Nullable Project project)
+    private static void queueSuccessfulNotification(@Nullable Project project)
     {
         Notifications.Bus.notify(createSuccessNotification(), project);
     }
 
 
     @NotNull
-    private Notification createSuccessNotification()
+    private static Notification createSuccessNotification()
     {
         return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
                                 FrcNotifications.IconInfo,

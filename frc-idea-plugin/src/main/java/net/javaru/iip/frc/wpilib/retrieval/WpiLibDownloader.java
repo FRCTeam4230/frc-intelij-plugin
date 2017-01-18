@@ -36,13 +36,9 @@ import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.jetbrains.annotations.NotNull;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.InputValidator;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.util.Computable;
 
 import net.javaru.iip.frc.FrcIcons;
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
@@ -50,7 +46,6 @@ import net.javaru.iip.frc.settings.FrcSettings;
 import net.javaru.iip.frc.util.UnzipUtils;
 import net.javaru.iip.frc.util.UriUtils;
 import net.javaru.iip.frc.wpilib.WpiLibPaths;
-import net.javaru.iip.frc.wpilib.attached.WpiLibrariesUtils;
 
 
 
@@ -58,15 +53,7 @@ public class WpiLibDownloader
 {
     private static final Logger LOG = Logger.getInstance(WpiLibDownloader.class);
 
-
-    public static boolean downloadLatestAndSeeIfAttached(@NotNull Project project) throws WpiLibDownloadFailedException
-    {
-        downloadLatest();
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>)
-                                                                     () -> WpiLibrariesUtils.areAllPresent(project));
-    }
-
-
+    
     public static void downloadLatest() throws WpiLibDownloadFailedException
     {
         try

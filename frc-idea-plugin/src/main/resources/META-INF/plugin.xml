@@ -22,8 +22,9 @@
     
     <description><![CDATA[
         <p>
-            A plug-in for <em><a href='http://www.firstinspires.org/'>FIRST</a> Robotics Competition</em>  
-            (<a href='http://www.firstinspires.org/robotics/frc'>FRC</a>) development using IntelliJ IDEA. 
+            <!-- The first sentence gets used as a summary on the plug-ins repository. -->
+            <em><a href='http://www.firstinspires.org/'>FIRST</a> Robotics Competition</em>  
+            (<a href='http://www.firstinspires.org/robotics/frc'>FRC</a>) development support for IntelliJ IDEA. 
             This plug-in will work with either the free open-sourced <em>Community Edition</em> or the 
             licensed <em>Ultimate Edition</em> of IntelliJ IDEA. <strong>This plug-in requires IntelliJ 
             IDEA 2016.3 or later.</strong>

@@ -19,10 +19,12 @@ package net.javaru.iip.frc.actions.tools;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.facet.FacetManager;
+import com.intellij.facet.ProjectFacetManager;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -42,6 +44,16 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
     private static final Logger LOG = Logger.getInstance(AttachUserLibDirAction.class);
 
 
+    @Override
+    public void update(AnActionEvent e)
+    {
+        final Project project = e.getData(CommonDataKeys.PROJECT);
+        e.getPresentation().setVisible(project != null &&
+                                       !project.isDisposed() &&
+                                       ProjectFacetManager.getInstance(project).getFacets(FrcFacet.FACET_TYPE_ID).size() > 0 &&
+                                       !WpiLibrariesUtils.isUserLibAttachedViaReadAction(project));
+    }
+    
     @Override
     public void actionPerformed(AnActionEvent actionEvent)
     {

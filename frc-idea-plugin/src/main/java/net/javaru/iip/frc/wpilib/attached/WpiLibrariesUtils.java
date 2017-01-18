@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderRootType;
@@ -81,7 +82,7 @@ public class WpiLibrariesUtils
 
 
     @Contract("null -> false")
-    public static boolean sNetworkTablesPresentViaReadAction(@Nullable Project project)
+    public static boolean isNetworkTablesPresentViaReadAction(@Nullable Project project)
     {
         return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isNetworkTablesPresent(project));
     }
@@ -207,5 +208,24 @@ public class WpiLibrariesUtils
         }
         
         return null;
+    }
+    
+    public static boolean isUserLibAttached(@NotNull Project project)
+    {
+        final Module[] modules = ModuleManager.getInstance(project).getModules();
+        for (Module module : modules)
+        {
+            if (findExistingUserLibDirLibrary(module) != null)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public static boolean isUserLibAttachedViaReadAction(@NotNull Project project)
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isUserLibAttached(project));
     }
 }

@@ -65,7 +65,7 @@ public class FrcFacetEditorTab extends FacetEditorTab
     public boolean isModified()
     {
         //TODO: Write this 'isModified' implemented method in the 'FrcFacetEditorTab' class
-        LOG.debug("[FRC] Yet to be implemented 'FrcFacetEditorTab.isModified()' method was called ");
+        LOG.trace("[FRC] Yet to be implemented 'FrcFacetEditorTab.isModified()' method was called ");
         return false;
     }
 

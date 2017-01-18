@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2015 Mark Vedder
+  ~ Copyright 2015-2017 Mark Vedder
   ~
   ~    Licensed under the Apache License, Version 2.0 (the "License");
   ~    you may not use this file except in compliance with the License.
@@ -17,32 +17,37 @@
 <idea-plugin url="https://gitlab.com/Javaru/frc-intellij-idea-plugin">
     <id>net.javaru.idea.frc</id>
     <name>FRC</name>
-    <version>0.1</version>
+    <version>0.2</version>
     <vendor url="https://gitlab.com/Javaru/frc-intellij-idea-plugin">Javaru</vendor>
     
     <description><![CDATA[
         <p>
-            A plug-in to allow FRC development using IntelliJ IDEA rather than Eclipse. It will work with either the
-            free open-sourced <em>Community Edition</em> or the licensed <em>Ultimate Edition</em> of IntelliJ IDEA.
-            <strong>This plug-in requires IntelliJ IDEA 2016.3 or later. </strong>
+            A plug-in for <em><a href='http://www.firstinspires.org/'>FIRST</a> Robotics Competition</em>  
+            (<a href='http://www.firstinspires.org/robotics/frc'>FRC</a>) development using IntelliJ IDEA. 
+            This plug-in will work with either the free open-sourced <em>Community Edition</em> or the 
+            licensed <em>Ultimate Edition</em> of IntelliJ IDEA. <strong>This plug-in requires IntelliJ 
+            IDEA 2016.3 or later.</strong>
         </p>
         <p> </p>
-        <p>Please report issues or make feature requests at 
+        <p>Please report issues or make feature requests at: 
             <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues</a>
         </p>
         <p> </p>
         <p>
-            <strong>This plug-in is in beta and is not feature complete yet.</strong> I started developing and using this plug-in for my own
-            use during the 2016 FRC build season. I had hoped to have it more feature rich prior to the 2017 FRC season. But time did not allow
-            for such. At this time, the primary feature is the the RiLog tool window which will show the output of the RioLog. There are also a 
-            few file templates for FRC Iterative Robots. I will try to add features as the 2017 build season progresses. I have many planned, and
-            some partially implemented. Thanks.
+            <strong>The plug-in is in beta and is not feature complete yet.</strong> But it does provide a fair number of features
+            at this time. More will be added in future versions.
         </p>
         
     ]]></description>
     
     <change-notes><![CDATA[
-      <strong>0.1</strong> <br>
+      <strong>v0.2</strong> <br>
+      &nbsp;&nbsp;&bull; Downloading of the WPILib libraries (Tools > Frc > Downloading Latest WPILib)<br>
+      &nbsp;&nbsp;&bull; Easy attachment of the WPILib libraries as dependencies (Tools > Frc > Attach WPILib JARs as Dependency)<br>
+      &nbsp;&nbsp;&bull; Easy attachment of the User Lib directory as dependencies (Tools > Frc > Attach User Lib Directory as Dependency)<br>
+      &nbsp;&nbsp;&bull; Some code cleanup and minor improvements
+      <br>
+      <strong>v0.1</strong> <br>
       &nbsp;&nbsp;&bull; Initial beta release of plug-in <br>
       &nbsp;&nbsp;&bull; FRC Facet <br>
       &nbsp;&nbsp;&bull; RioLog monitoring <br>

@@ -26,6 +26,8 @@ import com.intellij.notification.Notifications;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.wm.IdeFrame;
+import com.intellij.openapi.wm.ex.WindowManagerEx;
 
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
 
@@ -48,6 +50,7 @@ public final class FrcNotifications
     
     public static Notification notifyAboutTeamNumberNeedingToBeConfigured(@Nullable Project project)
     {
+        //See com/intellij/ide/plugins/PluginManager.java:177 for an example
         final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
                                                            FrcNotifications.IconInfo,
                                                            FrcNotifications.Title,
@@ -59,7 +62,8 @@ public final class FrcNotifications
                                                                if ("configure".equals(event.getDescription()))
                                                                {
                                                                    final Configurable configurable = FrcApplicationComponent.getInstance();
-                                                                   ShowSettingsUtil.getInstance().editConfigurable((Project) null, configurable);
+                                                                   IdeFrame ideFrame = WindowManagerEx.getInstanceEx().findFrameFor(null);
+                                                                   ShowSettingsUtil.getInstance().editConfigurable((JFrame)ideFrame, configurable);
                                                                }
                                                                theNotification.expire();
                                                            }

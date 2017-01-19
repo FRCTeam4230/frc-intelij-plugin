@@ -242,11 +242,14 @@ public class RioLogMonitoringProcess extends Process
         enabled = false;
         try
         {
+            
             if (rioLogMonitor != null)
             {
-                while (rioLogMonitor.isRunning)
+                int count = 0;
+                while (rioLogMonitor.isRunning && count <  60 /* 60 * 50 = 3,000ms (3 seconds)*/)
                 {
                     try {TimeUnit.MILLISECONDS.sleep(50);} catch (InterruptedException ignore) {}
+                    count++;
                 }
             }
         }
@@ -362,6 +365,8 @@ public class RioLogMonitoringProcess extends Process
                 LOG.warn("[FRC] An Exception occurred while monitoring the RIO Log UDP output", e);
                 isRunning = false;
             }
+            //This sets isRunning to false after the while(enabled) loop exits so the destroy method knows its ok to exit
+            isRunning = false;
         }
 
 

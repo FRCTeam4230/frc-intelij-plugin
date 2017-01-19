@@ -24,6 +24,7 @@ import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintWriter;
+import java.net.BindException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -37,13 +38,22 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import javax.swing.*;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.jetbrains.annotations.NotNull;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.options.Configurable;
+import com.intellij.openapi.options.ShowSettingsUtil;
+import com.intellij.openapi.wm.IdeFrame;
+import com.intellij.openapi.wm.ex.WindowManagerEx;
 
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
 import net.javaru.iip.frc.settings.FrcSettings;
+import net.javaru.iip.frc.ui.notify.FrcNotifications;
 
 
 
@@ -330,19 +340,28 @@ public class RioLogMonitoringProcess extends Process
                     }
                     catch (IOException e)
                     {
-                        LOG.error("[FRC] An IOException occurred while monitoring the RIO Log UDP output", e);
+                        LOG.warn("[FRC] An IOException occurred while monitoring the RIO Log UDP output", e);
                         isRunning = false;
                         cleanUpSocket(socket);
                         return;
                     }
                 }
             }
-            catch (Exception e)
+            catch (BindException e)
             {
-                LOG.error("[FRC] An Exception occurred while monitoring the RIO Log UDP output", e);
+                final String msg = "Could not bind to the RioLog port. This is likely due to a second IDEA window with an "
+                                   + "FRC project being open. It is a known limitation that only one FRC project can be " 
+                                   + "opened at a time. A fix for all FRC projects to share the port is planned for a " 
+                                   + "future release.";
+                LOG.warn(msg + " Cause Summary: " + e.toString(), e);
+                publishBindWarning(msg);
                 isRunning = false;
             }
-            isRunning = false;
+            catch (Exception e)
+            {
+                LOG.warn("[FRC] An Exception occurred while monitoring the RIO Log UDP output", e);
+                isRunning = false;
+            }
         }
 
 
@@ -384,6 +403,33 @@ public class RioLogMonitoringProcess extends Process
         {
             //TODO: add to settings
             return false;
+        }
+        
+        
+        protected void publishBindWarning(String msg)
+        {
+            final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+                                                               FrcNotifications.IconWarn,
+                                                               FrcNotifications.Title,
+                                                               "RIOLog Monitor",
+                                                               /*"Cannot bind to the RIOLOg port as it is already in use.<br>" 
+                                                               + "Likely there in another IDEA window opened with an FRC project.<br>" 
+                                                               + "It is a known issue that only FRC project can be opened at a time.<br>" 
+                                                               + "I hope to address it in near future release."*/
+                                                               msg,
+                                                               NotificationType.WARNING,
+                                                               (theNotification, event) ->
+                                                               {
+                                                                   if ("configure".equals(event.getDescription()))
+                                                                   {
+                                                                       final Configurable configurable = FrcApplicationComponent.getInstance();
+                                                                       IdeFrame ideFrame = WindowManagerEx.getInstanceEx().findFrameFor(null);
+                                                                       ShowSettingsUtil.getInstance().editConfigurable((JFrame) ideFrame, configurable);
+                                                                   }
+                                                                   theNotification.expire();
+                                                               }
+            );
+            Notifications.Bus.notify(notification, null);
         }
     }
 

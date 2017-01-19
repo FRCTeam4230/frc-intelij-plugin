@@ -61,7 +61,7 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
     private static final Logger LOG = Logger.getInstance(FrcApplicationComponent.class);
 
     // TODO: setting settings to static for now to fix issue that arose after changing the configurable settings in the plugin xml
-    private static FrcSettings settings;
+    private static FrcSettings settings = new FrcSettings();
     private FrcSettingsForm settingsForm;
 
     private static final FrcApplicationComponent defaultInstance = new FrcApplicationComponent();
@@ -82,7 +82,7 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
     public void initComponent()
     {
         LOG.debug("[FRC] FrcApplicationComponent.initComponent() has been called");
-        if (FrcApplicationComponent.settings.getTeamNumber() <= 0)
+        if (getState().getTeamNumber() <= 0)
         {
             FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(null);
         }

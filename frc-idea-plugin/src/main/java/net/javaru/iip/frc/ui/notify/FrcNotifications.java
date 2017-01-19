@@ -68,7 +68,7 @@ public final class FrcNotifications
                                                                theNotification.expire();
                                                            }
         );
-        Notifications.Bus.notify(notification, null);
+        Notifications.Bus.notify(notification, project);
         return notification;
     }
 }

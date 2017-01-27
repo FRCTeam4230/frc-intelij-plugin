@@ -33,7 +33,9 @@ import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.util.Computable;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 
 import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.wpilib.WpiLibPaths;
@@ -218,6 +220,14 @@ public class WpiLibrariesUtils
         final Library[] libraries = libraryTable.getLibraries();
         for (Library library : libraries)
         {
+            final String dirUrl = VirtualFileManager.constructUrl(LocalFileSystem.PROTOCOL, userLibDir.toString());
+
+            //Not sure why, but when testing, I had to replace back slashes as the dirUrl was file://C:\foo\bar which was not found, but file://C:/foo/bar was
+            if (library.isJarDirectory(dirUrl.replace('\\', '/')) || library.isJarDirectory(dirUrl))
+            {
+                return library;
+            }
+            
             final VirtualFile[] libraryFiles = library.getFiles(OrderRootType.CLASSES);
 
             for (VirtualFile virtualFile : libraryFiles)

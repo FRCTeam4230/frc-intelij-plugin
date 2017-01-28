@@ -5,6 +5,7 @@ drivetrain
 firewire
 firstinspires
 frc
+gamepad
 hid
 imgcodecs
 imgproc
@@ -14,6 +15,7 @@ logitech
 mecanum
 mjpeg
 mjpg
+navx
 networktable
 networktables
 objdetect

@@ -124,25 +124,46 @@ public class RioLogMonitoringProcess extends Process
             throw new IllegalStateException("Could not create necessary io streams.", e);
         }
 
-        enabled = true;
-        if (USE_DEBUGGING_SERVER)
+        try
         {
-            rioLogMonitor = new TestingRioLogMonitor();
-            LOG.warn(String.format("[FRC] System Property '%s is set to 'true'. Using '%s' for monitoring on port '%d'.",
-                                   SIMULATED_LOG_SERVICE_PROP_KEY_BASE,
-                                   rioLogMonitor.getClass().getSimpleName(),
-                                   rioLogMonitor.port));
+            enabled = true;
+            if (USE_DEBUGGING_SERVER)
+            {
+                rioLogMonitor = new TestingRioLogMonitor();
+                LOG.warn(String.format("[FRC] System Property '%s is set to 'true'. Using '%s' for monitoring on port '%d'.",
+                                       SIMULATED_LOG_SERVICE_PROP_KEY_BASE,
+                                       rioLogMonitor.getClass().getSimpleName(),
+                                       rioLogMonitor.port));
+            }
+            else
+            {
+                rioLogMonitor = new RioLogMonitor();
+                LOG.info(String.format("[FRC] Using '%s' for monitoring on port '%d'.",
+                                       rioLogMonitor.getClass().getSimpleName(),
+                                       rioLogMonitor.port));
+            }
         }
-        else
+        catch (Exception e)
         {
-            rioLogMonitor = new RioLogMonitor();
-            LOG.info(String.format("[FRC] Using '%s' for monitoring on port '%d'.",
-                                   rioLogMonitor.getClass().getSimpleName(),
-                                   rioLogMonitor.port));
+            enabled = false;
+            LOG.warn("[FRC] Could not initialize riolog monitor. Cause Summary: " + e.toString(), e);
+            Notifications.Bus.notify(new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+                                                      FrcNotifications.IconError,
+                                                      FrcNotifications.Title,
+                                                      "RioLog Initialization Failure",
+                                                      "Could not initialize the RioLog socket monitor. See idea.log for more details.",
+                                                      NotificationType.ERROR,
+                                                      null
+                                                      ));
         }
-        Thread thread = new Thread(rioLogMonitor);
-        thread.setName("RioLogMonitoringProcess");
-        thread.start();
+        
+        
+        if (enabled && rioLogMonitor != null)
+        {
+            Thread thread = new Thread(rioLogMonitor);
+            thread.setName("RioLogMonitoringProcess");
+            thread.start();
+        }
     }
 
 
@@ -456,7 +477,7 @@ public class RioLogMonitoringProcess extends Process
             catch (UnknownHostException e)
             {
                 final String message = "Cannot create group InetAddress due to an exception.";
-                LOG.error("[FRC] " + message);
+                LOG.warn("[FRC] " + message);
                 throw new IllegalStateException(message, e);
             }
         }

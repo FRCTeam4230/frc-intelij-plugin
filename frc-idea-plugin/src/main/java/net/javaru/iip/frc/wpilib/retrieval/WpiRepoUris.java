@@ -58,7 +58,7 @@ public class WpiRepoUris
         catch (URISyntaxException e)
         {
             //this really should never happen given how we are constructing the URI
-            LOG.error("[FRC] Could not extract base URI from URI. Summary: " + e.toString(), e);
+            LOG.warn("[FRC] Could not extract base URI from URI. Summary: " + e.toString(), e);
             return null;
         }
     }

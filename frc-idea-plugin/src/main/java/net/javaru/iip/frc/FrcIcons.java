@@ -105,7 +105,7 @@ public final class FrcIcons
         {
             //IntelliJ IDEA will still log an independent error in the Events window, but by loading a replacement icon, it will
             //prevent things (such as actions) from completely breaking because an icon was not loaded.
-            LOG.error("[FRC] An exception occurred when loading the icon from '" + path + "'. Cause Summary: " + throwable.toString());
+            LOG.warn("[FRC] An exception occurred when loading the icon from '" + path + "'. Cause Summary: " + throwable.toString());
             return IconLoader.getIcon("/icons/InvalidIconPlaceholder-16.png", FrcIcons.class);
         }
     }

@@ -86,8 +86,12 @@ public class FrcProjectComponent implements ProjectComponent
     {
         if (FrcApplicationComponent.getInstance().getState().getTeamNumber() <= 0)
         {
-            final Notification notification = FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(project);
+//            if (!FrcApplicationComponent.getInstance().showTeamNumConfigNotification(project))
+            {
+                FrcApplicationComponent.getInstance().expireTeamNumConfigNotification(project);
+                final Notification notification = FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(project);
 //                    startUpNotifications.add(notification);
+            }
         }
 
         if (!WpiLibrariesUtils.isWpilibPresent(project))

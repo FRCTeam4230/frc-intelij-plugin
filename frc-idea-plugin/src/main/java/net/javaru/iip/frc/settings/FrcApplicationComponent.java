@@ -22,6 +22,7 @@ import javax.swing.*;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import com.intellij.notification.Notification;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.components.ApplicationComponent;
@@ -33,6 +34,7 @@ import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.ModificationTracker;
 import com.intellij.openapi.util.SimpleModificationTracker;
 
@@ -64,6 +66,9 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
     private static FrcSettings settings = new FrcSettings();
     private FrcSettingsForm settingsForm;
 
+    @Nullable
+    private Notification teamNumConfigNotification;
+    
     private static final FrcApplicationComponent defaultInstance = new FrcApplicationComponent();
 
     public FrcApplicationComponent() { }
@@ -84,10 +89,25 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
         LOG.debug("[FRC] FrcApplicationComponent.initComponent() has been called");
         if (getState().getTeamNumber() <= 0)
         {
-            FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(null);
+            teamNumConfigNotification = FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(null);
         }
     }
 
+    
+    public void expireTeamNumConfigNotification(@NotNull Project project)
+    {
+        if (teamNumConfigNotification != null) 
+        {
+            try
+            {
+                teamNumConfigNotification.expire();
+            }
+            catch (Exception e)
+            {
+                LOG.debug("[FRC] An exception occurred when clearing Application teamNumConfigNotification. Cause Summary: " + e.toString());
+            }
+        }
+    }
 
     @Override
     public void disposeComponent()

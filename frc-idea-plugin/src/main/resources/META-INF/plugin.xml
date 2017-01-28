@@ -17,7 +17,7 @@
 <idea-plugin url="https://gitlab.com/Javaru/frc-intellij-idea-plugin">
     <id>net.javaru.idea.frc</id>
     <name>FRC</name>
-    <version>0.2</version>
+    <version>0.3</version>
     <vendor url="https://gitlab.com/Javaru/frc-intellij-idea-plugin">Javaru</vendor>
     
     <description><![CDATA[
@@ -42,11 +42,18 @@
     ]]></description>
     
     <change-notes><![CDATA[
+      <strong>v0.3</strong> <br>
+      &nbsp;&nbsp;&bull; Added auto checks at project startup that WPILib and User Lib are attached as Libraries<br>
+      &nbsp;&nbsp;&bull; Auto prompt at startup if Team Number is not configured<br>
+      &nbsp;&nbsp;&bull; Added notification about known issue of RioLog socket binding issue if two FRC projects are open at the same time<br>
+      &nbsp;&nbsp;&bull; Updated built-in spell check dictionary with additional FRC domain specific terms/words<br>
+      &nbsp;&nbsp;&bull; Some code cleanup and minor improvements<br>
+      <br>
       <strong>v0.2</strong> <br>
       &nbsp;&nbsp;&bull; Downloading of the WPILib libraries (Tools > Frc > Downloading Latest WPILib)<br>
       &nbsp;&nbsp;&bull; Easy attachment of the WPILib libraries as dependencies (Tools > Frc > Attach WPILib JARs as Dependency)<br>
       &nbsp;&nbsp;&bull; Easy attachment of the User Lib directory as dependencies (Tools > Frc > Attach User Lib Directory as Dependency)<br>
-      &nbsp;&nbsp;&bull; Some code cleanup and minor improvements
+      &nbsp;&nbsp;&bull; Some code cleanup and minor improvements<br>
       <br>
       <strong>v0.1</strong> <br>
       &nbsp;&nbsp;&bull; Initial beta release of plug-in <br>

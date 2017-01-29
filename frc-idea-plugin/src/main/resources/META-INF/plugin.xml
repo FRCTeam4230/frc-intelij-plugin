@@ -17,7 +17,7 @@
 <idea-plugin url="https://gitlab.com/Javaru/frc-intellij-idea-plugin">
     <id>net.javaru.idea.frc</id>
     <name>FRC</name>
-    <version>0.3</version>
+    <version>0.3.1</version>
     <vendor url="https://gitlab.com/Javaru/frc-intellij-idea-plugin">Javaru</vendor>
     
     <description><![CDATA[
@@ -42,6 +42,9 @@
     ]]></description>
     
     <change-notes><![CDATA[
+      <strong>v0.3.1</strong> <br>
+      &nbsp;&nbsp;&bull; Fixed an issue where the WpiLib was not downloaded to the properly nested directory. The 'current' sub-directory was missing in the full path.<br>
+      <br>
       <strong>v0.3</strong> <br>
       &nbsp;&nbsp;&bull; Added auto checks at project startup that WPILib and User Lib are attached as Libraries<br>
       &nbsp;&nbsp;&bull; Auto prompt at startup if Team Number is not configured<br>

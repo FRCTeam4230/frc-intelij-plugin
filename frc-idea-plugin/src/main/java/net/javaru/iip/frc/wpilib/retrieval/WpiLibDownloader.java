@@ -85,8 +85,11 @@ public class WpiLibDownloader
             LOG.debug("[FRC] coreJarUri: " + coreJarUri);
             final Path javaJarFilePath = WpiRepoHttpClient.downloadAndSaveToTemp(javaJarUri);
             final Path coreJarFilePath = WpiRepoHttpClient.downloadAndSaveToTemp(coreJarUri);
-            extractZipFileContainedInZipFile(javaJarFilePath, "resources/java.zip", "java");
-            extractZipFileContainedInZipFile(coreJarFilePath, "resources/tools.zip", "tools");
+            // The java.zip file has w directories in it:  ant;  javadoc;  lib;  And is extracted in 'current' so we end up with: 
+            //      C:\Users\Dilbert\wpilib\java\current\ant   C:\Users\Dilbert\wpilib\java\current\javadoc   C:\Users\Dilbert\wpilib\java\current\lib
+            extractZipFileContainedInZipFile(javaJarFilePath, "resources/java.zip", WpiLibPaths.getJavaCurrentDir());
+            // The tools.zip content needs to go into C:\Users\Mark\wpilib\tools  so we end up with C:\Users\Mark\wpilib\tools\plugins  and  C:\Users\Mark\wpilib\tools\*.jar 
+            extractZipFileContainedInZipFile(coreJarFilePath, "resources/tools.zip", WpiLibPaths.getToolsDir());
 
 
             Files.createDirectories(WpiLibPaths.getUserLibDir());
@@ -125,14 +128,13 @@ public class WpiLibDownloader
     }
 
 
-    private static void extractZipFileContainedInZipFile(Path jarFilePath, String innerFilePath, String wpilibChildDestDirName) throws IOException
+    private static void extractZipFileContainedInZipFile(Path jarFilePath, String innerFilePath, Path destDir) throws IOException
     {
         ZipFile outerJarFile = new ZipFile(jarFilePath.toFile());
         //Will be null if not found
         final ZipEntry zipEntry = outerJarFile.getEntry(innerFilePath);
         FrcSettings settings = FrcApplicationComponent.getInstance().getState();
         final Path wpiLibDir = settings.getWpiLibDir();
-        final Path destDir = wpiLibDir.resolve(wpilibChildDestDirName);
         LOG.debug("[FRC] Extracting '" + innerFilePath + "' to " + destDir);
         final BufferedInputStream inputStream = new BufferedInputStream(outerJarFile.getInputStream(zipEntry));
         UnzipUtils.unzip(inputStream, destDir, true);

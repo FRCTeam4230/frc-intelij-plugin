@@ -16,8 +16,12 @@
 
 package net.javaru.iip.frc.wpilib;
 
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Properties;
 
+import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
 
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
@@ -27,97 +31,154 @@ import net.javaru.iip.frc.settings.FrcSettings;
 
 public class WpiLibPaths
 {
+    
+    public static final String DEFAULT_CURRENT_VERSION_NAME = "current";
+
     private static final Logger LOG = Logger.getInstance(WpiLibPaths.class);
-
-
-    public static Path getUserLibDir()
+    
+    public static Path getWpiLibRootDir()
     {
         FrcSettings settings = FrcApplicationComponent.getInstance().getState();
-        final Path wpiLibDir = settings.getWpiLibDir();
-        return getUserLibDir(wpiLibDir);
+        return settings.getWpiLibDir();
     }
 
-
-    public static Path getUserLibDir(Path wpiLibDir)
-    {
-        final Path userLib = wpiLibDir.resolve("user/java/lib");
-        return userLib;
-    }
-    
-    
     public static Path getUserRootDir()
     {
-        FrcSettings settings = FrcApplicationComponent.getInstance().getState();
-        final Path wpiLibDir = settings.getWpiLibDir();
-        return getUserRootDir(wpiLibDir);
+        return getUserRootDir(getWpiLibRootDir());
     }
 
 
     public static Path getUserRootDir(Path wpiLibDir)
     {
-        final Path userRoot = wpiLibDir.resolve("user");
-        return userRoot;
+        return wpiLibDir.resolve("user");
     }
     
     
+    public static Path getUserLibDir()
+    {
+        return getUserLibDir(getWpiLibRootDir());
+    }
+
+
+    public static Path getUserLibDir(Path wpiLibDir)
+    {
+        // user/java/lib
+        return getUserRootDir(wpiLibDir).resolve("java/lib");
+    }
     
     public static Path getToolsDir()
     {
-        FrcSettings settings = FrcApplicationComponent.getInstance().getState();
-        final Path wpiLibDir = settings.getWpiLibDir();
-        return getToolsDir(wpiLibDir);
+        return getToolsDir(getWpiLibRootDir());
     }
 
 
     public static Path getToolsDir(Path wpiLibDir)
     {
-        final Path userLib = wpiLibDir.resolve("tools");
-        return userLib;
+        return wpiLibDir.resolve("tools");
     }
     
     public static Path getJavaDir()
     {
-        FrcSettings settings = FrcApplicationComponent.getInstance().getState();
-        final Path wpiLibDir = settings.getWpiLibDir();
-        return getJavaDir(wpiLibDir);
+        return getJavaDir(getWpiLibRootDir());
     }
 
 
     public static Path getJavaDir(Path wpiLibDir)
     {
-        final Path userLib = wpiLibDir.resolve("java");
-        return userLib;
+        return wpiLibDir.resolve("java");
+    }
+
+    public static Path getJavaCurrentDir()
+    {
+        return getJavaCurrentDir(getWpiLibRootDir());
+    }
+
+
+    public static Path getJavaCurrentDir(Path wpiLibDir)
+    {
+        return getJavaCurrentDir(wpiLibDir, resolveCurrentVersionName(wpiLibDir));
+    }
+    
+    protected static String resolveCurrentVersionName(Path wpiLibDir)
+    {
+        try
+        {
+            final Path propertiesFile = getWpilibPropertiesFile(wpiLibDir);
+            if (Files.notExists(propertiesFile))
+            {
+                LOG.info("[FRC] wpilib.properties file does not exist at '" + propertiesFile + "'. Using default version of '" + DEFAULT_CURRENT_VERSION_NAME + "'");
+                return DEFAULT_CURRENT_VERSION_NAME;
+            }
+            final String key = "version";
+            final Properties defaultProperties = new Properties();
+            defaultProperties.setProperty(key, DEFAULT_CURRENT_VERSION_NAME);
+            final Properties properties = new Properties(defaultProperties);
+            try (final InputStream in = Files.newInputStream(propertiesFile))
+            {
+                properties.load(in);
+                return properties.getProperty(key, DEFAULT_CURRENT_VERSION_NAME);
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.warn("[FRC] An exception occurred when determining current version from wpilib.properties");
+            return DEFAULT_CURRENT_VERSION_NAME;
+        }
+    }
+    
+    protected static Path getJavaCurrentDir(Path wpiLibDir, @NotNull String versionName)
+    {
+        return getJavaDir(wpiLibDir).resolve(versionName);
     }
 
 
     public static Path getJavaLibDir()
     {
-        FrcSettings settings = FrcApplicationComponent.getInstance().getState();
-        final Path wpiLibDir = settings.getWpiLibDir();
-        return getJavaLibDir(wpiLibDir);
+        return getJavaLibDir(getWpiLibRootDir());
     }
 
 
     public static Path getJavaLibDir(Path wpiLibDir)
     {
-        final Path javaLib = wpiLibDir.resolve("java/lib");
-        return javaLib;
+        // java/current/lib
+        return getJavaCurrentDir(wpiLibDir).resolve("lib");
+    }
+
+
+    public static Path getAntDir()
+    {
+        return getAntDir(getWpiLibRootDir());
+    }
+
+
+    public static Path getAntDir(Path wpiAntDir)
+    {
+        // java/current/ant
+        return getJavaCurrentDir(wpiAntDir).resolve("ant");
+    }
+
+
+    public static Path getJavadocDir()
+    {
+        return getJavadocDir(getWpiLibRootDir());
+    }
+
+
+    public static Path getJavadocDir(Path wpiJavadocDir)
+    {
+        // java/current/javadoc
+        return getJavaCurrentDir(wpiJavadocDir).resolve("javadoc");
     }
 
 
     public static Path getWpilibPropertiesFile()
     {
-        FrcSettings settings = FrcApplicationComponent.getInstance().getState();
-        final Path wpiLibDir = settings.getWpiLibDir();
-        return getWpilibPropertiesFile(wpiLibDir);
+        return getWpilibPropertiesFile(getWpiLibRootDir());
     }
 
 
     public static Path getWpilibPropertiesFile(Path wpiLibDir)
     {
-        final Path wpiPropertiesFile = wpiLibDir.resolve("wpilib.properties");
-        return wpiPropertiesFile;
+        return wpiLibDir.resolve("wpilib.properties");
     }
-
-
 }

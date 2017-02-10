@@ -270,6 +270,13 @@ public abstract class RioLogMonitoringProcess extends Process
     
     protected abstract class AbstractMonitoringRunnable implements MonitoringRunnable
     {
+        protected final int port;
+        protected boolean isRunning = true;
+
+
+        protected AbstractMonitoringRunnable(int port) {this.port = port;}
+
+
         protected void processReceivedText(String received) throws IOException
         {
             if (getSettings().isClearOnRobotRestart() && isRestartNotification(received))
@@ -295,6 +302,14 @@ public abstract class RioLogMonitoringProcess extends Process
                 fileWriter.flush();
             }
         }
+
+
+        @Override
+        public boolean isRunning() { return isRunning; }
+
+
+        @Override
+        public int getPort() { return port; }
 
 
         protected void logStartingMonitoring()

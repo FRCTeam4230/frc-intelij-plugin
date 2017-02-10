@@ -85,9 +85,6 @@ public class UdpRioLogMonitoringProcess extends RioLogMonitoringProcess
 
     private class UdpRioLogMonitor extends AbstractMonitoringRunnable
     {
-        protected boolean isRunning = true;
-
-        protected final int port;
 
 
         protected UdpRioLogMonitor()
@@ -98,16 +95,8 @@ public class UdpRioLogMonitoringProcess extends RioLogMonitoringProcess
 
         public UdpRioLogMonitor(int port)
         {
-            this.port = port;
+            super(port);
         }
-
-
-        @Override
-        public boolean isRunning() { return isRunning; }
-
-
-        @Override
-        public int getPort() { return port; }
 
 
         @Override
@@ -173,34 +162,17 @@ public class UdpRioLogMonitoringProcess extends RioLogMonitoringProcess
             //This sets isRunning to false after the while(enabled) loop exits so the destroy method knows its ok to exit
             isRunning = false;
         }
-
-
         
-
-
-        protected void logStartingMonitoring()
-        {
-            consoleWriter.println(getStartingMonitoringMessage());
-            consoleWriter.println();
-            consoleWriter.flush();
-            if (fileWriter != null)
-            {
-                fileWriter.println(getStartingMonitoringMessage());
-                fileWriter.println();
-                fileWriter.flush();
-            }
-        }
-
 
         @Override
         @NotNull
-        protected String getStartingMonitoringMessage() {return "==Monitoring RioLog on port " + port + "==";}
+        protected String getStartingMonitoringMessage() {return "==Monitoring RioLog on port " + getPort() + "==";}
 
 
         protected DatagramSocket createSocket() throws IOException
         {
-            LOG.debug("[FRC] Creating DatagramSocket with port " + port);
-            DatagramSocket socket = new DatagramSocket(port);
+            LOG.debug("[FRC] Creating DatagramSocket with port " + getPort());
+            DatagramSocket socket = new DatagramSocket(getPort());
             socket.setReuseAddress(true);
             socket.setBroadcast(true);
             return socket;
@@ -211,10 +183,6 @@ public class UdpRioLogMonitoringProcess extends RioLogMonitoringProcess
         {
             //no op - here mostly for the testing version of this class
         }
-
-
-       
-
 
         protected void publishBindWarning(String msg)
         {
@@ -269,7 +237,7 @@ public class UdpRioLogMonitoringProcess extends RioLogMonitoringProcess
         @Override
         protected DatagramSocket createSocket() throws IOException
         {
-            MulticastSocket socket = new MulticastSocket(port);
+            MulticastSocket socket = new MulticastSocket(getPort());
             socket.joinGroup(groupAddress);
             return socket;
         }
@@ -287,7 +255,7 @@ public class UdpRioLogMonitoringProcess extends RioLogMonitoringProcess
 
         @NotNull
         @Override
-        protected String getStartingMonitoringMessage() { return "«««Monitoring *SIMULATED* RioLog on port " + port + "»»»"; }
+        protected String getStartingMonitoringMessage() { return "«««Monitoring *SIMULATED* RioLog on port " + getPort() + "»»»"; }
 
 
         @Override

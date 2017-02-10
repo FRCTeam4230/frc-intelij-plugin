@@ -67,7 +67,7 @@ public class UdpRioLogMonitoringProcess extends RioLogMonitoringProcess
         MonitoringRunnable rioLogMonitor;
         if (USE_DEBUGGING_SERVER)
         {
-            rioLogMonitor = new TestingRioLogMonitor();
+            rioLogMonitor = new TestingUdpRioLogMonitor();
             LOG.warn(String.format("[FRC] System Property '%s is set to 'true'. Using '%s' for monitoring on port '%d'.",
                                    SIMULATED_LOG_SERVICE_PROP_KEY_BASE,
                                    rioLogMonitor.getClass().getSimpleName(),
@@ -75,7 +75,7 @@ public class UdpRioLogMonitoringProcess extends RioLogMonitoringProcess
         }
         else
         {
-            rioLogMonitor = new RioLogMonitor();
+            rioLogMonitor = new UdpRioLogMonitor();
             LOG.info(String.format("[FRC] Using '%s' for monitoring on port '%d'.",
                                    rioLogMonitor.getClass().getSimpleName(),
                                    rioLogMonitor.getPort()));
@@ -83,20 +83,20 @@ public class UdpRioLogMonitoringProcess extends RioLogMonitoringProcess
         return rioLogMonitor;
     }
 
-    private class RioLogMonitor extends AbstractMonitoringRunnable
+    private class UdpRioLogMonitor extends AbstractMonitoringRunnable
     {
         protected boolean isRunning = true;
 
         protected final int port;
 
 
-        protected RioLogMonitor()
+        protected UdpRioLogMonitor()
         {
             this(getSettings().getRioLogPort());
         }
 
 
-        public RioLogMonitor(int port)
+        public UdpRioLogMonitor(int port)
         {
             this.port = port;
         }
@@ -244,12 +244,12 @@ public class UdpRioLogMonitoringProcess extends RioLogMonitoringProcess
     }
 
 
-    private class TestingRioLogMonitor extends RioLogMonitor
+    private class TestingUdpRioLogMonitor extends UdpRioLogMonitor
     {
         private final InetAddress groupAddress;
 
 
-        public TestingRioLogMonitor()
+        public TestingUdpRioLogMonitor()
         {
             super(determineTestPort());
 

@@ -39,8 +39,8 @@ import com.intellij.openapi.util.ModificationTracker;
 import com.intellij.openapi.util.SimpleModificationTracker;
 
 import net.javaru.iip.frc.FrcPluginGlobals;
+import net.javaru.iip.frc.roboRIO.riolog.RioLogConsoleProjectService;
 import net.javaru.iip.frc.ui.FrcSettingsForm;
-import net.javaru.iip.frc.ui.RioLogConsoleProjectService;
 import net.javaru.iip.frc.ui.notify.FrcNotifications;
 
 

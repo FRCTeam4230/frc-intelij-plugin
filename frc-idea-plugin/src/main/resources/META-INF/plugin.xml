@@ -86,11 +86,11 @@
     <!-- For detailed info on what the various attributes are, see https://sites.google.com/site/malenkov/java/150403 -->
     <extensions defaultExtensionNs="com.intellij">
         <facetType id="FRC_FACET" implementation="net.javaru.iip.frc.facet.FrcFacetType" />
-        <executor id="FrcRioLog" implementation="net.javaru.iip.frc.ui.RioLogFrcWindowRunExecutor" />
+        <executor id="FrcRioLog" implementation="net.javaru.iip.frc.roboRIO.riolog.RioLogFrcWindowRunExecutor" />
         
         <projectService id="rioLogConsoleProjectService" 
-                        serviceInterface="net.javaru.iip.frc.ui.RioLogConsoleProjectService" 
-                        serviceImplementation="net.javaru.iip.frc.ui.RioLogConsoleProjectService"/>
+                        serviceInterface="net.javaru.iip.frc.roboRIO.riolog.RioLogConsoleProjectService" 
+                        serviceImplementation="net.javaru.iip.frc.roboRIO.riolog.RioLogConsoleProjectService"/>
 
         <spellchecker.bundledDictionaryProvider implementation="net.javaru.iip.frc.spellchecker.FrcBundledDictionaryProvider" />
 

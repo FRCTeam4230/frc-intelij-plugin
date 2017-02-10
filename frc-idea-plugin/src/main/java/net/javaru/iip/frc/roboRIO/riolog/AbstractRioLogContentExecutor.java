@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.ui;
+package net.javaru.iip.frc.roboRIO.riolog;
 
 import java.awt.*;
 import java.nio.charset.StandardCharsets;
@@ -70,9 +70,9 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 
+import net.javaru.iip.frc.roboRIO.riolog.udp.RioLogMonitoringProcess;
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
 import net.javaru.iip.frc.settings.FrcSettings;
-import net.javaru.iip.frc.udp.RioLogMonitoringProcess;
 
 
 

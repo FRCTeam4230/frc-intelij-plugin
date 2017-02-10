@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.udp;
+package net.javaru.iip.frc.roboRIO.riolog.udp;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

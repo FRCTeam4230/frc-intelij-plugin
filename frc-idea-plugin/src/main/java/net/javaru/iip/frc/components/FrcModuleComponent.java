@@ -24,7 +24,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
 
 import net.javaru.iip.frc.facet.FrcFacet;
-import net.javaru.iip.frc.ui.RioLogConsoleProjectService;
+import net.javaru.iip.frc.roboRIO.riolog.RioLogConsoleProjectService;
 
 
 

@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.javaru.iip.frc.udp.tester;
+package net.javaru.iip.frc.roboRIO.riolog.udp.tester;
 
 import java.io.IOException;
 import java.net.BindException;
@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.collect.ImmutableList;
 
 import net.javaru.iip.frc.FrcPluginGlobals;
-import net.javaru.iip.frc.udp.RioLogMonitoringProcess;
+import net.javaru.iip.frc.roboRIO.riolog.udp.RioLogMonitoringProcess;
 
 import static com.google.common.base.Charsets.UTF_8;
 

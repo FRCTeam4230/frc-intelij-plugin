@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.ui;
+package net.javaru.iip.frc.roboRIO.riolog;
 
 import java.util.Collection;
 
@@ -31,9 +31,9 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Disposer;
 
 import net.javaru.iip.frc.facet.FrcFacet;
+import net.javaru.iip.frc.roboRIO.riolog.udp.RioLogMonitoringProcess;
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
 import net.javaru.iip.frc.settings.FrcSettings;
-import net.javaru.iip.frc.udp.RioLogMonitoringProcess;
 
 
 

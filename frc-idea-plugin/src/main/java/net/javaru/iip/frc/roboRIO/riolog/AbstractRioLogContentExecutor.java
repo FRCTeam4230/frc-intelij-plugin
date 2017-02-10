@@ -643,7 +643,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         public RioLogToggleAutoClearAction()
         {
             super("Toggle Auto Clear", 
-                  "Toggles whether the console output is automatically cleared upon detecting roboRIO startup/restart via the 'startup' regex which is configurable in the settings.",
+                  "Toggles whether the console output is automatically cleared upon detecting roboRIO startup/restart.",
                   AUTO_CLEAR_ICON);
         }
 

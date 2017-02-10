@@ -19,33 +19,45 @@ package net.javaru.iip.frc.roboRIO.riolog.udp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.execution.Executor;
-import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ToolWindowId;
+
+import net.javaru.iip.frc.roboRIO.riolog.AbstractRioLogContentExecutor;
+import net.javaru.iip.frc.roboRIO.riolog.RioLogGlobals;
+import net.javaru.iip.frc.roboRIO.riolog.RioLogMonitoringProcess;
+import net.javaru.iip.frc.ui.FrcToolWindowExecutor;
 
 
 
-public class RioLogRunWindowContentExecutor extends AbstractRioLogContentExecutor
+public class UdpRioLogFrcWindowContentExecutor extends AbstractRioLogContentExecutor
 {
-    public static final String TOOL_WINDOW_ID = ToolWindowId.RUN;
 
 
-    RioLogRunWindowContentExecutor(@NotNull Project project, boolean activateToolWindow)
+    public UdpRioLogFrcWindowContentExecutor(@NotNull Project project, boolean activateToolWindow)
     {
         this(project, activateToolWindow, null);
     }
 
 
-    RioLogRunWindowContentExecutor(@NotNull Project project, boolean activateToolWindow, @Nullable Runnable afterCompletionRunnable)
+    public UdpRioLogFrcWindowContentExecutor(@NotNull Project project, boolean activateToolWindow, @Nullable Runnable afterCompletionRunnable)
     {
         super(project, activateToolWindow, afterCompletionRunnable);
     }
 
 
     @Override
-    protected String getToolWindowId() {return TOOL_WINDOW_ID;}
+    public String getToolWindowId() { return FrcToolWindowExecutor.FRC_TOOL_WINDOW_ID; }
 
 
     @Override
-    protected Executor createExecutor() { return DefaultRunExecutor.getRunExecutorInstance(); }
+    public String getTabTitle() { return RioLogGlobals.UDP_TAB_TITLE; }
+
+    @Override
+    protected Executor createExecutor() { return FrcToolWindowExecutor.getRunExecutorInstance(); }
+
+
+    @NotNull
+    protected RioLogMonitoringProcess createRioLogMonitoringProcess()
+    {
+        return new UdpRioLogMonitoringProcess(this::invokeClearAll);
+    }
 }

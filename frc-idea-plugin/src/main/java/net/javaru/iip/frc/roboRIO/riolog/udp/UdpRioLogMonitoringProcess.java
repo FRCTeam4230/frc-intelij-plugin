@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Mark Vedder
+ * Copyright 2015-2017 Mark Vedder
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,14 +16,7 @@
 
 package net.javaru.iip.frc.roboRIO.riolog.udp;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintWriter;
 import java.net.BindException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -31,12 +24,6 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import javax.swing.*;
 
@@ -51,241 +38,52 @@ import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.wm.IdeFrame;
 import com.intellij.openapi.wm.ex.WindowManagerEx;
 
-import net.javaru.iip.frc.roboRIO.riolog.RioLogUtils;
+import net.javaru.iip.frc.roboRIO.riolog.RioLogMonitoringProcess;
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
-import net.javaru.iip.frc.settings.FrcSettings;
 import net.javaru.iip.frc.ui.notify.FrcNotifications;
 
 
 
-public class RioLogMonitoringProcess extends Process
+public class UdpRioLogMonitoringProcess extends RioLogMonitoringProcess
 {
-    private static final Logger LOG = Logger.getInstance(RioLogMonitoringProcess.class);
-
-    public final static int MAX_PACKET_SIZE = 65507;
-
-    /**
-     * Set this System property to 'on' or 'true' to turn on the testing server that will send a constant output of
-     * mock log messages to the rioLog port. Used for testing without being attached to a RoboRIO.
-     */
-    public static final String SIMULATED_LOG_SERVICE_PROP_KEY_BASE = "frc.simulated.log.service";
-    public static final String SIMULATED_LOG_SERVICE_ENABLED_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".enabled";
-    public static final String SIMULATED_LOG_SERVICE_PORT_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".port";
-    public static final String SIMULATED_LOG_SERVICE_USE_CONFIGURED_PORT_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".use.configured.port";
-    public static final int SIMULATED_LOG_SERVICE_PORT_DEFAULT = 4248; //arbitrarily chosen port not listed at https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
+    private static final Logger LOG = Logger.getInstance(UdpRioLogMonitoringProcess.class);
 
     private static final boolean USE_DEBUGGING_SERVER = BooleanUtils.toBoolean(System.getProperty(SIMULATED_LOG_SERVICE_ENABLED_PROP_KEY,
                                                                                                   Boolean.FALSE.toString()));
 
 
-    private boolean enabled = true;
-
-    private PipedInputStream in;
-    private PrintWriter consoleWriter;
-    private PrintWriter fileWriter;
-    private RioLogMonitor rioLogMonitor;
-
-
-    private final Runnable clearConsoleRunnable;
-
-    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-
-
-    public RioLogMonitoringProcess(Runnable clearConsoleRunnable) throws IllegalStateException
+    public UdpRioLogMonitoringProcess(Runnable clearConsoleRunnable) throws IllegalStateException
     {
-        this.clearConsoleRunnable = clearConsoleRunnable;
-    }
-
-
-    private static FrcSettings getSettings() {return FrcApplicationComponent.getInstance().getState();}
-
-
-    public void restart()
-    {
-        stop();
-        start();
-    }
-
-
-    public void start()
-    {
-        try
-        {
-            in = new PipedInputStream();
-            consoleWriter = new PrintWriter(new OutputStreamWriter(new PipedOutputStream(in), StandardCharsets.UTF_8), /*AutoFlush*/ true);
-
-            if (getSettings().isLogToFile())
-            {
-                fileWriter = createFilePrintWriter();
-            }
-
-        }
-        catch (Exception e)
-        {
-            throw new IllegalStateException("Could not create necessary io streams.", e);
-        }
-
-        try
-        {
-            enabled = true;
-            if (USE_DEBUGGING_SERVER)
-            {
-                rioLogMonitor = new TestingRioLogMonitor();
-                LOG.warn(String.format("[FRC] System Property '%s is set to 'true'. Using '%s' for monitoring on port '%d'.",
-                                       SIMULATED_LOG_SERVICE_PROP_KEY_BASE,
-                                       rioLogMonitor.getClass().getSimpleName(),
-                                       rioLogMonitor.port));
-            }
-            else
-            {
-                rioLogMonitor = new RioLogMonitor();
-                LOG.info(String.format("[FRC] Using '%s' for monitoring on port '%d'.",
-                                       rioLogMonitor.getClass().getSimpleName(),
-                                       rioLogMonitor.port));
-            }
-        }
-        catch (Exception e)
-        {
-            enabled = false;
-            LOG.warn("[FRC] Could not initialize riolog monitor. Cause Summary: " + e.toString(), e);
-            Notifications.Bus.notify(new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
-                                                      FrcNotifications.IconError,
-                                                      FrcNotifications.Title,
-                                                      "RioLog Initialization Failure",
-                                                      "Could not initialize the RioLog socket monitor. See idea.log for more details.",
-                                                      NotificationType.ERROR,
-                                                      null
-                                                      ));
-        }
-        
-        
-        if (enabled && rioLogMonitor != null)
-        {
-            Thread thread = new Thread(rioLogMonitor);
-            thread.setName("RioLogMonitoringProcess");
-            thread.start();
-        }
-    }
-
-
-    public void stop()
-    {
-        destroy();
+        super(clearConsoleRunnable);
     }
 
     
-    public int getMonitoredPort()
+
+    @NotNull
+    @Override
+    protected MonitoringRunnable initMonitoringRunnable()
+
     {
-        return rioLogMonitor == null ? -1 : rioLogMonitor.port;
-    }
-
-    private PrintWriter createFilePrintWriter() throws IOException
-    {
-        final boolean append = getSettings().isLogFileAppend();
-        Path outputFile = determineOutputFilePath();
-        Files.createDirectories(outputFile.getParent());
-        return new PrintWriter(new OutputStreamWriter(new FileOutputStream(outputFile.toFile(), append), StandardCharsets.UTF_8), /*AutoFlush*/ true);
-    }
-
-
-    private Path determineOutputFilePath()
-    {
-        final Path directory = getSettings().getLogFileDirectory();
-        final String baseName = getSettings().getLogFileBaseName();
-        final String name = baseName.replace("${time}", dateFormat.format(new Date()));
-        return directory.resolve(name);
-    }
-
-
-    private void rollFileWriter() throws IOException
-    {
-        if (fileWriter != null)
+        MonitoringRunnable rioLogMonitor;
+        if (USE_DEBUGGING_SERVER)
         {
-            fileWriter.flush();
-            fileWriter.close();
-            fileWriter = createFilePrintWriter();
+            rioLogMonitor = new TestingRioLogMonitor();
+            LOG.warn(String.format("[FRC] System Property '%s is set to 'true'. Using '%s' for monitoring on port '%d'.",
+                                   SIMULATED_LOG_SERVICE_PROP_KEY_BASE,
+                                   rioLogMonitor.getClass().getSimpleName(),
+                                   rioLogMonitor.getPort()));
         }
-    }
-
-
-    @Override
-    public InputStream getInputStream() { return in; }
-
-
-    @Override
-    public OutputStream getOutputStream()
-    {
-        return new OutputStream()
+        else
         {
-            @Override
-            public void write(int b) throws IOException
-            {
-
-            }
-        };
-    }
-
-
-    @Override
-    public InputStream getErrorStream()
-    {
-        return new InputStream()
-        {
-            @Override
-            public int read() throws IOException
-            {
-                return 0;
-            }
-        };
-    }
-
-
-    @Override
-    public int waitFor() throws InterruptedException
-    {
-        while (enabled)
-        {
-            TimeUnit.MILLISECONDS.sleep(500);
+            rioLogMonitor = new RioLogMonitor();
+            LOG.info(String.format("[FRC] Using '%s' for monitoring on port '%d'.",
+                                   rioLogMonitor.getClass().getSimpleName(),
+                                   rioLogMonitor.getPort()));
         }
-        return 0;
+        return rioLogMonitor;
     }
 
-
-    @Override
-    public int exitValue()
-    {
-        return 0;
-    }
-
-
-    @Override
-    public void destroy()
-    {
-        enabled = false;
-        try
-        {
-            
-            if (rioLogMonitor != null)
-            {
-                int count = 0;
-                while (rioLogMonitor.isRunning && count <  60 /* 60 * 50 = 3,000ms (3 seconds)*/)
-                {
-                    try {TimeUnit.MILLISECONDS.sleep(50);} catch (InterruptedException ignore) {}
-                    count++;
-                }
-            }
-        }
-        catch (Exception ignore) {}
-        try { if (in != null) {in.close();} } catch (Exception ignore) {}
-        try { if (consoleWriter != null) {consoleWriter.close();} } catch (Exception ignore) {}
-        try { if (fileWriter != null) {fileWriter.close();} } catch (Exception ignore) {}
-    }
-
-
-    public boolean isEnabled() { return enabled; }
-
-
-    private class RioLogMonitor implements Runnable
+    private class RioLogMonitor extends AbstractMonitoringRunnable
     {
         protected boolean isRunning = true;
 
@@ -302,6 +100,14 @@ public class RioLogMonitoringProcess extends Process
         {
             this.port = port;
         }
+
+
+        @Override
+        public boolean isRunning() { return isRunning; }
+
+
+        @Override
+        public int getPort() { return port; }
 
 
         @Override
@@ -326,28 +132,7 @@ public class RioLogMonitoringProcess extends Process
                         final String received = new String(incomingPacket.getData(), 0, incomingPacket.getLength());
 
 
-                        if (getSettings().isClearOnRobotRestart() && RioLogUtils.isRestartNotification(received))
-                        {
-                            clearConsoleRunnable.run();
-                            rollFileWriter();
-                            logStartingMonitoring();
-                        }
-
-                        consoleWriter.print(received);
-                        if (addLineBreak())
-                        {
-                            consoleWriter.println();
-                        }
-                        consoleWriter.flush();
-                        if (fileWriter != null)
-                        {
-                            fileWriter.print(received);
-                            if (addLineBreak())
-                            {
-                                fileWriter.println();
-                            }
-                            fileWriter.flush();
-                        }
+                        processReceivedText(received);
                     }
                     catch (SocketTimeoutException ignore)
                     {
@@ -375,8 +160,8 @@ public class RioLogMonitoringProcess extends Process
             catch (BindException e)
             {
                 final String msg = "Could not bind to the RioLog port. This is likely due to a second IDEA window with an "
-                                   + "FRC project being open. It is a known limitation that only one FRC project can be " 
-                                   + "opened at a time. A fix for all FRC projects to share the port is planned for a " 
+                                   + "FRC project being open. It is a known limitation that only one FRC project can be "
+                                   + "opened at a time. A fix for all FRC projects to share the port is planned for a "
                                    + "future release.";
                 LOG.warn(msg + " Cause Summary: " + e.toString(), e);
                 publishBindWarning(msg);
@@ -390,6 +175,9 @@ public class RioLogMonitoringProcess extends Process
             //This sets isRunning to false after the while(enabled) loop exits so the destroy method knows its ok to exit
             isRunning = false;
         }
+
+
+        
 
 
         protected void logStartingMonitoring()
@@ -406,6 +194,7 @@ public class RioLogMonitoringProcess extends Process
         }
 
 
+        @Override
         @NotNull
         protected String getStartingMonitoringMessage() {return "==Monitoring RioLog on port " + port + "==";}
 
@@ -426,13 +215,9 @@ public class RioLogMonitoringProcess extends Process
         }
 
 
-        protected boolean addLineBreak()
-        {
-            //TODO: add to settings
-            return false;
-        }
-        
-        
+       
+
+
         protected void publishBindWarning(String msg)
         {
             final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
@@ -464,13 +249,12 @@ public class RioLogMonitoringProcess extends Process
     private class TestingRioLogMonitor extends RioLogMonitor
     {
         private final InetAddress groupAddress;
-        
 
 
         public TestingRioLogMonitor()
         {
             super(determineTestPort());
-            
+
             try
             {
                 groupAddress = InetAddress.getByName("230.0.0.1");

@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.collect.ImmutableList;
 
 import net.javaru.iip.frc.FrcPluginGlobals;
-import net.javaru.iip.frc.roboRIO.riolog.udp.RioLogMonitoringProcess;
+import net.javaru.iip.frc.roboRIO.riolog.RioLogMonitoringProcess;
 
 import static com.google.common.base.Charsets.UTF_8;
 

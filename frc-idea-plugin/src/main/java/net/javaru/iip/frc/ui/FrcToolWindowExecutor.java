@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.roboRIO.riolog.udp;
+package net.javaru.iip.frc.ui;
 
 import javax.swing.*;
 
@@ -28,14 +28,17 @@ import net.javaru.iip.frc.FrcIcons;
 
 
 // This class is registered in the plugin.xml file in the extensions element
-public class RioLogFrcWindowRunExecutor extends Executor
+// Access is obtained via:  ExecutionManager.getInstance(myProject);
+// For example, as used in AbstractRioLogContentExecutor:  
+//           ExecutionManager.getInstance(myProject).getContentManager().showRunContent(myExecutor, myRunContentDescriptor);
+public class FrcToolWindowExecutor extends Executor
 {
-    public static final String TOOL_WINDOW_ID = "FRC";
+    public static final String FRC_TOOL_WINDOW_ID = "FRC";
     // The executor ID must match the id attribute of the <extensions>/<executor> element in the plugin.xml file
-    public static final String EXECUTOR_ID = "FrcRioLog";
+    public static final String EXECUTOR_ID = "FrcToolWindow";
 
     @Override
-    public String getToolWindowId() { return TOOL_WINDOW_ID; }
+    public String getToolWindowId() { return FRC_TOOL_WINDOW_ID; }
 
 
     @Override
@@ -52,12 +55,12 @@ public class RioLogFrcWindowRunExecutor extends Executor
 
 
     @Override
-    public String getDescription() { return "FRC RIOLog Console"; }
+    public String getDescription() { return "FRC Tool Window"; }
 
 
     @NotNull
     @Override
-    public String getActionName() { return "Rio Log"; }
+    public String getActionName() { return "FRC Tool Window"; }
 
 
     @NotNull
@@ -67,11 +70,11 @@ public class RioLogFrcWindowRunExecutor extends Executor
 
     @NotNull
     @Override
-    public String getStartActionText() { return "Tail RIOLog"; }
+    public String getStartActionText() { return "FRC Tool Window"; }
 
 
     @Override
-    public String getContextActionId() { return "FrcRioLogViewer"; }
+    public String getContextActionId() { return "FrcToolWindowContextActionId"; }
 
 
     @Override

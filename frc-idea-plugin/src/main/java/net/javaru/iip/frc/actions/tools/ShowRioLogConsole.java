@@ -19,7 +19,7 @@ package net.javaru.iip.frc.actions.tools;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 
-import net.javaru.iip.frc.roboRIO.riolog.udp.RioLogConsoleProjectService;
+import net.javaru.iip.frc.roboRIO.riolog.RioLogConsoleProjectService;
 
 
 

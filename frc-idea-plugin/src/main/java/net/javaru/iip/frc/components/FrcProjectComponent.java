@@ -40,7 +40,7 @@ import net.javaru.iip.frc.actions.tools.AttachUserLibDirAction;
 import net.javaru.iip.frc.actions.tools.AttachWpilibAction;
 import net.javaru.iip.frc.actions.tools.DownloadWpiLibAction;
 import net.javaru.iip.frc.facet.FrcFacet;
-import net.javaru.iip.frc.roboRIO.riolog.udp.RioLogConsoleProjectService;
+import net.javaru.iip.frc.roboRIO.riolog.RioLogConsoleProjectService;
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
 import net.javaru.iip.frc.ui.notify.FrcNotifications;
 import net.javaru.iip.frc.wpilib.attached.WpiLibrariesUtils;

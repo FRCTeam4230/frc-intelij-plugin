@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.roboRIO.riolog.udp;
+package net.javaru.iip.frc.roboRIO.riolog;
 
 import java.util.Collection;
 
@@ -29,10 +29,14 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.wm.ToolWindowId;
 
 import net.javaru.iip.frc.facet.FrcFacet;
+import net.javaru.iip.frc.roboRIO.riolog.udp.UdpRioLogFrcWindowContentExecutor;
+import net.javaru.iip.frc.roboRIO.riolog.udp.UdpRioLogRunWindowContentExecutor;
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
 import net.javaru.iip.frc.settings.FrcSettings;
+import net.javaru.iip.frc.ui.FrcToolWindowExecutor;
 
 
 
@@ -295,7 +299,7 @@ public class RioLogConsoleProjectService
             LOG.debug("[FRC] Case 1: have console and need it. Checking if correct type & port. Project is: " + myProject.getName());
 
             //do we have the right console?
-            if (useRunWindow && RioLogFrcWindowContentExecutor.TOOL_WINDOW_ID.equals(contentExecutor.getToolWindowId()))
+            if (useRunWindow && FrcToolWindowExecutor.FRC_TOOL_WINDOW_ID.equals(contentExecutor.getToolWindowId()))
             {
                 //We have a FRC Tool Window, but need a Run Window
                 LOG.debug("[FRC] Case 1.1: have a FRC Tool Window, but need a Run Tab. Closing FRC Tool Window and creating Run tab. Project is: "
@@ -303,7 +307,7 @@ public class RioLogConsoleProjectService
                 closeContentExecutor();
                 createContentExecutor(true);
             }
-            else if (!useRunWindow && RioLogRunWindowContentExecutor.TOOL_WINDOW_ID.equals(contentExecutor.getToolWindowId()))
+            else if (!useRunWindow && ToolWindowId.RUN.equals(contentExecutor.getToolWindowId()))
             {
                 //We have a run window, but need a FRC tool window
                 LOG.debug("[FRC] Case 1.2: have a Run tab, but need a FRC Tool Window. Closing Run tab and creating FRC Tool Window. Project is: "
@@ -395,7 +399,7 @@ public class RioLogConsoleProjectService
         LOG.debug("[FRC] Creating AbstractRioLogContentExecutor");
         try
         {
-            contentExecutor = useRunWindow ? new RioLogRunWindowContentExecutor(myProject, true) : new RioLogFrcWindowContentExecutor(myProject, true);
+            contentExecutor = useRunWindow ? new UdpRioLogRunWindowContentExecutor(myProject, true) : new UdpRioLogFrcWindowContentExecutor(myProject, true);
             Disposer.register(myProject, contentExecutor);
             contentExecutor.run();
         }

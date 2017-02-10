@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.roboRIO.riolog.udp;
+package net.javaru.iip.frc.roboRIO.riolog;
 
 import java.awt.*;
 import java.nio.charset.StandardCharsets;
@@ -91,7 +91,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     @Nullable
     private Runnable myAfterCompletionRunnable;
     private Computable<Boolean> myStopEnabled;
-    private String myTitle = "RioLog";
+    
     private String myHelpId = null;
     private boolean myActivateToolWindow = true;
     private Executor myExecutor;
@@ -155,7 +155,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     {
         FileDocumentManager.getInstance().saveAllDocuments();
 
-        rioLogMonitoringProcess = new RioLogMonitoringProcess(this::invokeClearAll);
+        rioLogMonitoringProcess = createRioLogMonitoringProcess();
         
         //Not 100% sure what should be passed in for the commandLine parameter; the example I originally used used null. 
         //   And null was allowed. But a change was made in Mov 2015 that BaseOSProcessHandler now logs an exception if 
@@ -204,7 +204,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         DefaultActionGroup actions = new DefaultActionGroup();
 
         consolePanel = createConsolePanel(myConsoleView, actions);
-        myRunContentDescriptor = new RunContentDescriptor(myConsoleView, myProcessHandler, consolePanel, myTitle, AllIcons.General.MessageHistory);
+        myRunContentDescriptor = new RunContentDescriptor(myConsoleView, myProcessHandler, consolePanel, getTabTitle(), AllIcons.General.MessageHistory);
 
         Disposer.register(myProject, this);
         Disposer.register(this, myRunContentDescriptor);
@@ -234,6 +234,10 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         myProcessHandler.startNotify();
     }
 
+
+    @NotNull
+    protected abstract RioLogMonitoringProcess createRioLogMonitoringProcess();
+    
 
     private void addActionsToActionGroup(DefaultActionGroup actions)
     {
@@ -343,7 +347,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                                                            .getToolWindow(getToolWindowId());
             toolWindow.activate(null);
             final ContentManager contentManager = toolWindow.getContentManager();
-            final Content content = contentManager.findContent(getTitle());
+            final Content content = contentManager.findContent(getTabTitle());
             if (content != null)
             {
                 contentManager.setSelectedContent(content, true);
@@ -351,17 +355,17 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         }
     }
 
-    public String getTitle()
-    {
-        return myTitle;
-    }
+    
+    
 
     public void invokeClearAll()
     {
         myConsoleView.clear();
     }
 
-    protected abstract String getToolWindowId();
+    public abstract String getToolWindowId();
+
+    public abstract String getTabTitle();
 
     public void close()
     {
@@ -425,7 +429,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                 final java.util.List<RunContentDescriptor> allDescriptors = contentManager.getAllDescriptors();
                 for (RunContentDescriptor runContentDescriptor : allDescriptors)
                 {
-                    if (myTitle.equals(runContentDescriptor.getDisplayName()))
+                    if (getTabTitle().equals(runContentDescriptor.getDisplayName()))
                     {
                         try
                         {

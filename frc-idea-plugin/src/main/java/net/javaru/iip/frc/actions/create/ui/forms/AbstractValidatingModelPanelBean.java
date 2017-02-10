@@ -14,28 +14,25 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.roboRIO.riolog;
+package net.javaru.iip.frc.actions.create.ui.forms;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.intellij.openapi.diagnostic.Logger;
 
-import net.javaru.iip.frc.settings.FrcApplicationComponent;
+import net.javaru.iip.frc.actions.create.ui.ValidationListener;
 
 
 
-public class RioLogUtils
+public abstract class AbstractValidatingModelPanelBean
 {
-    private static final Logger LOG = Logger.getInstance(RioLogUtils.class);
+    private static final Logger LOG = Logger.getInstance(AbstractValidatingModelPanelBean.class);
+    protected final List<ValidationListener> validationListeners = new ArrayList<>();
 
 
-    public static  boolean isRestartNotification(String text)
+    public void addValidationListener(ValidationListener validationListener)
     {
-        if (FrcApplicationComponent.getInstance().getState().isUseRegexForRestartCheck())
-        {
-            return FrcApplicationComponent.getInstance().getState().getRioRestartRegex().matcher(text).find();
-        }
-        else
-        {
-            return text.contains("Launching") && text.contains("-jar") && text.contains("FRCUserProgram.jar");
-        }
+        validationListeners.add(validationListener);
     }
 }

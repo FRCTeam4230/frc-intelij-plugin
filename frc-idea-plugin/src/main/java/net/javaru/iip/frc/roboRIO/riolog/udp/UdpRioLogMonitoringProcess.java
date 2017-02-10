@@ -130,8 +130,6 @@ public class UdpRioLogMonitoringProcess extends RioLogMonitoringProcess
                     {
                         socket.receive(incomingPacket);
                         final String received = new String(incomingPacket.getData(), 0, incomingPacket.getLength());
-
-
                         processReceivedText(received);
                     }
                     catch (SocketTimeoutException ignore)

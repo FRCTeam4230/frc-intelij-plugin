@@ -272,7 +272,7 @@ public abstract class RioLogMonitoringProcess extends Process
     {
         protected void processReceivedText(String received) throws IOException
         {
-            if (getSettings().isClearOnRobotRestart() && RioLogUtils.isRestartNotification(received))
+            if (getSettings().isClearOnRobotRestart() && isRestartNotification(received))
             {
                 clearConsoleRunnable.run();
                 rollFileWriter();
@@ -318,6 +318,19 @@ public abstract class RioLogMonitoringProcess extends Process
         {
             //TODO: add to settings
             return false;
+        }
+
+
+        protected boolean isRestartNotification(String text)
+        {
+            if (FrcApplicationComponent.getInstance().getState().isUseRegexForRestartCheck())
+            {
+                return FrcApplicationComponent.getInstance().getState().getRioRestartRegex().matcher(text).find();
+            }
+            else
+            {
+                return text.contains("Launching") && text.contains("-jar") && text.contains("FRCUserProgram.jar");
+            }
         }
     }
 }

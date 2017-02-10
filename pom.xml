@@ -623,6 +623,13 @@
                 <artifactId>jdom2</artifactId>
                 <version>2.0.6</version>
             </dependency>
+            <dependency>
+                <!-- Alternative project with Javadoc: https://github.com/ePaul/jsch-documentation
+                     I have them generated at:  file:///P:/dev/proj/open/jsch/javadocs/index.html   -->
+                <groupId>com.jcraft</groupId>
+                <artifactId>jsch</artifactId>
+                <version>0.1.54</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -669,6 +676,13 @@
         <dependency>
             <groupId>org.jdom</groupId>
             <artifactId>jdom2</artifactId>
+        </dependency>
+
+        <dependency>
+            <!-- Alternative project with Javadoc: https://github.com/ePaul/jsch-documentation
+                 I have them generated at:  file:///P:/dev/proj/open/jsch/javadocs/index.html   -->
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
         </dependency>
     </dependencies>
 

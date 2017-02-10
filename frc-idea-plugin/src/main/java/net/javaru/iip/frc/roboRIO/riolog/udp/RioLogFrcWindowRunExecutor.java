@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.roboRIO.riolog;
+package net.javaru.iip.frc.roboRIO.riolog.udp;
 
 import javax.swing.*;
 

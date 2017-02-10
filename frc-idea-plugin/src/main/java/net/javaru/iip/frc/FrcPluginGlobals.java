@@ -25,7 +25,7 @@ import com.intellij.openapi.application.PathManager;
 public final class FrcPluginGlobals
 {
     public static final String FRC_PLUGIN_BASE_NAME = "FrcPlugin";
-    public static final String FRC_PLUGIN_DISPLAY_NAME = "FRC Plugin";
+    public static final String FRC_PLUGIN_DISPLAY_NAME = "FRC";
 
     //TODO enter the following info
     public static final String CONTACT_EMAIL = "TODO - NEED TO POPULATE CONTACT_EMAIL";

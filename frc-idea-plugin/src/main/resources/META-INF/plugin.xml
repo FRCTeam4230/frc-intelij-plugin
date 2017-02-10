@@ -92,6 +92,14 @@
                         serviceInterface="net.javaru.iip.frc.roboRIO.riolog.RioLogConsoleProjectService" 
                         serviceImplementation="net.javaru.iip.frc.roboRIO.riolog.RioLogConsoleProjectService"/>
 
+        <projectService id="udpRioLogConsoleProjectService" 
+                        serviceInterface="net.javaru.iip.frc.roboRIO.riolog.udp.UdpRioLogConsoleProjectService" 
+                        serviceImplementation="net.javaru.iip.frc.roboRIO.riolog.udp.UdpRioLogConsoleProjectService"/>
+
+        <projectService id="sshRioLogConsoleProjectService" 
+                        serviceInterface="net.javaru.iip.frc.roboRIO.riolog.ssh.SshRioLogConsoleProjectService" 
+                        serviceImplementation="net.javaru.iip.frc.roboRIO.riolog.ssh.SshRioLogConsoleProjectService"/>
+
         <spellchecker.bundledDictionaryProvider implementation="net.javaru.iip.frc.spellchecker.FrcBundledDictionaryProvider" />
 
         <applicationConfigurable id="frc.plugin.frcApplicationConfigurable"

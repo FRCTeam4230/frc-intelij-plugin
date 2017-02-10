@@ -14,48 +14,49 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.roboRIO.riolog.udp;
+package net.javaru.iip.frc.roboRIO.riolog.ssh;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.execution.Executor;
+import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.wm.ToolWindowId;
 
 import net.javaru.iip.frc.roboRIO.riolog.AbstractRioLogContentExecutor;
 import net.javaru.iip.frc.roboRIO.riolog.RioLogGlobals;
 import net.javaru.iip.frc.roboRIO.riolog.RioLogMonitoringProcess;
-import net.javaru.iip.frc.ui.FrcToolWindowExecutor;
 
 
 
-public class UdpRioLogFrcWindowContentExecutor extends AbstractRioLogContentExecutor
+public class SshRioLogRunWindowContentExecutor extends AbstractRioLogContentExecutor
 {
-    public UdpRioLogFrcWindowContentExecutor(@NotNull Project project, boolean activateToolWindow)
+    public SshRioLogRunWindowContentExecutor(@NotNull Project project, boolean activateToolWindow)
     {
         this(project, activateToolWindow, null);
     }
 
 
-    public UdpRioLogFrcWindowContentExecutor(@NotNull Project project, boolean activateToolWindow, @Nullable Runnable afterCompletionRunnable)
+    public SshRioLogRunWindowContentExecutor(@NotNull Project project, boolean activateToolWindow, @Nullable Runnable afterCompletionRunnable)
     {
         super(project, activateToolWindow, afterCompletionRunnable);
     }
 
 
     @Override
-    public String getToolWindowId() { return FrcToolWindowExecutor.FRC_TOOL_WINDOW_ID; }
+    public String getToolWindowId() {return ToolWindowId.RUN;}
 
 
     @Override
-    public String getTabTitle() { return RioLogGlobals.UDP_TAB_TITLE; }
+    public String getTabTitle() { return RioLogGlobals.SSH_TAB_TITLE; }
 
     @Override
-    protected Executor createExecutor() { return FrcToolWindowExecutor.getRunExecutorInstance(); }
+    protected Executor createExecutor() { return DefaultRunExecutor.getRunExecutorInstance(); }
 
 
     @NotNull
     protected RioLogMonitoringProcess createRioLogMonitoringProcess()
     {
-        return new UdpRioLogMonitoringProcess(this::invokeClearAll);
+        return new SshRioLogMonitoringProcess(this::invokeClearAll);
     }
 }

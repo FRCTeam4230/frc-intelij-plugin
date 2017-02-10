@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.roboRIO.riolog.udp;
+package net.javaru.iip.frc.roboRIO.riolog.ssh;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,15 +28,15 @@ import net.javaru.iip.frc.ui.FrcToolWindowExecutor;
 
 
 
-public class UdpRioLogFrcWindowContentExecutor extends AbstractRioLogContentExecutor
+public class SshRioLogFrcWindowContentExecutor extends AbstractRioLogContentExecutor
 {
-    public UdpRioLogFrcWindowContentExecutor(@NotNull Project project, boolean activateToolWindow)
+    public SshRioLogFrcWindowContentExecutor(@NotNull Project project, boolean activateToolWindow)
     {
         this(project, activateToolWindow, null);
     }
 
 
-    public UdpRioLogFrcWindowContentExecutor(@NotNull Project project, boolean activateToolWindow, @Nullable Runnable afterCompletionRunnable)
+    public SshRioLogFrcWindowContentExecutor(@NotNull Project project, boolean activateToolWindow, @Nullable Runnable afterCompletionRunnable)
     {
         super(project, activateToolWindow, afterCompletionRunnable);
     }
@@ -47,7 +47,7 @@ public class UdpRioLogFrcWindowContentExecutor extends AbstractRioLogContentExec
 
 
     @Override
-    public String getTabTitle() { return RioLogGlobals.UDP_TAB_TITLE; }
+    public String getTabTitle() { return RioLogGlobals.SSH_TAB_TITLE; }
 
     @Override
     protected Executor createExecutor() { return FrcToolWindowExecutor.getRunExecutorInstance(); }
@@ -56,6 +56,6 @@ public class UdpRioLogFrcWindowContentExecutor extends AbstractRioLogContentExec
     @NotNull
     protected RioLogMonitoringProcess createRioLogMonitoringProcess()
     {
-        return new UdpRioLogMonitoringProcess(this::invokeClearAll);
+        return new SshRioLogMonitoringProcess(this::invokeClearAll);
     }
 }

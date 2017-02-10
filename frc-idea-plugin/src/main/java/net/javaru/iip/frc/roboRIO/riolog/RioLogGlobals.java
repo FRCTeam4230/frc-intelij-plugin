@@ -20,5 +20,6 @@ public class RioLogGlobals
 {
 
     public static final String UDP_TAB_TITLE = "RioLog: Net Console";
+    public static final String SSH_TAB_TITLE = "RioLog: SSH Tailing";
 
 }

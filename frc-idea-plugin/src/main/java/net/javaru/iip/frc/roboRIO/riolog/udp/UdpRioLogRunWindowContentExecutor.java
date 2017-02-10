@@ -31,8 +31,6 @@ import net.javaru.iip.frc.roboRIO.riolog.RioLogMonitoringProcess;
 
 public class UdpRioLogRunWindowContentExecutor extends AbstractRioLogContentExecutor
 {
-
-
     public UdpRioLogRunWindowContentExecutor(@NotNull Project project, boolean activateToolWindow)
     {
         this(project, activateToolWindow, null);

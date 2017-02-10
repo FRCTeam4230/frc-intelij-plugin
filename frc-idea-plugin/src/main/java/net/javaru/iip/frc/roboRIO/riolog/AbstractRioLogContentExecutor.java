@@ -162,7 +162,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         //   commandLine is null or empty. We are not actually running a command. Just using the handler to monitor a 
         //   UDP port. 
         //   However, what ever we put, gets output on the screen, do for now we are just putting a basic message 
-        myProcessHandler = new BaseOSProcessHandler(rioLogMonitoringProcess, "RioLog Console", StandardCharsets.UTF_8)
+        myProcessHandler = new BaseOSProcessHandler(rioLogMonitoringProcess, getTabTitle(), StandardCharsets.UTF_8)
         {
             @Override
             public boolean isSilentlyDestroyOnClose()

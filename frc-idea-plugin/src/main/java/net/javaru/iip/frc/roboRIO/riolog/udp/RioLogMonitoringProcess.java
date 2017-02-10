@@ -324,8 +324,8 @@ public class RioLogMonitoringProcess extends Process
                         socket.receive(incomingPacket);
                         final String received = new String(incomingPacket.getData(), 0, incomingPacket.getLength());
 
-//                        if (getSettings().isClearOnRobotRestart() && getSettings().getRioRestartRegex().matcher(received).find())
-                        if (getSettings().isClearOnRobotRestart() && received.startsWith("\u2794"))
+
+                        if (getSettings().isClearOnRobotRestart() && isRestartNotification(received))
                         {
                             clearConsoleRunnable.run();
                             rollFileWriter();
@@ -456,6 +456,19 @@ public class RioLogMonitoringProcess extends Process
                                                                }
             );
             Notifications.Bus.notify(notification, null);
+        }
+    }
+
+
+    private boolean isRestartNotification(String text)
+    {
+        if (getSettings().isUseRegexForRestartCheck())
+        {
+            return getSettings().getRioRestartRegex().matcher(text).find();
+        }
+        else
+        {
+            return text.contains("Launching") && text.contains("-jar") && text.contains("FRCUserProgram.jar");
         }
     }
 

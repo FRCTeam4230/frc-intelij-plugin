@@ -76,6 +76,8 @@ public class FrcSettings implements Cloneable
     private int rioLogPort = DEFAULT_RIO_LOG_PORT;
 
     private Pattern rioRestartRegex = DEFAULT_RIO_RESTART_REGEX;
+    
+    private boolean useRegexForRestartCheck = false;
 
     private boolean clearOnRobotRestart = false;
 
@@ -125,6 +127,14 @@ public class FrcSettings implements Cloneable
     {
         this.rioLogPort = rioLogPort;
     }
+
+
+    public boolean isUseRegexForRestartCheck()
+    {
+        return useRegexForRestartCheck;
+    }
+
+    public void setUseRegexForRestartCheck(boolean useRegexForRestartCheck) { this.useRegexForRestartCheck = useRegexForRestartCheck; }
 
 
     public Pattern getRioRestartRegex()
@@ -245,6 +255,7 @@ public class FrcSettings implements Cloneable
             .append(wpiEclipsePluginReleaseRepoUri, that.wpiEclipsePluginReleaseRepoUri)
             .append(wpiEclipsePluginBetaRepoUri, that.wpiEclipsePluginBetaRepoUri)
             .append(teamNumber, that.teamNumber)
+            .append(useRegexForRestartCheck, that.useRegexForRestartCheck)
             .isEquals();
     }
 
@@ -265,6 +276,7 @@ public class FrcSettings implements Cloneable
             .append(wpiEclipsePluginReleaseRepoUri)
             .append(wpiEclipsePluginBetaRepoUri)
             .append(teamNumber)
+            .append(useRegexForRestartCheck)
             .toHashCode();
     }
     

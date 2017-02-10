@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.output.NullOutputStream;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
@@ -156,12 +157,29 @@ public abstract class RioLogMonitoringProcess extends Process
         return rioLogMonitor == null ? -1 : rioLogMonitor.getPort();
     }
 
-    private PrintWriter createFilePrintWriter() throws IOException
+    private PrintWriter createFilePrintWriter()
     {
-        final boolean append = getSettings().isLogFileAppend();
-        Path outputFile = determineOutputFilePath();
-        Files.createDirectories(outputFile.getParent());
-        return new PrintWriter(new OutputStreamWriter(new FileOutputStream(outputFile.toFile(), append), StandardCharsets.UTF_8), /*AutoFlush*/ true);
+        try
+        {
+            final boolean append = getSettings().isLogFileAppend();
+            Path outputFile = determineOutputFilePath();
+            Files.createDirectories(outputFile.getParent());
+            return new PrintWriter(new OutputStreamWriter(new FileOutputStream(outputFile.toFile(), append), StandardCharsets.UTF_8), /*AutoFlush*/ true);
+        }
+        catch (Exception e)
+        {
+            LOG.info("[FRC] Could not create PrintWriter for writing RiLog to file. Cause Summary: " + e.toString(), e);
+            Notifications.Bus.notify(new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
+                                                      FrcNotifications.IconWarn,
+                                                      FrcNotifications.Title,
+                                                      "RioLog File Logging",
+                                                      "Could not create writer to log RioLog to file. Cause:" + e.toString(),
+                                                      NotificationType.WARNING,
+                                                      null
+            ));
+            
+            return new PrintWriter(new NullOutputStream());
+        }
     }
 
 
@@ -174,7 +192,7 @@ public abstract class RioLogMonitoringProcess extends Process
     }
 
 
-    protected void rollFileWriter() throws IOException
+    protected void rollFileWriter()
     {
         if (fileWriter != null)
         {
@@ -277,7 +295,7 @@ public abstract class RioLogMonitoringProcess extends Process
         protected AbstractMonitoringRunnable(int port) {this.port = port;}
 
 
-        protected void processReceivedText(String received) throws IOException
+        protected void processReceivedText(String received)
         {
             if (getSettings().isClearOnRobotRestart() && isRestartNotification(received))
             {

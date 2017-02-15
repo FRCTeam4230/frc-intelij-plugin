@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.ImmutableList;
 
-import net.javaru.iip.frc.FrcPluginGlobals;
+import net.javaru.iip.frc.roboRIO.riolog.RioLogGlobals;
 import net.javaru.iip.frc.roboRIO.riolog.RioLogMonitoringProcess;
 
 import static com.google.common.base.Charsets.UTF_8;
@@ -332,7 +332,7 @@ public class SimulatedRioLogService extends Thread implements Runnable
                 messageCount++;
                 if (messageCount % simulatedRestartFrequency == 0)
                 {
-                    sendMessage(FrcPluginGlobals.ROBO_RIO_STARTUP_LOG_MSG);
+                    sendMessage(RioLogGlobals.ROBO_RIO_STARTUP_LOG_MSG);
                 }
                 if (messageCount % simulatedExceptionFrequency == 0)
                 {

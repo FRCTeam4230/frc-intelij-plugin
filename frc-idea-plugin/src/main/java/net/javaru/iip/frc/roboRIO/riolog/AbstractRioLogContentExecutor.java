@@ -116,6 +116,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         TextConsoleBuilder consoleBuilder = TextConsoleBuilderFactory.getInstance().createBuilder(project);
         ConsoleView console = consoleBuilder.getConsole();
         console.attachToProcess(processHandler);
+        
+       
         return console;
     }
 
@@ -547,7 +549,11 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         {
             ApplicationManager.getApplication().invokeLater(() -> 
                                                             {
-                                                                myProcessHandler.destroyProcess(); 
+                                                                myProcessHandler.destroyProcess();
+                                                                if (getRioLogMonitoringProcess() != null)
+                                                                {
+                                                                    getRioLogMonitoringProcess().monitoringStopped();
+                                                                }
                                                                 update(event);
                                                             });
         }

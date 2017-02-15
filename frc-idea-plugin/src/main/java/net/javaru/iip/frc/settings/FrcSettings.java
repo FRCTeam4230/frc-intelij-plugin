@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import com.intellij.openapi.diagnostic.Logger;
 
+import net.javaru.iip.frc.roboRIO.riolog.RioLogGlobals;
 import net.javaru.iip.frc.util.ClonerImpl;
 import net.javaru.iip.frc.util.UriUtils;
 
@@ -71,6 +72,10 @@ public class FrcSettings implements Cloneable
     public static final URI DEFAULT_WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI = UriUtils.createUriQuietly("http://first.wpi.edu/FRC/roborio/release/eclipse/");
     public static final URI DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI = UriUtils.createUriQuietly("http://first.wpi.edu/FRC/roborio/beta/eclipse/");
 
+    private static final String ROBORIO_HOST_mDNS_TEMPLATE = "roborio-%d-FRC.local";
+    private static final String ROBORIO_HOST_DNS_TEMPLATE = "roborio-%d-FRC.lan";
+    private static final String ROBORIO_HOST_IP_TEMPLATE = "10.%d.%d.2";
+    
     private boolean useFrcToolWindow = true;
     
     private int rioLogPort = DEFAULT_RIO_LOG_PORT;
@@ -95,7 +100,20 @@ public class FrcSettings implements Cloneable
     
     private Path wpiLibDir = Paths.get(System.getProperty("frc.alt.user.home.dir", System.getProperty("user.home", "C:\\Users\\Public"))).resolve("wpilib").toAbsolutePath();
     
-    private int teamNumber = -1;
+    public static final int UN_CONFIGURED_TEAM_NUMBER = 0;
+    
+    private int teamNumber = UN_CONFIGURED_TEAM_NUMBER;
+    
+    private String sshTailUsername = "admin";
+    private String sshTailPassword = "";
+    private String sshTailCommand = RioLogGlobals.DEFAULT_TAIL_COMMAND;
+    
+    public static final String USE_DEFAULT_HOST = "<<<Use Default Host>>>";
+    
+    private String roboRioHostMDns = USE_DEFAULT_HOST;
+    private String roboRioHostDns = USE_DEFAULT_HOST;
+    private String roboRioHostUsb = USE_DEFAULT_HOST;
+    private String roboRioHostIp = USE_DEFAULT_HOST;
 
 
     // **IMPORTANT** All settings/properties must have a default value upon construction.
@@ -231,7 +249,165 @@ public class FrcSettings implements Cloneable
 
 
     public void setTeamNumber(int teamNumber) { this.teamNumber = teamNumber; }
+    
+    public boolean isTeamNumberConfigured()
+    {
+        return teamNumber != UN_CONFIGURED_TEAM_NUMBER && teamNumber > 0;
+    }
 
+
+    public String getSshTailUsername() { return sshTailUsername; }
+
+
+    public void setSshTailUsername(String sshTailUsername) { this.sshTailUsername = sshTailUsername; }
+
+
+    public String getSshTailPassword() { return sshTailPassword; }
+
+
+    public void setSshTailPassword(String sshTailPassword) { this.sshTailPassword = sshTailPassword; }
+
+
+    public String getSshTailCommand() { return sshTailCommand; }
+
+
+    public void setSshTailCommand(String sshTailCommand) { this.sshTailCommand = sshTailCommand; }
+
+
+    public String getRoboRioHostMDns() 
+    {
+        if (USE_DEFAULT_HOST.equals(roboRioHostMDns))
+        {
+            return getDefaultRoboRioHost_mDNS();
+        }
+        else
+        {
+            return roboRioHostMDns;
+        }
+    }
+
+    public void setRoboRioHostMDns(String roboRioHostMDns) 
+    {
+        this.roboRioHostMDns = (getDefaultRoboRioHost_mDNS().equals(roboRioHostMDns)) ? USE_DEFAULT_HOST : roboRioHostMDns;
+    }
+
+
+    /**
+     * Gets the default mDNS Host for the configured team number in the format:
+     *  <tt> roboRIO-${team-number}-FRC.local</tt>
+     * @return the default mDNS Host for the configured team number
+     */
+    public String getDefaultRoboRioHost_mDNS()
+    {
+        return createDefaultRoboRioHost_mDNS(teamNumber);
+        
+    }
+    
+    public static String createDefaultRoboRioHost_mDNS(int teamNumber)
+    {
+        return String.format(ROBORIO_HOST_mDNS_TEMPLATE, teamNumber);
+    }
+
+
+    public String getRoboRioHostDns()
+    {
+        if (USE_DEFAULT_HOST.equals(roboRioHostDns))
+        {
+            return getDefaultRoboRioHost_DNS();
+        }
+        else
+        {
+            return roboRioHostDns;
+        }
+    }
+
+
+    public void setRoboRioHostDns(String roboRioHostDns)
+    {
+        this.roboRioHostDns = (getDefaultRoboRioHost_DNS().equals(roboRioHostDns)) ? USE_DEFAULT_HOST : roboRioHostDns;
+    }
+
+
+    /**
+     * Gets the default DNS Host for the configured team number in the format:
+     *  <tt> roboRIO-${team-number}-FRC.lan</tt>
+     * @return the default DNS Host for the configured team number
+     */
+    public String getDefaultRoboRioHost_DNS()
+    {
+        return createDefaultRoboRioHost_DNS(teamNumber);
+        
+    }
+    
+    public static String createDefaultRoboRioHost_DNS(int teamNumber)
+    {
+        return String.format(ROBORIO_HOST_DNS_TEMPLATE, teamNumber);
+    }
+
+
+    public String getRoboRioHostUsb()
+    {
+        if (USE_DEFAULT_HOST.equals(roboRioHostUsb))
+        {
+            return getDefaultRoboRioHost_USB();
+        }
+        else
+        {
+            return roboRioHostUsb;
+        }
+    }
+
+
+    public void setRoboRioHostUsb(String roboRioHostUsb)
+    {
+        this.roboRioHostUsb = (getDefaultRoboRioHost_USB().equals(roboRioHostUsb)) ? USE_DEFAULT_HOST : roboRioHostUsb;
+    }
+
+
+    public String getDefaultRoboRioHost_USB()
+    {
+        return "172.22.11.2";
+    }
+
+
+    public String getRoboRioHostIp()
+    {
+        if (USE_DEFAULT_HOST.equals(roboRioHostIp))
+        {
+            return getDefaultRoboRioHost_IP();
+        }
+        else
+        {
+            return roboRioHostIp;
+        }
+    }
+
+
+    public void setRoboRioHostIp(String roboRioHostIp)
+    {
+        this.roboRioHostIp = (getDefaultRoboRioHost_IP().equals(roboRioHostIp)) ? USE_DEFAULT_HOST : roboRioHostIp;
+    }
+
+
+    /**
+     * Gets the default IP Host for the configured team number in the format:
+     * <tt> roboRIO-${team-number}-FRC.lan</tt>
+     *
+     * @return the default IP Host for the configured team number
+     */
+    public String getDefaultRoboRioHost_IP()
+    {
+        return createDefaultRoboRioHost_IP(teamNumber);
+
+    }
+
+
+    public static String createDefaultRoboRioHost_IP(int teamNumber)
+    {
+        final int high = teamNumber / 100;   
+        final int low = teamNumber % 100;   
+        return String.format(ROBORIO_HOST_IP_TEMPLATE, high, low);
+    }
 
     @Override
     public boolean equals(Object o)
@@ -256,6 +432,13 @@ public class FrcSettings implements Cloneable
             .append(wpiEclipsePluginBetaRepoUri, that.wpiEclipsePluginBetaRepoUri)
             .append(teamNumber, that.teamNumber)
             .append(useRegexForRestartCheck, that.useRegexForRestartCheck)
+            .append(sshTailUsername, that.sshTailUsername)
+            .append(sshTailPassword, that.sshTailPassword)
+            .append(sshTailCommand, that.sshTailCommand)
+            .append(roboRioHostMDns, that.roboRioHostMDns)
+            .append(roboRioHostDns, that.roboRioHostDns)
+            .append(roboRioHostUsb, that.roboRioHostUsb)
+            .append(roboRioHostIp, that.roboRioHostIp)
             .isEquals();
     }
 
@@ -277,6 +460,13 @@ public class FrcSettings implements Cloneable
             .append(wpiEclipsePluginBetaRepoUri)
             .append(teamNumber)
             .append(useRegexForRestartCheck)
+            .append(sshTailUsername)
+            .append(sshTailPassword)
+            .append(sshTailCommand)
+            .append(roboRioHostMDns)
+            .append(roboRioHostDns)
+            .append(roboRioHostUsb)
+            .append(roboRioHostIp)
             .toHashCode();
     }
     

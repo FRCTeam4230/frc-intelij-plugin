@@ -32,10 +32,6 @@ public final class FrcPluginGlobals
     public static final String PLUGIN_WEBSITE = "https://gitlab.com/Javaru/frc-intellij-idea";
     public static final String ISSUES_WEBSITE = "https://gitlab.com/Javaru/frc-intellij-idea/issues";
 
-    /** The standard log message (line) output by the robRIO on startup. */
-    //  ➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
-    public static final String ROBO_RIO_STARTUP_LOG_MSG = "\u2794 Launching \u00AB'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'\u00BB";
-
 
     public static final Path FRC_OPTIONS_DIR = PathManager.getOptionsFile("FRC").toPath();
 

@@ -21,5 +21,14 @@ public class RioLogGlobals
 
     public static final String UDP_TAB_TITLE = "RioLog: Net Console";
     public static final String SSH_TAB_TITLE = "RioLog: SSH Tailing";
+    
+    public static final String DEFAULT_TAIL_COMMAND = "tail -f /home/lvuser/FRC_UserProgram.log";
 
+    /** 
+     * The standard log message (line) output by the robRIO on startup.
+     * <pre>
+     * ➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
+     * </pre>
+     */
+    public static final String ROBO_RIO_STARTUP_LOG_MSG = "\u2794 Launching \u00AB'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'\u00BB";
 }

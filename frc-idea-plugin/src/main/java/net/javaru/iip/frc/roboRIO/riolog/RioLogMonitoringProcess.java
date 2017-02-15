@@ -30,7 +30,6 @@ import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.output.NullOutputStream;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +37,8 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.util.concurrency.Semaphore;
 
 import net.javaru.iip.frc.settings.FrcApplicationComponent;
 import net.javaru.iip.frc.settings.FrcSettings;
@@ -62,6 +63,7 @@ public abstract class RioLogMonitoringProcess extends Process
     public static final String SIMULATED_LOG_SERVICE_USE_CONFIGURED_PORT_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".use.configured.port";
     public static final int SIMULATED_LOG_SERVICE_PORT_DEFAULT = 4248; //arbitrarily chosen port not listed at https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
 
+    private final Semaphore myWaitSemaphore;
     
 
     protected boolean enabled = true;
@@ -80,6 +82,8 @@ public abstract class RioLogMonitoringProcess extends Process
     protected RioLogMonitoringProcess(Runnable clearConsoleRunnable) throws IllegalStateException
     {
         this.clearConsoleRunnable = clearConsoleRunnable;
+        myWaitSemaphore = new Semaphore();
+        myWaitSemaphore.down();
     }
 
 
@@ -112,6 +116,7 @@ public abstract class RioLogMonitoringProcess extends Process
         catch (Exception e)
         {
             enabled = false;
+            myWaitSemaphore.up();
             LOG.warn("[FRC] Could not initialize riolog monitor. Cause Summary: " + e.toString(), e);
             Notifications.Bus.notify(new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
                                                       FrcNotifications.IconError,
@@ -202,6 +207,11 @@ public abstract class RioLogMonitoringProcess extends Process
         }
     }
 
+    protected void monitoringStopped()
+    {
+        // no op by default
+    }
+    
 
     @Override
     public InputStream getInputStream() { return in; }
@@ -238,11 +248,15 @@ public abstract class RioLogMonitoringProcess extends Process
     @Override
     public int waitFor() throws InterruptedException
     {
-        while (enabled)
+        try
         {
-            TimeUnit.MILLISECONDS.sleep(500);
+            myWaitSemaphore.waitFor();
+            return 0;
         }
-        return 0;
+        catch (ProcessCanceledException e)
+        {
+            return -1;
+        }
     }
 
 
@@ -259,18 +273,16 @@ public abstract class RioLogMonitoringProcess extends Process
         enabled = false;
         try
         {
-            
             if (rioLogMonitor != null)
             {
-                int count = 0;
-                while (rioLogMonitor.isRunning() && count <  60 /* 60 * 50 = 3,000ms (3 seconds)*/)
-                {
-                    try {TimeUnit.MILLISECONDS.sleep(50);} catch (InterruptedException ignore) {}
-                    count++;
-                }
+                rioLogMonitor.stop();
             }
         }
         catch (Exception ignore) {}
+        finally
+        {
+            myWaitSemaphore.up();
+        }
         try { if (in != null) {in.close();} } catch (Exception ignore) {}
         try { if (consoleWriter != null) {consoleWriter.close();} } catch (Exception ignore) {}
         try { if (fileWriter != null) {fileWriter.close();} } catch (Exception ignore) {}
@@ -283,7 +295,7 @@ public abstract class RioLogMonitoringProcess extends Process
     {
         int getPort();
         boolean isRunning();
-        
+        void stop();
     }
     
     protected abstract class AbstractMonitoringRunnable implements MonitoringRunnable
@@ -364,6 +376,13 @@ public abstract class RioLogMonitoringProcess extends Process
             {
                 return text.contains("Launching") && text.contains("-jar") && text.contains("FRCUserProgram.jar");
             }
+        }
+
+
+        @Override
+        public void stop()
+        {
+            isRunning = false;
         }
     }
 }

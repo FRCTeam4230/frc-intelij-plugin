@@ -300,8 +300,9 @@ public class FrcSettings implements Cloneable
     public String getDefaultRoboRioHost_mDNS()
     {
         return createDefaultRoboRioHost_mDNS(teamNumber);
-        
     }
+    
+    public boolean isRoboRioHostMDnsTheDefault() { return USE_DEFAULT_HOST.equals(roboRioHostMDns); }
     
     public static String createDefaultRoboRioHost_mDNS(int teamNumber)
     {
@@ -336,8 +337,11 @@ public class FrcSettings implements Cloneable
     public String getDefaultRoboRioHost_DNS()
     {
         return createDefaultRoboRioHost_DNS(teamNumber);
-        
     }
+
+
+    public boolean isRoboRioHostDnsTheDefault() { return USE_DEFAULT_HOST.equals(roboRioHostDns); }
+    
     
     public static String createDefaultRoboRioHost_DNS(int teamNumber)
     {
@@ -369,6 +373,9 @@ public class FrcSettings implements Cloneable
         return "172.22.11.2";
     }
 
+
+    public boolean isRoboRioHostUsbTheDefault() { return USE_DEFAULT_HOST.equals(roboRioHostUsb); }
+    
 
     public String getRoboRioHostIp()
     {
@@ -408,6 +415,9 @@ public class FrcSettings implements Cloneable
         final int low = teamNumber % 100;   
         return String.format(ROBORIO_HOST_IP_TEMPLATE, high, low);
     }
+
+
+    public boolean isRoboRioHostIpTheDefault() { return USE_DEFAULT_HOST.equals(roboRioHostIp); }
 
     @Override
     public boolean equals(Object o)

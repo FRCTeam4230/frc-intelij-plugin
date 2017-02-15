@@ -62,6 +62,11 @@ public class FrcSettingsForm
     private JButton roboRioStaticUsbIpDefaultValueButton;
     private JBTextField roboRioIpAddress;
     private JButton roboRioIpAddressDefaultValueButton;
+    private JPanel rioLogOutputPanel;
+    private JPanel sshTailSettingsPanel;
+    private JPanel generalPanel;
+    private JPanel roboRioPanel;
+    private JBLabel teamNumberWarningIconLabel;
     private ButtonGroup rioLogTargetWindowButtonGroup;
 
 
@@ -81,9 +86,7 @@ public class FrcSettingsForm
         configureRoboRioComponents();
         configureSshSettingComponents();
 
-
         portToDefaultValueButton.addActionListener(e -> setPortToDefault());
-        
     }
 
 
@@ -91,6 +94,8 @@ public class FrcSettingsForm
     {
         String teamNum = frcSettings.getTeamNumber() <= 0 ? "" : Integer.toString(frcSettings.getTeamNumber());
         teamNumberTextField.setText(teamNum);
+
+        teamNumberWarningIconLabel.setVisible(!frcSettings.isTeamNumberConfigured());
 
 
         teamNumberTextField.addKeyListener(new KeyListener()
@@ -115,6 +120,7 @@ public class FrcSettingsForm
                 if (StringUtils.isBlank(updatedText))
                 {
                     previousText = updatedText;
+                    teamNumberWarningIconLabel.setVisible(true);
                 }
                 else
                 {
@@ -123,11 +129,19 @@ public class FrcSettingsForm
                         final int teamNum = Integer.parseInt(updatedText);
                         previousText = updatedText;
                         frcSettings.setTeamNumber(teamNum);
+                        teamNumberWarningIconLabel.setVisible(false);
+
+                        if (frcSettings.isRoboRioHostMDnsTheDefault()) { roboRioMdnsHostName.setText(frcSettings.getDefaultRoboRioHost_mDNS()); }
+                        if (frcSettings.isRoboRioHostDnsTheDefault()) { roboRioDnsHostName.setText(frcSettings.getDefaultRoboRioHost_DNS()); }
+                        if (frcSettings.isRoboRioHostUsbTheDefault()) { roboRioStaticUsbIp.setText(frcSettings.getDefaultRoboRioHost_USB()); }
+                        if (frcSettings.isRoboRioHostIpTheDefault()) { roboRioIpAddress.setText(frcSettings.getDefaultRoboRioHost_IP()); }
+
                     }
                     catch (NumberFormatException ignore)
                     {
                         //not a valid integer....
                         teamNumberTextField.setText(previousText);
+                        teamNumberWarningIconLabel.setVisible(true);
                     }
                 }
             }
@@ -141,18 +155,24 @@ public class FrcSettingsForm
             {
                 final JTextField textField = (JTextField) input;
                 final String text = textField.getText();
-                try
-                {
-                    final Number number = DecimalFormat.getIntegerInstance().parse(text);
-                    final int i = number.intValue();
-                    return (i > 0);
-                }
-                catch (ParseException e)
-                {
-                    return false;
-                }
+                return isEnteredTeamNumberValid(text);
             }
         });
+    }
+
+
+    private boolean isEnteredTeamNumberValid(String text)
+    {
+        try
+        {
+            final Number number = DecimalFormat.getIntegerInstance().parse(text);
+            final int i = number.intValue();
+            return (i > 0);
+        }
+        catch (ParseException e)
+        {
+            return false;
+        }
     }
 
 
@@ -166,7 +186,7 @@ public class FrcSettingsForm
     private void configureRoboRioComponents()
     {
         // TODO should we add verifiers ?
-        
+
         roboRioMdnsHostName.setText(frcSettings.getRoboRioHostMDns());
         roboRioMdnsHostName.addKeyListener(new KeyListener()
         {
@@ -184,7 +204,7 @@ public class FrcSettingsForm
                 frcSettings.setRoboRioHostMDns(roboRioMdnsHostName.getText());
             }
         });
-        mDnsHostNameDefaultValueButton.addActionListener(e -> 
+        mDnsHostNameDefaultValueButton.addActionListener(e ->
                                                          {
                                                              final String defaultValue = frcSettings.getDefaultRoboRioHost_mDNS();
                                                              roboRioMdnsHostName.setText(defaultValue);
@@ -210,12 +230,12 @@ public class FrcSettingsForm
             }
         });
         dnsHostNameDefaultValueButton.addActionListener(e ->
-                                                         {
-                                                             final String defaultValue = frcSettings.getDefaultRoboRioHost_DNS();
-                                                             roboRioDnsHostName.setText(defaultValue);
-                                                             frcSettings.setRoboRioHostDns(defaultValue);
-                                                         });
-        
+                                                        {
+                                                            final String defaultValue = frcSettings.getDefaultRoboRioHost_DNS();
+                                                            roboRioDnsHostName.setText(defaultValue);
+                                                            frcSettings.setRoboRioHostDns(defaultValue);
+                                                        });
+
         roboRioIpAddress.setText(frcSettings.getRoboRioHostIp());
         roboRioIpAddress.addKeyListener(new KeyListener()
         {
@@ -234,11 +254,11 @@ public class FrcSettingsForm
             }
         });
         roboRioIpAddressDefaultValueButton.addActionListener(e ->
-                                                         {
-                                                             final String defaultValue = frcSettings.getDefaultRoboRioHost_IP();
-                                                             roboRioIpAddress.setText(defaultValue);
-                                                             frcSettings.setRoboRioHostIp(defaultValue);
-                                                         });
+                                                             {
+                                                                 final String defaultValue = frcSettings.getDefaultRoboRioHost_IP();
+                                                                 roboRioIpAddress.setText(defaultValue);
+                                                                 frcSettings.setRoboRioHostIp(defaultValue);
+                                                             });
 
         roboRioStaticUsbIp.setText(frcSettings.getRoboRioHostUsb());
         roboRioStaticUsbIp.addKeyListener(new KeyListener()
@@ -258,18 +278,19 @@ public class FrcSettingsForm
             }
         });
         roboRioStaticUsbIpDefaultValueButton.addActionListener(e ->
-                                                        {
-                                                            final String defaultValue = frcSettings.getDefaultRoboRioHost_USB();
-                                                            roboRioStaticUsbIp.setText(defaultValue);
-                                                            frcSettings.setRoboRioHostUsb(defaultValue);
-                                                        });
+                                                               {
+                                                                   final String defaultValue = frcSettings.getDefaultRoboRioHost_USB();
+                                                                   roboRioStaticUsbIp.setText(defaultValue);
+                                                                   frcSettings.setRoboRioHostUsb(defaultValue);
+                                                               });
 
     }
+
 
     private void configureSshSettingComponents()
     {
         // TODO should we add verifiers ?
-        
+
         sshTailUsername.setText(frcSettings.getSshTailUsername());
         sshTailPassword.setText(frcSettings.getSshTailPassword());
         sshTailCommand.setText(frcSettings.getSshTailCommand());
@@ -498,9 +519,9 @@ public class FrcSettingsForm
     {
         rootPanel = new JPanel();
         rootPanel.setLayout(new GridLayoutManager(4, 1, new Insets(0, 0, 0, 0), -1, -1));
-        final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(6, 2, new Insets(0, 0, 0, 0), -1, -1));
-        rootPanel.add(panel1,
+        rioLogOutputPanel = new JPanel();
+        rioLogOutputPanel.setLayout(new GridLayoutManager(6, 2, new Insets(0, 0, 0, 0), -1, -1));
+        rootPanel.add(rioLogOutputPanel,
                       new GridConstraints(2,
                                           0,
                                           1,
@@ -514,81 +535,81 @@ public class FrcSettingsForm
                                           null,
                                           0,
                                           false));
-        panel1.setBorder(BorderFactory.createTitledBorder("RIO Log Output"));
+        rioLogOutputPanel.setBorder(BorderFactory.createTitledBorder("RIO Log Output"));
         targetWindowIsFrcToolWindowRadioButton = new JRadioButton();
         targetWindowIsFrcToolWindowRadioButton.setText("FRC Tool Window");
         targetWindowIsFrcToolWindowRadioButton.setMnemonic('F');
         targetWindowIsFrcToolWindowRadioButton.setDisplayedMnemonicIndex(0);
         targetWindowIsFrcToolWindowRadioButton.setToolTipText("RIO Log output will appear in a dedicated FRC Tool Window");
-        panel1.add(targetWindowIsFrcToolWindowRadioButton,
-                   new GridConstraints(2,
-                                       0,
-                                       1,
-                                       2,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_FIXED,
-                                       null,
-                                       null,
-                                       null,
-                                       2,
-                                       false));
+        rioLogOutputPanel.add(targetWindowIsFrcToolWindowRadioButton,
+                              new GridConstraints(2,
+                                                  0,
+                                                  1,
+                                                  2,
+                                                  GridConstraints.ANCHOR_WEST,
+                                                  GridConstraints.FILL_NONE,
+                                                  GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                                  GridConstraints.SIZEPOLICY_FIXED,
+                                                  null,
+                                                  null,
+                                                  null,
+                                                  2,
+                                                  false));
         targetWindowIsRunWindowRadioButton = new JRadioButton();
         targetWindowIsRunWindowRadioButton.setText("Run Window");
         targetWindowIsRunWindowRadioButton.setMnemonic('R');
         targetWindowIsRunWindowRadioButton.setDisplayedMnemonicIndex(0);
         targetWindowIsRunWindowRadioButton.setToolTipText("RIO Log output will appear as a tab in the IDEA Run tool window.");
-        panel1.add(targetWindowIsRunWindowRadioButton,
-                   new GridConstraints(3,
-                                       0,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_FIXED,
-                                       null,
-                                       null,
-                                       null,
-                                       2,
-                                       false));
+        rioLogOutputPanel.add(targetWindowIsRunWindowRadioButton,
+                              new GridConstraints(3,
+                                                  0,
+                                                  1,
+                                                  1,
+                                                  GridConstraints.ANCHOR_WEST,
+                                                  GridConstraints.FILL_NONE,
+                                                  GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                                  GridConstraints.SIZEPOLICY_FIXED,
+                                                  null,
+                                                  null,
+                                                  null,
+                                                  2,
+                                                  false));
         final JLabel label1 = new JLabel();
         label1.setText("Target Tool Window:");
-        panel1.add(label1,
-                   new GridConstraints(1,
-                                       0,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_FIXED,
-                                       GridConstraints.SIZEPOLICY_FIXED,
-                                       null,
-                                       null,
-                                       null,
-                                       1,
-                                       false));
-        final JPanel panel2 = new JPanel();
-        panel2.setLayout(new GridLayoutManager(1, 4, new Insets(0, 0, 0, 0), -1, -1));
-        panel1.add(panel2,
-                   new GridConstraints(4,
-                                       0,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_CENTER,
-                                       GridConstraints.FILL_BOTH,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       null,
-                                       null,
-                                       null,
-                                       0,
-                                       false));
+        rioLogOutputPanel.add(label1,
+                              new GridConstraints(1,
+                                                  0,
+                                                  1,
+                                                  1,
+                                                  GridConstraints.ANCHOR_WEST,
+                                                  GridConstraints.FILL_NONE,
+                                                  GridConstraints.SIZEPOLICY_FIXED,
+                                                  GridConstraints.SIZEPOLICY_FIXED,
+                                                  null,
+                                                  null,
+                                                  null,
+                                                  1,
+                                                  false));
+        final JPanel panel1 = new JPanel();
+        panel1.setLayout(new GridLayoutManager(1, 4, new Insets(0, 0, 0, 0), -1, -1));
+        rioLogOutputPanel.add(panel1,
+                              new GridConstraints(4,
+                                                  0,
+                                                  1,
+                                                  1,
+                                                  GridConstraints.ANCHOR_CENTER,
+                                                  GridConstraints.FILL_BOTH,
+                                                  GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                                  GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                                  null,
+                                                  null,
+                                                  null,
+                                                  0,
+                                                  false));
         final JLabel label2 = new JLabel();
         label2.setText("Net Console UDP Port:");
         label2.setToolTipText("UDP Port (0 to 65,535) of the roboRIO for logging.");
-        panel2.add(label2,
+        panel1.add(label2,
                    new GridConstraints(0,
                                        0,
                                        1,
@@ -605,7 +626,7 @@ public class FrcSettingsForm
         rioLogPortTextField = new JTextField();
         rioLogPortTextField.setEnabled(true);
         rioLogPortTextField.setToolTipText("UDP Port (0 to 65,535) of the roboRIO for logging.");
-        panel2.add(rioLogPortTextField,
+        panel1.add(rioLogPortTextField,
                    new GridConstraints(0,
                                        1,
                                        1,
@@ -623,7 +644,7 @@ public class FrcSettingsForm
         portToDefaultValueButton.setHideActionText(false);
         portToDefaultValueButton.setText("Default");
         portToDefaultValueButton.setToolTipText("Sets the RIO Log port to its default value");
-        panel2.add(portToDefaultValueButton,
+        panel1.add(portToDefaultValueButton,
                    new GridConstraints(0,
                                        2,
                                        1,
@@ -638,7 +659,7 @@ public class FrcSettingsForm
                                        0,
                                        false));
         final Spacer spacer1 = new Spacer();
-        panel2.add(spacer1,
+        panel1.add(spacer1,
                    new GridConstraints(0,
                                        3,
                                        1,
@@ -653,57 +674,57 @@ public class FrcSettingsForm
                                        0,
                                        false));
         final Spacer spacer2 = new Spacer();
-        panel1.add(spacer2,
-                   new GridConstraints(0,
-                                       0,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_CENTER,
-                                       GridConstraints.FILL_VERTICAL,
-                                       1,
-                                       GridConstraints.SIZEPOLICY_FIXED,
-                                       new Dimension(-1, 5),
-                                       new Dimension(-1, 5),
-                                       new Dimension(-1, 5),
-                                       0,
-                                       false));
-        final JPanel panel3 = new JPanel();
-        panel3.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panel1.add(panel3,
-                   new GridConstraints(5,
-                                       0,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_CENTER,
-                                       GridConstraints.FILL_BOTH,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       null,
-                                       null,
-                                       null,
-                                       1,
-                                       false));
-        panel3.setBorder(BorderFactory.createTitledBorder("SSH Tail Settings"));
-        final JPanel panel4 = new JPanel();
-        panel4.setLayout(new GridLayoutManager(3, 3, new Insets(0, 0, 0, 0), -1, -1));
-        panel3.add(panel4,
-                   new GridConstraints(0,
-                                       0,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_CENTER,
-                                       GridConstraints.FILL_BOTH,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       null,
-                                       null,
-                                       null,
-                                       0,
-                                       false));
+        rioLogOutputPanel.add(spacer2,
+                              new GridConstraints(0,
+                                                  0,
+                                                  1,
+                                                  1,
+                                                  GridConstraints.ANCHOR_CENTER,
+                                                  GridConstraints.FILL_VERTICAL,
+                                                  1,
+                                                  GridConstraints.SIZEPOLICY_FIXED,
+                                                  new Dimension(-1, 5),
+                                                  new Dimension(-1, 5),
+                                                  new Dimension(-1, 5),
+                                                  0,
+                                                  false));
+        sshTailSettingsPanel = new JPanel();
+        sshTailSettingsPanel.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
+        rioLogOutputPanel.add(sshTailSettingsPanel,
+                              new GridConstraints(5,
+                                                  0,
+                                                  1,
+                                                  1,
+                                                  GridConstraints.ANCHOR_CENTER,
+                                                  GridConstraints.FILL_BOTH,
+                                                  GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                                  GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                                  null,
+                                                  null,
+                                                  null,
+                                                  1,
+                                                  false));
+        sshTailSettingsPanel.setBorder(BorderFactory.createTitledBorder("SSH Tail Settings"));
+        final JPanel panel2 = new JPanel();
+        panel2.setLayout(new GridLayoutManager(3, 3, new Insets(0, 0, 0, 0), -1, -1));
+        sshTailSettingsPanel.add(panel2,
+                                 new GridConstraints(0,
+                                                     0,
+                                                     1,
+                                                     1,
+                                                     GridConstraints.ANCHOR_CENTER,
+                                                     GridConstraints.FILL_BOTH,
+                                                     GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                                     GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                                     null,
+                                                     null,
+                                                     null,
+                                                     0,
+                                                     false));
         final JBLabel jBLabel1 = new JBLabel();
         jBLabel1.setText("User name:");
         jBLabel1.setToolTipText("roboRIO user name for SSH access for tailing logs. Default is 'admin'.");
-        panel4.add(jBLabel1,
+        panel2.add(jBLabel1,
                    new GridConstraints(0,
                                        0,
                                        1,
@@ -719,7 +740,7 @@ public class FrcSettingsForm
                                        false));
         sshTailUsername = new JBTextField();
         sshTailUsername.setToolTipText("roboRIO user name for SSH access for tailing logs. Default is 'admin'.");
-        panel4.add(sshTailUsername,
+        panel2.add(sshTailUsername,
                    new GridConstraints(0,
                                        1,
                                        1,
@@ -736,7 +757,7 @@ public class FrcSettingsForm
         final JBLabel jBLabel2 = new JBLabel();
         jBLabel2.setText("Password:");
         jBLabel2.setToolTipText("roboRIO password for SSH access for tailing logs. Default is blank (i.e. no password).");
-        panel4.add(jBLabel2,
+        panel2.add(jBLabel2,
                    new GridConstraints(1,
                                        0,
                                        1,
@@ -752,7 +773,7 @@ public class FrcSettingsForm
                                        false));
         sshTailPassword = new JBTextField();
         sshTailPassword.setToolTipText("roboRIO password for SSH access for tailing logs. Default is blank (i.e. no password).");
-        panel4.add(sshTailPassword,
+        panel2.add(sshTailPassword,
                    new GridConstraints(1,
                                        1,
                                        1,
@@ -768,7 +789,7 @@ public class FrcSettingsForm
                                        false));
         final JBLabel jBLabel3 = new JBLabel();
         jBLabel3.setText("Tail Command:");
-        panel4.add(jBLabel3,
+        panel2.add(jBLabel3,
                    new GridConstraints(2,
                                        0,
                                        1,
@@ -783,7 +804,7 @@ public class FrcSettingsForm
                                        2,
                                        false));
         sshTailCommand = new JBTextField();
-        panel4.add(sshTailCommand,
+        panel2.add(sshTailCommand,
                    new GridConstraints(2,
                                        1,
                                        1,
@@ -800,7 +821,7 @@ public class FrcSettingsForm
         tailCommandToDefaultValueButton = new JButton();
         tailCommandToDefaultValueButton.setText("Default");
         tailCommandToDefaultValueButton.setToolTipText("Sets the Tail command to its default value");
-        panel4.add(tailCommandToDefaultValueButton,
+        panel2.add(tailCommandToDefaultValueButton,
                    new GridConstraints(2,
                                        2,
                                        1,
@@ -815,35 +836,35 @@ public class FrcSettingsForm
                                        0,
                                        false));
         final Spacer spacer3 = new Spacer();
-        panel3.add(spacer3,
-                   new GridConstraints(0,
-                                       1,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_CENTER,
-                                       GridConstraints.FILL_HORIZONTAL,
-                                       GridConstraints.SIZEPOLICY_WANT_GROW,
-                                       1,
-                                       null,
-                                       null,
-                                       null,
-                                       0,
-                                       false));
+        sshTailSettingsPanel.add(spacer3,
+                                 new GridConstraints(0,
+                                                     1,
+                                                     1,
+                                                     1,
+                                                     GridConstraints.ANCHOR_CENTER,
+                                                     GridConstraints.FILL_HORIZONTAL,
+                                                     GridConstraints.SIZEPOLICY_WANT_GROW,
+                                                     1,
+                                                     null,
+                                                     null,
+                                                     null,
+                                                     0,
+                                                     false));
         final Spacer spacer4 = new Spacer();
-        panel3.add(spacer4,
-                   new GridConstraints(1,
-                                       0,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_CENTER,
-                                       GridConstraints.FILL_VERTICAL,
-                                       1,
-                                       GridConstraints.SIZEPOLICY_WANT_GROW,
-                                       null,
-                                       null,
-                                       null,
-                                       0,
-                                       false));
+        sshTailSettingsPanel.add(spacer4,
+                                 new GridConstraints(1,
+                                                     0,
+                                                     1,
+                                                     1,
+                                                     GridConstraints.ANCHOR_CENTER,
+                                                     GridConstraints.FILL_VERTICAL,
+                                                     1,
+                                                     GridConstraints.SIZEPOLICY_WANT_GROW,
+                                                     null,
+                                                     null,
+                                                     null,
+                                                     0,
+                                                     false));
         final Spacer spacer5 = new Spacer();
         rootPanel.add(spacer5,
                       new GridConstraints(3,
@@ -859,9 +880,9 @@ public class FrcSettingsForm
                                           null,
                                           0,
                                           false));
-        final JPanel panel5 = new JPanel();
-        panel5.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
-        rootPanel.add(panel5,
+        generalPanel = new JPanel();
+        generalPanel.setLayout(new GridLayoutManager(1, 4, new Insets(0, 0, 0, 0), -1, -1));
+        rootPanel.add(generalPanel,
                       new GridConstraints(0,
                                           0,
                                           1,
@@ -875,59 +896,77 @@ public class FrcSettingsForm
                                           null,
                                           0,
                                           false));
-        panel5.setBorder(BorderFactory.createTitledBorder("General"));
+        generalPanel.setBorder(BorderFactory.createTitledBorder("General"));
         final JBLabel jBLabel4 = new JBLabel();
         jBLabel4.setText("Team Number:");
         jBLabel4.setDisplayedMnemonic('T');
         jBLabel4.setDisplayedMnemonicIndex(0);
         jBLabel4.setToolTipText("Enter your FRC team number");
-        panel5.add(jBLabel4,
-                   new GridConstraints(0,
-                                       0,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_CENTER,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       null,
-                                       null,
-                                       null,
-                                       0,
-                                       false));
+        generalPanel.add(jBLabel4,
+                         new GridConstraints(0,
+                                             0,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_CENTER,
+                                             GridConstraints.FILL_NONE,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             null,
+                                             null,
+                                             null,
+                                             0,
+                                             false));
         final Spacer spacer6 = new Spacer();
-        panel5.add(spacer6,
-                   new GridConstraints(0,
-                                       2,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_CENTER,
-                                       GridConstraints.FILL_HORIZONTAL,
-                                       GridConstraints.SIZEPOLICY_WANT_GROW,
-                                       1,
-                                       null,
-                                       null,
-                                       null,
-                                       0,
-                                       false));
+        generalPanel.add(spacer6,
+                         new GridConstraints(0,
+                                             3,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_CENTER,
+                                             GridConstraints.FILL_HORIZONTAL,
+                                             GridConstraints.SIZEPOLICY_WANT_GROW,
+                                             1,
+                                             null,
+                                             null,
+                                             null,
+                                             0,
+                                             false));
         teamNumberTextField = new JBTextField();
-        panel5.add(teamNumberTextField,
-                   new GridConstraints(0,
-                                       1,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_CENTER,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_FIXED,
-                                       new Dimension(50, -1),
-                                       new Dimension(75, -1),
-                                       new Dimension(150, -1),
-                                       0,
-                                       false));
-        final JPanel panel6 = new JPanel();
-        panel6.setLayout(new GridLayoutManager(4, 4, new Insets(0, 0, 0, 0), -1, -1));
-        rootPanel.add(panel6,
+        generalPanel.add(teamNumberTextField,
+                         new GridConstraints(0,
+                                             1,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_CENTER,
+                                             GridConstraints.FILL_NONE,
+                                             GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             GridConstraints.SIZEPOLICY_FIXED,
+                                             new Dimension(50, -1),
+                                             new Dimension(75, -1),
+                                             new Dimension(150, -1),
+                                             0,
+                                             false));
+        teamNumberWarningIconLabel = new JBLabel();
+        teamNumberWarningIconLabel.setIcon(new ImageIcon(getClass().getResource("/general/balloonError.png")));
+        teamNumberWarningIconLabel.setText("");
+        teamNumberWarningIconLabel.setToolTipText("Please configure your FRC team number");
+        generalPanel.add(teamNumberWarningIconLabel,
+                         new GridConstraints(0,
+                                             2,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_CENTER,
+                                             GridConstraints.FILL_NONE,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             null,
+                                             null,
+                                             null,
+                                             0,
+                                             false));
+        roboRioPanel = new JPanel();
+        roboRioPanel.setLayout(new GridLayoutManager(4, 4, new Insets(0, 0, 0, 0), -1, -1));
+        rootPanel.add(roboRioPanel,
                       new GridConstraints(1,
                                           0,
                                           1,
@@ -941,213 +980,213 @@ public class FrcSettingsForm
                                           null,
                                           0,
                                           false));
-        panel6.setBorder(BorderFactory.createTitledBorder("roboRIO"));
+        roboRioPanel.setBorder(BorderFactory.createTitledBorder("roboRIO"));
         final JBLabel jBLabel5 = new JBLabel();
         jBLabel5.setText("mDNS Host Name:");
         jBLabel5.setToolTipText("robRio mDNS Host name");
-        panel6.add(jBLabel5,
-                   new GridConstraints(0,
-                                       0,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       null,
-                                       null,
-                                       null,
-                                       2,
-                                       false));
+        roboRioPanel.add(jBLabel5,
+                         new GridConstraints(0,
+                                             0,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_WEST,
+                                             GridConstraints.FILL_NONE,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             null,
+                                             null,
+                                             null,
+                                             2,
+                                             false));
         roboRioMdnsHostName = new JBTextField();
         roboRioMdnsHostName.setText("");
         roboRioMdnsHostName.setToolTipText("robRio Host (mDNS) name or IP");
-        panel6.add(roboRioMdnsHostName,
-                   new GridConstraints(0,
-                                       1,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_FIXED,
-                                       new Dimension(100, -1),
-                                       new Dimension(250, -1),
-                                       new Dimension(500, -1),
-                                       0,
-                                       false));
+        roboRioPanel.add(roboRioMdnsHostName,
+                         new GridConstraints(0,
+                                             1,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_WEST,
+                                             GridConstraints.FILL_NONE,
+                                             GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             GridConstraints.SIZEPOLICY_FIXED,
+                                             new Dimension(100, -1),
+                                             new Dimension(250, -1),
+                                             new Dimension(500, -1),
+                                             0,
+                                             false));
         mDnsHostNameDefaultValueButton = new JButton();
         mDnsHostNameDefaultValueButton.setText("Default");
-        panel6.add(mDnsHostNameDefaultValueButton,
-                   new GridConstraints(0,
-                                       2,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_FIXED,
-                                       null,
-                                       null,
-                                       null,
-                                       0,
-                                       false));
+        roboRioPanel.add(mDnsHostNameDefaultValueButton,
+                         new GridConstraints(0,
+                                             2,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_WEST,
+                                             GridConstraints.FILL_NONE,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             GridConstraints.SIZEPOLICY_FIXED,
+                                             null,
+                                             null,
+                                             null,
+                                             0,
+                                             false));
         final JBLabel jBLabel6 = new JBLabel();
         jBLabel6.setText("DNS Host Name:");
-        panel6.add(jBLabel6,
-                   new GridConstraints(1,
-                                       0,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       null,
-                                       null,
-                                       null,
-                                       2,
-                                       false));
+        roboRioPanel.add(jBLabel6,
+                         new GridConstraints(1,
+                                             0,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_WEST,
+                                             GridConstraints.FILL_NONE,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             null,
+                                             null,
+                                             null,
+                                             2,
+                                             false));
         roboRioDnsHostName = new JBTextField();
-        panel6.add(roboRioDnsHostName,
-                   new GridConstraints(1,
-                                       1,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_FIXED,
-                                       new Dimension(100, -1),
-                                       new Dimension(250, -1),
-                                       new Dimension(500, -1),
-                                       0,
-                                       false));
+        roboRioPanel.add(roboRioDnsHostName,
+                         new GridConstraints(1,
+                                             1,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_WEST,
+                                             GridConstraints.FILL_NONE,
+                                             GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             GridConstraints.SIZEPOLICY_FIXED,
+                                             new Dimension(100, -1),
+                                             new Dimension(250, -1),
+                                             new Dimension(500, -1),
+                                             0,
+                                             false));
         dnsHostNameDefaultValueButton = new JButton();
         dnsHostNameDefaultValueButton.setText("Default");
-        panel6.add(dnsHostNameDefaultValueButton,
-                   new GridConstraints(1,
-                                       2,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_FIXED,
-                                       null,
-                                       null,
-                                       null,
-                                       0,
-                                       false));
+        roboRioPanel.add(dnsHostNameDefaultValueButton,
+                         new GridConstraints(1,
+                                             2,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_WEST,
+                                             GridConstraints.FILL_NONE,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             GridConstraints.SIZEPOLICY_FIXED,
+                                             null,
+                                             null,
+                                             null,
+                                             0,
+                                             false));
         final Spacer spacer7 = new Spacer();
-        panel6.add(spacer7,
-                   new GridConstraints(0,
-                                       3,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_CENTER,
-                                       GridConstraints.FILL_HORIZONTAL,
-                                       GridConstraints.SIZEPOLICY_WANT_GROW,
-                                       1,
-                                       null,
-                                       null,
-                                       null,
-                                       0,
-                                       false));
+        roboRioPanel.add(spacer7,
+                         new GridConstraints(0,
+                                             3,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_CENTER,
+                                             GridConstraints.FILL_HORIZONTAL,
+                                             GridConstraints.SIZEPOLICY_WANT_GROW,
+                                             1,
+                                             null,
+                                             null,
+                                             null,
+                                             0,
+                                             false));
         final JBLabel jBLabel7 = new JBLabel();
         jBLabel7.setText("USB Static IP:");
-        panel6.add(jBLabel7,
-                   new GridConstraints(2,
-                                       0,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       null,
-                                       null,
-                                       null,
-                                       2,
-                                       false));
+        roboRioPanel.add(jBLabel7,
+                         new GridConstraints(2,
+                                             0,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_WEST,
+                                             GridConstraints.FILL_NONE,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             null,
+                                             null,
+                                             null,
+                                             2,
+                                             false));
         roboRioStaticUsbIp = new JBTextField();
-        panel6.add(roboRioStaticUsbIp,
-                   new GridConstraints(2,
-                                       1,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       new Dimension(100, -1),
-                                       new Dimension(250, -1),
-                                       new Dimension(500, -1),
-                                       0,
-                                       false));
+        roboRioPanel.add(roboRioStaticUsbIp,
+                         new GridConstraints(2,
+                                             1,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_WEST,
+                                             GridConstraints.FILL_NONE,
+                                             GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             new Dimension(100, -1),
+                                             new Dimension(250, -1),
+                                             new Dimension(500, -1),
+                                             0,
+                                             false));
         roboRioStaticUsbIpDefaultValueButton = new JButton();
         roboRioStaticUsbIpDefaultValueButton.setText("Default");
-        panel6.add(roboRioStaticUsbIpDefaultValueButton,
-                   new GridConstraints(2,
-                                       2,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_FIXED,
-                                       null,
-                                       null,
-                                       null,
-                                       0,
-                                       false));
+        roboRioPanel.add(roboRioStaticUsbIpDefaultValueButton,
+                         new GridConstraints(2,
+                                             2,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_WEST,
+                                             GridConstraints.FILL_NONE,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             GridConstraints.SIZEPOLICY_FIXED,
+                                             null,
+                                             null,
+                                             null,
+                                             0,
+                                             false));
         final JBLabel jBLabel8 = new JBLabel();
         jBLabel8.setText("IP Address:");
-        panel6.add(jBLabel8,
-                   new GridConstraints(3,
-                                       0,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       null,
-                                       null,
-                                       null,
-                                       2,
-                                       false));
+        roboRioPanel.add(jBLabel8,
+                         new GridConstraints(3,
+                                             0,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_WEST,
+                                             GridConstraints.FILL_NONE,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             null,
+                                             null,
+                                             null,
+                                             2,
+                                             false));
         roboRioIpAddress = new JBTextField();
-        panel6.add(roboRioIpAddress,
-                   new GridConstraints(3,
-                                       1,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       new Dimension(100, -1),
-                                       new Dimension(250, -1),
-                                       new Dimension(500, -1),
-                                       0,
-                                       false));
+        roboRioPanel.add(roboRioIpAddress,
+                         new GridConstraints(3,
+                                             1,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_WEST,
+                                             GridConstraints.FILL_NONE,
+                                             GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             new Dimension(100, -1),
+                                             new Dimension(250, -1),
+                                             new Dimension(500, -1),
+                                             0,
+                                             false));
         roboRioIpAddressDefaultValueButton = new JButton();
         roboRioIpAddressDefaultValueButton.setText("Default");
-        panel6.add(roboRioIpAddressDefaultValueButton,
-                   new GridConstraints(3,
-                                       2,
-                                       1,
-                                       1,
-                                       GridConstraints.ANCHOR_WEST,
-                                       GridConstraints.FILL_NONE,
-                                       GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                                       GridConstraints.SIZEPOLICY_FIXED,
-                                       null,
-                                       null,
-                                       null,
-                                       0,
-                                       false));
+        roboRioPanel.add(roboRioIpAddressDefaultValueButton,
+                         new GridConstraints(3,
+                                             2,
+                                             1,
+                                             1,
+                                             GridConstraints.ANCHOR_WEST,
+                                             GridConstraints.FILL_NONE,
+                                             GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                             GridConstraints.SIZEPOLICY_FIXED,
+                                             null,
+                                             null,
+                                             null,
+                                             0,
+                                             false));
         label2.setLabelFor(rioLogPortTextField);
         jBLabel4.setLabelFor(rioLogPortTextField);
         rioLogTargetWindowButtonGroup = new ButtonGroup();

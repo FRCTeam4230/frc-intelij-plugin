@@ -94,9 +94,7 @@ public class FrcSettingsForm
     {
         String teamNum = frcSettings.getTeamNumber() <= 0 ? "" : Integer.toString(frcSettings.getTeamNumber());
         teamNumberTextField.setText(teamNum);
-
-        teamNumberWarningIconLabel.setVisible(!frcSettings.isTeamNumberConfigured());
-
+        setTeamNumberWarningVisibility(!frcSettings.isTeamNumberConfigured());
 
         teamNumberTextField.addKeyListener(new KeyListener()
         {
@@ -120,7 +118,7 @@ public class FrcSettingsForm
                 if (StringUtils.isBlank(updatedText))
                 {
                     previousText = updatedText;
-                    teamNumberWarningIconLabel.setVisible(true);
+                    setTeamNumberWarningVisibility(true);
                 }
                 else
                 {
@@ -129,7 +127,7 @@ public class FrcSettingsForm
                         final int teamNum = Integer.parseInt(updatedText);
                         previousText = updatedText;
                         frcSettings.setTeamNumber(teamNum);
-                        teamNumberWarningIconLabel.setVisible(false);
+                        setTeamNumberWarningVisibility(false);
 
                         if (frcSettings.isRoboRioHostMDnsTheDefault()) { roboRioMdnsHostName.setText(frcSettings.getDefaultRoboRioHost_mDNS()); }
                         if (frcSettings.isRoboRioHostDnsTheDefault()) { roboRioDnsHostName.setText(frcSettings.getDefaultRoboRioHost_DNS()); }
@@ -141,7 +139,7 @@ public class FrcSettingsForm
                     {
                         //not a valid integer....
                         teamNumberTextField.setText(previousText);
-                        teamNumberWarningIconLabel.setVisible(true);
+                        setTeamNumberWarningVisibility(true);
                     }
                 }
             }
@@ -158,6 +156,12 @@ public class FrcSettingsForm
                 return isEnteredTeamNumberValid(text);
             }
         });
+    }
+
+
+    private void setTeamNumberWarningVisibility(boolean isVisible)
+    {
+        teamNumberWarningIconLabel.setVisible(isVisible);
     }
 
 
@@ -898,6 +902,7 @@ public class FrcSettingsForm
                                           false));
         generalPanel.setBorder(BorderFactory.createTitledBorder("General"));
         final JBLabel jBLabel4 = new JBLabel();
+        jBLabel4.setFont(new Font(jBLabel4.getFont().getName(), Font.BOLD, jBLabel4.getFont().getSize()));
         jBLabel4.setText("Team Number:");
         jBLabel4.setDisplayedMnemonic('T');
         jBLabel4.setDisplayedMnemonicIndex(0);

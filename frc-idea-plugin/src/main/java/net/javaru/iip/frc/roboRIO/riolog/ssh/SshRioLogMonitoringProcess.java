@@ -49,6 +49,11 @@ import net.javaru.iip.frc.roboRIO.riolog.RioLogMonitoringProcess;
 public class SshRioLogMonitoringProcess extends RioLogMonitoringProcess
 {
     private static final Logger LOG = Logger.getInstance(SshRioLogMonitoringProcess.class);
+    
+    //TODO - make these configurable in the settings
+    private static final int IS_REACHABLE_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(5);
+    private static final int CONNECTION_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(5);
+    
 
 
     public SshRioLogMonitoringProcess(Runnable clearConsoleRunnable) throws IllegalStateException
@@ -108,8 +113,7 @@ public class SshRioLogMonitoringProcess extends RioLogMonitoringProcess
 
         try
         {
-            //TODO - make timeout configurable
-            boolean reachable = address.isReachable((int) TimeUnit.SECONDS.toMillis(5));
+            boolean reachable = address.isReachable(IS_REACHABLE_TIMEOUT);
             if (!reachable)
             {
                 logToConsole("Host '" + host + "' is unreachable (Unknown Host)");
@@ -139,7 +143,7 @@ public class SshRioLogMonitoringProcess extends RioLogMonitoringProcess
 
     private class SshRioLogMonitor extends AbstractMonitoringRunnable
     {
-        protected SshRioLogMonitor(int port)
+        SshRioLogMonitor(int port)
         {
             super(port);
         }
@@ -444,7 +448,7 @@ public class SshRioLogMonitoringProcess extends RioLogMonitoringProcess
                     try
                     {
                         LOG.debug("[FRC] Connecting session");
-                        session.connect();
+                        session.connect(CONNECTION_TIMEOUT);
                         return (isSessionValidAndConnected()) ? session : null;
                     }
                     catch (JSchException e)
@@ -476,7 +480,7 @@ public class SshRioLogMonitoringProcess extends RioLogMonitoringProcess
                         channelExec.setOutputStream(stdProcessStream.getOutputStream());
 
                         LOG.debug("[FRC] Calling channel.connect()");
-                        channelExec.connect();
+                        channelExec.connect(CONNECTION_TIMEOUT);
                         if (!channel.isConnected())
                         {
                             logToConsole("Could not connect channel");

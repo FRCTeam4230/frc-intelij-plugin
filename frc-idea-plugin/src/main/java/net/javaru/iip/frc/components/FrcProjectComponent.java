@@ -33,6 +33,7 @@ import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupManager;
 
@@ -84,37 +85,41 @@ public class FrcProjectComponent implements ProjectComponent
 
     public static void checkProjectFrcStatus(@NotNull Project project)
     {
-        if (FrcApplicationComponent.getInstance().getState().getTeamNumber() <= 0)
+        DumbService.getInstance(project).runWhenSmart(() ->
         {
-//            if (!FrcApplicationComponent.getInstance().showTeamNumConfigNotification(project))
+            
+            if (FrcApplicationComponent.getInstance().getState().getTeamNumber() <= 0)
             {
-                FrcApplicationComponent.getInstance().expireTeamNumConfigNotification(project);
-                final Notification notification = FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(project);
+//              if (!FrcApplicationComponent.getInstance().showTeamNumConfigNotification(project))
+                {
+                    FrcApplicationComponent.getInstance().expireTeamNumConfigNotification(project);
+                    final Notification notification = FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(project);
 //                    startUpNotifications.add(notification);
-            }
-        }
-
-        if (!WpiLibrariesUtils.isWpilibPresent(project))
-        {
-            if (WpiLibrariesUtils.isWpilibInstalledOnSystem())
-            {
-                final Notification notification = queueAttachWpilibNotification(project);
-//                        startUpNotifications.add(notification);
-            }
-            else
-            {
-                final Notification notification = queueDownloadAndAttachWpilibNotification(project);
-//                        startUpNotifications.add(notification);
+                }
             }
 
-        }
+            if (!WpiLibrariesUtils.isWpilibPresent(project))
+            {
+                if (WpiLibrariesUtils.isWpilibInstalledOnSystem())
+                {
+                    final Notification notification = queueAttachWpilibNotification(project);
+//                    startUpNotifications.add(notification);
+                }
+                else
+                {
+                    final Notification notification = queueDownloadAndAttachWpilibNotification(project);
+//                    startUpNotifications.add(notification);
+                }
+    
+            }
 
 //            if (WpiLibrariesUtils.isUserLibNonEmptyAndNotAttached(project))
-        if (!WpiLibrariesUtils.isUserLibAttached(project))
-        {
-            final Notification notification = queueMissingUserLibNotification(project);
-//                    startUpNotifications.add(notification);
-        }
+            if (!WpiLibrariesUtils.isUserLibAttached(project))
+            {
+                final Notification notification = queueMissingUserLibNotification(project);
+//                startUpNotifications.add(notification);
+            }
+        });
     }
 
 

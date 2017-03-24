@@ -59,7 +59,10 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
             public void run(@NotNull ProgressIndicator indicator)
             {
                 WpiLibDownloader.downloadLatest();
-                areAttached = WpiLibrariesUtils.areAllPresentViaReadAction(project);
+                if (project != null)
+                {
+                    areAttached = WpiLibrariesUtils.areAllPresentViaReadAction(project);
+                }
             }
 
 

@@ -20,13 +20,13 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderRootType;
@@ -48,51 +48,48 @@ public class WpiLibrariesUtils
 {
 
     private static final Logger LOG = Logger.getInstance(WpiLibrariesUtils.class);
-    
-    @Contract("null -> false")
-    public static boolean isWpilibPresent(@Nullable Project project)
+
+
+    public static boolean isWpilibPresent(@NotNull Project project)
     {
         return isLibraryPresent(project, WpilibConstants.ROBOT_BASE_FQN) ||
                isLibraryPresent(project, WpilibConstants.ITERATIVE_ROBOT_FQN);
     }
 
-    @Contract("null -> false")
-    public static boolean isWpilibPresentViaReadAction(@Nullable Project project)
+
+    public static boolean isWpilibPresentViaReadAction(@NotNull Project project)
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isWpilibPresent(project));
+        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isWpilibPresent(project));
     }
 
 
-    @Contract("null -> false")
-    public static boolean isCsCorePresent(@Nullable Project project)
+    public static boolean isCsCorePresent(@NotNull Project project)
     {
         return isLibraryPresent(project, "edu.wpi.cscore.VideoCamera") ||
                isLibraryPresent(project, "edu.wpi.cscore.CameraServerJNI");
     }
 
 
-    @Contract("null -> false")
-    public static boolean isCsCorePresentViaReadAction(@Nullable Project project)
+    public static boolean isCsCorePresentViaReadAction(@NotNull Project project)
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isCsCorePresent(project));
+        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isCsCorePresent(project));
     }
 
-    @Contract("null -> false")
-    public static boolean isNetworkTablesPresent(@Nullable Project project)
+
+    public static boolean isNetworkTablesPresent(@NotNull Project project)
     {
         return isLibraryPresent(project, "edu.wpi.first.wpilibj.networktables.NetworkTable") ||
                isLibraryPresent(project, "edu.wpi.first.wpilibj.tables.ITable");
     }
 
 
-    @Contract("null -> false")
-    public static boolean isNetworkTablesPresentViaReadAction(@Nullable Project project)
+    public static boolean isNetworkTablesPresentViaReadAction(@NotNull Project project)
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isNetworkTablesPresent(project));
+        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isNetworkTablesPresent(project));
     }
 
-    @Contract("null -> false")
-    public static boolean isOpenCvPresent(@Nullable Project project)
+
+    public static boolean isOpenCvPresent(@NotNull Project project)
     {
         return isLibraryPresent(project, "org.opencv.core.Core") ||
                isLibraryPresent(project, "org.opencv.video.Video") ||
@@ -101,40 +98,37 @@ public class WpiLibrariesUtils
     }
 
 
-    @Contract("null -> false")
-    public static boolean isOpenCvPresentViaReadAction(@Nullable Project project)
+    public static boolean isOpenCvPresentViaReadAction(@NotNull Project project)
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isOpenCvPresent(project));
+        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isOpenCvPresent(project));
     }
 
-    public static boolean areAllPresent(@Nullable Project project)
+
+    public static boolean areAllPresent(@NotNull Project project)
     {
         return isWpilibPresent(project) && isNetworkTablesPresent(project) && isOpenCvPresent(project) && isCsCorePresent(project);
     }
 
 
-    @Contract("null -> false")
-    public static boolean areAllPresentViaReadAction(@Nullable Project project)
+    public static boolean areAllPresentViaReadAction(@NotNull Project project)
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> areAllPresent(project));
+        return DumbService.getInstance(project).runReadActionInSmartMode(() -> areAllPresent(project));
     }
 
-    @Contract("null -> false")
-    public static boolean isWpilibPresent(@Nullable Module module)
+
+    public static boolean isWpilibPresent(@NotNull Module module)
     {
         return isLibraryPresent(module, WpilibConstants.ROBOT_BASE_FQN) ||
                isLibraryPresent(module, WpilibConstants.ITERATIVE_ROBOT_FQN);
     }
 
 
-    @Contract("null -> false")
-    public static boolean isWpilibPresentViaReadAction(@Nullable Module module)
+    public static boolean isWpilibPresentViaReadAction(@NotNull Module module)
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isWpilibPresent(module));
+        return DumbService.getInstance(module.getProject()).runReadActionInSmartMode(() -> isWpilibPresent(module));
     }
-    
-    
-    
+
+
     public static boolean isWpilibInstalledOnSystem()
     {
         try
@@ -152,38 +146,35 @@ public class WpiLibrariesUtils
     {
         return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) WpiLibrariesUtils::isWpilibInstalledOnSystem);
     }
-    
-    
-    @Contract("null -> false")
-    public static boolean isCsCorePresent(@Nullable Module module)
+
+
+    public static boolean isCsCorePresent(@NotNull Module module)
     {
         return isLibraryPresent(module, "edu.wpi.cscore.VideoCamera") ||
                isLibraryPresent(module, "edu.wpi.cscore.CameraServerJNI");
     }
 
 
-    @Contract("null -> false")
-    public static boolean isCsCorePresentViaReadAction(@Nullable Module module)
+    public static boolean isCsCorePresentViaReadAction(@NotNull Module module)
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isCsCorePresent(module));
+        return DumbService.getInstance(module.getProject()).runReadActionInSmartMode(() -> isCsCorePresent(module));
     }
 
-    @Contract("null -> false")
-    public static boolean isNetworkTablesPresent(@Nullable Module module)
+
+    public static boolean isNetworkTablesPresent(@NotNull Module module)
     {
         return isLibraryPresent(module, "edu.wpi.first.wpilibj.networktables.NetworkTable") ||
                isLibraryPresent(module, "edu.wpi.first.wpilibj.tables.ITable");
     }
 
 
-    @Contract("null -> false")
-    public static boolean isNetworkTablesPresentReadAction(@Nullable Module module)
+    public static boolean isNetworkTablesPresentReadAction(@NotNull Module module)
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isNetworkTablesPresent(module));
+        return DumbService.getInstance(module.getProject()).runReadActionInSmartMode(() -> isNetworkTablesPresent(module));
     }
 
-    @Contract("null -> false")
-    public static boolean isOpenCvPresent(@Nullable Module module)
+
+    public static boolean isOpenCvPresent(@NotNull Module module)
     {
         return isLibraryPresent(module, "org.opencv.core.Core") ||
                isLibraryPresent(module, "org.opencv.video.Video") ||
@@ -192,24 +183,24 @@ public class WpiLibrariesUtils
     }
 
 
-    @Contract("null -> false")
-    public static boolean isOpenCvPresentViaReadAction(@Nullable Module module)
+    public static boolean isOpenCvPresentViaReadAction(@NotNull Module module)
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isOpenCvPresent(module));
+        return DumbService.getInstance(module.getProject()).runReadActionInSmartMode(() -> isOpenCvPresent(module));
     }
 
-    public static boolean areAllPresent(@Nullable Module module)
+
+    public static boolean areAllPresent(@NotNull Module module)
     {
         return isWpilibPresent(module) && isNetworkTablesPresent(module) && isOpenCvPresent(module) && isCsCorePresent(module);
     }
 
 
-    @Contract("null -> false")
-    public static boolean areAllPresentViaReadAction(@Nullable Module module)
+    public static boolean areAllPresentViaReadAction(@NotNull Module module)
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> areAllPresent(module));
+        return DumbService.getInstance(module.getProject()).runReadActionInSmartMode(() -> areAllPresent(module));
     }
-    
+
+
     @Nullable
     public static Library findExistingUserLibDirLibrary(@NotNull Module module)
     {
@@ -227,7 +218,7 @@ public class WpiLibrariesUtils
             {
                 return library;
             }
-            
+
             final VirtualFile[] libraryFiles = library.getFiles(OrderRootType.CLASSES);
 
             for (VirtualFile virtualFile : libraryFiles)
@@ -239,10 +230,11 @@ public class WpiLibrariesUtils
                 }
             }
         }
-        
+
         return null;
     }
-    
+
+
     public static boolean isUserLibAttached(@NotNull Project project)
     {
         final Module[] modules = ModuleManager.getInstance(project).getModules();
@@ -259,7 +251,7 @@ public class WpiLibrariesUtils
 
     public static boolean isUserLibAttachedViaReadAction(@NotNull Project project)
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isUserLibAttached(project));
+        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isUserLibAttached(project));
     }
 
 
@@ -278,8 +270,8 @@ public class WpiLibrariesUtils
     }
 
 
-    public static boolean isUserLibNonEmptyAndAttachedViaReadAction(@NotNull Project project) 
+    public static boolean isUserLibNonEmptyAndAttachedViaReadAction(@NotNull Project project)
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isUserLibNonEmptyAndNotAttached(project));
+        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isUserLibNonEmptyAndNotAttached(project));
     }
 }

@@ -90,7 +90,7 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
                     }
                     else
                     {
-                        LibraryUtils.attachDirectoryBasedLibrary(module, "WPILib User Lib Directory", WpiLibPaths.getUserLibDir().toString());
+                        LibraryUtils.attachDirectoryBasedLibrary(module, "WPILib User Lib Directory", WpiLibPaths.getUserLibDir());
                         if (notifyOnCompletion)
                         {
                             queueSuccessfulNotification(project);

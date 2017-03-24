@@ -85,7 +85,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                     if (frcFacet != null)
                     {
                         //TODO: need to see if it is present as a Project library, and if so, attach that
-                        if (WpiLibrariesUtils.isWpilibPresent(module))
+                        if (WpiLibrariesUtils.isWpilibPresentViaReadAction(module))
                         {
                             Notifications.Bus.notify(new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
                                                                       FrcNotifications.IconInfo,
@@ -135,7 +135,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                             }
                         }
 
-                        LibraryUtils.attachDirectoryBasedLibrary(module, "WPILib Libraries", wpiJavaLibDir.toString());
+                        LibraryUtils.attachDirectoryBasedLibrary(module, "WPILib Libraries", wpiJavaLibDir);
                         if (notifyOnCompletion)
                         {
                             queueSuccessfulNotification(project);

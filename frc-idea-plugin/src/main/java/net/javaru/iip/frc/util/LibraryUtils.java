@@ -16,6 +16,9 @@
 
 package net.javaru.iip.frc.util;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.application.ApplicationManager;
@@ -41,12 +44,26 @@ public class LibraryUtils
 
     public static void attachDirectoryBasedLibrary(@NotNull final Module module,
                                                    @NotNull final String libName,
-                                                   @NotNull final String dir)
+                                                   @NotNull final Path dir)
     {
         ApplicationManager.getApplication().runWriteAction(() ->
                                                            {
+                                                               try
+                                                               {
+                                                                   if (!Files.exists(dir))
+                                                                   {
+                                                                       Files.createDirectories(dir);
+                                                                   }
+                                                               }
+                                                               catch (Throwable t) 
+                                                               {
+                                                                   LOG.info("[FRC] Could not create non-existing directory for attachment as library. This " 
+                                                                            + "will result in directory not being attached as library. Target fir was '" 
+                                                                            + dir + "'. Cause Summary: " + t.toString());
+                                                               }
+                                                               
                                                                final ModuleRootManager rootManager = ModuleRootManager.getInstance(module);
-                                                               final String urlString = VirtualFileManager.constructUrl(LocalFileSystem.PROTOCOL, dir);
+                                                               final String urlString = VirtualFileManager.constructUrl(LocalFileSystem.PROTOCOL, dir.toString());
                                                                final VirtualFile dirVirtualFile = VirtualFileManager.getInstance().findFileByUrl(urlString);
                                                                if (dirVirtualFile != null)
                                                                {

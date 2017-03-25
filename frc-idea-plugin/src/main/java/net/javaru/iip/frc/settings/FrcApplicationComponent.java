@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.settings;
 
-import java.io.File;
 import javax.swing.*;
 
 import org.jetbrains.annotations.Nls;
@@ -24,13 +23,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.notification.Notification;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.components.ApplicationComponent;
-import com.intellij.openapi.components.ExportableApplicationComponent;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
@@ -48,14 +44,10 @@ import net.javaru.iip.frc.ui.notify.FrcNotifications;
 // @State persistence documentation: http://www.jetbrains.org/intellij/sdk/docs/basics/persisting_state_of_components.html
 @State(
         name = FrcPluginGlobals.FRC_PLUGIN_BASE_NAME,
-        storages = {
-            @Storage(id = FrcPluginGlobals.FRC_PLUGIN_BASE_NAME, file = StoragePathMacros.APP_CONFIG + "/frc.xml"),
-            @Storage(id = FrcPluginGlobals.FRC_PLUGIN_BASE_NAME, file = StoragePathMacros.APP_CONFIG + "frc.xml", deprecated = true)
-        }
-    )
+        storages = {@Storage(id = FrcPluginGlobals.FRC_PLUGIN_BASE_NAME, file = "frc.xml")}
+)
 public class FrcApplicationComponent extends SimpleModificationTracker implements Configurable,
                                                                                   ApplicationComponent,
-                                                                                  ExportableApplicationComponent,
                                                                                   PersistentStateComponent<FrcSettings>,
                                                                                   ModificationTracker
 {
@@ -115,25 +107,7 @@ public class FrcApplicationComponent extends SimpleModificationTracker implement
         LOG.debug("[FRC] FrcApplicationComponent.initComponent() has been called");
     }
 
-
-    // ==== ExportableComponent
-
-
-    @NotNull
-    @Override
-    public File[] getExportFiles()
-    {
-        return new File[] {PathManager.getOptionsFile("frc")};
-    }
-
-
-    @NotNull
-    @Override
-    public String getPresentableName()
-    {
-        return FrcPluginGlobals.FRC_PLUGIN_DISPLAY_NAME;
-    }
-
+    
 
     // ==== PersistentStateComponent
 

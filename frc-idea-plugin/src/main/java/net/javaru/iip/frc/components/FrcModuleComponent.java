@@ -77,7 +77,14 @@ public class FrcModuleComponent implements ModuleComponent
     public void moduleAdded()
     {
         LOG.debug("[FRC] " + getClass().getSimpleName() + ".moduleAdded() called for " + myModule.getName());
-        RioLogConsoleProjectService.update(myModule);
+        // We only want to update the RioLogConsole if the project is fully opened. In other words, this is a
+        // case where the user is adding a module to an open project rather than this moduleAdded() method being 
+        // called as part of the initial project loading when opening a project. In the latter case, the
+        // RioLogConsoleProjectService.update() is called via the ProjectComponent.projectOpened() method
+        if (myModule.getProject().isOpen())
+        {
+            RioLogConsoleProjectService.update(myModule);
+        }
     }
 
 

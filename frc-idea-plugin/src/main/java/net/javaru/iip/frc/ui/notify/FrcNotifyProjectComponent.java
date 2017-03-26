@@ -22,7 +22,7 @@ import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.project.Project;
 
 
-
+// **NOTE: This class is registered in the plugin.xml as a ProjectComponent**
 public class FrcNotifyProjectComponent extends AbstractProjectComponent
 {
     protected FrcNotifyProjectComponent(Project project)

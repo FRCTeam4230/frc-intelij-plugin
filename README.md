@@ -6,7 +6,7 @@ An IntelliJ IDEA plugin for FIRST Robotics Competition (FRC) robot development i
 ## Current State
 **This plug-in is in beta and is not feature complete yet.** I started developing and using this plug-in for my own use late in the 2016 FRC build season. I had hoped to have it more feature rich prior to the 2017 FRC season. But time did not allow for such. Nevertheless, the preliminary features avaiable in the plugin make it very useful. Now that the 2017 build season has ended, I hope to he able to spend more time on enhancing the plugin. I have many featured planned. Thanks.
 
-:warning: **The plugin is currently only compatible with IntelliJ IDEA v2016.3.x. There are some issues with the recently released v2017.1.x that need to be addressed before that IDEA version can be used. I hope to resolve these issues shortly.**
+:warning: **If using IntelliJ IDEA v2017.1, be sure you are using v0.5 or later of the plugin to prevent issues, specifically Issue #3.** Otherwise the plugin requires IntelliJ IDEA v2016.3.x or later.
 
 
 ## Documentation

@@ -31,8 +31,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.ModificationTracker;
-import com.intellij.openapi.util.SimpleModificationTracker;
 
 import net.javaru.iip.frc.FrcPluginGlobals;
 import net.javaru.iip.frc.roboRIO.riolog.RioLogConsoleProjectService;
@@ -46,10 +44,9 @@ import net.javaru.iip.frc.ui.notify.FrcNotifications;
         name = FrcPluginGlobals.FRC_PLUGIN_BASE_NAME,
         storages = {@Storage(id = FrcPluginGlobals.FRC_PLUGIN_BASE_NAME, file = "frc.xml")}
 )
-public class FrcApplicationComponent extends SimpleModificationTracker implements Configurable,
-                                                                                  ApplicationComponent,
-                                                                                  PersistentStateComponent<FrcSettings>,
-                                                                                  ModificationTracker
+public class FrcApplicationComponent implements Configurable,
+                                                ApplicationComponent,
+                                                PersistentStateComponent<FrcSettings>
 {
 
     private static final Logger LOG = Logger.getInstance(FrcApplicationComponent.class);

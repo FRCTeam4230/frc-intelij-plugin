@@ -17,7 +17,7 @@
 <idea-plugin url="https://gitlab.com/Javaru/frc-intellij-idea-plugin">
     <id>net.javaru.idea.frc</id>
     <name>FRC</name>
-    <version>0.5</version>
+    <version>0.6-SNAPSHOT</version>
     <vendor url="https://gitlab.com/Javaru/frc-intellij-idea-plugin">Javaru</vendor>
     
     <description><![CDATA[
@@ -27,7 +27,7 @@
             (<a href='http://www.firstinspires.org/robotics/frc'>FRC</a>) development support for IntelliJ IDEA. 
             This plug-in will work with either the free open-sourced <em>Community Edition</em> or the 
             licensed <em>Ultimate Edition</em> of IntelliJ IDEA. <strong>This plug-in requires IntelliJ 
-            IDEA 2016.3 or v2017.1 (with FRC plugin v0.5 and later)</strong>
+            IDEA v2016.3 or v2017.1 (with FRC plugin v0.5 and later)</strong>
         </p>
         <p> </p>
         <p>Please report issues or make feature requests at: 
@@ -52,12 +52,10 @@
       &nbsp;&nbsp;&bull; Added some <em>initial</em> documentation on the project's 
       <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/wikis/home">wiki</a><br>
       &nbsp;&nbsp;&bull; Added some words/terms to built-in spell check dictionary<br>
-      &nbsp;&nbsp;&bull; Now that the 2017 season is over (for my FRC team at least), time is once again available to work on this plugin to add more features 
-      and improve the current ones. Stay tuned.<br>
       <br>
       <strong>v0.4</strong> <br>
       &nbsp;&nbsp;&bull; Add tailing of roboRIO log via SSH over Wi-Fi (Experimental Feature). Like Net Console log monitoring, it supports the 
-         use of the <a href='https://plugins.jetbrains.com/idea/plugin/7125-grep-console'>Grep Console Plug-in</a> to provide syntax highlighting and line folding<br>
+      use of the <a href='https://plugins.jetbrains.com/idea/plugin/7125-grep-console'>Grep Console Plug-in</a> to provide syntax highlighting and line folding<br>
       &nbsp;&nbsp;&bull; Resolved issue with RioLog console not auto clearing (on roboRIO restart) when selected due to a character encoding difference on some developers' systems<br>
       &nbsp;&nbsp;&bull; Added some words/terms to built-in spell check dictionary<br>
       <br>

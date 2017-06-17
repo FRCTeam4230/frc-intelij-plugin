@@ -88,6 +88,11 @@ tasks.withType(JavaCompile) {
   options.encoding = 'UTF-8'
 }
 
+task wrapper(type: Wrapper) {
+  // After modifying the version, run from cmd line: gradlew wrapper
+  gradleVersion = '4.0'
+}
+
 repositories {
   mavenCentral()
   maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }

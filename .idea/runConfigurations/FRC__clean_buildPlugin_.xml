@@ -14,7 +14,7 @@
           <option value="buildPlugin" />
         </list>
       </option>
-      <option name="vmOptions" value="" />
+      <option name="vmOptions" value="-Dfrc.build.preserve.sandbox.config.file.on.clean=true" />
     </ExternalSystemSettings>
     <method />
   </configuration>

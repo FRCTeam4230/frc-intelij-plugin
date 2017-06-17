@@ -19,6 +19,7 @@ import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.SimpleFileVisitor
+import java.nio.file.StandardCopyOption
 import java.nio.file.attribute.BasicFileAttributes
 
 
@@ -97,6 +98,34 @@ repositories {
   mavenCentral()
   maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
   flatDir { dirs 'libs' }
+}
+
+java.nio.file.Path sandboxConfigFile = Paths.get("${buildDir}/idea-sandbox/config/options/frc.xml")
+java.nio.file.Path configTmpFile
+boolean preserveConfigFile = Boolean.parseBoolean(System.getProperty("frc.build.preserve.sandbox.config.file.on.clean", "true"))
+
+clean.doFirst {
+  if (preserveConfigFile && Files.exists(sandboxConfigFile))
+  {
+    configTmpFile = Files.createTempFile("frcConfig", ".xml")
+    println(configTmpFile)
+    Files.copy(sandboxConfigFile, configTmpFile, StandardCopyOption.REPLACE_EXISTING)
+  }
+}
+
+clean.doLast {
+  if (preserveConfigFile && configTmpFile != null && Files.exists(configTmpFile))
+  {
+    Files.createDirectories(sandboxConfigFile.getParent())
+    Files.copy(configTmpFile, sandboxConfigFile, StandardCopyOption.REPLACE_EXISTING)
+    try
+    {
+      configTmpFile.toFile().deleteOnExit()
+      Files.deleteIfExists(configTmpFile)
+    }
+    catch (Exception ignore) {}
+  }
+  
 }
 
 prepareSandbox.doFirst {

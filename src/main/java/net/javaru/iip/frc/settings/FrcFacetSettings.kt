@@ -1,0 +1,71 @@
+/*
+ * Copyright 2015-2017 Mark Vedder
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package net.javaru.iip.frc.settings
+
+import com.intellij.openapi.components.PersistentStateComponent
+import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.util.xmlb.XmlSerializerUtil
+
+
+data class FrcFacetSettings(val unusedPlaceholder: Int = 0) : PersistentStateComponent<FrcFacetSettings>
+{
+    companion object Settings
+    {
+        fun INSTANCE(): FrcFacetSettings
+        {
+            return ServiceManager.getService(FrcFacetSettings::class.java)
+        }
+
+        fun clone(original: FrcFacetSettings): FrcFacetSettings
+        {
+            return original.copy()
+        }
+
+        fun isValidTeamNumber(teamNumberString: String): Boolean
+        {
+            try
+            {
+                return isValidTeamNumber(Integer.valueOf(teamNumberString))
+            }
+            catch (ignore: NumberFormatException)
+            {
+                return false
+            }
+        }
+
+        fun isValidTeamNumber(teamNumber: Int): Boolean
+        {
+            return teamNumber > 0
+        }
+    }
+
+
+    private val LOG = Logger.getInstance(FrcFacetSettings::class.java)
+
+    override fun getState(): FrcFacetSettings
+    {
+        LOG.trace("[FRC] FrcFacetSettings.getState() called. Returning current state of: " + toString())
+        return this
+    }
+
+    override fun loadState(state: FrcFacetSettings)
+    {
+        LOG.trace("[FRC] FrcFacetSettings.loadState() called with state object of: " + state)
+        XmlSerializerUtil.copyBean<FrcFacetSettings>(state, this)
+    }
+}

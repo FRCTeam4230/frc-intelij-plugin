@@ -1,0 +1,14 @@
+package ${PACKAGE_NAME};
+
+import edu.wpi.first.wpilibj.buttons.Trigger;
+
+
+#parse("File Header.java")
+public class ${NAME} extends Trigger
+{
+
+    public boolean get()
+    {
+        return false;
+    }
+}

@@ -24,7 +24,7 @@ import java.nio.file.attribute.BasicFileAttributes
 
 
 buildscript {
-  ext.kotlin_version = '1.1.1'
+  ext.kotlin_version = '1.1.2'
 
   repositories {
     mavenCentral()
@@ -41,9 +41,13 @@ plugins {
 }
 
 allprojects {
-  tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+  //noinspection GroovyAssignabilityCheck
+  tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
+      // See https://kotlinlang.org/docs/reference/using-gradle.html#compiler-options
       jvmTarget = JavaVersion.VERSION_1_8.toString()
+      javaParameters = true
+      //noReflect = false
     }
   }
 }
@@ -66,7 +70,7 @@ intellij {
   plugins = []
   
   runIde {
-    systemProperties = ['key1': 'value1', 'key2': 'value2']
+    runIde.systemProperties = ['key1': 'value1', 'key2': 'value2']
   }
   
   publishPlugin {

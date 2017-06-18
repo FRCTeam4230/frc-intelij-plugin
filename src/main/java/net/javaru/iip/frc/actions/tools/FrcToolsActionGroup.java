@@ -16,9 +16,14 @@
 
 package net.javaru.iip.frc.actions.tools;
 
+import com.intellij.facet.ProjectFacetManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
+
+import net.javaru.iip.frc.facet.FrcFacet;
 
 
 
@@ -30,12 +35,10 @@ public class FrcToolsActionGroup extends DefaultActionGroup //implements DumbAwa
     @Override
     public void update(AnActionEvent e)
     {
-        
-        //TODO: Implement Once FrcFacet is created
-//        final Project project = e.getData(CommonDataKeys.PROJECT);
-//        e.getPresentation().setVisible(project != null &&
-//                                       !project.isDisposed() &&
-//                                       ProjectFacetManager.getInstance(project).getFacets(FrcFacet.FACET_TYPE_ID).size() > 0);
+        final Project project = e.getData(CommonDataKeys.PROJECT);
+        e.getPresentation().setVisible(project != null &&
+                                       !project.isDisposed() &&
+                                       ProjectFacetManager.getInstance(project).getFacets(FrcFacet.FACET_TYPE_ID).size() > 0);
 
     }
 }

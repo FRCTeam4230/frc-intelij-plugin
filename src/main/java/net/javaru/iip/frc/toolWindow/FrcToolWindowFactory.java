@@ -45,14 +45,11 @@ public class FrcToolWindowFactory implements ToolWindowFactory
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow)
     {
-        // If we can only run when IDE is Smart, see example in TodoToolWindowFactory in the JetBrains Open Source Plugins project
-        //   DumbService.getInstance(project).runWhenSmart(() -> ServiceManager.getService(project, TodoView.class).initToolWindow(toolWindow));
-        
         // Called the first time the tool window is opened (NOT when the tool window button is put on the tool bar)
         LOG.debug("[FRC] FrcToolWindowFactory.createToolWindowContent() called for Project '" + project.getName() + "'");
 
-        // If we can only run when IDE is Smart, use DumService.runWhenSmart() see example in TodoToolWindowFactory in the JetBrains Open Source Plugins project
-        //DumbService.getInstance(project).runWhenSmart(() -> ServiceManager.getService(project, FrcToolWindow.class).initToolWindow(toolWindow));
+        // If a change requires that this create method only run when IDE is Smart, use DumService.runWhenSmart() see example in TodoToolWindowFactory in the JetBrains Open Source Plugins project
+        //      DumbService.getInstance(project).runWhenSmart(() -> ServiceManager.getService(project, FrcToolWindow.class).initToolWindow(toolWindow));
         ServiceManager.getService(project, FrcToolWindow.class).initToolWindow(toolWindow);
     }
 

@@ -26,7 +26,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.IdeFrame;
 import com.intellij.openapi.wm.ex.WindowManagerEx;
 
-import net.javaru.iip.frc.FrcIcons;
+import net.javaru.iip.frc.FrcIcons.FRC;
 import net.javaru.iip.frc.FrcPluginGlobals;
 import net.javaru.iip.frc.i18n.FrcMessageBundle;
 import net.javaru.iip.frc.notify.FrcNotifications;
@@ -56,7 +56,7 @@ public class ConfigureTeamNumberBasicAction extends AnAction
         final String teamNumString = Messages.showInputDialog(ideFrame.getComponent(),
                                                               FrcMessageBundle.message("frc.ui.dialogs.enterTeamNumberPrompt"),
                                                               FrcPluginGlobals.FRC_PLUGIN_NAME,
-                                                              FrcIcons.FIRST_ICON_DIALOG_WINDOW,
+                                                              FRC.FIRST_ICON_DIALOG_WINDOW,
                                                               (settings.isTeamNumberConfigured() ? "" + settings.getTeamNumber() : ""),
                                                               new InputValidator()
         {
@@ -80,7 +80,7 @@ public class ConfigureTeamNumberBasicAction extends AnAction
     public void update(AnActionEvent e)
     {
         super.update(e);
-        e.getPresentation().setIcon(FrcIcons.FIRST_ICON_MEDIUM_16);
+        e.getPresentation().setIcon(FRC.FIRST_ICON_MEDIUM_16);
         e.getPresentation().setVisible(shouldBeVisible(e));
     }
     

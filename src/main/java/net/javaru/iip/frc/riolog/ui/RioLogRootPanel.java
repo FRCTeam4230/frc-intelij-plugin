@@ -32,6 +32,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.UIUtil;
 
+import net.javaru.iip.frc.FrcIcons.RioLog;
 import net.javaru.iip.frc.actions.MockAction;
 import net.javaru.iip.frc.i18n.FrcMessageBundle;
 import net.javaru.iip.frc.toolWindow.FrcToolWindowFactory;
@@ -70,11 +71,8 @@ public class RioLogRootPanel extends SimpleToolWindowPanel implements Disposable
     private static ActionToolbar createToolbar()
     {
         DefaultActionGroup group = new DefaultActionGroup();
-        group.add(MockAction.createMockAddAction());
-        group.add(MockAction.createMockRemoveAction());
-        group.add(MockAction.createMockCancelAction());
-        group.add(MockAction.createMockRefreshAction());
-
+        group.add(new MockAction("Net Console", RioLog.RIOLOG_UDP_CONSOLE));
+        group.add(new MockAction("SSH Console", RioLog.RIOLOG_SSH_CONSOLE));
         return ActionManager.getInstance().createActionToolbar(FrcToolWindowFactory.FRC_TOOL_WINDOW_ID, group, false);
     }
 

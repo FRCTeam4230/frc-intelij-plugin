@@ -42,7 +42,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.InputValidator;
 import com.intellij.openapi.ui.Messages;
 
-import net.javaru.iip.frc.FrcIcons;
+import net.javaru.iip.frc.FrcIcons.FRC;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.UnzipUtils;
 import net.javaru.iip.frc.util.UriUtils;
@@ -154,7 +154,7 @@ public class WpiLibDownloader
                 ApplicationManager.getApplication().invokeLater(() ->
                                                                 {
                                                                     final String teamNumberInput =
-                                                                        Messages.showInputDialog("FRC Team number:", "Team Number", FrcIcons.FIRST_ICON_MEDIUM_16, null, new InputValidator()
+                                                                        Messages.showInputDialog("FRC Team number:", "Team Number", FRC.FIRST_ICON_MEDIUM_16, null, new InputValidator()
                                                                         {
                                                                             @Override
                                                                             public boolean checkInput(String inputString)

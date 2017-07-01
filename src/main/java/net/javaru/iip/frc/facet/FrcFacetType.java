@@ -29,7 +29,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
 
-import net.javaru.iip.frc.FrcIcons;
+import net.javaru.iip.frc.FrcIcons.FRC;
 
 
 
@@ -84,7 +84,7 @@ public class FrcFacetType extends FacetType<FrcFacet, FrcFacetConfiguration>
     @Override
     public Icon getIcon()
     {
-        return FrcIcons.FIRST_ICON_MEDIUM_16;
+        return FRC.FIRST_ICON_MEDIUM_16;
     }
 
 

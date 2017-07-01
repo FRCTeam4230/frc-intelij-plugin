@@ -49,7 +49,7 @@ public class FrcFacetConfiguration implements FacetConfiguration// ,PersistentSt
     @Override
     public void readExternal(Element element) throws InvalidDataException
     {
-        LOG.debug("[FRC] Deprecated (and no op) method" + getClass().getSimpleName() + ".readExternal() called");
+        LOG.trace("[FRC] Deprecated (and no op) method" + getClass().getSimpleName() + ".readExternal() called");
         /* no op */
     }
 
@@ -59,7 +59,7 @@ public class FrcFacetConfiguration implements FacetConfiguration// ,PersistentSt
     @Override
     public void writeExternal(Element element) throws WriteExternalException
     {
-        LOG.debug("[FRC] Deprecated (and no op) method" + getClass().getSimpleName() + ".writeExternal() called");
+        LOG.trace("[FRC] Deprecated (and no op) method" + getClass().getSimpleName() + ".writeExternal() called");
         /* no op */
     }
 }

@@ -171,6 +171,9 @@
         
         <applicationConfigurable id="FRC.FrcApplicationSettingsConfigurable" instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable" groupId="language" />
 
+        <projectService serviceInterface="net.javaru.iip.frc.toolWindow.FrcToolWindowPanel" serviceImplementation="net.javaru.iip.frc.toolWindow.FrcToolWindowPanel" />
+        <projectService serviceInterface="net.javaru.iip.frc.riolog.ui.RioLogRootPanel" serviceImplementation="net.javaru.iip.frc.riolog.ui.RioLogRootPanel" />
+        
         <frameworkSupport implementation="net.javaru.iip.frc.facet.fw.FrcFrameworkSupportProvider" />
         <framework.detector implementation="net.javaru.iip.frc.facet.detector.RobotSubclassFrcFrameworkDetector" />
     </extensions>

@@ -13,19 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 import java.nio.charset.StandardCharsets
-import java.nio.file.FileVisitResult
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.nio.file.SimpleFileVisitor
-import java.nio.file.StandardCopyOption
+import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 
-
-
 buildscript {
-  ext.kotlin_version = '1.1.2'
+  ext.kotlin_version = '1.1.50'
 
   repositories {
     mavenCentral()
@@ -38,7 +31,9 @@ buildscript {
 }
 
 plugins {
-  id "org.jetbrains.intellij" version "0.2.11"
+  // https://github.com/JetBrains/gradle-intellij-plugin
+  // also see http://www.jetbrains.org/intellij/sdk/docs/tutorials/build_system/prerequisites.html
+  id "org.jetbrains.intellij" version "0.2.17"
 }
 
 allprojects {
@@ -71,12 +66,15 @@ intellij {
   plugins = []
   
   runIde {
+    // example of setting system property keys for the IDE run
     runIde.systemProperties = ['key1': 'value1', 'key2': 'value2']
   }
   
+  // See http://www.jetbrains.org/intellij/sdk/docs/tutorials/build_system/deployment.html
   publishPlugin {
     username 'javaru'
     password System.properties['intellij.publish.password']
+    channels 'nightly'
   }
 }
 
@@ -85,6 +83,7 @@ version = "${version}${buildNumber}"
 
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
+compileJava.options.encoding = 'UTF-8'
 tasks.withType(JavaCompile) {
   options.encoding = 'UTF-8'
 }
@@ -100,8 +99,8 @@ repositories {
   flatDir { dirs 'libs' }
 }
 
-java.nio.file.Path sandboxConfigFile = Paths.get("${buildDir}/idea-sandbox/config/options/frc.xml")
-java.nio.file.Path configTmpFile
+Path sandboxConfigFile = Paths.get("${buildDir}/idea-sandbox/config/options/frc.xml")
+Path configTmpFile
 boolean preserveConfigFile = Boolean.parseBoolean(System.getProperty("frc.build.preserve.sandbox.config.file.on.clean", "true"))
 
 clean.doFirst {

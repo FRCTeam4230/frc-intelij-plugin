@@ -25,6 +25,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.Transient
 import net.javaru.iip.frc.util.UriUtils
 import java.net.URI
+import java.nio.file.InvalidPathException
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -32,17 +33,27 @@ const val UN_CONFIGURED_TEAM_NUMBER: Int = 0
 
 const val DEFAULT_RIO_LOG_UDP_PORT: Int = 6666
 
+const val WPILIB_BASE_DIR_ENV_VAR: String = "wpilib.base.dir"
+/**
+ * Alternative base directory for the wpilib directory. By default the `user.dir` directory is used.
+ * A value set via this will override that default. Thus is this is set to `C:\libs` a wpilib
+ * directory of `C:\libs\wpilib` is used for wpi lib directory. 
+ */
+const val ALT_WPILIB_BASE_DIR_SYS_PROP: String = "frc.alt.wpilib.base.dir"
 
+
+private var calculatedWpiLibDir: Path = determineWpiLibDir()
 
 // NOTE: This class is registered as an <applicationService> in the plugin.xml
-@State(name = "FrcPlugin", storages = arrayOf(Storage("frc.xml")))
+@State(name = "FrcPlugin", storages = [(Storage("frc.xml"))])
 data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBER,
                                   var rioLogUdpPort: Int = DEFAULT_RIO_LOG_UDP_PORT,
                                   /* Plugin Run Count (PRC) */
                                   var prc: Int = 0,
-                                  var wpiLibDir: Path = Paths.get(System.getProperty("frc.alt.user.home.dir", System.getProperty("user.home", "C:\\Users\\Public"))).resolve("wpilib").toAbsolutePath(),
+                                  var wpiLibDir: Path = calculatedWpiLibDir,
                                   var wpiEclipsePluginReleaseRepoUri: URI = FrcApplicationSettings.DEFAULT_WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI,
-                                  var wpiEclipsePluginBetaRepoUri: URI = FrcApplicationSettings.DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI
+                                  var wpiEclipsePluginBetaRepoUri: URI = FrcApplicationSettings.DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI,
+                                  var clearRioLogOnRobotRestart: Boolean = false
                                  ) : PersistentStateComponent<FrcApplicationSettings>
 {
     companion object Settings
@@ -63,13 +74,13 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
 
         fun isValidTeamNumber(teamNumberString: String): Boolean
         {
-            try
+            return try
             {
-                return isValidTeamNumber(Integer.valueOf(teamNumberString))
+                isValidTeamNumber(Integer.valueOf(teamNumberString))
             }
             catch (ignore: NumberFormatException)
             {
-                return false
+                false
             }
         }
         
@@ -91,7 +102,7 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
     override fun loadState(state: FrcApplicationSettings)
     {
         LOG.trace("[FRC] FrcApplicationSettings.loadState() called with state object of: " + state)
-        XmlSerializerUtil.copyBean<FrcApplicationSettings>(state, this)
+        XmlSerializerUtil.copyBean(state, this)
     }
 
     @Transient
@@ -99,3 +110,61 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
 
     fun incrementRunCount() { prc++ }
 }
+
+// Used when initializing the wpilib directory
+private fun determineWpiLibDir(): Path
+{
+    val logger = Logger.getInstance(FrcApplicationSettings::class.java)
+    var basePath: Path? = null
+
+    if (System.getProperty(ALT_WPILIB_BASE_DIR_SYS_PROP) != null)
+    {
+        try
+        {
+            basePath = Paths.get(System.getProperty(ALT_WPILIB_BASE_DIR_SYS_PROP))
+            logger.debug("[FRC] calculated wpilib base dir set to '$basePath' via system property '$ALT_WPILIB_BASE_DIR_SYS_PROP'")
+        }
+        catch (e: InvalidPathException)
+        {
+            logger.warn("[FRC] The value, '${System.getProperty(ALT_WPILIB_BASE_DIR_SYS_PROP)}', configured in system property '$ALT_WPILIB_BASE_DIR_SYS_PROP' is " +
+                        "not a valid path. It wil be ignored when determining the wpilib base directory. Details: " + e.toString())
+        }
+    }
+    else
+    {
+        try
+        {
+            val envVar: String? = System.getenv(WPILIB_BASE_DIR_ENV_VAR)
+            if (envVar != null)
+            {
+                try
+                {
+                    basePath = Paths.get(envVar).toAbsolutePath()
+                    logger.debug("[FRC] calculated wpilib base dir set to '$basePath' via env var '$WPILIB_BASE_DIR_ENV_VAR'")
+                }
+                catch (e: InvalidPathException)
+                {
+                    logger.warn("[FRC] The value, '$envVar', configured in env variable '$WPILIB_BASE_DIR_ENV_VAR' is not a valid path. " +
+                                "It wil be ignored when determining the wpilib base directory. Details: " + e.toString())
+                }
+            }
+        }
+        catch (e: Exception) // Potential for SecurityException is the main concern
+        {
+            logger.warn("""[FRC] An exception occurred when checking env variable '$WPILIB_BASE_DIR_ENV_VAR'. Cause Summary: ${e.toString()}""")
+        }
+    }
+
+    if (basePath == null)
+    {
+        basePath = Paths.get(System.getProperty("user.home", "C:\\Users\\Public"))
+        logger.debug("[FRC] calculated wpilib base dir set to '$basePath' via (default) system property 'user.home'")
+    }
+
+
+    val wpiLibDir = basePath!!.resolve("wpilib").toAbsolutePath()
+    logger.debug("[FRC] calculated wpilib dir set to '$wpiLibDir'.")
+
+    return wpiLibDir
+}
+

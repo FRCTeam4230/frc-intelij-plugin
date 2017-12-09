@@ -29,7 +29,7 @@ import com.intellij.ui.content.ContentManager;
 import net.javaru.iip.frc.components.FrcProjectComponentImpl;
 
 
-
+// We implement DumbAware as we want the FRC Tool Window to be available when IDEA is indexing, and none of its content is dependent on indexes
 public class FrcToolWindowFactory implements ToolWindowFactory,
                                              DumbAware
 {

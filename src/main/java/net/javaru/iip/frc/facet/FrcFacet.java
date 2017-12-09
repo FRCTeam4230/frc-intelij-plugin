@@ -99,12 +99,12 @@ public class FrcFacet extends Facet<FrcFacetConfiguration>
     @Contract("null -> false")
     public static boolean isFrcFacetedModule(@Nullable Module module)
     {
-        if (module != null)
+        if (module == null)
         {
-            final FrcFacet frcFacet = FacetManager.getInstance(module).getFacetByType(FrcFacet.FACET_TYPE_ID);
-            if (frcFacet != null) { return true; }
+            return false;
         }
-        return false;
+        final FrcFacet frcFacet = FacetManager.getInstance(module).getFacetByType(FrcFacet.FACET_TYPE_ID);
+        return frcFacet != null;
     }
 
 

@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.ProjectFacetManager;
-import com.intellij.icons.AllIcons.General;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -121,7 +120,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                                                                                 "Download and Attach",
                                                                                 "Attach Empty Directory",
                                                                                 "Cancel Without Downloading or Attaching",
-                                                                                General.QuestionDialog);
+                                                                                Messages.getQuestionIcon());
                             if (response == Messages.YES)
                             {
                                 new Backgroundable(project, "Downloading WPILib Update", false)

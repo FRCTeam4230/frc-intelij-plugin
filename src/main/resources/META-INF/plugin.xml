@@ -287,6 +287,11 @@
                     text="Attach User Lib Directory as Dependency"
                     description="Attach the User Lib directory as a Module Dependency (i.e. Library)"
                     icon="AllIcons.Modules.Types.UserDefined" />
+            <action id="frc.tools.CheckWpiLbVersionAction"
+                    class="net.javaru.iip.frc.actions.tools.CheckWpiLbVersionAction"
+                    text="Check Attached WpiLib Version"
+                    description="Determines and displays the version of the WpiLib JAR that is attached as a dependency/library."
+                    />
             
             
             <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after" />

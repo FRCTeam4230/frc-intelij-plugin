@@ -67,7 +67,8 @@ intellij {
   
   runIde {
     // example of setting system property keys for the IDE run
-    runIde.systemProperties = ['key1': 'value1', 'key2': 'value2']
+    //runIde.systemProperties = ['key1': 'value1', 'key2': 'value2']
+    runIde.systemProperties = ['frc.simulated.log.service.enabled': System.getProperty('frc.simulated.log.service.enabled', 'false')]
   }
   
   // See http://www.jetbrains.org/intellij/sdk/docs/tutorials/build_system/deployment.html

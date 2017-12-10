@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.actions.tools;
 
-import com.intellij.facet.ProjectFacetManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
@@ -38,7 +37,7 @@ public class FrcToolsActionGroup extends DefaultActionGroup //implements DumbAwa
         final Project project = e.getData(CommonDataKeys.PROJECT);
         e.getPresentation().setVisible(project != null &&
                                        !project.isDisposed() &&
-                                       ProjectFacetManager.getInstance(project).getFacets(FrcFacet.FACET_TYPE_ID).size() > 0);
+                                       FrcFacet.isFrcFacetedProject(project));
 
     }
 }

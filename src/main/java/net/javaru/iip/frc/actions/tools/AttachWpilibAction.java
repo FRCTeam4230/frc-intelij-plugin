@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.facet.FacetManager;
-import com.intellij.facet.ProjectFacetManager;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -61,7 +60,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
         final Project project = e.getData(CommonDataKeys.PROJECT);
         e.getPresentation().setVisible(project != null &&
                                        !project.isDisposed() &&
-                                       ProjectFacetManager.getInstance(project).getFacets(FrcFacet.FACET_TYPE_ID).size() > 0 &&
+                                       FrcFacet.isFrcFacetedProject(project) &&
                                        !WpiLibLibrariesUtils.areAllPresentViaReadAction(project));
     }
 

@@ -20,7 +20,6 @@ package net.javaru.iip.frc.actions.tools;
 import javax.swing.*;
 
 import org.jetbrains.annotations.Nullable;
-import com.intellij.facet.ProjectFacetManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -58,6 +57,6 @@ public abstract class AbstractFrcToolsAction extends DumbAwareAction
         final Project project = e.getData(CommonDataKeys.PROJECT);
         e.getPresentation().setVisible(project != null &&
                                        !project.isDisposed() &&
-                                       ProjectFacetManager.getInstance(project).getFacets(FrcFacet.FACET_TYPE_ID).size() > 0);
+                                       FrcFacet.isFrcFacetedProject(project));
     }
 }

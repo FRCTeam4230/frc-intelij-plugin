@@ -42,7 +42,7 @@ const val WPILIB_BASE_DIR_ENV_VAR: String = "wpilib.base.dir"
 const val ALT_WPILIB_BASE_DIR_SYS_PROP: String = "frc.alt.wpilib.base.dir"
 
 
-private var calculatedWpiLibDir: Path = determineWpiLibDir()
+private val calculatedWpiLibDir: Path = determineWpiLibDir()
 
 // NOTE: This class is registered as an <applicationService> in the plugin.xml
 @State(name = "FrcPlugin", storages = [(Storage("frc.xml"))])
@@ -53,7 +53,18 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                   var wpiLibDir: Path = calculatedWpiLibDir,
                                   var wpiEclipsePluginReleaseRepoUri: URI = FrcApplicationSettings.DEFAULT_WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI,
                                   var wpiEclipsePluginBetaRepoUri: URI = FrcApplicationSettings.DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI,
-                                  var clearRioLogOnRobotRestart: Boolean = false
+                                  var clearRioLogOnRobotRestart: Boolean = false,
+                                  var logNetConsoleToFile: Boolean = false,
+                                  var useRegexForRestartCheck: Boolean = false,
+                                  /**
+                                   * Regex for detecting roboRIO restart.
+                                   * NOTE:  We limit the searched for text in the regex in case of encoding issues and in case an alternate path is used 
+                                   *        on the roboRIO. The actual full Statement logged by roboRIO starts with the arrow flush left and ends with the 
+                                   *        closing/right-pointing guillemet flush right as shown here:
+                                   *        
+                                   *            ➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
+                                   */
+                                  var rioRestartRegexString: String = "(?ium).*Launching.*FRCUserProgram\\.jar.*" 
                                  ) : PersistentStateComponent<FrcApplicationSettings>
 {
     companion object Settings

@@ -79,12 +79,15 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     {
         LOG.debug("[FRC] " + getClass().getSimpleName() + ".projectOpened() called for project " + myProject);
         LOG.debug("[FRC] wpiLibDir: " + FrcApplicationSettings.Settings.INSTANCE().getWpiLibDir());
+        
         registerMessageBusListeners();
         
         //TODO: Still need to copy stuff over from original - primarily RioLog update
         // RioLogConsoleProjectService.update(myProject);
-        
+
+        // For example, see com.intellij.framework.detection.impl.FrameworkDetectionManager#projectOpened
         StartupManager.getInstance(myProject).registerPostStartupActivity(() -> notifyToConfigureTeamNumIfNecessary(myProject));
+        StartupManager.getInstance(myProject).registerPostStartupActivity(() -> checkProjectFrcStatus(myProject, false));
     }
 
 
@@ -96,7 +99,6 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         notificationMap.values().forEach(Notification::expire);
         notificationMap.clear();
         ServiceManager.getService(RioLogUdpSocketManagerApplicationService.class).deregister(myProject);
-        
     }
 
 

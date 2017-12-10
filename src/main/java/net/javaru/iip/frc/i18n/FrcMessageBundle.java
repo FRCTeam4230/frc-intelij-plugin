@@ -26,6 +26,8 @@ import org.jetbrains.annotations.PropertyKey;
 import com.intellij.CommonBundle;
 import com.intellij.openapi.diagnostic.Logger;
 
+import net.javaru.iip.frc.util.FrcUiUtils;
+
 
 
 /**
@@ -59,5 +61,21 @@ public class FrcMessageBundle
     public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params)
     {
         return CommonBundle.message(getBundle(), key, params);
+    }
+
+
+    /**
+     * Gets a resource bundled message and returns it in inside HTML tags centering the text for use on a Swing label. 
+     * For example, given the key to the message 'My Message', this will return:
+     * <pre>
+     *     "&lt;html&gt;&lt;div style='text-align: center;'&gt;" + text + "&lt;/div&gt;&lt;/html&gt;"
+     * </pre>
+     * @param key the resource bundle key
+     * @param params any parameters used within the message
+     * @return the localized message inside HTML tags centering the text
+     */
+    public static String messageLabelCentered(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params)
+    {
+        return FrcUiUtils.centerLabelText(message(key, params));
     }
 }

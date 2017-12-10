@@ -78,6 +78,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     public void projectOpened()
     {
         LOG.debug("[FRC] " + getClass().getSimpleName() + ".projectOpened() called for project " + myProject);
+        LOG.debug("[FRC] wpiLibDir: " + FrcApplicationSettings.Settings.INSTANCE().getWpiLibDir());
         registerMessageBusListeners();
         
         //TODO: Still need to copy stuff over from original - primarily RioLog update

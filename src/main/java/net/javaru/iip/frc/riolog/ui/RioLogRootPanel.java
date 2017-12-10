@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.riolog.ui;
 
-import java.awt.*;
 import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,13 +27,9 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.UIUtil;
 
 import net.javaru.iip.frc.FrcIcons.RioLog;
 import net.javaru.iip.frc.actions.MockAction;
-import net.javaru.iip.frc.i18n.FrcMessageBundle;
 import net.javaru.iip.frc.toolWindow.FrcToolWindowFactory;
 
 
@@ -47,6 +42,7 @@ public class RioLogRootPanel extends SimpleToolWindowPanel implements Disposable
     
     private static final Logger LOG = Logger.getInstance(RioLogRootPanel.class);
     private static final long serialVersionUID = 3732957886793376891L;
+    public static final String RIOLOG_TOOL_WINDOW_ID = FrcToolWindowFactory.FRC_TOOL_WINDOW_ID;
 
     @NotNull
     private final Project myProject;
@@ -73,21 +69,12 @@ public class RioLogRootPanel extends SimpleToolWindowPanel implements Disposable
         DefaultActionGroup group = new DefaultActionGroup();
         group.add(new MockAction("Net Console", RioLog.RIOLOG_UDP_CONSOLE));
         group.add(new MockAction("SSH Console", RioLog.RIOLOG_SSH_CONSOLE));
-        return ActionManager.getInstance().createActionToolbar(FrcToolWindowFactory.FRC_TOOL_WINDOW_ID, group, false);
+        return ActionManager.getInstance().createActionToolbar(RIOLOG_TOOL_WINDOW_ID, group, false);
     }
-
     
     private JPanel createNoneActivePanel()
     {
-        JBPanel panel = new JBPanel();
-        JBLabel label = new JBLabel(FrcMessageBundle.message("frc.riolog.ui.inactive.panel.text"));
-        label.setIcon(UIUtil.getInformationIcon());
-        panel.add(label, BorderLayout.CENTER);
-        
-        
-        panel.revalidate();
-        panel.repaint();
-        return panel;
+       return new EmptyRioLogPanel().getRootPanel();
     }
 
     @Override

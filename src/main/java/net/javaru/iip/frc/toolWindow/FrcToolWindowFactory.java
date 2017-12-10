@@ -60,7 +60,8 @@ public class FrcToolWindowFactory implements ToolWindowFactory,
 
         final FrcToolWindowPanel frcToolWindowPanel = FrcToolWindowPanel.getInstance(project);
         final ContentManager contentManager = toolWindow.getContentManager();
-        final Content content = contentManager.getFactory().createContent(frcToolWindowPanel, null, false);
+        // TODO: Need to either rename the displayName, or pass in null
+        final Content content = contentManager.getFactory().createContent(frcToolWindowPanel, "Options Panel", false);
         contentManager.addContent(content);
         Disposer.register(project, frcToolWindowPanel);
     }

@@ -18,7 +18,7 @@ import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 
 buildscript {
-  ext.kotlin_version = '1.2.0'
+  ext.kotlin_version = '1.2.10'
 
   repositories {
     mavenCentral()

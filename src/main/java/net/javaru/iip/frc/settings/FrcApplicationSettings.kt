@@ -24,6 +24,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.Transient
 import net.javaru.iip.frc.util.UriUtils
+import org.apache.commons.lang3.StringUtils
 import java.net.URI
 import java.nio.file.InvalidPathException
 import java.nio.file.Path
@@ -41,6 +42,7 @@ const val WPILIB_BASE_DIR_ENV_VAR: String = "wpilib.base.dir"
  */
 const val ALT_WPILIB_BASE_DIR_SYS_PROP: String = "frc.alt.wpilib.base.dir"
 
+const val USE_WPILIB_BETA_SITE: String = "frc.use.wpilib.beta.site"
 
 private val calculatedWpiLibDir: Path = determineWpiLibDir()
 
@@ -128,7 +130,7 @@ private fun determineWpiLibDir(): Path
     val logger = Logger.getInstance(FrcApplicationSettings::class.java)
     var basePath: Path? = null
 
-    if (System.getProperty(ALT_WPILIB_BASE_DIR_SYS_PROP) != null)
+    if (StringUtils.isNotBlank(System.getProperty (ALT_WPILIB_BASE_DIR_SYS_PROP)))
     {
         try
         {
@@ -146,7 +148,7 @@ private fun determineWpiLibDir(): Path
         try
         {
             val envVar: String? = System.getenv(WPILIB_BASE_DIR_ENV_VAR)
-            if (envVar != null)
+            if (!envVar.isNullOrBlank())
             {
                 try
                 {

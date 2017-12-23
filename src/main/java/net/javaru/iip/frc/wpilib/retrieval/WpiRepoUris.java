@@ -19,10 +19,12 @@ package net.javaru.iip.frc.wpilib.retrieval;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.diagnostic.Logger;
 
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
+import net.javaru.iip.frc.settings.FrcApplicationSettingsKt;
 
 
 
@@ -38,7 +40,9 @@ class WpiRepoUris
      */
     public static URI getRepoFullUri()
     {
-        return FrcApplicationSettings.Settings.INSTANCE().getWpiEclipsePluginReleaseRepoUri();
+        return (BooleanUtils.toBoolean(System.getProperty(FrcApplicationSettingsKt.USE_WPILIB_BETA_SITE, "false")))
+               ? FrcApplicationSettings.Settings.INSTANCE().getWpiEclipsePluginBetaRepoUri()
+               : FrcApplicationSettings.Settings.INSTANCE().getWpiEclipsePluginReleaseRepoUri();
     }
 
 

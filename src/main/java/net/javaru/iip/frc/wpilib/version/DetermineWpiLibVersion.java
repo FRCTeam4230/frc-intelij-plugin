@@ -50,7 +50,7 @@ public class DetermineWpiLibVersion
         
         if (verClass.length == 0)
         {
-            return FrcMessageBundle.message("frc.wpilib.version.unavailable", WPILIB_VERSION_CLASS_FQN);
+            return FrcMessageBundle.message("frc.wpilib.version.unavailable", WpiLibConstants.VERSION_CLASS_FQN);
         }
 
         String version = null;

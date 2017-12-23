@@ -27,6 +27,7 @@ import com.intellij.psi.PsiLiteralExpression;
 
 import net.javaru.iip.frc.i18n.FrcMessageBundle;
 import net.javaru.iip.frc.util.FindClassUtils;
+import net.javaru.iip.frc.wpilib.WpiLibConstants;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 
 
@@ -34,7 +35,7 @@ import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 public class DetermineWpiLibVersion
 {
     private static final Logger LOG = Logger.getInstance(DetermineWpiLibVersion.class);
-    public static final String WPILIB_VERSION_CLASS_FQN = "edu.wpi.first.wpilibj.util.WPILibVersion";
+   
 
 
     public static String determineVersion(@NotNull Project project)
@@ -45,7 +46,7 @@ public class DetermineWpiLibVersion
         }
 
         
-        final PsiClass[] verClass = FindClassUtils.findClass(project, WPILIB_VERSION_CLASS_FQN);
+        final PsiClass[] verClass = FindClassUtils.findClass(project, WpiLibConstants.VERSION_CLASS_FQN);
         
         if (verClass.length == 0)
         {

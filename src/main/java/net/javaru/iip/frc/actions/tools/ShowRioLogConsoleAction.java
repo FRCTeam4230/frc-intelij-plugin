@@ -18,12 +18,13 @@ package net.javaru.iip.frc.actions.tools;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 
 
 
 
-public class ShowRioLogConsoleAction extends AbstractFrcToolsAction
+public class ShowRioLogConsoleAction extends AbstractFrcToolsAction implements DumbAware
 {
     private static final Logger LOG = Logger.getInstance(ShowRioLogConsoleAction.class);
     @Override

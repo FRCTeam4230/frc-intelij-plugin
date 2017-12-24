@@ -84,7 +84,7 @@ public class WpiLibDownloader
             LOG.debug("[FRC] coreJarUri: " + coreJarUri);
             final Path javaJarFilePath = WpiRepoHttpClient.downloadAndSaveToTemp(javaJarUri);
             final Path coreJarFilePath = WpiRepoHttpClient.downloadAndSaveToTemp(coreJarUri);
-            // The java.zip file has w directories in it:  ant;  javadoc;  lib;  And is extracted in 'current' so we end up with: 
+            // The java.zip file has 3 directories in it:  ant;  javadoc;  lib;  And is extracted in 'current' so we end up with: 
             //      C:\Users\Dilbert\wpilib\java\current\ant   C:\Users\Dilbert\wpilib\java\current\javadoc   C:\Users\Dilbert\wpilib\java\current\lib
             extractZipFileContainedInZipFile(javaJarFilePath, "resources/java.zip", WpiLibPaths.getJavaCurrentDir());
             // The tools.zip content needs to go into C:\Users\Mark\wpilib\tools  so we end up with C:\Users\Mark\wpilib\tools\plugins  and  C:\Users\Mark\wpilib\tools\*.jar 
@@ -133,7 +133,7 @@ public class WpiLibDownloader
         //Will be null if not found
         final ZipEntry zipEntry = outerJarFile.getEntry(innerFilePath);
         
-        LOG.debug("[FRC] Extracting '" + innerFilePath + "' to " + destDir);
+        LOG.debug("[FRC] Extracting '" + innerFilePath + "' from '" + jarFilePath.getFileName() +  "' to " + destDir);
         final BufferedInputStream inputStream = new BufferedInputStream(outerJarFile.getInputStream(zipEntry));
         UnzipUtils.unzip(inputStream, destDir, true);
     }

@@ -17,6 +17,7 @@
 package net.javaru.iip.frc.wpilib.retrieval;
 
 import java.io.BufferedInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -61,13 +62,14 @@ public class WpiLibDownloader
         {
             final Document siteXml = fetchSiteXml();
             final JavaFeatureDescriptor javaFeatureDescriptor = parseSiteXml(siteXml);
-
+            LOG.info("[FRC] Current WPILib version (as indicated in 'site.xml') is '" + javaFeatureDescriptor.getVersion() + "'");
 
             //final Document javaFeatureXml = WpiRepoHttpClient.fetchXmlResourceAsDocument(javaFeatureDescriptor.getUri());
 
             // For now, as a quick hit to get the download working, we are not going to get and a parse the 
             // the feature XML and traverse down the chain. We know we wan the java and core JARs. We'll hard
             // code the names for now.
+            // TODO: parse the site.xml in the event things change
 
             final URI siteXmlUri = WpiRepoUris.getRepoSiteXmlFileUri();
 
@@ -80,8 +82,8 @@ public class WpiLibDownloader
                                                                    String.format("plugins/edu.wpi.first.wpilib.plugins.core_%s.jar",
                                                                                  javaFeatureDescriptor.getVersion()));
 
-            LOG.debug("[FRC] javaJarUri: " + javaJarUri);
-            LOG.debug("[FRC] coreJarUri: " + coreJarUri);
+            LOG.info("[FRC] Using javaJarUri: " + javaJarUri);
+            LOG.info("[FRC] Using coreJarUri: " + coreJarUri);
             final Path javaJarFilePath = WpiRepoHttpClient.downloadAndSaveToTemp(javaJarUri);
             final Path coreJarFilePath = WpiRepoHttpClient.downloadAndSaveToTemp(coreJarUri);
             // The java.zip file has 3 directories in it:  ant;  javadoc;  lib;  And is extracted in 'current' so we end up with: 
@@ -93,7 +95,7 @@ public class WpiLibDownloader
 
             Files.createDirectories(WpiLibPaths.getUserLibDir());
             createWpilibPropertiesFile();
-            LOG.debug("[FRC] Download latest wpilib completed");
+            LOG.debug("[FRC] Download & extraction of latest wpilib completed");
         }
         catch (Exception e)
         {
@@ -130,12 +132,19 @@ public class WpiLibDownloader
     private static void extractZipFileContainedInZipFile(Path jarFilePath, String innerFilePath, Path destDir) throws IOException
     {
         ZipFile outerJarFile = new ZipFile(jarFilePath.toFile());
-        //Will be null if not found
+        // Will be null if not found
         final ZipEntry zipEntry = outerJarFile.getEntry(innerFilePath);
-        
-        LOG.debug("[FRC] Extracting '" + innerFilePath + "' from '" + jarFilePath.getFileName() +  "' to " + destDir);
-        final BufferedInputStream inputStream = new BufferedInputStream(outerJarFile.getInputStream(zipEntry));
-        UnzipUtils.unzip(inputStream, destDir, true);
+        if (zipEntry == null)
+        {
+            LOG.warn("[FRC] '" + innerFilePath + "' was not found in '" + jarFilePath.getFileName() + "'. Cannot extract it to " +destDir);
+            throw  new FileNotFoundException("'" + innerFilePath + "' was not found in '" + jarFilePath.getFileName() + "' and could not be extracted to " + destDir);
+        }
+        else 
+        {
+            LOG.info("[FRC] Extracting '" + innerFilePath + "' and its contents from '" + jarFilePath.getFileName() + "' to " + destDir);
+            final BufferedInputStream inputStream = new BufferedInputStream(outerJarFile.getInputStream(zipEntry));
+            UnzipUtils.unzip(inputStream, destDir, true);
+        }
     }
 
 

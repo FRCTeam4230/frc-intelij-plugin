@@ -40,7 +40,7 @@ public class DetermineWpiLibVersion
 
     public static String determineVersion(@NotNull Project project)
     {
-        if (!WpiLibLibrariesUtils.isWpilibPresent(project))
+        if (!WpiLibLibrariesUtils.isWpilibPresentViaReadAction(project))
         {
             return FrcMessageBundle.message("frc.wpilib.not.attached");
         }

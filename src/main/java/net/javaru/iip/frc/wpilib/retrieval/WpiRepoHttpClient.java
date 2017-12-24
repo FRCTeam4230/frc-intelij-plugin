@@ -69,7 +69,7 @@ class WpiRepoHttpClient
         final HttpGet httpRequest = new HttpGet(uri);
         try (final CloseableHttpResponse httpResponse = httpClient.execute(httpRequest, httpClientContext))
         {
-            LOG.debug("[FRC] http response status line was '" + httpResponse.getStatusLine() + "' for uri '" + uri + '\'');
+            LOG.info("[FRC] http response status line was '" + httpResponse.getStatusLine() + "' for URI '" + uri + '\'');
             final HttpEntity httpEntity = httpResponse.getEntity();
             final String xml = EntityUtils.toString(httpEntity, StandardCharsets.UTF_8);
             EntityUtils.consumeQuietly(httpEntity);
@@ -128,14 +128,22 @@ class WpiRepoHttpClient
         final Path resourceFileName = Paths.get(uri.getPath()).getFileName();
 
         final Path destinationPath = Paths.get(FileUtil.getTempDirectory()).resolve(resourceFileName).toAbsolutePath();
+        try
+        {
+            destinationPath.toFile().deleteOnExit();
+            LOG.debug("[FRC] temp file marked for deletion on exit: " + destinationPath);
+        }
+        catch (Exception e)
+        {
+            LOG.warn("[FRC] Could not mark temp file '" + destinationPath + "' for deletion on exit due to an exception: " + e.toString(), e);
+        }
 
         final CloseableHttpClient httpClient = getHttpClient();
         final HttpClientContext httpClientContext = HttpClientContext.create();
         final HttpGet httpRequest = new HttpGet(uri);
         try (final CloseableHttpResponse httpResponse = httpClient.execute(httpRequest, httpClientContext))
         {
-            LOG.debug(
-                "[FRC] http response status line when fetching resource ' " + resourceFileName + "' from URI '" + uri + "': " + httpResponse.getStatusLine());
+            LOG.info("[FRC] http response status line was '" + httpResponse.getStatusLine() + "' for URI '" + uri + '\'');
             final HttpEntity httpEntity = httpResponse.getEntity();
             if (httpEntity == null)
             {
@@ -146,12 +154,19 @@ class WpiRepoHttpClient
             }
             else
             {
-                Files.deleteIfExists(destinationPath);
+                try
+                {
+                    Files.deleteIfExists(destinationPath);
+                }
+                catch (IOException e)
+                {
+                    LOG.warn("[FRC] Could not delete existing dir '" + destinationPath + "' to ensure clean update. Cause Summary: " + e.toString(), e);
+                }
                 Files.createDirectories(destinationPath.getParent());
 
                 //TODO - put in code to check if file already exists
 
-                LOG.debug("[FRC] '" + resourceFileName + "' destination path: " + destinationPath);
+                LOG.info("[FRC] Copying '" + resourceFileName + "' to destination path '" + destinationPath + "'");
                 try (
                     final BufferedInputStream inputStream = new BufferedInputStream(httpEntity.getContent());
                     final BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(destinationPath));

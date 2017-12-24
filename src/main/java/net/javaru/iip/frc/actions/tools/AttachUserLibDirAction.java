@@ -33,6 +33,7 @@ import com.intellij.openapi.roots.libraries.Library;
 
 import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.notify.FrcNotifications;
+import net.javaru.iip.frc.util.IndexUtils;
 import net.javaru.iip.frc.util.LibraryUtils;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.WpiLibPaths;
@@ -85,7 +86,8 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
                                                                   FrcNotifications.IconInfo,
                                                                   FrcNotifications.Title,
                                                                   "User Lib Already Attached",
-                                                                  "The user/java/lib directory is already attached via library '" + existing.getName() + "'.",
+                                                                  "The FRC 'user/java/lib' directory is already attached via library '" + existing.getName() 
+                                                                  + "'. Indexes are being refreshed." ,
                                                                   NotificationType.INFORMATION,
                                                                   null
                         ), project);
@@ -98,6 +100,7 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
                             queueSuccessfulNotification(project);
                         }
                     }
+                    IndexUtils.refreshAll(project);
                 }
             }
         }
@@ -129,7 +132,7 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
                                 FrcNotifications.IconWarn,
                                 FrcNotifications.Title,
                                 "WPILib",
-                                "Could not attach user/java/lib dir as a library." + cause,
+                                "Could not attach 'user/java/lib' dir as a library." + cause,
                                 NotificationType.WARNING,
                                 null
         );
@@ -149,7 +152,7 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
                                 FrcNotifications.IconInfo,
                                 FrcNotifications.Title,
                                 "WPILib",
-                                "The user/java/lib has been attached as a library.",
+                                "The 'user/java/lib' has been attached as a library. Indexes are being refreshed.",
                                 NotificationType.INFORMATION,
                                 null
         );

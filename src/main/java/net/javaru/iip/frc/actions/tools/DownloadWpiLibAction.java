@@ -28,6 +28,7 @@ import com.intellij.openapi.progress.Task.Backgroundable;
 import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.notify.FrcNotifications;
+import net.javaru.iip.frc.util.IndexUtils;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloadFailedException;
 import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
@@ -40,6 +41,7 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
 
     public static final String NOTIFICATIONS_SUBTITLE = "WPILib Download";
 
+    //TODO: Make this action unavailable if it is currently running in the background
 
     @Override
     public void actionPerformed(AnActionEvent actionEvent)
@@ -52,18 +54,29 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
 
     public static void downloadLatestInBackground(@Nullable Project project, boolean autoAttach)
     {
+        
+        // TODO: The isAttached concepts needs some rework:
+        //    It needs to separate the use case of the default 'wpilib/java/lib' dir is attached as a project library (currently the only option)
+        //    and the use case of the individual JARs attached. 
+        //    The latter is complicated by the fact that JARs may be added, renamed and/or refactored, or removed from one year to the next 
+        //    A possible solution is an all or nothing: autoManaged (with the possibility of an alternate dir location) and manually manged.
+        
         new Backgroundable(project, "Downloading WPILib Update", false)
         {
-            boolean areAttached = false;
-
+            final boolean wasAttached = project != null && WpiLibLibrariesUtils.isWpilibJavaLibDirAttachedViaReadAction(project);
+            boolean isAttached = wasAttached;
+            
 
             @Override
             public void run(@NotNull ProgressIndicator indicator)
             {
+                LOG.info("[FRC] Downloading latest WPILib...");
+                LOG.debug("[FRC] wasAttached = " + wasAttached);
                 WpiLibDownloader.downloadLatest();
                 if (project != null)
                 {
-                    areAttached = WpiLibLibrariesUtils.areAllPresentViaReadAction(project);
+                    isAttached = WpiLibLibrariesUtils.isWpilibJavaLibDirAttachedViaReadAction(project);
+                    LOG.debug("[FRC] After download. isAttached = " + isAttached);
                 }
             }
 
@@ -71,14 +84,22 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
             @Override
             public void onSuccess()
             {
+                LOG.info("[FRC] Downloading latest WPILib completed successfully.");
+                LOG.debug("[FRC] onSuccess() called for WPILib download. isAttached = " + isAttached + "  wasAttached = " + wasAttached);
                 @Nullable
                 final Notification notification;
 
-                if (!areAttached && project != null)
+                if (project != null && (wasAttached || !isAttached))
                 {
                     if (autoAttach)
                     {
-                        AttachWpilibAction.attachWpiLib(project, true);
+                        LOG.info("[FRC] Auto-attaching WPILib after download.");
+                        AttachWpilibAction.attachWpiLib(project, !wasAttached, true);
+                        notification = null;
+                    }
+                    else if (wasAttached) 
+                    {
+                        IndexUtils.refreshAll(project);
                         notification = null;
                     }
                     else
@@ -94,7 +115,7 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
                                                             if ("attach".equals(event.getDescription()))
                                                             {
                                                                 Logger.getInstance(DownloadWpiLibAction.class).debug("[FRC] Attaching WPILib library");
-                                                                AttachWpilibAction.attachWpiLib(project, true);
+                                                                AttachWpilibAction.attachWpiLib(project, true, true);
                                                             }
                                                             theNotification.expire();
                                                         }
@@ -110,14 +131,15 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
                 {
                     Notifications.Bus.notify(notification, myProject);
                 }
-
+                // We reindex to catch the files that have changed
+                IndexUtils.refreshAll(project);
             }
 
 
             @Override
             public void onError(@NotNull Exception error)
             {
-
+                // A nice TODO: make the replacement of files a transaction with rollback if possible
                 String content = "Cause: ";
 
                 if (error instanceof WpiLibDownloadFailedException)
@@ -137,6 +159,8 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
                                                           NotificationType.WARNING,
                                                           null
                 ), project);
+                // We reindex to catch the files that have changed, which may have even have happened on a failure if it was a partial failure
+                IndexUtils.refreshAll(project);
             }
 
         }.queue();

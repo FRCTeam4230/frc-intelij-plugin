@@ -131,7 +131,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
                                                           if (knownFacetedProject || isFrcFacetedProject(project))
                                                           {
-                                                              if (notificationMap.get(WpilibAttached) == null && !WpiLibLibrariesUtils.isWpilibPresent(project))
+                                                              if (notificationMap.get(WpilibAttached) == null && !WpiLibLibrariesUtils.isWpilibPresentViaReadAction(project))
                                                               {
                                                                   final Notification notification = 
                                                                   (WpiLibLibrariesUtils.isWpilibInstalledOnSystem())
@@ -140,7 +140,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                                   notificationMap.put(WpilibAttached, notification);
                                                               }
 
-                                                              if (notificationMap.get(UserLibAttached) == null && !WpiLibLibrariesUtils.isUserLibAttached(project))
+                                                              if (notificationMap.get(UserLibAttached) == null && !WpiLibLibrariesUtils.isUserLibAttachedViaReadAction(project))
                                                               {
                                                                   final Notification notification = queueMissingUserLibNotification(project);
                                                                   notificationMap.put(UserLibAttached, notification);
@@ -209,7 +209,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                                theNotification.expire();
                                                                if ("attach".equals(event.getDescription()))
                                                                {
-                                                                   AttachWpilibAction.attachWpiLib(project, false);
+                                                                   AttachWpilibAction.attachWpiLib(project, false, true);
                                                                }
                                                            }
         );

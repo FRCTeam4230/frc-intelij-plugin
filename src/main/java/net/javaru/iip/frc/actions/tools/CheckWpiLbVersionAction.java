@@ -52,10 +52,11 @@ public class CheckWpiLbVersionAction extends AbstractFrcToolsAction
     @Override
     public void update(AnActionEvent e)
     {
+        //TODO: Make this action unavailable if a download is currently running in the background
         final Project project = e.getData(CommonDataKeys.PROJECT);
         e.getPresentation().setVisible(project != null &&
                                        !project.isDisposed() &&
                                        FrcFacet.isFrcFacetedProject(project) &&
-                                       WpiLibLibrariesUtils.areAllPresentViaReadAction(project));
+                                       WpiLibLibrariesUtils.isWpilibPresentViaReadAction(project));
     }
 }

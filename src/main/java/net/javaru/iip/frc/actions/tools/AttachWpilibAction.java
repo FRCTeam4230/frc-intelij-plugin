@@ -40,6 +40,7 @@ import com.intellij.openapi.ui.Messages;
 import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.util.FrcFileUtils;
+import net.javaru.iip.frc.util.IndexUtils;
 import net.javaru.iip.frc.util.LibraryUtils;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.WpiLibPaths;
@@ -61,7 +62,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
         e.getPresentation().setVisible(project != null &&
                                        !project.isDisposed() &&
                                        FrcFacet.isFrcFacetedProject(project) &&
-                                       !WpiLibLibrariesUtils.areAllPresentViaReadAction(project));
+                                       !WpiLibLibrariesUtils.isWpilibPresentViaReadAction(project));
     }
 
 
@@ -69,11 +70,11 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
     public void actionPerformed(AnActionEvent actionEvent)
     {
         final Project project = actionEvent.getProject();
-        attachWpiLib(project, true);
+        attachWpiLib(project, true, true);
     }
 
 
-    public static void attachWpiLib(Project project, final boolean notifyOnCompletion)
+    public static void attachWpiLib(Project project, final boolean notifyOnCompletion, boolean doReindex)
     {
         if (project != null)
         {
@@ -143,6 +144,10 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                             queueSuccessfulNotification(project);
                         }
                     }
+                }
+                if (doReindex)
+                {
+                    IndexUtils.refreshAll(project);
                 }
             }
             catch (Exception e)

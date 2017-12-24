@@ -41,13 +41,13 @@ public final class UriUtils
     {
         try
         {
-            LOG.debug("uri =          " +  uri);
+            LOG.debug("    [FRC] uri =          " +  uri);
 
 
             final String pathString = uri.getPath();
             final Path path = Paths.get(pathString);
-            LOG.debug("path =         " +  path);
-            LOG.debug("host =         " +  uri.getHost());
+            LOG.debug("    [FRC] path =         " +  path);
+            LOG.debug("    [FRC] host =         " +  uri.getHost());
 
             //The File System wil "normalize" to the proper forward or back slash
             final Path rootPath = Paths.get("/");
@@ -67,7 +67,7 @@ public final class UriUtils
                                      sibling.toString().replace('\\', '/'),
                                      null);
             }
-            LOG.debug("siblingUri =   " +  siblingUri);
+            LOG.debug("    [FRC] siblingUri =   " +  siblingUri);
             return siblingUri;
         }
         catch (URISyntaxException e)

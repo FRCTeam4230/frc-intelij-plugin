@@ -51,8 +51,13 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
 {
     private static final Logger LOG = Logger.getInstance(RobotSubclassFrcFrameworkDetector.class);
     
-    private static final Set<String> SUPER_CLASSES_FQN = ImmutableSet.of(WpiLibConstants.ITERATIVE_ROBOT_FQN,
-                                                                         WpiLibConstants.ROBOT_BASE_FQN);
+    // All robot classes extend RobotBase. Thus we are technically fine just checking for that one. 
+    // But we include the others in the event WPI Lib modifies the inheritance hierarchy.
+    private static final Set<String> SUPER_CLASSES_FQN = ImmutableSet.of(WpiLibConstants.ROBOT_BASE_FQN,
+                                                                         WpiLibConstants.SAMPLE_ROBOT_FQN,
+                                                                         WpiLibConstants.ITERATIVE_ROBOT_BASE_FQN,
+                                                                         WpiLibConstants.ITERATIVE_ROBOT_FQN,
+                                                                         WpiLibConstants.TIMED_ROBOT_FQN);
 
     private static final Set<String> SUPER_CLASSES_NAMES = initSuperClassNames();
 

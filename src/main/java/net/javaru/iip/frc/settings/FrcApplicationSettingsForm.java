@@ -30,9 +30,9 @@ import com.intellij.ui.components.JBTextField;
 
 
 
-public class FrcApplicationSettingsFrom
+public class FrcApplicationSettingsForm
 {
-    private static final Logger LOG = Logger.getInstance(FrcApplicationSettingsFrom.class);
+    private static final Logger LOG = Logger.getInstance(FrcApplicationSettingsForm.class);
 
     private FrcApplicationSettings internalState = FrcApplicationSettings.Settings.clone(FrcApplicationSettings.Settings.INSTANCE());
 
@@ -42,7 +42,7 @@ public class FrcApplicationSettingsFrom
     private JBLabel teamNumberWarningIconLabel;
 
 
-    public FrcApplicationSettingsFrom()
+    public FrcApplicationSettingsForm()
     {
         initForm();
         load(FrcApplicationSettings.Settings.INSTANCE());
@@ -58,7 +58,7 @@ public class FrcApplicationSettingsFrom
     public boolean isModified()
     {
         final boolean modified = !FrcApplicationSettings.Settings.INSTANCE().equals(internalState);
-        LOG.trace("[FRC] FrcApplicationSettingsFrom.isModified returning " + modified);
+        LOG.trace("[FRC] FrcApplicationSettingsForm.isModified returning " + modified);
         return modified;
     }
 

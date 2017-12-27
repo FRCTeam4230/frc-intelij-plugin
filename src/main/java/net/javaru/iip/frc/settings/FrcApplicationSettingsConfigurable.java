@@ -34,7 +34,7 @@ public class FrcApplicationSettingsConfigurable implements SearchableConfigurabl
 {
     private static final Logger LOG = Logger.getInstance(FrcApplicationSettingsConfigurable.class);
 
-    private FrcApplicationSettingsFrom myForm;
+    private FrcApplicationSettingsForm myForm;
 
     private static FrcApplicationSettingsConfigurable defaultInstance = new FrcApplicationSettingsConfigurable();
     
@@ -64,7 +64,7 @@ public class FrcApplicationSettingsConfigurable implements SearchableConfigurabl
     @Override
     public JComponent createComponent()
     {
-        myForm = new FrcApplicationSettingsFrom();
+        myForm = new FrcApplicationSettingsForm();
         return myForm.getRootPanel();
     }
 

@@ -39,6 +39,7 @@ import net.javaru.iip.frc.actions.tools.AttachWpilibAction;
 import net.javaru.iip.frc.actions.tools.DownloadWpiLibAction;
 import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.notify.FrcNotifications;
+import net.javaru.iip.frc.riolog.RioLogConsoleProjectService;
 import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
@@ -82,8 +83,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         
         registerMessageBusListeners();
         
-        //TODO: Still need to copy stuff over from original - primarily RioLog update
-        // RioLogConsoleProjectService.update(myProject);
+        RioLogConsoleProjectService.update(myProject);
 
         // For example, see com.intellij.framework.detection.impl.FrameworkDetectionManager#projectOpened
         StartupManager.getInstance(myProject).registerPostStartupActivity(() -> notifyToConfigureTeamNumIfNecessary(myProject));
@@ -297,9 +297,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         {
             if (FrcFacet.isFrcFacet(facet))
             {
-                //TODO need to implement once RioLogConsoleProjectService is reworked
-                //RioLogConsoleProjectService.update(facet);
-                LOG.info("TODO: need to FrcProjectComponentImpl.implement updateForFrcFacet(Facet) once RioLogConsoleProjectService is reworked");
+                RioLogConsoleProjectService.update(facet);
             }
         }
     }

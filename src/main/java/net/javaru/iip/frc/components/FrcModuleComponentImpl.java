@@ -23,6 +23,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 
 import net.javaru.iip.frc.facet.FrcFacet;
+import net.javaru.iip.frc.riolog.RioLogConsoleProjectService;
 
 
 
@@ -99,9 +100,7 @@ public class FrcModuleComponentImpl implements FrcModuleComponent
         // RioLogConsoleProjectService.update() is called via the ProjectComponent.projectOpened() method
         if (myModule.getProject().isOpen())
         {
-            //TODO - finish implmenting
-            LOG.warn("[FRC] Still need to implement FrcModuleComponentImpl.moduleAdded()");
-            //RioLogConsoleProjectService.update(myModule);
+            RioLogConsoleProjectService.update(myModule);
         }
     }
 
@@ -117,11 +116,9 @@ public class FrcModuleComponentImpl implements FrcModuleComponent
     public void disposeComponent()
     {
         LOG.debug("[FRC] " + getClass().getSimpleName() + ".disposeComponent() called for module " + myModule);
-        if (myModule.isDisposed())
+        if (!myModule.isDisposed())
         {
-            //TODO - finish implmenting
-            LOG.warn("[FRC] Still need to implement FrcModuleComponentImpl.disposeComponent()");
-            //RioLogConsoleProjectService.update(myModule);
+            RioLogConsoleProjectService.update(myModule);
         }
     }
 

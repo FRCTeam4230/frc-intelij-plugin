@@ -89,11 +89,11 @@ public class SimulatedRioLogTestingService extends Thread implements Runnable
     public static final String SIMULATED_EXCEPTION_FREQUENCY_PROP_KEY =
        SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".simulated.exception.frequency";
 
-    public static final String PAUSE_DURATION_PROP_KEY =SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".pause.duration";
+    public static final String PAUSE_DURATION_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".pause.duration";
 
-    public static final String PAUSE_TIMEUNIT_PROP_KEY =SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".pause.timeunit";
+    public static final String PAUSE_TIMEUNIT_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".pause.timeunit";
 
-    public static final String SOCKET_PORT_PROP_KEY =SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".socket.port";
+    public static final String SOCKET_PORT_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".socket.port";
     public static final int DEFAULT_SOCKET_PORT = RioLogUdpSocketManagerApplicationService.SIMULATED_LOG_SERVICE_PORT_DEFAULT + 1;
 
 

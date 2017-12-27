@@ -86,6 +86,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         RioLogConsoleProjectService.update(myProject);
 
         // For example, see com.intellij.framework.detection.impl.FrameworkDetectionManager#projectOpened
+        StartupManager.getInstance(myProject).registerPostStartupActivity(() -> RioLogConsoleProjectService.activateUdpNow(myProject));
         StartupManager.getInstance(myProject).registerPostStartupActivity(() -> notifyToConfigureTeamNumIfNecessary(myProject));
         StartupManager.getInstance(myProject).registerPostStartupActivity(() -> checkProjectFrcStatus(myProject, false));
     }

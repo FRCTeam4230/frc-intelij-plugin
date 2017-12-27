@@ -70,6 +70,7 @@ intellij {
     //runIde.systemProperties = ['key1': 'value1', 'key2': 'value2']
     runIde.systemProperties = [
             'frc.simulated.log.service.enabled': System.getProperty('frc.simulated.log.service.enabled', 'false'),
+            'frc.simulated.log.service.use.configured.port': System.getProperty('frc.simulated.log.service.use.configured.port', 'false'),
             'frc.use.wpilib.beta.site': System.getProperty('frc.use.wpilib.beta.site', 'false'),
             'frc.alt.wpilib.base.dir': System.getProperty('frc.alt.wpilib.base.dir', ''),
             'wpilib.base.dir': System.getProperty('wpilib.base.dir', '')

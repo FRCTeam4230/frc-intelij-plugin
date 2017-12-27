@@ -146,7 +146,7 @@ public class UdpRioLogMonitoringProcess extends RioLogMonitoringProcess
             }
             catch (BindException e)
             {
-                final String msg = "Could not bind to the RioLog port. This can occur is another tool, such as Eclipse, "
+                final String msg = "Could not bind to the RioLog port. This can occur if another tool, such as Eclipse, "
                                    + "is bound to the RioLog port. It can also occur if a second IDEA window with an "
                                    + "FRC project is open. It is a known limitation that only one FRC project can be "
                                    + "opened at a time with the RioLog monitor running. A fix so that all FRC projects " 

@@ -33,7 +33,7 @@ public class ShowRioLogConsoleAction extends AbstractFrcToolsAction implements D
         if (project != null)
         {
             RioLogConsoleProjectService.update(project);
-            RioLogConsoleProjectService.activateNow(project);
+            RioLogConsoleProjectService.activateUdpSafely(project);
         }
     }
 }

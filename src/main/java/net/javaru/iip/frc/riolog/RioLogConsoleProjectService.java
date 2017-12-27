@@ -149,60 +149,175 @@ public class RioLogConsoleProjectService
     }
 
 
-    public static void activateSafely(@Nullable Facet facet)
+    public static void activateBothSafely(@Nullable Facet facet)
     {
         if (facet != null)
         {
             final Project project = facet.getModule().getProject();
-            getInstance(project).activateSafely();
+            getInstance(project).activateBothSafely();
         }
     }
 
 
-    public static void activateSafely(@Nullable Module module)
+    public static void activateBothSafely(@Nullable Module module)
     {
         if (module != null)
         {
             final Project project = module.getProject();
-            getInstance(project).activateSafely();
+            getInstance(project).activateBothSafely();
         }
     }
 
 
-    public static void activateSafely(@Nullable Project project)
+    public static void activateBothSafely(@Nullable Project project)
     {
         if (project != null)
         {
-            getInstance(project).activateSafely();
+            getInstance(project).activateBothSafely();
         }
     }
 
 
-    public static void activateNow(@Nullable Facet facet)
+    public static void activateBothNow(@Nullable Facet facet)
     {
         if (facet != null)
         {
             final Project project = facet.getModule().getProject();
-            getInstance(project).activateNow();
+            getInstance(project).activateBothNow();
         }
     }
 
 
-    public static void activateNow(@Nullable Module module)
+    public static void activateBothNow(@Nullable Module module)
     {
         if (module != null)
         {
             final Project project = module.getProject();
-            getInstance(project).activateNow();
+            getInstance(project).activateBothNow();
         }
     }
 
 
-    public static void activateNow(@Nullable Project project)
+    public static void activateBothNow(@Nullable Project project)
     {
         if (project != null)
         {
-            getInstance(project).activateNow();
+            getInstance(project).activateBothNow();
+        }
+    }
+
+
+    public static void activateUdpSafely(@Nullable Facet facet)
+    {
+        if (facet != null)
+        {
+            final Project project = facet.getModule().getProject();
+            getInstance(project).activateUdpSafely();
+        }
+    }
+
+
+    public static void activateUdpSafely(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final Project project = module.getProject();
+            getInstance(project).activateUdpSafely();
+        }
+    }
+
+
+    public static void activateUdpSafely(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            getInstance(project).activateUdpSafely();
+        }
+    }
+
+
+    public static void activateUdpNow(@Nullable Facet facet)
+    {
+        if (facet != null)
+        {
+            final Project project = facet.getModule().getProject();
+            getInstance(project).activateUdpNow();
+        }
+    }
+
+
+    public static void activateUdpNow(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final Project project = module.getProject();
+            getInstance(project).activateUdpNow();
+        }
+    }
+
+
+    public static void activateUdpNow(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            getInstance(project).activateUdpNow();
+        }
+    }
+
+    public static void activateSshSafely(@Nullable Facet facet)
+    {
+        if (facet != null)
+        {
+            final Project project = facet.getModule().getProject();
+            getInstance(project).activateSshSafely();
+        }
+    }
+
+
+    public static void activateSshSafely(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final Project project = module.getProject();
+            getInstance(project).activateSshSafely();
+        }
+    }
+
+
+    public static void activateSshSafely(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            getInstance(project).activateSshSafely();
+        }
+    }
+
+
+    public static void activateSshNow(@Nullable Facet facet)
+    {
+        if (facet != null)
+        {
+            final Project project = facet.getModule().getProject();
+            getInstance(project).activateSshNow();
+        }
+    }
+
+
+    public static void activateSshNow(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final Project project = module.getProject();
+            getInstance(project).activateSshNow();
+        }
+    }
+
+
+    public static void activateSshNow(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            getInstance(project).activateSshNow();
         }
     }
 
@@ -271,17 +386,40 @@ public class RioLogConsoleProjectService
     }
 
 
-    public void activateSafely()
+    public void activateBothSafely()
     {
         sshRioLogConsoleProjectService.activateSafely();
         udpRioLogConsoleProjectService.activateSafely();
     }
 
 
-    public void activateNow()
+    public void activateBothNow()
     {
         sshRioLogConsoleProjectService.activateNow();
         udpRioLogConsoleProjectService.activateNow();
+    }
+
+
+    public void activateUdpSafely()
+    {
+        udpRioLogConsoleProjectService.activateSafely();
+    }
+
+
+    public void activateUdpNow()
+    {
+        udpRioLogConsoleProjectService.activateNow();
+    }
+
+    public void activateSshSafely()
+    {
+        sshRioLogConsoleProjectService.activateSafely();
+    }
+
+
+    public void activateSshNow()
+    {
+        sshRioLogConsoleProjectService.activateNow();
     }
 
 
@@ -290,6 +428,4 @@ public class RioLogConsoleProjectService
         sshRioLogConsoleProjectService.closeContentExecutor();
         udpRioLogConsoleProjectService.closeContentExecutor();
     }
-
-
 }

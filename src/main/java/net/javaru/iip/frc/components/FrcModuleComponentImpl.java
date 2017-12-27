@@ -81,23 +81,13 @@ public class FrcModuleComponentImpl implements FrcModuleComponent
     }
 
 
+    @SuppressWarnings("unused")
     @Contract("null -> false")
     public static boolean isFrcFacetedModule(@Nullable Module module) {return FrcFacet.isFrcFacetedModule(module);}
 
 
-    @Override
-    public void projectOpened()
-    {
-        LOG.debug("[FRC] " + getClass().getSimpleName() + ".projectOpened() called for module " + myModule);
-    }
-
-
-    @Override
-    public void projectClosed()
-    {
-        LOG.debug("[FRC] " + getClass().getSimpleName() + ".projectClosed() called for module " + myModule);
-    }
-
+    // projectOpened() and projectClosed() are deprecated and thus not implemented
+    
 
     @Override
     public void moduleAdded()

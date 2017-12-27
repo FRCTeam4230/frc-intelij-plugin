@@ -3,6 +3,7 @@ syntax: regexp
 ([\\/]~|^~)
 
 # Exclude build targets
+/out
 ([\\/]o|^o)ut$
 ([\\/]o|^o)utput$
 ([\\/]t|^t)arget$

@@ -127,10 +127,10 @@ public class FrcApplicationSettingsForm
                         setTeamNumberWarningVisibility(false);
 
                         //TODO: Reimplement when ready
-//                        if (frcSettings.isRoboRioHostMDnsTheDefault()) { roboRioMdnsHostName.setText(frcSettings.getDefaultRoboRioHost_mDNS()); }
-//                        if (frcSettings.isRoboRioHostDnsTheDefault()) { roboRioDnsHostName.setText(frcSettings.getDefaultRoboRioHost_DNS()); }
-//                        if (frcSettings.isRoboRioHostUsbTheDefault()) { roboRioStaticUsbIp.setText(frcSettings.getDefaultRoboRioHost_USB()); }
-//                        if (frcSettings.isRoboRioHostIpTheDefault()) { roboRioIpAddress.setText(frcSettings.getDefaultRoboRioHost_IP()); }
+//                        if (frcSettings.isRoboRioHostTheDefault_mDNS()) { roboRioMdnsHostName.setText(frcSettings.getDefaultRoboRioHost_mDNS()); }
+//                        if (frcSettings.isRoboRioHostTheDefault_DNS()) { roboRioDnsHostName.setText(frcSettings.getDefaultRoboRioHost_DNS()); }
+//                        if (frcSettings.isRoboRioHostTheDefault_USB()) { roboRioStaticUsbIp.setText(frcSettings.getDefaultRoboRioHost_USB()); }
+//                        if (frcSettings.isRoboRioHostTheDefault_IP()) { roboRioIpAddress.setText(frcSettings.getDefaultRoboRioHost_IP()); }
 
                     }
                     catch (NumberFormatException ignore)

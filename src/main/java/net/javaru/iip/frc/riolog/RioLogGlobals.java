@@ -16,6 +16,10 @@
 
 package net.javaru.iip.frc.riolog;
 
+import java.util.regex.Pattern;
+
+
+
 public class RioLogGlobals
 {
 
@@ -32,5 +36,7 @@ public class RioLogGlobals
      */
     public static final String ROBO_RIO_STARTUP_LOG_MSG = "\u2794 Launching \u00AB'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'\u00BB";
 
-    
+
+    public static final Pattern RIO_RESTART_REGEX_DEFAULT = Pattern.compile(".*Launching.*FRCUserProgram\\.jar.*",
+                                                                            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.MULTILINE);
 }

@@ -152,15 +152,35 @@
              -->
     <extensions defaultExtensionNs="com.intellij">
         <facetType id="FRC_FACET" implementation="net.javaru.iip.frc.facet.FrcFacetType" />
+
+        <executor id="FrcRioLogToolWindowExecutor" implementation="net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor" />
         
         <spellchecker.bundledDictionaryProvider implementation="net.javaru.iip.frc.spellchecker.FrcBundledDictionaryProvider" />
+
+        <applicationService id="FRC.FrcApplicationSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcApplicationSettings" />
+        <applicationService id="FRC.FrcNotificationsSettings"   serviceImplementation="net.javaru.iip.frc.settings.FrcNotificationsSettings" />
+        <applicationService id="FRC.FrcRoboRioSettings"         serviceImplementation="net.javaru.iip.frc.settings.FrcRoboRioSettings" />
+        <applicationService id="FRC.FrcSshSettings"             serviceImplementation="net.javaru.iip.frc.settings.FrcSshSettings" />
         
-        <applicationService id="FRC.FrcApplicationSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcApplicationSettings" />
-        <applicationService id="FRC.FrcNotificationsSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcNotificationsSettings" />
         <applicationService id="FRC.RioLogUdpSocketManagerApplicationService" serviceImplementation="net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService" />
         
         <applicationConfigurable id="FRC.FrcApplicationSettingsConfigurable" instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable" groupId="language" />
 
+
+        <projectService id="FRC.RioLogConsoleProjectService"
+                        serviceInterface="net.javaru.iip.frc.riolog.RioLogConsoleProjectService"
+                        serviceImplementation="net.javaru.iip.frc.riolog.RioLogConsoleProjectService" />
+
+        <projectService id="FRC.UdpRioLogConsoleProjectService"
+                        serviceInterface="net.javaru.iip.frc.riolog.udp.UdpRioLogConsoleProjectService"
+                        serviceImplementation="net.javaru.iip.frc.riolog.udp.UdpRioLogConsoleProjectService" />
+
+        <projectService id="FRC.SshRioLogConsoleProjectService"
+                        serviceInterface="net.javaru.iip.frc.riolog.ssh.SshRioLogConsoleProjectService"
+                        serviceImplementation="net.javaru.iip.frc.riolog.ssh.SshRioLogConsoleProjectService" />
+        
+        
+        
         <frameworkSupport implementation="net.javaru.iip.frc.facet.fw.FrcFrameworkSupportProvider" />
         <framework.detector implementation="net.javaru.iip.frc.facet.detector.RobotSubclassFrcFrameworkDetector" />
     </extensions>

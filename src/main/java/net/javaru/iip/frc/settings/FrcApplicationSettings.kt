@@ -55,8 +55,12 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                   var wpiLibDir: Path = calculatedWpiLibDir,
                                   var wpiEclipsePluginReleaseRepoUri: URI = FrcApplicationSettings.DEFAULT_WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI,
                                   var wpiEclipsePluginBetaRepoUri: URI = FrcApplicationSettings.DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI,
+                                  var useFrcToolWindow: Boolean = false,
                                   var clearRioLogOnRobotRestart: Boolean = false,
                                   var logNetConsoleToFile: Boolean = false,
+                                  var logNetConsoleToFileAppend: Boolean = false,
+                                  var logNetConsoleToFilePath: String = "/tmp/frc/riolog",
+                                  var logNetConsoleToFileBaseName: String = "rioLog-\${time}.log",
                                   var useRegexForRestartCheck: Boolean = false,
                                   /**
                                    * Regex for detecting roboRIO restart.

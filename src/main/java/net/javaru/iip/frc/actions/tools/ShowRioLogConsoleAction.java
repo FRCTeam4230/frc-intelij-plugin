@@ -17,26 +17,23 @@
 package net.javaru.iip.frc.actions.tools;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 
+import net.javaru.iip.frc.riolog.RioLogConsoleProjectService;
 
 
 
 public class ShowRioLogConsoleAction extends AbstractFrcToolsAction implements DumbAware
 {
-    private static final Logger LOG = Logger.getInstance(ShowRioLogConsoleAction.class);
     @Override
     public void actionPerformed(AnActionEvent actionEvent)
     {
         final Project project = actionEvent.getProject();
         if (project != null)
         {
-            //TODO: implement once RioLogConsoleProjectService is reworked - or delete this action and replace with a show FRC tool window depending on how things change
-            LOG.warn("[FRC] Need to implement ShowRioLogConsoleAction.actionPerformed() once RioLog Service is reworked ");
-//            RioLogConsoleProjectService.update(project);
-//            RioLogConsoleProjectService.activateNow(project);
+            RioLogConsoleProjectService.update(project);
+            RioLogConsoleProjectService.activateNow(project);
         }
     }
 }

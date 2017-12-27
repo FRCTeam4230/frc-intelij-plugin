@@ -137,7 +137,7 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
 
 
             @Override
-            public void onError(@NotNull Exception error)
+            public void onThrowable(@NotNull Throwable error)
             {
                 // A nice TODO: make the replacement of files a transaction with rollback if possible
                 String content = "Cause: ";

@@ -153,16 +153,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <facetType id="FRC_FACET" implementation="net.javaru.iip.frc.facet.FrcFacetType" />
         
-
-        <facet.toolWindow id="FRC" 
-                          anchor="bottom"
-                          icon="/icons/first/FIRST_icon_13x13_elevated.png"
-                          facetIdList="FRC_FACET"
-                          factoryClass="net.javaru.iip.frc.toolWindow.FrcToolWindowFactory"
-                          canCloseContents="false"
-        />
-        
-        
         <spellchecker.bundledDictionaryProvider implementation="net.javaru.iip.frc.spellchecker.FrcBundledDictionaryProvider" />
         
         <applicationService id="FRC.FrcApplicationSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcApplicationSettings" />
@@ -171,9 +161,6 @@
         
         <applicationConfigurable id="FRC.FrcApplicationSettingsConfigurable" instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable" groupId="language" />
 
-        <projectService serviceInterface="net.javaru.iip.frc.toolWindow.FrcToolWindowPanel" serviceImplementation="net.javaru.iip.frc.toolWindow.FrcToolWindowPanel" />
-        <projectService serviceInterface="net.javaru.iip.frc.riolog.ui.RioLogRootPanel" serviceImplementation="net.javaru.iip.frc.riolog.ui.RioLogRootPanel" />
-        
         <frameworkSupport implementation="net.javaru.iip.frc.facet.fw.FrcFrameworkSupportProvider" />
         <framework.detector implementation="net.javaru.iip.frc.facet.detector.RobotSubclassFrcFrameworkDetector" />
     </extensions>

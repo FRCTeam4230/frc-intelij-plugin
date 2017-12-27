@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.riolog.ui;
+package net.javaru.iip.frc.toolWindow;
 
 import javax.swing.*;
 
@@ -30,11 +30,15 @@ import com.intellij.openapi.wm.ToolWindowManager;
 
 import net.javaru.iip.frc.FrcIcons.RioLog;
 import net.javaru.iip.frc.actions.MockAction;
-import net.javaru.iip.frc.toolWindow.FrcToolWindowFactory;
 
 
-
-// Must be registered as a <projectService> in plugins.xml
+// **NOT IN USE AT THIS TIME** this was created as part of an attempt to place the RioLog into another tool window. However, it looks
+//                             like Executors are (or have to be) a tool window in of themselves. Need to do some more research to see
+//                             if we can either add the executor to a SimpleToolWindowPanel (the preferred option) or add other UI 
+//                             components to the executor for when we want to add other things. If not, we'll need to have a "RioLog" 
+//                             and "FRC" tool window 
+// 
+// Must be registered as a <projectService> in plugins.xml 
 public class RioLogRootPanel extends SimpleToolWindowPanel implements Disposable
 {
     /* We implement this as a SimpleToolWindowPanel in the event we want to break the RioLog out
@@ -42,7 +46,7 @@ public class RioLogRootPanel extends SimpleToolWindowPanel implements Disposable
     
     private static final Logger LOG = Logger.getInstance(RioLogRootPanel.class);
     private static final long serialVersionUID = 3732957886793376891L;
-    public static final String RIOLOG_TOOL_WINDOW_ID = FrcToolWindowFactory.FRC_TOOL_WINDOW_ID;
+    public static final String RIOLOG_TOOL_WINDOW_ID = ""; // TODO Set to Executor Tool Window ID
 
     @NotNull
     private final Project myProject;

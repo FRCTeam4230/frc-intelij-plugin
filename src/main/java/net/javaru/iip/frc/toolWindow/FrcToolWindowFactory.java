@@ -29,11 +29,33 @@ import com.intellij.ui.content.ContentManager;
 import net.javaru.iip.frc.components.FrcProjectComponentImpl;
 
 
+
+// **NOT IN USE AT THIS TIME** this was created as part of an attempt to place the RioLog into another tool window. However, it looks
+//                             like Executors are (or have to be) a tool window in of themselves. Need to do some more research to see
+//                             if we can either add the executor to a SimpleToolWindowPanel (the preferred option) or add other UI 
+//                             components to the executor for when we want to add other things. If not, we'll need to have a "RioLog" 
+//                             and "FRC" tool window 
+//
+//        To use, add the following to the <extensions> element in plugin.xml
+//        Just after <facetType id="FRC_FACET"... /> is a good spot
+//        
+//        <facet.toolWindow id="FRC" 
+//                          anchor="bottom"
+//                          icon="/icons/first/FIRST_icon_13x13_elevated.png"
+//                          facetIdList="FRC_FACET"
+//                          factoryClass="net.javaru.iip.frc.toolWindow.FrcToolWindowFactory"
+//                          canCloseContents="false"
+//        />
+//        <projectService serviceInterface="net.javaru.iip.frc.toolWindow.FrcToolWindowPanel" serviceImplementation="net.javaru.iip.frc.toolWindow.FrcToolWindowPanel" />
+//       
+//       and if needed
+//       <projectService serviceInterface="net.javaru.iip.frc.riolog.ui.RioLogRootPanel" serviceImplementation="net.javaru.iip.frc.riolog.ui.RioLogRootPanel" />
+// 
 // We implement DumbAware as we want the FRC Tool Window to be available when IDEA is indexing, and none of its content is dependent on indexes
 public class FrcToolWindowFactory implements ToolWindowFactory,
                                              DumbAware
 {
-    public static final String FRC_TOOL_WINDOW_ID = "FRC";
+    public static final String FRC_TOOL_WINDOW_ID = "FRC Tools";
     /*
         LIFECYCLE
             - Project is opened (or a Facet is added)
@@ -41,6 +63,10 @@ public class FrcToolWindowFactory implements ToolWindowFactory,
             - init(ToolWindow) is called (assuming above returned true)
             - User opens the tool window for the First time (or the project loads and the tool window was previously open when the project was last closed)
             - createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) is called
+     */
+    
+    
+    /*
      */
     
     

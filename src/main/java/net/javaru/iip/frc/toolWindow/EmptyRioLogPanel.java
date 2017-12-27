@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.riolog.ui;
+package net.javaru.iip.frc.toolWindow;
 
 import javax.swing.*;
 

@@ -34,7 +34,7 @@
     
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <!-- Minimum ('since-build') and maximum ('until-build') build of IDEA compatible with the plugin -->
-    <idea-version since-build="163.0" />
+    <idea-version since-build="171.0" />
 
     <description><![CDATA[
         <p>
@@ -43,7 +43,7 @@
             (<a href='http://www.firstinspires.org/robotics/frc'>FRC</a>) development support for IntelliJ IDEA. 
             This plug-in will work with either the free open-sourced <em>Community Edition</em> or the 
             licensed <em>Ultimate Edition</em> of IntelliJ IDEA. <strong>This plug-in requires IntelliJ 
-            IDEA v2016.3 or v2017.1 (with FRC plugin v0.5 and later)</strong>
+            v2017.1 or later.</strong> (IDEA v2016.3 can be used with FRC plugin v0.4, but will be missing functionality.)
         </p>
         <p> </p>
         <p>Please report issues or make feature requests at: 
@@ -58,6 +58,13 @@
     ]]></description>
 
     <change-notes><![CDATA[
+      <strong>v0.6</strong> <br>
+      &nbsp;&nbsp;&bull; IntelliJ IDEA v2017.1 or later now required (v2017.3 recommended)<br>
+      &nbsp;&nbsp;&bull; Refactored code base<br>
+      &nbsp;&nbsp;&bull; Changes to handle some changes in 2018 WPILib<br>
+      &nbsp;&nbsp;&bull; Resolved multiple binding issue for Net Console RioLog monitor if multiple FRC projects were opened simultaneously<br>
+      &nbsp;&nbsp;&bull; New <em>Tools &gt; FRC</em> action to report the version of the attached WpiLib<br>
+      &nbsp;&nbsp;&bull; Added some words/terms to built-in spell check dictionary<br>
       <strong>v0.5</strong> <br>
       &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/3">Issue #3</a> that was causing changes to plugin settings 
       to not be persisted between IDE runs when using IntelliJ IDEA v2017.1<br>

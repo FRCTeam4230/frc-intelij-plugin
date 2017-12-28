@@ -56,7 +56,7 @@ intellij {
   pluginName 'FRC'
   downloadSources Boolean.valueOf(downloadIdeaSources)
   
-  sameSinceUntilBuild Boolean.valueOf(isEAP)
+  sameSinceUntilBuild Boolean.valueOf(isEAP) || Boolean.valueOf(sameSinceUntilBuild)
   // alternativeIdePath = Absolute path to the locally installed JetBrains IDE. It makes sense to use this 
   // property if you want to test your plugin in WebStorm or any other non-IDEA JetBrains IDE. Empty value 
   // means that the IDE that was used for compiling will be used for running/debugging as well.  

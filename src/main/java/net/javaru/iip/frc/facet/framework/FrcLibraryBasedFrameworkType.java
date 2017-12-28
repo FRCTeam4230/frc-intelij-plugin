@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.facet.fw;
+package net.javaru.iip.frc.facet.framework;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

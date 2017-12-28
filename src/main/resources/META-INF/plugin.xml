@@ -188,7 +188,7 @@
 
         <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
         
-        <frameworkSupport implementation="net.javaru.iip.frc.facet.fw.FrcFrameworkSupportProvider" />
+        <frameworkSupport implementation="net.javaru.iip.frc.facet.framework.FrcFrameworkSupportProvider" />
         <framework.detector implementation="net.javaru.iip.frc.facet.detector.RobotSubclassFrcFrameworkDetector" />
     </extensions>
 

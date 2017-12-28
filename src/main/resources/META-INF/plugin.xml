@@ -185,8 +185,8 @@
         <projectService id="FRC.SshRioLogConsoleProjectService"
                         serviceInterface="net.javaru.iip.frc.riolog.ssh.SshRioLogConsoleProjectService"
                         serviceImplementation="net.javaru.iip.frc.riolog.ssh.SshRioLogConsoleProjectService" />
-        
-        
+
+        <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
         
         <frameworkSupport implementation="net.javaru.iip.frc.facet.fw.FrcFrameworkSupportProvider" />
         <framework.detector implementation="net.javaru.iip.frc.facet.detector.RobotSubclassFrcFrameworkDetector" />
@@ -309,6 +309,30 @@
             
             
             <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after" />
+        </group>
+
+        <group id="frc.NewFileTemplates"
+               text="FRC"
+               description="Create New FRC Components"
+               class="net.javaru.iip.frc.actions.create.FrcCreateComponentsActionGroup"
+               popup="true"
+               icon="/icons/first/FIRST_icon_16x16.png"
+        >
+            <separator />
+            <action id="frc.action.new.basic.command" class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicCommandClassAction" text="FRC Command" />
+            <action id="frc.action.new.basic.commandGroup"
+                    class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicCommandGroupClassAction"
+                    text="FRC Command Group" />
+            <action id="frc.action.new.basic.subsystem" class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicSubsystemClassAction" text="FRC Subsystem" />
+            <action id="frc.action.new.basic.pidSubsystem"
+                    class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicPidSubsystemClassAction"
+                    text="FRC PID Subsystem" />
+            <action id="frc.action.new.basic.trigger"
+                    class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicTriggerClassAction"
+                    text="FRC Trigger (i.e. Button)" />
+
+            <!--<action id="frc.action.new.build.file" class="net.javaru.iip.frc.actions.create.build.NewFrcAntBuildFileAction" text="FRC New Ant Build File" />-->
+            <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewJavaSpecialFile" />
         </group>
 
         <action id="FRC.ConfigureTeamNumberAction"

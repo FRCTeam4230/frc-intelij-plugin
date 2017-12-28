@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.facet.detector;
+package net.javaru.iip.frc.facet.framework.detector;
 
 import java.io.InputStream;
 import java.util.ArrayList;

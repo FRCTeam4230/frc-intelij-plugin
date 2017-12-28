@@ -188,7 +188,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                                theNotification.expire();
                                                                if ("download".equals(event.getDescription()))
                                                                {
-                                                                   DownloadWpiLibAction.downloadLatestInBackground(project, true);
+                                                                   DownloadWpiLibAction.downloadLatestInBackground(project, true, true);
                                                                }
                                                            }
         );

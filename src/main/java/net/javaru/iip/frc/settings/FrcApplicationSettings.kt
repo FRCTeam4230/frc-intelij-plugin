@@ -62,6 +62,8 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                   var logNetConsoleToFilePath: String = "/tmp/frc/riolog",
                                   var logNetConsoleToFileBaseName: String = "rioLog-\${time}.log",
                                   var useRegexForRestartCheck: Boolean = false,
+                                  var autoAttachWpiLib: Boolean = true,
+                                  var autoAttachUserLib: Boolean = true,
                                   /**
                                    * Regex for detecting roboRIO restart.
                                    * NOTE:  We limit the searched for text in the regex in case of encoding issues and in case an alternate path is used 

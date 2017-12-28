@@ -48,11 +48,11 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
     {
         @Nullable
         final Project project = actionEvent.getProject();
-        downloadLatestInBackground(project, false);
+        downloadLatestInBackground(project, false, true);
     }
 
 
-    public static void downloadLatestInBackground(@Nullable Project project, boolean autoAttach)
+    public static void downloadLatestInBackground(@Nullable final Project project, final boolean autoAttach, final boolean notifyOnCompletion)
     {
         
         // TODO: The isAttached concepts needs some rework:
@@ -97,14 +97,15 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
                         AttachWpilibAction.attachWpiLib(project, !wasAttached, true);
                         notification = null;
                     }
-                    else if (wasAttached) 
+                    else if (wasAttached)
                     {
                         IndexUtils.refreshAll(project);
                         notification = null;
                     }
                     else
                     {
-                        notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+                        notification = notifyOnCompletion ?
+                                       new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
                                                         FrcNotifications.IconInfo,
                                                         FrcNotifications.Title,
                                                         NOTIFICATIONS_SUBTITLE + " Completed Successfully",
@@ -119,7 +120,8 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
                                                             }
                                                             theNotification.expire();
                                                         }
-                        );
+                                       )
+                                       : null;
                     }
                 }
                 else

@@ -174,7 +174,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
             LOG.info("[FRC] Failed to attach WPILib Cause: " + e.toString(), e);
         }
 
-        String cause = e != null ? "Cause: " + e.toString() : "";
+        String cause = e != null ? " Cause: " + e.toString() : "";
         return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
                                 FrcNotifications.IconWarn,
                                 FrcNotifications.Title,

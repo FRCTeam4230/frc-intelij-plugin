@@ -28,6 +28,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.libraries.Library;
@@ -279,31 +280,44 @@ public class WpiLibLibrariesUtils
     public static Library findExistingDirBasedLibrary(@NotNull Module module, Path libDir)
     {
         // get the libraries for the module
-        final LibraryTable libraryTable = ModuleRootManager.getInstance(module).getModifiableModel().getModuleLibraryTable();
-        final Library[] libraries = libraryTable.getLibraries();
-        for (Library library : libraries)
+        final ModifiableRootModel modifiableRootModel = ModuleRootManager.getInstance(module).getModifiableModel();
+               
+        // TODO: see if this needs to be changed so it is wrapped in ModuleRootModificationUtil.updateModel() described in javadoc for modifiableRootModel.dispose()
+        try
         {
-            final String dirUrl = VirtualFileManager.constructUrl(LocalFileSystem.PROTOCOL, libDir.toString());
-
-            //Not sure why, but when testing, I had to replace back slashes as the dirUrl was file://C:\foo\bar which was not found, but file://C:/foo/bar was
-            if (library.isJarDirectory(dirUrl.replace('\\', '/')) || library.isJarDirectory(dirUrl))
+            final LibraryTable libraryTable = modifiableRootModel.getModuleLibraryTable();
+            final Library[] libraries = libraryTable.getLibraries();
+            for (Library library : libraries)
             {
-                return library;
-            }
-
-            final VirtualFile[] libraryFiles = library.getFiles(OrderRootType.CLASSES);
-
-            for (VirtualFile virtualFile : libraryFiles)
-            {
-                Path dir = Paths.get(virtualFile.getPresentableUrl());
-                if (libDir.equals(dir) || dir.startsWith(libDir))
+                final String dirUrl = VirtualFileManager.constructUrl(LocalFileSystem.PROTOCOL, libDir.toString());
+    
+                //Not sure why, but when testing, I had to replace back slashes as the dirUrl was file://C:\foo\bar which was not found, but file://C:/foo/bar was
+                if (library.isJarDirectory(dirUrl.replace('\\', '/')) || library.isJarDirectory(dirUrl))
                 {
                     return library;
                 }
+    
+                final VirtualFile[] libraryFiles = library.getFiles(OrderRootType.CLASSES);
+    
+                for (VirtualFile virtualFile : libraryFiles)
+                {
+                    Path dir = Paths.get(virtualFile.getPresentableUrl());
+                    if (libDir.equals(dir) || dir.startsWith(libDir))
+                    {
+                        return library;
+                    }
+                }
+            }
+
+            return null;
+        }
+        finally
+        {
+            if (!modifiableRootModel.isDisposed())
+            {
+                modifiableRootModel.dispose();
             }
         }
-
-        return null;
     }
 
 

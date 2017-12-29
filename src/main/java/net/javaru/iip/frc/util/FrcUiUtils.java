@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.util;
 
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -34,8 +35,18 @@ public final class FrcUiUtils
      * @param text the text to wrap
      * @return the provided text inside HTML tags centering the text
      */
+    @Language("HTML")
     public static String centerLabelText(@NotNull String text)
     {
+        //noinspection LanguageMismatch
         return "<html><div style='text-align: center;'>" + text + "</div></html>";
+    }
+
+
+    @Language("HTML")
+    public static String boldLabelText(@NotNull String text)
+    {
+        //noinspection LanguageMismatch
+        return  "<html><div style='font-weight: bold;'>" + text + "</div></html>";
     }
 }

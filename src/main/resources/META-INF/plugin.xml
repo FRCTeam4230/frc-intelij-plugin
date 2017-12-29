@@ -187,8 +187,18 @@
                         serviceImplementation="net.javaru.iip.frc.riolog.ssh.SshRioLogConsoleProjectService" />
 
         <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
+
+        <moduleType id="FrcModuleType" implementationClass="net.javaru.iip.frc.module.FrcModuleType" />
+        <moduleBuilder id="FrcModuleBuilder" builderClass="net.javaru.iip.frc.module.FrcModuleBuilder" order="first" />
+
         
-        <frameworkSupport implementation="net.javaru.iip.frc.facet.framework.FrcFrameworkSupportProvider" />
+        <projectTemplate projectType="FRC_Module" templatePath="projectTemplates/robots/FRC_Command_Based_Robot.zip" />
+        <projectTemplate projectType="FRC_Module" templatePath="projectTemplates/robots/FRC_Iterative_Robot.zip" />
+        <projectTemplate projectType="FRC_Module" templatePath="projectTemplates/robots/FRC_Timed_Robot.zip" />
+        <projectTemplate projectType="FRC_Module" templatePath="projectTemplates/robots/FRC_Sample_Robot.zip" />
+        
+        
+        <!--<frameworkSupport implementation="net.javaru.iip.frc.facet.framework.FrcFrameworkSupportProvider" />-->
         <framework.detector implementation="net.javaru.iip.frc.facet.framework.detector.RobotSubclassFrcFrameworkDetector" />
     </extensions>
 

@@ -61,144 +61,6 @@ data class FrcRoboRioSettings(var roboRioHostRawMDns: String = USE_DEFAULT_HOST_
         {
             return original.copy()
         }
-
-        // ==== mDNS Host Helpers ====
-        
-        fun setRoboRioHost_mDNS(roboRioHostMDns: String)
-        {
-            INSTANCE().roboRioHostRawMDns = 
-            if (getRoboRioHostDefault_mDNS() == roboRioHostMDns)
-            {
-                USE_DEFAULT_HOST_PLACEHOLDER
-            }
-            else
-            {
-                roboRioHostMDns
-            }
-        }
-        
-        fun getRoboRioHost_mDNS(): String
-        {
-            return if (USE_DEFAULT_HOST_PLACEHOLDER == INSTANCE().roboRioHostRawMDns)
-            {
-                getRoboRioHostDefault_mDNS()
-            }
-            else
-            {
-                INSTANCE().roboRioHostRawMDns
-            }
-        }
-
-        fun getRoboRioHostDefault_mDNS(): String = createRoboRioHostDefault_mDNS(FrcApplicationSettings.INSTANCE().teamNumber)
-
-        fun createRoboRioHostDefault_mDNS(teamNumber: Int): String = String.format(ROBORIO_HOST_mDNS_TEMPLATE, teamNumber)
-        
-        fun isRoboRioHostTheDefault_mDNS(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == INSTANCE().roboRioHostRawMDns
-
-        // ==== DNS Host Helpers ====
-        
-        fun setRoboRioHost_DNS(roboRioHostDns: String)
-        {
-            INSTANCE().roboRioHostRawDns =
-                    if (getRoboRioHostDefault_DNS() == roboRioHostDns)
-                    {
-                        USE_DEFAULT_HOST_PLACEHOLDER
-                    }
-                    else
-                    {
-                        roboRioHostDns
-                    }
-        }
-        
-        fun getRoboRioHost_DNS(): String
-        {
-            return if (USE_DEFAULT_HOST_PLACEHOLDER == INSTANCE().roboRioHostRawDns)
-            {
-                getRoboRioHostDefault_DNS()
-            }
-            else
-            {
-                INSTANCE().roboRioHostRawDns
-            }
-        }
-
-        fun getRoboRioHostDefault_DNS(): String = createRoboRioHostDefault_DNS(FrcApplicationSettings.INSTANCE().teamNumber)
-
-        fun createRoboRioHostDefault_DNS(teamNumber: Int): String = String.format(ROBORIO_HOST_DNS_TEMPLATE, teamNumber)
-
-        fun isRoboRioHostTheDefault_DNS(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == INSTANCE().roboRioHostRawDns
-
-
-        // ==== IP Host Helpers ====
-        
-        fun setRoboRioHost_IP(roboRioHostIp: String)
-        {
-            INSTANCE().roboRioHostRawIp =
-                    if (getRoboRioHostDefault_IP() == roboRioHostIp)
-                    {
-                        USE_DEFAULT_HOST_PLACEHOLDER
-                    }
-                    else
-                    {
-                        roboRioHostIp
-                    }
-        }
-        
-        fun getRoboRioHost_IP(): String
-        {
-            return if (USE_DEFAULT_HOST_PLACEHOLDER == INSTANCE().roboRioHostRawIp)
-            {
-                getRoboRioHostDefault_IP()
-            }
-            else
-            {
-                INSTANCE().roboRioHostRawIp
-            }
-        }
-
-        fun getRoboRioHostDefault_IP(): String = createRoboRioHostDefault_IP(FrcApplicationSettings.INSTANCE().teamNumber)
-
-        fun createRoboRioHostDefault_IP(teamNumber: Int): String
-        {
-            val high = teamNumber / 100
-            val low = teamNumber % 100
-            return String.format(ROBORIO_HOST_IP_TEMPLATE, high, low)
-        }
-
-        fun isRoboRioHostTheDefault_IP(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == INSTANCE().roboRioHostRawIp
-
-        // ==== USB Host Helpers ====
-
-        fun setRoboRioHost_USB(roboRioHostUsb: String)
-        {
-            INSTANCE().roboRioHostRawUsb =
-                    if (getRoboRioHostDefault_USB() == roboRioHostUsb)
-                    {
-                        USE_DEFAULT_HOST_PLACEHOLDER
-                    }
-                    else
-                    {
-                        roboRioHostUsb
-                    }
-        }
-
-        fun getRoboRioHost_USB(): String
-        {
-            return if (USE_DEFAULT_HOST_PLACEHOLDER == INSTANCE().roboRioHostRawUsb)
-            {
-                getRoboRioHostDefault_USB()
-            }
-            else
-            {
-                INSTANCE().roboRioHostRawUsb
-            }
-        }
-
-        fun getRoboRioHostDefault_USB(): String = ROBORIO_HOST_USB_DEFAULT
-        
-
-        fun isRoboRioHostTheDefault_USB(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == INSTANCE().roboRioHostRawUsb
-        
     }
 
 
@@ -215,4 +77,142 @@ data class FrcRoboRioSettings(var roboRioHostRawMDns: String = USE_DEFAULT_HOST_
         LOG.trace("[FRC] FrcRoboRioSettings.loadState() called with state object of: " + state)
         XmlSerializerUtil.copyBean(state, this)
     }
+
+
+    // ==== mDNS Host Helpers ====
+
+    fun setRoboRioHost_mDNS(roboRioHostMDns: String)
+    {
+        roboRioHostRawMDns =
+                if (getRoboRioHostDefault_mDNS() == roboRioHostMDns)
+                {
+                    USE_DEFAULT_HOST_PLACEHOLDER
+                }
+                else
+                {
+                    roboRioHostMDns
+                }
+    }
+
+    fun getRoboRioHost_mDNS(): String
+    {
+        return if (USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawMDns)
+        {
+            getRoboRioHostDefault_mDNS()
+        }
+        else
+        {
+            roboRioHostRawMDns
+        }
+    }
+
+    fun getRoboRioHostDefault_mDNS(): String = createRoboRioHostDefault_mDNS(FrcApplicationSettings.INSTANCE().teamNumber)
+
+    fun createRoboRioHostDefault_mDNS(teamNumber: Int): String = String.format(ROBORIO_HOST_mDNS_TEMPLATE, teamNumber)
+
+    fun isRoboRioHostTheDefault_mDNS(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawMDns
+
+    // ==== DNS Host Helpers ====
+
+    fun setRoboRioHost_DNS(roboRioHostDns: String)
+    {
+        roboRioHostRawDns =
+                if (getRoboRioHostDefault_DNS() == roboRioHostDns)
+                {
+                    USE_DEFAULT_HOST_PLACEHOLDER
+                }
+                else
+                {
+                    roboRioHostDns
+                }
+    }
+
+    fun getRoboRioHost_DNS(): String
+    {
+        return if (USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawDns)
+        {
+            getRoboRioHostDefault_DNS()
+        }
+        else
+        {
+            roboRioHostRawDns
+        }
+    }
+
+    fun getRoboRioHostDefault_DNS(): String = createRoboRioHostDefault_DNS(FrcApplicationSettings.INSTANCE().teamNumber)
+
+    fun createRoboRioHostDefault_DNS(teamNumber: Int): String = String.format(ROBORIO_HOST_DNS_TEMPLATE, teamNumber)
+
+    fun isRoboRioHostTheDefault_DNS(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawDns
+
+
+    // ==== IP Host Helpers ====
+
+    fun setRoboRioHost_IP(roboRioHostIp: String)
+    {
+        roboRioHostRawIp =
+                if (getRoboRioHostDefault_IP() == roboRioHostIp)
+                {
+                    USE_DEFAULT_HOST_PLACEHOLDER
+                }
+                else
+                {
+                    roboRioHostIp
+                }
+    }
+
+    fun getRoboRioHost_IP(): String
+    {
+        return if (USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawIp)
+        {
+            getRoboRioHostDefault_IP()
+        }
+        else
+        {
+            roboRioHostRawIp
+        }
+    }
+
+    fun getRoboRioHostDefault_IP(): String = createRoboRioHostDefault_IP(FrcApplicationSettings.INSTANCE().teamNumber)
+
+    fun createRoboRioHostDefault_IP(teamNumber: Int): String
+    {
+        val high = teamNumber / 100
+        val low = teamNumber % 100
+        return String.format(ROBORIO_HOST_IP_TEMPLATE, high, low)
+    }
+
+    fun isRoboRioHostTheDefault_IP(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawIp
+
+    // ==== USB Host Helpers ====
+
+    fun setRoboRioHost_USB(roboRioHostUsb: String)
+    {
+        roboRioHostRawUsb =
+                if (getRoboRioHostDefault_USB() == roboRioHostUsb)
+                {
+                    USE_DEFAULT_HOST_PLACEHOLDER
+                }
+                else
+                {
+                    roboRioHostUsb
+                }
+    }
+
+    fun getRoboRioHost_USB(): String
+    {
+        return if (USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawUsb)
+        {
+            getRoboRioHostDefault_USB()
+        }
+        else
+        {
+            roboRioHostRawUsb
+        }
+    }
+
+    fun getRoboRioHostDefault_USB(): String = ROBORIO_HOST_USB_DEFAULT
+
+
+    fun isRoboRioHostTheDefault_USB(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawUsb
 }

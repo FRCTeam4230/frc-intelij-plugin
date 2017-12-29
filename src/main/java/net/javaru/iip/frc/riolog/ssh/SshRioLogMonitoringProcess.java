@@ -344,10 +344,10 @@ public class SshRioLogMonitoringProcess extends RioLogMonitoringProcess
                 if (!isConnectedFully())
                 {
                     // TODO - make connection order configurable
-                    final Iterator<String> hosts = Iterators.forArray(FrcRoboRioSettings.Settings.getRoboRioHost_mDNS(),
-                                                                      FrcRoboRioSettings.Settings.getRoboRioHost_DNS(),
-                                                                      FrcRoboRioSettings.Settings.getRoboRioHost_USB(),
-                                                                      FrcRoboRioSettings.Settings.getRoboRioHost_IP());
+                    final Iterator<String> hosts = Iterators.forArray(FrcRoboRioSettings.Settings.INSTANCE().getRoboRioHost_mDNS(),
+                                                                      FrcRoboRioSettings.Settings.INSTANCE().getRoboRioHost_DNS(),
+                                                                      FrcRoboRioSettings.Settings.INSTANCE().getRoboRioHost_USB(),
+                                                                      FrcRoboRioSettings.Settings.INSTANCE().getRoboRioHost_IP());
 
                     while (!isConnectedFully() && hosts.hasNext())
                     {

@@ -96,10 +96,26 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     public void projectClosed()
     {
         LOG.debug("[FRC] " + getClass().getSimpleName() + ".projectClosed() called for project " + myProject);
-        final Map<NotificationKey, Notification> notificationMap = notificationsTracker.remove(myProject);
-        notificationMap.values().forEach(Notification::expire);
-        notificationMap.clear();
+        clearNotificationsTrackerMap();
         ServiceManager.getService(RioLogUdpSocketManagerApplicationService.class).deregister(myProject);
+    }
+
+
+    public void clearNotificationsTrackerMap()
+    {
+        try
+        {
+            final Map<NotificationKey, Notification> notificationMap = notificationsTracker.remove(myProject);
+            if (notificationMap != null && !notificationMap.isEmpty())
+            {
+                notificationMap.values().forEach(Notification::expire);
+                notificationMap.clear();
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.warn("[FRC] An exception occurred when clearing the notifications tracker map for project '" + myProject + "'. Cause: " + e.toString());
+        }
     }
 
 

@@ -1,6 +1,10 @@
-#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package
 
 import edu.wpi.first.wpilibj.command.Command;
+
+${PACKAGE_NAME}
+    ;
+#end
 
 #parse("File Header.java")
 public class ${NAME} extends Command 
@@ -16,6 +20,7 @@ public class ${NAME} extends Command
      * The initialize method is called just before the first time 
      * this Command is run after being started.
      */
+    @Override
     protected void initialize()
     {
         
@@ -26,6 +31,7 @@ public class ${NAME} extends Command
      * The execute method is called repeatedly when this Command is 
      * scheduled to run until this Command either finishes or is canceled.
      */
+    @Override
     protected void execute()
     {
         
@@ -50,6 +56,7 @@ public class ${NAME} extends Command
      *
      * @see Command#isTimedOut() isTimedOut()
      */]]#
+    @Override
     protected boolean isFinished()
     {
         // TODO: Make this return true when this Command no longer needs to run execute()
@@ -63,6 +70,7 @@ public class ${NAME} extends Command
      * wrap up loose ends, like shutting off a motor that was being used in the 
      * command.
      */]]#
+    @Override
     protected void end()
     {
             
@@ -83,6 +91,7 @@ public class ${NAME} extends Command
      * method, as done here.
      * </p>
      */]]#
+    @Override
     protected void interrupted()
     {
         super.interrupted();

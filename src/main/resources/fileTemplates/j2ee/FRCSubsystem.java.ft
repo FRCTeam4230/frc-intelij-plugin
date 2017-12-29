@@ -1,6 +1,9 @@
-package ${PACKAGE_NAME};
+package
 
 import edu.wpi.first.wpilibj.command.Subsystem;
+
+${PACKAGE_NAME}
+    ;
 
 #parse("File Header.java")
 public class ${NAME} extends Subsystem
@@ -12,7 +15,7 @@ public class ${NAME} extends Subsystem
 
     public void initDefaultCommand()
     {
-        // Set the default command, if any, for a subsystem here. Example:
+        // TODO: Set the default command, if any, for a subsystem here. Example:
         //    setDefaultCommand(new MySpecialCommand());
     }
 }

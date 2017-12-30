@@ -148,10 +148,10 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
                                                           if (knownFacetedProject || isFrcFacetedProject(project))
                                                           {
-                                                              if (notificationMap.get(WpilibAttached) == null && !WpiLibLibrariesUtils.isWpilibPresentViaReadAction(project))
+                                                              if (notificationMap.get(WpilibAttached) == null && !WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project))
                                                               {
                                                                   final Notification notification = 
-                                                                  (WpiLibLibrariesUtils.isWpilibInstalledOnSystem())
+                                                                  (WpiLibLibrariesUtils.isWpilibDownloadedToSystem())
                                                                       ? queueAttachWpilibNotification(project)
                                                                       : queueDownloadAndAttachWpilibNotification(project);
                                                                   notificationMap.put(WpilibAttached, notification);

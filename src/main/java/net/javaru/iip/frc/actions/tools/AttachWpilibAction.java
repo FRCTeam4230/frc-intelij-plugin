@@ -62,7 +62,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
         e.getPresentation().setVisible(project != null &&
                                        !project.isDisposed() &&
                                        FrcFacet.isFrcFacetedProject(project) &&
-                                       !WpiLibLibrariesUtils.isWpilibPresentViaReadAction(project));
+                                       !WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project));
     }
 
 
@@ -88,7 +88,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                     if (frcFacet != null)
                     {
                         //TODO: need to see if it is present as a Project library, and if so, attach that
-                        if (WpiLibLibrariesUtils.isWpilibPresentViaReadAction(module))
+                        if (WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(module))
                         {
                             Notifications.Bus.notify(new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
                                                                       FrcNotifications.IconInfo,

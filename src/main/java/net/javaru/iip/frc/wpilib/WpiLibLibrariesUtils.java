@@ -17,9 +17,18 @@
 package net.javaru.iip.frc.wpilib;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.application.ApplicationManager;
@@ -37,8 +46,18 @@ import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiExpression;
+import com.intellij.psi.PsiField;
+import com.intellij.psi.PsiLiteralExpression;
+import com.intellij.psi.impl.compiled.ClassFileDecompiler;
 
+import net.javaru.iip.frc.i18n.FrcMessageBundle;
+import net.javaru.iip.frc.util.FindClassUtils;
 import net.javaru.iip.frc.util.FrcFileUtils;
+import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
 
 import static net.javaru.iip.frc.util.FindClassUtils.isLibraryPresent;
 
@@ -55,7 +74,7 @@ public class WpiLibLibrariesUtils
     public static final String NETWORK_TABLES_CLASS_2 = "edu.wpi.first.networktables.TableListener";
 
 
-    private static boolean isWpilibPresent(@NotNull Project project)
+    private static boolean isWpilibAttached(@NotNull Project project)
     {
         return isLibraryPresent(project, WpiLibConstants.ROBOT_BASE_FQN) ||
                isLibraryPresent(project, WpiLibConstants.ITERATIVE_ROBOT_FQN) ||
@@ -63,9 +82,9 @@ public class WpiLibLibrariesUtils
     }
 
 
-    public static boolean isWpilibPresentViaReadAction(@NotNull Project project)
+    public static boolean isWpilibAttachedViaReadAction(@NotNull Project project)
     {
-        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isWpilibPresent(project));
+        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isWpilibAttached(project));
     }
 
 
@@ -126,7 +145,7 @@ public class WpiLibLibrariesUtils
 
     private static boolean areAllPresent(@NotNull Project project)
     {
-        final boolean wpilibPresent = isWpilibPresent(project);
+        final boolean wpilibPresent = isWpilibAttached(project);
         final boolean networkTablesPresent = isNetworkTablesPresent(project);
         final boolean openCvPresent = isOpenCvPresent(project);
         final boolean csCorePresent = isCsCorePresent(project);
@@ -142,20 +161,20 @@ public class WpiLibLibrariesUtils
     }
 
 
-    private static boolean isWpilibPresent(@NotNull Module module)
+    private static boolean isWpilibAttached(@NotNull Module module)
     {
         return isLibraryPresent(module, WpiLibConstants.ROBOT_BASE_FQN) ||
                isLibraryPresent(module, WpiLibConstants.ITERATIVE_ROBOT_FQN);
     }
 
 
-    public static boolean isWpilibPresentViaReadAction(@NotNull Module module)
+    public static boolean isWpilibAttachedViaReadAction(@NotNull Module module)
     {
-        return DumbService.getInstance(module.getProject()).runReadActionInSmartMode(() -> isWpilibPresent(module));
+        return DumbService.getInstance(module.getProject()).runReadActionInSmartMode(() -> isWpilibAttached(module));
     }
 
 
-    public static boolean isWpilibInstalledOnSystem()
+    public static boolean isWpilibDownloadedToSystem()
     {
         try
         {
@@ -168,9 +187,9 @@ public class WpiLibLibrariesUtils
     }
 
 
-    public static boolean isWpilibInstalledOnSystemViaReadAction()
+    public static boolean isWpilibDownloadedToSystemViaReadAction()
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) WpiLibLibrariesUtils::isWpilibInstalledOnSystem);
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) WpiLibLibrariesUtils::isWpilibDownloadedToSystem);
     }
 
 
@@ -232,7 +251,7 @@ public class WpiLibLibrariesUtils
     private static boolean areAllPresent(@NotNull Module module)
     {
         // wpiutil.jar was added in v2018 and has only a single class - not check on it for now
-        return isWpilibPresent(module) && isNetworkTablesPresent(module) && isOpenCvPresent(module) && isCsCorePresent(module);
+        return isWpilibAttached(module) && isNetworkTablesPresent(module) && isOpenCvPresent(module) && isCsCorePresent(module);
     }
 
 
@@ -335,6 +354,7 @@ public class WpiLibLibrariesUtils
     }
 
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isUserLibAttachedViaReadAction(@NotNull Project project)
     {
         return DumbService.getInstance(project).runReadActionInSmartMode(() -> isUserLibAttached(project));
@@ -360,4 +380,214 @@ public class WpiLibLibrariesUtils
     {
         return DumbService.getInstance(project).runReadActionInSmartMode(() -> isUserLibNonEmptyAndNotAttached(project));
     }
+
+
+    @Nullable
+    public static WpiLibVersion determineAvailableWpiLibVersion()
+    {
+        return WpiLibDownloader.getLatestVersionAvailable();
+    }
+    
+
+    @Nullable
+    public static WpiLibVersion determineAttachedWpiLibVersionViaReadAction(@NotNull Project project)
+    {
+        return DumbService.getInstance(project).runReadActionInSmartMode(() -> determineAttachedWpiLibVersion(project));
+    }
+
+    @Nullable
+    public static WpiLibVersion determineAttachedWpiLibVersion(@NotNull Project project)
+    {
+        final String versionString = determineAttachedWpiLibVersionString(project);
+        return extractWpiLibVersionFromVersionString(versionString);
+    }
+
+    public static String determineAttachedWpiLibVersionString(@NotNull Project project)
+    {
+        if (!isWpilibAttachedViaReadAction(project))
+        {
+            return FrcMessageBundle.message("frc.wpilib.not.attached");
+        }
+
+        
+        final PsiClass[] verClass = FindClassUtils.findClass(project, WpiLibConstants.VERSION_CLASS_FQN);
+        
+        if (verClass.length == 0)
+        {
+            return FrcMessageBundle.message("frc.wpilib.version.unavailable", WpiLibConstants.VERSION_CLASS_FQN);
+        }
+
+        String version = null;
+        for (PsiClass aClass : verClass)
+        {
+            @Nullable
+            final PsiField versionField = aClass.findFieldByName("Version", false);
+            if (versionField != null)
+            {
+                final PsiExpression initializer = versionField.getInitializer();
+                
+                if (initializer instanceof PsiLiteralExpression)
+                {
+                    Object value = ((PsiLiteralExpression) initializer).getValue();
+                    if (value != null && value instanceof String)
+                    {
+                        version = value.toString();
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return version != null ? version : FrcMessageBundle.message("frc.wpilib.version.undetermined");
+    }
+
+ 
+    @Nullable
+    public static WpiLibVersion determineSystemAvailableWpiLibVersionViaReadAction()
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<WpiLibVersion>) WpiLibLibrariesUtils::determineSystemAvailableWpiLibVersion);
+    }
+    
+    @Nullable
+    public static WpiLibVersion determineSystemAvailableWpiLibVersion()
+    {
+        final String versionString = determineSystemAvailableWpiLibVersionString();
+        final WpiLibVersion version = extractWpiLibVersionFromVersionString(versionString);
+        if (version != null) {LOG.debug("[FRC] WPILib version determined as " + version); }
+        return version;
+    }
+
+    public static String determineSystemAvailableWpiLibVersionStringViaReadAction()
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<String>) WpiLibLibrariesUtils::determineSystemAvailableWpiLibVersionString);
+    }
+    
+    public static String determineSystemAvailableWpiLibVersionString()
+    {
+        if (!isWpilibDownloadedToSystem())
+        {
+            return FrcMessageBundle.message("frc.wpilib.version.second.half.msg.not.on.system");
+        }
+        else
+        {
+            try
+            {
+                final Path sourcesJar = WpiLibPaths.getJavaLibDir().resolve("WPILib-sources.jar");
+                if (Files.isReadable(sourcesJar))
+                {
+                    try (JarFile jarFile = new JarFile(sourcesJar.toFile()))
+                    {
+                        final ZipEntry entry = jarFile.getEntry("edu/wpi/first/wpilibj/util/WPILibVersion.java");
+                        if (entry != null)
+                        {
+                            try (InputStream inputStream = jarFile.getInputStream(entry))
+                            {
+                                final List<String> lines = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
+                                for (String line : lines)
+                                {
+                                    if (line.toLowerCase().contains("string version"))
+                                    {
+                                        final int begin = line.indexOf('"') + 1;
+                                        final int end = line.indexOf('"', begin);
+                                        final String version = line.substring(begin, end);
+                                        LOG.debug("[FRC] WPILib version extracted from WPILib-sources.jar as " + version);
+                                        return version;
+                                    }
+                                }
+                                
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        LOG.debug("[FRC] Could not extract WPILib version from source JAR. Cause: " + e.toString());
+                    }
+                }
+                else
+                {
+                    LOG.debug("[FRC] Could not extract WPILib version from source JAR as the file is not readable: " + sourcesJar);
+                    // We don't have the sources JAR
+                    final Path classesJar = WpiLibPaths.getJavaLibDir().resolve("WPILib.jar");
+                    if (Files.isReadable(classesJar))
+                    {
+                        final Path tempFile = Files.createTempFile("WpiLibVersion", ".class");
+                        try
+                        {
+                            
+                            try (JarFile jarFile = new JarFile(classesJar.toFile()))
+                            {
+                                final ZipEntry entry = jarFile.getEntry("edu/wpi/first/wpilibj/util/WPILibVersion.class");
+                                if (entry != null)
+                                {
+                                    
+                                    try (InputStream inputStream = jarFile.getInputStream(entry))
+                                    {
+                                        FileUtils.copyToFile(inputStream, tempFile.toFile());
+                                    }
+                                }
+                            }
+
+                            final VirtualFile virtualFile = VirtualFileManager.getInstance().findFileByUrl(tempFile.toUri().toString());
+                            if (virtualFile == null)
+                            {
+                                LOG.debug("[FRC] Could not extract WPILib version from classes JAR. Could not create virtualFile to extracted class file at " + classesJar);
+                            }
+                            else 
+                            {
+                                final String text = new ClassFileDecompiler().decompile(virtualFile).toString();
+                                final int begin = text.indexOf('"') + 1;
+                                final int end = text.indexOf('"', begin);
+                                final String version = text.substring(begin, end);
+                                LOG.debug("[FRC] WPILib version extracted from the WPILibVersion.class file in WPILib.jar as " + version);
+                                return version;
+                            }
+                            
+                        }
+                        catch (Exception e)
+                        {
+                            LOG.debug("[FRC] Could not extract WPILib version from classes JAR. Cause: " + e.toString());
+                        }
+                        finally
+                        {
+                            FrcFileUtils.deleteFileSafely(tempFile);
+                        }
+                    }
+                    
+                    
+                }
+            }
+            catch (Exception e)
+            {
+                LOG.debug("[FRC] Could not extract WPILib version. Cause: " + e.toString());
+            }
+
+        }
+        return FrcMessageBundle.message("frc.wpilib.version.second.half.msg.undetermined");
+    }
+
+
+    @Nullable
+    public static WpiLibVersion extractWpiLibVersionFromVersionString(String versionString)
+    {
+        try
+        {
+            if (StringUtils.isBlank(versionString))
+            {
+                return null;
+            }
+            else if (Character.isDigit(versionString.toCharArray()[0]))
+            {
+                return WpiLibVersionImpl.parse(versionString);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch (Exception ignore)
+        {
+            return null;
+        }
+    }
+    
 }

@@ -17,10 +17,10 @@
 package net.javaru.iip.frc.wpilib.retrieval;
 
 import java.net.URI;
-import java.net.URISyntaxException;
+import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
 
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
@@ -31,47 +31,80 @@ import net.javaru.iip.frc.settings.FrcApplicationSettingsKt;
 class WpiRepoUris
 {
     private static final Logger LOG = Logger.getInstance(WpiRepoUris.class);
+    public static final String SITE_XML = "site.xml";
 
 
     /**
-     * Returns the full WPI Eclipse Repo URI. For example: http://first.wpi.edu/FRC/roborio/release/eclipse/
+     * Returns the full WPI Eclipse Repo URI configured for use (either release or beta). For example: http://first.wpi.edu/FRC/roborio/release/eclipse/
      *
-     * @return the full WPI Eclipse Repo URI. For example: http://first.wpi.edu/FRC/roborio/release/eclipse/
+     * @return the full WPI Eclipse Repo URI configured for use (either release or beta). For example: http://first.wpi.edu/FRC/roborio/release/eclipse/
      */
-    public static URI getRepoFullUri()
+    @NotNull
+    public static URI getActiveRepoUri()
     {
-        return (BooleanUtils.toBoolean(System.getProperty(FrcApplicationSettingsKt.USE_WPILIB_BETA_SITE, "false")))
-               ? FrcApplicationSettings.Settings.INSTANCE().getWpiEclipsePluginBetaRepoUri()
-               : FrcApplicationSettings.Settings.INSTANCE().getWpiEclipsePluginReleaseRepoUri();
+        return useBetaRepo() ? getBetaRepoUri() : getReleaseRepoUri();
+    }
+
+
+    public static boolean useBetaRepo()
+    {
+        return BooleanUtils.toBoolean(System.getProperty(FrcApplicationSettingsKt.USE_WPILIB_BETA_SITE, "false"));
     }
 
 
     /**
-     * Returns the base of the WPI Eclipse Repo URI. For example: http://first.wpi.edu
+     * Returns the full WPI Eclipse <em>beta</em> Repo URI. For example: http://first.wpi.edu/FRC/roborio/beta/eclipse/
+     * Generally the {@link #getActiveRepoUri()} should be used unless the beta repo is specifically being queried.
      *
-     * @return the base of the WPI Eclipse Repo URI. For example: http://first.wpi.edu
+     * @return the full WPI Eclipse <em>beta</em> Repo URI. For example: http://first.wpi.edu/FRC/roborio/beta/eclipse/
+     * 
+     * @see #getActiveRepoUri() 
      */
-    @Nullable
-    public static URI getRepoBaseUri()
+    @NotNull
+    public static URI getBetaRepoUri()
     {
-        final URI fullRpoUri = getRepoFullUri();
-        try
-        {
-            return new URI(fullRpoUri.getScheme(), fullRpoUri.getHost(), null, null);
-        }
-        catch (URISyntaxException e)
-        {
-            //this really should never happen given how we are constructing the URI
-            LOG.warn("[FRC] Could not extract base URI from URI. Summary: " + e.toString(), e);
-            return null;
-        }
+        return FrcApplicationSettings.Settings.INSTANCE().getWpiEclipsePluginBetaRepoUri();
     }
 
 
-    public static URI getRepoSiteXmlFileUri()
+    /**
+     * Returns the full WPI Eclipse <em>release</em> Repo URI. For example: http://first.wpi.edu/FRC/roborio/release/eclipse/
+     * Generally the {@link #getActiveRepoUri()} should be used unless the release repo is specifically being queried.
+     *
+     * @return the full WPI Eclipse <em>release</em> Repo URI. For example: http://first.wpi.edu/FRC/roborio/release/eclipse/
+     *
+     * @see #getActiveRepoUri()
+     */
+    @NotNull
+    public static URI getReleaseRepoUri()
     {
-        return getRepoFullUri().resolve("site.xml");
+        return FrcApplicationSettings.Settings.INSTANCE().getWpiEclipsePluginReleaseRepoUri();
     }
 
 
+//    /**
+//     * Returns the base of the WPI Eclipse Repo URI. For example: http://first.wpi.edu
+//     *
+//     * @return the base of the WPI Eclipse Repo URI. For example: http://first.wpi.edu
+//     */
+//    @Nullable
+//    public static URI getRepoBaseUri()
+//    {
+//        final URI fullRpoUri = getActiveRepoUri();
+//        try
+//        {
+//            return new URI(fullRpoUri.getScheme(), fullRpoUri.getHost(), null, null);
+//        }
+//        catch (URISyntaxException e)
+//        {
+//            //this really should never happen given how we are constructing the URI
+//            LOG.warn("[FRC] Could not extract base URI from URI. Summary: " + e.toString(), e);
+//            return null;
+//        }
+//    }
+    
+    public static URI getSiteUri(@Nonnull URI repoBaseUri)
+    {
+        return repoBaseUri.resolve(SITE_XML);
+    }
 }

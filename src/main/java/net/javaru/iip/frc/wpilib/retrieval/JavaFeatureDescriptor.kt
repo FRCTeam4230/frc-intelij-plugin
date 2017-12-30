@@ -17,9 +17,10 @@
 package net.javaru.iip.frc.wpilib.retrieval
 
 
+import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import java.net.URI
 
 
-internal data class JavaFeatureDescriptor(val id: String, val version: String, val uri: URI)
+internal data class JavaFeatureDescriptor(val id: String, val version: WpiLibVersion, val uri: URI)
 {
 }

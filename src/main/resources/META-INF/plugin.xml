@@ -311,10 +311,10 @@
                     text="Attach User Lib Directory as Dependency"
                     description="Attach the User Lib directory as a Module Dependency (i.e. Library)"
                     icon="AllIcons.Modules.Types.UserDefined" />
-            <action id="frc.tools.CheckWpiLbVersionAction"
-                    class="net.javaru.iip.frc.actions.tools.CheckWpiLbVersionAction"
-                    text="Check Attached WpiLib Version"
-                    description="Determines and displays the version of the WpiLib JAR that is attached as a dependency/library."
+            <action id="frc.tools.CheckWpiLbVersionStatusAction"
+                    class="net.javaru.iip.frc.actions.tools.CheckSystemWpiLbVersionAction"
+                    text="Check WPILib Version"
+                    description="Determines and displays the version of the WPILib JAR that is attached as a dependency/library and what version is available for download."
                     />
             
             

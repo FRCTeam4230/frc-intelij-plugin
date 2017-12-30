@@ -30,13 +30,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.io.FileUtilRt;
+import com.intellij.openapi.vfs.VirtualFile;
 
 
 
 public final class FrcFileUtils
 {
+    private static final Logger LOG = Logger.getInstance(FrcFileUtils.class);
+
 
     private FrcFileUtils() { }
 
@@ -95,18 +101,21 @@ public final class FrcFileUtils
             return !dirStream.iterator().hasNext();
         }
     }
-    
+
+
     public static boolean directoryDoesNotHaveJars(@NotNull final Path directory, final boolean recursive) throws IOException
     {
         return !directoryHasJars(directory, recursive);
-        
+
     }
+
+
     public static boolean directoryHasJars(@NotNull final Path directory, final boolean recursive) throws IOException
     {
         if (!Files.exists(directory)) { return false; }
-        
+
         final AtomicBoolean foundJar = new AtomicBoolean(false);
-        
+
         class MyFileVisitor extends SimpleFileVisitor<Path>
         {
             @Override
@@ -117,7 +126,7 @@ public final class FrcFileUtils
                     foundJar.set(true);
                     return FileVisitResult.TERMINATE;
                 }
-                else 
+                else
                 {
                     return FileVisitResult.CONTINUE;
                 }
@@ -133,5 +142,83 @@ public final class FrcFileUtils
         final MyFileVisitor fileVisitor = new MyFileVisitor();
         Files.walkFileTree(directory, fileVisitor);
         return foundJar.get();
+    }
+
+    
+    public static void deleteFileSafely(@Nullable Path file)
+    {
+        try
+        {
+            if (file != null && Files.isRegularFile(file))
+            {
+                if (!Files.deleteIfExists(file))
+                {
+                    try { file.toFile().deleteOnExit(); } catch (Exception ignore) { }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.debug("An exception occurred when attempting to delete file '" + file + "'. Cause: " + e.toString());
+            try { file.toFile().deleteOnExit(); } catch (Exception ignore) { }
+        }
+    }
+    @SuppressWarnings("UnusedReturnValue")
+    public static boolean deleteSafely(@Nullable VirtualFile virtualFile, @NotNull Object requester)
+    {
+        if (virtualFile != null && virtualFile.exists())
+        {
+            // return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) WpiLibLibrariesUtils::isWpilibDownloadedToSystem);
+            //ApplicationManager.getApplication().runWriteAction(() -> 
+
+            return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> {
+                try
+                {
+                    virtualFile.delete(requester);
+                    return true;
+                }
+                catch (IOException e)
+                {
+                    LOG.info("[FRC] Could not delete '" + virtualFile.toString() + "' as requested by '" + requester + "'. Cause: " + e.toString());
+                    return false;
+                }
+            });
+
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+
+    @SuppressWarnings("UnusedReturnValue")
+    public static boolean deleteSafelyIfEmpty(@Nullable VirtualFile virtualFile, @NotNull Object requester)
+    {
+        if (virtualFile != null)
+        {
+            if (virtualFile.isDirectory())
+            {
+                final VirtualFile[] children = virtualFile.getChildren();
+                if (children != null && children.length == 0)
+                {
+                    return deleteSafely(virtualFile, requester);
+                }
+                else
+                {
+                    LOG.debug("[FRC] virtual file dir is not empty and will not be deleted: " + virtualFile.getPresentableUrl());
+                    return false;
+                }
+            }
+            else
+            {
+                LOG.debug("[FRC] virtualFile is not a directory and will not be deleted: " + virtualFile.getPresentableUrl());
+                return false;
+            }
+        }
+        else
+        {
+            return true;
+        }
     }
 }

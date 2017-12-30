@@ -32,12 +32,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.InputValidator;
@@ -48,6 +51,8 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.UnzipUtils;
 import net.javaru.iip.frc.util.UriUtils;
 import net.javaru.iip.frc.wpilib.WpiLibPaths;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
 
 
 
@@ -56,12 +61,62 @@ public class WpiLibDownloader
     private static final Logger LOG = Logger.getInstance(WpiLibDownloader.class);
 
 
+    /**
+     * Returns the latest JavaFeatureDescriptor (which includes a version property) and the repo URI it came from.
+     * Thus if the use beta site is enabled, either the latest beta or the latest release will be returned.
+     * @return the latest JavaFeatureDescriptor (which includes a version property) and the repo URI it came from
+     */
+    public static ImmutablePair<JavaFeatureDescriptor, URI> downloadLatestJavaDescriptor() throws WpiLibDownloadFailedException
+    {
+        try
+        {
+            final URI betaRepoUri = WpiRepoUris.getBetaRepoUri();
+            final URI releaseRepoUri = WpiRepoUris.getReleaseRepoUri();
+            
+            @Nullable
+            final JavaFeatureDescriptor betaDescriptor = WpiRepoUris.useBetaRepo() ? parseSiteXml(fetchSiteXml(betaRepoUri), betaRepoUri) : null ;
+            final JavaFeatureDescriptor releaseDescriptor = parseSiteXml(fetchSiteXml(releaseRepoUri), releaseRepoUri);
+            
+            if (betaDescriptor == null || releaseDescriptor.getVersion().isNewThan(betaDescriptor.getVersion()))
+            {
+                return ImmutablePair.of(releaseDescriptor, releaseRepoUri);
+            }
+            else
+            {
+                return ImmutablePair.of(betaDescriptor, betaRepoUri); 
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.warn("[FRC] Could not check for the latest version of WPILib. Cause Summary: " + e.toString(), e);
+            throw new WpiLibDownloadFailedException(e);
+        }
+    }
+
+
+    /**
+     * Returns the latest version of the WpiLib available, or {@code null} if the version could not be retrieved. 
+     * @return the latest version of the WpiLib available, or {@code null} if the version could not be retrieved.
+     */
+    @Nullable
+    public static WpiLibVersion getLatestVersionAvailable()
+    {
+        try
+        {
+            return downloadLatestJavaDescriptor().getKey().getVersion();
+        }
+        catch (Exception ignore)
+        {
+            return null;
+        }
+    }
+    
     public static void downloadLatest() throws WpiLibDownloadFailedException
     {
         try
         {
-            final Document siteXml = fetchSiteXml();
-            final JavaFeatureDescriptor javaFeatureDescriptor = parseSiteXml(siteXml);
+            final ImmutablePair<JavaFeatureDescriptor, URI> latest = downloadLatestJavaDescriptor();
+            final JavaFeatureDescriptor javaFeatureDescriptor = latest.getKey();
             LOG.info("[FRC] Current WPILib version (as indicated in 'site.xml') is '" + javaFeatureDescriptor.getVersion() + "'");
 
             //final Document javaFeatureXml = WpiRepoHttpClient.fetchXmlResourceAsDocument(javaFeatureDescriptor.getUri());
@@ -71,7 +126,7 @@ public class WpiLibDownloader
             // code the names for now.
             // TODO: parse the site.xml in the event things change
 
-            final URI siteXmlUri = WpiRepoUris.getRepoSiteXmlFileUri();
+            final URI siteXmlUri = WpiRepoUris.getSiteUri(latest.getValue());
 
             final URI javaJarUri = UriUtils.resolveSiblingResource(siteXmlUri,
                                                                    String.format("plugins/edu.wpi.first.wpilib.plugins.java_%s.jar",
@@ -99,33 +154,33 @@ public class WpiLibDownloader
         }
         catch (Exception e)
         {
-            LOG.warn("[FRC] Could not download latest version of WPILib, Cause Summary: " + e.toString(), e);
+            LOG.warn("[FRC] Could not download latest version of WPILib. Cause Summary: " + e.toString(), e);
             throw new WpiLibDownloadFailedException(e);
         }
 
     }
 
 
-    public static Document fetchSiteXml() throws IOException, JDOMException
+    public static Document fetchSiteXml(@NotNull URI repoBaseUri) throws IOException, JDOMException
     {
-        final URI siteXmlUri = WpiRepoUris.getRepoSiteXmlFileUri();
+        final URI siteXmlUri = WpiRepoUris.getSiteUri(repoBaseUri);
         final Document siteDocument = WpiRepoHttpClient.fetchXmlResourceAsDocument(siteXmlUri);
         return siteDocument;
     }
 
 
-    public static JavaFeatureDescriptor parseSiteXml(Document siteDocument)
+    public static JavaFeatureDescriptor parseSiteXml(Document siteDocument, @NotNull URI repoBaseUri)
     {
         final XPathFactory xPathFactory = XPathFactory.instance();
         final XPathExpression<Element> expression = xPathFactory.compile("/site/feature[contains(@id, 'java')]", Filters.element());
         final Element javaFeatureElement = expression.evaluateFirst(siteDocument);
         final String id = javaFeatureElement.getAttribute("id").getValue();
         final String versionString = javaFeatureElement.getAttribute("version").getValue();
-        //final JJWpiVersion version = new JJWpiVersion(versionString);
+        WpiLibVersion version = WpiLibVersionImpl.parse(versionString);
         final String javaFeatureRelativeUrl = javaFeatureElement.getAttribute("url").getValue();
-        final URI javaFeatureUri = UriUtils.resolveSiblingResource(WpiRepoUris.getRepoSiteXmlFileUri(), javaFeatureRelativeUrl);
+        final URI javaFeatureUri = UriUtils.resolveSiblingResource(WpiRepoUris.getSiteUri(repoBaseUri), javaFeatureRelativeUrl);
 
-        return new JavaFeatureDescriptor(id, versionString, javaFeatureUri);
+        return new JavaFeatureDescriptor(id, version, javaFeatureUri);
     }
 
 

@@ -171,7 +171,7 @@ public final class FrcFileUtils
             // return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) WpiLibLibrariesUtils::isWpilibDownloadedToSystem);
             //ApplicationManager.getApplication().runWriteAction(() -> 
 
-            return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> {
+            return ApplicationManager.getApplication().runWriteAction((Computable<Boolean>) () -> {
                 try
                 {
                     virtualFile.delete(requester);

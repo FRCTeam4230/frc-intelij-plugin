@@ -43,7 +43,7 @@ public abstract class RioLogMonitorProjectService
     private AbstractRioLogContentExecutor udpContentExecutor;
 
 
-    public RioLogMonitorProjectService(@NotNull Project myProject) {this.myProject = myProject;}
+    protected RioLogMonitorProjectService(@NotNull Project myProject) {this.myProject = myProject;}
 
 
     public synchronized void update()

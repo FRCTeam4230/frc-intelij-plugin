@@ -76,12 +76,12 @@ public class WpiLibLibrariesUtils
 
 
     /**
-     * A convenience method to call {@code return WpiLibVersionStatus.getCurrentStatus(project)}.
+     * A convenience method to call {@code return WpiLibVersionStatus.getCurrentVersionStatus(project)}.
      * @return the current WpiLibVersionStatus 
      */
     public static WpiLibVersionStatus getCurrentWpiLibVersionStatus(@Nullable Project project)
     {
-        return WpiLibVersionStatus.getCurrentStatus(project);
+        return WpiLibVersionStatus.getCurrentVersionStatus(project);
     }
     
     

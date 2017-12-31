@@ -28,7 +28,7 @@ import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 /**
  * A class that provides the current version of WPILib in its three forms: attached, downloaded, available for download. 
  * It also has convenience/utility methods for working with the versions. To create/construct, use the factory method
- * {@link WpiLibVersionStatus#getCurrentStatus(Project) WpiLibVersionStatus#getCurrentStatus(@Nullable Project)}.
+ * {@link WpiLibVersionStatus#getCurrentVersionStatus(Project) WpiLibVersionStatus#getCurrentVersionStatus(@Nullable Project)}.
  */
 public class WpiLibVersionStatus
 {
@@ -56,7 +56,7 @@ public class WpiLibVersionStatus
 
     //TODO i18n
     
-    // use getCurrentStatus(Project)
+    // use getCurrentVersionStatus(Project)
     private WpiLibVersionStatus(@Nullable Project project,
                                 boolean wpiLibAttached, 
                                 @Nullable WpiLibVersion attachedVersion,
@@ -121,7 +121,7 @@ public class WpiLibVersionStatus
      * @param project the project, if any, to check the attached version for
      * @return the current versions of the WPILib
      */
-    public static WpiLibVersionStatus getCurrentStatus(@Nullable Project project)
+    public static WpiLibVersionStatus getCurrentVersionStatus(@Nullable Project project)
     {
         WpiLibVersion attachedVersion = null;
         WpiLibVersion downloadedVersion = null;

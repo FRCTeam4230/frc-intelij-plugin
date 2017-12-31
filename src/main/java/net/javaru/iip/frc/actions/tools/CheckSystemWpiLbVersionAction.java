@@ -39,7 +39,7 @@ public class CheckSystemWpiLbVersionAction extends AbstractFrcToolsAction
     {
         final Project project = e.getProject();
 
-        final WpiLibVersionStatus versionStatus = WpiLibVersionStatus.getCurrentStatus(project);
+        final WpiLibVersionStatus versionStatus = WpiLibVersionStatus.getCurrentVersionStatus(project);
         LOG.info("[FRC] WpiLib Version Status: " + versionStatus);
 
         //TODO: i18n

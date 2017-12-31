@@ -58,6 +58,7 @@ import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersionStatus;
 
 import static net.javaru.iip.frc.util.FindClassUtils.isLibraryPresent;
 
@@ -74,6 +75,16 @@ public class WpiLibLibrariesUtils
     public static final String NETWORK_TABLES_CLASS_2 = "edu.wpi.first.networktables.TableListener";
 
 
+    /**
+     * A convenience method to call {@code return WpiLibVersionStatus.getCurrentStatus(project)}.
+     * @return the current WpiLibVersionStatus 
+     */
+    public static WpiLibVersionStatus getCurrentWpiLibVersionStatus(@Nullable Project project)
+    {
+        return WpiLibVersionStatus.getCurrentStatus(project);
+    }
+    
+    
     private static boolean isWpilibAttached(@NotNull Project project)
     {
         return isLibraryPresent(project, WpiLibConstants.ROBOT_BASE_FQN) ||

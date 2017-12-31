@@ -71,6 +71,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 
+import net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 
 
@@ -138,7 +139,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
     private static ActionToolbar createToolbar(ActionGroup actions)
     {
-        return ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, false);
+        return ActionManager.getInstance().createActionToolbar(FrcRioLogToolWindowExecutor.FRC_RIO_LOG_TOOL_WINDOW_ID, actions, false);
     }
 
 
@@ -154,6 +155,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                                                             invokeClearAll();
                                                             myProcessHandler.waitFor(2000L);
                                                             run();
+                                                            ensureContentIsPinned();
                                                         });
     }
 
@@ -345,6 +347,32 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     }
 
 
+    public void ensureContentIsPinned()
+    {
+        final ToolWindow toolWindow = ToolWindowManager.getInstance(myProject)
+                                                       .getToolWindow(getToolWindowId());
+        final ContentManager contentManager = toolWindow.getContentManager();
+        ensureContentIsPinned(contentManager);
+    }
+
+
+    public void ensureContentIsPinned(@NotNull ContentManager contentManager)
+    {
+        final Content content = contentManager.findContent(getTabTitle());
+        ensureContentIsPinned(content);
+    }
+
+
+    public static void ensureContentIsPinned(@Nullable Content content)
+    {
+        if (content != null)
+        {
+            content.setPinnable(true);
+            content.setPinned(true);
+        }
+    }
+
+
     private class ActivateRioLogConsoleRunnable implements Runnable
     {
         @Override
@@ -359,6 +387,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             if (content != null)
             {
                 contentManager.setSelectedContent(content, true);
+                ensureContentIsPinned(content);
             }
         }
     }
@@ -580,12 +609,16 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         {
             ApplicationManager.getApplication().invokeLater(() ->
                                                             {
+                                                                
+                                                                rioLogMonitorProcess.stop();
+                                                                
                                                                 myProcessHandler.destroyProcess();
                                                                 if (getRioLogMonitorProcess() != null)
                                                                 {
                                                                     getRioLogMonitorProcess().monitoringStopped();
                                                                 }
                                                                 update(event);
+                                                                ensureContentIsPinned();
                                                             });
         }
 

@@ -94,7 +94,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     private Computable<Boolean> myStopEnabled;
 
     private String myHelpId = null;
-    private boolean myActivateToolWindow = true;
+    private boolean myActivateToolWindow;
     private Executor myExecutor;
     private RunContentDescriptor myRunContentDescriptor;
     private AbstractRioLogMonitorProcess rioLogMonitorProcess;
@@ -230,7 +230,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             myProcessHandler.addProcessListener(new ProcessAdapter()
             {
                 @Override
-                public void processTerminated(ProcessEvent event)
+                public void processTerminated(@NotNull ProcessEvent event)
                 {
                     SwingUtilities.invokeLater(myAfterCompletionRunnable);
                 }
@@ -547,14 +547,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         public void setSelected(final AnActionEvent event, final boolean flag)
         {
             myConsole.setOutputPaused(flag);
-            ApplicationManager.getApplication().invokeLater(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    update(event);
-                }
-            });
+            ApplicationManager.getApplication().invokeLater(() -> update(event));
         }
 
 
@@ -582,14 +575,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                 else
                 {
                     presentation.setEnabled(true);
-                    myConsole.performWhenNoDeferredOutput(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            update(event);
-                        }
-                    });
+                    myConsole.performWhenNoDeferredOutput(() -> update(event));
                 }
             }
         }

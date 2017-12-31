@@ -40,7 +40,7 @@ public abstract class RioLogMonitorProjectService
     @NotNull
     protected final Project myProject;
     @Nullable
-    private AbstractRioLogContentExecutor udpContentExecutor;
+    private AbstractRioLogContentExecutor contentExecutor;
 
 
     protected RioLogMonitorProjectService(@NotNull Project myProject) {this.myProject = myProject;}
@@ -72,21 +72,21 @@ public abstract class RioLogMonitorProjectService
         final Thread currentThread = Thread.currentThread();
         LOG.debug("[FRC] Current thread:   " + currentThread.getId() + " :: " + currentThread.getName());
         LOG.debug("[FRC] needConsole:      " + needConsole);
-        LOG.debug("[FRC] haveConsole:      " + (udpContentExecutor != null));
+        LOG.debug("[FRC] haveConsole:      " + (contentExecutor != null));
         LOG.debug("[FRC] useRunWindow:     " + useRunWindow);
         LOG.debug("[FRC] configuredPort:   " + configuredPort);
         LOG.debug("[FRC] currentPort:      " + currentPort);
         LOG.debug("[FRC] portBounceNeeded: " + portBounceNeeded);
 
 
-        if (needConsole && udpContentExecutor != null && udpContentExecutor.getRioLogMonitoringProcess() != null
-            && udpContentExecutor.getRioLogMonitoringProcess().isEnabled())
+        if (needConsole && contentExecutor != null && contentExecutor.getRioLogMonitoringProcess() != null
+            && contentExecutor.getRioLogMonitoringProcess().isEnabled())
         {
             // Case 1 - we have and need it, but we need to check if we have the right type (i.e. settings change)
             LOG.debug("[FRC] Case 1: have console and need it. Checking if correct type & port. Project is: " + myProject.getName());
 
             //do we have the right console?
-            if (useRunWindow && FrcRioLogToolWindowExecutor.FRC_RIO_LOG_TOOL_WINDOW_ID.equals(udpContentExecutor.getToolWindowId()))
+            if (useRunWindow && FrcRioLogToolWindowExecutor.FRC_RIO_LOG_TOOL_WINDOW_ID.equals(contentExecutor.getToolWindowId()))
             {
                 //We have a FRC Tool Window, but need a Run Window
                 LOG.debug("[FRC] Case 1.1: have a FRC Tool Window, but need a Run Tab. Closing FRC Tool Window and creating Run tab. Project is: "
@@ -94,7 +94,7 @@ public abstract class RioLogMonitorProjectService
                 closeContentExecutor();
                 initContentExecutor(true);
             }
-            else if (!useRunWindow && ToolWindowId.RUN.equals(udpContentExecutor.getToolWindowId()))
+            else if (!useRunWindow && ToolWindowId.RUN.equals(contentExecutor.getToolWindowId()))
             {
                 //We have a run window, but need a FRC tool window
                 LOG.debug("[FRC] Case 1.2: have a Run tab, but need a FRC Tool Window. Closing Run tab and creating FRC Tool Window. Project is: "
@@ -108,7 +108,7 @@ public abstract class RioLogMonitorProjectService
                 {
                     LOG.debug("[FRC] Case 1.3A: have console, need it, and it is the right type, but port has changed. Triggering 'reRun' action. Project is: "
                               + myProject.getName());
-                    if (udpContentExecutor != null) {udpContentExecutor.reRun();}
+                    if (contentExecutor != null) {contentExecutor.reRun();}
                 }
                 else
                 {
@@ -123,7 +123,7 @@ public abstract class RioLogMonitorProjectService
             LOG.debug("[FRC] Case 2: need a console, but we don't have one. Creating one. Project is: " + myProject.getName());
             initContentExecutor(useRunWindow);
         }
-        else if (udpContentExecutor != null)
+        else if (contentExecutor != null)
         {
             // Case 3 we have it, but don't need it
             LOG.debug("[FRC] Case 3: We have a console, but don't need it. Closing it. Project is: " + myProject.getName());
@@ -139,9 +139,9 @@ public abstract class RioLogMonitorProjectService
 
     private int determineCurrentlyMonitoredPort()
     {
-        if (udpContentExecutor != null)
+        if (contentExecutor != null)
         {
-            final RioLogMonitoringProcess rioLogMonitoringProcess = udpContentExecutor.getRioLogMonitoringProcess();
+            final RioLogMonitoringProcess rioLogMonitoringProcess = contentExecutor.getRioLogMonitoringProcess();
             if (rioLogMonitoringProcess != null)
             {
                 return rioLogMonitoringProcess.getMonitoredPort();
@@ -153,35 +153,35 @@ public abstract class RioLogMonitorProjectService
 
     public void activateSafely()
     {
-        if (udpContentExecutor != null)
+        if (contentExecutor != null)
         {
-            udpContentExecutor.activateRioLogConsoleSafely();
+            contentExecutor.activateRioLogConsoleSafely();
         }
     }
 
 
     public void activateNow()
     {
-        if (udpContentExecutor != null)
+        if (contentExecutor != null)
         {
-            udpContentExecutor.activateRioLogConsoleNow();
+            contentExecutor.activateRioLogConsoleNow();
         }
     }
 
 
     public void closeContentExecutor()
     {
-        if (udpContentExecutor != null)
+        if (contentExecutor != null)
         {
             try
             {
-                udpContentExecutor.close();
+                contentExecutor.close();
             }
             catch (Exception e)
             {
-                LOG.debug("[FRC] An exception occurred when closing the udpContentExecutor. Cause Summary: " + e.toString(), e);
+                LOG.debug("[FRC] An exception occurred when closing the contentExecutor. Cause Summary: " + e.toString(), e);
             }
-            udpContentExecutor = null;
+            contentExecutor = null;
         }
     }
 
@@ -191,9 +191,9 @@ public abstract class RioLogMonitorProjectService
         LOG.debug("[FRC] Creating AbstractRioLogContentExecutor");
         try
         {
-            udpContentExecutor = createRioLogContentExecutor(useRunWindow);
-            Disposer.register(myProject, udpContentExecutor);
-            udpContentExecutor.run();
+            contentExecutor = createRioLogContentExecutor(useRunWindow);
+            Disposer.register(myProject, contentExecutor);
+            contentExecutor.run();
         }
         catch (Exception e)
         {

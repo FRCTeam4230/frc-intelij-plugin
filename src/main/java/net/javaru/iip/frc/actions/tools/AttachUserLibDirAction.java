@@ -82,7 +82,7 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
                     final Library existing = WpiLibLibrariesUtils.findExistingUserLibDirLibrary(module);
                     if (existing != null)
                     {
-                        Notifications.Bus.notify(new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
+                        Notifications.Bus.notify(new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
                                                                   FrcNotifications.IconInfo,
                                                                   FrcNotifications.Title,
                                                                   "User Lib Already Attached",
@@ -128,7 +128,7 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
         }
 
         String cause = e != null ? "Cause: " + e.toString() : "";
-        return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
+        return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
                                 FrcNotifications.IconWarn,
                                 FrcNotifications.Title,
                                 "WPILib",
@@ -148,7 +148,7 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
     @NotNull
     private static Notification createSuccessNotification()
     {
-        return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
+        return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
                                 FrcNotifications.IconInfo,
                                 FrcNotifications.Title,
                                 "WPILib",

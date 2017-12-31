@@ -105,7 +105,7 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
                     else
                     {
                         notification = notifyOnCompletion ?
-                                       new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+                                       new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
                                                         FrcNotifications.IconInfo,
                                                         FrcNotifications.Title,
                                                         NOTIFICATIONS_SUBTITLE + " Completed Successfully",
@@ -153,7 +153,7 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
                     content += error.toString();
                 }
 
-                Notifications.Bus.notify(new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+                Notifications.Bus.notify(new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
                                                           FrcNotifications.IconWarn,
                                                           FrcNotifications.Title,
                                                           NOTIFICATIONS_SUBTITLE + " Failed",
@@ -171,7 +171,7 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
 
     private static Notification createNoActionSuccessNotification()
     {
-        return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
+        return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
                                 FrcNotifications.IconInfo,
                                 FrcNotifications.Title,
                                 NOTIFICATIONS_SUBTITLE,

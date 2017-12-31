@@ -14,15 +14,14 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc;
+package net.javaru.iip.frc.notify;
 
-public class FrcPluginGlobals
+import com.intellij.openapi.components.ApplicationComponent;
+
+
+
+
+public interface FrcNotificationsApplicationComponent extends ApplicationComponent
 {
-
-    public static final String FRC_PLUGIN_NAME = "FRC";
-
-    public static final int TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL = 12;
-    public static final int TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT = 8;
-
-    private FrcPluginGlobals() { }
+    
 }

@@ -44,7 +44,7 @@ import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 
-import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL;
+import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT;
 import static net.javaru.iip.frc.components.FrcProjectComponentImpl.NotificationKey.*;
 
 
@@ -174,7 +174,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
         final boolean shouldNotify = !settings.isTeamNumberConfigured()
                                      &&
-                                     (isFrcFacetedProject(project) || settings.getPrc() <= TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL)
+                                     (isFrcFacetedProject(project) || settings.getPrc() <= TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT)
                                      &&
                                      notificationMap.get(TeamNumConfigured) == null; //Don't publish multiple notifications for same project
 
@@ -190,10 +190,9 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         }
     }
 
-
     private static Notification queueDownloadAndAttachWpilibNotification(@NotNull Project project)
     {
-        final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+        final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
                                                            FrcNotifications.IconInfo,
                                                            FrcNotifications.Title,
                                                            "WPILib Not Found on System",
@@ -215,7 +214,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
     private static Notification queueAttachWpilibNotification(@NotNull Project project)
     {
-        final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+        final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
                                                            FrcNotifications.IconInfo,
                                                            FrcNotifications.Title,
                                                            "WPILib not Attached",
@@ -237,7 +236,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
     private static Notification queueMissingUserLibNotification(@NotNull Project project)
     {
-        final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+        final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
                                                            FrcNotifications.IconInfo,
                                                            FrcNotifications.Title,
                                                            "User Lib Directory Not Attached",

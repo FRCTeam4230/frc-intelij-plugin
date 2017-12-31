@@ -119,7 +119,7 @@ public abstract class RioLogMonitoringProcess extends Process
             enabled = false;
             myWaitSemaphore.up();
             LOG.warn("[FRC] Could not initialize riolog monitor. Cause Summary: " + e.toString(), e);
-            Notifications.Bus.notify(new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+            Notifications.Bus.notify(new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
                                                       FrcNotifications.IconError,
                                                       FrcNotifications.Title,
                                                       "RioLog Initialization Failure",
@@ -175,7 +175,7 @@ public abstract class RioLogMonitoringProcess extends Process
         catch (Exception e)
         {
             LOG.info("[FRC] Could not create PrintWriter for writing RiLog to file. Cause Summary: " + e.toString(), e);
-            Notifications.Bus.notify(new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
+            Notifications.Bus.notify(new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
                                                       FrcNotifications.IconWarn,
                                                       FrcNotifications.Title,
                                                       "RioLog File Logging",

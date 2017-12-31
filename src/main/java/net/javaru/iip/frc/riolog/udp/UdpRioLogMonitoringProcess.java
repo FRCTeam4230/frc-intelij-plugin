@@ -189,7 +189,7 @@ public class UdpRioLogMonitoringProcess extends RioLogMonitoringProcess
 
         protected void publishBindWarning(String msg)
         {
-            final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP,
+            final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
                                                                FrcNotifications.IconWarn,
                                                                FrcNotifications.Title,
                                                                "RIOLog Monitor",

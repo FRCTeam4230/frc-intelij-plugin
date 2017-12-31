@@ -116,7 +116,7 @@ public final class FrcIcons
     }
     
 
-    private static Icon loadIcon(String path)
+    public static Icon loadIcon(String path)
     {
         try
         {

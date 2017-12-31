@@ -90,7 +90,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                         //TODO: need to see if it is present as a Project library, and if so, attach that
                         if (WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(module))
                         {
-                            Notifications.Bus.notify(new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
+                            Notifications.Bus.notify(new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
                                                                       FrcNotifications.IconInfo,
                                                                       FrcNotifications.Title,
                                                                       "WPILib",
@@ -175,7 +175,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
         }
 
         String cause = e != null ? " Cause: " + e.toString() : "";
-        return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
+        return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
                                 FrcNotifications.IconWarn,
                                 FrcNotifications.Title,
                                 "WPILib",
@@ -195,7 +195,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
     @NotNull
     private static Notification createSuccessNotification()
     {
-        return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP,
+        return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
                                 FrcNotifications.IconInfo,
                                 FrcNotifications.Title,
                                 "WPILib",

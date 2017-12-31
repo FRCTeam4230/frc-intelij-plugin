@@ -169,6 +169,14 @@ public abstract class RioLogMonitorProjectService
     }
 
 
+    public void stop()
+    {
+        if (contentExecutor != null)
+        {
+            contentExecutor.invokeStop();
+        }
+    }
+
     public void closeContentExecutor()
     {
         if (contentExecutor != null)

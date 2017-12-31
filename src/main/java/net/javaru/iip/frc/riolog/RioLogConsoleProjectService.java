@@ -322,6 +322,85 @@ public class RioLogConsoleProjectService
     }
 
 
+    public static void stopUdp(@Nullable Facet facet)
+    {
+        if (facet != null)
+        {
+            final Project project = facet.getModule().getProject();
+            getInstance(project).stopUdp();
+        }
+    }
+
+    public static void stopUdp(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final Project project = module.getProject();
+            getInstance(project).stopUdp();
+        }
+    }
+
+    public static void stopUdp(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            getInstance(project).stopUdp();
+        }
+    }
+
+    public static void stopSsh(@Nullable Facet facet)
+    {
+        if (facet != null)
+        {
+            final Project project = facet.getModule().getProject();
+            getInstance(project).stopSsh();
+        }
+    }
+
+    public static void stopSsh(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final Project project = module.getProject();
+            getInstance(project).stopSsh();
+        }
+    }
+
+    public static void stopSsh(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            getInstance(project).stopSsh();
+        }
+    }
+    
+    
+    public static void stopBoth(@Nullable Facet facet)
+    {
+        if (facet != null)
+        {
+            final Project project = facet.getModule().getProject();
+            getInstance(project).stopBoth();
+        }
+    }
+
+    public static void stopBoth(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final Project project = module.getProject();
+            getInstance(project).stopBoth();
+        }
+    }
+
+    public static void stopBoth(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            getInstance(project).stopBoth();
+        }
+    }
+
     public static void close(@Nullable Facet facet)
     {
         if (facet != null)
@@ -427,5 +506,22 @@ public class RioLogConsoleProjectService
     {
         sshRioLogConsoleProjectService.closeContentExecutor();
         udpRioLogConsoleProjectService.closeContentExecutor();
+    }
+    
+    
+    public void stopUdp()
+    {
+        udpRioLogConsoleProjectService.stop();
+    }
+    
+    public void stopSsh()
+    {
+        sshRioLogConsoleProjectService.stop();
+    }
+    
+    public void stopBoth()
+    {
+        stopSsh();
+        stopUdp();
     }
 }

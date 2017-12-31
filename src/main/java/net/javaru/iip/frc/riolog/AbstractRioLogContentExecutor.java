@@ -49,6 +49,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.CommonShortcuts;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -96,6 +97,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     private Executor myExecutor;
     private RunContentDescriptor myRunContentDescriptor;
     private RioLogMonitoringProcess rioLogMonitoringProcess;
+    private ActionToolbar actionToolbar;
+    private RioLogStopAction rioLogStopAction;
 
     
     /*
@@ -127,7 +130,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.add(view.getComponent(), BorderLayout.CENTER);
-        ActionToolbar actionToolbar = createToolbar(actions);
+        actionToolbar = createToolbar(actions);
         panel.add(actionToolbar.getComponent(), BorderLayout.WEST);
         return panel;
     }
@@ -281,7 +284,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
         // See com.intellij.execution.impl.ConsoleViewImpl.createConsoleActions for example 
         actions.add(new RioLogRerunAction(consolePanel));
-        actions.add(new RioLogStopAction());
+        rioLogStopAction = new RioLogStopAction();
+        actions.add(rioLogStopAction);
         actions.add(new RioLogPauseOutputAction(myConsoleView, myProcessHandler));
         actions.add(new Separator());
 
@@ -365,6 +369,30 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         myConsoleView.clear();
     }
 
+
+    /**
+     * Programmatically invokes (i.e. clicks) the Stop Action Button.
+     */
+    public void invokeStop()
+    {
+        // As recommended by Dmitry Jemerov in https://devnet.jetbrains.com/message/5281469#5195728
+        //     Indicates an example of programmatically triggering AnAction can be found in
+        //     com.intellij.openapi.actionSystem.ex.CheckboxAction.createCustomComponent()
+        if (actionToolbar != null && rioLogStopAction != null)
+        {
+            final DataContext dataContext = actionToolbar.getToolbarDataContext();
+            rioLogStopAction.actionPerformed(new AnActionEvent(null, 
+                                                               dataContext, 
+                                                               ActionPlaces.UNKNOWN, 
+                                                               rioLogStopAction.getTemplatePresentation(), 
+                                                               ActionManager.getInstance(), 
+                                                               0));
+        }
+        else
+        {
+            LOG.debug("[FRC] Could not pragmatically invoke the RioLog stop action as either the actionToolbar or the rioLogStopAction is null.");
+        }
+    }
 
     public abstract String getToolWindowId();
 

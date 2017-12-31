@@ -17,6 +17,7 @@
 package net.javaru.iip.frc.riolog;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,13 +42,16 @@ public abstract class AbstractRioLogMonitorProjectService
     protected final Project myProject;
     @Nullable
     private AbstractRioLogContentExecutor contentExecutor;
-
+    @NotNull
+    protected final AtomicBoolean isFirstRunFlag = new AtomicBoolean(true);
 
     protected AbstractRioLogMonitorProjectService(@NotNull Project myProject) {this.myProject = myProject;}
 
 
     public synchronized void update()
     {
+        boolean isFirstRun = isFirstRunFlag.getAndSet(false);
+        
         final Module[] modules = ModuleManager.getInstance(myProject).getModules();
 
         boolean needConsole = false;
@@ -70,13 +74,14 @@ public abstract class AbstractRioLogMonitorProjectService
 
 
         final Thread currentThread = Thread.currentThread();
-        LOG.debug("[FRC] Current thread:   " + currentThread.getId() + " :: " + currentThread.getName());
-        LOG.debug("[FRC] needConsole:      " + needConsole);
-        LOG.debug("[FRC] haveConsole:      " + (contentExecutor != null));
-        LOG.debug("[FRC] useRunWindow:     " + useRunWindow);
-        LOG.debug("[FRC] configuredPort:   " + configuredPort);
-        LOG.debug("[FRC] currentPort:      " + currentPort);
-        LOG.debug("[FRC] portBounceNeeded: " + portBounceNeeded);
+        LOG.debug("[FRC]     Current thread:   " + currentThread.getId() + " :: " + currentThread.getName());
+        LOG.debug("[FRC]     needConsole:      " + needConsole);
+        LOG.debug("[FRC]     haveConsole:      " + (contentExecutor != null));
+        LOG.debug("[FRC]     useRunWindow:     " + useRunWindow);
+        LOG.debug("[FRC]     configuredPort:   " + configuredPort);
+        LOG.debug("[FRC]     currentPort:      " + currentPort);
+        LOG.debug("[FRC]     portBounceNeeded: " + portBounceNeeded);
+        LOG.debug("[FRC]     isFirstRun:       " + isFirstRun);
 
 
         if (needConsole && contentExecutor != null && contentExecutor.getRioLogMonitorProcess() != null
@@ -92,7 +97,7 @@ public abstract class AbstractRioLogMonitorProjectService
                 LOG.debug("[FRC] Case 1.1: have a FRC Tool Window, but need a Run Tab. Closing FRC Tool Window and creating Run tab. Project is: "
                           + myProject.getName());
                 closeContentExecutor();
-                initContentExecutor(true);
+                initContentExecutor(true, isFirstRun);
             }
             else if (!useRunWindow && ToolWindowId.RUN.equals(contentExecutor.getToolWindowId()))
             {
@@ -100,7 +105,7 @@ public abstract class AbstractRioLogMonitorProjectService
                 LOG.debug("[FRC] Case 1.2: have a Run tab, but need a FRC Tool Window. Closing Run tab and creating FRC Tool Window. Project is: "
                           + myProject.getName());
                 closeContentExecutor();
-                initContentExecutor(false);
+                initContentExecutor(false, isFirstRun);
             }
             else
             {
@@ -121,7 +126,7 @@ public abstract class AbstractRioLogMonitorProjectService
         {
             // Case 2 - we need it, but don't have it
             LOG.debug("[FRC] Case 2: need a console, but we don't have one. Creating one. Project is: " + myProject.getName());
-            initContentExecutor(useRunWindow);
+            initContentExecutor(useRunWindow, isFirstRun);
         }
         else if (contentExecutor != null)
         {
@@ -194,14 +199,14 @@ public abstract class AbstractRioLogMonitorProjectService
     }
 
 
-    private void initContentExecutor(final boolean useRunWindow)
+    private void initContentExecutor(final boolean useRunWindow, final boolean isFirstRun)
     {
-        LOG.debug("[FRC] Creating AbstractRioLogContentExecutor");
+        LOG.debug("[FRC] Creating AbstractRioLogContentExecutor: useRunWindow=" + useRunWindow +  " isFirstRun=" + isFirstRun);
         try
         {
             contentExecutor = createRioLogContentExecutor(useRunWindow);
             Disposer.register(myProject, contentExecutor);
-            contentExecutor.run();
+            contentExecutor.run(isFirstRun);
         }
         catch (Exception e)
         {

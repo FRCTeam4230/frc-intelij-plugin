@@ -24,8 +24,10 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowId;
 
+import net.javaru.iip.frc.i18n.FrcMessageBundle;
 import net.javaru.iip.frc.riolog.AbstractRioLogContentExecutor;
 import net.javaru.iip.frc.riolog.AbstractRioLogMonitorProcess;
+import net.javaru.iip.frc.riolog.AnnouncementRioLogMonitorProcess;
 import net.javaru.iip.frc.riolog.RioLogGlobals;
 
 
@@ -63,5 +65,18 @@ public class SshRioLogRunWindowContentExecutor extends AbstractRioLogContentExec
     protected AbstractRioLogMonitorProcess createRioLogMonitoringProcess()
     {
         return new SshRioLogMonitorProcess(this::invokeClearAll);
+    }
+
+
+    @NotNull
+    @Override
+    protected AbstractRioLogMonitorProcess createAnnouncementRioLogMonitoringProcess()
+    {
+        return new AnnouncementRioLogMonitorProcess(this::invokeClearAll,
+                                                    this::invokeStop,
+                                                    new StringBuffer(SshRioLogMonitorProcess.getExperimentalFeatureMessage())
+                                                        .append("\n\n")
+                                                        .append(
+                                                            FrcMessageBundle.message("frc.riolog.first.start.message.ssh")));
     }
 }

@@ -88,7 +88,9 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         final boolean isTemplateFirstOpen = templateCreationCleanup();
         // TODO auto attach wpilib and user dir if fresh project
         
-        RioLogProjectService.update(myProject);
+        
+        // TODO: See if we need to call RioLogProjectService.update(myProject) in any way. FrcModuleComponentImpl.moduleAdded(), which we need if someone adds a module to an existing project, and moduleAdded is called during a project opening
+        // RioLogProjectService.update(myProject);
 
         // For example, see com.intellij.framework.detection.impl.FrameworkDetectionManager#projectOpened
         StartupManager.getInstance(myProject).registerPostStartupActivity(() -> RioLogProjectService.activateUdpNow(myProject));

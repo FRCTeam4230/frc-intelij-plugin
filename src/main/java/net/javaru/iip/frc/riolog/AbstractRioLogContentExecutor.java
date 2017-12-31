@@ -154,17 +154,17 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                                                             myProcessHandler.destroyProcess();
                                                             invokeClearAll();
                                                             myProcessHandler.waitFor(2000L);
-                                                            run();
+                                                            run(false);
                                                             ensureContentIsPinned();
                                                         });
     }
 
 
-    public void run()
+    public void run(boolean isFirstRun)
     {
         FileDocumentManager.getInstance().saveAllDocuments();
 
-        rioLogMonitorProcess = createRioLogMonitoringProcess();
+        rioLogMonitorProcess = isFirstRun ? createAnnouncementRioLogMonitoringProcess() : createRioLogMonitoringProcess();
 
         //Not 100% sure what should be passed in for the commandLine parameter; the example I originally used used null. 
         //   And null was allowed. But a change was made in Mov 2015 that BaseOSProcessHandler now logs an exception if 
@@ -244,6 +244,9 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
     @NotNull
     protected abstract AbstractRioLogMonitorProcess createRioLogMonitoringProcess();
+
+    @NotNull
+    protected abstract AbstractRioLogMonitorProcess createAnnouncementRioLogMonitoringProcess();
 
 
     private void addActionsToActionGroup(DefaultActionGroup actions)

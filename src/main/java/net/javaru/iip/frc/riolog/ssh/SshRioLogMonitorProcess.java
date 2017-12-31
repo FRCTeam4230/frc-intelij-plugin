@@ -142,6 +142,15 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
     }
 
 
+    @NotNull
+    public static String getExperimentalFeatureMessage()
+    {
+        return "\n\n" +
+               "************************************************************************************************************************\n" +
+               "** This is an Experimental Feature. Please report issues at https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues **\n" +
+               "************************************************************************************************************************\n";
+    }
+
     private class SshRioLogMonitor extends AbstractMonitoringRunnable
     {
         SshRioLogMonitor(int port)
@@ -154,10 +163,7 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         @Override
         protected String getStartingMonitoringMessage()
         {
-            return "\n\n" +
-                   "************************************************************************************************************************\n" +
-                   "** This is an Experimental Feature. Please report issues at https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues **\n" +
-                   "************************************************************************************************************************\n";
+            return getExperimentalFeatureMessage();
         }
 
 

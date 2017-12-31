@@ -301,6 +301,8 @@ public abstract class AbstractRioLogMonitorProcess extends Process
         boolean isRunning();
 
         void stop();
+        
+        void logMessage(CharSequence message);
     }
 
     protected abstract class AbstractMonitoringRunnable implements MonitoringRunnable
@@ -355,6 +357,21 @@ public abstract class AbstractRioLogMonitorProcess extends Process
             if (fileWriter != null)
             {
                 fileWriter.println(getStartingMonitoringMessage());
+                fileWriter.println();
+                fileWriter.flush();
+            }
+        }
+
+        @Override
+        public void logMessage(@NotNull CharSequence message)
+        {
+            final String msg = message.toString();
+            consoleWriter.println(msg);
+            consoleWriter.println();
+            consoleWriter.flush();
+            if (fileWriter != null)
+            {
+                fileWriter.println(msg);
                 fileWriter.println();
                 fileWriter.flush();
             }

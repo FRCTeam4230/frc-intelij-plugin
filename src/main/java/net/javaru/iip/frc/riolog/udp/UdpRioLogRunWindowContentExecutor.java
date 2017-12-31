@@ -23,8 +23,10 @@ import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowId;
 
+import net.javaru.iip.frc.i18n.FrcMessageBundle;
 import net.javaru.iip.frc.riolog.AbstractRioLogContentExecutor;
 import net.javaru.iip.frc.riolog.AbstractRioLogMonitorProcess;
+import net.javaru.iip.frc.riolog.AnnouncementRioLogMonitorProcess;
 import net.javaru.iip.frc.riolog.RioLogGlobals;
 
 
@@ -59,5 +61,16 @@ public class UdpRioLogRunWindowContentExecutor extends AbstractRioLogContentExec
     protected AbstractRioLogMonitorProcess createRioLogMonitoringProcess()
     {
         return new UdpRioLogMonitorProcess(this::invokeClearAll);
+    }
+
+
+    @NotNull
+    @Override
+    protected AbstractRioLogMonitorProcess createAnnouncementRioLogMonitoringProcess()
+    {
+        return new AnnouncementRioLogMonitorProcess(this::invokeClearAll,
+                                                    this::invokeStop,
+                                                    new StringBuffer("\n\n")
+                                                        .append(FrcMessageBundle.message("frc.riolog.first.start.message.udp")));
     }
 }

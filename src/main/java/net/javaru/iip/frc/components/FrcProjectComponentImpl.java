@@ -33,6 +33,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupManager;
+import com.intellij.openapi.vfs.VirtualFile;
 
 import net.javaru.iip.frc.actions.tools.AttachUserLibDirAction;
 import net.javaru.iip.frc.actions.tools.AttachWpilibAction;
@@ -42,6 +43,7 @@ import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.riolog.RioLogConsoleProjectService;
 import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
+import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT;
@@ -82,6 +84,9 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         LOG.debug("[FRC] wpiLibDir: " + FrcApplicationSettings.Settings.INSTANCE().getWpiLibDir());
         
         registerMessageBusListeners();
+
+        final boolean isTemplateFirstOpen = templateCreationCleanup();
+        // TODO auto attach wpilib and user dir if fresh project
         
         RioLogConsoleProjectService.update(myProject);
 
@@ -139,6 +144,43 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     public static boolean isFrcFacetedProject(@Nullable Project project) {return FrcFacet.isFrcFacetedProject(project);}
 
 
+    private boolean templateCreationCleanup()
+    {
+        boolean isFreshTemplateProject = false;
+        try
+        {
+            final VirtualFile projectFile = myProject.getProjectFile();
+            if (projectFile != null)
+            {
+                final VirtualFile ideaDir = projectFile.getParent();
+                final VirtualFile projectTemplateFile = ideaDir.findChild("project-template.xml");
+                if (projectTemplateFile != null && projectTemplateFile.exists())
+                {
+                    isFreshTemplateProject = true;
+                    FrcFileUtils.deleteSafely(projectTemplateFile, this);
+                    // This is assuming a standard template was used...
+                    final VirtualFile srcDir = myProject.getBaseDir().findChild("src");
+                    if (srcDir != null && srcDir.exists())
+                    {
+                        final VirtualFile frcDir = srcDir.findChild("frc");
+                        if (frcDir != null && frcDir.exists())
+                        {
+                            final VirtualFile teamDir = frcDir.findChild("team0000");
+                            FrcFileUtils.deleteSafelyIfEmpty(teamDir, this);
+                            FrcFileUtils.deleteSafelyIfEmpty(frcDir, this);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.warn("[FRC] Could not check for and/or cleanup template files. Cause: " + e.toString(), e);
+        }
+
+        return isFreshTemplateProject;
+    }
+    
     public static void checkProjectFrcStatus(@NotNull Project project, boolean knownFacetedProject)
     {
         DumbService.getInstance(project).runWhenSmart(() ->

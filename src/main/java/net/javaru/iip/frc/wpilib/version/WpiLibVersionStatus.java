@@ -19,17 +19,19 @@ package net.javaru.iip.frc.wpilib.version;
 import javax.annotation.Nonnull;
 
 import org.jetbrains.annotations.Nullable;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 
 
 
+/**
+ * A class that provides the current version of WPILib in its three forms: attached, downloaded, available for download. 
+ * It also has convenience/utility methods for working with the versions. To create/construct, use the factory method
+ * {@link WpiLibVersionStatus#getCurrentStatus(Project) WpiLibVersionStatus#getCurrentStatus(@Nullable Project)}.
+ */
 public class WpiLibVersionStatus
 {
-    private static final Logger LOG = Logger.getInstance(WpiLibVersionStatus.class);
-
     @Nullable
     private final Project project;
     @Nullable
@@ -54,6 +56,7 @@ public class WpiLibVersionStatus
 
     //TODO i18n
     
+    // use getCurrentStatus(Project)
     private WpiLibVersionStatus(@Nullable Project project,
                                 boolean wpiLibAttached, 
                                 @Nullable WpiLibVersion attachedVersion,
@@ -135,7 +138,7 @@ public class WpiLibVersionStatus
                     attachedVersion = WpiLibLibrariesUtils.determineAttachedWpiLibVersionViaReadAction(project);
                 }
             }
-            catch (Exception ignore) {};
+            catch (Exception ignore) {}
         }
         
         try
@@ -146,13 +149,13 @@ public class WpiLibVersionStatus
                 downloadedVersion = WpiLibLibrariesUtils.determineSystemAvailableWpiLibVersionViaReadAction();
             }
         }
-        catch (Exception ignore) {};
+        catch (Exception ignore) {}
         
         try
         {
             availableVersion = WpiLibLibrariesUtils.determineAvailableWpiLibVersion();
         }
-        catch (Exception ignore) {};
+        catch (Exception ignore) {}
         
         return new WpiLibVersionStatus(project, wpiLibAttached, attachedVersion, wpiLibDownloaded, downloadedVersion, availableVersion);
     }

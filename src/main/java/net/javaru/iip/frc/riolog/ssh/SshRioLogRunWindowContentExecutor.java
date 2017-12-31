@@ -25,8 +25,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowId;
 
 import net.javaru.iip.frc.riolog.AbstractRioLogContentExecutor;
+import net.javaru.iip.frc.riolog.AbstractRioLogMonitorProcess;
 import net.javaru.iip.frc.riolog.RioLogGlobals;
-import net.javaru.iip.frc.riolog.RioLogMonitoringProcess;
 
 
 
@@ -60,8 +60,8 @@ public class SshRioLogRunWindowContentExecutor extends AbstractRioLogContentExec
 
 
     @NotNull
-    protected RioLogMonitoringProcess createRioLogMonitoringProcess()
+    protected AbstractRioLogMonitorProcess createRioLogMonitoringProcess()
     {
-        return new SshRioLogMonitoringProcess(this::invokeClearAll);
+        return new SshRioLogMonitorProcess(this::invokeClearAll);
     }
 }

@@ -43,22 +43,22 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 
-import net.javaru.iip.frc.riolog.RioLogMonitoringProcess;
+import net.javaru.iip.frc.riolog.AbstractRioLogMonitorProcess;
 import net.javaru.iip.frc.settings.FrcRoboRioSettings;
 import net.javaru.iip.frc.settings.FrcSshSettings;
 
 
 
-public class SshRioLogMonitoringProcess extends RioLogMonitoringProcess
+public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
 {
-    private static final Logger LOG = Logger.getInstance(SshRioLogMonitoringProcess.class);
+    private static final Logger LOG = Logger.getInstance(SshRioLogMonitorProcess.class);
 
     //TODO - make these configurable in the settings
     private static final int IS_REACHABLE_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(5);
     private static final int CONNECTION_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(5);
 
 
-    public SshRioLogMonitoringProcess(Runnable clearConsoleRunnable) throws IllegalStateException
+    public SshRioLogMonitorProcess(Runnable clearConsoleRunnable) throws IllegalStateException
     {
         super(clearConsoleRunnable);
     }

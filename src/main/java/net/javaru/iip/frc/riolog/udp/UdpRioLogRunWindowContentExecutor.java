@@ -24,8 +24,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowId;
 
 import net.javaru.iip.frc.riolog.AbstractRioLogContentExecutor;
+import net.javaru.iip.frc.riolog.AbstractRioLogMonitorProcess;
 import net.javaru.iip.frc.riolog.RioLogGlobals;
-import net.javaru.iip.frc.riolog.RioLogMonitoringProcess;
 
 
 
@@ -56,8 +56,8 @@ public class UdpRioLogRunWindowContentExecutor extends AbstractRioLogContentExec
 
 
     @NotNull
-    protected RioLogMonitoringProcess createRioLogMonitoringProcess()
+    protected AbstractRioLogMonitorProcess createRioLogMonitoringProcess()
     {
-        return new UdpRioLogMonitoringProcess(this::invokeClearAll);
+        return new UdpRioLogMonitorProcess(this::invokeClearAll);
     }
 }

@@ -39,20 +39,20 @@ import com.intellij.openapi.wm.IdeFrame;
 import com.intellij.openapi.wm.ex.WindowManagerEx;
 
 import net.javaru.iip.frc.notify.FrcNotifications;
-import net.javaru.iip.frc.riolog.RioLogMonitoringProcess;
+import net.javaru.iip.frc.riolog.AbstractRioLogMonitorProcess;
 import net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable;
 
 
 
-public class UdpRioLogMonitoringProcess extends RioLogMonitoringProcess
+public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
 {
-    private static final Logger LOG = Logger.getInstance(UdpRioLogMonitoringProcess.class);
+    private static final Logger LOG = Logger.getInstance(UdpRioLogMonitorProcess.class);
 
     private static final boolean USE_DEBUGGING_SERVER = BooleanUtils.toBoolean(System.getProperty(SIMULATED_LOG_SERVICE_ENABLED_PROP_KEY,
                                                                                                   Boolean.FALSE.toString()));
 
 
-    public UdpRioLogMonitoringProcess(Runnable clearConsoleRunnable) throws IllegalStateException
+    public UdpRioLogMonitorProcess(Runnable clearConsoleRunnable) throws IllegalStateException
     {
         super(clearConsoleRunnable);
     }

@@ -20,7 +20,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 
-import net.javaru.iip.frc.riolog.RioLogConsoleProjectService;
+import net.javaru.iip.frc.riolog.RioLogProjectService;
 
 
 
@@ -32,8 +32,8 @@ public class ShowRioLogConsoleAction extends AbstractFrcToolsAction implements D
         final Project project = actionEvent.getProject();
         if (project != null)
         {
-            RioLogConsoleProjectService.update(project);
-            RioLogConsoleProjectService.activateUdpSafely(project);
+            RioLogProjectService.update(project);
+            RioLogProjectService.activateUdpSafely(project);
         }
     }
 }

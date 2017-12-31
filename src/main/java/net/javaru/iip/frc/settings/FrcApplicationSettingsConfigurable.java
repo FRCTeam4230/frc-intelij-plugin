@@ -27,7 +27,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 
 import net.javaru.iip.frc.i18n.FrcMessageBundle;
-import net.javaru.iip.frc.riolog.RioLogConsoleProjectService;
+import net.javaru.iip.frc.riolog.RioLogProjectService;
 
 
 
@@ -82,7 +82,7 @@ public class FrcApplicationSettingsConfigurable implements SearchableConfigurabl
     public void apply() throws ConfigurationException
     {
         myForm.applyTo(FrcApplicationSettings.Settings.INSTANCE());
-        RioLogConsoleProjectService.updateAllOpenProjects();
+        RioLogProjectService.updateAllOpenProjects();
     }
 
 

@@ -48,9 +48,9 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings;
 
 
 @SuppressWarnings("WeakerAccess")
-public abstract class RioLogMonitoringProcess extends Process
+public abstract class AbstractRioLogMonitorProcess extends Process
 {
-    private static final Logger LOG = Logger.getInstance(RioLogMonitoringProcess.class);
+    private static final Logger LOG = Logger.getInstance(AbstractRioLogMonitorProcess.class);
 
     public final static int MAX_PACKET_SIZE = 65507;
 
@@ -80,7 +80,7 @@ public abstract class RioLogMonitoringProcess extends Process
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 
 
-    protected RioLogMonitoringProcess(Runnable clearConsoleRunnable) throws IllegalStateException
+    protected AbstractRioLogMonitorProcess(Runnable clearConsoleRunnable) throws IllegalStateException
     {
         this.clearConsoleRunnable = clearConsoleRunnable;
         myWaitSemaphore = new Semaphore();
@@ -133,7 +133,7 @@ public abstract class RioLogMonitoringProcess extends Process
         if (enabled && rioLogMonitor != null)
         {
             Thread thread = new Thread(rioLogMonitor);
-            thread.setName("RioLogMonitoringProcess");
+            thread.setName("RioLogMonitorProcess");
             thread.start();
         }
     }

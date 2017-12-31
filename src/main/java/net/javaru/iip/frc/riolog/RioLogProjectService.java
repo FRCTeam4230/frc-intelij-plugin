@@ -25,8 +25,8 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 
-import net.javaru.iip.frc.riolog.ssh.SshRioLogConsoleProjectService;
-import net.javaru.iip.frc.riolog.udp.UdpRioLogConsoleProjectService;
+import net.javaru.iip.frc.riolog.ssh.SshRioLogMonitorProjectService;
+import net.javaru.iip.frc.riolog.udp.UdpRioLogMonitorProjectService;
 
 
 
@@ -38,19 +38,19 @@ import net.javaru.iip.frc.riolog.udp.UdpRioLogConsoleProjectService;
  * <a href="http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_services.html">Plugin Services</a>.
  * For example:
  * <pre>
- * final RioLogConsoleProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogConsoleProjectService.class);
+ * final RioLogProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogProjectService.class);
  * </pre>
  * There are also three static {@code update} methods that can be used when the caller has access to a facet, a module, or a project.
  */
-public class RioLogConsoleProjectService
+public class RioLogProjectService
 {
-    private static final Logger LOG = Logger.getInstance(RioLogConsoleProjectService.class);
+    private static final Logger LOG = Logger.getInstance(RioLogProjectService.class);
 
     @NotNull
     private final Project myProject;
 
-    private final RioLogMonitorProjectService udpRioLogConsoleProjectService;
-    private final RioLogMonitorProjectService sshRioLogConsoleProjectService;
+    private final AbstractRioLogMonitorProjectService udpRioLogConsoleProjectService;
+    private final AbstractRioLogMonitorProjectService sshRioLogConsoleProjectService;
 
     @Nullable
     private AbstractRioLogContentExecutor udpContentExecutor;
@@ -94,7 +94,7 @@ public class RioLogConsoleProjectService
      * A null safe convenience static utility method for {@link #update() updating} the RioLog Condole for a facet.
      * Equivalent to calling:<br/><br/>
      * <pre>
-     * ServiceManager.getService(facet.getModule().getProject(), RioLogConsoleProjectService.class).update();
+     * ServiceManager.getService(facet.getModule().getProject(), RioLogProjectService.class).update();
      * </pre>
      * but with full null safety
      *
@@ -114,7 +114,7 @@ public class RioLogConsoleProjectService
      * A null safe convenience static utility method for {@link #update() updating} the RioLog Condole for a module.
      * Equivalent to calling:<br/><br/>
      * <pre>
-     * ServiceManager.getService(module.getProject(), RioLogConsoleProjectService.class).update();
+     * ServiceManager.getService(module.getProject(), RioLogProjectService.class).update();
      * </pre>
      * but with full null safety
      *
@@ -134,7 +134,7 @@ public class RioLogConsoleProjectService
      * A null safe convenience static utility method for {@link #update() updating} the RioLog Condole for a project.
      * Equivalent to calling:<br/><br/>
      * <pre>
-     * ServiceManager.getService(project, RioLogConsoleProjectService.class).update();
+     * ServiceManager.getService(project, RioLogProjectService.class).update();
      * </pre>
      * but with full null safety
      *
@@ -431,26 +431,26 @@ public class RioLogConsoleProjectService
 
 
     // See http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_services.html for more information
-    public static RioLogConsoleProjectService getInstance(@NotNull Project project)
+    public static RioLogProjectService getInstance(@NotNull Project project)
     {
-        return ServiceManager.getService(project, RioLogConsoleProjectService.class);
+        return ServiceManager.getService(project, RioLogProjectService.class);
     }
 
 
     /**
      * Do not call the constructor directly. Use as a project service via {@code com.intellij.openapi.components.ServiceManager}:<br/>
      * <pre>
-     * final RioLogConsoleProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogConsoleProjectService.class);
+     * final RioLogProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogProjectService.class);
      * </pre>
      *
      * @param myProject the project
      */
-    private RioLogConsoleProjectService(@NotNull Project myProject)
+    private RioLogProjectService(@NotNull Project myProject)
     {
-        LOG.debug("[FRC] RioLogConsoleProjectService constructor called.");
+        LOG.debug("[FRC] RioLogProjectService constructor called.");
         this.myProject = myProject;
-        this.udpRioLogConsoleProjectService = UdpRioLogConsoleProjectService.getInstance(myProject);
-        this.sshRioLogConsoleProjectService = SshRioLogConsoleProjectService.getInstance(myProject);
+        this.udpRioLogConsoleProjectService = UdpRioLogMonitorProjectService.getInstance(myProject);
+        this.sshRioLogConsoleProjectService = SshRioLogMonitorProjectService.getInstance(myProject);
     }
 
 

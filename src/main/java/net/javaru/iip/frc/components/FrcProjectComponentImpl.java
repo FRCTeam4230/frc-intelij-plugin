@@ -40,7 +40,7 @@ import net.javaru.iip.frc.actions.tools.AttachWpilibAction;
 import net.javaru.iip.frc.actions.tools.DownloadWpiLibAction;
 import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.notify.FrcNotifications;
-import net.javaru.iip.frc.riolog.RioLogConsoleProjectService;
+import net.javaru.iip.frc.riolog.RioLogProjectService;
 import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.FrcFileUtils;
@@ -88,10 +88,10 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         final boolean isTemplateFirstOpen = templateCreationCleanup();
         // TODO auto attach wpilib and user dir if fresh project
         
-        RioLogConsoleProjectService.update(myProject);
+        RioLogProjectService.update(myProject);
 
         // For example, see com.intellij.framework.detection.impl.FrameworkDetectionManager#projectOpened
-        StartupManager.getInstance(myProject).registerPostStartupActivity(() -> RioLogConsoleProjectService.activateUdpNow(myProject));
+        StartupManager.getInstance(myProject).registerPostStartupActivity(() -> RioLogProjectService.activateUdpNow(myProject));
         StartupManager.getInstance(myProject).registerPostStartupActivity(() -> notifyToConfigureTeamNumIfNecessary(myProject));
         StartupManager.getInstance(myProject).registerPostStartupActivity(() -> checkProjectFrcStatus(myProject, false));
     }
@@ -355,7 +355,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         {
             if (FrcFacet.isFrcFacet(facet))
             {
-                RioLogConsoleProjectService.update(facet);
+                RioLogProjectService.update(facet);
             }
         }
     }

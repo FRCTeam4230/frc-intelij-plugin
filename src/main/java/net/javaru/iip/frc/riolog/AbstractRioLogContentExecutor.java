@@ -96,7 +96,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     private boolean myActivateToolWindow = true;
     private Executor myExecutor;
     private RunContentDescriptor myRunContentDescriptor;
-    private RioLogMonitoringProcess rioLogMonitoringProcess;
+    private AbstractRioLogMonitorProcess rioLogMonitorProcess;
     private ActionToolbar actionToolbar;
     private RioLogStopAction rioLogStopAction;
 
@@ -143,7 +143,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
 
     @Nullable
-    public RioLogMonitoringProcess getRioLogMonitoringProcess() { return rioLogMonitoringProcess; }
+    public AbstractRioLogMonitorProcess getRioLogMonitorProcess() { return rioLogMonitorProcess; }
 
 
     public void reRun()
@@ -162,14 +162,14 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     {
         FileDocumentManager.getInstance().saveAllDocuments();
 
-        rioLogMonitoringProcess = createRioLogMonitoringProcess();
+        rioLogMonitorProcess = createRioLogMonitoringProcess();
 
         //Not 100% sure what should be passed in for the commandLine parameter; the example I originally used used null. 
         //   And null was allowed. But a change was made in Mov 2015 that BaseOSProcessHandler now logs an exception if 
         //   commandLine is null or empty. We are not actually running a command. Just using the handler to monitor a 
         //   UDP port. 
         //   However, what ever we put, gets output on the screen, do for now we are just putting a basic message 
-        myProcessHandler = new BaseOSProcessHandler(rioLogMonitoringProcess, getTabTitle(), StandardCharsets.UTF_8)
+        myProcessHandler = new BaseOSProcessHandler(rioLogMonitorProcess, getTabTitle(), StandardCharsets.UTF_8)
         {
             @Override
             public boolean isSilentlyDestroyOnClose()
@@ -196,7 +196,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         //    The bug should not happen in real world use as it seems to occur after repeatedly removing and re-adding the facet during testing.
         //    As near as I can tell, this is what happens...
         //    For some reason, sometimes the FrcFacetManagerListener.facetAdded() gets called twice (I *think* on separate threads, but have not 100% confirmed yet)
-        //    This results in the RioLogConsoleProjectService.update method getting called twice, the second time before the first one has completed
+        //    This results in the RioLogProjectService.update method getting called twice, the second time before the first one has completed
         //    This results in this run method getting called twice. So two different RunContentDescriptor instances get created.
         //    The RunContentManager.removeRunContent(myExecutor, myRunContentDescriptor) method appears to use instance equality
         //    specifically, the runDescriptor does not match in com.intellij.execution.ui.RunContentManagerImpl#getRunContentByDescriptor does not find a match
@@ -235,13 +235,13 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             });
         }
 
-        rioLogMonitoringProcess.start();
+        rioLogMonitorProcess.start();
         myProcessHandler.startNotify();
     }
 
 
     @NotNull
-    protected abstract RioLogMonitoringProcess createRioLogMonitoringProcess();
+    protected abstract AbstractRioLogMonitorProcess createRioLogMonitoringProcess();
 
 
     private void addActionsToActionGroup(DefaultActionGroup actions)
@@ -323,7 +323,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         actions.add(new Separator());
         actions.add(new RioLogToggleAutoClearAction());
         // We no longer provide a close button. As long as a FRC Facet is present, we want a RioLog console. 
-        // The 'work' of the close action was moved to myCloseRunnable and closing is managed by the RioLogConsoleProjectService
+        // The 'work' of the close action was moved to myCloseRunnable and closing is managed by the RioLogProjectService
         // Leaving this line of code here commented out in case in the future we need to remember how we did include a close button.
         //actions.add(new com.intellij.execution.ui.actions.CloseAction(myExecutor, descriptor, myProject));
     }
@@ -425,7 +425,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             //    The bug should not happen in real world use as it seems to occur after repeatedly removing and re-adding the facet during testing.
             //    As near as I can tell, this is what happens...
             //    For some reason, sometimes the FrcFacetManagerListener.facetAdded() gets called twice (I *think* on separate threads, but have not 100% confirmed yet)
-            //    This results in the RioLogConsoleProjectService.update method getting called twice, the second time before the first one has completed
+            //    This results in the RioLogProjectService.update method getting called twice, the second time before the first one has completed
             //    This results in this class' run method getting called twice. So two different RunContentDescriptor instances get created.
             //    The RunContentManager.removeRunContent(myExecutor, myRunContentDescriptor) method appears to use instance equality
             //    specifically, the runDescriptor does not match in com.intellij.execution.ui.RunContentManagerImpl#getRunContentByDescriptor does not find a match
@@ -581,9 +581,9 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             ApplicationManager.getApplication().invokeLater(() ->
                                                             {
                                                                 myProcessHandler.destroyProcess();
-                                                                if (getRioLogMonitoringProcess() != null)
+                                                                if (getRioLogMonitorProcess() != null)
                                                                 {
-                                                                    getRioLogMonitoringProcess().monitoringStopped();
+                                                                    getRioLogMonitorProcess().monitoringStopped();
                                                                 }
                                                                 update(event);
                                                             });

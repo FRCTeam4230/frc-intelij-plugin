@@ -34,16 +34,16 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings;
 
 
 
-public abstract class RioLogMonitorProjectService
+public abstract class AbstractRioLogMonitorProjectService
 {
-    private static final Logger LOG = Logger.getInstance(RioLogMonitorProjectService.class);
+    private static final Logger LOG = Logger.getInstance(AbstractRioLogMonitorProjectService.class);
     @NotNull
     protected final Project myProject;
     @Nullable
     private AbstractRioLogContentExecutor contentExecutor;
 
 
-    protected RioLogMonitorProjectService(@NotNull Project myProject) {this.myProject = myProject;}
+    protected AbstractRioLogMonitorProjectService(@NotNull Project myProject) {this.myProject = myProject;}
 
 
     public synchronized void update()
@@ -79,8 +79,8 @@ public abstract class RioLogMonitorProjectService
         LOG.debug("[FRC] portBounceNeeded: " + portBounceNeeded);
 
 
-        if (needConsole && contentExecutor != null && contentExecutor.getRioLogMonitoringProcess() != null
-            && contentExecutor.getRioLogMonitoringProcess().isEnabled())
+        if (needConsole && contentExecutor != null && contentExecutor.getRioLogMonitorProcess() != null
+            && contentExecutor.getRioLogMonitorProcess().isEnabled())
         {
             // Case 1 - we have and need it, but we need to check if we have the right type (i.e. settings change)
             LOG.debug("[FRC] Case 1: have console and need it. Checking if correct type & port. Project is: " + myProject.getName());
@@ -141,10 +141,10 @@ public abstract class RioLogMonitorProjectService
     {
         if (contentExecutor != null)
         {
-            final RioLogMonitoringProcess rioLogMonitoringProcess = contentExecutor.getRioLogMonitoringProcess();
-            if (rioLogMonitoringProcess != null)
+            final AbstractRioLogMonitorProcess rioLogMonitorProcess = contentExecutor.getRioLogMonitorProcess();
+            if (rioLogMonitorProcess != null)
             {
-                return rioLogMonitoringProcess.getMonitoredPort();
+                return rioLogMonitorProcess.getMonitoredPort();
             }
         }
         return -1;

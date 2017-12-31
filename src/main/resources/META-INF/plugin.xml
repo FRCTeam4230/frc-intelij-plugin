@@ -175,16 +175,16 @@
 
 
         <projectService id="FRC.RioLogConsoleProjectService"
-                        serviceInterface="net.javaru.iip.frc.riolog.RioLogConsoleProjectService"
-                        serviceImplementation="net.javaru.iip.frc.riolog.RioLogConsoleProjectService" />
+                        serviceInterface="net.javaru.iip.frc.riolog.RioLogProjectService"
+                        serviceImplementation="net.javaru.iip.frc.riolog.RioLogProjectService" />
 
         <projectService id="FRC.UdpRioLogConsoleProjectService"
-                        serviceInterface="net.javaru.iip.frc.riolog.udp.UdpRioLogConsoleProjectService"
-                        serviceImplementation="net.javaru.iip.frc.riolog.udp.UdpRioLogConsoleProjectService" />
+                        serviceInterface="net.javaru.iip.frc.riolog.udp.UdpRioLogMonitorProjectService"
+                        serviceImplementation="net.javaru.iip.frc.riolog.udp.UdpRioLogMonitorProjectService" />
 
         <projectService id="FRC.SshRioLogConsoleProjectService"
-                        serviceInterface="net.javaru.iip.frc.riolog.ssh.SshRioLogConsoleProjectService"
-                        serviceImplementation="net.javaru.iip.frc.riolog.ssh.SshRioLogConsoleProjectService" />
+                        serviceInterface="net.javaru.iip.frc.riolog.ssh.SshRioLogMonitorProjectService"
+                        serviceImplementation="net.javaru.iip.frc.riolog.ssh.SshRioLogMonitorProjectService" />
 
         <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
 

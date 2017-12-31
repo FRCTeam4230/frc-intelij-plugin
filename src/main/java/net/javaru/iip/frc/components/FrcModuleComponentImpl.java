@@ -23,7 +23,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 
 import net.javaru.iip.frc.facet.FrcFacet;
-import net.javaru.iip.frc.riolog.RioLogConsoleProjectService;
+import net.javaru.iip.frc.riolog.RioLogProjectService;
 
 
 
@@ -97,10 +97,10 @@ public class FrcModuleComponentImpl implements FrcModuleComponent
         // We only want to update the RioLogConsole if the project is fully opened. In other words, this is a
         // case where the user is adding a module to an open project rather than this moduleAdded() method being 
         // called as part of the initial project loading when opening a project. In the latter case, the
-        // RioLogConsoleProjectService.update() is called via the ProjectComponent.projectOpened() method
+        // RioLogProjectService.update() is called via the ProjectComponent.projectOpened() method
         if (myModule.getProject().isOpen())
         {
-            RioLogConsoleProjectService.update(myModule);
+            RioLogProjectService.update(myModule);
         }
     }
 
@@ -118,7 +118,7 @@ public class FrcModuleComponentImpl implements FrcModuleComponent
         LOG.debug("[FRC] " + getClass().getSimpleName() + ".disposeComponent() called for module " + myModule);
         if (!myModule.isDisposed())
         {
-            RioLogConsoleProjectService.update(myModule);
+            RioLogProjectService.update(myModule);
         }
     }
 

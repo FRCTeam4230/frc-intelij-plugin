@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package net.javaru.iip.frc.riolog.ssh;
+package net.javaru.iip.frc.riolog.udp;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.components.ServiceManager;
@@ -22,40 +22,40 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.riolog.AbstractRioLogContentExecutor;
-import net.javaru.iip.frc.riolog.RioLogMonitorProjectService;
+import net.javaru.iip.frc.riolog.AbstractRioLogMonitorProjectService;
 
 
 
-public class SshRioLogConsoleProjectService extends RioLogMonitorProjectService
+public class UdpRioLogMonitorProjectService extends AbstractRioLogMonitorProjectService
 {
-    private static final Logger LOG = Logger.getInstance(SshRioLogConsoleProjectService.class);
+    private static final Logger LOG = Logger.getInstance(UdpRioLogMonitorProjectService.class);
 
 
     // See http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_services.html for more information
-    public static SshRioLogConsoleProjectService getInstance(@NotNull Project project)
+    public static UdpRioLogMonitorProjectService getInstance(@NotNull Project project)
     {
-        return ServiceManager.getService(project, SshRioLogConsoleProjectService.class);
+        return ServiceManager.getService(project, UdpRioLogMonitorProjectService.class);
     }
 
 
     /**
      * Do not call the constructor directly. Use as a project service via {@code com.intellij.openapi.components.ServiceManager}:<br/>
      * <pre>
-     * final RioLogConsoleProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogConsoleProjectService.class);
+     * final RioLogProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogProjectService.class);
      * </pre>
      *
      * @param myProject the project
      */
-    private SshRioLogConsoleProjectService(@NotNull Project myProject)
+    private UdpRioLogMonitorProjectService(@NotNull Project myProject)
     {
         super(myProject);
-        LOG.debug("[FRC] SshRioLogConsoleProjectService constructor called.");
+        LOG.debug("[FRC] UdpRioLogMonitorProjectService constructor called.");
     }
 
 
     @NotNull
     protected AbstractRioLogContentExecutor createRioLogContentExecutor(boolean useRunWindow)
     {
-        return useRunWindow ? new SshRioLogRunWindowContentExecutor(myProject, true) : new SshRioLogFrcWindowContentExecutor(myProject, true);
+        return useRunWindow ? new UdpRioLogRunWindowContentExecutor(myProject, true) : new UdpRioLogFrcWindowContentExecutor(myProject, true);
     }
 }

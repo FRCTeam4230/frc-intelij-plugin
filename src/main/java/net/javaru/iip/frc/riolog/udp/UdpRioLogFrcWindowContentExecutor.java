@@ -73,7 +73,7 @@ public class UdpRioLogFrcWindowContentExecutor extends AbstractRioLogContentExec
     {
         return new AnnouncementRioLogMonitorProcess(this::invokeClearAll,
                                                     this::invokeStop,
-                                                    new StringBuffer("\n\n")
+                                                    new StringBuffer("\n")
                                                         .append(FrcMessageBundle.message("frc.riolog.first.start.message.udp")));
     }
 }

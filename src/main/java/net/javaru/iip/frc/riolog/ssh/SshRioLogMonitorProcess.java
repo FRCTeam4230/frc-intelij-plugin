@@ -58,9 +58,15 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
     private static final int CONNECTION_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(5);
 
 
-    public SshRioLogMonitorProcess(Runnable clearConsoleRunnable) throws IllegalStateException
+    /**
+     * @param clearConsoleRunnable Runnable that programmatically 'clicks' the clear button on the Executor window.
+     * @param stopRioLogRunnable   Runnable that programmatically 'clicks' the stop button on the Executor window.
+     *
+     * @throws IllegalStateException If an initialization issue occurs
+     */
+    public SshRioLogMonitorProcess(@NotNull Runnable clearConsoleRunnable, @NotNull Runnable stopRioLogRunnable) throws IllegalStateException
     {
-        super(clearConsoleRunnable);
+        super(clearConsoleRunnable, stopRioLogRunnable);
     }
 
     @NotNull

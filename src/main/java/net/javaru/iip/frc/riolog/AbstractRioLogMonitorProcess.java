@@ -74,15 +74,32 @@ public abstract class AbstractRioLogMonitorProcess extends Process
     protected PrintWriter fileWriter;
     private MonitoringRunnable rioLogMonitor;
 
-
+    /**
+     * Runnable that programmatically 'clicks' the clear button on the Executor window.
+     */
     protected final Runnable clearConsoleRunnable;
+    /**
+     * Runnable that programmatically 'clicks' the stop button on the Executor window.
+     * This runnable should <strong>not</strong> be called from within this class' 
+     * {@link #stop()} method as that would cause an infinite loop since the 
+     * stopRioLogRunnable calls this class's {@code stop()} method.
+     */
+    protected final Runnable stopRioLogRunnable;
 
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 
 
-    protected AbstractRioLogMonitorProcess(Runnable clearConsoleRunnable) throws IllegalStateException
+    /**
+     * 
+     * @param clearConsoleRunnable Runnable that programmatically 'clicks' the clear button on the Executor window.
+     * @param stopRioLogRunnable Runnable that programmatically 'clicks' the stop button on the Executor window.
+     *                           
+     * @throws IllegalStateException  If an initialization issue occurs
+     */
+    protected AbstractRioLogMonitorProcess(@NotNull Runnable clearConsoleRunnable, @NotNull Runnable stopRioLogRunnable) throws IllegalStateException
     {
         this.clearConsoleRunnable = clearConsoleRunnable;
+        this.stopRioLogRunnable = stopRioLogRunnable;
         myWaitSemaphore = new Semaphore();
         myWaitSemaphore.down();
     }
@@ -145,6 +162,7 @@ public abstract class AbstractRioLogMonitorProcess extends Process
 
     public void stop()
     {
+        // Do not call the stopRioLogRunnable from the stop method. That runnable calls this stop method. So we'd get into an endless loop.
         destroy();
     }
 

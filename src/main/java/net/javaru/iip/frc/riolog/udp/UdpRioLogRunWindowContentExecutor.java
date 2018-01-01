@@ -60,7 +60,7 @@ public class UdpRioLogRunWindowContentExecutor extends AbstractRioLogContentExec
     @NotNull
     protected AbstractRioLogMonitorProcess createRioLogMonitoringProcess()
     {
-        return new UdpRioLogMonitorProcess(this::invokeClearAll);
+        return new UdpRioLogMonitorProcess(this::invokeClearAll, this::invokeStop);
     }
 
 

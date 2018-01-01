@@ -64,7 +64,7 @@ public class SshRioLogRunWindowContentExecutor extends AbstractRioLogContentExec
     @NotNull
     protected AbstractRioLogMonitorProcess createRioLogMonitoringProcess()
     {
-        return new SshRioLogMonitorProcess(this::invokeClearAll);
+        return new SshRioLogMonitorProcess(this::invokeClearAll, this::invokeStop);
     }
 
 

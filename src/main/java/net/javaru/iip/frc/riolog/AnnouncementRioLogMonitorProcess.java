@@ -27,12 +27,18 @@ public class AnnouncementRioLogMonitorProcess extends AbstractRioLogMonitorProce
 
 
     private final CharSequence message;
-    private final Runnable stopRioLogRunnable;
 
-    public AnnouncementRioLogMonitorProcess(Runnable clearConsoleRunnable, Runnable stopRioLogRunnable, @NotNull CharSequence message) throws IllegalStateException
+
+    /**
+     * @param clearConsoleRunnable Runnable that programmatically 'clicks' the clear button on the Executor window.
+     * @param stopRioLogRunnable   Runnable that programmatically 'clicks' the stop button on the Executor window.
+     * @param message              The message to display on the RioLog console                            
+     *
+     * @throws IllegalStateException If an initialization issue occurs
+     */
+    public AnnouncementRioLogMonitorProcess(@NotNull Runnable clearConsoleRunnable, @NotNull Runnable stopRioLogRunnable, @NotNull CharSequence message) throws IllegalStateException
     {
-        super(clearConsoleRunnable);
-        this.stopRioLogRunnable = stopRioLogRunnable;
+        super(clearConsoleRunnable,stopRioLogRunnable);
         this.message = message;
     }
 

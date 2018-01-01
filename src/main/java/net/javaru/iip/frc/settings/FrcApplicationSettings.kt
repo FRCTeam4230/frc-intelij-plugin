@@ -64,6 +64,9 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                   var useRegexForRestartCheck: Boolean = false,
                                   var autoAttachWpiLib: Boolean = true,
                                   var autoAttachUserLib: Boolean = true,
+                                  var checkForNewWpiLibVersionOnProjectOpen: Boolean = true,
+                                  /** Whether to prompt (false) user to download new version or just automatically download it and then notify (true). */
+                                  var autoDownloadNewWpiLibVersions: Boolean = false,
                                   /**
                                    * Regex for detecting roboRIO restart.
                                    * NOTE:  We limit the searched for text in the regex in case of encoding issues and in case an alternate path is used 

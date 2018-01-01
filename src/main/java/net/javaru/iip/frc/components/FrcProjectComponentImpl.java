@@ -45,6 +45,7 @@ import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersionStatus;
 
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT;
 import static net.javaru.iip.frc.components.FrcProjectComponentImpl.NotificationKey.*;
@@ -80,13 +81,58 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     @Override
     public void projectOpened()
     {
+        final FrcApplicationSettings appSettings = FrcApplicationSettings.Settings.INSTANCE();
+        
         LOG.debug("[FRC] " + getClass().getSimpleName() + ".projectOpened() called for project " + myProject);
-        LOG.debug("[FRC] wpiLibDir: " + FrcApplicationSettings.Settings.INSTANCE().getWpiLibDir());
+        LOG.debug("[FRC] wpiLibDir: " + appSettings.getWpiLibDir());
         
         registerMessageBusListeners();
-
+        
+        
+        
         final boolean isTemplateFirstOpen = templateCreationCleanup();
-        // TODO auto attach wpilib and user dir if fresh project
+
+        if (isTemplateFirstOpen || appSettings.getCheckForNewWpiLibVersionOnProjectOpen())
+        {
+            final WpiLibVersionStatus versionStatus = WpiLibVersionStatus.getCurrentVersionStatus(myProject);
+            if (!isTemplateFirstOpen)
+            {
+                LOG.debug("[FRC] On project WpiLib Version Status: " + versionStatus);
+                if (versionStatus.isNewerVersionAvailableThanAttached())
+                {
+                    
+                    if (appSettings.getAutoDownloadNewWpiLibVersions())
+                    {
+                        // TODO Prompt user if they would like to download new version.
+                    }
+                    else
+                    {
+                        // TODO auto download and then notify user
+                    }
+                    
+                }
+                else
+                {
+                    // TODO auto attach wpilib and user dir if fresh project
+                    
+                    // Possibilities
+                    //    1) WpiLib is not downloaded
+                    //       a) can be downloaded                           - ask permission and download it, auto attach
+                    //       b) cannot be downloaded                        - notify - possibly link to how to manually download
+                    //    2) WpiLib is downloaded (may already be attached, unlikely, but check just in case)
+                    //       a) Has the latest version                      - auto attach 
+                    //       b) need a newer version                        - ask permission and download it, auto attach
+                    //       c) Can not determine what latest version is    - we can still attach, but need to notify
+                    //
+                    //  1a and 2b are the same, except for a different message in the notification.
+                    //  1b and 2c are just notifications
+                    //  2a is the simplest use case
+
+
+                    LOG.debug("[FRC] This is first open for new project from template. WpiLib Status: " + versionStatus);
+                }
+            }
+        }
         
         
         // TODO: See if we need to call RioLogProjectService.update(myProject) in any way. FrcModuleComponentImpl.moduleAdded(), which we need if someone adds a module to an existing project, and moduleAdded is called during a project opening
@@ -240,7 +286,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                            FrcNotifications.IconInfo,
                                                            FrcNotifications.Title,
                                                            "WPILib Not Found on System",
-                                                           "Would you like to <a href='download'>download and attach</a> WPILib?",
+                                                           "Would you like to <a href='download'>download and attach</a> WPILib as a Module Library?",
                                                            NotificationType.INFORMATION,
                                                            (theNotification, event) ->
                                                            {
@@ -262,7 +308,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                            FrcNotifications.IconInfo,
                                                            FrcNotifications.Title,
                                                            "WPILib not Attached",
-                                                           "Would you like to <a href='attach'>attach</a> WPILib as a library?",
+                                                           "Would you like to <a href='attach'>attach</a> WPILib as a Module Library?",
                                                            NotificationType.INFORMATION,
                                                            (theNotification, event) ->
                                                            {
@@ -284,7 +330,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                            FrcNotifications.IconInfo,
                                                            FrcNotifications.Title,
                                                            "User Lib Directory Not Attached",
-                                                           "Would you like to <a href='attach'>attach</a> the User Lib directory as a Library?",
+                                                           "Would you like to <a href='attach'>attach</a> the User Lib directory as a Module Library?",
                                                            NotificationType.INFORMATION,
                                                            (theNotification, event) ->
                                                            {

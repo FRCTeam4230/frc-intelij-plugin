@@ -87,9 +87,18 @@ public class WpiLibLibrariesUtils
     
     private static boolean isWpilibAttached(@NotNull Project project)
     {
-        return isLibraryPresent(project, WpiLibConstants.ROBOT_BASE_FQN) ||
-               isLibraryPresent(project, WpiLibConstants.ITERATIVE_ROBOT_FQN) ||
-               isLibraryPresent(project, WpiLibConstants.VERSION_CLASS_FQN);
+        //noinspection SimplifiableIfStatement
+        if (project.isInitialized())
+        {
+            return isLibraryPresent(project, WpiLibConstants.ROBOT_BASE_FQN) ||
+                   isLibraryPresent(project, WpiLibConstants.ITERATIVE_ROBOT_FQN) ||
+                   isLibraryPresent(project, WpiLibConstants.VERSION_CLASS_FQN);
+        }
+        else
+        {
+            // TODO - I'd rather this thrown an exception to notify the caller that the project is not yet ready... or possible use a nullable Boolean.
+            return false;
+        }
     }
 
 

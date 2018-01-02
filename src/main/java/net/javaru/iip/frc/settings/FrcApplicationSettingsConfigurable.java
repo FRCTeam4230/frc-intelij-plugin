@@ -84,7 +84,7 @@ public class FrcApplicationSettingsConfigurable implements SearchableConfigurabl
         myForm.applyTo(FrcApplicationSettings.Settings.INSTANCE(), 
                        FrcRoboRioSettings.Settings.INSTANCE(), 
                        FrcSshSettings.Settings.INSTANCE());
-        // TODO This needs to be inhanced so it does not start the rioLog is it is not currently running. But it does need to update it... or set a flag so that on next click of the "start" button it updates
+        // TODO This needs to be enhanced so it does not start the rioLog is it is not currently running. But it does need to update it... or set a flag so that on next click of the "start" button it updates
         RioLogProjectService.updateAllOpenProjects();
     }
 

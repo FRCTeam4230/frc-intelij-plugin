@@ -81,13 +81,17 @@ public class FrcApplicationSettingsConfigurable implements SearchableConfigurabl
     @Override
     public void apply() throws ConfigurationException
     {
-        myForm.applyTo(FrcApplicationSettings.Settings.INSTANCE());
+        myForm.applyTo(FrcApplicationSettings.Settings.INSTANCE(), 
+                       FrcRoboRioSettings.Settings.INSTANCE(), 
+                       FrcSshSettings.Settings.INSTANCE());
         RioLogProjectService.updateAllOpenProjects();
     }
 
 
     @Override
-    public void reset() { myForm.load(FrcApplicationSettings.Settings.INSTANCE()); 
+    public void reset() { myForm.load(FrcApplicationSettings.Settings.INSTANCE(), 
+                                      FrcRoboRioSettings.Settings.INSTANCE(),
+                                      FrcSshSettings.Settings.INSTANCE()); 
     }
 
 

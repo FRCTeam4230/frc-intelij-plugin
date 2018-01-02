@@ -106,7 +106,7 @@ data class FrcRoboRioSettings(var roboRioHostRawMDns: String = USE_DEFAULT_HOST_
         }
     }
 
-    fun getRoboRioHostDefault_mDNS(): String = createRoboRioHostDefault_mDNS(FrcApplicationSettings.INSTANCE().teamNumber)
+    fun getRoboRioHostDefault_mDNS(frcApplicationSettings: FrcApplicationSettings = FrcApplicationSettings.INSTANCE()): String = createRoboRioHostDefault_mDNS(frcApplicationSettings.teamNumber)
 
     fun createRoboRioHostDefault_mDNS(teamNumber: Int): String = String.format(ROBORIO_HOST_mDNS_TEMPLATE, teamNumber)
 
@@ -139,7 +139,7 @@ data class FrcRoboRioSettings(var roboRioHostRawMDns: String = USE_DEFAULT_HOST_
         }
     }
 
-    fun getRoboRioHostDefault_DNS(): String = createRoboRioHostDefault_DNS(FrcApplicationSettings.INSTANCE().teamNumber)
+    fun getRoboRioHostDefault_DNS(frcApplicationSettings: FrcApplicationSettings = FrcApplicationSettings.INSTANCE()): String = createRoboRioHostDefault_DNS(frcApplicationSettings.teamNumber)
 
     fun createRoboRioHostDefault_DNS(teamNumber: Int): String = String.format(ROBORIO_HOST_DNS_TEMPLATE, teamNumber)
 
@@ -173,7 +173,7 @@ data class FrcRoboRioSettings(var roboRioHostRawMDns: String = USE_DEFAULT_HOST_
         }
     }
 
-    fun getRoboRioHostDefault_IP(): String = createRoboRioHostDefault_IP(FrcApplicationSettings.INSTANCE().teamNumber)
+    fun getRoboRioHostDefault_IP(frcApplicationSettings: FrcApplicationSettings = FrcApplicationSettings.INSTANCE()): String = createRoboRioHostDefault_IP(frcApplicationSettings.teamNumber)
 
     fun createRoboRioHostDefault_IP(teamNumber: Int): String
     {

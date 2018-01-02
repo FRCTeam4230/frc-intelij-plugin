@@ -124,7 +124,7 @@ public class WpiLibVersionImpl implements WpiLibVersion
 
 
     @Override
-    public String getVersion() { return version;}
+    public String getVersionString() { return version;}
 
 
     @Override
@@ -178,7 +178,7 @@ public class WpiLibVersionImpl implements WpiLibVersion
             .append(getMajor(), that.getMajor())
             .append(getMinor(), that.getMinor())
             .append(getPatch(), that.getPatch())
-            .append(getVersion(), that.getVersion())
+            .append(getVersionString(), that.getVersionString())
             .append(getPreReleaseModifier(), that.getPreReleaseModifier())
             .append(getPreReleaseModifierVersion(), that.getPreReleaseModifierVersion())
             .isEquals();
@@ -189,7 +189,7 @@ public class WpiLibVersionImpl implements WpiLibVersion
     public int hashCode()
     {
         return new HashCodeBuilder(17, 37)
-            .append(getVersion())
+            .append(getVersionString())
             .append(getGeneration())
             .append(getMajor())
             .append(getMinor())

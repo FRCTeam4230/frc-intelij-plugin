@@ -28,7 +28,7 @@ public interface WpiLibVersion extends Comparable<WpiLibVersion>
 {
     int getGeneration();
 
-    String getVersion();
+    String getVersionString();
 
     int getMajor();
 

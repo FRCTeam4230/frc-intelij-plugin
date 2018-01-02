@@ -199,7 +199,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                                 FrcNotifications.IconInfo,
                                 FrcNotifications.Title,
                                 "WPILib",
-                                "WPILib JARs have been attached as a library",
+                                "WPILib JARs have been attached as a library.",
                                 NotificationType.INFORMATION,
                                 null
         );

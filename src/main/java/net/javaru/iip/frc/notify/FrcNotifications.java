@@ -38,6 +38,9 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings;
 
 
 
+/**
+ * Also see {@link net.javaru.iip.frc.components.FrcProjectComponentImpl} for some notification methods.
+ */
 // NOTE: This class is registered in the plugin.xml as a ApplicationComponent
 public class FrcNotifications implements FrcNotificationsApplicationComponent
 {
@@ -74,7 +77,7 @@ public class FrcNotifications implements FrcNotificationsApplicationComponent
     }
 
 
-
+    //TODO: Move to FrcProjectComponentImpl and then move the notificationsMap placement into this method
     @SuppressWarnings("UnusedReturnValue")
     public static Notification notifyAboutTeamNumberNeedingToBeConfigured(@Nullable Project project, boolean useSticky)
     {

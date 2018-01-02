@@ -16,9 +16,16 @@
 
 package net.javaru.iip.frc.components;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.facet.Facet;
@@ -45,6 +52,7 @@ import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionStatus;
 
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT;
@@ -63,7 +71,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     private final static Map<Project, Map<NotificationKey, Notification>> notificationsTracker =  new HashMap<>(); 
     
     
-    protected enum NotificationKey {TeamNumConfigured, WpilibAttached, UserLibAttached}
+    protected enum NotificationKey {ConfigureTeamNumberQuery, AttachWpiLibQuery, AttachUserLibQuery, DownloadNewWpiLibVersionQuery, LatestWpiLibIsBeingDownloaded}
 
     /** Do not call constructor directly. Use the static {@link #getInstance(Project)} method. */
     public FrcProjectComponentImpl(@NotNull Project project)
@@ -81,67 +89,30 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     @Override
     public void projectOpened()
     {
+        
+        // IMPORTANT: Keep in mine the project is not yet fully initialized. 
+        //            As such, some activities can not occur yet. Use:
+        //               StartupManager.getInstance(myProject).registerPostStartupActivity(() -> someMethod(myProject));
+        
         final FrcApplicationSettings appSettings = FrcApplicationSettings.Settings.INSTANCE();
         
         LOG.debug("[FRC] " + getClass().getSimpleName() + ".projectOpened() called for project " + myProject);
         LOG.debug("[FRC] wpiLibDir: " + appSettings.getWpiLibDir());
         
-        registerMessageBusListeners();
+        registerMessageBusListeners(); 
         
         
         
-        final boolean isTemplateFirstOpen = templateCreationCleanup();
-
-        if (isTemplateFirstOpen || appSettings.getCheckForNewWpiLibVersionOnProjectOpen())
-        {
-            final WpiLibVersionStatus versionStatus = WpiLibVersionStatus.getCurrentVersionStatus(myProject);
-            if (!isTemplateFirstOpen)
-            {
-                LOG.debug("[FRC] On project WpiLib Version Status: " + versionStatus);
-                if (versionStatus.isNewerVersionAvailableThanAttached())
-                {
-                    
-                    if (appSettings.getAutoDownloadNewWpiLibVersions())
-                    {
-                        // TODO Prompt user if they would like to download new version.
-                    }
-                    else
-                    {
-                        // TODO auto download and then notify user
-                    }
-                    
-                }
-                else
-                {
-                    // TODO auto attach wpilib and user dir if fresh project
-                    
-                    // Possibilities
-                    //    1) WpiLib is not downloaded
-                    //       a) can be downloaded                           - ask permission and download it, auto attach
-                    //       b) cannot be downloaded                        - notify - possibly link to how to manually download
-                    //    2) WpiLib is downloaded (may already be attached, unlikely, but check just in case)
-                    //       a) Has the latest version                      - auto attach 
-                    //       b) need a newer version                        - ask permission and download it, auto attach
-                    //       c) Can not determine what latest version is    - we can still attach, but need to notify
-                    //
-                    //  1a and 2b are the same, except for a different message in the notification.
-                    //  1b and 2c are just notifications
-                    //  2a is the simplest use case
+        final boolean isTemplateFirstOpen = frcFreshTemplateProjectCheckAndCleanup();
 
 
-                    LOG.debug("[FRC] This is first open for new project from template. WpiLib Status: " + versionStatus);
-                }
-            }
-        }
         
         
         // TODO: See if we need to call RioLogProjectService.update(myProject) in any way. FrcModuleComponentImpl.moduleAdded(), which we need if someone adds a module to an existing project, and moduleAdded is called during a project opening
         // RioLogProjectService.update(myProject);
 
         // For example, see com.intellij.framework.detection.impl.FrameworkDetectionManager#projectOpened
-        StartupManager.getInstance(myProject).registerPostStartupActivity(() -> RioLogProjectService.activateUdpNow(myProject));
-        StartupManager.getInstance(myProject).registerPostStartupActivity(() -> notifyToConfigureTeamNumIfNecessary(myProject));
-        StartupManager.getInstance(myProject).registerPostStartupActivity(() -> checkProjectFrcStatus(myProject, false));
+        StartupManager.getInstance(myProject).registerPostStartupActivity(() -> this.runPostStartupActivities(isTemplateFirstOpen));
     }
 
 
@@ -192,7 +163,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     public static boolean isFrcFacetedProject(@Nullable Project project) {return FrcFacet.isFrcFacetedProject(project);}
 
 
-    private boolean templateCreationCleanup()
+    private boolean frcFreshTemplateProjectCheckAndCleanup()
     {
         boolean isFreshTemplateProject = false;
         try
@@ -202,9 +173,9 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
             {
                 final VirtualFile ideaDir = projectFile.getParent();
                 final VirtualFile projectTemplateFile = ideaDir.findChild("project-template.xml");
-                if (projectTemplateFile != null && projectTemplateFile.exists())
+                isFreshTemplateProject = isFrcProjectTemplate(projectTemplateFile);
+                if (isFreshTemplateProject)
                 {
-                    isFreshTemplateProject = true;
                     FrcFileUtils.deleteSafely(projectTemplateFile, this);
                     // This is assuming a standard template was used...
                     final VirtualFile srcDir = myProject.getBaseDir().findChild("src");
@@ -229,44 +200,124 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         return isFreshTemplateProject;
     }
     
-    public static void checkProjectFrcStatus(@NotNull Project project, boolean knownFacetedProject)
+    private boolean isFrcProjectTemplate(@Nullable VirtualFile projectTemplateFile)
     {
+        if (projectTemplateFile != null && projectTemplateFile.exists())
+        {
+            try (final InputStream inputStream = projectTemplateFile.getInputStream())
+            {
+                Document document = new SAXBuilder().build(inputStream);
+                final XPathFactory xPathFactory = XPathFactory.instance();
+                XPathExpression<Element> expression = xPathFactory.compile("/template/input-field", Filters.element());
+                final Element inputFieldElement = expression.evaluateFirst(document);
+                if (inputFieldElement != null)
+                {
+                    final String defaultValue = inputFieldElement.getAttributeValue("default");
+                    if (defaultValue != null && defaultValue.toLowerCase().contains("frc"))
+                    {
+                        return true;
+                    }
+                    // check the icon as a secondary check
+                    expression = xPathFactory.compile("/template/icon-path", Filters.element());
+                    final Element iconElement = expression.evaluateFirst(document);
+                    if (iconElement != null)
+                    {
+                        final String iconPath = iconElement.getValue();
+                        return iconPath != null && iconPath.toLowerCase().contains("/icons/first/first_icon"); 
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                LOG.warn("Could not determine isFrcProjectTemplate due to an Exception: " + e.toString(), e);
+            }
+        }
+        return false;
+    }
+    
+    private void runPostStartupActivities(final boolean isFreshFrcTemplateProject)
+    {
+        // TODO: Need some additional work to handle the variety of cases, escpecailly a new version is available for download.
+        
+        boolean isFrcProject = isFreshFrcTemplateProject || isFrcFacetedProject(myProject);
+        if (isFrcProject)
+        {
+            LOG.debug("[FRC] isFreshFrcTemplateProject = " + isFreshFrcTemplateProject);
+
+            final FrcApplicationSettings appSettings = FrcApplicationSettings.Settings.INSTANCE();
+            
+            RioLogProjectService.activateUdpNow(myProject);
+            notifyToConfigureTeamNumIfNecessary(myProject, true);
+
+            final WpiLibVersionStatus versionStatus = WpiLibVersionStatus.getCurrentVersionStatus(myProject, true);
+
+            if (isFreshFrcTemplateProject)
+            {
+                if (!versionStatus.isWpiLibDownloaded() || versionStatus.isNewerVersionAvailableThanDownloaded())
+                {
+                    if (!versionStatus.isWpiLibDownloaded())
+                    {
+                        queueLatestWpiLibVersionIsBeingDownloadedNotification(myProject);
+                    }
+                    DownloadWpiLibAction.downloadLatestInBackground(myProject,
+                                                                    true,
+                                                                    false);
+                }
+                else
+                {
+                    AttachWpilibAction.attachWpiLib(myProject, false, true);
+                }
+                AttachUserLibDirAction.attachUserLib(myProject, false);
+                
+            }
+            else
+            {
+                checkProjectFrcStatus(myProject, true, false);
+            }
+        }
+    }
+
+
+    public static void checkProjectFrcStatus(@NotNull Project project, boolean knownFacetedProject, boolean checkTeamNumConfigStatus)
+    {
+        // TODO add check for if a new version of WPILib is available
         DumbService.getInstance(project).runWhenSmart(() ->
                                                       {
                                                           final Map<NotificationKey, Notification> notificationMap = getNotificationMapForProject(project);
-                                                          notifyToConfigureTeamNumIfNecessary(project);
+                                                          if (checkTeamNumConfigStatus)
+                                                          {
+                                                              notifyToConfigureTeamNumIfNecessary(project, knownFacetedProject);
+                                                          }
 
                                                           if (knownFacetedProject || isFrcFacetedProject(project))
                                                           {
-                                                              if (notificationMap.get(WpilibAttached) == null && !WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project))
+                                                              if (notificationMap.get(AttachWpiLibQuery) == null && !WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project))
                                                               {
-                                                                  final Notification notification = 
-                                                                  (WpiLibLibrariesUtils.isWpilibDownloadedToSystem())
-                                                                      ? queueAttachWpilibNotification(project)
+                                                                  final Notification notification =
+                                                                      (WpiLibLibrariesUtils.isWpilibDownloadedToSystem())
+                                                                      ? queueAttachWpilibQueryNotification(project)
                                                                       : queueDownloadAndAttachWpilibNotification(project);
-                                                                  notificationMap.put(WpilibAttached, notification);
                                                               }
 
-                                                              if (notificationMap.get(UserLibAttached) == null && !WpiLibLibrariesUtils.isUserLibAttachedViaReadAction(project))
+                                                              if (notificationMap.get(AttachUserLibQuery) == null && !WpiLibLibrariesUtils.isUserLibAttachedViaReadAction(project))
                                                               {
-                                                                  final Notification notification = queueMissingUserLibNotification(project);
-                                                                  notificationMap.put(UserLibAttached, notification);
+                                                                  final Notification notification = queueMissingUserLibQueryNotification(project);
                                                               }
                                                           }
                                                       });
     }
 
 
-    private static void notifyToConfigureTeamNumIfNecessary(@NotNull Project project)
+    private static void notifyToConfigureTeamNumIfNecessary(@NotNull Project project, boolean knownFacetedProject)
     {
         final Map<NotificationKey, Notification> notificationMap = getNotificationMapForProject(project);
         final FrcApplicationSettings settings = FrcApplicationSettings.Settings.INSTANCE();
 
         final boolean shouldNotify = !settings.isTeamNumberConfigured()
                                      &&
-                                     (isFrcFacetedProject(project) || settings.getPrc() <= TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT)
+                                     ((knownFacetedProject || isFrcFacetedProject(project)) || settings.getPrc() <= TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT)
                                      &&
-                                     notificationMap.get(TeamNumConfigured) == null; //Don't publish multiple notifications for same project
+                                     notificationMap.get(ConfigureTeamNumberQuery) == null; //Don't publish multiple notifications for same project
 
         if (shouldNotify)
         {
@@ -276,10 +327,54 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
             // Expire the application level notification to prevent duplicate notification in the event log
             FrcNotifications.expireConfigureTeamNumberNotification(null);
             final Notification notification = FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured( project, true);
-            notificationMap.put(TeamNumConfigured, notification);
+            notificationMap.put(ConfigureTeamNumberQuery, notification);
         }
     }
 
+    public static Notification queueNewerWpiLibVersionIsAvailable(@NotNull Project project,
+                                                                  @NotNull WpiLibVersionStatus versionStatus)
+    {
+        return queueNewerWpiLibVersionIsAvailable(project, versionStatus.getAttachedVersion(), versionStatus.getAvailableVersion());    
+    }
+
+
+    public static Notification queueNewerWpiLibVersionIsAvailable(@NotNull Project project,
+                                                                  @Nullable WpiLibVersion attachedVersion,
+                                                                  @Nullable WpiLibVersion availableVersion)
+    {
+
+        StringBuilder content = new StringBuilder("A newer version of the WPILib is available for download.<br>");
+        if (attachedVersion != null && availableVersion != null)
+        {
+            content.append("Current Version: ")
+                   .append(attachedVersion.getVersionString())
+                   .append(" Available Version: ")
+                   .append(availableVersion.getVersionString())
+                   .append("<br>");
+        }
+        content.append("Would you like to download the new version? <a href='download'>Yes</a>  <a href='doNotDownload'>No</a>");
+        final Notification notification = FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP
+            .createNotification(FrcNotifications.Title,
+                                "New WPI Lib Available",
+                                content.toString(),
+                                NotificationType.INFORMATION,
+                                (theNotification, event) ->
+                                {
+                                    theNotification.expire();
+                                    if ("download".equals(event.getDescription()))
+                                    {
+                                        DownloadWpiLibAction.downloadLatestInBackground(
+                                            project,
+                                            true,
+                                            true);
+                                    }
+                                }
+            );
+        Notifications.Bus.notify(notification, project);
+        getNotificationMapForProject(project).put(DownloadNewWpiLibVersionQuery, notification);
+        return notification;
+    }
+    
     private static Notification queueDownloadAndAttachWpilibNotification(@NotNull Project project)
     {
         final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
@@ -298,11 +393,12 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                            }
         );
         Notifications.Bus.notify(notification, null);
+        getNotificationMapForProject(project).put(AttachWpiLibQuery, notification);
         return notification;
     }
 
 
-    private static Notification queueAttachWpilibNotification(@NotNull Project project)
+    private static Notification queueAttachWpilibQueryNotification(@NotNull Project project)
     {
         final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
                                                            FrcNotifications.IconInfo,
@@ -320,11 +416,12 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                            }
         );
         Notifications.Bus.notify(notification, null);
+        getNotificationMapForProject(project).put(AttachWpiLibQuery, notification);
         return notification;
     }
 
 
-    private static Notification queueMissingUserLibNotification(@NotNull Project project)
+    private static Notification queueMissingUserLibQueryNotification(@NotNull Project project)
     {
         final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
                                                            FrcNotifications.IconInfo,
@@ -339,13 +436,38 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                                {
                                                                    AttachUserLibDirAction.attachUserLib(project, false);
                                                                }
-
                                                            }
         );
         Notifications.Bus.notify(notification, null);
+        getNotificationMapForProject(project).put(AttachUserLibQuery, notification);
+        return notification;
+    }
+    
+    public static Notification queueLatestWpiLibVersionIsBeingDownloadedNotification(@Nullable Project project)
+    {
+        final Notification notification = FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.createNotification(FrcNotifications.Title,
+                                                                                                                "WPILib",
+                                                                                                                "The latest version of the WPILib is being downloaded.",
+                                                                                                                NotificationType.INFORMATION,
+                                                                                                                null);
+        Notifications.Bus.notify(notification, null);
+        if (project != null)
+        {
+            getNotificationMapForProject(project).put(DownloadNewWpiLibVersionQuery, notification);
+        }
         return notification;
     }
 
+    
+    public static void cancelWpiLibIsDownloadingNotifications(@NotNull Project project)
+    {
+        final Map<NotificationKey, Notification> notificationMap = getNotificationMapForProject(project);
+        final Notification notification = notificationMap.remove(DownloadNewWpiLibVersionQuery);
+        if (notification != null)
+        {
+            notification.expire();
+        }
+    }
 
     @SuppressWarnings("unused")
     private Map<NotificationKey, Notification> getNotificationsMap()
@@ -380,7 +502,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
             if (FrcFacet.isFrcFacet(facet))
             {
                 updateForFrcFacet(facet);
-                checkProjectFrcStatus(facet.getModule().getProject(), true);
+                checkProjectFrcStatus(facet.getModule().getProject(), true, true);
             }
         }
 
@@ -400,7 +522,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
 
         private void updateForFrcFacet(@NotNull Facet facet)
-        {
+        { 
             if (FrcFacet.isFrcFacet(facet))
             {
                 RioLogProjectService.update(facet);

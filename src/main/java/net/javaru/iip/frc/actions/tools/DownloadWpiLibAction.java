@@ -33,6 +33,8 @@ import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloadFailedException;
 import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
 
+import static net.javaru.iip.frc.components.FrcProjectComponentImpl.cancelWpiLibIsDownloadingNotifications;
+
 
 
 public class DownloadWpiLibAction extends AbstractFrcToolsAction
@@ -129,6 +131,8 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
                     notification = createNoActionSuccessNotification();
                 }
 
+                cancelWpiLibIsDownloadingNotifications(myProject);
+                
                 if (notification != null)
                 {
                     Notifications.Bus.notify(notification, myProject);

@@ -130,12 +130,12 @@ public class WpiLibDownloader
 
             final URI javaJarUri = UriUtils.resolveSiblingResource(siteXmlUri,
                                                                    String.format("plugins/edu.wpi.first.wpilib.plugins.java_%s.jar",
-                                                                                 javaFeatureDescriptor.getVersion()));
+                                                                                 javaFeatureDescriptor.getVersion().getVersionString()));
 
 
             final URI coreJarUri = UriUtils.resolveSiblingResource(siteXmlUri,
                                                                    String.format("plugins/edu.wpi.first.wpilib.plugins.core_%s.jar",
-                                                                                 javaFeatureDescriptor.getVersion()));
+                                                                                 javaFeatureDescriptor.getVersion().getVersionString()));
 
             LOG.info("[FRC] Using javaJarUri: " + javaJarUri);
             LOG.info("[FRC] Using coreJarUri: " + coreJarUri);

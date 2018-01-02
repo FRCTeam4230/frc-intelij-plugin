@@ -53,16 +53,18 @@ public class WpiLibVersionStatus
     @Nonnull
     private final String availableVersionSummary;
 
+    private final boolean availableVersionChecked;
 
     //TODO i18n
     
     // use getCurrentVersionStatus(Project)
     private WpiLibVersionStatus(@Nullable Project project,
-                                boolean wpiLibAttached, 
+                                boolean wpiLibAttached,
                                 @Nullable WpiLibVersion attachedVersion,
-                                boolean wpiLibDownloaded, 
+                                boolean wpiLibDownloaded,
                                 @Nullable WpiLibVersion downloadedVersion,
-                                @Nullable WpiLibVersion availableVersion)
+                                @Nullable WpiLibVersion availableVersion, 
+                                boolean availableVersionChecked)
     {
         this.project = project;
         this.wpiLibAttached = wpiLibAttached;
@@ -70,13 +72,13 @@ public class WpiLibVersionStatus
         this.wpiLibDownloaded = wpiLibDownloaded;
         this.downloadedVersion = downloadedVersion;
         this.availableVersion = availableVersion;
-
+        this.availableVersionChecked = availableVersionChecked;
         
         if (wpiLibAttached)
         {
             if (attachedVersion != null)
             {
-                attachedVersionSummary = "Attached Version is: " + attachedVersion.getVersion();
+                attachedVersionSummary = "Attached Version is: " + attachedVersion.getVersionString();
             }
             else
             {
@@ -92,7 +94,7 @@ public class WpiLibVersionStatus
         {
             if (downloadedVersion != null)
             {
-                downloadedVersionSummary = "Downloaded Version is: " + downloadedVersion.getVersion();
+                downloadedVersionSummary = "Downloaded Version is: " + downloadedVersion.getVersionString();
             }
             else 
             {
@@ -107,21 +109,26 @@ public class WpiLibVersionStatus
         
         if (availableVersion != null)
         {
-            availableVersionSummary = "Available for download: " + availableVersion.getVersion();
+            availableVersionSummary = "Available for download: " + availableVersion.getVersionString();
         }
         else
         {
-            availableVersionSummary = "Could not determine latest version available for download";
+            availableVersionSummary = availableVersionChecked ? "Could not determine latest version available for download" : "Not Checked";
         }
     }
 
 
+    public static WpiLibVersionStatus getCurrentVersionStatus(@Nullable Project project)
+    {
+        return getCurrentVersionStatus(project, true);
+    }
+    
     /**
      * Determines the current versions of the WPILib. If project is null, the attached version is not determined.
      * @param project the project, if any, to check the attached version for
      * @return the current versions of the WPILib
      */
-    public static WpiLibVersionStatus getCurrentVersionStatus(@Nullable Project project)
+    public static WpiLibVersionStatus getCurrentVersionStatus(@Nullable Project project, boolean checkLatestAvailable)
     {
         WpiLibVersion attachedVersion = null;
         WpiLibVersion downloadedVersion = null;
@@ -153,11 +160,11 @@ public class WpiLibVersionStatus
         
         try
         {
-            availableVersion = WpiLibLibrariesUtils.determineAvailableWpiLibVersion();
+            availableVersion = checkLatestAvailable ? WpiLibLibrariesUtils.determineAvailableWpiLibVersion() : null;
         }
         catch (Exception ignore) {}
         
-        return new WpiLibVersionStatus(project, wpiLibAttached, attachedVersion, wpiLibDownloaded, downloadedVersion, availableVersion);
+        return new WpiLibVersionStatus(project, wpiLibAttached, attachedVersion, wpiLibDownloaded, downloadedVersion, availableVersion, checkLatestAvailable);
     }
 
 
@@ -214,6 +221,9 @@ public class WpiLibVersionStatus
     {
         return downloadedVersion != null && attachedVersion != null && downloadedVersion.isNewThan(attachedVersion);
     }
+
+
+    public boolean wasAvailableVersionChecked() { return availableVersionChecked; }
 
 
     @Override

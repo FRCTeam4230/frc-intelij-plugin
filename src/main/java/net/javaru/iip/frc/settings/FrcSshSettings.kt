@@ -24,11 +24,13 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.xmlb.XmlSerializerUtil
 import net.javaru.iip.frc.riolog.RioLogGlobals
 
+const val SSH_USERNAME_DEFAULT: String = "admin";
+const val SSH_PASSWORD_DEFAULT: String = "";
 
 // NOTE: This class is registered as an <applicationService> in the plugin.xml
 @State(name = "FrcSsh", storages = [(Storage("frc.xml"))])
-data class FrcSshSettings(var sshUsername: String = "admin",
-                          var sshPassword: String = "",
+data class FrcSshSettings(var sshUsername: String = SSH_USERNAME_DEFAULT,
+                          var sshPassword: String = SSH_PASSWORD_DEFAULT,
                           var sshTailCommand: String = RioLogGlobals.DEFAULT_TAIL_COMMAND
                          ) : PersistentStateComponent<FrcSshSettings>
 {

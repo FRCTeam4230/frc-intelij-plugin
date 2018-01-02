@@ -65,6 +65,8 @@ public class FrcApplicationSettingsForm
     private JBTextField sshPassword;
     private JBTextField sshTailCommand;
     private JButton tailCommandToDefaultValueButton;
+    private JButton sshUsernameToDefaultButton;
+    private JButton sshPasswordToDefaultButton;
 
 
     public FrcApplicationSettingsForm()
@@ -452,6 +454,11 @@ public class FrcApplicationSettingsForm
                 internalFrcSshSettings.setSshUsername(sshUsername.getText());
             }
         });
+        sshUsernameToDefaultButton.addActionListener(e ->
+                                                     {
+                                                         sshUsername.setText(FrcSshSettingsKt.SSH_USERNAME_DEFAULT);
+                                                         internalFrcSshSettings.setSshUsername(FrcSshSettingsKt.SSH_USERNAME_DEFAULT);
+                                                     });
 
         sshPassword.addKeyListener(new KeyListener()
         {
@@ -469,6 +476,11 @@ public class FrcApplicationSettingsForm
                 internalFrcSshSettings.setSshPassword(sshPassword.getText());
             }
         });
+        sshPasswordToDefaultButton.addActionListener(e ->
+                                                     {
+                                                         sshPassword.setText(FrcSshSettingsKt.SSH_PASSWORD_DEFAULT);
+                                                         internalFrcSshSettings.setSshPassword(FrcSshSettingsKt.SSH_PASSWORD_DEFAULT);
+                                                     });
 
         sshTailCommand.addKeyListener(new KeyListener()
         {

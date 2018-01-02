@@ -78,7 +78,7 @@ public class FrcApplicationSettingsForm
 
     private void initForm()
     {
-//        initTargetWindowRadioButtons();
+//        initRioLogTargetWindowRadioButtons();
         initPortTextField();
         initTeamNumberField();
         initRoboRioComponents();
@@ -86,11 +86,13 @@ public class FrcApplicationSettingsForm
 
         portToDefaultValueButton.addActionListener(e -> setUdpPortToDefault());
     }
-    
+
 
     public boolean isModified()
     {
-        final boolean modified = !FrcApplicationSettings.Settings.INSTANCE().equals(internalFrcApplicationSettings);
+        final boolean modified = !FrcApplicationSettings.Settings.INSTANCE().equals(internalFrcApplicationSettings) ||
+                                 !FrcRoboRioSettings.Settings.INSTANCE().equals(internalFrcRoboRioSettings) ||
+                                 !FrcSshSettings.Settings.INSTANCE().equals(internalFrcSshSettings);
         LOG.trace("[FRC] FrcApplicationSettingsForm.isModified returning " + modified);
         return modified;
     }
@@ -103,8 +105,12 @@ public class FrcApplicationSettingsForm
         internalFrcApplicationSettings = FrcApplicationSettings.Settings.clone(applicationSettings);
         internalFrcRoboRioSettings = FrcRoboRioSettings.Settings.clone(frcRoboRioSettings);
         internalFrcSshSettings = FrcSshSettings.Settings.clone(frcSshSettings);
-        //TODO: set state of Fields and components to values in applicationSettings
-        setTeamNumberTextFieldValue(applicationSettings.getTeamNumber());
+
+//        resetRioLogTargetWindowRadioButtons();
+        resetTeamNumberTextFieldValue();
+        resetRoboRioHostFields();
+        resetPortTextField();
+        resetSshSettingsFields();
     }
     
     public void applyTo(@NotNull FrcApplicationSettings frcApplicationSettings, 
@@ -144,14 +150,16 @@ public class FrcApplicationSettingsForm
     }
 
 
-    private void setTeamNumberTextFieldValue(int teamNumber)
+    private void resetTeamNumberTextFieldValue()
     {
+        final int teamNumber = internalFrcApplicationSettings.getTeamNumber();
         teamNumberTextField.setText(teamNumber <= 0 ? "" : Integer.toString(teamNumber));
         setTeamNumberWarningVisibility(teamNumber <= 0);
     }
     
     private void initTeamNumberField()
     {
+        resetTeamNumberTextFieldValue();
         teamNumberTextField.addKeyListener(new KeyListener()
         {
 
@@ -217,8 +225,7 @@ public class FrcApplicationSettingsForm
     
     private void initPortTextField()
     {
-        rioLogPortTextField.setText(DecimalFormat.getIntegerInstance().format(internalFrcApplicationSettings.getRioLogUdpPort()));
-
+        resetPortTextField();
 
         rioLogPortTextField.addFocusListener(new FocusListener()
         {
@@ -304,11 +311,19 @@ public class FrcApplicationSettingsForm
         });
     }
 
+
+    private void resetPortTextField()
+    {
+        rioLogPortTextField.setText(DecimalFormat.getIntegerInstance().format(internalFrcApplicationSettings.getRioLogUdpPort()));
+    }
+
+
     private void initRoboRioComponents()
     {
         // TODO should we add verifiers ?
 
-        roboRioMDnsHostName.setText(internalFrcRoboRioSettings.getRoboRioHost_mDNS());
+        resetRoboRioHostFields();
+        
         roboRioMDnsHostName.addKeyListener(new KeyListener()
         {
             @Override
@@ -333,7 +348,7 @@ public class FrcApplicationSettingsForm
                                                          });
 
 
-        roboRioDnsHostName.setText(internalFrcRoboRioSettings.getRoboRioHost_DNS());
+        
         roboRioDnsHostName.addKeyListener(new KeyListener()
         {
             @Override
@@ -357,7 +372,7 @@ public class FrcApplicationSettingsForm
                                                             internalFrcRoboRioSettings.setRoboRioHost_DNS(defaultValue);
                                                         });
 
-        roboRioIpAddress.setText(internalFrcRoboRioSettings.getRoboRioHost_IP());
+        
         roboRioIpAddress.addKeyListener(new KeyListener()
         {
             @Override
@@ -381,7 +396,7 @@ public class FrcApplicationSettingsForm
                                                                  internalFrcRoboRioSettings.setRoboRioHost_IP(defaultValue);
                                                              });
 
-        roboRioStaticUsbIp.setText(internalFrcRoboRioSettings.getRoboRioHost_USB());
+        
         roboRioStaticUsbIp.addKeyListener(new KeyListener()
         {
             @Override
@@ -407,13 +422,19 @@ public class FrcApplicationSettingsForm
         
     }
     
+    private void resetRoboRioHostFields()
+    {
+        roboRioMDnsHostName.setText(internalFrcRoboRioSettings.getRoboRioHost_mDNS());
+        roboRioDnsHostName.setText(internalFrcRoboRioSettings.getRoboRioHost_DNS());
+        roboRioIpAddress.setText(internalFrcRoboRioSettings.getRoboRioHost_IP());
+        roboRioStaticUsbIp.setText(internalFrcRoboRioSettings.getRoboRioHost_USB());
+    }
+    
     private void initSshSettingComponents()
     {
         // TODO should we add verifiers ?
 
-        sshUsername.setText(internalFrcSshSettings.getSshUsername());
-        sshPassword.setText(internalFrcSshSettings.getSshPassword());
-        sshTailCommand.setText(internalFrcSshSettings.getSshTailCommand());
+        resetSshSettingsFields();
 
         sshUsername.addKeyListener(new KeyListener()
         {
@@ -472,6 +493,15 @@ public class FrcApplicationSettingsForm
                                                           });
     }
 
+
+    private void resetSshSettingsFields()
+    {
+        sshUsername.setText(internalFrcSshSettings.getSshUsername());
+        sshPassword.setText(internalFrcSshSettings.getSshPassword());
+        sshTailCommand.setText(internalFrcSshSettings.getSshTailCommand());
+    }
+
+
     private void setUdpPortToDefault()
     {
         rioLogPortTextField.setText(DecimalFormat.getIntegerInstance().format(FrcApplicationSettingsKt.DEFAULT_RIO_LOG_UDP_PORT));
@@ -479,16 +509,9 @@ public class FrcApplicationSettingsForm
     }
 
 
-//    private void initTargetWindowRadioButtons()
+//    private void initRioLogTargetWindowRadioButtons()
 //    {
-//        if (internalFrcApplicationSettings.getUseFrcToolWindow())
-//        {
-//            rioLogTargetWindowButtonGroup.setSelected(targetWindowIsFrcToolWindowRadioButton.getModel(), true);
-//        }
-//        else
-//        {
-//            rioLogTargetWindowButtonGroup.setSelected(targetWindowIsRunWindowRadioButton.getModel(), true);
-//        }
+//        resetRioLogTargetWindowRadioButtons();
 //
 //        targetWindowIsRunWindowRadioButton.setActionCommand(RioLogTargetWindowActionCommands.RunWindow.name());
 //        targetWindowIsFrcToolWindowRadioButton.setActionCommand(RioLogTargetWindowActionCommands.FrcWindow.name());
@@ -513,7 +536,19 @@ public class FrcApplicationSettingsForm
 //        }
 //        
 //    }
-
+//
+//    
+//    private void resetRioLogTargetWindowRadioButtons()
+//    {
+//        if (internalFrcApplicationSettings.getUseFrcToolWindow())
+//        {
+//            rioLogTargetWindowButtonGroup.setSelected(targetWindowIsFrcToolWindowRadioButton.getModel(), true);
+//        }
+//        else
+//        {
+//            rioLogTargetWindowButtonGroup.setSelected(targetWindowIsRunWindowRadioButton.getModel(), true);
+//        }
+//    }
     private boolean isEnteredTeamNumberValid(String text)
     {
         try

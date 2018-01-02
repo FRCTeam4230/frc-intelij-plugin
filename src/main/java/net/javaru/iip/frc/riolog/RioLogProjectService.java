@@ -374,6 +374,32 @@ public class RioLogProjectService
         }
     }
     
+    public static void stopSshForAllOpenProjects()
+    {
+        final Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+        for (Project project : openProjects)
+        {
+            stopSsh(project);
+        }
+    }
+    
+    public static void stopUdpForAllOpenProjects()
+    {
+        final Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+        for (Project project : openProjects)
+        {
+            stopUdp(project);
+        }
+    }
+    
+    public static void stopBothForAllOpenProjects()
+    {
+        final Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+        for (Project project : openProjects)
+        {
+            stopBoth(project);
+        }
+    }
     
     public static void stopBoth(@Nullable Facet facet)
     {

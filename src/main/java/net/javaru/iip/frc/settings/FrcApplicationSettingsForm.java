@@ -116,7 +116,7 @@ public class FrcApplicationSettingsForm
         resetSshSettingsFields();
     }
     
-    public void applyTo(@NotNull FrcApplicationSettings frcApplicationSettings, 
+    public synchronized void applyTo(@NotNull FrcApplicationSettings frcApplicationSettings, 
                         @NotNull FrcRoboRioSettings frcRoboRioSettings,
                         @NotNull FrcSshSettings frcSshSettings)
     {

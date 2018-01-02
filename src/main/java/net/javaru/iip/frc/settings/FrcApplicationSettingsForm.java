@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPasswordField;
 import com.intellij.ui.components.JBTextField;
 
 import net.javaru.iip.frc.riolog.RioLogGlobals;
@@ -62,7 +63,7 @@ public class FrcApplicationSettingsForm
     private JButton portToDefaultValueButton;
     private JPanel sshRioLogSettingsPanel;
     private JBTextField sshUsername;
-    private JBTextField sshPassword;
+    private JBPasswordField sshPassword;
     private JBTextField sshTailCommand;
     private JButton tailCommandToDefaultValueButton;
     private JButton sshUsernameToDefaultButton;

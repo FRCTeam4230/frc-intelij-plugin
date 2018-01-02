@@ -297,18 +297,6 @@
                       <toolTipText value="roboRIO password for SSH access for tailing logs. Default is blank (i.e. no password)."/>
                     </properties>
                   </component>
-                  <component id="ab393" class="com.intellij.ui.components.JBTextField" binding="sshPassword">
-                    <constraints>
-                      <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false">
-                        <minimum-size width="100" height="-1"/>
-                        <preferred-size width="250" height="-1"/>
-                        <maximum-size width="500" height="-1"/>
-                      </grid>
-                    </constraints>
-                    <properties>
-                      <toolTipText value="roboRIO password for SSH access for tailing logs. Default is blank (i.e. no password)."/>
-                    </properties>
-                  </component>
                   <component id="cb436" class="com.intellij.ui.components.JBLabel">
                     <constraints>
                       <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
@@ -355,6 +343,18 @@
                     <properties>
                       <text value="Default"/>
                       <toolTipText value="Sets the SSH Password to its default value"/>
+                    </properties>
+                  </component>
+                  <component id="5b151" class="com.intellij.ui.components.JBPasswordField" binding="sshPassword">
+                    <constraints>
+                      <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false">
+                        <minimum-size width="100" height="-1"/>
+                        <preferred-size width="250" height="-1"/>
+                        <maximum-size width="500" height="-1"/>
+                      </grid>
+                    </constraints>
+                    <properties>
+                      <toolTipText value="roboRIO password for SSH access for tailing logs"/>
                     </properties>
                   </component>
                 </children>

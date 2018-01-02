@@ -237,7 +237,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     
     private void runPostStartupActivities(final boolean isFreshFrcTemplateProject)
     {
-        // TODO: Need some additional work to handle the variety of cases, escpecailly a new version is available for download.
+        // TODO: Need some additional work to handle the variety of cases, especially a new version is available for download.
         
         boolean isFrcProject = isFreshFrcTemplateProject || isFrcFacetedProject(myProject);
         if (isFrcProject)

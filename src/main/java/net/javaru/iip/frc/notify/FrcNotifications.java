@@ -77,6 +77,28 @@ public class FrcNotifications implements FrcNotificationsApplicationComponent
     }
 
 
+    @Override
+    public void initComponent()
+    {
+        // no op
+    }
+
+
+    @Override
+    public void disposeComponent()
+    {
+        // no op
+    }
+
+
+    @NotNull
+    @Override
+    public String getComponentName()
+    {
+        return getClass().getSimpleName();
+    }
+
+
     //TODO: Move to FrcProjectComponentImpl and then move the notificationsMap placement into this method
     @SuppressWarnings("UnusedReturnValue")
     public static Notification notifyAboutTeamNumberNeedingToBeConfigured(@Nullable Project project, boolean useSticky)

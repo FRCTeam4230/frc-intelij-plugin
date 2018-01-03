@@ -18,7 +18,7 @@
 <!-- Documentation: http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_configuration_file.html -->
 
 <!-- url="" specifies the URL of the plugin homepage (displayed in the Welcome Screen and in "Plugins" settings dialog) -->
-<idea-plugin url="https://gitlab.com/Javaru/frc-intellij-idea-plugin">
+<idea-plugin url="https://gitlab.com/Javaru/frc-intellij-idea-plugin/wikis">
     
     <!-- Unique identifier of the plugin. Cannot be changed between the plugin versions. If not specified, assumed to be equal to <name>. -->
     <id>net.javaru.idea.frc</id>
@@ -38,35 +38,38 @@
 
     <description><![CDATA[
         <p>
-            <!-- The first sentence gets used as a summary on the plug-ins repository. -->
+            <!-- The first sentence gets used as a summary on the plugins repository. -->
             <em><a href='http://www.firstinspires.org/'>FIRST</a> Robotics Competition</em>  
             (<a href='http://www.firstinspires.org/robotics/frc'>FRC</a>) development support for IntelliJ IDEA. 
-            This plug-in will work with either the free open-sourced <em>Community Edition</em> or the 
-            licensed <em>Ultimate Edition</em> of IntelliJ IDEA. As of v0.6, <strong>this plug-in requires IntelliJ 
+            This plugin will work with either the free open-sourced <em>Community Edition</em> or the 
+            licensed <em>Ultimate Edition</em> of IntelliJ IDEA. As of v0.6, <strong>this plugin requires IntelliJ 
             v2017.3 or later.</strong>
         </p>
         <p> </p>
-        <p>Please report issues or make feature requests at: 
-            <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues</a>
+        <p>
+            <strong>Please report issues or make feature requests at:</strong> 
+            <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues</a><br>
+            Usage documentation is available at the project's <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/wikis">wiki</a>
         </p>
         <p> </p>
         <p>
-            <strong>The plug-in is in beta and is not feature complete yet.</strong> But it does provide a fair number of features
-            at this time. More will be added in future versions.
+            This plugin provides most of the functionality in the 'official' eclipse plugin, plus some additional functionality. 
+            Although it is in beta, it was successfully used by over 300 users during 2017 FRC seasons. More features are planned 
+            for future versions, with a 1.0 release coming soon. Please report issues or make feature requests via the above link.
         </p>
         
     ]]></description>
 
     <change-notes><![CDATA[
       <strong>v0.6</strong> <br>
-      &nbsp;&nbsp;&bull; IntelliJ IDEA v2017.3 or later now required<br>
-      &nbsp;&nbsp;&bull; Added FRC project templates to the New Project wizard
+      &nbsp;&nbsp;&bull; <strong>IntelliJ IDEA v2017.3 or later now required</strong><br>
+      &nbsp;&nbsp;&bull; Added FRC project templates to IntelliJ IDEA's New Project wizard<br>
       &nbsp;&nbsp;&bull; Updates for 2018 WPILib compatibility<br>
-      &nbsp;&nbsp;&bull; Improved &quot;version aware&quot; WPILib update process. Menu: <em>Tools &gt; FRC &gt; Check fro WPILib update</em><br>
+      &nbsp;&nbsp;&bull; Improved &quot;version aware&quot; WPILib update process in the tool menu<br>
       &nbsp;&nbsp;&bull; Improvements to the <em>SSH Tailing of roboRIO Log File</em> feature<br>
       &nbsp;&nbsp;&bull; Added some words/terms to built-in spell check dictionary<br>
       &nbsp;&nbsp;&bull; Miscellaneous changes and improvements<br>
-      &nbsp;&nbsp;&bull; Complete refactor of plugin's code base<br>
+      <br>
       <strong>v0.5</strong> <br>
       &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/3">Issue #3</a> that was causing changes to plugin settings 
       to not be persisted between IDE runs when using IntelliJ IDEA v2017.1<br>
@@ -75,12 +78,12 @@
       &nbsp;&nbsp;&bull; Resolved two issues related to lifecycle / &quot;initialization sequencing&quot; that caused some exceptions -- 
       &quot;Runner FrcRioLog is not registered&quot; or an &quot;IndexNotReadyException&quot; -- when opening a new FRC project.<br>
       &nbsp;&nbsp;&bull; Added some <em>initial</em> documentation on the project's 
-      <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/wikis/home">wiki</a><br>
+      <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/wikis">wiki</a><br>
       &nbsp;&nbsp;&bull; Added some words/terms to built-in spell check dictionary<br>
       <br>
       <strong>v0.4</strong> <br>
       &nbsp;&nbsp;&bull; Add tailing of roboRIO log via SSH over Wi-Fi (Experimental Feature). Like Net Console log monitoring, it supports the 
-      use of the <a href='https://plugins.jetbrains.com/idea/plugin/7125-grep-console'>Grep Console Plug-in</a> to provide syntax highlighting and line folding<br>
+      use of the <a href='https://plugins.jetbrains.com/idea/plugin/7125-grep-console'>Grep Console plugin</a> to provide syntax highlighting and line folding<br>
       &nbsp;&nbsp;&bull; Resolved issue with RioLog console not auto clearing (on roboRIO restart) when selected due to a character encoding difference on some developers' systems<br>
       &nbsp;&nbsp;&bull; Added some words/terms to built-in spell check dictionary<br>
       <br>
@@ -101,7 +104,7 @@
       &nbsp;&nbsp;&bull; Some code cleanup and minor improvements<br>
       <br>
       <strong>v0.1</strong> <br>
-      &nbsp;&nbsp;&bull; Initial beta release of plug-in <br>
+      &nbsp;&nbsp;&bull; Initial beta release of plugin <br>
       &nbsp;&nbsp;&bull; FRC Facet <br>
       &nbsp;&nbsp;&bull; RioLog monitoring <br>
       &nbsp;&nbsp;&bull; Basic FRC templates <br>

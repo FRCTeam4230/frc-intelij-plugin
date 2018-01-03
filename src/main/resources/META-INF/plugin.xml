@@ -117,7 +117,7 @@
     <!-- The unique identifiers of the plugins on which this plugin depends. -->
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
-    <!-- TODO: Make AntSupport Optional ? -->
+    <!-- TODO: Make AntSupport Required ? -->
     <!--<depends>AntSupport</depends>-->
 
     <!-- Optional dependency on another plugin.

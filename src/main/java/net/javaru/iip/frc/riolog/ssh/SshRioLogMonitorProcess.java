@@ -30,6 +30,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -56,6 +57,8 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
     //TODO - make these configurable in the settings
     private static final int IS_REACHABLE_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(5);
     private static final int CONNECTION_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(5);
+    
+    private AtomicInteger connectionAttempts = new AtomicInteger(0);
 
 
     /**
@@ -158,10 +161,10 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
                + "\n"
                + "This console will make an SSH connection to the roboRIO, then run a tail -f command on the Robot program's log file.\n"
                + "This allows you to monitor the log when the Net Console may be otherwise unavailable.\n" 
-               + "It will sequentially try the four different URL's (mDNS, DNS, USB, IP) that can be used to connect to the roboRIO.\n"
-               + "A future version of the FRC Plugin will allow you to configure which URL's to use, and the order in which they are tried,\n"
-               + "and/or have a button on the toolbar to the left that allows you to set the connection type to use (since you'll know how\n" 
-               + "the robot is connected).\n";
+               + "It will sequentially try the four different URL's (mDNS, DNS, USB, IP) that can be used to connect to the roboRIO,\n"
+               + "starting with the last known good host (once a connection has been made for the current project while open.)\n"
+               + "A future version of the FRC Plugin will allow you to configure which URL's to use, and the order in which they are\n"
+               + "tried, and/or have a button on the toolbar to the left that allows you to set the connection type to use.\n";
     }
 
     private class SshRioLogMonitor extends AbstractMonitoringRunnable
@@ -330,9 +333,29 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
                             connect();
                             if (!isConnectedFully())
                             {
-                                logToConsole("Unable to connect to roboRIO via SSH. Will attempt reconnect in 20 seconds...\n");
-                                //This is the connection retry interval - TODO make the retry interval configurable
-                                try {TimeUnit.SECONDS.sleep(20);} catch (InterruptedException ignore) {}
+                                final int attempts = connectionAttempts.incrementAndGet();
+                                if (attempts >= 3)
+                                {
+                                    logToConsole("Unable to connect to roboRIO via SSH. (Attempt " + attempts + " of 3)\n");
+                                    riologQueue.offer("\n");
+                                    riologQueue.offer("Unable to connect to roboRIO via SSH after 3 attempts.\n");
+                                    riologQueue.offer("Verify the roboRIO is connected, and then click the Start button to attempt connecting again.\n");
+                                    riologQueue.offer("\n");
+                                    riologQueue.offer("\n");
+                                    // give the queue a moment to flush
+                                    try {TimeUnit.SECONDS.sleep(2);} catch (InterruptedException ignore) {}
+                                    running.getAndSet(false);
+                                    stopRioLogRunnable.run();
+                                    disconnectFully();
+                                    connectionAttempts.set(0);
+                                }
+                                else 
+                                {
+                                    logToConsole("Unable to connect to roboRIO via SSH. (Attempt " + attempts + " of 3) Will attempt reconnect in 20 seconds...\n");
+                                    //This is the connection retry interval - TODO make the retry interval configurable
+                                    try {TimeUnit.SECONDS.sleep(20);} catch (InterruptedException ignore) {}
+                                }
+                                
                             }
                         } while (running.get() && !isConnectedFully());
                     }

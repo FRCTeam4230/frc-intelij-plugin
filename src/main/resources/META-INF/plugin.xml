@@ -23,7 +23,7 @@
     <!-- Unique identifier of the plugin. Cannot be changed between the plugin versions. If not specified, assumed to be equal to <name>. -->
     <id>net.javaru.idea.frc</id>
     <name>FRC</name>
-    <version>0.6-SNAPSHOT</version>
+    <version>0.6</version>
 
     <!-- The vendor of the plugin.
        The optional "url" attribute specifies the URL of the vendor homepage.

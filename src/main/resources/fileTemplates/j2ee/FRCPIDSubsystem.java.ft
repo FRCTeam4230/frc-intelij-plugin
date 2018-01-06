@@ -1,21 +1,22 @@
-package ${PACKAGE_NAME};
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package
 
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
+
+${PACKAGE_NAME}
+    ;
+#end
 
 
 #parse("File Header.java")
 public class ${NAME} extends PIDSubsystem
 {
-
-    
     public ${NAME}()
     {
         // Initialize your subsystem here
-        super(/* TODO Add consturctor paramters*/);
+        super(0, 0, 0 /* TODO: decide which super constructor to use/call and set the appropriate values */);
         
         // Use these to get going:
-        // setSetpoint() -  Sets where the PID controller should move the system
-        //                  to
+        // setSetpoint() -  Sets where the PID controller should move the system to
         // enable() - Enables the PID controller.
     }
 

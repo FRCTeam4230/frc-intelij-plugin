@@ -1,6 +1,10 @@
-package ${PACKAGE_NAME};
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package
 
 import edu.wpi.first.wpilibj.buttons.Trigger;
+
+${PACKAGE_NAME}
+    ;
+#end
 
 
 #parse("File Header.java")

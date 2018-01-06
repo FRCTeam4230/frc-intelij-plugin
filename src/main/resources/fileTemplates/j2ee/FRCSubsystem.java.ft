@@ -1,9 +1,10 @@
-package
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 ${PACKAGE_NAME}
     ;
+#end
 
 #parse("File Header.java")
 public class ${NAME} extends Subsystem

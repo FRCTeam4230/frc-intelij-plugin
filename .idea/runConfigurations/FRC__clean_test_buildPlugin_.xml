@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="FRC [clean buildPlugin]" type="GradleRunConfiguration" factoryName="Gradle" singleton="true">
+  <configuration default="false" name="FRC [clean test buildPlugin]" type="GradleRunConfiguration" factoryName="Gradle" singleton="true">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -17,6 +17,7 @@
       </option>
       <option name="vmOptions" value="-Dfrc.build.preserve.sandbox.config.file.on.clean=true" />
     </ExternalSystemSettings>
+    <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
     <method />
   </configuration>
 </component>

@@ -19,6 +19,7 @@ package net.javaru.iip.frc.wpilib.version;
 import javax.annotation.Nonnull;
 
 import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
@@ -207,19 +208,21 @@ public class WpiLibVersionStatus
 
     public boolean isNewerVersionAvailableThanAttached()
     {
-        return availableVersion != null && attachedVersion != null && availableVersion.isNewThan(attachedVersion);
+        final boolean isNewerAvailable = availableVersion != null && attachedVersion != null && availableVersion.isNewerThan(attachedVersion);
+        Logger.getInstance(WpiLibVersionStatus.class).debug("[FRC] isNewerVersionAvailableThanAttached() = " + isNewerAvailable + " for avail of " + availableVersionSummary + " and attached of " + attachedVersionSummary );
+        return isNewerAvailable;
     }
     
     
     public boolean isNewerVersionAvailableThanDownloaded()
     {
-        return availableVersion != null && downloadedVersion != null && availableVersion.isNewThan(downloadedVersion);
+        return availableVersion != null && downloadedVersion != null && availableVersion.isNewerThan(downloadedVersion);
     }
 
 
     public boolean isNewerVersionDownloadedThanAttached()
     {
-        return downloadedVersion != null && attachedVersion != null && downloadedVersion.isNewThan(attachedVersion);
+        return downloadedVersion != null && attachedVersion != null && downloadedVersion.isNewerThan(attachedVersion);
     }
 
 

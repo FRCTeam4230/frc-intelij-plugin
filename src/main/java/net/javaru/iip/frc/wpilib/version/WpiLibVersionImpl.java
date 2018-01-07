@@ -32,7 +32,8 @@ public class WpiLibVersionImpl implements WpiLibVersion
 {
 
     private static final Pattern pre2017Pattern = Pattern.compile("([\\d]{1,2})\\.([\\d]{1,2})\\.([\\d]{1,2})\\.([\\d]{12})");
-    private static final Pattern post2017Pattern = Pattern.compile("([\\d]{4})\\.([\\d]{1,2})\\.([\\d]{1,2})(\\.(alpha|beta|rc)(-([\\d]{1,2}))?)?");
+    private static final Pattern post2017Pattern = Pattern.compile(
+        "(?<major>[\\d]{4})\\.(?<minor>[\\d]{1,2})(\\.(?<patch>[\\d]{1,2})(?<preAll>[-.](?<preName>alpha|beta|rc)([-.](?<preVer>[\\d]{1,2}))?)?)?");
     private final String version;
     private final int generation;
     private final int major;
@@ -68,14 +69,13 @@ public class WpiLibVersionImpl implements WpiLibVersion
         Matcher matcher = post2017Pattern.matcher(version.toLowerCase());
         if (matcher.find())
         {
-            boolean isPreRel = matcher.group(4) != null;
             return new WpiLibVersionImpl(version,
                                          2017,
-                                         Integer.parseInt(matcher.group(1)),
-                                         Integer.parseInt(matcher.group(2)),
-                                         Integer.parseInt(matcher.group(3)),
-                                         isPreRel ? PreReleaseModifier.valueOf(matcher.group(5)) : null,
-                                         isPreRel ? Integer.parseInt(matcher.group(7)) : null);
+                                         Integer.parseInt(matcher.group("major")),
+                                         matcher.group("minor") != null ? Integer.parseInt(matcher.group("minor")) : 0,
+                                         matcher.group("patch") != null ? Integer.parseInt(matcher.group("patch")) : 0,
+                                         matcher.group("preAll") != null ? PreReleaseModifier.valueOf(matcher.group("preName")) : null,
+                                         matcher.group("preVer") != null ? Integer.parseInt(matcher.group("preVer")) : null);
         }
         else
         {
@@ -152,7 +152,17 @@ public class WpiLibVersionImpl implements WpiLibVersion
     @Override
     public String toString()
     {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+        return getVersionString();
+    }
+    
+    public String toStringDetailed()
+    {
+        return toStringDetailed(ToStringStyle.SHORT_PREFIX_STYLE);
+    }
+    
+    public String toStringDetailed(final ToStringStyle style)
+    {
+        return new ToStringBuilder(this, style)
             .append("version", version)
             .append("generation", generation)
             .append("major", major)

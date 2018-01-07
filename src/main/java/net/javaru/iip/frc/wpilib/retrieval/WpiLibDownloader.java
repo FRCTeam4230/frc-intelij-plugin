@@ -77,7 +77,7 @@ public class WpiLibDownloader
             final JavaFeatureDescriptor betaDescriptor = WpiRepoUris.useBetaRepo() ? parseSiteXml(fetchSiteXml(betaRepoUri), betaRepoUri) : null ;
             final JavaFeatureDescriptor releaseDescriptor = parseSiteXml(fetchSiteXml(releaseRepoUri), releaseRepoUri);
             
-            if (betaDescriptor == null || releaseDescriptor.getVersion().isNewThan(betaDescriptor.getVersion()))
+            if (betaDescriptor == null || releaseDescriptor.getVersion().isNewerThan(betaDescriptor.getVersion()))
             {
                 return ImmutablePair.of(releaseDescriptor, releaseRepoUri);
             }

@@ -148,6 +148,123 @@ public class RioLogProjectService
         }
     }
 
+    /**
+     * A null safe convenience static utility method for {@link #updateUdp() updating} the RioLog Condole for a facet.
+     * Equivalent to calling:<br/><br/>
+     * <pre>
+     * ServiceManager.getService(facet.getModule().getProject(), RioLogProjectService.class).updateUdp();
+     * </pre>
+     * but with full null safety
+     *
+     * @param facet the facet
+     */
+    public static void updateUdp(@Nullable Facet facet)
+    {
+        if (facet != null)
+        {
+            final Module module = facet.getModule();
+            updateUdp(module);
+        }
+    }
+
+
+    /**
+     * A null safe convenience static utility method for {@link #updateUdp() updating} the RioLog Condole for a module.
+     * Equivalent to calling:<br/><br/>
+     * <pre>
+     * ServiceManager.getService(module.getProject(), RioLogProjectService.class).updateUdp();
+     * </pre>
+     * but with full null safety
+     *
+     * @param module the module
+     */
+    public static void updateUdp(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final Project project = module.getProject();
+            updateUdp(project);
+        }
+    }
+
+
+    /**
+     * A null safe convenience static utility method for {@link #updateUdp() updating} the RioLog Condole for a project.
+     * Equivalent to calling:<br/><br/>
+     * <pre>
+     * ServiceManager.getService(project, RioLogProjectService.class).updateUdp();
+     * </pre>
+     * but with full null safety
+     *
+     * @param project the project
+     */
+    public static void updateUdp(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            getInstance(project).updateUdp();
+        }
+    }
+
+
+    /**
+     * A null safe convenience static utility method for {@link #updateSsh() updating} the RioLog Condole for a facet.
+     * Equivalent to calling:<br/><br/>
+     * <pre>
+     * ServiceManager.getService(facet.getModule().getProject(), RioLogProjectService.class).updateSsh();
+     * </pre>
+     * but with full null safety
+     *
+     * @param facet the facet
+     */
+    public static void updateSsh(@Nullable Facet facet)
+    {
+        if (facet != null)
+        {
+            final Module module = facet.getModule();
+            updateSsh(module);
+        }
+    }
+
+
+    /**
+     * A null safe convenience static utility method for {@link #updateSsh() updating} the RioLog Condole for a module.
+     * Equivalent to calling:<br/><br/>
+     * <pre>
+     * ServiceManager.getService(module.getProject(), RioLogProjectService.class).updateSsh();
+     * </pre>
+     * but with full null safety
+     *
+     * @param module the module
+     */
+    public static void updateSsh(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final Project project = module.getProject();
+            updateSsh(project);
+        }
+    }
+
+
+    /**
+     * A null safe convenience static utility method for {@link #updateSsh() updating} the RioLog Condole for a project.
+     * Equivalent to calling:<br/><br/>
+     * <pre>
+     * ServiceManager.getService(project, RioLogProjectService.class).updateSsh();
+     * </pre>
+     * but with full null safety
+     *
+     * @param project the project
+     */
+    public static void updateSsh(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            getInstance(project).updateSsh();
+        }
+    }
+
 
     public static void activateBothSafely(@Nullable Facet facet)
     {
@@ -488,6 +605,16 @@ public class RioLogProjectService
     {
         sshRioLogConsoleProjectService.update();
         udpRioLogConsoleProjectService.update();
+    }
+
+    public synchronized void updateUdp()
+    {
+        udpRioLogConsoleProjectService.update();
+    }
+
+    public synchronized void updateSsh()
+    {
+        sshRioLogConsoleProjectService.update();
     }
 
 

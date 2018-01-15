@@ -298,10 +298,6 @@
                popup="true"
                icon="/icons/first/FIRST_icon_16x16.png"
         >
-            <action id="frc.tools.ShowRioLogConsoleAction"
-                    text="Show FRC _RioLog Console"
-                    class="net.javaru.iip.frc.actions.tools.ShowRioLogConsoleAction"
-                    icon="/icons/first/FIRST_icon_16x16.png" />
             <action id="frc.tools.AttachWpilibAction"
                     text="Attach WPILib JARs as Dependency"
                     description="Attach WPILib JARs as a Module Dependency (i.e. Library)"
@@ -326,6 +322,25 @@
             <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after" />
         </group>
 
+        <group id="FRC.FrcRioLogActionsGroup"
+               text="RIOLog Monitoring"
+               class="net.javaru.iip.frc.actions.tools.riolog.FrcRioLogActionGroup"
+               popup="true"
+               icon="/icons/riolog/riolog.png"
+               >
+
+            <action id="frc.tools.ShowSsh"
+                    text="Show RIOLog Monitoring via SSH (alternative methodology)"
+                    class="net.javaru.iip.frc.actions.tools.ShowRioLogSshConsoleAction"
+                    icon="/icons/first/FIRST_icon_16x16.png" />
+            
+            <action id="frc.tools.ShowUdp"
+                    text="Show Legacy (2017 and older) UDP based RIOLog Console"
+                    class="net.javaru.iip.frc.actions.tools.ShowRioLogUdpConsoleAction"
+                    icon="/icons/first/FIRST_icon_16x16.png" />
+            <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="first" />
+        </group>
+        
         <group id="frc.NewFileTemplates"
                text="FRC"
                description="Create New FRC Components"

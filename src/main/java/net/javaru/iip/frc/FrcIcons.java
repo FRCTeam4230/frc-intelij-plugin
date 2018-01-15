@@ -77,6 +77,8 @@ public final class FrcIcons
 
     public static class RioLog
     {
+        public static final Icon RIOLOG = loadIcon("/icons/riolog/riolog.png"); // 16x16
+        public static final Icon RIOLOG_x2 = loadIcon("/icons/riolog/riolog@2x.png"); // 32x32
         public static final Icon RIOLOG_SSH_CONSOLE = loadIcon("/icons/riolog/letter-S.png");
         public static final Icon RIOLOG_UDP_CONSOLE = loadIcon("/icons/riolog/letter-N.png");
     }

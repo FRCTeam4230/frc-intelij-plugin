@@ -24,7 +24,7 @@ import net.javaru.iip.frc.riolog.RioLogProjectService;
 
 
 
-public class ShowRioLogConsoleAction extends AbstractFrcToolsAction implements DumbAware
+public class ShowRioLogSshConsoleAction extends AbstractFrcToolsAction implements DumbAware
 {
     @Override
     public void actionPerformed(AnActionEvent actionEvent)
@@ -32,8 +32,8 @@ public class ShowRioLogConsoleAction extends AbstractFrcToolsAction implements D
         final Project project = actionEvent.getProject();
         if (project != null)
         {
-            RioLogProjectService.update(project);
-            RioLogProjectService.activateUdpSafely(project);
+            RioLogProjectService.updateSsh(project);
+            RioLogProjectService.activateSshSafely(project);
         }
     }
 }

@@ -71,6 +71,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 
+import net.javaru.iip.frc.FrcIcons;
 import net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 
@@ -211,7 +212,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         DefaultActionGroup actions = new DefaultActionGroup();
 
         consolePanel = createConsolePanel(myConsoleView, actions);
-        myRunContentDescriptor = new RunContentDescriptor(myConsoleView, myProcessHandler, consolePanel, getTabTitle(), AllIcons.General.MessageHistory);
+        myRunContentDescriptor = new RunContentDescriptor(myConsoleView, myProcessHandler, consolePanel, getTabTitle(), FrcIcons.RioLog.RIOLOG);
 
         Disposer.register(myProject, this);
         Disposer.register(this, myRunContentDescriptor);

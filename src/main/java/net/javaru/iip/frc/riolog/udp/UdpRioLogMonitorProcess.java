@@ -25,22 +25,12 @@ import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
-import javax.swing.*;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.jetbrains.annotations.NotNull;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ShowSettingsUtil;
-import com.intellij.openapi.wm.IdeFrame;
-import com.intellij.openapi.wm.ex.WindowManagerEx;
 
-import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.riolog.AbstractRioLogMonitorProcess;
-import net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable;
 
 
 
@@ -50,8 +40,6 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
 
     private static final boolean USE_DEBUGGING_SERVER = BooleanUtils.toBoolean(System.getProperty(SIMULATED_LOG_SERVICE_ENABLED_PROP_KEY,
                                                                                                   Boolean.FALSE.toString()));
-
-    private boolean isFirstBindAttempt = true;
 
     /**
      * @param clearConsoleRunnable Runnable that programmatically 'clicks' the clear button on the Executor window.
@@ -208,27 +196,27 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         }
 
 
-        protected void publishBindWarning(String msg)
-        {
-            final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
-                                                               FrcNotifications.IconWarn,
-                                                               FrcNotifications.Title,
-                                                               "RIOLog Monitor",
-                                                               msg,
-                                                               NotificationType.WARNING,
-                                                               (theNotification, event) ->
-                                                               {
-                                                                   if ("configure".equals(event.getDescription()))
-                                                                   {
-                                                                       final Configurable configurable = FrcApplicationSettingsConfigurable.getInstance();
-                                                                       IdeFrame ideFrame = WindowManagerEx.getInstanceEx().findFrameFor(null);
-                                                                       ShowSettingsUtil.getInstance().editConfigurable((JFrame) ideFrame, configurable);
-                                                                   }
-                                                                   theNotification.expire();
-                                                               }
-            );
-            Notifications.Bus.notify(notification, null);
-        }
+//        protected void publishBindWarning(String msg)
+//        {
+//            final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
+//                                                               FrcNotifications.IconWarn,
+//                                                               FrcNotifications.Title,
+//                                                               "RIOLog Monitor",
+//                                                               msg,
+//                                                               NotificationType.WARNING,
+//                                                               (theNotification, event) ->
+//                                                               {
+//                                                                   if ("configure".equals(event.getDescription()))
+//                                                                   {
+//                                                                       final Configurable configurable = FrcApplicationSettingsConfigurable.getInstance();
+//                                                                       IdeFrame ideFrame = WindowManagerEx.getInstanceEx().findFrameFor(null);
+//                                                                       ShowSettingsUtil.getInstance().editConfigurable((JFrame) ideFrame, configurable);
+//                                                                   }
+//                                                                   theNotification.expire();
+//                                                               }
+//            );
+//            Notifications.Bus.notify(notification, null);
+//        }
     }
 
 

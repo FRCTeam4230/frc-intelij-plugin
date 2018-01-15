@@ -51,6 +51,7 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
     private static final boolean USE_DEBUGGING_SERVER = BooleanUtils.toBoolean(System.getProperty(SIMULATED_LOG_SERVICE_ENABLED_PROP_KEY,
                                                                                                   Boolean.FALSE.toString()));
 
+    private boolean isFirstBindAttempt = true;
 
     /**
      * @param clearConsoleRunnable Runnable that programmatically 'clicks' the clear button on the Executor window.
@@ -152,14 +153,18 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
             }
             catch (BindException e)
             {
-                final String msg = "Could not bind to the RioLog port. This can occur if another tool, such as Eclipse, "
-                                   + "is bound to the RioLog port. It can also occur if a second IDEA window with an "
-                                   + "FRC project is open. It is a known limitation that only one FRC project can be "
-                                   + "opened at a time with the RioLog monitor running. A fix so that all FRC projects " 
-                                   + "share the port is planned for a future release. In the meantime, stop the RioLog " 
-                                   + "monitoring in the other IDEA instance.";
+                final String msg = "Could not bind to the RioLog port. This can occur if the port is already bound to in another " 
+                                   + "instance of IntelliJ IDEA with an FRC project open, or by another tool, such as Eclipse. "
+                                   + "You will need to stop the RioLog monitoring in the other tool and then then reattempt to start monitoring.";
                 LOG.warn(msg + " Cause Summary: " + e.toString(), e);
-                publishBindWarning(msg);
+                consoleWriter.println();
+                consoleWriter.println("==Could not bind to the RioLog UDP port.==");
+                consoleWriter.println("This can occur if the port is already bound to in another instance of IntelliJ IDEA with an FRC project open, or by another tool, such as Eclipse.");
+                consoleWriter.println("You will need to stop the monitoring in the other tool and then reattempt to start monitoring.");
+                consoleWriter.println("Since this UDP based RIOLog monitoring is no longer used (since 2018), and this is considered legacy feature, there is no plan to resolve this minor shortcoming of only having a single monitor running at a time.");
+                consoleWriter.println();
+                consoleWriter.flush();
+                // publishBindWarning(msg);
                 isRunning = false;
             }
             catch (Exception e)
@@ -179,8 +184,18 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
 
         protected DatagramSocket createSocket() throws IOException
         {
+            // We try to create the socket doing a retry after 1 second on the first BindException
             LOG.debug("[FRC] Creating DatagramSocket with port " + getPort());
-            DatagramSocket socket = new DatagramSocket(getPort());
+            DatagramSocket socket;
+            try
+            {
+                socket = new DatagramSocket(getPort());
+            }
+            catch (BindException e)
+            {
+                try {TimeUnit.SECONDS.sleep(1);} catch (InterruptedException ignore) {}
+                socket = new DatagramSocket(getPort());
+            }
             socket.setReuseAddress(true);
             socket.setBroadcast(true);
             return socket;

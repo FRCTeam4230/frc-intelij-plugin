@@ -53,6 +53,7 @@ import net.javaru.iip.frc.util.UriUtils;
 import net.javaru.iip.frc.wpilib.WpiLibPaths;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersions;
 
 
 
@@ -124,7 +125,7 @@ public class WpiLibDownloader
             // For now, as a quick hit to get the download working, we are not going to get and a parse the 
             // the feature XML and traverse down the chain. We know we wan the java and core JARs. We'll hard
             // code the names for now.
-            // TODO: parse the site.xml in the event things change
+            // TODO: parse the site.xml in the event things change like they did in 2018 ;)
 
             final URI siteXmlUri = WpiRepoUris.getSiteUri(latest.getValue());
 
@@ -142,12 +143,19 @@ public class WpiLibDownloader
             final Path javaJarFilePath = WpiRepoHttpClient.downloadAndSaveToTemp(javaJarUri);
             final Path coreJarFilePath = WpiRepoHttpClient.downloadAndSaveToTemp(coreJarUri);
             // The java.zip file has 3 directories in it:  ant;  javadoc;  lib;  And is extracted in 'current' so we end up with: 
-            //      C:\Users\Dilbert\wpilib\java\current\ant   C:\Users\Dilbert\wpilib\java\current\javadoc   C:\Users\Dilbert\wpilib\java\current\lib
+            //      C:\Users\UserName\wpilib\java\current\ant   C:\Users\UserName\wpilib\java\current\javadoc   C:\Users\UserName\wpilib\java\current\lib
             extractZipFileContainedInZipFile(javaJarFilePath, "resources/java.zip", WpiLibPaths.getJavaCurrentDir());
-            // The tools.zip content needs to go into C:\Users\Mark\wpilib\tools  so we end up with C:\Users\Mark\wpilib\tools\plugins  and  C:\Users\Mark\wpilib\tools\*.jar 
+            // The tools.zip content needs to go into C:\Users\UserName\wpilib\tools  so we end up with C:\Users\UserName\wpilib\tools\plugins  and  C:\Users\UserName\wpilib\tools\*.jar 
             extractZipFileContainedInZipFile(coreJarFilePath, "resources/tools.zip", WpiLibPaths.getToolsDir());
 
-
+            // common.zip was added in 2018 and contains the JRE that is deployed to the roboRIO upon building
+            //     It's content goes to C:\Users\UserName\wpilib\common
+            //     We ultimately end up with C:\Users\UserName\wpilib\common\current\lib\linux\athena\shared which contains a number or *.so files
+            if (WpiLibVersions.is2018OrLater(javaFeatureDescriptor.getVersion()))
+            {
+                extractZipFileContainedInZipFile(coreJarFilePath, "resources/common.zip", WpiLibPaths.getCommonCurrentVersionDir());
+            }
+            
             Files.createDirectories(WpiLibPaths.getUserLibDir());
             createWpilibPropertiesFile();
             LOG.debug("[FRC] Download & extraction of latest wpilib completed");

@@ -25,6 +25,7 @@ import com.intellij.openapi.ui.Messages;
 
 import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.i18n.FrcMessageBundle;
+import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionStatus;
 
 
@@ -88,7 +89,21 @@ public class CheckSystemWpiLbVersionAction extends AbstractFrcToolsAction
             else
             {
                 // CASE 1b: Attached, and it's the latest
-                sb.append(indent).append("You have the latest available version.").append("<br>");
+                
+                if (WpiLibLibrariesUtils.is2018CommonRefreshNeededViaReadAction())
+                {
+                    sb.append(indent).append("<b>While you have the latest version available, it needs to be refreshed to resolve a ").append("<br>");
+                    sb.append(indent).append("previous issue &mdash; where some files where not properly extracted &mdash; which will ").append("<br>");
+                    sb.append(indent).append("prevent you from being able to deploy code to the roboRIO.</b>").append("<br>");
+                    sb.append("<br>");
+                    sb.append("Would you like to refresh the download? (Highly recommended)<br>");
+                    yesText = "Download";
+                }
+                else
+                {
+                    sb.append(indent).append("You have the latest available version.").append("<br>");
+                }
+                
             }
             
         }

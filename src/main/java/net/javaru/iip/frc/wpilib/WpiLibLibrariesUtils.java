@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.wpilib;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -59,6 +60,7 @@ import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionStatus;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersions;
 
 import static net.javaru.iip.frc.util.FindClassUtils.isLibraryPresent;
 
@@ -212,6 +214,30 @@ public class WpiLibLibrariesUtils
         return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) WpiLibLibrariesUtils::isWpilibDownloadedToSystem);
     }
 
+    
+    public static boolean isCommonDownloadedToSystem()
+    {
+        final Path commonSharedDir = WpiLibPaths.getCommonCurrentVersionSharedDir();
+        final File[] files = commonSharedDir.toFile().listFiles();
+        return files != null && files.length > 0;
+    }
+    
+    public static boolean isCommonDownloadedToSystemViaReadAction()
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) WpiLibLibrariesUtils::isCommonDownloadedToSystem);
+    }
+
+
+    public static boolean is2018CommonRefreshNeeded()
+    {
+        final WpiLibVersion downloadedVersion = determineSystemAvailableWpiLibVersion();
+        return downloadedVersion != null && WpiLibVersions.is2018OrLater(downloadedVersion) && !isCommonDownloadedToSystem();
+    }
+
+    public static boolean is2018CommonRefreshNeededViaReadAction()
+    {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) WpiLibLibrariesUtils::is2018CommonRefreshNeeded);
+    }
 
     private static boolean isCsCorePresent(@NotNull Module module)
     {

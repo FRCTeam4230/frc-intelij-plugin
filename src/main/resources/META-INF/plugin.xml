@@ -42,8 +42,8 @@
             <em><a href='http://www.firstinspires.org/'>FIRST</a> Robotics Competition</em>  
             (<a href='http://www.firstinspires.org/robotics/frc'>FRC</a>) development support for IntelliJ IDEA. 
             This plugin will work with either the free open-sourced <em>Community Edition</em> or the 
-            licensed <em>Ultimate Edition</em> of IntelliJ IDEA. As of v0.6, <strong>this plugin requires IntelliJ 
-            v2017.3 or later.</strong>
+            licensed <em>Ultimate Edition</em> of IntelliJ IDEA. As of v0.6, <strong>this plugin requires 
+            IntelliJ IDEA v2017.3 or later.</strong>
         </p>
         <p> </p>
         <p>
@@ -61,6 +61,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+      <strong>v0.7</strong> <br>
+      &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/8">Issue #8</a>, &quot;Cannot deploy code to roboRIO&quot; that was caused by a change in the way the 2018 WPILib deploys code to the roboRIO<br>
+      <br>
       <strong>v0.6</strong> <br>
       &nbsp;&nbsp;&bull; <strong>IntelliJ IDEA v2017.3 or later now required</strong><br>
       &nbsp;&nbsp;&bull; Added FRC project templates to IntelliJ IDEA's New Project wizard<br>

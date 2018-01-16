@@ -78,7 +78,49 @@ public class WpiLibPaths
         return wpiLibDir.resolve("tools");
     }
 
+    public static Path getCommonDir()
+    {
+        return getCommonDir(getWpiLibRootDir());
+    }
 
+
+    public static Path getCommonDir(Path wpiLibDir)
+    {
+        return wpiLibDir.resolve("common");
+    }
+
+
+    public static Path getCommonCurrentVersionDir()
+    {
+        return getCommonCurrentVersionDir(getWpiLibRootDir());
+    }
+
+
+    public static Path getCommonCurrentVersionDir(Path wpiLibDir)
+    {
+        return getCommonCurrentVersionDir(wpiLibDir, resolveCurrentVersionName(wpiLibDir));
+    }
+
+
+    protected static Path getCommonCurrentVersionDir(Path wpiLibDir, @NotNull String versionName)
+    {
+        return getCommonDir(wpiLibDir).resolve(versionName);
+    }
+
+
+    public static Path getCommonCurrentVersionSharedDir()
+    {
+        return getCommonCurrentVersionSharedDir(getWpiLibRootDir());
+    }
+
+
+    public static Path getCommonCurrentVersionSharedDir(Path wpiLibDir)
+    {
+        return getCommonCurrentVersionDir(wpiLibDir).resolve("lib/linux/athena/shared");
+    }
+
+
+    
     public static Path getJavaDir()
     {
         return getJavaDir(getWpiLibRootDir());
@@ -100,6 +142,12 @@ public class WpiLibPaths
     public static Path getJavaCurrentDir(Path wpiLibDir)
     {
         return getJavaCurrentDir(wpiLibDir, resolveCurrentVersionName(wpiLibDir));
+    }
+
+
+    protected static Path getJavaCurrentDir(Path wpiLibDir, @NotNull String versionName)
+    {
+        return getJavaDir(wpiLibDir).resolve(versionName);
     }
 
 
@@ -132,10 +180,6 @@ public class WpiLibPaths
     }
 
 
-    protected static Path getJavaCurrentDir(Path wpiLibDir, @NotNull String versionName)
-    {
-        return getJavaDir(wpiLibDir).resolve(versionName);
-    }
 
 
     public static Path getJavaLibDir()

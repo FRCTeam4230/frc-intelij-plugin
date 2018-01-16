@@ -56,6 +56,21 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
 
     public static void downloadLatestInBackground(@Nullable final Project project, final boolean autoAttach, final boolean notifyOnCompletion)
     {
+        downloadLatestInBackground(project, autoAttach, notifyOnCompletion, true, null, null);
+    }
+    
+    public static void downloadLatestInBackground(@Nullable final Project project, final boolean autoAttach, final boolean notifyOnCompletion, boolean notifyOnFailure)
+    {
+        downloadLatestInBackground(project, autoAttach, notifyOnCompletion, notifyOnFailure, null, null);
+    }
+    
+    public static void downloadLatestInBackground(@Nullable final Project project, 
+                                                  final boolean autoAttach, 
+                                                  final boolean notifyOnCompletion,
+                                                  boolean notifyOnFailure,
+                                                  @Nullable Runnable onSuccessAction,
+                                                  @Nullable Runnable onFailAction)
+    {
         
         // TODO: The isAttached concepts needs some rework:
         //    It needs to separate the use case of the default 'wpilib/java/lib' dir is attached as a project library (currently the only option)
@@ -137,6 +152,12 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
                 {
                     Notifications.Bus.notify(notification, myProject);
                 }
+                
+                if (onSuccessAction != null)
+                {
+                    onSuccessAction.run();
+                }
+                
                 // We reindex to catch the files that have changed
                 IndexUtils.refreshAll(project);
             }
@@ -157,14 +178,23 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
                     content += error.toString();
                 }
 
-                Notifications.Bus.notify(new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
-                                                          FrcNotifications.IconWarn,
-                                                          FrcNotifications.Title,
-                                                          NOTIFICATIONS_SUBTITLE + " Failed",
-                                                          content,
-                                                          NotificationType.WARNING,
-                                                          null
-                ), project);
+                if (notifyOnFailure)
+                {
+                    Notifications.Bus.notify(new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
+                                                              FrcNotifications.IconWarn,
+                                                              FrcNotifications.Title,
+                                                              NOTIFICATIONS_SUBTITLE + " Failed",
+                                                              content,
+                                                              NotificationType.WARNING,
+                                                              null
+                    ), project);
+                }
+                
+                if (onFailAction != null)
+                {
+                    onFailAction.run();
+                }
+                
                 // We reindex to catch the files that have changed, which may have even have happened on a failure if it was a partial failure
                 IndexUtils.refreshAll(project);
             }

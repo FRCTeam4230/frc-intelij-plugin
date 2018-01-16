@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetManagerAdapter;
+import com.intellij.ide.browsers.BrowserLauncherImpl;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -51,11 +52,13 @@ import net.javaru.iip.frc.riolog.RioLogProjectService;
 import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.FrcFileUtils;
+import net.javaru.iip.frc.util.UriUtils;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionStatus;
 
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT;
+import static net.javaru.iip.frc.actions.tools.DownloadWpiLibAction.NOTIFICATIONS_SUBTITLE;
 import static net.javaru.iip.frc.components.FrcProjectComponentImpl.NotificationKey.*;
 
 
@@ -99,9 +102,10 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         LOG.debug("[FRC] " + getClass().getSimpleName() + ".projectOpened() called for project " + myProject);
         LOG.debug("[FRC] wpiLibDir: " + appSettings.getWpiLibDir());
         
-        registerMessageBusListeners(); 
+        registerMessageBusListeners();
+
         
-        
+        checkIssue8Refresh();
         
         final boolean isTemplateFirstOpen = frcFreshTemplateProjectCheckAndCleanup();
 
@@ -198,6 +202,68 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         }
 
         return isFreshTemplateProject;
+    }
+
+
+    private void checkIssue8Refresh()
+    {
+        if (isFrcFacetedProject(myProject) && WpiLibLibrariesUtils.is2018CommonRefreshNeededViaReadAction())
+        {
+
+            final Notification refreshNotification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
+                                                                      FrcNotifications.IconInfo,
+                                                                      FrcNotifications.Title,
+                                                                      NOTIFICATIONS_SUBTITLE + " Refresh Required",
+                                                                      "In order to fully resolve "
+                                                                      + "<a href='openIssue'>Issue #8: Cannot deploy code to roboRIO</a>, "
+                                                                      + "caused by a change to the 2018 WPILib, the previously downloaded WPILib and its associated tools needs "
+                                                                      + "to be refreshed. A fresh download has been started.",
+                                                                      NotificationType.INFORMATION,
+                                                                      (notification, event) -> {
+                                                                          if ("openIssue".equals(event.getDescription()))
+                                                                          {
+                                                                              BrowserLauncherImpl.getInstance().browse(UriUtils.createUri("https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/8"));
+                                                                          }
+                                                                      }
+            );
+            Notifications.Bus.notify(refreshNotification, myProject);
+
+            DownloadWpiLibAction.downloadLatestInBackground(myProject,
+                                                            true,
+                                                            false,
+                                                            true,
+                                                            () -> {
+                                                                refreshNotification.expire();
+                                                                final Notification refreshCompletedNotification = new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP
+                                                                                                                                       .getDisplayId(),
+                                                                                                                                   FrcNotifications.IconInfo,
+                                                                                                                                   FrcNotifications.Title,
+                                                                                                                                   NOTIFICATIONS_SUBTITLE,
+                                                                                                                                   "Refresh of WPILib has completed",
+                                                                                                                                   NotificationType.INFORMATION,
+                                                                                                                                   null
+                                                                );
+                                                                Notifications.Bus.notify(refreshCompletedNotification, myProject);
+
+                                                            },
+                                                            () -> {
+                                                                refreshNotification.expire();
+                                                                final Notification refreshFailedNotification = new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP
+                                                                                                                                    .getDisplayId(),
+                                                                                                                                FrcNotifications.IconWarn,
+                                                                                                                                FrcNotifications.Title,
+                                                                                                                                NOTIFICATIONS_SUBTITLE
+                                                                                                                                + " Refresh Failed",
+                                                                                                                                "Refresh of WPILib failed. You will likely have problems deploying code to a 2018 roboRIO until "
+                                                                                                                                + "a fresh copy of the WPILib is downloaded. Please verify your internet connection and download a "
+                                                                                                                                + "fresh copy of the WPILIb and its tools via the menu: <em>Tools > FRC > Download Latest WPILib</em>",
+                                                                                                                                NotificationType.INFORMATION,
+                                                                                                                                null
+                                                                );
+                                                                Notifications.Bus.notify(refreshFailedNotification, myProject);
+
+                                                            });
+        }
     }
     
     private boolean isFrcProjectTemplate(@Nullable VirtualFile projectTemplateFile)

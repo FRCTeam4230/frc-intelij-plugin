@@ -155,16 +155,15 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
     public static String getExperimentalFeatureMessage()
     {
         return "\n\n"
-               + "************************************************************************************************************************\n"
-               + "** This is an Experimental Feature. Please report issues at https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues **\n"
-               + "************************************************************************************************************************\n"
-               + "\n"
+//               + "************************************************************************************************************************\n"
+//               + "** This is an Experimental Feature. Please report issues at https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues **\n"
+//               + "************************************************************************************************************************\n"
+//               + "\n"
                + "This console will make an SSH connection to the roboRIO, then run a tail -f command on the Robot program's log file.\n"
-               + "This allows you to monitor the log when the Net Console may be otherwise unavailable.\n" 
                + "It will sequentially try the four different URL's (mDNS, DNS, USB, IP) that can be used to connect to the roboRIO,\n"
                + "starting with the last known good host (once a connection has been made for the current project while open.)\n"
-               + "A future version of the FRC Plugin will allow you to configure which URL's to use, and the order in which they are\n"
-               + "tried, and/or have a button on the toolbar to the left that allows you to set the connection type to use.\n";
+               + "A future version of the FRC Plugin will check the different connection addresses in parallel for improved performance.\n"
+            ;
     }
 
     private class SshRioLogMonitor extends AbstractMonitoringRunnable

@@ -62,8 +62,13 @@
 
     <change-notes><![CDATA[
       <strong>v0.6.1</strong> <br>
-      &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/8">Issue #8</a>, &quot;Cannot deploy code to roboRIO&quot; that was caused by a change in the way the 2018 WPILib deploys code to the roboRIO<br>
+      &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/8">Issue #8</a>, &quot;Cannot deploy code to roboRIO&quot; 
+      that was caused by a change in the way the 2018 WPILib deploys code to the roboRIO<br>
       &nbsp;&nbsp;&bull; Fixed issue with two file templates that had an extraneous package statement<br>
+      &nbsp;&nbsp;&bull; Known issue: WPI Lib changes the Net Console (i.e. RIOLog) protocol for 2018, breaking that feature.(See 
+      <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/8">Issue #7</a>) I am in the process of reimplementing 
+      the Net Console. I will release an update with the change soon. In the meantime, the alternate 'tailing via SSH' monitoring can be used. 
+      From the menu: Tools | FRC | RIOLog Monitoring | SSH tailing<br>
       <br>
       <strong>v0.6</strong> <br>
       &nbsp;&nbsp;&bull; <strong>IntelliJ IDEA v2017.3 or later now required</strong><br>
@@ -334,14 +339,13 @@
                >
 
             <action id="frc.tools.ShowSsh"
-                    text="Show RIOLog Monitoring via SSH (alternative methodology)"
-                    class="net.javaru.iip.frc.actions.tools.ShowRioLogSshConsoleAction"
-                    icon="/icons/first/FIRST_icon_16x16.png" />
+                    text="SSH tailing (alternative RIOLog monitoring technique)"
+                    class="net.javaru.iip.frc.actions.tools.ShowRioLogSshConsoleAction" />
             
+            <!-- text="Legacy Net Console (2017 and older)" -->
             <action id="frc.tools.ShowUdp"
-                    text="Show Legacy (2017 and older) UDP based RIOLog Console"
-                    class="net.javaru.iip.frc.actions.tools.ShowRioLogUdpConsoleAction"
-                    icon="/icons/first/FIRST_icon_16x16.png" />
+                    text="Net Console"
+                    class="net.javaru.iip.frc.actions.tools.ShowRioLogUdpConsoleAction" />
             <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="first" />
         </group>
         

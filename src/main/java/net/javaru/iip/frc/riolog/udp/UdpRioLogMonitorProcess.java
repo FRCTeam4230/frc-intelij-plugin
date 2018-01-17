@@ -167,7 +167,11 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
 
         @Override
         @NotNull
-        protected String getStartingMonitoringMessage() {return "==Monitoring RioLog on port " + getPort() + "==";}
+        protected String getStartingMonitoringMessage() 
+        {
+            return
+                get2018ChangeMessage() + "==Monitoring RioLog on port " + getPort() + "==";
+        }
 
 
         protected DatagramSocket createSocket() throws IOException
@@ -217,6 +221,21 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
 //            );
 //            Notifications.Bus.notify(notification, null);
 //        }
+    }
+
+
+    @NotNull
+    public static String get2018ChangeMessage()
+    {
+        return "\n"
+               + "**************************************************************************************************************************************************\n" 
+               + "I M P O R T A N T   N O T E \n" 
+               + "WPI Lib changed the RIOLog implementation for 2018. It was changed from using UDP to a new TCP based mechanism. I am in the process of\n" 
+               + "reimplementing the Net Console for this IntelliJ IDEA plugin to use the new protocol. Unfortunately there are a number of touch points involved.\n" 
+               + "I will release an update with the new Net Console implementation very soon. In the meantime, the alternate 'tailing via SSH' monitoring can be used.\n" 
+               + "From the menu: Tools > FRC > RIOLog Monitoring > SSH tailing \n"
+               + "**************************************************************************************************************************************************\n"
+               + "\n";
     }
 
 

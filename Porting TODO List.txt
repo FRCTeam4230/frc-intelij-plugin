@@ -1,4 +1,4 @@
 
 - library detection testing & debugging
 - riolog / tool window
-- templates
+- templates (done)

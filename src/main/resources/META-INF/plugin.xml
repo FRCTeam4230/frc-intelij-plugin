@@ -64,7 +64,6 @@
       <strong>v0.6.1</strong> <br>
       &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/8">Issue #8</a>, &quot;Cannot deploy code to roboRIO&quot; 
       that was caused by a change in the way the 2018 WPILib deploys code to the roboRIO<br>
-      &nbsp;&nbsp;&bull; Fixed issue with two file templates that had an extraneous package statement<br>
       &nbsp;&nbsp;&bull; Known issue: WPI Lib changed the Net Console (i.e. RIOLog) protocol for 2018, breaking that feature. (See 
       <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/7">Issue #7</a>) I am in the process of reimplementing 
       the Net Console. I will release an update with the change soon. In the meantime, the alternate 'tailing via SSH' monitoring can be used. 

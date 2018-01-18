@@ -72,7 +72,7 @@ public abstract class AbstractRioLogMonitorProcess extends Process
     private PipedInputStream in;
     protected PrintWriter consoleWriter;
     protected PrintWriter fileWriter;
-    private MonitoringRunnable rioLogMonitor;
+    private RioLogMonitoringRunnable rioLogMonitor;
 
     /**
      * Runnable that programmatically 'clicks' the clear button on the Executor window.
@@ -157,7 +157,7 @@ public abstract class AbstractRioLogMonitorProcess extends Process
 
 
     @NotNull
-    protected abstract MonitoringRunnable initMonitoringRunnable();
+    protected abstract RioLogMonitoringRunnable initMonitoringRunnable();
 
 
     public void stop()
@@ -312,7 +312,7 @@ public abstract class AbstractRioLogMonitorProcess extends Process
     public boolean isEnabled() { return enabled; }
 
 
-    protected interface MonitoringRunnable extends Runnable
+    protected interface RioLogMonitoringRunnable extends Runnable
     {
         int getPort();
 
@@ -323,13 +323,13 @@ public abstract class AbstractRioLogMonitorProcess extends Process
         void logMessage(CharSequence message);
     }
 
-    protected abstract class AbstractMonitoringRunnable implements MonitoringRunnable
+    protected abstract class AbstractRioLogMonitoringRunnable implements RioLogMonitoringRunnable
     {
         protected final int port;
         protected boolean isRunning = true;
 
 
-        protected AbstractMonitoringRunnable(int port) {this.port = port;}
+        protected AbstractRioLogMonitoringRunnable(int port) {this.port = port;}
 
 
         protected void processReceivedText(String received)

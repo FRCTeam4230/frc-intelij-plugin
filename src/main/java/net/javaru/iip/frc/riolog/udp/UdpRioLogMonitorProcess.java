@@ -55,13 +55,13 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
 
     @NotNull
     @Override
-    protected MonitoringRunnable initMonitoringRunnable()
+    protected RioLogMonitoringRunnable initMonitoringRunnable()
 
     {
-        MonitoringRunnable rioLogMonitor;
+        RioLogMonitoringRunnable rioLogMonitor;
         if (USE_DEBUGGING_SERVER)
         {
-            rioLogMonitor = new TestingUdpRioLogMonitor();
+            rioLogMonitor = new TestingUdpRioLogMonitoringRunnable();
             LOG.warn(String.format("[FRC] System Property '%s is set to 'true'. Using '%s' for monitoring on port '%d'.",
                                    SIMULATED_LOG_SERVICE_PROP_KEY_BASE,
                                    rioLogMonitor.getClass().getSimpleName(),
@@ -69,7 +69,7 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         }
         else
         {
-            rioLogMonitor = new UdpRioLogMonitor();
+            rioLogMonitor = new UdpRioLogMonitoringRunnable();
             LOG.info(String.format("[FRC] Using '%s' for monitoring on port '%d'.",
                                    rioLogMonitor.getClass().getSimpleName(),
                                    rioLogMonitor.getPort()));
@@ -78,17 +78,17 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
     }
 
 
-    private class UdpRioLogMonitor extends AbstractMonitoringRunnable
+    private class UdpRioLogMonitoringRunnable extends AbstractRioLogMonitoringRunnable
     {
 
 
-        protected UdpRioLogMonitor()
+        protected UdpRioLogMonitoringRunnable()
         {
             this(getSettings().getRioLogUdpPort());
         }
 
 
-        public UdpRioLogMonitor(int port)
+        public UdpRioLogMonitoringRunnable(int port)
         {
             super(port);
         }
@@ -239,12 +239,12 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
     }
 
 
-    private class TestingUdpRioLogMonitor extends UdpRioLogMonitor
+    private class TestingUdpRioLogMonitoringRunnable extends UdpRioLogMonitoringRunnable
     {
         private final InetAddress groupAddress;
 
 
-        public TestingUdpRioLogMonitor()
+        public TestingUdpRioLogMonitoringRunnable()
         {
             super(determineTestPort());
 

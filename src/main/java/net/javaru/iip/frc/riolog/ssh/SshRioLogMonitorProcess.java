@@ -74,10 +74,10 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
 
     @NotNull
     @Override
-    protected MonitoringRunnable initMonitoringRunnable()
+    protected RioLogMonitoringRunnable initMonitoringRunnable()
     {
         //Long term to do - make port configurable
-        return new SshRioLogMonitor(22);
+        return new SshRioLogMonitoringRunnable(22);
     }
 
 
@@ -166,9 +166,9 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
             ;
     }
 
-    private class SshRioLogMonitor extends AbstractMonitoringRunnable
+    private class SshRioLogMonitoringRunnable extends AbstractRioLogMonitoringRunnable
     {
-        SshRioLogMonitor(int port)
+        SshRioLogMonitoringRunnable(int port)
         {
             super(port);
         }
@@ -215,7 +215,7 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
                     }
                     catch (InterruptedException e)
                     {
-                        LOG.debug("[FRC] InterruptedException in SshRioLogMonitor.run(). Calling 'stop().");
+                        LOG.debug("[FRC] InterruptedException in SshRioLogMonitoringRunnable.run(). Calling 'stop().");
                         isRunning = false;
                         enabled = false;
                         stop();

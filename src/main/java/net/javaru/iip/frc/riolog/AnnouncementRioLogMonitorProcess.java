@@ -45,15 +45,15 @@ public class AnnouncementRioLogMonitorProcess extends AbstractRioLogMonitorProce
 
     @NotNull
     @Override
-    protected MonitoringRunnable initMonitoringRunnable()
+    protected RioLogMonitoringRunnable initMonitoringRunnable()
     {
-        return new AnnouncementMonitoringRunnable();
+        return new AnnouncementRioLogMonitoringRunnable();
     }
     
-    class AnnouncementMonitoringRunnable extends AbstractMonitoringRunnable
+    class AnnouncementRioLogMonitoringRunnable extends AbstractRioLogMonitoringRunnable
     {
 
-        protected AnnouncementMonitoringRunnable()
+        protected AnnouncementRioLogMonitoringRunnable()
         {
             super(0);
         }

@@ -239,6 +239,7 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
 
     class JSchSShTailer
     {
+        private final Logger LOG = Logger.getInstance(JSchSShTailer.class);
         private AtomicBoolean running = new AtomicBoolean(false);
 
         private final ConnectionConfig connectionConfig = new ConnectionConfig();
@@ -581,9 +582,12 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
     }
 
 
-    //TODO Allow for custom settings
+    
     public class ConnectionConfig implements UserInfo
     {
+        //TODO Allow for custom settings
+
+        private final Logger LOG = Logger.getInstance(ConnectionConfig.class);
         private final boolean useStrictHostKeyChecking = false;
         private final int port = 22;
         private Path knownHostsFilePath = Paths.get(System.getProperty("user.home", "C:\\Users\\Public"))

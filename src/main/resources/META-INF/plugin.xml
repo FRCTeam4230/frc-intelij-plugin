@@ -183,6 +183,7 @@
         <applicationService id="FRC.FrcSshSettings"             serviceImplementation="net.javaru.iip.frc.settings.FrcSshSettings" />
         
         <applicationService id="FRC.RioLogUdpSocketManagerApplicationService" serviceImplementation="net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService" />
+        <applicationService id="FRC.TcpRioSocketConnectorApplicationService" serviceImplementation="net.javaru.iip.frc.riolog.tcp.TcpRioSocketConnectorApplicationService" />
         
         <applicationConfigurable id="FRC.FrcApplicationSettingsConfigurable" instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable" groupId="language" />
 
@@ -190,6 +191,10 @@
         <projectService id="FRC.RioLogConsoleProjectService"
                         serviceInterface="net.javaru.iip.frc.riolog.RioLogProjectService"
                         serviceImplementation="net.javaru.iip.frc.riolog.RioLogProjectService" />
+
+        <projectService id="FRC.TcpRioLogConsoleProjectService"
+                        serviceInterface="net.javaru.iip.frc.riolog.tcp.TcpRioLogMonitorProjectService"
+                        serviceImplementation="net.javaru.iip.frc.riolog.tcp.TcpRioLogMonitorProjectService" />
 
         <projectService id="FRC.UdpRioLogConsoleProjectService"
                         serviceInterface="net.javaru.iip.frc.riolog.udp.UdpRioLogMonitorProjectService"
@@ -337,13 +342,16 @@
                icon="/icons/riolog/riolog.png"
                >
 
+            <action id="frc.tools.ShowTcp"
+                    text="Net Console"
+                    class="net.javaru.iip.frc.actions.tools.ShowRioLogTcpConsoleAction" />
+            
             <action id="frc.tools.ShowSsh"
                     text="SSH tailing (alternative RIOLog monitoring technique)"
                     class="net.javaru.iip.frc.actions.tools.ShowRioLogSshConsoleAction" />
             
-            <!-- text="Legacy Net Console (2017 and older)" -->
             <action id="frc.tools.ShowUdp"
-                    text="Net Console"
+                    text="Legacy Net Console (2017 and older)"
                     class="net.javaru.iip.frc.actions.tools.ShowRioLogUdpConsoleAction" />
             <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="first" />
         </group>

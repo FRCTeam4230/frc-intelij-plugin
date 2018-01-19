@@ -24,10 +24,12 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.xmlb.XmlSerializerUtil
+import net.javaru.iip.frc.util.ipAddressToByteArray
 
 
 private const val ROBORIO_HOST_mDNS_TEMPLATE = "roborio-%d-FRC.local"
 private const val ROBORIO_HOST_DNS_TEMPLATE = "roborio-%d-FRC.lan"
+private const val ROBORIO_HOST_FIELD_LOCAL_TEMPLATE = "roborio-%d-FRC.frc-field.local"
 private const val ROBORIO_HOST_IP_TEMPLATE = "10.%d.%d.2"
 private const val ROBORIO_HOST_USB_DEFAULT = "172.22.11.2"
 private const val USE_DEFAULT_HOST_PLACEHOLDER = "<<<Use Default Host>>>"
@@ -46,7 +48,8 @@ enum class RoboRioConnectionType
 data class FrcRoboRioSettings(var roboRioHostRawMDns: String = USE_DEFAULT_HOST_PLACEHOLDER,
                               var roboRioHostRawDns: String = USE_DEFAULT_HOST_PLACEHOLDER,
                               var roboRioHostRawIp: String = USE_DEFAULT_HOST_PLACEHOLDER,
-                              var roboRioHostRawUsb: String = USE_DEFAULT_HOST_PLACEHOLDER
+                              var roboRioHostRawUsb: String = USE_DEFAULT_HOST_PLACEHOLDER,
+                              var roboRioHostRawFieldLocal: String = USE_DEFAULT_HOST_PLACEHOLDER
                              ) : PersistentStateComponent<FrcRoboRioSettings>
 {
     @Suppress("unused", "MemberVisibilityCanPrivate")
@@ -146,6 +149,40 @@ data class FrcRoboRioSettings(var roboRioHostRawMDns: String = USE_DEFAULT_HOST_
     fun isRoboRioHostTheDefault_DNS(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawDns
 
 
+    // ==== FieldLocal Host Helpers ====
+
+    fun setRoboRioHost_FieldLocal(roboRioHostFieldLocal: String)
+    {
+        roboRioHostRawFieldLocal =
+                if (getRoboRioHostDefault_FieldLocal() == roboRioHostFieldLocal)
+                {
+                    USE_DEFAULT_HOST_PLACEHOLDER
+                }
+                else
+                {
+                    roboRioHostFieldLocal
+                }
+    }
+
+    fun getRoboRioHost_FieldLocal(): String
+    {
+        return if (USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawFieldLocal)
+        {
+            getRoboRioHostDefault_FieldLocal()
+        }
+        else
+        {
+            roboRioHostRawFieldLocal
+        }
+    }
+
+    fun getRoboRioHostDefault_FieldLocal(frcApplicationSettings: FrcApplicationSettings = FrcApplicationSettings.INSTANCE()): String = createRoboRioHostDefault_FieldLocal(frcApplicationSettings.teamNumber)
+
+    fun createRoboRioHostDefault_FieldLocal(teamNumber: Int): String = String.format(ROBORIO_HOST_FIELD_LOCAL_TEMPLATE, teamNumber)
+
+    fun isRoboRioHostTheDefault_FieldLocal(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawFieldLocal
+
+
     // ==== IP Host Helpers ====
 
     fun setRoboRioHost_IP(roboRioHostIp: String)
@@ -171,6 +208,11 @@ data class FrcRoboRioSettings(var roboRioHostRawMDns: String = USE_DEFAULT_HOST_
         {
             roboRioHostRawIp
         }
+    }
+
+    fun getRoboRioHost_IP_asIpByteArray(): ByteArray
+    {
+        return getRoboRioHost_IP().ipAddressToByteArray();
     }
 
     fun getRoboRioHostDefault_IP(frcApplicationSettings: FrcApplicationSettings = FrcApplicationSettings.INSTANCE()): String = createRoboRioHostDefault_IP(frcApplicationSettings.teamNumber)
@@ -211,6 +253,11 @@ data class FrcRoboRioSettings(var roboRioHostRawMDns: String = USE_DEFAULT_HOST_
         }
     }
 
+    fun getRoboRioHost_USB_asIpByteArray(): ByteArray
+    {
+        return getRoboRioHost_USB().ipAddressToByteArray()
+    }
+    
     fun getRoboRioHostDefault_USB(): String = ROBORIO_HOST_USB_DEFAULT
 
 

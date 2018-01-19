@@ -35,6 +35,7 @@ import java.util.Date;
 
 import org.apache.commons.io.output.NullOutputStream;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -177,7 +178,7 @@ public abstract class AbstractRioLogMonitorProcess extends Process
 
     public int getMonitoredPort()
     {
-        return rioLogMonitor == null ? -1 : rioLogMonitor.getPort();
+        return rioLogMonitor == null || rioLogMonitor.getPort() == null ? -1 : rioLogMonitor.getPort();
     }
 
 
@@ -314,7 +315,8 @@ public abstract class AbstractRioLogMonitorProcess extends Process
 
     protected interface RioLogMonitoringRunnable extends Runnable
     {
-        int getPort();
+        @Nullable
+        Integer getPort();
 
         boolean isRunning();
 
@@ -325,11 +327,12 @@ public abstract class AbstractRioLogMonitorProcess extends Process
 
     protected abstract class AbstractRioLogMonitoringRunnable implements RioLogMonitoringRunnable
     {
-        protected final int port;
+        @Nullable
+        protected final Integer port;
         protected boolean isRunning = true;
 
 
-        protected AbstractRioLogMonitoringRunnable(int port) {this.port = port;}
+        protected AbstractRioLogMonitoringRunnable(@Nullable Integer port) {this.port = port;}
 
 
         protected void processReceivedText(String received)
@@ -364,7 +367,8 @@ public abstract class AbstractRioLogMonitorProcess extends Process
 
 
         @Override
-        public int getPort() { return port; }
+        @Nullable
+        public Integer getPort() { return port; }
 
 
         protected void logStartingMonitoring()

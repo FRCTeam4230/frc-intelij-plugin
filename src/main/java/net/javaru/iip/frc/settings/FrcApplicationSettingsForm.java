@@ -16,12 +16,9 @@
 
 package net.javaru.iip.frc.settings;
 
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import javax.swing.*;
 
@@ -58,9 +55,9 @@ public class FrcApplicationSettingsForm
     private JBTextField roboRioIpAddress;
     private JButton roboRioIpAddressDefaultValueButton;
     private JPanel rioLogOutputPanel;
-    private JPanel udpRioLogSettingsPanel;
-    private JBTextField rioLogPortTextField;
-    private JButton portToDefaultValueButton;
+//    private JPanel udpRioLogSettingsPanel;
+//    private JBTextField rioLogPortTextField;
+//    private JButton portToDefaultValueButton;
     private JPanel sshRioLogSettingsPanel;
     private JBTextField sshUsername;
     private JBPasswordField sshPassword;
@@ -68,6 +65,8 @@ public class FrcApplicationSettingsForm
     private JButton tailCommandToDefaultValueButton;
     private JButton sshUsernameToDefaultButton;
     private JButton sshPasswordToDefaultButton;
+    private JBTextField roboRioFieldLocalHostName;
+    private JButton fieldLocalHostNameDefaultValueButton;
 
 
     public FrcApplicationSettingsForm()
@@ -82,12 +81,12 @@ public class FrcApplicationSettingsForm
     private void initForm()
     {
 //        initRioLogTargetWindowRadioButtons();
-        initPortTextField();
+//        initPortTextField();
         initTeamNumberField();
         initRoboRioComponents();
         initSshSettingComponents();
 
-        portToDefaultValueButton.addActionListener(e -> setUdpPortToDefault());
+//        portToDefaultValueButton.addActionListener(e -> setUdpPortToDefault());
     }
 
 
@@ -112,7 +111,7 @@ public class FrcApplicationSettingsForm
 //        resetRioLogTargetWindowRadioButtons();
         resetTeamNumberTextFieldValue();
         resetRoboRioHostFields();
-        resetPortTextField();
+//        resetPortTextField();
         resetSshSettingsFields();
     }
     
@@ -199,6 +198,7 @@ public class FrcApplicationSettingsForm
 
                         if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_mDNS()) { roboRioMDnsHostName.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_mDNS(internalFrcApplicationSettings)); }
                         if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_DNS()) { roboRioDnsHostName.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_DNS(internalFrcApplicationSettings)); }
+                        if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_FieldLocal()) { roboRioFieldLocalHostName.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_FieldLocal(internalFrcApplicationSettings)); }
                         if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_USB()) { roboRioStaticUsbIp.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_USB()); }
                         if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_IP()) { roboRioIpAddress.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_IP(internalFrcApplicationSettings)); }
                     }
@@ -226,99 +226,99 @@ public class FrcApplicationSettingsForm
     }
 
     
-    private void initPortTextField()
-    {
-        resetPortTextField();
-
-        rioLogPortTextField.addFocusListener(new FocusListener()
-        {
-            @Override
-            public void focusGained(FocusEvent e) { }
-
-
-            @Override
-            public void focusLost(FocusEvent e)
-            {
-                final String text = rioLogPortTextField.getText();
-                try
-                {
-                    internalFrcApplicationSettings.setRioLogUdpPort(DecimalFormat.getIntegerInstance().parse(text).intValue());
-                }
-                catch (ParseException e1)
-                {
-                    LOG.warn("[FRC] Could not parse the value '" + text + "' as an integer. Setting field and port to default value.");
-                    setUdpPortToDefault();
-                }
-            }
-        });
-
-        rioLogPortTextField.setInputVerifier(new InputVerifier()
-        {
-            @Override
-            public boolean verify(JComponent input)
-            {
-                final JTextField textField = (JTextField) input;
-                final String text = textField.getText();
-                try
-                {
-                    final Number number = DecimalFormat.getIntegerInstance().parse(text);
-                    final int i = number.intValue();
-                    return (i >= 0 && i <= 65_535);
-                }
-                catch (ParseException e)
-                {
-                    return false;
-                }
-            }
-        });
-
-        rioLogPortTextField.addKeyListener(new KeyListener()
-        {
-
-            private String previousText = rioLogPortTextField.getText();
-            private NumberFormat formatter = DecimalFormat.getIntegerInstance();
-
-
-            public void keyTyped(KeyEvent e) { }
-
-
-            @Override
-            public void keyPressed(KeyEvent e) { }
-
-
-            @Override
-            public void keyReleased(KeyEvent e)
-            {
-                String text = rioLogPortTextField.getText();
-                if (!StringUtils.isNotBlank(text))
-                {
-                    previousText = text;
-                }
-                else
-                {
-                    try
-                    {
-                        final Number number = formatter.parse(text);
-                        String formattedText = formatter.format(number);
-                        rioLogPortTextField.setText(formattedText);
-                        previousText = formattedText;
-                        internalFrcApplicationSettings.setRioLogUdpPort(number.intValue());
-                    }
-                    catch (ParseException ignore)
-                    {
-                        //not a valid integer....
-                        rioLogPortTextField.setText(previousText);
-                    }
-                }
-            }
-        });
-    }
-
-
-    private void resetPortTextField()
-    {
-        rioLogPortTextField.setText(DecimalFormat.getIntegerInstance().format(internalFrcApplicationSettings.getRioLogUdpPort()));
-    }
+//    private void initPortTextField()
+//    {
+//        resetPortTextField();
+//
+//        rioLogPortTextField.addFocusListener(new FocusListener()
+//        {
+//            @Override
+//            public void focusGained(FocusEvent e) { }
+//
+//
+//            @Override
+//            public void focusLost(FocusEvent e)
+//            {
+//                final String text = rioLogPortTextField.getText();
+//                try
+//                {
+//                    internalFrcApplicationSettings.setRioLogUdpPort(DecimalFormat.getIntegerInstance().parse(text).intValue());
+//                }
+//                catch (ParseException e1)
+//                {
+//                    LOG.warn("[FRC] Could not parse the value '" + text + "' as an integer. Setting field and port to default value.");
+//                    setUdpPortToDefault();
+//                }
+//            }
+//        });
+//
+//        rioLogPortTextField.setInputVerifier(new InputVerifier()
+//        {
+//            @Override
+//            public boolean verify(JComponent input)
+//            {
+//                final JTextField textField = (JTextField) input;
+//                final String text = textField.getText();
+//                try
+//                {
+//                    final Number number = DecimalFormat.getIntegerInstance().parse(text);
+//                    final int i = number.intValue();
+//                    return (i >= 0 && i <= 65_535);
+//                }
+//                catch (ParseException e)
+//                {
+//                    return false;
+//                }
+//            }
+//        });
+//
+//        rioLogPortTextField.addKeyListener(new KeyListener()
+//        {
+//
+//            private String previousText = rioLogPortTextField.getText();
+//            private NumberFormat formatter = DecimalFormat.getIntegerInstance();
+//
+//
+//            public void keyTyped(KeyEvent e) { }
+//
+//
+//            @Override
+//            public void keyPressed(KeyEvent e) { }
+//
+//
+//            @Override
+//            public void keyReleased(KeyEvent e)
+//            {
+//                String text = rioLogPortTextField.getText();
+//                if (!StringUtils.isNotBlank(text))
+//                {
+//                    previousText = text;
+//                }
+//                else
+//                {
+//                    try
+//                    {
+//                        final Number number = formatter.parse(text);
+//                        String formattedText = formatter.format(number);
+//                        rioLogPortTextField.setText(formattedText);
+//                        previousText = formattedText;
+//                        internalFrcApplicationSettings.setRioLogUdpPort(number.intValue());
+//                    }
+//                    catch (ParseException ignore)
+//                    {
+//                        //not a valid integer....
+//                        rioLogPortTextField.setText(previousText);
+//                    }
+//                }
+//            }
+//        });
+//    }
+//
+//
+//    private void resetPortTextField()
+//    {
+//        rioLogPortTextField.setText(DecimalFormat.getIntegerInstance().format(internalFrcApplicationSettings.getRioLogUdpPort()));
+//    }
 
 
     private void initRoboRioComponents()
@@ -370,9 +370,32 @@ public class FrcApplicationSettingsForm
         });
         dnsHostNameDefaultValueButton.addActionListener(e ->
                                                         {
-                                                            final String defaultValue = internalFrcRoboRioSettings.getRoboRioHostDefault_mDNS(internalFrcApplicationSettings);
+                                                            final String defaultValue = internalFrcRoboRioSettings.getRoboRioHostDefault_DNS(internalFrcApplicationSettings);
                                                             roboRioDnsHostName.setText(defaultValue);
                                                             internalFrcRoboRioSettings.setRoboRioHost_DNS(defaultValue);
+                                                        });
+
+        roboRioFieldLocalHostName.addKeyListener(new KeyListener()
+        {
+            @Override
+            public void keyTyped(KeyEvent e) { }
+
+
+            @Override
+            public void keyPressed(KeyEvent e) { }
+
+
+            @Override
+            public void keyReleased(KeyEvent e)
+            {
+                internalFrcRoboRioSettings.setRoboRioHost_FieldLocal(roboRioFieldLocalHostName.getText());
+            }
+        });
+        fieldLocalHostNameDefaultValueButton.addActionListener(e ->
+                                                        {
+                                                            final String defaultValue = internalFrcRoboRioSettings.getRoboRioHostDefault_FieldLocal(internalFrcApplicationSettings);
+                                                            roboRioFieldLocalHostName.setText(defaultValue);
+                                                            internalFrcRoboRioSettings.setRoboRioHost_FieldLocal(defaultValue);
                                                         });
 
         
@@ -429,6 +452,7 @@ public class FrcApplicationSettingsForm
     {
         roboRioMDnsHostName.setText(internalFrcRoboRioSettings.getRoboRioHost_mDNS());
         roboRioDnsHostName.setText(internalFrcRoboRioSettings.getRoboRioHost_DNS());
+        roboRioFieldLocalHostName.setText(internalFrcRoboRioSettings.getRoboRioHost_FieldLocal());
         roboRioIpAddress.setText(internalFrcRoboRioSettings.getRoboRioHost_IP());
         roboRioStaticUsbIp.setText(internalFrcRoboRioSettings.getRoboRioHost_USB());
     }
@@ -515,11 +539,11 @@ public class FrcApplicationSettingsForm
     }
 
 
-    private void setUdpPortToDefault()
-    {
-        rioLogPortTextField.setText(DecimalFormat.getIntegerInstance().format(FrcApplicationSettingsKt.DEFAULT_RIO_LOG_UDP_PORT));
-        internalFrcApplicationSettings.setRioLogUdpPort(FrcApplicationSettingsKt.DEFAULT_RIO_LOG_UDP_PORT);
-    }
+//    private void setUdpPortToDefault()
+//    {
+//        rioLogPortTextField.setText(DecimalFormat.getIntegerInstance().format(FrcApplicationSettingsKt.DEFAULT_RIO_LOG_UDP_PORT));
+//        internalFrcApplicationSettings.setRioLogUdpPort(FrcApplicationSettingsKt.DEFAULT_RIO_LOG_UDP_PORT);
+//    }
 
 
 //    private void initRioLogTargetWindowRadioButtons()

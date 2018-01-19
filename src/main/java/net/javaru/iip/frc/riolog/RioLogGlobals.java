@@ -23,7 +23,8 @@ import java.util.regex.Pattern;
 public class RioLogGlobals
 {
 
-    public static final String UDP_TAB_TITLE = "RIOLog: Net Console";
+    public static final String TCP_TAB_TITLE = "RIOLog: Net Console";
+    public static final String UDP_TAB_TITLE = "RIOLog: Legacy Net Console";
     public static final String SSH_TAB_TITLE = "RIOLog: SSH Tailing";
 
     public static final String DEFAULT_TAIL_COMMAND = "tail -f /home/lvuser/FRC_UserProgram.log";

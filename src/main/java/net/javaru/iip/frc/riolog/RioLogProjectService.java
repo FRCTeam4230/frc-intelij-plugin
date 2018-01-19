@@ -26,6 +26,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 
 import net.javaru.iip.frc.riolog.ssh.SshRioLogMonitorProjectService;
+import net.javaru.iip.frc.riolog.tcp.TcpRioLogMonitorProjectService;
 import net.javaru.iip.frc.riolog.udp.UdpRioLogMonitorProjectService;
 
 
@@ -51,6 +52,7 @@ public class RioLogProjectService
 
     private final AbstractRioLogMonitorProjectService udpRioLogConsoleProjectService;
     private final AbstractRioLogMonitorProjectService sshRioLogConsoleProjectService;
+    private final AbstractRioLogMonitorProjectService tcpRioLogConsoleProjectService;
 
     @Nullable
     private AbstractRioLogContentExecutor udpContentExecutor;
@@ -203,6 +205,64 @@ public class RioLogProjectService
         if (project != null)
         {
             getInstance(project).updateUdp();
+        }
+    }
+
+    /**
+     * A null safe convenience static utility method for {@link #updateTcp() updating} the RioLog Condole for a facet.
+     * Equivalent to calling:<br/><br/>
+     * <pre>
+     * ServiceManager.getService(facet.getModule().getProject(), RioLogProjectService.class).updateTcp();
+     * </pre>
+     * but with full null safety
+     *
+     * @param facet the facet
+     */
+    public static void updateTcp(@Nullable Facet facet)
+    {
+        if (facet != null)
+        {
+            final Module module = facet.getModule();
+            updateTcp(module);
+        }
+    }
+
+
+    /**
+     * A null safe convenience static utility method for {@link #updateTcp() updating} the RioLog Condole for a module.
+     * Equivalent to calling:<br/><br/>
+     * <pre>
+     * ServiceManager.getService(module.getProject(), RioLogProjectService.class).updateTcp();
+     * </pre>
+     * but with full null safety
+     *
+     * @param module the module
+     */
+    public static void updateTcp(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final Project project = module.getProject();
+            updateTcp(project);
+        }
+    }
+
+
+    /**
+     * A null safe convenience static utility method for {@link #updateTcp() updating} the RioLog Condole for a project.
+     * Equivalent to calling:<br/><br/>
+     * <pre>
+     * ServiceManager.getService(project, RioLogProjectService.class).updateTcp();
+     * </pre>
+     * but with full null safety
+     *
+     * @param project the project
+     */
+    public static void updateTcp(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            getInstance(project).updateTcp();
         }
     }
 
@@ -381,6 +441,63 @@ public class RioLogProjectService
         }
     }
 
+    public static void activateTcpSafely(@Nullable Facet facet)
+    {
+        if (facet != null)
+        {
+            final Project project = facet.getModule().getProject();
+            getInstance(project).activateTcpSafely();
+        }
+    }
+
+
+    public static void activateTcpSafely(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final Project project = module.getProject();
+            getInstance(project).activateTcpSafely();
+        }
+    }
+
+
+    public static void activateTcpSafely(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            getInstance(project).activateTcpSafely();
+        }
+    }
+
+
+    public static void activateTcpNow(@Nullable Facet facet)
+    {
+        if (facet != null)
+        {
+            final Project project = facet.getModule().getProject();
+            getInstance(project).activateTcpNow();
+        }
+    }
+
+
+    public static void activateTcpNow(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final Project project = module.getProject();
+            getInstance(project).activateTcpNow();
+        }
+    }
+
+
+    public static void activateTcpNow(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            getInstance(project).activateTcpNow();
+        }
+    }
+
     public static void activateSshSafely(@Nullable Facet facet)
     {
         if (facet != null)
@@ -465,6 +582,32 @@ public class RioLogProjectService
         }
     }
 
+    public static void stopTcp(@Nullable Facet facet)
+    {
+        if (facet != null)
+        {
+            final Project project = facet.getModule().getProject();
+            getInstance(project).stopTcp();
+        }
+    }
+
+    public static void stopTcp(@Nullable Module module)
+    {
+        if (module != null)
+        {
+            final Project project = module.getProject();
+            getInstance(project).stopTcp();
+        }
+    }
+
+    public static void stopTcp(@Nullable Project project)
+    {
+        if (project != null)
+        {
+            getInstance(project).stopTcp();
+        }
+    }
+
     public static void stopSsh(@Nullable Facet facet)
     {
         if (facet != null)
@@ -506,6 +649,15 @@ public class RioLogProjectService
         for (Project project : openProjects)
         {
             stopUdp(project);
+        }
+    }
+    
+    public static void stopTcpForAllOpenProjects()
+    {
+        final Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+        for (Project project : openProjects)
+        {
+            stopTcp(project);
         }
     }
     
@@ -594,6 +746,7 @@ public class RioLogProjectService
         this.myProject = myProject;
         this.udpRioLogConsoleProjectService = UdpRioLogMonitorProjectService.getInstance(myProject);
         this.sshRioLogConsoleProjectService = SshRioLogMonitorProjectService.getInstance(myProject);
+        this.tcpRioLogConsoleProjectService = TcpRioLogMonitorProjectService.getInstance(myProject);
     }
 
 
@@ -605,6 +758,7 @@ public class RioLogProjectService
     {
         sshRioLogConsoleProjectService.update();
         udpRioLogConsoleProjectService.update();
+        tcpRioLogConsoleProjectService.update();
     }
 
     public synchronized void updateUdp()
@@ -617,11 +771,13 @@ public class RioLogProjectService
         sshRioLogConsoleProjectService.update();
     }
 
+    public synchronized void updateTcp() { tcpRioLogConsoleProjectService.update(); }
 
     public void activateBothSafely()
     {
         sshRioLogConsoleProjectService.activateSafely();
         udpRioLogConsoleProjectService.activateSafely();
+        tcpRioLogConsoleProjectService.activateSafely();
     }
 
 
@@ -629,6 +785,7 @@ public class RioLogProjectService
     {
         sshRioLogConsoleProjectService.activateNow();
         udpRioLogConsoleProjectService.activateNow();
+        tcpRioLogConsoleProjectService.activateNow();
     }
 
 
@@ -637,10 +794,20 @@ public class RioLogProjectService
         udpRioLogConsoleProjectService.activateSafely();
     }
 
+    public void activateTcpSafely()
+    {
+        tcpRioLogConsoleProjectService.activateSafely();
+    }
+
 
     public void activateUdpNow()
     {
         udpRioLogConsoleProjectService.activateNow();
+    }
+
+    public void activateTcpNow()
+    {
+        tcpRioLogConsoleProjectService.activateNow();
     }
 
     public void activateSshSafely()
@@ -659,10 +826,16 @@ public class RioLogProjectService
     {
         sshRioLogConsoleProjectService.closeContentExecutor();
         udpRioLogConsoleProjectService.closeContentExecutor();
+        tcpRioLogConsoleProjectService.closeContentExecutor();
     }
     
     
     public void stopUdp()
+    {
+        udpRioLogConsoleProjectService.stop();
+    }
+    
+    public void stopTcp()
     {
         udpRioLogConsoleProjectService.stop();
     }
@@ -676,5 +849,6 @@ public class RioLogProjectService
     {
         stopSsh();
         stopUdp();
+        stopTcp();
     }
 }

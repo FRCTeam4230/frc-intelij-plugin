@@ -70,9 +70,13 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         else
         {
             rioLogMonitor = new UdpRioLogMonitoringRunnable();
-            LOG.info(String.format("[FRC] Using '%s' for monitoring on port '%d'.",
-                                   rioLogMonitor.getClass().getSimpleName(),
-                                   rioLogMonitor.getPort()));
+            final String message = rioLogMonitor.getPort() != null
+                                   ? String.format("[FRC] Using '%s' for monitoring on port '%d'.",
+                                                   rioLogMonitor.getClass().getSimpleName(),
+                                                   rioLogMonitor.getPort())
+                                   : String.format("[FRC] Using '%s' for monitoring.",
+                                                   rioLogMonitor.getClass().getSimpleName());
+            LOG.info(message);
         }
         return rioLogMonitor;
     }
@@ -169,13 +173,24 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         @NotNull
         protected String getStartingMonitoringMessage() 
         {
-            return
-                get2018ChangeMessage() + "==Monitoring RioLog on port " + getPort() + "==";
+            StringBuilder sb = new StringBuilder();
+            sb.append(get2018ChangeMessage());
+            sb.append("==Monitoring RioLog");
+            if (getPort() != null)
+            {
+                sb.append(" on port ").append(getPort());
+            }
+            sb.append("==");
+            return sb.toString();
         }
 
 
         protected DatagramSocket createSocket() throws IOException
         {
+            if (getPort() == null)
+            {
+                throw new IllegalStateException("port is null");
+            }
             // We try to create the socket doing a retry after 1 second on the first BindException
             LOG.debug("[FRC] Creating DatagramSocket with port " + getPort());
             DatagramSocket socket;
@@ -264,6 +279,11 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         @Override
         protected DatagramSocket createSocket() throws IOException
         {
+            if (getPort() == null)
+            {
+                throw new IOException("port is null");
+            }
+                
             MulticastSocket socket = new MulticastSocket(getPort());
             socket.joinGroup(groupAddress);
             return socket;

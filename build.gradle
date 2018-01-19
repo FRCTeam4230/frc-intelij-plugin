@@ -166,8 +166,8 @@ dependencies {
   compile group: 'org.jetbrains.kotlin', name: 'kotlin-runtime', version: kotlin_version
   testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test', version: kotlin_version
   compile 'org.jdom:jdom2:2.0.6'
-  compile 'commons-io:commons-io:2.5'
-  compile 'org.apache.commons:commons-lang3:3.5'
+  compile 'commons-io:commons-io:2.6'
+  compile 'org.apache.commons:commons-lang3:3.7'
   compile 'com.jcraft:jsch:0.1.54'
   testCompile("org.junit.jupiter:junit-jupiter-api:5.0.2")
   testCompile("org.junit.jupiter:junit-jupiter-params:5.0.2")

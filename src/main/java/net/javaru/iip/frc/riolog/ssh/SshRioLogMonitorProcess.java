@@ -76,7 +76,6 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
     @Override
     protected RioLogMonitoringRunnable initMonitoringRunnable()
     {
-        //Long term to do - make port configurable
         return new SshRioLogMonitoringRunnable(22);
     }
 
@@ -155,10 +154,6 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
     public static String getExperimentalFeatureMessage()
     {
         return "\n\n"
-//               + "************************************************************************************************************************\n"
-//               + "** This is an Experimental Feature. Please report issues at https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues **\n"
-//               + "************************************************************************************************************************\n"
-//               + "\n"
                + "This console will make an SSH connection to the roboRIO, then run a tail -f command on the Robot program's log file.\n"
                + "It will sequentially try the four different URL's (mDNS, DNS, USB, IP) that can be used to connect to the roboRIO,\n"
                + "starting with the last known good host (once a connection has been made for the current project while open.)\n"
@@ -372,6 +367,7 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
 
             private void connect()
             {
+                
                 //disconnect any previously existing sessions/channels
                 disconnectFully();
                 this.session = null;
@@ -385,7 +381,7 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
 
                 if (!isConnectedFully())
                 {
-                    // TODO - make connection order configurable
+                    // TODO - make connection order configurable, or preferably let's make them in parallel now that the proof of concept has proven out
                     final Iterator<String> hosts = Iterators.forArray(FrcRoboRioSettings.Settings.INSTANCE().getRoboRioHost_mDNS(),
                                                                       FrcRoboRioSettings.Settings.INSTANCE().getRoboRioHost_DNS(),
                                                                       FrcRoboRioSettings.Settings.INSTANCE().getRoboRioHost_USB(),

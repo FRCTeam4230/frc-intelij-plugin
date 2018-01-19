@@ -35,8 +35,23 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings;
 
 
 
+/**
+ * Service that manages RioLog monitoring. 
+ */
 public abstract class AbstractRioLogMonitorProjectService
 {
+
+    // TODO: This class needs a some refactoring/rework. 
+    //       It's kind of grown into a mess as it was written when first starting 
+    //       out with less understanding of the IntelliJ IDEA plugin API. And the
+    //       idea of having an option to appear in the Run Tool Window as an option
+    //       isn't really adding much as a feature since in normal robot dev work
+    //       you are not doing much in the run window. _Maybe_ an option to have
+    //       it as a tab in the debug window might be cool... but a low priority
+    //       Also, its not acting as a ProjectService but more an ApplicationService
+    //       We need to fix that and have better cross project support in the event 
+    //       multiple FRC projects are open
+    
     private static final Logger LOG = Logger.getInstance(AbstractRioLogMonitorProjectService.class);
     @NotNull
     protected final Project myProject;
@@ -50,6 +65,7 @@ public abstract class AbstractRioLogMonitorProjectService
 
     public synchronized void update()
     {
+        // TODO change so the "usage" message show every time the window is opened (not activated, but opened), not just on project open. In other words, lets; not auto start the monitoring upon window open.
         boolean isFirstRun = isFirstRunFlag.getAndSet(false);
         
         final Module[] modules = ModuleManager.getInstance(myProject).getModules();
@@ -66,8 +82,7 @@ public abstract class AbstractRioLogMonitorProjectService
 
         final FrcApplicationSettings frcSettings = FrcApplicationSettings.Settings.INSTANCE();
         final boolean useRunWindow = !frcSettings.getUseFrcToolWindow();
-
-        // TODO: Move to application service so it works across multiple projects
+        
         final int configuredPort = frcSettings.getRioLogUdpPort();
         final int currentPort = determineCurrentlyMonitoredPort();
         final boolean portBounceNeeded = currentPort != -1 && currentPort != configuredPort;

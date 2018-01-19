@@ -32,8 +32,8 @@ public class ShowRioLogSshConsoleAction extends AbstractFrcToolsAction implement
         final Project project = actionEvent.getProject();
         if (project != null)
         {
-            RioLogProjectService.updateSsh(project);
-            RioLogProjectService.activateSshSafely(project);
+            RioLogProjectService.getInstance(project).updateSsh();
+            RioLogProjectService.getInstance(project).activateSshSafely();
         }
     }
 }

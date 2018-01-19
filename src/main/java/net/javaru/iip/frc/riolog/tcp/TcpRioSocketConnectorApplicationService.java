@@ -40,6 +40,12 @@ import com.intellij.openapi.diagnostic.Logger;
 import net.javaru.iip.frc.settings.FrcRoboRioSettings;
 
 
+/* 
+    "Based on" (well mostly directly ported over from) the RioConnector class
+    https://github.com/wpilibsuite/riolog/blob/master/src/main/java/netconsole2/RioConnector.java
+    https://github.com/wpilibsuite/EclipsePlugins/blob/master/edu.wpi.first.wpilib.plugins.riolog/src/netconsole2/RioConnector.java
+*/
+
 public class TcpRioSocketConnectorApplicationService
 {
     private static final Logger LOG = Logger.getInstance(TcpRioSocketConnectorApplicationService.class);

@@ -39,9 +39,9 @@ public class TcpRioLogMonitorProjectService extends AbstractRioLogMonitorProject
     /**
      * Do not call the constructor directly. Use as a project service via {@code com.intellij.openapi.components.ServiceManager}:<br/>
      * <pre>
-     * final RioLogProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogProjectService.class);
+     * final AbstractRioLogMonitorProjectService rioLogConsoleProjectService = ServiceManager.getService(project, TcpRioLogMonitorProjectService.class);
      * </pre>
-     *
+     * or use the {@link #getInstance(Project)} convenience method
      * @param myProject the project
      */
     private TcpRioLogMonitorProjectService(@NotNull Project myProject)

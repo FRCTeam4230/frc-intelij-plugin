@@ -30,8 +30,6 @@ public class UdpRioLogMonitorProjectService extends AbstractRioLogMonitorProject
 {
     private static final Logger LOG = Logger.getInstance(UdpRioLogMonitorProjectService.class);
 
-
-    // See http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_services.html for more information
     public static UdpRioLogMonitorProjectService getInstance(@NotNull Project project)
     {
         return ServiceManager.getService(project, UdpRioLogMonitorProjectService.class);
@@ -41,9 +39,9 @@ public class UdpRioLogMonitorProjectService extends AbstractRioLogMonitorProject
     /**
      * Do not call the constructor directly. Use as a project service via {@code com.intellij.openapi.components.ServiceManager}:<br/>
      * <pre>
-     * final RioLogProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogProjectService.class);
+     * final AbstractRioLogMonitorProjectService rioLogConsoleProjectService = ServiceManager.getService(project, UdpRioLogMonitorProjectService.class);
      * </pre>
-     *
+     * or use the {@link #getInstance(Project)} convenience method
      * @param myProject the project
      */
     private UdpRioLogMonitorProjectService(@NotNull Project myProject)

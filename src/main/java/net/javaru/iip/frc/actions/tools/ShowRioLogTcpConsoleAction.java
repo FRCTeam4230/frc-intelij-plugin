@@ -32,8 +32,8 @@ public class ShowRioLogTcpConsoleAction extends AbstractFrcToolsAction implement
         final Project project = actionEvent.getProject();
         if (project != null)
         {
-            RioLogProjectService.updateTcp(project);
-            RioLogProjectService.activateTcpSafely(project);
+            RioLogProjectService.getInstance(project).updateTcp();
+            RioLogProjectService.getInstance(project).activateTcpSafely();
         }
     }
 }

@@ -163,15 +163,17 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
     public void run(boolean isFirstRun)
     {
+        // Implementation based on com.intellij.execution.RunContentExecutor
+        // When reworking, look at com.intellij.build.BuildContentManagerImpl which is a more up to date ContentExecutor implementation  
+        
         FileDocumentManager.getInstance().saveAllDocuments();
 
         rioLogMonitorProcess = isFirstRun ? createAnnouncementRioLogMonitoringProcess() : createRioLogMonitoringProcess();
 
-        //Not 100% sure what should be passed in for the commandLine parameter; the example I originally used used null. 
-        //   And null was allowed. But a change was made in Mov 2015 that BaseOSProcessHandler now logs an exception if 
-        //   commandLine is null or empty. We are not actually running a command. Just using the handler to monitor a 
-        //   UDP port. 
-        //   However, what ever we put, gets output on the screen, do for now we are just putting a basic message 
+        //   Regarding the commandLine parameter; the example from an IDEA bundled plugin I originally used used a null value
+        //   for it as it was nullable. But a change was made in Nov 2015 that BaseOSProcessHandler now logs an exception if 
+        //   commandLine is null or empty. We are not actually running a command, just using the handler to monitor a network
+        //   connection. What ever we put, gets output on the screen, so for we are just putting a basic message which works ok. 
         myProcessHandler = new BaseOSProcessHandler(rioLogMonitorProcess, getTabTitle(), StandardCharsets.UTF_8)
         {
             @Override
@@ -194,8 +196,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         //Executor executor = DefaultRunExecutor.getRunExecutorInstance(); //Gets the Run Window I believe
         myExecutor = createExecutor();
 
-
-        // This is a bit of overkill... but there is a bug that sometimes multiple content tabs are added to the run window. 
+        // TODO: let's improve this by using a lock or synchronization instead of this ugly hack
+        // This is a bit of overkill... and a messy hack... but there is a bug that sometimes multiple content tabs are added to the run window. 
         //    The bug should not happen in real world use as it seems to occur after repeatedly removing and re-adding the facet during testing.
         //    As near as I can tell, this is what happens...
         //    For some reason, sometimes the FrcFacetManagerListener.facetAdded() gets called twice (I *think* on separate threads, but have not 100% confirmed yet)

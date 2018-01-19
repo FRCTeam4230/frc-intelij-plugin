@@ -17,6 +17,17 @@
 
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 
+<!--
+    TO USE THIS WHEN DEBUGGING...
+    Overwrite the one in
+       ~\.gradle\caches\modules-2\files-2.1\com.jetbrains.intellij.idea\ideaIC\2016.3\{HASH-SUM}\ideaIC-2016.3\bin\log.xml
+    for each version of IDEA you are testing with. I need to ask on the forum if there is an easier 
+    alternative and/or open a feature request on the idea gradle plugin so it can use copy an alternative log config
+    to the above directory as part of the 'runIde' task. When I tracked its use in IDEA, the loading of the log.xml 
+    file happens immediately in the startup process, and there is no system property or such to override the location 
+    setting of the log.xml file. 
+-->
+
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
     <appender name="CONSOLE-WARN" class="org.apache.log4j.ConsoleAppender">
         <param name="target" value="System.err" />

@@ -62,6 +62,7 @@ import static net.javaru.iip.frc.actions.tools.DownloadWpiLibAction.NOTIFICATION
 import static net.javaru.iip.frc.components.FrcProjectComponentImpl.NotificationKey.*;
 
 
+// TODO: This projectComponent has become an ugly mess. Let's clean it up. A lot of the notification work can be moved to a dedicated notification class.
 
 public class FrcProjectComponentImpl implements FrcProjectComponent
 {
@@ -109,9 +110,6 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         
         final boolean isTemplateFirstOpen = frcFreshTemplateProjectCheckAndCleanup();
 
-
-        
-        
         // TODO: See if we need to call RioLogProjectService.update(myProject) in any way. FrcModuleComponentImpl.moduleAdded(), which we need if someone adds a module to an existing project, and moduleAdded is called during a project opening
         // RioLogProjectService.update(myProject);
 
@@ -310,9 +308,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         {
             LOG.debug("[FRC] isFreshFrcTemplateProject = " + isFreshFrcTemplateProject);
 
-            final FrcApplicationSettings appSettings = FrcApplicationSettings.Settings.INSTANCE();
-            
-            RioLogProjectService.activateUdpNow(myProject);
+            RioLogProjectService.getInstance(myProject).activateUdpNow();
             notifyToConfigureTeamNumIfNecessary(myProject, true);
 
             final WpiLibVersionStatus versionStatus = WpiLibVersionStatus.getCurrentVersionStatus(myProject, true);
@@ -359,15 +355,16 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                           {
                                                               if (notificationMap.get(AttachWpiLibQuery) == null && !WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project))
                                                               {
-                                                                  final Notification notification =
-                                                                      (WpiLibLibrariesUtils.isWpilibDownloadedToSystem())
-                                                                      ? queueAttachWpilibQueryNotification(project)
-                                                                      : queueDownloadAndAttachWpilibNotification(project);
+                                                                  
+                                                                  if (WpiLibLibrariesUtils.isWpilibDownloadedToSystem())
+                                                                      { queueAttachWpilibQueryNotification(project); }
+                                                                  else 
+                                                                      { queueDownloadAndAttachWpilibNotification(project); }
                                                               }
 
                                                               if (notificationMap.get(AttachUserLibQuery) == null && !WpiLibLibrariesUtils.isUserLibAttachedViaReadAction(project))
                                                               {
-                                                                  final Notification notification = queueMissingUserLibQueryNotification(project);
+                                                                  queueMissingUserLibQueryNotification(project);
                                                               }
                                                           }
                                                       });
@@ -464,6 +461,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     }
 
 
+    @SuppressWarnings("UnusedReturnValue")
     private static Notification queueAttachWpilibQueryNotification(@NotNull Project project)
     {
         final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
@@ -487,6 +485,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     }
 
 
+    @SuppressWarnings("UnusedReturnValue")
     private static Notification queueMissingUserLibQueryNotification(@NotNull Project project)
     {
         final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
@@ -508,7 +507,9 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         getNotificationMapForProject(project).put(AttachUserLibQuery, notification);
         return notification;
     }
-    
+
+
+    @SuppressWarnings("UnusedReturnValue")
     public static Notification queueLatestWpiLibVersionIsBeingDownloadedNotification(@Nullable Project project)
     {
         final Notification notification = FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.createNotification(FrcNotifications.Title,
@@ -591,7 +592,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         { 
             if (FrcFacet.isFrcFacet(facet))
             {
-                RioLogProjectService.update(facet);
+                RioLogProjectService.getInstance(facet.getModule().getProject()).update();
             }
         }
     }

@@ -100,7 +100,7 @@ public class FrcModuleComponentImpl implements FrcModuleComponent
         // RioLogProjectService.update() is called via the ProjectComponent.projectOpened() method
         if (myModule.getProject().isOpen())
         {
-            RioLogProjectService.update(myModule);
+            RioLogProjectService.getInstance(myModule.getProject()).update();
         }
     }
 
@@ -118,7 +118,7 @@ public class FrcModuleComponentImpl implements FrcModuleComponent
         LOG.debug("[FRC] " + getClass().getSimpleName() + ".disposeComponent() called for module " + myModule);
         if (!myModule.isDisposed())
         {
-            RioLogProjectService.update(myModule);
+            RioLogProjectService.getInstance(myModule.getProject()).update();
         }
     }
 

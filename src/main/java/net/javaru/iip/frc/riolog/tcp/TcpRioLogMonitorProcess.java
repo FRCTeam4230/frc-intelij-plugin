@@ -154,9 +154,9 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
     class TcpRioLogListener implements Runnable
     {
         /* 
-            "Based on" (well mostly directly copied over) the RioConnector
-            https://github.com/wpilibsuite/riolog/blob/master/src/main/java/netconsole2/RioConnector.java
-            https://github.com/wpilibsuite/EclipsePlugins/blob/master/edu.wpi.first.wpilib.plugins.riolog/src/netconsole2/RioConnector.java
+            "Based on" (well mostly directly ported over from) the RioConsole class
+            https://github.com/wpilibsuite/riolog/blob/master/src/main/java/netconsole2/RioConsole.java
+            https://github.com/wpilibsuite/EclipsePlugins/blob/master/edu.wpi.first.wpilib.plugins.riolog/src/netconsole2/RioConsole.java
         */
         
         private Socket socket;

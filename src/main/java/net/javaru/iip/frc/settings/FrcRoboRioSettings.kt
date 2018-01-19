@@ -27,6 +27,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 import net.javaru.iip.frc.util.ipAddressToByteArray
 
 
+@Suppress("ConstPropertyName") // the lower case m makes it more discernible from the DNS one
 private const val ROBORIO_HOST_mDNS_TEMPLATE = "roborio-%d-FRC.local"
 private const val ROBORIO_HOST_DNS_TEMPLATE = "roborio-%d-FRC.lan"
 private const val ROBORIO_HOST_FIELD_LOCAL_TEMPLATE = "roborio-%d-FRC.frc-field.local"
@@ -35,13 +36,6 @@ private const val ROBORIO_HOST_USB_DEFAULT = "172.22.11.2"
 private const val USE_DEFAULT_HOST_PLACEHOLDER = "<<<Use Default Host>>>"
 
 
-enum class RoboRioConnectionType
-{
-    mDNS,
-    DNS,
-    USB,
-    IP
-}
 
 // NOTE: This class is registered as an <applicationService> in the plugin.xml
 @State(name = "FrcRoboRio", storages = [(Storage("frc.xml"))])
@@ -81,6 +75,12 @@ data class FrcRoboRioSettings(var roboRioHostRawMDns: String = USE_DEFAULT_HOST_
         XmlSerializerUtil.copyBean(state, this)
     }
 
+    
+    // NOTE: These helper methods break normal naming conventions by using 
+    //       some snake_case rather than solely conventional camelCase.
+    //       This is to make the multitude of similarly named functions
+    //       (especially in the case of mDNS and DNS) more discernible
+    //       as a preventative measure to reduce the risk of bugs
 
     // ==== mDNS Host Helpers ====
 
@@ -212,7 +212,7 @@ data class FrcRoboRioSettings(var roboRioHostRawMDns: String = USE_DEFAULT_HOST_
 
     fun getRoboRioHost_IP_asIpByteArray(): ByteArray
     {
-        return getRoboRioHost_IP().ipAddressToByteArray();
+        return getRoboRioHost_IP().ipAddressToByteArray()
     }
 
     fun getRoboRioHostDefault_IP(frcApplicationSettings: FrcApplicationSettings = FrcApplicationSettings.INSTANCE()): String = createRoboRioHostDefault_IP(frcApplicationSettings.teamNumber)

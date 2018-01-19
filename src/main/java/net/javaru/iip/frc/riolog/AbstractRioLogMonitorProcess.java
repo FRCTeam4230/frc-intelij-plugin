@@ -316,6 +316,7 @@ public abstract class AbstractRioLogMonitorProcess extends Process
     protected interface RioLogMonitoringRunnable extends Runnable
     {
         @Nullable
+        @Deprecated
         Integer getPort();
 
         boolean isRunning();
@@ -327,11 +328,14 @@ public abstract class AbstractRioLogMonitorProcess extends Process
 
     protected abstract class AbstractRioLogMonitoringRunnable implements RioLogMonitoringRunnable
     {
+        @Deprecated // TODO - Let's get rid of this since it no longer has bearing and is not a user configurable item
         @Nullable
         protected final Integer port;
+        // TODO - Let's deprecate this favor of thread interruption monitoring
         protected boolean isRunning = true;
 
 
+        protected AbstractRioLogMonitoringRunnable() {this.port = null;}
         protected AbstractRioLogMonitoringRunnable(@Nullable Integer port) {this.port = port;}
 
 
@@ -368,6 +372,7 @@ public abstract class AbstractRioLogMonitorProcess extends Process
 
         @Override
         @Nullable
+        @Deprecated
         public Integer getPort() { return port; }
 
 

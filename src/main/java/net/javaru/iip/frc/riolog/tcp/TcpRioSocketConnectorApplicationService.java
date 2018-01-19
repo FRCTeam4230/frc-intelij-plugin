@@ -18,13 +18,13 @@ package net.javaru.iip.frc.riolog.tcp;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -111,28 +111,6 @@ public class TcpRioSocketConnectorApplicationService
 
             LOG.debug("[FRC] Connected to robot at " + socket.getInetAddress().getHostAddress());
             return socket;
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
-
-    public void close()
-    {
-        lock.lock();
-        try
-        {
-            Socket s = socket;
-            socket = null;
-            try
-            {
-                if (s != null)
-                {
-                    s.close();
-                }
-            }
-            catch (IOException ignore) {}
         }
         finally
         {
@@ -285,7 +263,7 @@ public class TcpRioSocketConnectorApplicationService
         }
         catch (UnknownHostException e)
         {
-            LOG.debug("[FRC] Error converting address:" + address + ".", e);
+            LOG.debug("[FRC] Error converting address:" + Arrays.toString(address) + ". Cause Summary: " + e.toString(), e);
         }
     }
 

@@ -30,8 +30,6 @@ public class TcpRioLogMonitorProjectService extends AbstractRioLogMonitorProject
 {
     private static final Logger LOG = Logger.getInstance(TcpRioLogMonitorProjectService.class);
 
-
-    // See http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_services.html for more information
     public static TcpRioLogMonitorProjectService getInstance(@NotNull Project project)
     {
         return ServiceManager.getService(project, TcpRioLogMonitorProjectService.class);

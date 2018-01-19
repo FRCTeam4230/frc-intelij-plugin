@@ -19,7 +19,6 @@ package net.javaru.iip.frc.riolog.tcp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.execution.Executor;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.i18n.FrcMessageBundle;
@@ -33,9 +32,6 @@ import net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor;
 
 public class TcpRioLogFrcWindowContentExecutor extends AbstractRioLogContentExecutor
 {
-    private static final Logger LOG = Logger.getInstance(TcpRioLogFrcWindowContentExecutor.class);
-
-
     public TcpRioLogFrcWindowContentExecutor(@NotNull Project project, boolean activateToolWindow)
     {
         this(project, activateToolWindow, null);

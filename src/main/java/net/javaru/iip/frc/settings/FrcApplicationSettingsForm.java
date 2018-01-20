@@ -18,29 +18,19 @@ package net.javaru.iip.frc.settings;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import javax.swing.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPasswordField;
 import com.intellij.ui.components.JBTextField;
 
-import net.javaru.iip.frc.components.FrcProjectComponentImpl;
-import net.javaru.iip.frc.notify.FrcNotifications;
+import net.javaru.iip.frc.actions.ConfigureTeamNumberBasicAction;
 import net.javaru.iip.frc.riolog.RioLogGlobals;
-import net.javaru.iip.frc.wpilib.WpiLibPaths;
-import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
 
 
 
@@ -164,32 +154,7 @@ public class FrcApplicationSettingsForm
         if (teamNumberHasChanged)
         {
             LOG.info("[FRC] Team number has been changed in settings. Updating the wpilib.properties file");
-            ApplicationManager.getApplication().runWriteAction(() -> {
-                try
-                {
-                    WpiLibDownloader.updateOrCreateWpilibPropertiesFile();
-                }
-                catch (IOException e)
-                {
-                    final Notification notification =
-                        FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP
-                            .createNotification("FRC",
-                                                "Team Number Update Failure",
-                                                "The '" + WpiLibPaths.getWpilibPropertiesFile() + "' file could not be updated with "
-                                                + "the change to the team number. You will need to manually update the 'team-number' "
-                                                + "property in the file in order for your robot deploys to work. Update Failure Cause: "
-                                                + e.toString(),
-                                                NotificationType.ERROR);
-                    final Project[] projects = ProjectManager.getInstance().getOpenProjects();
-                    for (Project project : projects)
-                    {
-                        if (FrcProjectComponentImpl.isFrcFacetedProject(project))
-                        {
-                            Notifications.Bus.notify(notification, project);
-                        }
-                    }
-                }
-            });
+            ConfigureTeamNumberBasicAction.performTeamNumberChangeUpdates();
         }
         
         // ** NO CODE BELOW THIS **

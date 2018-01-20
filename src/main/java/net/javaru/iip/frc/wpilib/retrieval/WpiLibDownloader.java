@@ -42,10 +42,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.InputValidator;
 import com.intellij.openapi.ui.Messages;
 
 import net.javaru.iip.frc.FrcIcons.FRC;
+import net.javaru.iip.frc.components.FrcProjectComponentImpl;
+import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.UnzipUtils;
 import net.javaru.iip.frc.util.UriUtils;
@@ -115,6 +119,11 @@ public class WpiLibDownloader
     {
         try
         {
+            // We do the properties file update first so that if the team number id not set,
+            // The user is prompted immediately after starting the action, rather than a few
+            // minutes after the download completes
+            updateOrCreateWpilibPropertiesFile();
+            
             final ImmutablePair<JavaFeatureDescriptor, URI> latest = downloadLatestJavaDescriptor();
             final JavaFeatureDescriptor javaFeatureDescriptor = latest.getKey();
             LOG.info("[FRC] Current WPILib version (as indicated in 'site.xml') is '" + javaFeatureDescriptor.getVersion() + "'");
@@ -156,7 +165,7 @@ public class WpiLibDownloader
             }
             
             Files.createDirectories(WpiLibPaths.getUserLibDir());
-            updateOrCreateWpilibPropertiesFile();
+            
             LOG.debug("[FRC] Download & extraction of latest wpilib completed");
         }
         catch (Exception e)
@@ -215,44 +224,10 @@ public class WpiLibDownloader
         final Path file = WpiLibPaths.getWpilibPropertiesFile();
 
         LOG.debug("[FRC] Creating / Updating wpilib.properties file at: " + file);
-
+     
         if (!FrcApplicationSettings.Settings.INSTANCE().isTeamNumberConfigured())
         {
-            ApplicationManager.getApplication().invokeLater(() ->
-                                                            {
-                                                                final String teamNumberInput =
-                                                                    Messages.showInputDialog("FRC Team number:", "Team Number", FRC.FIRST_ICON_MEDIUM_16, null, new InputValidator()
-                                                                    {
-                                                                        @Override
-                                                                        public boolean checkInput(String inputString)
-                                                                        {
-                                                                            try
-                                                                            {
-                                                                                final int teamNum = Integer.parseInt(inputString);
-                                                                                return teamNum > 0;
-                                                                            }
-                                                                            catch (NumberFormatException ignore)
-                                                                            {
-                                                                                return false;
-                                                                            }
-                                                                        }
-                                        
-                                        
-                                                                        @Override
-                                                                        public boolean canClose(String inputString)
-                                                                        {
-                                                                            return checkInput(inputString);
-                                                                        }
-                                                                    });
-                                        
-                                                                
-                                                                if (teamNumberInput != null)
-                                                                {
-                                                                    final int num = Integer.parseInt(teamNumberInput);
-                                                                    FrcApplicationSettings.Settings.INSTANCE().setTeamNumber(num);
-                                                                }
-                                                            });
-
+            ApplicationManager.getApplication().invokeAndWait(WpiLibDownloader::promptForTeamNumber);
         }
 
         if (Files.exists(file))
@@ -281,6 +256,54 @@ public class WpiLibDownloader
             writer.println(new SimpleDateFormat("'#'EEE MMM dd HH:mm:ss zzz yyyy").format(new Date()));
             writer.println("version=current");
             writer.println("team-number=" + FrcApplicationSettings.Settings.INSTANCE().getTeamNumber());
+        }
+    }
+    
+
+    private static void promptForTeamNumber()
+    {
+        final String teamNumberInput =
+            Messages.showInputDialog("<html>Your FRC Team Number is needed <br>to properly configure WPILib.<br><br>FRC Team Number:<html>", "Team Number", FRC.FIRST_ICON_MEDIUM_16, null, new InputValidator()
+            {
+                @Override
+                public boolean checkInput(String inputString)
+                {
+                    try
+                    {
+                        final int teamNum = Integer.parseInt(inputString);
+                        return teamNum > 0;
+                    }
+                    catch (NumberFormatException ignore)
+                    {
+                        return false;
+                    }
+                }
+
+
+                @Override
+                public boolean canClose(String inputString)
+                {
+                    return checkInput(inputString);
+                }
+            });
+
+
+        if (teamNumberInput != null)
+        {
+            final int num = Integer.parseInt(teamNumberInput);
+            FrcApplicationSettings.Settings.INSTANCE().setTeamNumber(num);
+        }
+        else
+        {
+            // The user canceled on the input prompt
+            final Project[] projects = ProjectManager.getInstance().getOpenProjects();
+            for (Project project : projects)
+            {
+                if (FrcProjectComponentImpl.isFrcFacetedProject(project))
+                {
+                    FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(project, true, true);
+                }
+            }
         }
     }
 }

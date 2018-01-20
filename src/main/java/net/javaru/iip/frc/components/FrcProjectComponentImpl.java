@@ -389,7 +389,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                 LOG.debug("[FRC] Publishing 'configure team number' notification for Project '" + project + "'"); }
             // Expire the application level notification to prevent duplicate notification in the event log
             FrcNotifications.expireConfigureTeamNumberNotification(null);
-            final Notification notification = FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured( project, true);
+            final Notification notification = FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(project, true, false);
             notificationMap.put(ConfigureTeamNumberQuery, notification);
         }
     }

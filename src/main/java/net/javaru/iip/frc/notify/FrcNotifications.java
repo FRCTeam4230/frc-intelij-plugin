@@ -101,16 +101,23 @@ public class FrcNotifications implements FrcNotificationsApplicationComponent
 
     //TODO: Move to FrcProjectComponentImpl and then move the notificationsMap placement into this method
     @SuppressWarnings("UnusedReturnValue")
-    public static Notification notifyAboutTeamNumberNeedingToBeConfigured(@Nullable Project project, boolean useSticky)
+    public static Notification notifyAboutTeamNumberNeedingToBeConfigured(@Nullable Project project, boolean useSticky, boolean asWarning)
     {
         
         //See com/intellij/ide/plugins/PluginManager.java:177 for an example
 
         Notification notification = configureTeamNumberNotifications.get(project);
 
+        // We want to replace an existing info notification with a warning one if a warning one has been requested
+        if (notification != null && asWarning && notification.getType() != NotificationType.WARNING)
+        {
+            notification.expire();
+            notification = null;
+        }
+        
         if (notification == null || notification.isExpired())
         {
-            notification = createConfigureTeamNotification(project, useSticky);
+            notification = createConfigureTeamNotification(project, useSticky, asWarning);
             // This makes the notification title & subtitle appear in bold in the Event Log window
             notification.setImportant(true);
             configureTeamNumberNotifications.put(project, notification);
@@ -121,15 +128,21 @@ public class FrcNotifications implements FrcNotificationsApplicationComponent
 
 
     @NotNull
-    private static Notification createConfigureTeamNotification(@Nullable Project project, boolean useSticky)
+    private static Notification createConfigureTeamNotification(@Nullable Project project, boolean useSticky, boolean asWarning)
     {
+        final String subtitle = asWarning ? "Team Number Not Set" : "Configuration Needed";
+        final String contentPrefix = asWarning ?"Without your FRC team number being set, robot deploys will fail. " : "";
+        final String content =  contentPrefix + "Please <a href='configure'>configure</a> your FRC Team Number.";
+        final Icon icon = asWarning ? FrcNotifications.IconWarn : FrcNotifications.IconInfo;
+        final NotificationType notificationType = asWarning ? NotificationType.WARNING : NotificationType.INFORMATION;
+
         final NotificationGroup notificationGroup = useSticky ? FRC_ACTIONABLE_NOTIFICATION_GROUP : FRC_GENERAL_NOTIFICATION_GROUP;
         return new Notification(notificationGroup.getDisplayId(),
-                                FrcNotifications.IconInfo,
+                                icon,
                                 FrcNotifications.Title,
-                                "Configuration Needed",
-                                "Please <a href='configure'>configure</a> your FRC Team Number.",
-                                NotificationType.INFORMATION,
+                                subtitle,
+                                content,
+                                notificationType,
                                 (theNotification, event) ->
                                                            {
                                                                if ("configure".equals(event.getDescription()))

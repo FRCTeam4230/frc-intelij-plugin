@@ -16,11 +16,18 @@
 
 package net.javaru.iip.frc.actions;
 
+import java.io.IOException;
+
 import org.jetbrains.annotations.Nullable;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.InputValidator;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.IdeFrame;
@@ -28,9 +35,12 @@ import com.intellij.openapi.wm.ex.WindowManagerEx;
 
 import net.javaru.iip.frc.FrcIcons.FRC;
 import net.javaru.iip.frc.FrcPluginGlobals;
+import net.javaru.iip.frc.components.FrcProjectComponentImpl;
 import net.javaru.iip.frc.i18n.FrcMessageBundle;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
+import net.javaru.iip.frc.wpilib.WpiLibPaths;
+import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
 
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL;
 
@@ -71,6 +81,7 @@ public class ConfigureTeamNumberBasicAction extends AnAction
         if (teamNumString != null && FrcApplicationSettings.Settings.isValidTeamNumber(teamNumString))
         {
             settings.setTeamNumber(Integer.parseInt(teamNumString));
+            performTeamNumberChangeUpdates();
             FrcNotifications.expireConfigureTeamNumberNotification(project);
         }
     }
@@ -88,5 +99,35 @@ public class ConfigureTeamNumberBasicAction extends AnAction
     {
         final FrcApplicationSettings settings = FrcApplicationSettings.Settings.INSTANCE();
         return (!settings.isTeamNumberConfigured() && settings.getPrc() <= TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL);
+    }
+    
+    public static void performTeamNumberChangeUpdates()
+    {
+        ApplicationManager.getApplication().runWriteAction(() -> {
+            try
+            {
+                WpiLibDownloader.updateOrCreateWpilibPropertiesFile();
+            }
+            catch (IOException e)
+            {
+                final Notification notification =
+                    FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP
+                        .createNotification("FRC",
+                                            "Team Number Update Failure",
+                                            "The '" + WpiLibPaths.getWpilibPropertiesFile() + "' file could not be updated with "
+                                            + "the change to the team number. You will need to manually update the 'team-number' "
+                                            + "property in the file in order for your robot deploys to work. Update Failure Cause: "
+                                            + e.toString(),
+                                            NotificationType.ERROR);
+                final Project[] projects = ProjectManager.getInstance().getOpenProjects();
+                for (Project project : projects)
+                {
+                    if (FrcProjectComponentImpl.isFrcFacetedProject(project))
+                    {
+                        Notifications.Bus.notify(notification, project);
+                    }
+                }
+            }
+        });
     }
 }

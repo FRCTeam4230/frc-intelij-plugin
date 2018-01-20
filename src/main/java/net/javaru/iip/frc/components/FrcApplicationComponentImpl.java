@@ -61,7 +61,7 @@ public class FrcApplicationComponentImpl implements FrcApplicationComponent
         
         if (!settings.isTeamNumberConfigured() && settings.getPrc() <= TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL)
         {
-            FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(null, true);
+            FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(null, true, false);
         }
     }
     

@@ -28,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -157,7 +156,7 @@ public class WpiLibDownloader
             }
             
             Files.createDirectories(WpiLibPaths.getUserLibDir());
-            createWpilibPropertiesFile();
+            updateOrCreateWpilibPropertiesFile();
             LOG.debug("[FRC] Download & extraction of latest wpilib completed");
         }
         catch (Exception e)
@@ -211,70 +210,78 @@ public class WpiLibDownloader
     }
 
 
-    private static void createWpilibPropertiesFile() throws IOException
+    public static void updateOrCreateWpilibPropertiesFile() throws IOException
     {
         final Path file = WpiLibPaths.getWpilibPropertiesFile();
-        if (!Files.exists(file))
+
+        LOG.debug("[FRC] Creating / Updating wpilib.properties file at: " + file);
+
+        if (!FrcApplicationSettings.Settings.INSTANCE().isTeamNumberConfigured())
         {
-            LOG.debug("[FRC] Creating wpilib.properties file at: " + file);
-
-            //TODO: When team number moves to Facet, we need to get it from there
-            FrcApplicationSettings settings = FrcApplicationSettings.Settings.INSTANCE();
-            final AtomicInteger teamNumber = new AtomicInteger(settings.getTeamNumber());
-            if (teamNumber.get() <= 0)
-            {
-                ApplicationManager.getApplication().invokeLater(() ->
-                                                                {
-                                                                    final String teamNumberInput =
-                                                                        Messages.showInputDialog("FRC Team number:", "Team Number", FRC.FIRST_ICON_MEDIUM_16, null, new InputValidator()
-                                                                        {
-                                                                            @Override
-                                                                            public boolean checkInput(String inputString)
-                                                                            {
-                                                                                try
-                                                                                {
-                                                                                    final int teamNum = Integer.parseInt(inputString);
-                                                                                    return teamNum > 0;
-                                                                                }
-                                                                                catch (NumberFormatException ignore)
-                                                                                {
-                                                                                    return false;
-                                                                                }
-                                                                            }
-                                            
-                                            
-                                                                            @Override
-                                                                            public boolean canClose(String inputString)
-                                                                            {
-                                                                                return checkInput(inputString);
-                                                                            }
-                                                                        });
-                                            
-                                                                    if (teamNumberInput != null)
+            ApplicationManager.getApplication().invokeLater(() ->
+                                                            {
+                                                                final String teamNumberInput =
+                                                                    Messages.showInputDialog("FRC Team number:", "Team Number", FRC.FIRST_ICON_MEDIUM_16, null, new InputValidator()
                                                                     {
-                                                                        final int num = Integer.parseInt(teamNumberInput);
-                                                                        teamNumber.set(num);
-                                                                        settings.setTeamNumber(num);
-                                                                    }
-                                                                });
+                                                                        @Override
+                                                                        public boolean checkInput(String inputString)
+                                                                        {
+                                                                            try
+                                                                            {
+                                                                                final int teamNum = Integer.parseInt(inputString);
+                                                                                return teamNum > 0;
+                                                                            }
+                                                                            catch (NumberFormatException ignore)
+                                                                            {
+                                                                                return false;
+                                                                            }
+                                                                        }
+                                        
+                                        
+                                                                        @Override
+                                                                        public boolean canClose(String inputString)
+                                                                        {
+                                                                            return checkInput(inputString);
+                                                                        }
+                                                                    });
+                                        
+                                                                
+                                                                if (teamNumberInput != null)
+                                                                {
+                                                                    final int num = Integer.parseInt(teamNumberInput);
+                                                                    // TODO: we need to make sure updating the team number here does not have it call this method
+                                                                    FrcApplicationSettings.Settings.INSTANCE().setTeamNumber(num);
+                                                                }
+                                                            });
 
-            }
+        }
 
-
-            Files.createDirectories(file.getParent());
-            final boolean append = true;
-            final boolean autoFlush = true;
-            //We don't use a FileWriter or the PrintWriter(File) constructor so we can specify the Character Set, which is IS_ 8859-1 for properties files 
-            try (
-                final PrintWriter writer
-                    = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file.toFile(), append), StandardCharsets.ISO_8859_1), autoFlush)
-            )
+        if (Files.exists(file))
+        {
+            if (!Files.isWritable(file))
             {
-                writer.println("#Don't add new properties, they will be deleted by the eclipse plugin.");
-                writer.println(new SimpleDateFormat("'#'EEE MMM dd HH:mm:ss zzz yyyy").format(new Date()));
-                writer.println("version=current");
-                writer.println("team-number=" + teamNumber.get());
+                throw new IOException("File write access denied for file " + file );
             }
+            
+            if (!Files.isReadable(file))
+            {
+                throw new IOException("File read access denied for file " + file);
+            }
+        }
+        
+        Files.createDirectories(file.getParent());
+        final boolean append = false;
+        final boolean autoFlush = true;
+        //We don't use a FileWriter or the PrintWriter(File) constructor so we can specify the Character Set, which is ISO 8859-1 for properties files 
+        try (
+            final PrintWriter writer
+                = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file.toFile(), append), StandardCharsets.ISO_8859_1), autoFlush)
+        )
+        {
+            writer.println("#Don't add new properties, they will be deleted by the eclipse and/or IntelliJ IDEA plugin.");
+            writer.println(new SimpleDateFormat("'#'EEE MMM dd HH:mm:ss zzz yyyy").format(new Date()));
+            writer.println("version=current");
+            writer.println("team-number=" + FrcApplicationSettings.Settings.INSTANCE().getTeamNumber());
         }
     }
 }

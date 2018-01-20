@@ -249,7 +249,6 @@ public class WpiLibDownloader
                                                                 if (teamNumberInput != null)
                                                                 {
                                                                     final int num = Integer.parseInt(teamNumberInput);
-                                                                    // TODO: we need to make sure updating the team number here does not have it call this method
                                                                     FrcApplicationSettings.Settings.INSTANCE().setTeamNumber(num);
                                                                 }
                                                             });

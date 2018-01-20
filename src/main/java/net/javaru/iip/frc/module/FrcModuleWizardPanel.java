@@ -1,0 +1,128 @@
+/*
+ * Copyright 2015-2017 Mark Vedder
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package net.javaru.iip.frc.module;
+
+import java.awt.*;
+import javax.swing.*;
+
+import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
+import com.intellij.util.ui.JBUI;
+
+import net.javaru.iip.frc.util.FrcUiUtils;
+
+
+
+public class FrcModuleWizardPanel extends JPanel
+{
+    private static final Logger LOG = Logger.getInstance(FrcModuleWizardPanel.class);
+    private static final long serialVersionUID = -7663072295702631169L;
+
+
+    private JPanel rootPanel;
+    private JPanel selectRobotTypePanel;
+    private ButtonGroup robotTypeButtonGroup;
+
+    public FrcModuleWizardPanel()
+    {
+        super(new BorderLayout());
+        add(rootPanel, BorderLayout.CENTER);
+    }
+
+    
+    @NotNull
+    public RobotType getSelectedRobotType()
+    {
+        final ButtonModel selectedButtonModel = robotTypeButtonGroup.getSelection();
+        //TODO: we want to make sure a button is actual selected. Need to implement a validate method. For now, below in initRobotTypeSelectionPanel() we set the 1st robot type as selected
+        return selectedButtonModel == null ? RobotType.Iterative : RobotType.valueOf(selectedButtonModel.getActionCommand());
+    }
+
+    private void createUIComponents()
+    {
+        initRobotTypeSelectionPanel();
+    }
+    
+    private void initRobotTypeSelectionPanel()
+    {
+        final RobotType[] robotTypes = RobotType.values();
+        final GridLayoutManager layoutManager = new GridLayoutManager(((robotTypes.length * 2) +1 ), 1, JBUI.emptyInsets(), -1, -1);
+        robotTypeButtonGroup = new ButtonGroup();
+        selectRobotTypePanel = new JPanel(layoutManager);
+        
+
+        int currentRow = 0;
+        for (RobotType robotType : robotTypes)
+        {
+            JRadioButton button = new JRadioButton(FrcUiUtils.boldLabelText(robotType.getLabelName()));
+            button.setActionCommand(robotType.name());
+            robotTypeButtonGroup.add(button);
+            if (robotType == robotTypes[0]) {button.setSelected(true);}
+            selectRobotTypePanel.add(button,
+                                     new GridConstraints(currentRow++,
+                                                         0,
+                                                         1,
+                                                         1,
+                                                         GridConstraints.ANCHOR_WEST,
+                                                         GridConstraints.FILL_NONE,
+                                                         GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                                         GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                                         null,
+                                                         null,
+                                                         null,
+                                                         2,
+                                                         false));
+            JLabel label = new JLabel(robotType.getDescription());
+            selectRobotTypePanel.add(label,
+                                     new GridConstraints(currentRow++,
+                                                         0,
+                                                         1,
+                                                         1,
+                                                         GridConstraints.ANCHOR_WEST,
+                                                         GridConstraints.FILL_NONE,
+                                                         GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                                         GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                                                         null,
+                                                         null,
+                                                         null,
+                                                         6,
+                                                         false));
+            
+        }
+        
+        final Spacer spacer = new Spacer();
+        selectRobotTypePanel.add(spacer,
+                                 new GridConstraints(currentRow,
+                                                     0,
+                                                     1,
+                                                     1,
+                                                     GridConstraints.ANCHOR_CENTER,
+                                                     GridConstraints.FILL_VERTICAL,
+                                                     1,
+                                                     GridConstraints.SIZEPOLICY_WANT_GROW,
+                                                     null,
+                                                     null,
+                                                     null,
+                                                     0,
+                                                     false));
+        
+        
+    }
+}

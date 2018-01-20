@@ -1,0 +1,66 @@
+/*
+ * Copyright 2015-2017 Mark Vedder
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package net.javaru.iip.frc.actions.create.basic;
+
+import javax.swing.*;
+
+import com.intellij.ide.actions.CreateFileFromTemplateDialog.Builder;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiDirectory;
+
+import net.javaru.iip.frc.FrcIcons;
+import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory;
+
+import static net.javaru.iip.frc.i18n.FrcMessageBundle.message;
+
+
+
+public class NewFrcBasicCommandGroupClassAction extends AbstractNewFrcBasicClassAction
+{
+    private static final Icon ICON = FrcIcons.Components.COMMAND_GROUP;
+
+
+    protected NewFrcBasicCommandGroupClassAction()
+    {
+        super(message("frc.new.class.commandGroup.action.name"),
+              message("frc.new.class.commandGroup.action.description"),
+              ICON);
+    }
+
+
+    @Override
+    protected void buildDialog(Project project, PsiDirectory directory, Builder builder)
+    {
+        builder.setTitle(message("frc.new.class.commandGroup.action.name"))
+               .addKind(message("frc.new.class.commandGroup.action.name"), ICON, FrcFileTemplateGroupDescriptorFactory.COMMAND_GROUP.getFileName());
+    }
+
+
+    @Override
+    protected String getActionName(PsiDirectory directory, String newName, String templateName)
+    {
+        return message("frc.new.class.commandGroup.action.details", directory, newName);
+    }
+
+
+    @Override
+    protected String getErrorTitle()
+    {
+        return message("frc.new.class.commandGroup.action.error");
+    }
+    
+}

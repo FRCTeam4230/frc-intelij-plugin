@@ -3,6 +3,7 @@ syntax: regexp
 ([\\/]~|^~)
 
 # Exclude build targets
+/out
 ([\\/]o|^o)ut$
 ([\\/]o|^o)utput$
 ([\\/]t|^t)arget$
@@ -28,7 +29,18 @@ syntax: glob
 *.iml
 *.iws
 *.ipr
-.idea/
+# Exclude  most, but not all, IDEA ProjectConfig files
+.idea/*
+!.idea/copyright
+!.idea/inspectionProfiles
+!.idea/runConfigurations
+!.idea/icon.png
+!.idea/encodings.xml
+!.idea/kotlinc.xml
+!.idea/vcs.xml
+
+src/main/java/net/javaru/iip/frc/actions/NotificationStatusAction.java
+
 atlassian-ide-plugin.xml
 
 # Exclude Misc development time files
@@ -38,3 +50,19 @@ FRC.zip
 frc-*.jar
 frc-*.zip
 
+
+### Gradle template
+.gradle
+/build/
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Cache of project
+.gradletasknamecache
+
+# # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
+# gradle/wrapper/gradle-wrapper.properties

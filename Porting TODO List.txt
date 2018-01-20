@@ -1,5 +1,0 @@
-
-- library detection testing & debugging
-- riolog / tool window
-- templates (done)
-

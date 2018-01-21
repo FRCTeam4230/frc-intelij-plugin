@@ -308,8 +308,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         {
             LOG.debug("[FRC] isFreshFrcTemplateProject = " + isFreshFrcTemplateProject);
 
-            //TODO change to TCP when new TPC monitoring is ready
-            RioLogProjectService.getInstance(myProject).activateUdp();
+            RioLogProjectService.getInstance(myProject).activateTcp();
             notifyToConfigureTeamNumIfNecessary(myProject, true);
 
             final WpiLibVersionStatus versionStatus = WpiLibVersionStatus.getCurrentVersionStatus(myProject, true);

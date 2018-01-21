@@ -342,19 +342,16 @@
                icon="/icons/riolog/riolog.png"
                >
 
-            <!--TODO reactivate when new TPC monitoring is ready-->
-            <!--<action id="frc.tools.ShowTcp"
+            <action id="frc.tools.ShowTcp"
                     text="Net Console"
-                    class="net.javaru.iip.frc.actions.tools.ShowRioLogTcpConsoleAction" />-->
+                    class="net.javaru.iip.frc.actions.tools.ShowRioLogTcpConsoleAction" />
             
             <action id="frc.tools.ShowSsh"
                     text="SSH tailing (alternative RIOLog monitoring technique)"
                     class="net.javaru.iip.frc.actions.tools.ShowRioLogSshConsoleAction" />
 
-            <!--TODO change text wording back when new TPC monitoring is ready -->
-            <!--text="Legacy Net Console (2017 and older)" -->
             <action id="frc.tools.ShowUdp"
-                    text="Net Console"
+                    text="Legacy Net Console (2017 and older)"
                     class="net.javaru.iip.frc.actions.tools.ShowRioLogUdpConsoleAction" />
             <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="first" />
         </group>

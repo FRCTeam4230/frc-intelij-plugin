@@ -123,8 +123,7 @@ public class RioLogProjectService
     {
         sshRioLogConsoleProjectService.update();
         udpRioLogConsoleProjectService.update();
-        //TODO reactivate when new TPC monitoring is ready
-//        tcpRioLogConsoleProjectService.update();
+        tcpRioLogConsoleProjectService.update();
     }
 
     public synchronized void updateUdp()

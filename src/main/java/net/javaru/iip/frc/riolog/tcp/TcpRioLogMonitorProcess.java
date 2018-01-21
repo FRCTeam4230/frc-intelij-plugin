@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +34,10 @@ import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
 
 import net.javaru.iip.frc.riolog.AbstractRioLogMonitorProcess;
+import net.javaru.iip.frc.riolog.tcp.message.ErrorMessage;
+import net.javaru.iip.frc.riolog.tcp.message.InfoMessage;
+import net.javaru.iip.frc.riolog.tcp.message.Message;
+import net.javaru.iip.frc.riolog.tcp.message.MessageToStringRenderer;
 
 
 
@@ -164,6 +167,9 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         private boolean autoReconnect = true;
         private final AtomicBoolean cleanup = new AtomicBoolean(false);
         private final AtomicBoolean reconnect = new AtomicBoolean(false);
+        // TODO add capability (i.e. toolbar button) to set verbosity level and thus the showWarning and showInfo booleans
+        private final AtomicBoolean showWarning = new AtomicBoolean(true); 
+        private final AtomicBoolean showInfo = new AtomicBoolean(true);
         private Consumer<Boolean> connectedCallback = null;
         private final Lock lock = new ReentrantLock();
         private final Condition wakeupListener = lock.newCondition();        
@@ -246,6 +252,7 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
                     handleSegment(tag, data);
                 } 
                 LOG.debug("[FRC] exiting TcpRioLogListener.run() loop");
+                // closeSocket() called within stop() which is called in finally block
             }
             finally
             {
@@ -299,36 +306,80 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         
         private void handleSegment(int tag, ByteBuffer data)
         {
-            if (LOG.isTraceEnabled())
-            { LOG.trace("[FRC] handleSegment called: tag=" + tag); }
-            
-            
-            // tag == 11    Error or warning
-            // tag == 12    Standard message
-            // other tags are ignored
-            if (tag == 11 || tag == 12)
+            // The data sent is not direct Strings to display as is, but "Messages" that need to be (for the lat of a better term) 
+            // parsed. Then those Messages need to be rendered to get the actual content to display on the console.
+            try
             {
+                if (LOG.isTraceEnabled())
+                { LOG.trace("[FRC] handleSegment called: tag=" + tag); }
+
+                Message message;
+                if (tag == 11)
+                {  // Error or warning
+                    message = new ErrorMessage(data);
+                    if (message.getType() == Message.Type.kWarning && !showWarning.get())
+                    {
+                        return;
+                    }
+                }
+                else if (tag == 12 && showInfo.get())
+                {  // Console
+                    message = new InfoMessage(data);
+                }
+                else
+                {
+                    LOG.trace("Ignoring tag " + tag);
+                    return;  // Ignore other tags
+                }
+
+
                 try
                 {
-                    final String value = StandardCharsets.UTF_8.decode(data).toString();
-                    if (LOG.isTraceEnabled()) { LOG.trace("[FRC] Queueing Console data: " + value); }
-                    riologQueue.put(value);
+                    // The data sent is not direct Strings to display as is, but "Messages" that need to be (for the lat of a better term) 
+                    // parsed. Then those Messages need to be rendered to get the actual content to display on the console.
+                    // TODO: let's use the renderToString(Message, Message.RenderOptions()) overload to allow us to pass in custom renderOptions in order to turn on and off the timestamp, errorCode, errorLocation, errorCallstack, warningLocation, warningCallstack
+                    final String messageContent = MessageToStringRenderer.renderToString(message);
+                    riologQueue.put(messageContent);
                 }
                 catch (InterruptedException e)
                 {
                     LOG.debug("[FRC] InterruptedException during riologQueue.put(). Interrupting listener thread");
                     Thread.currentThread().interrupt();
                 }
-                catch (Exception e)
-                {
-                    LOG.warn("[FRC] An exception occurred when handling segment. Cause Summary: " + e.toString(), e);
-                    Thread.currentThread().interrupt();
-                }
             }
-            else
+            catch (Exception e)
             {
-                LOG.debug("[FRC] ignoring tag of '" + tag);
+                LOG.warn("[FRC] An exception occurred when handling segment. Cause Summary: " + e.toString(), e);
+                Thread.currentThread().interrupt();
             }
+
+
+//            // tag == 11    Error or warning
+//            // tag == 12    Standard message
+//            // other tags are ignored
+//            if (tag == 11 || tag == 12)
+//            {
+//                try
+//                {
+//                    final String value = StandardCharsets.UTF_8.decode(data).toString();
+//                    if (LOG.isTraceEnabled()) { LOG.trace("[FRC] Queueing Console data: " + value); }
+//                    riologQueue.put(value);
+//                }
+//                catch (InterruptedException e)
+//                {
+//                    LOG.debug("[FRC] InterruptedException during riologQueue.put(). Interrupting listener thread");
+//                    Thread.currentThread().interrupt();
+//                }
+//                catch (Exception e)
+//                {
+//                    LOG.warn("[FRC] An exception occurred when handling segment. Cause Summary: " + e.toString(), e);
+//                    Thread.currentThread().interrupt();
+//                }
+//            }
+//            else
+//            {
+//                LOG.debug("[FRC] ignoring tag of '" + tag);
+//            }
             
         }
         
@@ -394,7 +445,14 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
             }
             try
             {
-                riologQueue.put(">>>Connected to roboRIO<<<");
+                String connectionInfo = "";
+                try
+                {
+                    connectionInfo = " via " + mySocket.getInetAddress().toString();   
+                }
+                catch (Exception ignore) {}
+                    
+                riologQueue.put(">>>Connected to roboRIO" + connectionInfo + "<<<");
             }
             catch (InterruptedException ignore) {}
             LOG.info("[FRC] RIOLog TCP socket connected");
@@ -431,6 +489,12 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         }
 
 
+        @Override
+        protected void finalize()
+        {
+            stop();
+        }
+        
         public void stop()
         {
             cleanup.set(true);

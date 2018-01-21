@@ -137,38 +137,22 @@ public class RioLogProjectService
     }
 
     public synchronized void updateTcp() { tcpRioLogConsoleProjectService.update(); }
-    
 
-    public void activateUdpSafely()
+    public void activateUdp()
     {
-        udpRioLogConsoleProjectService.activateSafely();
+        udpRioLogConsoleProjectService.activate();
     }
 
-    public void activateTcpSafely()
+    public void activateTcp()
     {
-        tcpRioLogConsoleProjectService.activateSafely();
+        tcpRioLogConsoleProjectService.activate();
     }
 
-    public void activateUdpNow()
+    public void activateSsh()
     {
-        udpRioLogConsoleProjectService.activateNow();
+        sshRioLogConsoleProjectService.activate();
     }
 
-    public void activateTcpNow()
-    {
-        tcpRioLogConsoleProjectService.activateNow();
-    }
-
-    public void activateSshSafely()
-    {
-        sshRioLogConsoleProjectService.activateSafely();
-    }
-
-    public void activateSshNow()
-    {
-        sshRioLogConsoleProjectService.activateNow();
-    }
-    
     public void stopUdp()
     {
         udpRioLogConsoleProjectService.stop();

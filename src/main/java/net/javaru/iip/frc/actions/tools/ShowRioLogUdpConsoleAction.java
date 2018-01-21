@@ -33,7 +33,7 @@ public class ShowRioLogUdpConsoleAction extends AbstractFrcToolsAction implement
         if (project != null)
         {
             RioLogProjectService.getInstance(project).updateUdp();
-            RioLogProjectService.getInstance(project).activateUdpSafely();
+            RioLogProjectService.getInstance(project).activateUdp();
         }
     }
 }

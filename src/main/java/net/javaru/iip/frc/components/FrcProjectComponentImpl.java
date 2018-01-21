@@ -308,7 +308,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         {
             LOG.debug("[FRC] isFreshFrcTemplateProject = " + isFreshFrcTemplateProject);
 
-            RioLogProjectService.getInstance(myProject).activateUdpNow();
+            RioLogProjectService.getInstance(myProject).activateTcp();
             notifyToConfigureTeamNumIfNecessary(myProject, true);
 
             final WpiLibVersionStatus versionStatus = WpiLibVersionStatus.getCurrentVersionStatus(myProject, true);

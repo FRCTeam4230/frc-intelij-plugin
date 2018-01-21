@@ -84,6 +84,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     private static final Icon AUTO_CLEAR_ICON = AllIcons.Ide.OutgoingChangesOn;
     private static final Icon START_ICON = AllIcons.Actions.Execute;
     private static final Icon RESTART_ICON = AllIcons.Actions.Restart;
+    protected final String toStringValue;
     protected final Project myProject;
 
     private JComponent consolePanel;
@@ -113,6 +114,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         myProject = project;
         myActivateToolWindow = activateToolWindow;
         this.myAfterCompletionRunnable = afterCompletionRunnable;
+        toStringValue = getClass().getSimpleName() + " Tool Windows ID: " + getToolWindowId() + "  Tab Title: " + getTabTitle();
     }
 
 
@@ -161,14 +163,14 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     }
 
 
-    public void run(boolean isFirstRun)
+    public void run(boolean isFreshActivation)
     {
         // Implementation based on com.intellij.execution.RunContentExecutor
         // When reworking, look at com.intellij.build.BuildContentManagerImpl which is a more up to date ContentExecutor implementation  
         
         FileDocumentManager.getInstance().saveAllDocuments();
 
-        rioLogMonitorProcess = isFirstRun ? createAnnouncementRioLogMonitoringProcess() : createRioLogMonitoringProcess();
+        rioLogMonitorProcess = isFreshActivation ? createAnnouncementRioLogMonitoringProcess() : createRioLogMonitoringProcess();
 
         //   Regarding the commandLine parameter; the example from an IDEA bundled plugin I originally used used a null value
         //   for it as it was nullable. But a change was made in Nov 2015 that BaseOSProcessHandler now logs an exception if 
@@ -340,16 +342,28 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     protected abstract Executor createExecutor();
 
 
+    @Deprecated
     public void activateRioLogConsoleNow()
     {
         ApplicationManager.getApplication().invokeLater(new ActivateRioLogConsoleRunnable());
     }
 
-
+    @Deprecated
     public void activateRioLogConsoleSafely()
     {
-        ApplicationManager.getApplication().invokeLater(new ActivateRioLogConsoleRunnable(),
-                                                        o -> myProject.isInitialized() && myProject.isOpen());
+        ApplicationManager.getApplication().invokeLater(new ActivateRioLogConsoleRunnable(), o -> myProject.isInitialized() && myProject.isOpen());
+    }
+
+    public void activateRioLogConsole()
+    {
+        if (myProject.isInitialized() && myProject.isOpen())
+        {
+            ApplicationManager.getApplication().invokeLater(new ActivateRioLogConsoleRunnable());
+        }
+        else 
+        {
+            ApplicationManager.getApplication().invokeLater(new ActivateRioLogConsoleRunnable(), o -> myProject.isInitialized() && myProject.isOpen());
+        }
     }
 
 
@@ -384,7 +398,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         @Override
         public void run()
         {
-            LOG.debug("[FRC] ActivateRioLogConsoleRunnable is executing");
+            LOG.debug("[FRC] ActivateRioLogConsoleRunnable is executing for " + toString());
             final ToolWindow toolWindow = ToolWindowManager.getInstance(myProject)
                                                            .getToolWindow(getToolWindowId());
             toolWindow.activate(null);
@@ -392,8 +406,13 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             final Content content = contentManager.findContent(getTabTitle());
             if (content != null)
             {
+                LOG.debug("[FRC] requesting focus for " + content.getDescription());
                 contentManager.setSelectedContent(content, true);
                 ensureContentIsPinned(content);
+            }
+            else
+            {
+                LOG.debug("[FRC] content was null and cannot be activated/given-focus for " + toString());
             }
         }
     }
@@ -432,6 +451,13 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     public abstract String getToolWindowId();
 
     public abstract String getTabTitle();
+
+
+    @Override
+    public String toString()
+    {
+        return toStringValue;
+    }
 
 
     public void close()

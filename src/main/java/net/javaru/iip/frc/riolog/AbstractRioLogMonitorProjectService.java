@@ -17,7 +17,6 @@
 package net.javaru.iip.frc.riolog;
 
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -57,17 +56,12 @@ public abstract class AbstractRioLogMonitorProjectService
     protected final Project myProject;
     @Nullable
     private AbstractRioLogContentExecutor contentExecutor;
-    @NotNull
-    protected final AtomicBoolean isFirstRunFlag = new AtomicBoolean(true);
 
     protected AbstractRioLogMonitorProjectService(@NotNull Project myProject) {this.myProject = myProject;}
 
 
     public synchronized void update()
     {
-        // TODO change so the "usage" message show every time the window is opened (not activated, but opened), not just on project open. In other words, lets; not auto start the monitoring upon window open.
-        boolean isFirstRun = isFirstRunFlag.getAndSet(false);
-        
         final Module[] modules = ModuleManager.getInstance(myProject).getModules();
 
         boolean needConsole = false;
@@ -86,21 +80,20 @@ public abstract class AbstractRioLogMonitorProjectService
         final int configuredPort = frcSettings.getRioLogUdpPort();
         final int currentPort = determineCurrentlyMonitoredPort();
         final boolean portBounceNeeded = currentPort != -1 && currentPort != configuredPort;
+        final boolean haveConsole = contentExecutor != null; 
 
 
         final Thread currentThread = Thread.currentThread();
         LOG.debug("[FRC]     Current thread:   " + currentThread.getId() + " :: " + currentThread.getName());
         LOG.debug("[FRC]     needConsole:      " + needConsole);
-        LOG.debug("[FRC]     haveConsole:      " + (contentExecutor != null));
+        LOG.debug("[FRC]     haveConsole:      " + haveConsole);
         LOG.debug("[FRC]     useRunWindow:     " + useRunWindow);
         LOG.debug("[FRC]     configuredPort:   " + configuredPort);
         LOG.debug("[FRC]     currentPort:      " + currentPort);
         LOG.debug("[FRC]     portBounceNeeded: " + portBounceNeeded);
-        LOG.debug("[FRC]     isFirstRun:       " + isFirstRun);
 
 
-        if (needConsole && contentExecutor != null && contentExecutor.getRioLogMonitorProcess() != null
-            && contentExecutor.getRioLogMonitorProcess().isEnabled())
+        if (needConsole && haveConsole && contentExecutor.getRioLogMonitorProcess() != null && contentExecutor.getRioLogMonitorProcess().isEnabled())
         {
             // Case 1 - we have and need it, but we need to check if we have the right type (i.e. settings change)
             LOG.debug("[FRC] Case 1: have console and need it. Checking if correct type & port. Project is: " + myProject.getName());
@@ -112,7 +105,7 @@ public abstract class AbstractRioLogMonitorProjectService
                 LOG.debug("[FRC] Case 1.1: have a FRC Tool Window, but need a Run Tab. Closing FRC Tool Window and creating Run tab. Project is: "
                           + myProject.getName());
                 closeContentExecutor();
-                initContentExecutor(true, isFirstRun);
+                initContentExecutor(true, false);
             }
             else if (!useRunWindow && ToolWindowId.RUN.equals(contentExecutor.getToolWindowId()))
             {
@@ -120,7 +113,7 @@ public abstract class AbstractRioLogMonitorProjectService
                 LOG.debug("[FRC] Case 1.2: have a Run tab, but need a FRC Tool Window. Closing Run tab and creating FRC Tool Window. Project is: "
                           + myProject.getName());
                 closeContentExecutor();
-                initContentExecutor(false, isFirstRun);
+                initContentExecutor(false, false);
             }
             else
             {
@@ -132,27 +125,34 @@ public abstract class AbstractRioLogMonitorProjectService
                 }
                 else
                 {
-                    LOG.debug("[FRC] Case 1.3B: have console, need it, and it is the right type, listening on the correct port. No action needed. Project is: "
+                    LOG.debug("[FRC] Case 1.3B: have console, need it, and it is the right type, listening on the correct port. Just need to activate it. Project is: "
                               + myProject.getName());
+                    activate();
                 }
             }
         }
+        else if (needConsole && haveConsole && contentExecutor.getRioLogMonitorProcess() != null && !contentExecutor.getRioLogMonitorProcess().isEnabled())
+        {
+            // Case 2 - We need it, have, but its just not enabled
+            LOG.debug("[FRC] Case 2: need a console, have it, but its not enabled. Activating it. Project is: " + myProject.getName());
+            activate();
+        }
         else if (needConsole)
         {
-            // Case 2 - we need it, but don't have it
-            LOG.debug("[FRC] Case 2: need a console, but we don't have one. Creating one. Project is: " + myProject.getName());
-            initContentExecutor(useRunWindow, isFirstRun);
+            // Case 3 - we need it, but don't have it
+            LOG.debug("[FRC] Case 3: need a console, but we don't have one. Creating one. Project is: " + myProject.getName());
+            initContentExecutor(useRunWindow, true);
         }
-        else if (contentExecutor != null)
+        else if (haveConsole)
         {
-            // Case 3 we have it, but don't need it
-            LOG.debug("[FRC] Case 3: We have a console, but don't need it. Closing it. Project is: " + myProject.getName());
+            // Case 4 we have it, but don't need it
+            LOG.debug("[FRC] Case 4: We have a console, but don't need it. Closing it. Project is: " + myProject.getName());
             closeContentExecutor();
         }
         else
         {
-            //Case 4, we don't have it and don't need it... so do nothing
-            LOG.debug("[FRC] Case 4: We don't have a console window an we don't need one. No action needed. Project is: " + myProject.getName());
+            //Case 5, we don't have it and don't need it... so do nothing
+            LOG.debug("[FRC] Case 5: We don't have a console window an we don't need one. No action needed. Project is: " + myProject.getName());
         }
     }
 
@@ -171,23 +171,18 @@ public abstract class AbstractRioLogMonitorProjectService
     }
 
 
-    public void activateSafely()
+    public void activate()
     {
         if (contentExecutor != null)
         {
-            contentExecutor.activateRioLogConsoleSafely();
+            LOG.debug("[FRC] activate called for " + contentExecutor.toString());
+            contentExecutor.activateRioLogConsole();
         }
-    }
-
-
-    public void activateNow()
-    {
-        if (contentExecutor != null)
+        else
         {
-            contentExecutor.activateRioLogConsoleNow();
+            LOG.debug("[FRC] activate called, but contentExecutor is null. No action taken.");
         }
     }
-
 
     public void stop()
     {
@@ -214,14 +209,14 @@ public abstract class AbstractRioLogMonitorProjectService
     }
 
 
-    private void initContentExecutor(final boolean useRunWindow, final boolean isFirstRun)
+    private void initContentExecutor(final boolean useRunWindow, final boolean isFreshActivation)
     {
-        LOG.debug("[FRC] Creating AbstractRioLogContentExecutor: useRunWindow=" + useRunWindow +  " isFirstRun=" + isFirstRun);
+        LOG.debug("[FRC] Creating AbstractRioLogContentExecutor: useRunWindow=" + useRunWindow +  " isFreshActivation=" + isFreshActivation);
         try
         {
             contentExecutor = createRioLogContentExecutor(useRunWindow);
             Disposer.register(myProject, contentExecutor);
-            contentExecutor.run(isFirstRun);
+            contentExecutor.run(isFreshActivation);
         }
         catch (Exception e)
         {

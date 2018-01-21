@@ -27,6 +27,7 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindowId;
+import com.intellij.openapi.wm.ToolWindowManager;
 
 import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor;
@@ -80,7 +81,9 @@ public abstract class AbstractRioLogMonitorProjectService
         final int configuredPort = frcSettings.getRioLogUdpPort();
         final int currentPort = determineCurrentlyMonitoredPort();
         final boolean portBounceNeeded = currentPort != -1 && currentPort != configuredPort;
-        final boolean haveConsole = contentExecutor != null; 
+        final boolean haveConsole = contentExecutor != null && ToolWindowManager.getInstance(myProject)
+                                                                                .getToolWindow(contentExecutor.getToolWindowId())
+                                                                                .isAvailable();; 
 
 
         final Thread currentThread = Thread.currentThread();

@@ -244,11 +244,12 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
     {
         return "\n"
                + "**************************************************************************************************************************************************\n" 
-               + "I M P O R T A N T   N O T E \n" 
-               + "WPI Lib changed the RIOLog implementation for 2018. It was changed from using UDP to a new TCP based mechanism. I am in the process of\n" 
-               + "reimplementing the Net Console for this IntelliJ IDEA plugin to use the new protocol. Unfortunately there are a number of touch points involved.\n" 
-               + "I will release an update with the new Net Console implementation very soon. In the meantime, the alternate 'tailing via SSH' monitoring can be used.\n" 
-               + "From the menu: Tools > FRC > RIOLog Monitoring > SSH tailing \n"
+               + "I M P O R T A N T   N O T I C E \n" 
+               + "WPILib changed the RIOLog implementation for 2018. It was changed from using UDP to a new and more robust TCP based implementation.\n" 
+               + "This Legacy Net Console uses the older UDP based monitoring and will only work with Robots running v2017 or older WPILib code on the roboRIO.\n" 
+               + "To access the current Net Console go to the menu:  Tools > FRC > RIOLog Monitoring > Net Console \n"
+               + "The alternate 'ssh tailing' monitoring can also be used with all robots. From the menu:  Tools > FRC > RIOLog Monitoring > SSH Tailing \n"
+               + "I M P O R T A N T   N O T I C E \n"
                + "**************************************************************************************************************************************************\n"
                + "\n";
     }

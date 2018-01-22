@@ -121,6 +121,13 @@ public class RioLogProjectService
      */
     public synchronized void update()
     {
+        //For now, we are only going to update the primary console
+        tcpRioLogConsoleProjectService.update();
+    }
+
+    public synchronized void updateAll()
+    {
+        //For now, we are only going to update the primary console
         sshRioLogConsoleProjectService.update();
         udpRioLogConsoleProjectService.update();
         tcpRioLogConsoleProjectService.update();

@@ -64,6 +64,7 @@
     
       <strong>v0.7</strong> <br>
       &nbsp;&nbsp;&bull; Added RIOLog monitoring for WPILib's new (for 2018) TCP implementation (<a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/7">Issue #7</a>)<br>
+      &nbsp;&nbsp;&bull; No longer open the SSH Tailing alternative RIOLog monitoring by default. It is available via the menu: Tools | FRC | RIOLog Monitoring | SSH Tailing</a>)<br>
       &nbsp;&nbsp;&bull; Resolved an issue where the team number was sometimes not correctly set in the wpilib.properties (<a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/13">Issue #13</a>)<br>
       &nbsp;&nbsp;&bull; Miscellaneous changes and improvements<br>
       <br>

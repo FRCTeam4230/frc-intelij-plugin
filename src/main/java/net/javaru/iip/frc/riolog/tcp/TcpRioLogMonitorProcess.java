@@ -30,6 +30,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
 
@@ -134,6 +135,12 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
 
 
         @Override
+        protected boolean addLineBreak()
+        {
+            return true;
+        }
+
+        @Override
         public void stop()
         {
             LOG.debug("[FRC] stopping TCP listener");
@@ -221,6 +228,7 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
                         break;
                     }
 
+                    @SuppressWarnings("UnusedAssignment")
                     int tag = -1;
                     try
                     {
@@ -448,11 +456,14 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
                 String connectionInfo = "";
                 try
                 {
-                    connectionInfo = " via " + mySocket.getInetAddress().toString();   
+                    String host = mySocket.getInetAddress().toString();
+                    if (host.startsWith("/")) { host = StringUtils.removeStartIgnoreCase(host, "/"); }
+                    connectionInfo = " via " + host + " on port " + mySocket.getPort();
                 }
                 catch (Exception ignore) {}
                     
                 riologQueue.put(">>>Connected to roboRIO" + connectionInfo + "<<<");
+                riologQueue.put("");
             }
             catch (InterruptedException ignore) {}
             LOG.info("[FRC] RIOLog TCP socket connected");
@@ -498,6 +509,7 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         public void stop()
         {
             cleanup.set(true);
+            TcpRioSocketConnectorApplicationService.getInstance().stopConnectionAttempts();
             closeSocket();
             Thread.currentThread().interrupt();
         }

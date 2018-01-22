@@ -351,6 +351,20 @@ public class TcpRioSocketConnectorApplicationService
     }
 
 
+    public void stopConnectionAttempts()
+    {
+        lock.lock();
+        try
+        {
+            done = true;
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+    
+    
     private boolean isDone()
     {
         lock.lock();

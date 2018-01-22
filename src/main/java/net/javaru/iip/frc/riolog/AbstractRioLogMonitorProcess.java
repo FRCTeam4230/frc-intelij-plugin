@@ -163,7 +163,8 @@ public abstract class AbstractRioLogMonitorProcess extends Process
 
     public void stop()
     {
-        // Do not call the stopRioLogRunnable from the stop method. That runnable calls this stop method. So we'd get into an endless loop.
+        // Do not call the stopRioLogRunnable from the stop method. That runnable calls this stop method. 
+        // So we'd get into an endless loop.
         destroy();
     }
 

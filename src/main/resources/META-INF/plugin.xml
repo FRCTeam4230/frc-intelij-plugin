@@ -61,13 +61,15 @@
     ]]></description>
 
     <change-notes><![CDATA[
+    
+      <strong>v0.6.2.SNAPSHOT</strong> <br>
+      &nbsp;&nbsp;&bull; Added RIOLog monitoring for WPILib's new (for 2018) TCP implementation (<a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/7">Issue #7</a>)<br>
+      &nbsp;&nbsp;&bull; Resolved an issue where the team number was sometimes not correctly set in the wpilib.properties (<a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/13">Issue #13</a>)<br>
+      &nbsp;&nbsp;&bull; Miscellaneous changes and improvements<br>
+      <br>
       <strong>v0.6.1</strong> <br>
       &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/8">Issue #8</a>, &quot;Cannot deploy code to roboRIO&quot; 
       that was caused by a change in the way the 2018 WPILib deploys code to the roboRIO<br>
-      &nbsp;&nbsp;&bull; Known issue: WPI Lib changed the Net Console (i.e. RIOLog) protocol for 2018, breaking that feature. (See 
-      <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/7">Issue #7</a>) I am in the process of reimplementing 
-      the Net Console. I will release an update with the change soon. In the meantime, the alternate 'tailing via SSH' monitoring can be used. 
-      From the menu: Tools | FRC | RIOLog Monitoring | SSH tailing<br>
       <br>
       <strong>v0.6</strong> <br>
       &nbsp;&nbsp;&bull; <strong>IntelliJ IDEA v2017.3 or later now required</strong><br>

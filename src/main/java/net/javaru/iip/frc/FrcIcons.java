@@ -18,6 +18,7 @@ package net.javaru.iip.frc;
 
 import javax.swing.*;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.IconLoader;
 
@@ -126,10 +127,11 @@ public final class FrcIcons
         }
         catch (Throwable throwable)
         {
-            //IntelliJ IDEA will still log an independent error in the Events window, but by loading a replacement icon, it will
-            //prevent things (such as actions) from completely breaking because an icon was not loaded.
+            // IntelliJ IDEA will still log an independent error in the Events window, but by using a replacement icon, 
+            // it will prevent things (such as actions) from completely breaking because an icon was not loaded. We
+            // use what is basically a blank icon as it seems like a good substitute.
             LOG.warn("[FRC] An exception occurred when loading the icon from '" + path + "'. Cause Summary: " + throwable.toString());
-            return IconLoader.getIcon("/icons/InvalidIconPlaceholder-16.png", FrcIcons.class);
+            return AllIcons.Nodes.EmptyNode;
         }
     }
 

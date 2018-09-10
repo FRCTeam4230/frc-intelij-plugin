@@ -54,14 +54,18 @@
         <p> </p>
         <p>
             This plugin provides most of the functionality in the 'official' eclipse plugin, plus some additional functionality. 
-            Although it is in beta, it was successfully used by over 300 users during 2017 FRC seasons. More features are planned 
-            for future versions, with a 1.0 release coming soon. Please report issues or make feature requests via the above link.
+            Although it is in beta, it was successfully used by over 300 users during the 2017 FRC season, and over 1,500 users
+            during the 2018 FRC season. More features are planned for future versions, with a 1.0 release coming soon. Please 
+            report issues or make feature requests via the above link.
         </p>
         
     ]]></description>
 
     <change-notes><![CDATA[
     
+      <strong>v0.7.1</strong> <br>
+      &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/19">Issue #19</a>, a NPE that sometimes occurred when initializing the FRC framework<br>
+      <br>
       <strong>v0.7</strong> <br>
       &nbsp;&nbsp;&bull; Added RIOLog monitoring for WPILib's new (for 2018) TCP implementation (<a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/7">Issue #7</a>)<br>
       &nbsp;&nbsp;&bull; No longer open the SSH Tailing alternative RIOLog monitoring by default. It is available via the menu: Tools | FRC | RIOLog Monitoring | SSH Tailing</a>)<br>

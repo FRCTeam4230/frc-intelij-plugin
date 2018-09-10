@@ -18,7 +18,7 @@ import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 
 buildscript {
-  ext.kotlin_version = '1.2.10'
+  ext.kotlin_version = '1.2.41'
 
   repositories {
     mavenCentral()
@@ -105,6 +105,9 @@ compileJava.options.encoding = 'UTF-8'
 tasks.withType(JavaCompile) {
   options.encoding = 'UTF-8'
 }
+tasks.withType(Test) {
+  systemProperty "file.encoding", "UTF-8"
+}
 
 task wrapper(type: Wrapper) {
   // After modifying the version, run from cmd line: gradlew wrapper
@@ -161,7 +164,7 @@ prepareSandbox.doFirst {
 
 
 dependencies {
-  compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jre8', version: kotlin_version
+  compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: kotlin_version
   compile group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: kotlin_version
   compile group: 'org.jetbrains.kotlin', name: 'kotlin-runtime', version: kotlin_version
   testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test', version: kotlin_version

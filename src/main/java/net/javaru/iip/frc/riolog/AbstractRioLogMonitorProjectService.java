@@ -26,6 +26,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowId;
 import com.intellij.openapi.wm.ToolWindowManager;
 
@@ -81,9 +82,7 @@ public abstract class AbstractRioLogMonitorProjectService
         final int configuredPort = frcSettings.getRioLogUdpPort();
         final int currentPort = determineCurrentlyMonitoredPort();
         final boolean portBounceNeeded = currentPort != -1 && currentPort != configuredPort;
-        final boolean haveConsole = contentExecutor != null && ToolWindowManager.getInstance(myProject)
-                                                                                .getToolWindow(contentExecutor.getToolWindowId())
-                                                                                .isAvailable();; 
+        final boolean haveConsole = contentExecutor != null && isFrcToolWindowAvailable();
 
 
         final Thread currentThread = Thread.currentThread();
@@ -157,6 +156,25 @@ public abstract class AbstractRioLogMonitorProjectService
             //Case 5, we don't have it and don't need it... so do nothing
             LOG.debug("[FRC] Case 5: We don't have a console window an we don't need one. No action needed. Project is: " + myProject.getName());
         }
+    }
+
+
+    protected boolean isFrcToolWindowAvailable()
+    {
+        if (contentExecutor != null)
+        {
+            final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(myProject);
+            if (toolWindowManager != null)
+            {
+                final ToolWindow toolWindow = toolWindowManager.getToolWindow(contentExecutor.getToolWindowId());
+                if (toolWindow != null)
+                {
+                    return toolWindow.isAvailable();
+                }
+            }
+        }
+        
+        return false;
     }
 
 

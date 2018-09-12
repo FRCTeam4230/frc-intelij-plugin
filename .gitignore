@@ -11,14 +11,14 @@ syntax: regexp
 
 # Exclude other resources
 \.orig
-\.log.*
+.*\.log
 release\.properties$
 runtime\.properties$
 \.releaseBackup$
 .*dist\.zip$
 .*workspace\.xml$
 .*[\.-]?HOLD.*
-
+.sandbox/
 
 syntax: glob
 # Exclude IDE files

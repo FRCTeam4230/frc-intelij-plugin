@@ -1,0 +1,22 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="FRC [runIde] (2017.3)" type="GradleRunConfiguration" factoryName="Gradle" singleton="true">
+    <log_file alias="idea.log" path="$PROJECT_DIR$/build/idea-sandbox/system/log/idea.log" />
+    <ExternalSystemSettings>
+      <option name="executionName" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalSystemIdString" value="GRADLE" />
+      <option name="scriptParameters" value="-PideaVersion=IC-2017.3" />
+      <option name="taskDescriptions">
+        <list />
+      </option>
+      <option name="taskNames">
+        <list>
+          <option value="test" />
+          <option value="runIde" />
+        </list>
+      </option>
+      <option name="vmOptions" value="-Dfrc.simulated.log.service.enabled=false -Dfrc.simulated.log.service.use.configured.port=true -Dfrc.use.wpilib.beta.site=false -Dfrc.alt.wpilib.base.dir=P:\dev\proj\frc\wpilib-2018-base-B" />
+    </ExternalSystemSettings>
+    <method v="2" />
+  </configuration>
+</component>

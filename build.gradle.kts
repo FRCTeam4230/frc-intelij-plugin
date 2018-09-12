@@ -55,7 +55,6 @@ task<Wrapper>("wrapper") {
     //    Alternatively you can just run:   gradle wrapper --gradle-version 4.10 --distribution-type ALL
     gradleVersion = "4.10"
     distributionType = Wrapper.DistributionType.ALL
-
 }
 
 

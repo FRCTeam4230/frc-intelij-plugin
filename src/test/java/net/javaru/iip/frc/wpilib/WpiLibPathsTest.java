@@ -20,10 +20,10 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import com.intellij.util.ResourceUtil;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 
@@ -33,39 +33,40 @@ public class WpiLibPathsTest
     
     
     @Test
-    public void getUserRootDir() throws Exception
+    public void getUserRootDir()
     {
-        assertEquals("Wrong dir path for getUserRootDir", "C:\\Users\\Dilbert\\wpilib\\user", WpiLibPaths.getUserRootDir(wpiLibDir).toString());
+        assertEquals("C:\\Users\\Dilbert\\wpilib\\user", WpiLibPaths.getUserRootDir(wpiLibDir).toString(), "Wrong dir path for getUserRootDir");
     }
 
 
     @Test
-    public void getUserLibDir() throws Exception
+    public void getUserLibDir()
     {
-        assertEquals("Wrong dir path for getUserLibDir", "C:\\Users\\Dilbert\\wpilib\\user\\java\\lib", WpiLibPaths.getUserLibDir(wpiLibDir).toString());
+        assertEquals("C:\\Users\\Dilbert\\wpilib\\user\\java\\lib", WpiLibPaths.getUserLibDir(wpiLibDir).toString(),
+                                "Wrong dir path for getUserLibDir");
     }
 
 
     @Test
-    public void getToolsDir() throws Exception
+    public void getToolsDir()
     {
-        assertEquals("Wrong dir path for getToolsDir", "C:\\Users\\Dilbert\\wpilib\\tools", WpiLibPaths.getToolsDir(wpiLibDir).toString());
+        assertEquals("C:\\Users\\Dilbert\\wpilib\\tools", WpiLibPaths.getToolsDir(wpiLibDir).toString(), "Wrong dir path for getToolsDir");
     }
 
 
     @Test
-    public void getJavaDir() throws Exception
+    public void getJavaDir()
     {
-        assertEquals("Wrong dir path for getJavaDir", "C:\\Users\\Dilbert\\wpilib\\java", WpiLibPaths.getJavaDir(wpiLibDir).toString());
+        assertEquals("C:\\Users\\Dilbert\\wpilib\\java", WpiLibPaths.getJavaDir(wpiLibDir).toString(), "Wrong dir path for getJavaDir");
     }
 
 
     @Test
-    public void getJavaCurrentVersionDir() throws Exception
+    public void getJavaCurrentVersionDir()
     {
-        assertEquals("Wrong dir path for getJavaCurrentDir",
-                     "C:\\Users\\Dilbert\\wpilib\\java\\current",
-                     WpiLibPaths.getJavaCurrentDir(wpiLibDir, "current").toString());
+        assertEquals(
+                "C:\\Users\\Dilbert\\wpilib\\java\\current",
+                WpiLibPaths.getJavaCurrentDir(wpiLibDir, "current").toString(), "Wrong dir path for getJavaCurrentDir");
     }
 
 
@@ -79,45 +80,47 @@ public class WpiLibPathsTest
         System.out.println("mockWpiLibDir = " + mockWpiLibDir);
 
 
-        assertEquals("Wrong dir path for getJavaCurrentDir reading properties file",
-                     mockWpiLibDir.resolve("java/alt-version-value").toString(),
-                     WpiLibPaths.getJavaCurrentDir(mockWpiLibDir).toString());
+        assertEquals(
+                mockWpiLibDir.resolve("java/alt-version-value").toString(),
+                WpiLibPaths.getJavaCurrentDir(mockWpiLibDir).toString(), "Wrong dir path for getJavaCurrentDir reading properties file");
 
         //Test properties file does not exit
         mockWpiLibDir = Paths.get("/nonExistent/Mock/Path");
-        assertEquals("Wrong dir path for getJavaCurrentDir when properties file is not found",
-                     mockWpiLibDir.resolve("java/current").toString(),
-                     WpiLibPaths.getJavaCurrentDir(mockWpiLibDir).toString());
+        assertEquals(
+                mockWpiLibDir.resolve("java/current").toString(),
+                WpiLibPaths.getJavaCurrentDir(mockWpiLibDir).toString(), "Wrong dir path for getJavaCurrentDir when properties file is not found");
     }
 
 
     @Test
-    public void getJavaLibDir() throws Exception
+    public void getJavaLibDir()
     {
-        assertEquals("Wrong dir path for getJavaLibDir", "C:\\Users\\Dilbert\\wpilib\\java\\current\\lib", WpiLibPaths.getJavaLibDir(wpiLibDir).toString());
+        assertEquals("C:\\Users\\Dilbert\\wpilib\\java\\current\\lib", WpiLibPaths.getJavaLibDir(wpiLibDir).toString(),
+                                "Wrong dir path for getJavaLibDir");
     }
 
 
     @Test
-    public void getAntDir() throws Exception
+    public void getAntDir()
     {
-        assertEquals("Wrong dir path for getAntDir", "C:\\Users\\Dilbert\\wpilib\\java\\current\\ant", WpiLibPaths.getAntDir(wpiLibDir).toString());
+        assertEquals("C:\\Users\\Dilbert\\wpilib\\java\\current\\ant", WpiLibPaths.getAntDir(wpiLibDir).toString(), "Wrong dir path for getAntDir");
     }
 
 
     @Test
-    public void getJavadocDir() throws Exception
+    public void getJavadocDir()
     {
-        assertEquals("Wrong dir path for getJavadocDir", "C:\\Users\\Dilbert\\wpilib\\java\\current\\javadoc", WpiLibPaths.getJavadocDir(wpiLibDir).toString());
+        assertEquals("C:\\Users\\Dilbert\\wpilib\\java\\current\\javadoc", WpiLibPaths.getJavadocDir(wpiLibDir).toString(),
+                                "Wrong dir path for getJavadocDir");
     }
 
 
     @Test
-    public void getWpilibPropertiesFile() throws Exception
+    public void getWpilibPropertiesFile()
     {
-        assertEquals("Wrong file path for getWpilibPropertiesFile",
-                     "C:\\Users\\Dilbert\\wpilib\\wpilib.properties",
-                     WpiLibPaths.getWpilibPropertiesFile(wpiLibDir).toString());
+        assertEquals(
+                "C:\\Users\\Dilbert\\wpilib\\wpilib.properties",
+                WpiLibPaths.getWpilibPropertiesFile(wpiLibDir).toString(), "Wrong file path for getWpilibPropertiesFile");
     }
 
 }

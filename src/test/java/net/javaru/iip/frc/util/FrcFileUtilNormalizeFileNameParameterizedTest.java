@@ -17,55 +17,41 @@
 package net.javaru.iip.frc.util;
 
 import java.util.Arrays;
-import java.util.Collection;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 
-@RunWith(Parameterized.class)
 public class FrcFileUtilNormalizeFileNameParameterizedTest
 {
 
-    private final String param;
-    private final String expected;
+    @ParameterizedTest
+    @MethodSource("data")
+   void testTestNormalizeFileNameExtension(String param, String expected)
+   {
+       final String actual = FrcFileUtils.normalizeFileNameExtension(param, "xml");
+       assertEquals(expected, actual, "Wrong value for " + param);
+   }
 
 
-    public FrcFileUtilNormalizeFileNameParameterizedTest(String param, String expected)
+    static Iterable<Arguments> data()
     {
-        this.param = param;
-        this.expected = expected;
-    }
-
-
-    @Parameters
-    public static Collection<Object[]> data()
-    {
-        return Arrays.asList(new Object[][] {
-             /*   0 */ {"build", "build.xml"},
-             /*   1 */ {"build.xml", "build.xml"},
-             /*   2 */ {"build.XML", "build.xml"},
-             /*   3 */ {"build.Xml", "build.xml"},
-             /*   4 */ {"build.foo", "build.foo.xml"},
-             /*   5 */ {"build.foo.xml", "build.foo.xml"},
-             /*   6 */ {null, null},
-             /*   7 */ {"build ", "build.xml"},
-             /*   8 */ {" build", "build.xml"},
-             /*   9 */ {" build ", "build.xml"},
-             /*  10 */ {" build.xml ", "build.xml"},
-             });
-    }
-
-
-    @Test
-    public void testNormalizeFileNameExtension()
-    {
-        final String actual = FrcFileUtils.normalizeFileNameExtension(param, "xml");
-        assertEquals("Wrong value for " + param, expected, actual);
+        return Arrays.asList(
+               Arguments.of("build", "build.xml"),
+               Arguments.of("build.xml", "build.xml"),
+               Arguments.of("build.XML", "build.xml"),
+               Arguments.of("build.Xml", "build.xml"),
+               Arguments.of("build.foo", "build.foo.xml"),
+               Arguments.of("build.foo.xml", "build.foo.xml"),
+               Arguments.of(null, null),
+               Arguments.of("build ", "build.xml"),
+               Arguments.of(" build", "build.xml"),
+               Arguments.of(" build ", "build.xml"),
+               Arguments.of(" build.xml ", "build.xml")
+                );
     }
 }

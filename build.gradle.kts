@@ -30,6 +30,22 @@
  *     limitations under the License.
  */
 
+/*
+ * Copyright 2015-2018 the original author or authors
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *     
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ */
+
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.internal.impldep.org.apache.maven.wagon.PathUtils.password
 import org.gradle.api.tasks.wrapper.Wrapper
@@ -48,15 +64,14 @@ version = "0.8-SNAPSHOT"
 //    build.loadExtraPropertiesOf(project)
 //}
 
-// TODO: Per gradle run warning, this syntax is deprecated and will be removed in Gradle 5.0.
-//       Creating a custom task named 'wrapper' has been deprecated. This is scheduled to be removed in Gradle 5.0. You can configure the existing task using the 'wrapper { }' syntax or create your custom task under a different name.    
-task<Wrapper>("wrapper") {
-    // After modifying the anything, run from cmd line:   gradle wrapper
-    //    Alternatively you can just run:   gradle wrapper --gradle-version 4.10 --distribution-type ALL
-    gradleVersion = "4.10"
+tasks.getByName<Wrapper>("wrapper") {
+    // After modifying the anything, run from cmd line:   gradlew wrapper
+    //    Although this seems to only update the gradle-wrapper.properties file and not the gradle-wrapper.jar
+    //    Alternatively you can just run:   gradlew wrapper --gradle-version 4.10.1 --distribution-type ALL
+    //       This one updates both the properties file and the jar
+    gradleVersion = "4.10.1"
     distributionType = Wrapper.DistributionType.ALL
 }
-
 
 val kotlinVersion = plugins.getPlugin(KotlinPluginWrapper::class.java).kotlinPluginVersion
 
@@ -83,15 +98,15 @@ tasks {
     withType<JavaCompile> {
         options.encoding = Charsets.UTF_8.name()
     }
-    withType<Test> {
-        systemProperty("file.encoding", Charsets.UTF_8.name())
-        configureEach {
-            testLogging {
-                events("failed")
-                exceptionFormat = TestExceptionFormat.FULL
-            }
-        }
-    }
+//    withType<Test> {
+//        systemProperty("file.encoding", Charsets.UTF_8.name())
+//        configureEach {
+//            testLogging {
+//                events("failed")
+//                exceptionFormat = TestExceptionFormat.FULL
+//            }
+//        }
+//    }
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         all {
             kotlinOptions {

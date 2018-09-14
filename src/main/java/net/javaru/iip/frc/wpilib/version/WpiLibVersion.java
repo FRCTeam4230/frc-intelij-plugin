@@ -80,4 +80,7 @@ public interface WpiLibVersion extends Comparable<WpiLibVersion>
     }
 
     default boolean isOlderThan(@Nonnull WpiLibVersion other) { return compareTo(other) < 0;}
+
+    WpiLibVersion clone();
+     
 }

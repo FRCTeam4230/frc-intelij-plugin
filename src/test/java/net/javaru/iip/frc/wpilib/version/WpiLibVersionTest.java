@@ -19,6 +19,7 @@ package net.javaru.iip.frc.wpilib.version;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,6 +65,17 @@ class WpiLibVersionTest
         assertEquals(versionList, list, "Sorted list is not equal to expected");
     }
 
+    @ParameterizedTest
+    @MethodSource("versionListProvider")
+    void areEqual(WpiLibVersion libVersion)
+    {
+        //noinspection CastToConcreteClass
+        assertAll(
+                () -> assertEquals(libVersion, libVersion, "Equals method does not return true for same object"),
+                () -> assertEquals(libVersion, WpiLibVersionImpl.parse(libVersion.toString()), "Equals method did not return true for equal WpiLibVersion objects using parse"),
+                () -> assertEquals(libVersion, libVersion.clone(), "Equals method did not return true for equal WpiLibVersion objects using clone")
+        );
+    }
 
     @ParameterizedTest
     @MethodSource("isNewerThanProvider")
@@ -88,6 +100,10 @@ class WpiLibVersionTest
                      + expectedIsXOlderThanY);
     }
 
+    static Iterable<Arguments> versionListProvider() 
+    {
+        return versionList.stream().map(Arguments::of).collect(Collectors.toList());
+    }
 
     static Iterable<Arguments> isNewerThanProvider()
     {
@@ -145,7 +161,6 @@ class WpiLibVersionTest
     {
         List<Arguments> args = new ArrayList<>();
         WpiLibVersion expected;
-        WpiLibVersion actual;
 
         expected = new ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.alpha, 5);
         args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-alpha-5")));
@@ -176,7 +191,6 @@ class WpiLibVersionTest
 
         expected = new ExpectedWpiLibVersion(2017, 2018, 1, 0, null, null);
         args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1")));
-
 
         return args;
     }
@@ -239,6 +253,14 @@ class WpiLibVersionTest
         @Nullable
         @Override
         public Integer getPreReleaseModifierVersion() { return preReleaseModifierVersion; }
+
+
+        @SuppressWarnings("MethodDoesntCallSuperMethod")
+        @Override
+        public WpiLibVersion clone()
+        {
+            return new ExpectedWpiLibVersion(this.generation, this.major, this.minor, this.patch, this.preReleaseModifier, this.preReleaseModifierVersion);
+        }
     }
 
     private static final WpiLibVersion v15 = WpiLibVersionImpl.parse("0.1.0.201502241928");
@@ -287,6 +309,14 @@ class WpiLibVersionTest
     private static final WpiLibVersion v2018_2_3 = WpiLibVersionImpl.parse("2018.2.3");
     private static final WpiLibVersion v2018_2_4 = WpiLibVersionImpl.parse("2018.2.4");
     private static final WpiLibVersion v2018_2_5 = WpiLibVersionImpl.parse("2018.2.5");
+    private static final WpiLibVersion v2018_3_1 = WpiLibVersionImpl.parse("2018.3.1");
+    private static final WpiLibVersion v2018_4_1 = WpiLibVersionImpl.parse("2018.4.1");
+    private static final WpiLibVersion v2018_5_1 = WpiLibVersionImpl.parse("2018.5.1");
+    private static final WpiLibVersion v2018_5_2 = WpiLibVersionImpl.parse("2018.5.2");
+    private static final WpiLibVersion v2018_6_1 = WpiLibVersionImpl.parse("2018.6.1");
+    private static final WpiLibVersion v2019_0_0 = WpiLibVersionImpl.parse("2019.0.0");
+    private static final WpiLibVersion v2019_0_1 = WpiLibVersionImpl.parse("2019.0.1");
+    private static final WpiLibVersion v2019_1_1 = WpiLibVersionImpl.parse("2019.1.1");
 
     private static final ImmutableList<WpiLibVersion> versionList;
 
@@ -340,6 +370,14 @@ class WpiLibVersionTest
         list.add(v2018_2_3);
         list.add(v2018_2_4);
         list.add(v2018_2_5);
+        list.add(v2018_3_1);
+        list.add(v2018_4_1);
+        list.add(v2018_5_1);
+        list.add(v2018_5_2);
+        list.add(v2018_6_1);
+        list.add(v2019_0_0);
+        list.add(v2019_0_1);
+        list.add(v2019_1_1);
 
         versionList = list.build();
     }

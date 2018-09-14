@@ -100,6 +100,12 @@ public class WpiLibVersionImpl implements WpiLibVersion
         }
     }
 
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
+    @Override
+    public WpiLibVersion clone()
+    {
+        return new WpiLibVersionImpl(this.version, this.generation, this.major, this.minor, this.patch, this.preReleaseModifier, this.preReleaseModifierVersion);
+    }
 
     private WpiLibVersionImpl(String version,
                               int generation,

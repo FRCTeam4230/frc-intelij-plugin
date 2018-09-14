@@ -58,7 +58,7 @@ public class LibraryUtils
                                                                catch (Throwable t) 
                                                                {
                                                                    LOG.info("[FRC] Could not create non-existing directory for attachment as library. This " 
-                                                                            + "will result in directory not being attached as library. Target fir was '" 
+                                                                            + "will result in directory not being attached as library. Target dir was '" 
                                                                             + dir + "'. Cause Summary: " + t.toString());
                                                                }
                                                                

@@ -32,14 +32,6 @@ version = "0.8-SNAPSHOT"
 //    build.loadExtraPropertiesOf(project)
 //}
 
-tasks.getByName<Wrapper>("wrapper") {
-    // After modifying the anything, run from cmd line:   gradlew wrapper
-    //    Although this seems to only update the gradle-wrapper.properties file and not the gradle-wrapper.jar
-    //    Alternatively you can just run:   gradlew wrapper --gradle-version 4.10.1 --distribution-type ALL
-    //       This one updates both the properties file and the jar
-    gradleVersion = "4.10.1"
-    distributionType = Wrapper.DistributionType.ALL
-}
 
 val kotlinVersion = plugins.getPlugin(KotlinPluginWrapper::class.java).kotlinPluginVersion
 
@@ -56,8 +48,8 @@ plugins {
     base
     java
     kotlin("jvm") version "1.2.41"
-    id("org.jetbrains.intellij") version "0.3.9" // gradle plugin-for writing IntelliJ plugins
-    // v0.4 -- 0.4.2 breaks the copyright configuration. can;t find any notes about changes 
+    id("org.jetbrains.intellij") version "0.3.12" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
+    // v0.4 -- 0.4.2 breaks the copyright configuration. can't find any notes about changes 
     id("org.jetbrains.gradle.plugin.idea-ext") version "0.3" // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
 }
 
@@ -148,7 +140,6 @@ idea {
                 profiles {
                     create("Apache 2 -- 2015 inception") {
                         keyword = "Copyright"
-                        allowReplaceRegexp = "Mark Ve|TRGR"
                         notice = """
                             #set( ${'$'}inceptionYear = 2015 )
                             Copyright ${'$'}inceptionYear#if(${'$'}today.year!=${'$'}inceptionYear)-${'$'}today.year#end the original author or authors

@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="FRC [runIde] (2018.2)" type="GradleRunConfiguration" factoryName="Gradle" singleton="true">
-    <log_file alias="idea.log" path="$PROJECT_DIR$/build/idea-sandbox/system/log/idea.log" />
+    <log_file alias="idea.log" path="$PROJECT_DIR$/.sandbox/system/log/idea.log" />
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -15,8 +15,9 @@
           <option value="runIde" />
         </list>
       </option>
-      <option name="vmOptions" value="-Dfrc.simulated.log.service.enabled=false -Dfrc.simulated.log.service.use.configured.port=true -Dfrc.use.wpilib.beta.site=true" />
+      <option name="vmOptions" value="-Dfrc.simulated.log.service.enabled=false -Dfrc.simulated.log.service.use.configured.port=true -Dfrc.use.wpilib.beta.site=true -Dfrc.alt.wpilib.base.dir=P:\dev\proj\frc\wpilib-2018-base-B" />
     </ExternalSystemSettings>
+    <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
     <method v="2" />
   </configuration>
 </component>

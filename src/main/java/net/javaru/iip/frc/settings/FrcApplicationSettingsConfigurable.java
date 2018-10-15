@@ -26,7 +26,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 
-import net.javaru.iip.frc.i18n.FrcMessageBundle;
+import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.riolog.RioLogProjectService;
 
 
@@ -53,7 +53,7 @@ public class FrcApplicationSettingsConfigurable implements SearchableConfigurabl
     @Override
     public String getDisplayName()
     {
-        return FrcMessageBundle.message("frc.ui.application.settings.display.name");
+        return FrcBundle.message("frc.ui.application.settings.display.name");
     }
 
 

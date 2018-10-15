@@ -34,16 +34,16 @@ import net.javaru.iip.frc.util.FrcUiUtils;
 /**
  * FRC Message Bundle.
  */
-public class FrcMessageBundle
+public class FrcBundle
 {
-    //private static final Logger LOG = Logger.getInstance(FrcMessageBundle.class);
+    //private static final Logger LOG = Logger.getInstance(FrcBundle.class);
     
     @NonNls
     private static final String BUNDLE_NAME = "i18n.FrcBundle";
     private static Reference<ResourceBundle> ourBundle;
 
 
-    private FrcMessageBundle() { }
+    private FrcBundle() { }
 
 
     private static ResourceBundle getBundle()

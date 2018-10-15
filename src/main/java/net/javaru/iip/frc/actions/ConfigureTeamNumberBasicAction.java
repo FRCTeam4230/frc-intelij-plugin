@@ -36,7 +36,7 @@ import com.intellij.openapi.wm.ex.WindowManagerEx;
 import net.javaru.iip.frc.FrcIcons.FRC;
 import net.javaru.iip.frc.FrcPluginGlobals;
 import net.javaru.iip.frc.components.FrcProjectComponentImpl;
-import net.javaru.iip.frc.i18n.FrcMessageBundle;
+import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.wpilib.WpiLibPaths;
@@ -64,7 +64,7 @@ public class ConfigureTeamNumberBasicAction extends AnAction
         final FrcApplicationSettings settings = FrcApplicationSettings.Settings.INSTANCE();
 
         final String teamNumString = Messages.showInputDialog(ideFrame.getComponent(),
-                                                              FrcMessageBundle.message("frc.ui.dialogs.enterTeamNumberPrompt"),
+                                                              FrcBundle.message("frc.ui.dialogs.enterTeamNumberPrompt"),
                                                               FrcPluginGlobals.FRC_PLUGIN_NAME,
                                                               FRC.FIRST_ICON_DIALOG_WINDOW,
                                                               (settings.isTeamNumberConfigured() ? "" + settings.getTeamNumber() : ""),

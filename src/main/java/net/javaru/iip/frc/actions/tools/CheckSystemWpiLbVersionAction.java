@@ -24,7 +24,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 
 import net.javaru.iip.frc.facet.FrcFacet;
-import net.javaru.iip.frc.i18n.FrcMessageBundle;
+import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionStatus;
 
@@ -50,7 +50,7 @@ public class CheckSystemWpiLbVersionAction extends AbstractFrcToolsAction
         //TODO: i18n
 
 
-        final String title = FrcMessageBundle.message("frc.wpilib.version.dialog.title");
+        final String title = FrcBundle.message("frc.wpilib.version.dialog.title");
         @Nullable
         String yesText = null;
         

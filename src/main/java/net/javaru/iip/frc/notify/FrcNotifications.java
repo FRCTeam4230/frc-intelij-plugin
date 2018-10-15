@@ -33,7 +33,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.actions.ConfigureTeamNumberBasicAction;
-import net.javaru.iip.frc.i18n.FrcMessageBundle;
+import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 
 
@@ -47,11 +47,11 @@ public class FrcNotifications implements FrcNotificationsApplicationComponent
     private static final Logger LOG = Logger.getInstance(FrcNotifications.class);
 
 
-    public static final NotificationGroup FRC_GENERAL_NOTIFICATION_GROUP = new NotificationGroup(FrcMessageBundle.message("frc.notifications.group.name.general"),
+    public static final NotificationGroup FRC_GENERAL_NOTIFICATION_GROUP = new NotificationGroup(FrcBundle.message("frc.notifications.group.name.general"),
                                                                                                  NotificationDisplayType.BALLOON,
                                                                                                  true);
 
-    public static final NotificationGroup FRC_ACTIONABLE_NOTIFICATION_GROUP = new NotificationGroup(FrcMessageBundle.message("frc.notifications.group.name.actionable"),
+    public static final NotificationGroup FRC_ACTIONABLE_NOTIFICATION_GROUP = new NotificationGroup(FrcBundle.message("frc.notifications.group.name.actionable"),
 
                                                                                                     NotificationDisplayType.STICKY_BALLOON,
                                                                                                     true);

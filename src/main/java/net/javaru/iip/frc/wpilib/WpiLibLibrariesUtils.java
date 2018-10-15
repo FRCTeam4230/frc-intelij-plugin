@@ -53,7 +53,7 @@ import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.impl.compiled.ClassFileDecompiler;
 
-import net.javaru.iip.frc.i18n.FrcMessageBundle;
+import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.util.FindClassUtils;
 import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
@@ -452,7 +452,7 @@ public class WpiLibLibrariesUtils
     {
         if (!isWpilibAttachedViaReadAction(project))
         {
-            return FrcMessageBundle.message("frc.wpilib.not.attached");
+            return FrcBundle.message("frc.wpilib.not.attached");
         }
 
         
@@ -460,7 +460,7 @@ public class WpiLibLibrariesUtils
         
         if (verClass.length == 0)
         {
-            return FrcMessageBundle.message("frc.wpilib.version.unavailable", WpiLibConstants.VERSION_CLASS_FQN);
+            return FrcBundle.message("frc.wpilib.version.unavailable", WpiLibConstants.VERSION_CLASS_FQN);
         }
 
         String version = null;
@@ -484,7 +484,7 @@ public class WpiLibLibrariesUtils
             }
         }
         
-        return version != null ? version : FrcMessageBundle.message("frc.wpilib.version.undetermined");
+        return version != null ? version : FrcBundle.message("frc.wpilib.version.undetermined");
     }
 
  
@@ -512,7 +512,7 @@ public class WpiLibLibrariesUtils
     {
         if (!isWpilibDownloadedToSystem())
         {
-            return FrcMessageBundle.message("frc.wpilib.version.second.half.msg.not.on.system");
+            return FrcBundle.message("frc.wpilib.version.second.half.msg.not.on.system");
         }
         else
         {
@@ -608,7 +608,7 @@ public class WpiLibLibrariesUtils
             }
 
         }
-        return FrcMessageBundle.message("frc.wpilib.version.second.half.msg.undetermined");
+        return FrcBundle.message("frc.wpilib.version.second.half.msg.undetermined");
     }
 
 

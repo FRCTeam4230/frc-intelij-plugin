@@ -25,7 +25,7 @@ import com.intellij.psi.PsiDirectory;
 import net.javaru.iip.frc.FrcIcons;
 import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory;
 
-import static net.javaru.iip.frc.i18n.FrcMessageBundle.message;
+import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 

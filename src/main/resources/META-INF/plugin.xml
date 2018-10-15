@@ -63,9 +63,10 @@
 
     <change-notes><![CDATA[
     
-      <strong>NEXT VERSION</strong>
+      <strong>NEXT VERSION</strong> <br>
       &nbsp;&nbsp;&bull; Implemented <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/15">Enhancement #15</a>, automatically include <tt>user\java\docs</tt>
-      as a Javadoc directory when creating/attaching the 'WPILib User Lib' library
+      as a Javadoc directory when creating/attaching the 'WPILib User Lib' library<br>
+      <br>
       <strong>v0.7.1</strong> <br>
       &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/19">Issue #19</a>, a NPE that sometimes occurred when initializing the FRC framework<br>
       <br>

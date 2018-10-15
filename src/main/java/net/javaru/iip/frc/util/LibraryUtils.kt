@@ -40,7 +40,7 @@ import java.nio.file.Path
     {
         ApplicationManager.getApplication().runWriteAction {
             
-            LOG.debug("Attaching Library: $libDef")
+            LOG.debug("[FRC] Attaching Library: $libDef")
             val rootManager = ModuleRootManager.getInstance(libDef.module)
             val modifiableRootModel = rootManager.modifiableModel
             val libraryTable = modifiableRootModel.moduleLibraryTable
@@ -48,12 +48,12 @@ import java.nio.file.Path
             var library = libraryTable.getLibraryByName(libDef.libName)
             if (library == null)
             {
-                LOG.info("Library '${libDef.libName} does not exist and will be created.")
+                LOG.info("[FRC] Library '${libDef.libName} does not exist and will be created.")
                 library = libraryTable.createLibrary(libDef.libName)
             }
             else
             {
-                LOG.info("Library '${libDef.libName} already exists. Will modify/update it.")
+                LOG.info("[FRC] Library '${libDef.libName} already exists. Will modify/update it.")
                 val libraryModifiableModel = library.modifiableModel
                 libraryModifiableModel.getUrls(OrderRootType.CLASSES).forEach { libraryModifiableModel.removeRoot(it, OrderRootType.CLASSES) }
                 libraryModifiableModel.getUrls(OrderRootType.SOURCES).forEach { libraryModifiableModel.removeRoot(it, OrderRootType.SOURCES) }
@@ -67,7 +67,7 @@ import java.nio.file.Path
             
             libraryModifiableModel.commit()
             modifiableRootModel.commit()
-            LOG.debug("Library attach competed for '${libDef.libName}")
+            LOG.debug("[FRC] Library attach competed for '${libDef.libName}")
         }
     }
 

@@ -41,7 +41,10 @@ import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.util.IndexUtils;
-import net.javaru.iip.frc.util.LibraryUtils;
+import net.javaru.iip.frc.util.LibDef;
+import net.javaru.iip.frc.util.LibDefBuilder;
+import net.javaru.iip.frc.util.LibDirType;
+import net.javaru.iip.frc.util.LibraryUtilsKt;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.WpiLibPaths;
 import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
@@ -138,7 +141,8 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                             }
                         }
 
-                        LibraryUtils.attachDirectoryBasedLibrary(module, "WPILib Libraries", wpiJavaLibDir);
+                        LibDef libDef = new LibDefBuilder(module, "WPILib Libraries").addDir(wpiJavaLibDir, LibDirType.BIN, LibDirType.SRC, LibDirType.DOC).build();
+                        LibraryUtilsKt.attachDirectoryBasedLibrary(libDef);
                         if (notifyOnCompletion)
                         {
                             queueSuccessfulNotification(project);

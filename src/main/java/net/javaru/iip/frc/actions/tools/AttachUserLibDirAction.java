@@ -34,7 +34,10 @@ import com.intellij.openapi.roots.libraries.Library;
 import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.util.IndexUtils;
-import net.javaru.iip.frc.util.LibraryUtils;
+import net.javaru.iip.frc.util.LibDef;
+import net.javaru.iip.frc.util.LibDefBuilder;
+import net.javaru.iip.frc.util.LibDirType;
+import net.javaru.iip.frc.util.LibraryUtilsKt;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.WpiLibPaths;
 
@@ -94,7 +97,11 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
                     }
                     else
                     {
-                        LibraryUtils.attachDirectoryBasedLibrary(module, "WPILib User Lib Directory", WpiLibPaths.getUserLibDir());
+                        final LibDef libDef = new LibDefBuilder(module, "WPILib User Lib Directory")
+                                .addDir(WpiLibPaths.getUserLibDir(), LibDirType.BIN, LibDirType.SRC, LibDirType.DOC)
+                                .addDir(WpiLibPaths.getUserDocsDir(), LibDirType.DOC)
+                                .build();
+                        LibraryUtilsKt.attachDirectoryBasedLibrary(libDef);
                         if (notifyOnCompletion)
                         {
                             queueSuccessfulNotification(project);

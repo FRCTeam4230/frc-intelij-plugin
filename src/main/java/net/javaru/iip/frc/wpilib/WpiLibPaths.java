@@ -67,6 +67,18 @@ public class WpiLibPaths
     }
 
 
+    public static Path getUserDocsDir()
+    {
+        return getUserDocsDir(getWpiLibRootDir());
+    }
+
+
+    public static Path getUserDocsDir(Path wpiLibDir)
+    {
+        // user/java/docs
+        return getUserRootDir(wpiLibDir).resolve("java/docs");
+    }
+
     public static Path getToolsDir()
     {
         return getToolsDir(getWpiLibRootDir());

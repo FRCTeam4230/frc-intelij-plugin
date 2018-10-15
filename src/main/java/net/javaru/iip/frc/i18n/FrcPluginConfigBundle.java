@@ -34,18 +34,18 @@ import net.javaru.iip.frc.util.FrcUiUtils;
 /**
  * FRC Message Bundle.
  */
-public class FrcBundle
+public class FrcPluginConfigBundle
 {
     //private static final Logger LOG = Logger.getInstance(FrcBundle.class);
     
     @NonNls
-    private static final String BUNDLE_NAME = "i18n.FrcBundle";
+    private static final String BUNDLE_NAME = "i18n.FrcPluginConfigBundle";
     private static Reference<ResourceBundle> ourBundle;
 
 
-    private FrcBundle() { }
+    private FrcPluginConfigBundle() { }
 
-
+    
     @SuppressWarnings("Duplicates")
     private static ResourceBundle getBundle()
     {
@@ -99,5 +99,17 @@ public class FrcBundle
     public static String messageLabelCentered(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params)
     {
         return FrcUiUtils.centerLabelText(message(key, params));
+    }
+
+
+    public static String actionText(@NonNls String actionId)
+    {
+        return message("action." + actionId + ".text");
+    }
+
+
+    public static String actionDescription(@NonNls String actionId)
+    {
+        return message("action." + actionId + ".description");
     }
 }

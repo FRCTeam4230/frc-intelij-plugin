@@ -20,11 +20,12 @@ import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.ResourceBundle;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.PropertyKey;
-import com.intellij.CommonBundle;
-import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.BundleBase;
 
 import net.javaru.iip.frc.util.FrcUiUtils;
 
@@ -35,10 +36,10 @@ import net.javaru.iip.frc.util.FrcUiUtils;
  */
 public class FrcMessageBundle
 {
-    private static final Logger LOG = Logger.getInstance(FrcMessageBundle.class);
+    //private static final Logger LOG = Logger.getInstance(FrcMessageBundle.class);
     
     @NonNls
-    private static final String BUNDLE_NAME = "messages.FrcBundle";
+    private static final String BUNDLE_NAME = "i18n.FrcBundle";
     private static Reference<ResourceBundle> ourBundle;
 
 
@@ -58,11 +59,31 @@ public class FrcMessageBundle
 
 
     @NotNull
-    public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params)
+    public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, 
+                                 @NotNull Object... params)
     {
-        return CommonBundle.message(getBundle(), key, params);
+        return BundleBase.message(getBundle(), key, params);
     }
 
+
+    @Nullable
+    @Contract("_,!null,_ -> !null")
+    public static String messageOrDefault(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key,
+                                          @Nullable final String defaultValue,
+                                          @NotNull Object... params)
+    {
+        return BundleBase.messageOrDefault(getBundle(), key, defaultValue, params);
+    }
+
+
+    @Nullable
+    public static String messageOrNull(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key,
+                                       @NotNull Object... params)
+    {
+        final String value = messageOrDefault(key, key, params);
+        return (key.equals(value)) ? null :value;
+    }
+    
 
     /**
      * Gets a resource bundled message and returns it in inside HTML tags centering the text for use on a Swing label. 

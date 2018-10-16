@@ -16,8 +16,7 @@
 
 package net.javaru.iip.frc.wpilib.version;
 
-import javax.annotation.Nonnull;
-
+import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
 
 
@@ -28,7 +27,7 @@ public class WpiLibVersions
 
     private static final WpiLibVersion WPILIB_2018_VERSION_CHECK = WpiLibVersionImpl.parse("2017.9999.0");
     
-    public static boolean is2018OrLater(@Nonnull WpiLibVersion wpiLibVersion)
+    public static boolean is2018OrLater(@NotNull WpiLibVersion wpiLibVersion)
     {
         return wpiLibVersion.isNewerThan(WPILIB_2018_VERSION_CHECK);
     }

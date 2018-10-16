@@ -17,7 +17,6 @@
 package net.javaru.iip.frc.wpilib.retrieval;
 
 import java.net.URI;
-import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.jetbrains.annotations.NotNull;
@@ -103,7 +102,7 @@ class WpiRepoUris
 //        }
 //    }
     
-    public static URI getSiteUri(@Nonnull URI repoBaseUri)
+    public static URI getSiteUri(@NotNull URI repoBaseUri)
     {
         return repoBaseUri.resolve(SITE_XML);
     }

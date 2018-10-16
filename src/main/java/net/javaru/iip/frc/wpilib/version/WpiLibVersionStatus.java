@@ -16,8 +16,7 @@
 
 package net.javaru.iip.frc.wpilib.version;
 
-import javax.annotation.Nonnull;
-
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -45,13 +44,13 @@ public class WpiLibVersionStatus
     private final boolean wpiLibAttached;
     private final boolean wpiLibDownloaded;
     
-    @Nonnull
+    @NotNull
     private final String attachedVersionSummary;
 
-    @Nonnull
+    @NotNull
     private final String downloadedVersionSummary;
 
-    @Nonnull
+    @NotNull
     private final String availableVersionSummary;
 
     private final boolean availableVersionChecked;
@@ -194,15 +193,15 @@ public class WpiLibVersionStatus
     public boolean isAvailableVersionDeterminable() { return availableVersion != null; }
 
 
-    @Nonnull
+    @NotNull
     public String getAttachedVersionSummary() { return attachedVersionSummary; }
 
 
-    @Nonnull
+    @NotNull
     public String getDownloadedVersionSummary() { return downloadedVersionSummary; }
 
 
-    @Nonnull
+    @NotNull
     public String getAvailableVersionSummary() { return availableVersionSummary; }
 
 

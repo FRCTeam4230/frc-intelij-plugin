@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.module;
 
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +38,7 @@ public class FrcModuleWizardStep extends ModuleWizardStep
     @NotNull
     private final FrcModuleWizardPanel wizardPanel = new FrcModuleWizardPanel();
 
-    public FrcModuleWizardStep(@Nonnull FrcModuleBuilder frcModuleBuilder, @NotNull WizardContext wizardContext) 
+    public FrcModuleWizardStep(@NotNull FrcModuleBuilder frcModuleBuilder, @NotNull WizardContext wizardContext) 
     {
         this.frcModuleBuilder = frcModuleBuilder;
         this.wizardContext = wizardContext;

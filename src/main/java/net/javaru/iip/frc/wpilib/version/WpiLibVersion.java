@@ -16,8 +16,6 @@
 
 package net.javaru.iip.frc.wpilib.version;
 
-import javax.annotation.Nonnull;
-
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -72,14 +70,14 @@ public interface WpiLibVersion extends Comparable<WpiLibVersion>
         alpha, beta, rc
     }
 
-    default boolean isNewerThan(@Nonnull WpiLibVersion other) 
+    default boolean isNewerThan(@NotNull WpiLibVersion other) 
     {
         final boolean isNewer = compareTo(other) > 0;
         Logger.getInstance(WpiLibVersion.class).debug("" + getVersionString() + ".isNewerThan(" + other.getVersionString() + ") = " + isNewer);
         return isNewer; 
     }
 
-    default boolean isOlderThan(@Nonnull WpiLibVersion other) { return compareTo(other) < 0;}
+    default boolean isOlderThan(@NotNull WpiLibVersion other) { return compareTo(other) < 0;}
 
     WpiLibVersion clone();
      

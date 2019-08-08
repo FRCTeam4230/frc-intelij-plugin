@@ -19,7 +19,6 @@ package net.javaru.iip.frc.wpilib.version;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.intellij.openapi.diagnostic.Logger;
 
 
 
@@ -70,13 +69,14 @@ public interface WpiLibVersion extends Comparable<WpiLibVersion>
         alpha, beta, rc
     }
 
-    default boolean isNewerThan(@NotNull WpiLibVersion other) 
-    {
-        final boolean isNewer = compareTo(other) > 0;
-        Logger.getInstance(WpiLibVersion.class).debug("" + getVersionString() + ".isNewerThan(" + other.getVersionString() + ") = " + isNewer);
-        return isNewer; 
-    }
+    default boolean isSameAs(@NotNull WpiLibVersion other) { return compareTo(other) == 0; }
+    
+    default boolean isSameOrNewerThan(@NotNull WpiLibVersion other) { return compareTo(other) >= 0; }
+    
+    default boolean isNewerThan(@NotNull WpiLibVersion other) { return compareTo(other) > 0; }
 
+    default boolean isSameOrOlderThan(@NotNull WpiLibVersion other) { return compareTo(other) <= 0;}
+    
     default boolean isOlderThan(@NotNull WpiLibVersion other) { return compareTo(other) < 0;}
 
     WpiLibVersion clone();

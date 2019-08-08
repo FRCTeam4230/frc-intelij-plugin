@@ -27,8 +27,12 @@ public class WpiLibVersions
 
     private static final WpiLibVersion WPILIB_2018_VERSION_CHECK = WpiLibVersionImpl.parse("2017.9999.0");
     
-    public static boolean is2018OrLater(@NotNull WpiLibVersion wpiLibVersion)
-    {
-        return wpiLibVersion.isNewerThan(WPILIB_2018_VERSION_CHECK);
-    }
+    private static final WpiLibVersion WPILIB_GRADLE_CHECK = WpiLibVersionImpl.parse("2019.0.0.alpha-1");
+    
+    public static boolean is2018OrLater(@NotNull WpiLibVersion wpiLibVersion) { return wpiLibVersion.isNewerThan(WPILIB_2018_VERSION_CHECK); }
+    
+    public static boolean usesGradle(@NotNull WpiLibVersion wpiLibVersion) { return wpiLibVersion.isSameOrNewerThan(WPILIB_GRADLE_CHECK); }
+    
+    public static boolean usesAnt(@NotNull WpiLibVersion wpiLibVersion) { return wpiLibVersion.isOlderThan(WPILIB_GRADLE_CHECK); }
+    
 }

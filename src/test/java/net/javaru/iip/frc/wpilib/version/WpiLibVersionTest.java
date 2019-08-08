@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -38,7 +39,35 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class WpiLibVersionTest
 {
+    @Test
+    void usesGradle()
+    {
+        assertAll(
+                () -> assertFalse(WpiLibVersions.usesGradle(v15)),
+                () -> assertFalse(WpiLibVersions.usesGradle(v16_03)),
+                () -> assertFalse(WpiLibVersions.usesGradle(v2017_1_1)),
+                () -> assertFalse(WpiLibVersions.usesGradle(v2018_1_1_beta_2)),
+                () -> assertFalse(WpiLibVersions.usesGradle(v2018_6_1)),
+                () -> assertTrue(WpiLibVersions.usesGradle(v2019_0_0)),
+                () -> assertTrue(WpiLibVersions.usesGradle(v2019_1_1)),
+                () -> assertTrue(WpiLibVersions.usesGradle(v2020_1_1))
+        );
+    }
 
+    @Test
+    void usesAnt()
+    {
+        assertAll(
+                () -> assertTrue(WpiLibVersions.usesAnt(v15)),
+                () -> assertTrue(WpiLibVersions.usesAnt(v16_03)),
+                () -> assertTrue(WpiLibVersions.usesAnt(v2017_1_1)),
+                () -> assertTrue(WpiLibVersions.usesAnt(v2018_1_1_beta_2)),
+                () -> assertTrue(WpiLibVersions.usesAnt(v2018_6_1)),
+                () -> assertFalse(WpiLibVersions.usesAnt(v2019_0_0)),
+                () -> assertFalse(WpiLibVersions.usesAnt(v2019_1_1)),
+                () -> assertFalse(WpiLibVersions.usesAnt(v2020_1_1))
+        );
+    }
 
     @ParameterizedTest
     @MethodSource("parseProvider")
@@ -69,7 +98,6 @@ class WpiLibVersionTest
     @MethodSource("versionListProvider")
     void areEqual(WpiLibVersion libVersion)
     {
-        //noinspection CastToConcreteClass
         assertAll(
                 () -> assertEquals(libVersion, libVersion, "Equals method does not return true for same object"),
                 () -> assertEquals(libVersion, WpiLibVersionImpl.parse(libVersion.toString()), "Equals method did not return true for equal WpiLibVersion objects using parse"),
@@ -87,6 +115,27 @@ class WpiLibVersionTest
                      "" + x.getVersionString() + ".isNewerThan(" + y.getVersionString() + ") returned " + actual + " but should have been "
                      + expectedIsXNewerThanY);
     }
+    
+    @ParameterizedTest
+    @MethodSource("isNewerThanProvider")
+    void isSameOrNewerThan(WpiLibVersion x, WpiLibVersion y, boolean expectedIsXNewerThanY)
+    {
+        final boolean actual = x.isSameOrNewerThan(y);
+        final boolean actualX = x.isSameOrNewerThan(x);
+        final boolean actualY = y.isSameOrNewerThan(y);
+        assertAll(
+                () -> assertEquals(expectedIsXNewerThanY,
+                                   actual,
+                                   "" + x.getVersionString() + ".isSameOrNewerThan(" + y.getVersionString() + ") returned " + actual + " but should have been"
+                                   + expectedIsXNewerThanY),
+                () -> assertTrue(actualX,
+                                 "" + x.getVersionString() + ".isSameOrNewerThan(" + x.getVersionString() + ") returned " + actualX
+                                 + " but should have been true"),
+                () -> assertTrue(actualY,
+                                 "" + y.getVersionString() + ".isSameOrNewerThan(" + y.getVersionString() + ") returned " + actualY
+                                 + " but should have been true")
+        );
+    }
 
 
     @ParameterizedTest
@@ -99,7 +148,55 @@ class WpiLibVersionTest
                      "" + x.getVersionString() + ".isOlderThan(" + y.getVersionString() + ") returned " + actual + " but should have been "
                      + expectedIsXOlderThanY);
     }
-
+    
+    
+    @ParameterizedTest
+    @MethodSource("isOlderThanProvider")
+    void isSameOrOlderThan(WpiLibVersion x, WpiLibVersion y, boolean expectedIsXOlderThanY)
+    {
+        final boolean actual = x.isSameOrOlderThan(y);
+        final boolean actualX = x.isSameOrOlderThan(x);
+        final boolean actualY = y.isSameOrOlderThan(y);
+        assertAll(
+                () -> assertEquals(expectedIsXOlderThanY,
+                                   actual,
+                                   "" + x.getVersionString() + ".isSameOrOlderThan(" + y.getVersionString() + ") returned " + actual + " but should have been"
+                                   + expectedIsXOlderThanY),
+                () -> assertTrue(actualX,
+                                 "" + x.getVersionString() + ".isSameOrOlderThan(" + x.getVersionString() + ") returned " + actualX
+                                 + " but should have been true"),
+                () -> assertTrue(actualY,
+                                 "" + y.getVersionString() + ".isSameOrOlderThan(" + y.getVersionString() + ") returned " + actualY
+                                 + " but should have been true")
+        );
+    }
+    
+    
+    @ParameterizedTest
+    @MethodSource("isOlderThanProvider")
+    void isSameAs(WpiLibVersion x, WpiLibVersion y, @SuppressWarnings("unused") boolean unused)
+    {
+        final boolean actualX = x.isSameAs(x);
+        final boolean actualY = y.isSameAs(y);
+        final boolean actualXtoY = x.isSameAs(y);
+        final boolean actualYtoX = y.isSameAs(x);
+        assertAll(
+                () -> assertTrue(actualX,
+                                 "" + x.getVersionString() + ".isSameAs(" + x.getVersionString() + ") returned " + actualX
+                                 + " but should have been true"),
+                () -> assertTrue(actualY,
+                                 "" + y.getVersionString() + ".isSameAs(" + y.getVersionString() + ") returned " + actualY
+                                 + " but should have been true"),
+                () -> assertFalse(actualXtoY,
+                                 "" + x.getVersionString() + ".isSameAs(" + y.getVersionString() + ") returned " + actualXtoY
+                                 + " but should have been false"),
+                () -> assertFalse(actualXtoY,
+                                 "" + y.getVersionString() + ".isSameAs(" + x.getVersionString() + ") returned " + actualYtoX
+                                 + " but should have been false")
+        );
+    }
+    
+    
     static Iterable<Arguments> versionListProvider() 
     {
         return versionList.stream().map(Arguments::of).collect(Collectors.toList());
@@ -317,6 +414,9 @@ class WpiLibVersionTest
     private static final WpiLibVersion v2019_0_0 = WpiLibVersionImpl.parse("2019.0.0");
     private static final WpiLibVersion v2019_0_1 = WpiLibVersionImpl.parse("2019.0.1");
     private static final WpiLibVersion v2019_1_1 = WpiLibVersionImpl.parse("2019.1.1");
+    private static final WpiLibVersion v2019_1_2 = WpiLibVersionImpl.parse("2019.1.2");
+    private static final WpiLibVersion v2020_1_1 = WpiLibVersionImpl.parse("2020.1.1");
+    private static final WpiLibVersion v2020_1_2 = WpiLibVersionImpl.parse("2020.1.2");
 
     private static final ImmutableList<WpiLibVersion> versionList;
 
@@ -378,6 +478,9 @@ class WpiLibVersionTest
         list.add(v2019_0_0);
         list.add(v2019_0_1);
         list.add(v2019_1_1);
+        list.add(v2019_1_2);
+        list.add(v2020_1_1);
+        list.add(v2020_1_2);
 
         versionList = list.build();
     }

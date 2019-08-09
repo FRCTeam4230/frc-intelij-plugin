@@ -58,9 +58,9 @@ import net.javaru.iip.frc.util.FindClassUtils;
 import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersionExtKt;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionStatus;
-import net.javaru.iip.frc.wpilib.version.WpiLibVersions;
 
 import static net.javaru.iip.frc.util.FindClassUtils.isLibraryPresent;
 
@@ -231,7 +231,7 @@ public class WpiLibLibrariesUtils
     public static boolean is2018CommonRefreshNeeded()
     {
         final WpiLibVersion downloadedVersion = determineSystemAvailableWpiLibVersion();
-        return downloadedVersion != null && WpiLibVersions.is2018OrLater(downloadedVersion) && !isCommonDownloadedToSystem();
+        return downloadedVersion != null && WpiLibVersionExtKt.is2018OrLater(downloadedVersion) && !isCommonDownloadedToSystem();
     }
 
     public static boolean is2018CommonRefreshNeededViaReadAction()
@@ -623,7 +623,7 @@ public class WpiLibLibrariesUtils
             }
             else if (Character.isDigit(versionString.toCharArray()[0]))
             {
-                return WpiLibVersionImpl.parse(versionString);
+                return WpiLibVersionImpl.Companion.parse(versionString);
             }
             else
             {

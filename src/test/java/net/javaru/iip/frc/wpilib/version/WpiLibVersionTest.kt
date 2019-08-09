@@ -14,474 +14,453 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.wpilib.version;
+package net.javaru.iip.frc.wpilib.version
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
-
-import net.javaru.iip.frc.wpilib.version.WpiLibVersion.PreReleaseModifier;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.google.common.collect.ImmutableList
+import net.javaru.iip.frc.wpilib.version.WpiLibVersion.PreReleaseModifier
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.RepeatedTest
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.*
+import java.util.stream.Stream
 
 
-
-class WpiLibVersionTest
+internal class WpiLibVersionTest
 {
     @Test
-    void usesGradle()
+    fun usesGradle()
     {
         assertAll(
-                () -> assertFalse(WpiLibVersions.usesGradle(v15)),
-                () -> assertFalse(WpiLibVersions.usesGradle(v16_03)),
-                () -> assertFalse(WpiLibVersions.usesGradle(v2017_1_1)),
-                () -> assertFalse(WpiLibVersions.usesGradle(v2018_1_1_beta_2)),
-                () -> assertFalse(WpiLibVersions.usesGradle(v2018_6_1)),
-                () -> assertTrue(WpiLibVersions.usesGradle(v2019_0_0)),
-                () -> assertTrue(WpiLibVersions.usesGradle(v2019_1_1)),
-                () -> assertTrue(WpiLibVersions.usesGradle(v2020_1_1))
-        );
+                { assertFalse(v15.usesGradle()) },
+                { assertFalse(v16_03.usesGradle()) },
+                { assertFalse(v2017_1_1.usesGradle()) },
+                { assertFalse(v2018_1_1_beta_2.usesGradle()) },
+                { assertFalse(v2018_6_1.usesGradle()) },
+                { assertTrue(v2019_0_0.usesGradle()) },
+                { assertTrue(v2019_1_1.usesGradle()) },
+                { assertTrue(v2020_1_1.usesGradle()) }
+                 )
     }
 
     @Test
-    void usesAnt()
+    fun usesAnt()
     {
         assertAll(
-                () -> assertTrue(WpiLibVersions.usesAnt(v15)),
-                () -> assertTrue(WpiLibVersions.usesAnt(v16_03)),
-                () -> assertTrue(WpiLibVersions.usesAnt(v2017_1_1)),
-                () -> assertTrue(WpiLibVersions.usesAnt(v2018_1_1_beta_2)),
-                () -> assertTrue(WpiLibVersions.usesAnt(v2018_6_1)),
-                () -> assertFalse(WpiLibVersions.usesAnt(v2019_0_0)),
-                () -> assertFalse(WpiLibVersions.usesAnt(v2019_1_1)),
-                () -> assertFalse(WpiLibVersions.usesAnt(v2020_1_1))
-        );
+                { assertTrue(v15.usesAnt()) },
+                { assertTrue(v16_03.usesAnt()) },
+                { assertTrue(v2017_1_1.usesAnt()) },
+                { assertTrue(v2018_1_1_beta_2.usesAnt()) },
+                { assertTrue(v2018_6_1.usesAnt()) },
+                { assertFalse(v2019_0_0.usesAnt()) },
+                { assertFalse(v2019_1_1.usesAnt()) },
+                { assertFalse(v2020_1_1.usesAnt()) }
+                 )
     }
 
     @ParameterizedTest
     @MethodSource("parseProvider")
-    void parse(WpiLibVersion expected, WpiLibVersion actual)
+    fun parse(expected: WpiLibVersion, actual: WpiLibVersion)
     {
         assertAll(
-            () -> assertEquals(expected.getGeneration(), actual.getGeneration(), "Generation"),
-            () -> assertEquals(expected.getMajor(), actual.getMajor(), "Major"),
-            () -> assertEquals(expected.getMinor(), actual.getMinor(), "Minor"),
-            () -> assertEquals(expected.getPatch(), actual.getPatch(), "Path"),
-            () -> assertEquals(expected.getPreReleaseModifier(), actual.getPreReleaseModifier(), "PreReleaseModifier"),
-            () -> assertEquals(expected.getPreReleaseModifierVersion(), actual.getPreReleaseModifierVersion(), "PreReleaseModifierVersion")
-        );
+                { assertEquals(expected.generation, actual.generation, "Generation") },
+                { assertEquals(expected.major, actual.major, "Major") },
+                { assertEquals(expected.minor, actual.minor, "Minor") },
+                { assertEquals(expected.patch, actual.patch, "Path") },
+                { assertEquals(expected.preReleaseModifier, actual.preReleaseModifier, "PreReleaseModifier") },
+                { assertEquals(expected.preReleaseModifierVersion, actual.preReleaseModifierVersion, "PreReleaseModifierVersion") }
+                 )
     }
 
 
-
     @RepeatedTest(5)
-    void compareTo()
+    fun compareTo()
     {
-        List<WpiLibVersion> list = new ArrayList<>(versionList);
-        Collections.shuffle(list);
-        Collections.sort(list);
-        assertEquals(versionList, list, "Sorted list is not equal to expected");
+        // To test compareTo, we shuffle the list, and then resort it (since sort uses the compareTo)
+        val list = ArrayList(versionList)
+        list.shuffle()
+        list.sort()
+        assertEquals(versionList, list, "Sorted list is not equal to expected")
     }
 
     @ParameterizedTest
     @MethodSource("versionListProvider")
-    void areEqual(WpiLibVersion libVersion)
+    fun areEqual(libVersion: WpiLibVersion)
     {
         assertAll(
-                () -> assertEquals(libVersion, libVersion, "Equals method does not return true for same object"),
-                () -> assertEquals(libVersion, WpiLibVersionImpl.parse(libVersion.toString()), "Equals method did not return true for equal WpiLibVersion objects using parse"),
-                () -> assertEquals(libVersion, libVersion.clone(), "Equals method did not return true for equal WpiLibVersion objects using clone")
-        );
+                { assertEquals(libVersion, libVersion, "Equals method does not return true for same object") },
+                { assertEquals(libVersion, WpiLibVersionImpl.parse(libVersion.toString()), "Equals method did not return true for equal WpiLibVersion objects using parse") },
+                { assertEquals(libVersion, libVersion.cloneIt(), "Equals method did not return true for equal WpiLibVersion objects using clone") }
+                 )
     }
 
     @ParameterizedTest
     @MethodSource("isNewerThanProvider")
-    void isNewerThan(WpiLibVersion x, WpiLibVersion y, boolean expectedIsXNewerThanY)
+    fun isNewerThan(x: WpiLibVersion, y: WpiLibVersion, expectedIsXNewerThanY: Boolean)
     {
-        final boolean actual = x.isNewerThan(y);
+        val actual = x.isNewerThan(y)
         assertEquals(expectedIsXNewerThanY,
                      actual,
-                     "" + x.getVersionString() + ".isNewerThan(" + y.getVersionString() + ") returned " + actual + " but should have been "
-                     + expectedIsXNewerThanY);
+                     "" + x.versionString + ".isNewerThan(" + y.versionString + ") returned " + actual + " but should have been "
+                     + expectedIsXNewerThanY)
     }
-    
+
     @ParameterizedTest
     @MethodSource("isNewerThanProvider")
-    void isSameOrNewerThan(WpiLibVersion x, WpiLibVersion y, boolean expectedIsXNewerThanY)
+    fun isSameOrNewerThan(x: WpiLibVersion, y: WpiLibVersion, expectedIsXNewerThanY: Boolean)
     {
-        final boolean actual = x.isSameOrNewerThan(y);
-        final boolean actualX = x.isSameOrNewerThan(x);
-        final boolean actualY = y.isSameOrNewerThan(y);
+        val actual = x.isSameOrNewerThan(y)
+        val actualX = x.isSameOrNewerThan(x)
+        val actualY = y.isSameOrNewerThan(y)
         assertAll(
-                () -> assertEquals(expectedIsXNewerThanY,
-                                   actual,
-                                   "" + x.getVersionString() + ".isSameOrNewerThan(" + y.getVersionString() + ") returned " + actual + " but should have been"
-                                   + expectedIsXNewerThanY),
-                () -> assertTrue(actualX,
-                                 "" + x.getVersionString() + ".isSameOrNewerThan(" + x.getVersionString() + ") returned " + actualX
-                                 + " but should have been true"),
-                () -> assertTrue(actualY,
-                                 "" + y.getVersionString() + ".isSameOrNewerThan(" + y.getVersionString() + ") returned " + actualY
-                                 + " but should have been true")
-        );
+                {
+                    assertEquals(expectedIsXNewerThanY,
+                                 actual,
+                                 "" + x.versionString + ".isSameOrNewerThan(" + y.versionString + ") returned " + actual + " but should have been"
+                                 + expectedIsXNewerThanY)
+                },
+                {
+                    assertTrue(actualX,
+                               "" + x.versionString + ".isSameOrNewerThan(" + x.versionString + ") returned " + actualX
+                               + " but should have been true")
+                },
+                {
+                    assertTrue(actualY,
+                               "" + y.versionString + ".isSameOrNewerThan(" + y.versionString + ") returned " + actualY
+                               + " but should have been true")
+                }
+                 )
     }
 
 
     @ParameterizedTest
     @MethodSource("isOlderThanProvider")
-    void isOlderThan(WpiLibVersion x, WpiLibVersion y, boolean expectedIsXOlderThanY)
+    fun isOlderThan(x: WpiLibVersion, y: WpiLibVersion, expectedIsXOlderThanY: Boolean)
     {
-        final boolean actual = x.isOlderThan(y);
+        val actual = x.isOlderThan(y)
         assertEquals(expectedIsXOlderThanY,
                      actual,
-                     "" + x.getVersionString() + ".isOlderThan(" + y.getVersionString() + ") returned " + actual + " but should have been "
-                     + expectedIsXOlderThanY);
+                     "" + x.versionString + ".isOlderThan(" + y.versionString + ") returned " + actual + " but should have been "
+                     + expectedIsXOlderThanY)
     }
-    
-    
+
+
     @ParameterizedTest
     @MethodSource("isOlderThanProvider")
-    void isSameOrOlderThan(WpiLibVersion x, WpiLibVersion y, boolean expectedIsXOlderThanY)
+    fun isSameOrOlderThan(x: WpiLibVersion, y: WpiLibVersion, expectedIsXOlderThanY: Boolean)
     {
-        final boolean actual = x.isSameOrOlderThan(y);
-        final boolean actualX = x.isSameOrOlderThan(x);
-        final boolean actualY = y.isSameOrOlderThan(y);
+        val actual = x.isSameOrOlderThan(y)
+        val actualX = x.isSameOrOlderThan(x)
+        val actualY = y.isSameOrOlderThan(y)
         assertAll(
-                () -> assertEquals(expectedIsXOlderThanY,
-                                   actual,
-                                   "" + x.getVersionString() + ".isSameOrOlderThan(" + y.getVersionString() + ") returned " + actual + " but should have been"
-                                   + expectedIsXOlderThanY),
-                () -> assertTrue(actualX,
-                                 "" + x.getVersionString() + ".isSameOrOlderThan(" + x.getVersionString() + ") returned " + actualX
-                                 + " but should have been true"),
-                () -> assertTrue(actualY,
-                                 "" + y.getVersionString() + ".isSameOrOlderThan(" + y.getVersionString() + ") returned " + actualY
-                                 + " but should have been true")
-        );
+                {
+                    assertEquals(expectedIsXOlderThanY,
+                                 actual,
+                                 "" + x.versionString + ".isSameOrOlderThan(" + y.versionString + ") returned " + actual + " but should have been"
+                                 + expectedIsXOlderThanY)
+                },
+                {
+                    assertTrue(actualX,
+                               "" + x.versionString + ".isSameOrOlderThan(" + x.versionString + ") returned " + actualX
+                               + " but should have been true")
+                },
+                {
+                    assertTrue(actualY,
+                               "" + y.versionString + ".isSameOrOlderThan(" + y.versionString + ") returned " + actualY
+                               + " but should have been true")
+                }
+                 )
     }
-    
-    
+
+
     @ParameterizedTest
     @MethodSource("isOlderThanProvider")
-    void isSameAs(WpiLibVersion x, WpiLibVersion y, @SuppressWarnings("unused") boolean unused)
+    fun isSameAs(x: WpiLibVersion, y: WpiLibVersion, unused: Boolean)
     {
-        final boolean actualX = x.isSameAs(x);
-        final boolean actualY = y.isSameAs(y);
-        final boolean actualXtoY = x.isSameAs(y);
-        final boolean actualYtoX = y.isSameAs(x);
+        val actualX = x.isSameAs(x)
+        val actualY = y.isSameAs(y)
+        val actualXtoY = x.isSameAs(y)
+        val actualYtoX = y.isSameAs(x)
         assertAll(
-                () -> assertTrue(actualX,
-                                 "" + x.getVersionString() + ".isSameAs(" + x.getVersionString() + ") returned " + actualX
-                                 + " but should have been true"),
-                () -> assertTrue(actualY,
-                                 "" + y.getVersionString() + ".isSameAs(" + y.getVersionString() + ") returned " + actualY
-                                 + " but should have been true"),
-                () -> assertFalse(actualXtoY,
-                                 "" + x.getVersionString() + ".isSameAs(" + y.getVersionString() + ") returned " + actualXtoY
-                                 + " but should have been false"),
-                () -> assertFalse(actualXtoY,
-                                 "" + y.getVersionString() + ".isSameAs(" + x.getVersionString() + ") returned " + actualYtoX
-                                 + " but should have been false")
-        );
-    }
-    
-    
-    static Iterable<Arguments> versionListProvider() 
-    {
-        return versionList.stream().map(Arguments::of).collect(Collectors.toList());
-    }
-
-    static Iterable<Arguments> isNewerThanProvider()
-    {
-        return createArgsList(false, true);
-    }
-
-    static Iterable<Arguments> isOlderThanProvider()
-    {
-        return createArgsList(true, false);
+                {
+                    assertTrue(actualX,
+                               "" + x.versionString + ".isSameAs(" + x.versionString + ") returned " + actualX
+                               + " but should have been true")
+                },
+                {
+                    assertTrue(actualY,
+                               "" + y.versionString + ".isSameAs(" + y.versionString + ") returned " + actualY
+                               + " but should have been true")
+                },
+                {
+                    assertFalse(actualXtoY,
+                                "" + x.versionString + ".isSameAs(" + y.versionString + ") returned " + actualXtoY
+                                + " but should have been false")
+                },
+                {
+                    assertFalse(actualXtoY,
+                                "" + y.versionString + ".isSameAs(" + x.versionString + ") returned " + actualYtoX
+                                + " but should have been false")
+                }
+                 )
     }
 
 
-    @NotNull
-    private static List<Arguments> createArgsList(boolean oldToNew, boolean newToOld)
+    internal class ExpectedWpiLibVersion(override val generation: Int,
+                                         override val major: Int,
+                                         override val minor: Int,
+                                         override val patch: Int,
+                                         override val preReleaseModifier: PreReleaseModifier?,
+                                         override val preReleaseModifierVersion: Int?) : WpiLibVersion
     {
-        List<Arguments> args = new ArrayList<>();
 
-        for (int i = 0; i < versionList.size() - 1; i++)
+
+        override val versionString: String
+            get() = throw UnsupportedOperationException("Not supported fo test impl")
+
+
+        override fun cloneIt(): WpiLibVersion
         {
-            final WpiLibVersion olderVer = versionList.get(i);
-            final WpiLibVersion newerVer = versionList.get(i + 1);
-            args.add(Arguments.of(olderVer, newerVer, oldToNew));
-            args.add(Arguments.of(newerVer, olderVer, newToOld));
-        }
-
-
-        for (int i = 0; i < versionList.size() - 2; i+=2)
-        {
-            final WpiLibVersion olderVer = versionList.get(i);
-            final WpiLibVersion newerVer = versionList.get(i + 2);
-            args.add(Arguments.of(olderVer, newerVer, oldToNew));
-            args.add(Arguments.of(newerVer, olderVer, newToOld));
-        }
-
-        for (int i = 0; i < versionList.size() - 3; i+=3)
-        {
-            final WpiLibVersion olderVer = versionList.get(i);
-            final WpiLibVersion newerVer = versionList.get(i + 3);
-            args.add(Arguments.of(olderVer, newerVer, oldToNew));
-            args.add(Arguments.of(newerVer, olderVer, newToOld));
-        }
-
-        for (int i = versionList.size() - 1; i > 1; i--)
-        {
-            final WpiLibVersion olderVer = versionList.get(i - 1);
-            final WpiLibVersion newerVer = versionList.get(i);
-            args.add(Arguments.of(olderVer, newerVer, oldToNew));
-            args.add(Arguments.of(newerVer, olderVer, newToOld));
-        }
-        return args;
-    }
-
-
-    static Iterable<Arguments> parseProvider()
-    {
-        List<Arguments> args = new ArrayList<>();
-        WpiLibVersion expected;
-
-        expected = new ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.alpha, 5);
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-alpha-5")));
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.alpha-5")));
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-alpha.5")));
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.alpha.5")));
-
-        expected = new ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.beta, 5);
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta-5")));
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta-5")));
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta.5")));
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta.5")));
-
-        expected = new ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.rc, 5);
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-rc-5")));
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.rc-5")));
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-rc.5")));
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.rc.5")));
-
-        expected = new ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.beta, null);
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta")));
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta")));
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta")));
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta")));
-
-        expected = new ExpectedWpiLibVersion(2017, 2018, 1, 2, null, null);
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2")));
-
-        expected = new ExpectedWpiLibVersion(2017, 2018, 1, 0, null, null);
-        args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1")));
-
-        return args;
-    }
-
-
-    static class ExpectedWpiLibVersion implements WpiLibVersion
-    {
-        private final int generation;
-        private final int major;
-        private final int minor;
-        private final int patch;
-        @Nullable
-        private final PreReleaseModifier preReleaseModifier;
-
-        @Nullable
-        private final Integer preReleaseModifierVersion;
-
-
-        public ExpectedWpiLibVersion(int generation,
-                                     int major,
-                                     int minor,
-                                     int patch,
-                                     @Nullable PreReleaseModifier preReleaseModifier,
-                                     @Nullable Integer preReleaseModifierVersion)
-        {
-            this.generation = generation;
-            this.major = major;
-            this.minor = minor;
-            this.patch = patch;
-            this.preReleaseModifier = preReleaseModifier;
-            this.preReleaseModifierVersion = preReleaseModifierVersion;
-        }
-
-
-        @Override
-        public int getGeneration() { return generation; }
-
-
-        @Override
-        public String getVersionString() { throw new UnsupportedOperationException("Not supported fo test impl");}
-
-
-        @Override
-        public int getMajor() { return major; }
-
-
-        @Override
-        public int getMinor() { return minor; }
-
-
-        @Override
-        public int getPatch() { return patch; }
-
-
-        @Nullable
-        @Override
-        public PreReleaseModifier getPreReleaseModifier() { return preReleaseModifier; }
-
-
-        @Nullable
-        @Override
-        public Integer getPreReleaseModifierVersion() { return preReleaseModifierVersion; }
-
-
-        @SuppressWarnings("MethodDoesntCallSuperMethod")
-        @Override
-        public WpiLibVersion clone()
-        {
-            return new ExpectedWpiLibVersion(this.generation, this.major, this.minor, this.patch, this.preReleaseModifier, this.preReleaseModifierVersion);
+            return ExpectedWpiLibVersion(this.generation, this.major, this.minor, this.patch, this.preReleaseModifier, this.preReleaseModifierVersion)
         }
     }
 
-    private static final WpiLibVersion v15 = WpiLibVersionImpl.parse("0.1.0.201502241928");
-    private static final WpiLibVersion v16_02 = WpiLibVersionImpl.parse("0.1.0.201602112135");
-    private static final WpiLibVersion v16_03 = WpiLibVersionImpl.parse("0.1.0.201603020231");
-    private static final WpiLibVersion v2017_1_1_alpha_1 = WpiLibVersionImpl.parse("2017.1.1.alpha-1");
-    private static final WpiLibVersion v2017_1_1_alpha_2 = WpiLibVersionImpl.parse("2017.1.1.alpha-2");
-    private static final WpiLibVersion v2017_1_1_beta_1 = WpiLibVersionImpl.parse("2017.1.1.beta-1");
-    private static final WpiLibVersion v2017_1_1_beta_2 = WpiLibVersionImpl.parse("2017.1.1.beta-2");
-    private static final WpiLibVersion v2017_1_1_beta_3 = WpiLibVersionImpl.parse("2017.1.1.beta-3");
-    private static final WpiLibVersion v2017_1_1_rc_1 = WpiLibVersionImpl.parse("2017.1.1.rc-1");
-    private static final WpiLibVersion v2017_1_1_rc_2 = WpiLibVersionImpl.parse("2017.1.1.rc-2");
-    private static final WpiLibVersion v2017_1_1 = WpiLibVersionImpl.parse("2017.1.1");
-    private static final WpiLibVersion v2017_1_2_rc_1 = WpiLibVersionImpl.parse("2017.1.2.rc-1");
-    private static final WpiLibVersion v2017_1_2 = WpiLibVersionImpl.parse("2017.1.2");
-    private static final WpiLibVersion v2017_2_1_beta_1 = WpiLibVersionImpl.parse("2017.2.1.beta-1");
-    private static final WpiLibVersion v2017_2_1_rc_1 = WpiLibVersionImpl.parse("2017.2.1.rc-1");
-    private static final WpiLibVersion v2017_2_1_rc_2 = WpiLibVersionImpl.parse("2017.2.1.rc-2");
-    private static final WpiLibVersion v2017_2_1 = WpiLibVersionImpl.parse("2017.2.1");
-    private static final WpiLibVersion v2018_1_1_alpha_1 = WpiLibVersionImpl.parse("2018.1.1.alpha-1");
-    private static final WpiLibVersion v2018_1_1_alpha_2 = WpiLibVersionImpl.parse("2018.1.1.alpha-2");
-    private static final WpiLibVersion v2018_1_1_alpha_3 = WpiLibVersionImpl.parse("2018.1.1.alpha-3");
-    private static final WpiLibVersion v2018_1_1_alpha_4 = WpiLibVersionImpl.parse("2018.1.1.alpha-4");
-    private static final WpiLibVersion v2018_1_1_alpha_5 = WpiLibVersionImpl.parse("2018.1.1.alpha-5");
-    private static final WpiLibVersion v2018_1_1_alpha_6 = WpiLibVersionImpl.parse("2018.1.1.alpha-6");
-    private static final WpiLibVersion v2018_1_1_beta_1 = WpiLibVersionImpl.parse("2018.1.1.beta-1");
-    private static final WpiLibVersion v2018_1_1_beta_2 = WpiLibVersionImpl.parse("2018.1.1.beta-2");
-    private static final WpiLibVersion v2018_1_1_beta_3 = WpiLibVersionImpl.parse("2018.1.1.beta-3");
-    private static final WpiLibVersion v2018_1_1_beta_4 = WpiLibVersionImpl.parse("2018.1.1.beta-4");
-    private static final WpiLibVersion v2018_1_1_beta_5 = WpiLibVersionImpl.parse("2018.1.1.beta-5");
-    private static final WpiLibVersion v2018_1_1_beta_6 = WpiLibVersionImpl.parse("2018.1.1.beta-6");
-    private static final WpiLibVersion v2018_1_1_rc_1 = WpiLibVersionImpl.parse("2018.1.1.rc-1");
-    private static final WpiLibVersion v2018_1_1_rc_2 = WpiLibVersionImpl.parse("2018.1.1.rc-2");
-    private static final WpiLibVersion v2018_1_1_rc_3 = WpiLibVersionImpl.parse("2018.1.1.rc-3");
-    private static final WpiLibVersion v2018_1_1_rc_4 = WpiLibVersionImpl.parse("2018.1.1.rc-4");
-    private static final WpiLibVersion v2018_1_1_rc_5 = WpiLibVersionImpl.parse("2018.1.1.rc-5");
-    private static final WpiLibVersion v2018_1_1_rc_6 = WpiLibVersionImpl.parse("2018.1.1.rc-6");
-    private static final WpiLibVersion v2018_1_1 = WpiLibVersionImpl.parse("2018.1.1");
-    private static final WpiLibVersion v2018_1_2 = WpiLibVersionImpl.parse("2018.1.2");
-    private static final WpiLibVersion v2018_1_3 = WpiLibVersionImpl.parse("2018.1.3");
-    private static final WpiLibVersion v2018_1_4 = WpiLibVersionImpl.parse("2018.1.4");
-    private static final WpiLibVersion v2018_1_5 = WpiLibVersionImpl.parse("2018.1.5");
-    private static final WpiLibVersion v2018_2_0 = WpiLibVersionImpl.parse("2018.2.0");
-    private static final WpiLibVersion v2018_2_1 = WpiLibVersionImpl.parse("2018.2.1");
-    private static final WpiLibVersion v2018_2_2 = WpiLibVersionImpl.parse("2018.2.2");
-    private static final WpiLibVersion v2018_2_3 = WpiLibVersionImpl.parse("2018.2.3");
-    private static final WpiLibVersion v2018_2_4 = WpiLibVersionImpl.parse("2018.2.4");
-    private static final WpiLibVersion v2018_2_5 = WpiLibVersionImpl.parse("2018.2.5");
-    private static final WpiLibVersion v2018_3_1 = WpiLibVersionImpl.parse("2018.3.1");
-    private static final WpiLibVersion v2018_4_1 = WpiLibVersionImpl.parse("2018.4.1");
-    private static final WpiLibVersion v2018_5_1 = WpiLibVersionImpl.parse("2018.5.1");
-    private static final WpiLibVersion v2018_5_2 = WpiLibVersionImpl.parse("2018.5.2");
-    private static final WpiLibVersion v2018_6_1 = WpiLibVersionImpl.parse("2018.6.1");
-    private static final WpiLibVersion v2019_0_0 = WpiLibVersionImpl.parse("2019.0.0");
-    private static final WpiLibVersion v2019_0_1 = WpiLibVersionImpl.parse("2019.0.1");
-    private static final WpiLibVersion v2019_1_1 = WpiLibVersionImpl.parse("2019.1.1");
-    private static final WpiLibVersion v2019_1_2 = WpiLibVersionImpl.parse("2019.1.2");
-    private static final WpiLibVersion v2020_1_1 = WpiLibVersionImpl.parse("2020.1.1");
-    private static final WpiLibVersion v2020_1_2 = WpiLibVersionImpl.parse("2020.1.2");
-
-    private static final ImmutableList<WpiLibVersion> versionList;
-
-    static
+    @Suppress("unused")
+    companion object
     {
-        final Builder<WpiLibVersion> list = ImmutableList.builder();
 
-        list.add(v15);
-        list.add(v16_02);
-        list.add(v16_03);
-        list.add(v2017_1_1_alpha_1);
-        list.add(v2017_1_1_alpha_2);
-        list.add(v2017_1_1_beta_1);
-        list.add(v2017_1_1_beta_2);
-        list.add(v2017_1_1_beta_3);
-        list.add(v2017_1_1_rc_1);
-        list.add(v2017_1_1_rc_2);
-        list.add(v2017_1_1);
-        list.add(v2017_1_2_rc_1);
-        list.add(v2017_1_2);
-        list.add(v2017_2_1_beta_1);
-        list.add(v2017_2_1_rc_1);
-        list.add(v2017_2_1_rc_2);
-        list.add(v2017_2_1);
-        list.add(v2018_1_1_alpha_1);
-        list.add(v2018_1_1_alpha_2);
-        list.add(v2018_1_1_alpha_3);
-        list.add(v2018_1_1_alpha_4);
-        list.add(v2018_1_1_alpha_5);
-        list.add(v2018_1_1_alpha_6);
-        list.add(v2018_1_1_beta_1);
-        list.add(v2018_1_1_beta_2);
-        list.add(v2018_1_1_beta_3);
-        list.add(v2018_1_1_beta_4);
-        list.add(v2018_1_1_beta_5);
-        list.add(v2018_1_1_beta_6);
-        list.add(v2018_1_1_rc_1);
-        list.add(v2018_1_1_rc_2);
-        list.add(v2018_1_1_rc_3);
-        list.add(v2018_1_1_rc_4);
-        list.add(v2018_1_1_rc_5);
-        list.add(v2018_1_1_rc_6);
-        list.add(v2018_1_1);
-        list.add(v2018_1_2);
-        list.add(v2018_1_3);
-        list.add(v2018_1_4);
-        list.add(v2018_1_5);
-        list.add(v2018_2_0);
-        list.add(v2018_2_1);
-        list.add(v2018_2_2);
-        list.add(v2018_2_3);
-        list.add(v2018_2_4);
-        list.add(v2018_2_5);
-        list.add(v2018_3_1);
-        list.add(v2018_4_1);
-        list.add(v2018_5_1);
-        list.add(v2018_5_2);
-        list.add(v2018_6_1);
-        list.add(v2019_0_0);
-        list.add(v2019_0_1);
-        list.add(v2019_1_1);
-        list.add(v2019_1_2);
-        list.add(v2020_1_1);
-        list.add(v2020_1_2);
+        @JvmStatic
+        fun versionListProvider(): Stream<Arguments>
+        {
+            val args = versionList.stream().map { Arguments.of(it) }
+            return args
 
-        versionList = list.build();
+            //return versionList.stream().map<Arguments>(Function<WpiLibVersion, Arguments> { Arguments.of(it) }).collect<List<Arguments>, Any>(Collectors.toList())
+            
+            
+        }
+
+        @JvmStatic
+        fun isNewerThanProvider(): Iterable<Arguments> = createArgsList(false, true)
+
+
+        @JvmStatic
+        fun isOlderThanProvider(): Iterable<Arguments> = createArgsList(true, false)
+
+
+        private fun createArgsList(oldToNew: Boolean, newToOld: Boolean): List<Arguments>
+        {
+            val args = ArrayList<Arguments>()
+
+            for (i in 0 until versionList.size - 1)
+            {
+                val olderVer = versionList[i]
+                val newerVer = versionList[i + 1]
+                args.add(Arguments.of(olderVer, newerVer, oldToNew))
+                args.add(Arguments.of(newerVer, olderVer, newToOld))
+            }
+
+
+            run {
+                var i = 0
+                while (i < versionList.size - 2)
+                {
+                    val olderVer = versionList[i]
+                    val newerVer = versionList[i + 2]
+                    args.add(Arguments.of(olderVer, newerVer, oldToNew))
+                    args.add(Arguments.of(newerVer, olderVer, newToOld))
+                    i += 2
+                }
+            }
+
+            run {
+                var i = 0
+                while (i < versionList.size - 3)
+                {
+                    val olderVer = versionList[i]
+                    val newerVer = versionList[i + 3]
+                    args.add(Arguments.of(olderVer, newerVer, oldToNew))
+                    args.add(Arguments.of(newerVer, olderVer, newToOld))
+                    i += 3
+                }
+            }
+
+            for (i in versionList.size - 1 downTo 2)
+            {
+                val olderVer = versionList[i - 1]
+                val newerVer = versionList[i]
+                args.add(Arguments.of(olderVer, newerVer, oldToNew))
+                args.add(Arguments.of(newerVer, olderVer, newToOld))
+            }
+            return args
+        }
+
+
+        @JvmStatic
+        fun parseProvider(): Iterable<Arguments>
+        {
+            val args = ArrayList<Arguments>()
+            var expected: WpiLibVersion
+
+            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.alpha, 5)
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-alpha-5")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.alpha-5")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-alpha.5")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.alpha.5")))
+
+            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.beta, 5)
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta-5")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta-5")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta.5")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta.5")))
+
+            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.rc, 5)
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-rc-5")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.rc-5")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-rc.5")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.rc.5")))
+
+            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.beta, null)
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta")))
+
+            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, null, null)
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2")))
+
+            expected = ExpectedWpiLibVersion(2017, 2018, 1, 0, null, null)
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1")))
+
+            return args
+        }
+
+        private val v15 = WpiLibVersionImpl.parse("0.1.0.201502241928")
+        private val v16_02 = WpiLibVersionImpl.parse("0.1.0.201602112135")
+        private val v16_03 = WpiLibVersionImpl.parse("0.1.0.201603020231")
+        private val v2017_1_1_alpha_1 = WpiLibVersionImpl.parse("2017.1.1.alpha-1")
+        private val v2017_1_1_alpha_2 = WpiLibVersionImpl.parse("2017.1.1.alpha-2")
+        private val v2017_1_1_beta_1 = WpiLibVersionImpl.parse("2017.1.1.beta-1")
+        private val v2017_1_1_beta_2 = WpiLibVersionImpl.parse("2017.1.1.beta-2")
+        private val v2017_1_1_beta_3 = WpiLibVersionImpl.parse("2017.1.1.beta-3")
+        private val v2017_1_1_rc_1 = WpiLibVersionImpl.parse("2017.1.1.rc-1")
+        private val v2017_1_1_rc_2 = WpiLibVersionImpl.parse("2017.1.1.rc-2")
+        private val v2017_1_1 = WpiLibVersionImpl.parse("2017.1.1")
+        private val v2017_1_2_rc_1 = WpiLibVersionImpl.parse("2017.1.2.rc-1")
+        private val v2017_1_2 = WpiLibVersionImpl.parse("2017.1.2")
+        private val v2017_2_1_beta_1 = WpiLibVersionImpl.parse("2017.2.1.beta-1")
+        private val v2017_2_1_rc_1 = WpiLibVersionImpl.parse("2017.2.1.rc-1")
+        private val v2017_2_1_rc_2 = WpiLibVersionImpl.parse("2017.2.1.rc-2")
+        private val v2017_2_1 = WpiLibVersionImpl.parse("2017.2.1")
+        private val v2018_1_1_alpha_1 = WpiLibVersionImpl.parse("2018.1.1.alpha-1")
+        private val v2018_1_1_alpha_2 = WpiLibVersionImpl.parse("2018.1.1.alpha-2")
+        private val v2018_1_1_alpha_3 = WpiLibVersionImpl.parse("2018.1.1.alpha-3")
+        private val v2018_1_1_alpha_4 = WpiLibVersionImpl.parse("2018.1.1.alpha-4")
+        private val v2018_1_1_alpha_5 = WpiLibVersionImpl.parse("2018.1.1.alpha-5")
+        private val v2018_1_1_alpha_6 = WpiLibVersionImpl.parse("2018.1.1.alpha-6")
+        private val v2018_1_1_beta_1 = WpiLibVersionImpl.parse("2018.1.1.beta-1")
+        private val v2018_1_1_beta_2 = WpiLibVersionImpl.parse("2018.1.1.beta-2")
+        private val v2018_1_1_beta_3 = WpiLibVersionImpl.parse("2018.1.1.beta-3")
+        private val v2018_1_1_beta_4 = WpiLibVersionImpl.parse("2018.1.1.beta-4")
+        private val v2018_1_1_beta_5 = WpiLibVersionImpl.parse("2018.1.1.beta-5")
+        private val v2018_1_1_beta_6 = WpiLibVersionImpl.parse("2018.1.1.beta-6")
+        private val v2018_1_1_rc_1 = WpiLibVersionImpl.parse("2018.1.1.rc-1")
+        private val v2018_1_1_rc_2 = WpiLibVersionImpl.parse("2018.1.1.rc-2")
+        private val v2018_1_1_rc_3 = WpiLibVersionImpl.parse("2018.1.1.rc-3")
+        private val v2018_1_1_rc_4 = WpiLibVersionImpl.parse("2018.1.1.rc-4")
+        private val v2018_1_1_rc_5 = WpiLibVersionImpl.parse("2018.1.1.rc-5")
+        private val v2018_1_1_rc_6 = WpiLibVersionImpl.parse("2018.1.1.rc-6")
+        private val v2018_1_1 = WpiLibVersionImpl.parse("2018.1.1")
+        private val v2018_1_2 = WpiLibVersionImpl.parse("2018.1.2")
+        private val v2018_1_3 = WpiLibVersionImpl.parse("2018.1.3")
+        private val v2018_1_4 = WpiLibVersionImpl.parse("2018.1.4")
+        private val v2018_1_5 = WpiLibVersionImpl.parse("2018.1.5")
+        private val v2018_2_0 = WpiLibVersionImpl.parse("2018.2.0")
+        private val v2018_2_1 = WpiLibVersionImpl.parse("2018.2.1")
+        private val v2018_2_2 = WpiLibVersionImpl.parse("2018.2.2")
+        private val v2018_2_3 = WpiLibVersionImpl.parse("2018.2.3")
+        private val v2018_2_4 = WpiLibVersionImpl.parse("2018.2.4")
+        private val v2018_2_5 = WpiLibVersionImpl.parse("2018.2.5")
+        private val v2018_3_1 = WpiLibVersionImpl.parse("2018.3.1")
+        private val v2018_4_1 = WpiLibVersionImpl.parse("2018.4.1")
+        private val v2018_5_1 = WpiLibVersionImpl.parse("2018.5.1")
+        private val v2018_5_2 = WpiLibVersionImpl.parse("2018.5.2")
+        private val v2018_6_1 = WpiLibVersionImpl.parse("2018.6.1")
+        private val v2019_0_0 = WpiLibVersionImpl.parse("2019.0.0")
+        private val v2019_0_1 = WpiLibVersionImpl.parse("2019.0.1")
+        private val v2019_1_1 = WpiLibVersionImpl.parse("2019.1.1")
+        private val v2019_1_2 = WpiLibVersionImpl.parse("2019.1.2")
+        private val v2020_1_1 = WpiLibVersionImpl.parse("2020.1.1")
+        private val v2020_1_2 = WpiLibVersionImpl.parse("2020.1.2")
+
+        private val versionList: ImmutableList<WpiLibVersion>
+
+        init
+        {
+            val list = ImmutableList.builder<WpiLibVersion>()
+
+            list.add(v15)
+            list.add(v16_02)
+            list.add(v16_03)
+            list.add(v2017_1_1_alpha_1)
+            list.add(v2017_1_1_alpha_2)
+            list.add(v2017_1_1_beta_1)
+            list.add(v2017_1_1_beta_2)
+            list.add(v2017_1_1_beta_3)
+            list.add(v2017_1_1_rc_1)
+            list.add(v2017_1_1_rc_2)
+            list.add(v2017_1_1)
+            list.add(v2017_1_2_rc_1)
+            list.add(v2017_1_2)
+            list.add(v2017_2_1_beta_1)
+            list.add(v2017_2_1_rc_1)
+            list.add(v2017_2_1_rc_2)
+            list.add(v2017_2_1)
+            list.add(v2018_1_1_alpha_1)
+            list.add(v2018_1_1_alpha_2)
+            list.add(v2018_1_1_alpha_3)
+            list.add(v2018_1_1_alpha_4)
+            list.add(v2018_1_1_alpha_5)
+            list.add(v2018_1_1_alpha_6)
+            list.add(v2018_1_1_beta_1)
+            list.add(v2018_1_1_beta_2)
+            list.add(v2018_1_1_beta_3)
+            list.add(v2018_1_1_beta_4)
+            list.add(v2018_1_1_beta_5)
+            list.add(v2018_1_1_beta_6)
+            list.add(v2018_1_1_rc_1)
+            list.add(v2018_1_1_rc_2)
+            list.add(v2018_1_1_rc_3)
+            list.add(v2018_1_1_rc_4)
+            list.add(v2018_1_1_rc_5)
+            list.add(v2018_1_1_rc_6)
+            list.add(v2018_1_1)
+            list.add(v2018_1_2)
+            list.add(v2018_1_3)
+            list.add(v2018_1_4)
+            list.add(v2018_1_5)
+            list.add(v2018_2_0)
+            list.add(v2018_2_1)
+            list.add(v2018_2_2)
+            list.add(v2018_2_3)
+            list.add(v2018_2_4)
+            list.add(v2018_2_5)
+            list.add(v2018_3_1)
+            list.add(v2018_4_1)
+            list.add(v2018_5_1)
+            list.add(v2018_5_2)
+            list.add(v2018_6_1)
+            list.add(v2019_0_0)
+            list.add(v2019_0_1)
+            list.add(v2019_1_1)
+            list.add(v2019_1_2)
+            list.add(v2020_1_1)
+            list.add(v2020_1_2)
+
+            versionList = list.build()
+        }
     }
 }

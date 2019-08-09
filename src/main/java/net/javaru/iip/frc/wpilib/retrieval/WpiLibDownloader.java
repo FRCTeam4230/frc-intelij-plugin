@@ -55,8 +55,8 @@ import net.javaru.iip.frc.util.UnzipUtils;
 import net.javaru.iip.frc.util.UriUtils;
 import net.javaru.iip.frc.wpilib.WpiLibPaths;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersionExtKt;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
-import net.javaru.iip.frc.wpilib.version.WpiLibVersions;
 
 
 
@@ -159,7 +159,7 @@ public class WpiLibDownloader
             // common.zip was added in 2018 and contains the JRE that is deployed to the roboRIO upon building
             //     It's content goes to C:\Users\UserName\wpilib\common
             //     We ultimately end up with C:\Users\UserName\wpilib\common\current\lib\linux\athena\shared which contains a number or *.so files
-            if (WpiLibVersions.is2018OrLater(javaFeatureDescriptor.getVersion()))
+            if (WpiLibVersionExtKt.is2018OrLater(javaFeatureDescriptor.getVersion()))
             {
                 extractZipFileContainedInZipFile(coreJarFilePath, "resources/common.zip", WpiLibPaths.getCommonCurrentVersionDir());
             }
@@ -192,7 +192,7 @@ public class WpiLibDownloader
         final Element javaFeatureElement = expression.evaluateFirst(siteDocument);
         final String id = javaFeatureElement.getAttribute("id").getValue();
         final String versionString = javaFeatureElement.getAttribute("version").getValue();
-        WpiLibVersion version = WpiLibVersionImpl.parse(versionString);
+        WpiLibVersion version = WpiLibVersionImpl.Companion.parse(versionString);
         final String javaFeatureRelativeUrl = javaFeatureElement.getAttribute("url").getValue();
         final URI javaFeatureUri = UriUtils.resolveSiblingResource(WpiRepoUris.getSiteUri(repoBaseUri), javaFeatureRelativeUrl);
 

@@ -18,7 +18,8 @@ package net.javaru.iip.frc;
 
 public class FrcPluginGlobals
 {
-
+    @SuppressWarnings("unused")
+    public static final String FRC_PLUGIN_ID_STRING = "net.javaru.idea.frc";
     public static final String FRC_PLUGIN_NAME = "FRC";
 
     public static final int TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL = 12;

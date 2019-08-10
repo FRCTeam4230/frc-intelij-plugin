@@ -27,7 +27,7 @@
         </constraints>
         <properties>
           <font size="16"/>
-          <text resource-bundle="messages/FrcBundle" key="frc.riolog.ui.inactive.panel.text.line1"/>
+          <text resource-bundle="i18n/FrcBundle" key="frc.riolog.ui.inactive.panel.text.line1"/>
         </properties>
       </component>
       <component id="6e8e1" class="com.intellij.ui.components.JBLabel">
@@ -36,7 +36,7 @@
         </constraints>
         <properties>
           <font size="16"/>
-          <text resource-bundle="messages/FrcBundle" key="frc.riolog.ui.inactive.panel.text.line2"/>
+          <text resource-bundle="i18n/FrcBundle" key="frc.riolog.ui.inactive.panel.text.line2"/>
         </properties>
       </component>
     </children>

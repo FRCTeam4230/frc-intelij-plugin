@@ -172,13 +172,13 @@ repositories {
 dependencies {
     val junit5Version = "5.3.1"
 
-    implementation(kotlin("stdlib", kotlinVersion))
-    implementation(kotlin("reflect", kotlinVersion))
+    compile(kotlin("stdlib", kotlinVersion))
+    compile(kotlin("reflect", kotlinVersion))
     testImplementation(kotlin("test", kotlinVersion))
-    implementation("org.jdom:jdom2:2.0.6")
-    implementation("commons-io:commons-io:2.6")
-    implementation("org.apache.commons:commons-lang3:3.7")
-    implementation("com.jcraft:jsch:0.1.54")
+    compile("org.jdom:jdom2:2.0.6")
+    compile("commons-io:commons-io:2.6")
+    compile("org.apache.commons:commons-lang3:3.7")
+    compile("com.jcraft:jsch:0.1.54")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junit5Version")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junit5Version")

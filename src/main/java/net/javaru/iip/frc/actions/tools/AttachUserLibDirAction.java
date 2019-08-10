@@ -85,8 +85,8 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
                     final Library existing = WpiLibLibrariesUtils.findExistingUserLibDirLibrary(module);
                     if (existing != null)
                     {
-                        Notifications.Bus.notify(new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
-                                                                  FrcNotifications.IconInfo,
+                        Notifications.Bus.notify(new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
+                                                                  FrcNotifications.Companion.getIconInfo(),
                                                                   FrcNotifications.Title,
                                                                   "User Lib Already Attached",
                                                                   "The FRC 'user/java/lib' directory is already attached via library '" + existing.getName() 
@@ -135,8 +135,8 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
         }
 
         String cause = e != null ? "Cause: " + e.toString() : "";
-        return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
-                                FrcNotifications.IconWarn,
+        return new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
+                                FrcNotifications.Companion.getIconWarn(),
                                 FrcNotifications.Title,
                                 "WPILib",
                                 "Could not attach 'user/java/lib' dir as a library." + cause,
@@ -155,8 +155,8 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
     @NotNull
     private static Notification createSuccessNotification()
     {
-        return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
-                                FrcNotifications.IconInfo,
+        return new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
+                                FrcNotifications.Companion.getIconInfo(),
                                 FrcNotifications.Title,
                                 "WPILib",
                                 "The 'user/java/lib' has been attached as a library. Indexes are being refreshed.",

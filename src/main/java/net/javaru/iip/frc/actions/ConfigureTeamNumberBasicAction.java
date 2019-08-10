@@ -82,7 +82,7 @@ public class ConfigureTeamNumberBasicAction extends AnAction
         {
             settings.setTeamNumber(Integer.parseInt(teamNumString));
             performTeamNumberChangeUpdates();
-            FrcNotifications.expireConfigureTeamNumberNotification(project);
+            FrcNotifications.Companion.expireConfigureTeamNumberNotification(project);
         }
     }
 
@@ -111,8 +111,8 @@ public class ConfigureTeamNumberBasicAction extends AnAction
             catch (IOException e)
             {
                 final Notification notification =
-                    FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP
-                        .createNotification("FRC",
+                    FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP()
+                                              .createNotification("FRC",
                                             "Team Number Update Failure",
                                             "The '" + WpiLibPaths.getWpilibPropertiesFile() + "' file could not be updated with "
                                             + "the change to the team number. You will need to manually update the 'team-number' "

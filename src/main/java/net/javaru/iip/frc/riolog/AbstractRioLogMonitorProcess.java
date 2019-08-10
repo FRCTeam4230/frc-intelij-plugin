@@ -137,8 +137,8 @@ public abstract class AbstractRioLogMonitorProcess extends Process
             enabled = false;
             myWaitSemaphore.up();
             LOG.warn("[FRC] Could not initialize riolog monitor. Cause Summary: " + e.toString(), e);
-            Notifications.Bus.notify(new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
-                                                      FrcNotifications.IconError,
+            Notifications.Bus.notify(new Notification(FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP().getDisplayId(),
+                                                      FrcNotifications.Companion.getIconError(),
                                                       FrcNotifications.Title,
                                                       "RioLog Initialization Failure",
                                                       "Could not initialize the RioLog socket monitor. See idea.log for more details.",
@@ -195,8 +195,8 @@ public abstract class AbstractRioLogMonitorProcess extends Process
         catch (Exception e)
         {
             LOG.info("[FRC] Could not create PrintWriter for writing RiLog to file. Cause Summary: " + e.toString(), e);
-            Notifications.Bus.notify(new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
-                                                      FrcNotifications.IconWarn,
+            Notifications.Bus.notify(new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
+                                                      FrcNotifications.Companion.getIconWarn(),
                                                       FrcNotifications.Title,
                                                       "RioLog File Logging",
                                                       "Could not create writer to log RioLog to file. Cause:" + e.toString(),

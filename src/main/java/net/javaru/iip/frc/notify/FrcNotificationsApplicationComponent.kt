@@ -14,14 +14,9 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.notify;
+package net.javaru.iip.frc.notify
 
-import com.intellij.openapi.components.ApplicationComponent;
-
-
+import com.intellij.openapi.components.ApplicationComponent
 
 
-public interface FrcNotificationsApplicationComponent extends ApplicationComponent
-{
-    
-}
+interface FrcNotificationsApplicationComponent : ApplicationComponent

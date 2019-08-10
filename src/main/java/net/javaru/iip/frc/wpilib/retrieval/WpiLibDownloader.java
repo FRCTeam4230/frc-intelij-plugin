@@ -301,7 +301,7 @@ public class WpiLibDownloader
             {
                 if (FrcProjectComponentImpl.isFrcFacetedProject(project))
                 {
-                    FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(project, true, true);
+                    FrcNotifications.Companion.notifyAboutTeamNumberNeedingToBeConfigured(project, true, true);
                 }
             }
         }

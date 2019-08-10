@@ -122,8 +122,8 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
                     else
                     {
                         notification = notifyOnCompletion ?
-                                       new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
-                                                        FrcNotifications.IconInfo,
+                                       new Notification(FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP().getDisplayId(),
+                                                        FrcNotifications.Companion.getIconInfo(),
                                                         FrcNotifications.Title,
                                                         NOTIFICATIONS_SUBTITLE + " Completed Successfully",
                                                         "One or more WPILib JARs are not attached. <a href='attach'>Attach as library</a>",
@@ -180,8 +180,8 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
 
                 if (notifyOnFailure)
                 {
-                    Notifications.Bus.notify(new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
-                                                              FrcNotifications.IconWarn,
+                    Notifications.Bus.notify(new Notification(FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP().getDisplayId(),
+                                                              FrcNotifications.Companion.getIconWarn(),
                                                               FrcNotifications.Title,
                                                               NOTIFICATIONS_SUBTITLE + " Failed",
                                                               content,
@@ -205,8 +205,8 @@ public class DownloadWpiLibAction extends AbstractFrcToolsAction
 
     private static Notification createNoActionSuccessNotification()
     {
-        return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
-                                FrcNotifications.IconInfo,
+        return new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
+                                FrcNotifications.Companion.getIconInfo(),
                                 FrcNotifications.Title,
                                 NOTIFICATIONS_SUBTITLE,
                                 "Download completed successfully.",

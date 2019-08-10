@@ -33,7 +33,7 @@ public class ExpireTheNotificationAction extends AnAction
     @Override
     public void actionPerformed(AnActionEvent e)
     {
-        FrcNotifications.expireConfigureTeamNumberNotification(e.getData(CommonDataKeys.PROJECT));
+        FrcNotifications.Companion.expireConfigureTeamNumberNotification(e.getData(CommonDataKeys.PROJECT));
     }
 
 

@@ -93,8 +93,8 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                         //TODO: need to see if it is present as a Project library, and if so, attach that
                         if (WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(module))
                         {
-                            Notifications.Bus.notify(new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
-                                                                      FrcNotifications.IconInfo,
+                            Notifications.Bus.notify(new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
+                                                                      FrcNotifications.Companion.getIconInfo(),
                                                                       FrcNotifications.Title,
                                                                       "WPILib",
                                                                       "WPILib is already attached as a library",
@@ -179,8 +179,8 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
         }
 
         String cause = e != null ? " Cause: " + e.toString() : "";
-        return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
-                                FrcNotifications.IconWarn,
+        return new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
+                                FrcNotifications.Companion.getIconWarn(),
                                 FrcNotifications.Title,
                                 "WPILib",
                                 "Could not attach WPILib JARs as a library." + cause,
@@ -199,8 +199,8 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
     @NotNull
     private static Notification createSuccessNotification()
     {
-        return new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP.getDisplayId(),
-                                FrcNotifications.IconInfo,
+        return new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
+                                FrcNotifications.Companion.getIconInfo(),
                                 FrcNotifications.Title,
                                 "WPILib",
                                 "WPILib JARs have been attached as a library.",

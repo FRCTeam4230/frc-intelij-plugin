@@ -208,8 +208,8 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         if (isFrcFacetedProject(myProject) && WpiLibLibrariesUtils.is2018CommonRefreshNeededViaReadAction())
         {
 
-            final Notification refreshNotification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
-                                                                      FrcNotifications.IconInfo,
+            final Notification refreshNotification = new Notification(FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP().getDisplayId(),
+                                                                      FrcNotifications.Companion.getIconInfo(),
                                                                       FrcNotifications.Title,
                                                                       NOTIFICATIONS_SUBTITLE + " Refresh Required",
                                                                       "In order to fully resolve "
@@ -232,9 +232,9 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                             true,
                                                             () -> {
                                                                 refreshNotification.expire();
-                                                                final Notification refreshCompletedNotification = new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP
-                                                                                                                                       .getDisplayId(),
-                                                                                                                                   FrcNotifications.IconInfo,
+                                                                final Notification refreshCompletedNotification = new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP()
+                                                                                                                                                             .getDisplayId(),
+                                                                                                                                   FrcNotifications.Companion.getIconInfo(),
                                                                                                                                    FrcNotifications.Title,
                                                                                                                                    NOTIFICATIONS_SUBTITLE,
                                                                                                                                    "Refresh of WPILib has completed",
@@ -246,9 +246,9 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                             },
                                                             () -> {
                                                                 refreshNotification.expire();
-                                                                final Notification refreshFailedNotification = new Notification(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP
-                                                                                                                                    .getDisplayId(),
-                                                                                                                                FrcNotifications.IconWarn,
+                                                                final Notification refreshFailedNotification = new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP()
+                                                                                                                                                          .getDisplayId(),
+                                                                                                                                FrcNotifications.Companion.getIconWarn(),
                                                                                                                                 FrcNotifications.Title,
                                                                                                                                 NOTIFICATIONS_SUBTITLE
                                                                                                                                 + " Refresh Failed",
@@ -388,8 +388,8 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
             { 
                 LOG.debug("[FRC] Publishing 'configure team number' notification for Project '" + project + "'"); }
             // Expire the application level notification to prevent duplicate notification in the event log
-            FrcNotifications.expireConfigureTeamNumberNotification(null);
-            final Notification notification = FrcNotifications.notifyAboutTeamNumberNeedingToBeConfigured(project, true, false);
+            FrcNotifications.Companion.expireConfigureTeamNumberNotification(null);
+            final Notification notification = FrcNotifications.Companion.notifyAboutTeamNumberNeedingToBeConfigured(project, true, false);
             notificationMap.put(ConfigureTeamNumberQuery, notification);
         }
     }
@@ -416,12 +416,12 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                    .append("<br>");
         }
         content.append("Would you like to download the new version? <a href='download'>Yes</a>  <a href='doNotDownload'>No</a>");
-        final Notification notification = FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP
-            .createNotification(FrcNotifications.Title,
-                                "New WPI Lib Available",
-                                content.toString(),
-                                NotificationType.INFORMATION,
-                                (theNotification, event) ->
+        final Notification notification = FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP()
+                                                                    .createNotification(FrcNotifications.Title,
+                                                                                        "New WPI Lib Available",
+                                                                                        content.toString(),
+                                                                                        NotificationType.INFORMATION,
+                                                                                        (theNotification, event) ->
                                 {
                                     theNotification.expire();
                                     if ("download".equals(event.getDescription()))
@@ -440,8 +440,8 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     
     private static Notification queueDownloadAndAttachWpilibNotification(@NotNull Project project)
     {
-        final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
-                                                           FrcNotifications.IconInfo,
+        final Notification notification = new Notification(FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP().getDisplayId(),
+                                                           FrcNotifications.Companion.getIconInfo(),
                                                            FrcNotifications.Title,
                                                            "WPILib Not Found on System",
                                                            "Would you like to <a href='download'>download and attach</a> WPILib as a Module Library?",
@@ -464,8 +464,8 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     @SuppressWarnings("UnusedReturnValue")
     private static Notification queueAttachWpilibQueryNotification(@NotNull Project project)
     {
-        final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
-                                                           FrcNotifications.IconInfo,
+        final Notification notification = new Notification(FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP().getDisplayId(),
+                                                           FrcNotifications.Companion.getIconInfo(),
                                                            FrcNotifications.Title,
                                                            "WPILib not Attached",
                                                            "Would you like to <a href='attach'>attach</a> WPILib as a Module Library?",
@@ -488,8 +488,8 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     @SuppressWarnings("UnusedReturnValue")
     private static Notification queueMissingUserLibQueryNotification(@NotNull Project project)
     {
-        final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
-                                                           FrcNotifications.IconInfo,
+        final Notification notification = new Notification(FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP().getDisplayId(),
+                                                           FrcNotifications.Companion.getIconInfo(),
                                                            FrcNotifications.Title,
                                                            "User Lib Directory Not Attached",
                                                            "Would you like to <a href='attach'>attach</a> the User Lib directory as a Module Library?",
@@ -512,11 +512,12 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     @SuppressWarnings("UnusedReturnValue")
     public static Notification queueLatestWpiLibVersionIsBeingDownloadedNotification(@Nullable Project project)
     {
-        final Notification notification = FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.createNotification(FrcNotifications.Title,
-                                                                                                                "WPILib",
-                                                                                                                "The latest version of the WPILib is being downloaded.",
-                                                                                                                NotificationType.INFORMATION,
-                                                                                                                null);
+        final Notification notification = FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP()
+                                                                    .createNotification(FrcNotifications.Title,
+                                                                                        "WPILib",
+                                                                                        "The latest version of the WPILib is being downloaded.",
+                                                                                        NotificationType.INFORMATION,
+                                                                                        null);
         Notifications.Bus.notify(notification, null);
         if (project != null)
         {

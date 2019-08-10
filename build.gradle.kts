@@ -15,14 +15,10 @@
  */
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.internal.impldep.org.apache.maven.wagon.PathUtils.password
-import org.gradle.api.tasks.wrapper.Wrapper
 import org.jetbrains.gradle.ext.ProjectSettings
-
 import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
-import java.time.LocalDate
 
 
 group = "net.javaru.iip.frc"
@@ -47,7 +43,7 @@ val publishRepoChannel: String by project
 plugins {
     base
     java
-    kotlin("jvm") version "1.2.41"
+    kotlin("jvm") version "1.2.41"  // It's best to kep the major.minor version consistent with the latest version of IntelliJ IDEA (and update the valid IDEA versions as appropriate)
     id("org.jetbrains.intellij") version "0.3.12" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
     // v0.4 -- 0.4.2 breaks the copyright configuration. can't find any notes about changes 
     id("org.jetbrains.gradle.plugin.idea-ext") version "0.3" // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
@@ -132,6 +128,7 @@ publishPlugin {
 idea {
     // https://github.com/JetBrains/gradle-idea-ext-plugin
     // Note, the DSL apparently changed in v0.4 since if I upgrade to it or later, the following breaks. But I cannot find any documentation on the change and have not ug into the code to see what needs to change
+    //       Looks like the new v0.5 DSL is (now) documented here: https://github.com/JetBrains/gradle-idea-ext-plugin/wiki/DSL-spec-v.-0.5 
     project {
         (this as ExtensionAware)
         configure<ProjectSettings> {
@@ -175,18 +172,17 @@ repositories {
 dependencies {
     val junit5Version = "5.3.1"
 
-    compile(kotlin("stdlib", kotlinVersion))
-    compile(kotlin("reflect", kotlinVersion))
-    compile(kotlin("runtime", kotlinVersion))
-    testCompile(kotlin("test", kotlinVersion))
-    compile("org.jdom:jdom2:2.0.6")
-    compile("commons-io:commons-io:2.6")
-    compile("org.apache.commons:commons-lang3:3.7")
-    compile("com.jcraft:jsch:0.1.54")
-    testCompile("org.junit.jupiter:junit-jupiter-api:$junit5Version")
-    testCompile("org.junit.jupiter:junit-jupiter-params:$junit5Version")
-    testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
-    testRuntime("org.junit.vintage:junit-vintage-engine:$junit5Version")
+    implementation(kotlin("stdlib", kotlinVersion))
+    implementation(kotlin("reflect", kotlinVersion))
+    testImplementation(kotlin("test", kotlinVersion))
+    implementation("org.jdom:jdom2:2.0.6")
+    implementation("commons-io:commons-io:2.6")
+    implementation("org.apache.commons:commons-lang3:3.7")
+    implementation("com.jcraft:jsch:0.1.54")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:$junit5Version")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
+    testImplementation("org.junit.vintage:junit-vintage-engine:$junit5Version")
 }
 
 

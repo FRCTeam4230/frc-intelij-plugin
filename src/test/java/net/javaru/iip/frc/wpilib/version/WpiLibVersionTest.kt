@@ -178,7 +178,8 @@ internal class WpiLibVersionTest
 
     @ParameterizedTest
     @MethodSource("isOlderThanProvider")
-    fun isSameAs(x: WpiLibVersion, y: WpiLibVersion, unused: Boolean)
+    @SuppressWarnings("unused")
+    fun isSameAs(x: WpiLibVersion, y: WpiLibVersion)
     {
         val actualX = x.isSameAs(x)
         val actualY = y.isSameAs(y)
@@ -233,15 +234,7 @@ internal class WpiLibVersionTest
     {
 
         @JvmStatic
-        fun versionListProvider(): Stream<Arguments>
-        {
-            val args = versionList.stream().map { Arguments.of(it) }
-            return args
-
-            //return versionList.stream().map<Arguments>(Function<WpiLibVersion, Arguments> { Arguments.of(it) }).collect<List<Arguments>, Any>(Collectors.toList())
-            
-            
-        }
+        fun versionListProvider(): Stream<Arguments> = versionList.stream().map { Arguments.of(it) }
 
         @JvmStatic
         fun isNewerThanProvider(): Iterable<Arguments> = createArgsList(false, true)

@@ -12,6 +12,7 @@
       <option name="taskNames">
         <list>
           <option value="test" />
+          <option value="buildPlugin" />
           <option value="runIde" />
         </list>
       </option>

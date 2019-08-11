@@ -507,7 +507,7 @@ public class FrcApplicationSettingsForm
             @Override
             public void keyReleased(KeyEvent e)
             {
-                internalFrcSshSettings.setSshPassword(sshPassword.getText());
+                internalFrcSshSettings.setSshPassword(new String(sshPassword.getPassword()));
             }
         });
         sshPasswordToDefaultButton.addActionListener(e ->

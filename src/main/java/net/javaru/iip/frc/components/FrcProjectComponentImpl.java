@@ -46,8 +46,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import net.javaru.iip.frc.actions.tools.AttachUserLibDirAction;
 import net.javaru.iip.frc.actions.tools.AttachWpilibAction;
 import net.javaru.iip.frc.actions.tools.DownloadWpiLibAction;
-import net.javaru.iip.frc.facet.FrcFacet;
+import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.notify.FrcNotifications;
+import net.javaru.iip.frc.plugin.FrcPluginVersionManager;
 import net.javaru.iip.frc.riolog.RioLogProjectService;
 import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
@@ -107,6 +108,8 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
         
         checkIssue8Refresh();
+    
+        FrcPluginVersionManager.INSTANCE.checkPluginUpdateStatus(myProject);
         
         final boolean isTemplateFirstOpen = frcFreshTemplateProjectCheckAndCleanup();
 

@@ -53,8 +53,8 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                   /* Plugin Run Count (PRC) */
                                   var prc: Int = 0,
                                   var wpiLibDir: Path = calculatedWpiLibDir,
-                                  var wpiEclipsePluginReleaseRepoUri: URI = FrcApplicationSettings.DEFAULT_WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI,
-                                  var wpiEclipsePluginBetaRepoUri: URI = FrcApplicationSettings.DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI,
+                                  var wpiEclipsePluginReleaseRepoUri: URI = DEFAULT_WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI,
+                                  var wpiEclipsePluginBetaRepoUri: URI = DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI,
                                   var useFrcToolWindow: Boolean = true,
                                   var clearRioLogOnRobotRestart: Boolean = false,
                                   var logNetConsoleToFile: Boolean = false,
@@ -75,7 +75,9 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                    *        
                                    *            ➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
                                    */
-                                  var rioRestartRegexString: String = "(?ium).*Launching.*FRCUserProgram\\.jar.*" 
+                                  var rioRestartRegexString: String = "(?ium).*Launching.*FRCUserProgram\\.jar.*", /* TODO Need to update for Gradle based deploy*/
+                                  /* Tracking for notification of the 2019 update requirement */
+                                  var notify19Up: String = "2019-01-01"
                                  ) : PersistentStateComponent<FrcApplicationSettings>
 {
     companion object Settings

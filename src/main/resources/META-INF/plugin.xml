@@ -34,7 +34,7 @@
     
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <!-- Minimum ('since-build') and maximum ('until-build') build of IDEA compatible with the plugin -->
-    <idea-version since-build="173.0" />
+    <idea-version since-build="191" until-build="191.*"/>
 
     <description><![CDATA[
         <p>

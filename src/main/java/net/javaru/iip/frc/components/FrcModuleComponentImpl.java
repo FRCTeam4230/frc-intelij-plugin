@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 
-import net.javaru.iip.frc.facet.FrcFacet;
+import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.riolog.RioLogProjectService;
 
 
@@ -78,13 +78,13 @@ public class FrcModuleComponentImpl implements FrcModuleComponent
     @Override
     public boolean isThisModuleFrcFaceted()
     {
-        return FrcFacet.isFrcFacetedModule(myModule);       
+        return FrcFacetKt.isFrcFacetedModule(myModule);       
     }
 
 
     @SuppressWarnings("unused")
     @Contract("null -> false")
-    public static boolean isFrcFacetedModule(@Nullable Module module) {return FrcFacet.isFrcFacetedModule(module);}
+    public static boolean isFrcFacetedModule(@Nullable Module module) {return FrcFacetKt.isFrcFacetedModule(module);}
 
 
     // projectOpened() and projectClosed() are deprecated and thus not implemented

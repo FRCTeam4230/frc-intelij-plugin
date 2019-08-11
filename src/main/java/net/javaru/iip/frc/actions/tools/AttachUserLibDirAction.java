@@ -32,6 +32,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.libraries.Library;
 
 import net.javaru.iip.frc.facet.FrcFacet;
+import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.util.IndexUtils;
 import net.javaru.iip.frc.util.LibDef;
@@ -55,7 +56,7 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
         final Project project = e.getData(CommonDataKeys.PROJECT);
         e.getPresentation().setVisible(project != null &&
                                        !project.isDisposed() &&
-                                       FrcFacet.isFrcFacetedProject(project) &&
+                                       FrcFacetKt.isFrcFacetedProject(project) &&
                                        !WpiLibLibrariesUtils.isUserLibAttachedViaReadAction(project));
     }
 
@@ -79,7 +80,7 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
             for (Module module : modules)
             {
                 final FacetManager facetManager = FacetManager.getInstance(module);
-                final FrcFacet frcFacet = facetManager.getFacetByType(FrcFacet.FACET_TYPE_ID);
+                final FrcFacet frcFacet = facetManager.getFacetByType(FrcFacet.Companion.getFACET_TYPE_ID());
                 if (frcFacet != null)
                 {
                     final Library existing = WpiLibLibrariesUtils.findExistingUserLibDirLibrary(module);

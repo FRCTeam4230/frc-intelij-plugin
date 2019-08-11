@@ -25,7 +25,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.project.Project;
 
-import net.javaru.iip.frc.facet.FrcFacet;
+import net.javaru.iip.frc.facet.FrcFacetKt;
 
 
 
@@ -57,6 +57,6 @@ public abstract class AbstractFrcToolsAction extends AnAction
         final Project project = e.getData(CommonDataKeys.PROJECT);
         e.getPresentation().setVisible(project != null &&
                                        !project.isDisposed() &&
-                                       FrcFacet.isFrcFacetedProject(project));
+                                       FrcFacetKt.isFrcFacetedProject(project));
     }
 }

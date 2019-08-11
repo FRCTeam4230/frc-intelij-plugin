@@ -14,85 +14,72 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.facet;
+package net.javaru.iip.frc.facet
 
-import javax.swing.*;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import com.intellij.facet.Facet;
-import com.intellij.facet.FacetType;
-import com.intellij.facet.ui.DefaultFacetSettingsEditor;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.module.JavaModuleType;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleType;
-import com.intellij.openapi.project.Project;
-
-import net.javaru.iip.frc.FrcIcons.FRC;
+import com.intellij.facet.Facet
+import com.intellij.facet.FacetType
+import com.intellij.facet.ui.DefaultFacetSettingsEditor
+import com.intellij.openapi.module.JavaModuleType
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleType
+import com.intellij.openapi.project.Project
+import net.javaru.iip.frc.FrcIcons.FRC
+import javax.swing.Icon
 
 
 
-public class FrcFacetType extends FacetType<FrcFacet, FrcFacetConfiguration>
+class FrcFacetType : FacetType<FrcFacet, FrcFacetConfiguration>(FrcFacet.FACET_TYPE_ID, FrcFacet.FACET_TYPE_ID_STRING, FrcFacet.FACET_NAME)
 {
-    private static final Logger LOG = Logger.getInstance(FrcFacetType.class);
-
-
-    public FrcFacetType()
+    // private val LOG = Logger.getInstance(FrcFacetType::class.java)
+    
+    companion object
     {
-        // id, stringId, presentableName
-        super(FrcFacet.FACET_TYPE_ID, FrcFacet.FACET_TYPE_ID_STRING, FrcFacet.FACET_NAME);
-    }
-
-
-    public static FrcFacetType getInstance()
-    {
-        return findInstance(FrcFacetType.class);
+        val instance: FrcFacetType
+            get() = findInstance(FrcFacetType::class.java)
     }
     
-    @Override
-    public FrcFacetConfiguration createDefaultConfiguration()
+    override fun createDefaultConfiguration(): FrcFacetConfiguration
     {
-        return new FrcFacetConfiguration();
+        return FrcFacetConfiguration()
+    }
+
+    /**
+     * Create a new facet instance
+     * @param module parent module for facet. Must be passed to [Facet] constructor
+     * @param name name of facet. Must be passed to [Facet] constructor
+     * @param facetConfiguration facet configuration. Must be passed to [Facet] constructor
+     * @param underlyingFacet underlying facet. Must be passed to [Facet] constructor
+     * @return a created facet
+     */
+    override fun createFacet(module: Module, name: String, facetConfiguration: FrcFacetConfiguration, underlyingFacet: Facet<*>?): FrcFacet
+    {
+        @Suppress("UNCHECKED_CAST")
+        return FrcFacet(this, module, name, facetConfiguration, underlyingFacet)
     }
 
 
-    @Override
-    public FrcFacet createFacet(@NotNull Module module, String name, @NotNull FrcFacetConfiguration facetConfiguration, @Nullable Facet underlyingFacet)
+    override fun isSuitableModuleType(moduleType: ModuleType<*>): Boolean
     {
-        return new FrcFacet(this, module, name, facetConfiguration, underlyingFacet);
+        return moduleType is JavaModuleType
     }
 
 
-    @Override
-    public boolean isSuitableModuleType(ModuleType moduleType)
-    {
-        return moduleType instanceof JavaModuleType;
-    }
-
-
-    @Nullable
-    @Override
-    public DefaultFacetSettingsEditor createDefaultConfigurationEditor(@NotNull Project project, @NotNull FrcFacetConfiguration configuration)
+    override fun createDefaultConfigurationEditor(project: Project, configuration: FrcFacetConfiguration): DefaultFacetSettingsEditor?
     {
         // super returns null - may want to implement if needed
-        return super.createDefaultConfigurationEditor(project, configuration);
+        return super.createDefaultConfigurationEditor(project, configuration)
     }
 
 
-    @Nullable
-    @Override
-    public Icon getIcon()
+    override fun getIcon(): Icon?
     {
-        return FRC.FIRST_ICON_MEDIUM_16;
+        return FRC.FIRST_ICON_MEDIUM_16
     }
 
 
-    @Nullable
-    @Override
-    public String getHelpTopic()
+    override fun getHelpTopic(): String?
     {
         // super returns null - may want to implement if help system is every added
-        return super.getHelpTopic();
+        return super.getHelpTopic()
     }
 }

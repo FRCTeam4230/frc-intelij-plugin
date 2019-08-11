@@ -14,52 +14,52 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.facet;
+package net.javaru.iip.frc.facet
 
-import org.jdom.Element;
-import com.intellij.facet.FacetConfiguration;
-import com.intellij.facet.ui.FacetEditorContext;
-import com.intellij.facet.ui.FacetEditorTab;
-import com.intellij.facet.ui.FacetValidatorsManager;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.util.InvalidDataException;
-import com.intellij.openapi.util.WriteExternalException;
-
+import com.intellij.facet.FacetConfiguration
+import com.intellij.facet.ui.FacetEditorContext
+import com.intellij.facet.ui.FacetEditorTab
+import com.intellij.facet.ui.FacetValidatorsManager
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.util.InvalidDataException
+import com.intellij.openapi.util.WriteExternalException
+import org.jdom.Element
 
 
 // TODO need to implement the PersistentStateComponent
-public class FrcFacetConfiguration implements FacetConfiguration// ,PersistentStateComponent<FrcFacetSettings>
+class FrcFacetConfiguration : FacetConfiguration// ,PersistentStateComponent<FrcFacetSettings>
 {
-    private static final Logger LOG = Logger.getInstance(FrcFacetConfiguration.class);
+    companion object
+    {
+        private val LOG = Logger.getInstance(FrcFacetConfiguration::class.java)
 
-    private static final FacetEditorTab[] NO_EDITOR_TABS = new FacetEditorTab[0];
+        private val NO_EDITOR_TABS: Array<FacetEditorTab> = emptyArray<FacetEditorTab>()
+    }
 
-
-    @Override
-    public FacetEditorTab[] createEditorTabs(FacetEditorContext facetEditorContext, FacetValidatorsManager validatorsManager)
+    override fun createEditorTabs(facetEditorContext: FacetEditorContext, validatorsManager: FacetValidatorsManager): Array<FacetEditorTab>
     {
         //TODO Need to implement the FrcFacetEditorTab
         //return new FacetEditorTab[] {new FrcFacetEditorTab(facetEditorContext, FrcFacetSettings.Settings.INSTANCE())};
-        return NO_EDITOR_TABS;
+        return NO_EDITOR_TABS
     }
 
 
-    /** @deprecated  */
-    @Deprecated
-    @Override
-    public void readExternal(Element element) throws InvalidDataException
+    @Deprecated("Is deprecated in API interface ")
+    @Throws(InvalidDataException::class)
+    override fun readExternal(element: Element)
     {
-        LOG.trace("[FRC] Deprecated (and no op) method" + getClass().getSimpleName() + ".readExternal() called");
+        LOG.trace("[FRC] Deprecated (and no op) method" + javaClass.simpleName + ".readExternal() called. (Is deprecated in API interface.)")
         /* no op */
     }
 
 
-    /** @deprecated  */
-    @Deprecated
-    @Override
-    public void writeExternal(Element element) throws WriteExternalException
+    @Deprecated("Is deprecated in API interface ")
+    @Throws(WriteExternalException::class)
+    override fun writeExternal(element: Element)
     {
-        LOG.trace("[FRC] Deprecated (and no op) method" + getClass().getSimpleName() + ".writeExternal() called");
+        LOG.trace("[FRC] Deprecated (and no op) method" + javaClass.simpleName + ".writeExternal() called. (Is deprecated in API interface.)")
         /* no op */
     }
+
+    
 }

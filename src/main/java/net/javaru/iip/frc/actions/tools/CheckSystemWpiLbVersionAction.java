@@ -23,7 +23,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 
-import net.javaru.iip.frc.facet.FrcFacet;
+import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionStatus;
@@ -181,9 +181,9 @@ public class CheckSystemWpiLbVersionAction extends AbstractFrcToolsAction
     {
         //TODO: Make this action unavailable if a download is currently running in the background
         final Project project = e.getData(CommonDataKeys.PROJECT);
-        e.getPresentation().setVisible(project != null 
-                                       && !project.isDisposed() 
-                                       && FrcFacet.isFrcFacetedProject(project) 
+        e.getPresentation().setVisible(project != null
+                                       && !project.isDisposed()
+                                       && FrcFacetKt.isFrcFacetedProject(project) 
                                        //&& WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project)
         );
     }

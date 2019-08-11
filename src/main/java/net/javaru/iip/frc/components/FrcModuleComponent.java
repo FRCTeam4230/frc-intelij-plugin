@@ -24,7 +24,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
 
 import net.javaru.iip.frc.FrcPluginGlobals;
-import net.javaru.iip.frc.facet.FrcFacet;
+import net.javaru.iip.frc.facet.FrcFacetKt;
 
 
 
@@ -54,7 +54,7 @@ public interface FrcModuleComponent extends ModuleComponent
     @Contract("null -> false")
     static boolean isFrcFacetedModule(@Nullable Module module)
     {   
-        return FrcFacet.isFrcFacetedModule(module);
+        return FrcFacetKt.isFrcFacetedModule(module);
     }
     
 }

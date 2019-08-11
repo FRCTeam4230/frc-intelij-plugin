@@ -35,6 +35,6 @@ public abstract class FrcAbstractFrameworkDetector extends FacetBasedFrameworkDe
     @Override
     public FacetType<FrcFacet, FrcFacetConfiguration> getFacetType()
     {
-        return FrcFacetType.getInstance();
+        return FrcFacetType.Companion.getInstance();
     }
 }

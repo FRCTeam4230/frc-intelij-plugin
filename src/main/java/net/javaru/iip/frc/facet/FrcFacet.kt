@@ -14,111 +14,95 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.facet;
+package net.javaru.iip.frc.facet
 
-import java.util.Collection;
-
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
-import com.intellij.facet.Facet;
-import com.intellij.facet.FacetManager;
-import com.intellij.facet.FacetType;
-import com.intellij.facet.FacetTypeId;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
+import com.google.common.collect.ImmutableList
+import com.intellij.facet.Facet
+import com.intellij.facet.FacetManager
+import com.intellij.facet.FacetType
+import com.intellij.facet.FacetTypeId
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleManager
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
+import net.javaru.iip.frc.facet.FrcFacet.Companion.FACET_TYPE_ID
+import org.jetbrains.annotations.Contract
 
 
-
-public class FrcFacet extends Facet<FrcFacetConfiguration>
+class FrcFacet(facetType: FacetType<FrcFacet, FrcFacetConfiguration>,
+               module: Module,
+               name: String,
+               configuration: FrcFacetConfiguration,
+               underlyingFacet: Facet<*>?) : Facet<FrcFacetConfiguration>(facetType, module, name, configuration, underlyingFacet)
 {
-    private static final Logger LOG = Logger.getInstance(FrcFacet.class);
-
-    public static final String FACET_TYPE_ID_STRING = "FRC_FACET";
-    public final static FacetTypeId<FrcFacet> FACET_TYPE_ID = new FacetTypeId<>(FrcFacet.FACET_TYPE_ID_STRING);
-    public static final String FACET_NAME = "FRC";
-    public static final String FULL_NAME = "FRC (FIRST Robotics Competition)";
-
-
-    public FrcFacet(@NotNull final FacetType facetType,
-                    @NotNull final Module module,
-                    final String name,
-                    @NotNull final FrcFacetConfiguration configuration,
-                    Facet underlyingFacet)
+    companion object
     {
-        super(facetType, module, name, configuration, underlyingFacet);
+        //private val LOG = Logger.getInstance(FrcFacet::class.java)
+
+        const val FACET_TYPE_ID_STRING = "FRC_FACET"
+        val FACET_TYPE_ID = FacetTypeId<FrcFacet>(FACET_TYPE_ID_STRING)
+        const val FACET_NAME = "FRC"
+        //const val FULL_NAME = "FRC (FIRST Robotics Competition)"
+
+
+        fun getInstance(module: Module): FrcFacet? = FacetManager.getInstance(module).getFacetByType(FACET_TYPE_ID)
     }
+}
 
-
-    @Nullable
-    public static FrcFacet getInstance(Module module)
+val allFrcFacetsForAllOpenProjects: ImmutableList<FrcFacet>
+    get()
     {
-        return FacetManager.getInstance(module).getFacetByType(FACET_TYPE_ID);
-    }
+        val openProjects = ProjectManager.getInstance().openProjects
 
+        val listBuilder = ImmutableList.builder<FrcFacet>()
 
-    @NotNull
-    public static ImmutableList<FrcFacet> getAllFrcFacetsForAllOpenProjects()
-    {
-        final Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
-
-        final Builder<FrcFacet> listBuilder = ImmutableList.builder();
-
-        for (Project openProject : openProjects)
+        for (openProject in openProjects)
         {
-            listBuilder.addAll(getAllFrcFacetsForProject(openProject));
+            listBuilder.addAll(openProject.getAllFrcFacetsForProject())
         }
-
-        return listBuilder.build();
+        return listBuilder.build()
     }
 
+fun Project?.getAllFrcFacetsForProject(): ImmutableList<FrcFacet>
+{
+    if (this == null) return ImmutableList.of()
 
-    public static ImmutableList<FrcFacet> getAllFrcFacetsForProject(@NotNull Project project)
+    val listBuilder = ImmutableList.builder<FrcFacet>()
+    val modules = ModuleManager.getInstance(this).modules
+    for (module in modules)
     {
-        final Builder<FrcFacet> listBuilder = ImmutableList.builder();
-        final Module[] modules = ModuleManager.getInstance(project).getModules();
-        for (Module module : modules)
+        val frcFacets = FacetManager.getInstance(module).getFacetsByType(FACET_TYPE_ID)
+        listBuilder.addAll(frcFacets)
+    }
+    return listBuilder.build()
+}
+
+fun Facet<*>?.isFrcFacet(): Boolean = this is FrcFacet
+
+@Contract("null -> false")
+fun Module?.isFrcFacetedModule(): Boolean
+{
+    if (this == null)
+    {
+        return false
+    }
+    val frcFacet = FacetManager.getInstance(this).getFacetByType(FACET_TYPE_ID)
+    return frcFacet != null
+}
+
+@Contract("null -> false")
+fun Project?.isFrcFacetedProject(): Boolean
+{
+    if (this != null)
+    {
+        val modules = ModuleManager.getInstance(this).modules
+        for (module in modules)
         {
-            final Collection<FrcFacet> frcFacets = FacetManager.getInstance(module).getFacetsByType(FACET_TYPE_ID);
-            listBuilder.addAll(frcFacets);
-        }
-        return listBuilder.build();
-    }
-
-
-    public static boolean isFrcFacet(@Nullable Facet facet)
-    {
-        return facet instanceof FrcFacet;
-    }
-    
-    @Contract("null -> false")
-    public static boolean isFrcFacetedModule(@Nullable Module module)
-    {
-        if (module == null)
-        {
-            return false;
-        }
-        final FrcFacet frcFacet = FacetManager.getInstance(module).getFacetByType(FrcFacet.FACET_TYPE_ID);
-        return frcFacet != null;
-    }
-
-
-    @Contract("null -> false")
-    public static boolean isFrcFacetedProject(@Nullable Project project)
-    {
-        if (project != null)
-        {
-            final Module[] modules = ModuleManager.getInstance(project).getModules();
-            for (Module module : modules)
+            if (module.isFrcFacetedModule())
             {
-                if (isFrcFacetedModule(module)) {return true;}
+                return true
             }
         }
-        return false;
     }
+    return false
 }

@@ -268,7 +268,7 @@ public abstract class AbstractRioLogMonitorProjectService
     private FrcFacet checkForFrcFacet(@NotNull Module module)
     {
         final FacetManager facetManager = FacetManager.getInstance(module);
-        final Collection<FrcFacet> facetsByType = facetManager.getFacetsByType(FrcFacet.FACET_TYPE_ID);
+        final Collection<FrcFacet> facetsByType = facetManager.getFacetsByType(FrcFacet.Companion.getFACET_TYPE_ID());
         if (facetsByType.isEmpty())
         {
             return null;

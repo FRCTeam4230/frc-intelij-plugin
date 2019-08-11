@@ -38,6 +38,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 
 import net.javaru.iip.frc.facet.FrcFacet;
+import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.util.IndexUtils;
@@ -64,7 +65,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
         final Project project = e.getData(CommonDataKeys.PROJECT);
         e.getPresentation().setVisible(project != null &&
                                        !project.isDisposed() &&
-                                       FrcFacet.isFrcFacetedProject(project) &&
+                                       FrcFacetKt.isFrcFacetedProject(project) &&
                                        !WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project));
     }
 
@@ -87,7 +88,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                 for (Module module : modules)
                 {
                     final FacetManager facetManager = FacetManager.getInstance(module);
-                    final FrcFacet frcFacet = facetManager.getFacetByType(FrcFacet.FACET_TYPE_ID);
+                    final FrcFacet frcFacet = facetManager.getFacetByType(FrcFacet.Companion.getFACET_TYPE_ID());
                     if (frcFacet != null)
                     {
                         //TODO: need to see if it is present as a Project library, and if so, attach that

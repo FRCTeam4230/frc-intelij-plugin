@@ -21,7 +21,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 
-import net.javaru.iip.frc.facet.FrcFacet;
+import net.javaru.iip.frc.facet.FrcFacetKt;
 
 
 
@@ -33,6 +33,6 @@ public class FrcCreateComponentsActionGroup extends DefaultActionGroup //impleme
         final Project project = e.getData(CommonDataKeys.PROJECT);
         e.getPresentation().setVisible(project != null &&
                                        !project.isDisposed() &&
-                                       FrcFacet.isFrcFacetedProject(project));
+                                       FrcFacetKt.isFrcFacetedProject(project));
     }
 }

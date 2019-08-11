@@ -36,7 +36,7 @@ public class FrcFrameworkSupportProvider extends FacetBasedFrameworkSupportProvi
 
     protected FrcFrameworkSupportProvider()
     {
-        super(FrcFacetType.getInstance());
+        super(FrcFacetType.Companion.getInstance());
     }
 
 

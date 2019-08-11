@@ -50,6 +50,6 @@ public class FrcLibraryBasedFrameworkType extends LibraryBasedFrameworkType
     @Override
     public String getUnderlyingFrameworkTypeId()
     {
-        return FacetBasedFrameworkSupportProvider.getProviderId(FrcFacet.FACET_TYPE_ID);
+        return FacetBasedFrameworkSupportProvider.getProviderId(FrcFacet.Companion.getFACET_TYPE_ID());
     }
 }

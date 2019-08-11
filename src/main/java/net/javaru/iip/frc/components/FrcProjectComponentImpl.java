@@ -160,9 +160,9 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
 
     @Override
-    public boolean isThisProjectFrcFaceted() { return FrcFacet.isFrcFacetedProject(myProject); }
+    public boolean isThisProjectFrcFaceted() { return FrcFacetKt.isFrcFacetedProject(myProject); }
 
-    public static boolean isFrcFacetedProject(@Nullable Project project) {return FrcFacet.isFrcFacetedProject(project);}
+    public static boolean isFrcFacetedProject(@Nullable Project project) {return FrcFacetKt.isFrcFacetedProject(project);}
 
 
     private boolean frcFreshTemplateProjectCheckAndCleanup()
@@ -567,7 +567,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         @Override
         public void facetAdded(@NotNull Facet facet)
         {
-            if (FrcFacet.isFrcFacet(facet))
+            if (FrcFacetKt.isFrcFacet(facet))
             {
                 updateForFrcFacet(facet);
                 checkProjectFrcStatus(facet.getModule().getProject(), true, true);
@@ -591,7 +591,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
         private void updateForFrcFacet(@NotNull Facet facet)
         { 
-            if (FrcFacet.isFrcFacet(facet))
+            if (FrcFacetKt.isFrcFacet(facet))
             {
                 RioLogProjectService.getInstance(facet.getModule().getProject()).update();
             }

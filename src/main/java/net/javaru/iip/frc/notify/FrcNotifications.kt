@@ -20,6 +20,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationDisplayType
 import com.intellij.notification.NotificationGroup
+import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
 import com.intellij.notification.NotificationsConfiguration
@@ -30,7 +31,19 @@ import net.javaru.iip.frc.i18n.FrcBundle
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import java.util.*
 import javax.swing.Icon
+import javax.swing.event.HyperlinkEvent
 
+
+@Suppress("unused")
+enum class FrcNotificationType(val group: NotificationGroup, val notificationType: NotificationType, val icon: Icon)
+{ 
+    GENERAL_INFO(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP, NotificationType.INFORMATION, FrcNotifications.IconInfo), 
+    GENERAL_WARN(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP, NotificationType.WARNING, FrcNotifications.IconWarn), 
+    GENERAL_ERROR(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP, NotificationType.ERROR, FrcNotifications.IconError), 
+    ACTIONABLE_INFO(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP, NotificationType.INFORMATION, FrcNotifications.IconInfo),
+    ACTIONABLE_WARN(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP, NotificationType.WARNING, FrcNotifications.IconWarn),
+    ACTIONABLE_ERROR(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP, NotificationType.ERROR, FrcNotifications.IconError)
+}
 /**
  * Also see [net.javaru.iip.frc.components.FrcProjectComponentImpl] for some notification methods.
  */
@@ -68,7 +81,6 @@ class FrcNotifications private constructor() : FrcNotificationsApplicationCompon
                                                                true)
 
         val FRC_ACTIONABLE_NOTIFICATION_GROUP = NotificationGroup(FrcBundle.message("frc.notifications.group.name.actionable"),
-
                                                                   NotificationDisplayType.STICKY_BALLOON,
                                                                   true)
 
@@ -178,6 +190,56 @@ class FrcNotifications private constructor() : FrcNotificationsApplicationCompon
                 "${project.name}--${project.basePath}"
             else 
                 "null-project"
+        }
+
+        /**
+         * @sample notifyExampleUsage
+         */
+        fun notify(type: FrcNotificationType, content: String, subTitle: String? = null, project: Project? = null, listener: NotificationListener? = null): Notification
+        {
+            val notification = Notification(type.group.displayId,
+                                            type.icon,
+                                            Title,
+                                            subTitle,
+                                            content,
+                                            type.notificationType,
+                                            listener)
+            Notifications.Bus.notify(notification, project)
+            return notification
+        }
+
+        /**
+         * @sample notifyExampleUsage
+         */
+        fun notify(type: FrcNotificationType, content: String, subTitle: String? = null, project: Project? = null, listener: (notification: Notification, event: HyperlinkEvent) -> Unit): Notification
+        {
+            return notify(type, content, subTitle, project, listener)
+        }
+
+        @Suppress("ObjectLiteralToLambda")
+        private fun notifyExampleUsage()
+        {
+            // Most Idiomatic
+            notify(FrcNotificationType.ACTIONABLE_ERROR, "<a href='open'>Click</a> to open item.", "Open?", null) { _, event ->
+                if (event.description == "open") { /* Action code goes here */ }
+            }
+
+            
+            // OK
+            notify(FrcNotificationType.ACTIONABLE_ERROR, "<a href='open'>Click</a> to open item.", "Open?", null, NotificationListener { _, event ->
+                if (event.description == "open") { /* Action code goes here */ } 
+            })
+
+            
+            // Least Idiomatic - Object could be converted to a lambda to give the second option, then that lambda could be moved outside the parameters to get the first 
+            notify(FrcNotificationType.ACTIONABLE_ERROR, "<a href='open'>Click</a> to open item.", "Open?", null, object : NotificationListener
+            {
+                override fun hyperlinkUpdate(notification: Notification, event: HyperlinkEvent)
+                {
+                    if (event.description == "open") { /* Action code goes here */ }
+                }
+            })
+
         }
     }
 

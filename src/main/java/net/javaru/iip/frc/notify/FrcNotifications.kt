@@ -47,8 +47,8 @@ enum class FrcNotificationType(val group: NotificationGroup, val notificationTyp
 /**
  * Also see [net.javaru.iip.frc.components.FrcProjectComponentImpl] for some notification methods.
  */
-// NOTE: This class is registered in the plugin.xml as a ApplicationComponent
-class FrcNotifications private constructor() : FrcNotificationsApplicationComponent
+// NOTE: This class is registered in the plugin.xml as an ApplicationService
+class FrcNotifications private constructor()
 {
 
     init
@@ -61,15 +61,6 @@ class FrcNotifications private constructor() : FrcNotificationsApplicationCompon
                                                                             NotificationDisplayType.STICKY_BALLOON,
                                                                             true)
     }
-
-
-    override fun initComponent() { /* no op */ }
-
-
-    override fun disposeComponent() { /* no op */ }
-
-
-    override fun getComponentName(): String = javaClass.simpleName
 
     companion object
     {

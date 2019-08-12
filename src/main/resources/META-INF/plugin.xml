@@ -240,7 +240,6 @@
             <implementation-class>net.javaru.iip.frc.components.FrcApplicationComponentImpl</implementation-class>
         </component>
         <component>
-            <interface-class>net.javaru.iip.frc.notify.FrcNotificationsApplicationComponent</interface-class>
             <implementation-class>net.javaru.iip.frc.notify.FrcNotifications</implementation-class>
         </component>
     </application-components>

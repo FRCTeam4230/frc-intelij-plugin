@@ -25,7 +25,35 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings;
 
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL;
 
+/*
+    TODO: Issue #26:  Migrate this ApplicationComponent to a "true" ApplicationService (or possibly remove it completely)
+    
+    The FrcApplicationComponent interface was originally extending ApplicationComponent
+    However, the ApplicationComponent was deprecated. No methods from it were being 
+    used, but the initComponent() method from its super interface, BaseComponent, is being 
+    used to ensure the team number is configured and to increment the run count. The
+    deprecation information in ApplicationComponent says to use 
+    com.intellij.util.messages.MessageBus instead (full message below). For now, I changed
+    the FrcApplicationComponent interface so it extends BaseComponent (rather than the deprecated
+    ApplicationComponent). But at some point I should look at converting this class to be a true 
+    ApplicationService. At this point, I probably do not need the "configure team" notification
+    to happen immediately on IDE start (after the plugin is installed). I can do that the first time
+    a project is loaded or the FRC project wizard is used.
+    
+    Deprecation Information:
+    
+    Please use application services or extensions instead of application component, because if you 
+    register a class as an application component it will be loaded, its instance will be created 
+    and initComponent() methods will be called each time IDE is started even if user doesn't use any 
+    feature of your plugin. So consider using specific extensions instead to ensure that the plugin 
+    will not impact IDE performance until user calls its actions explicitly.
+    Deprecated:  This interface is not used anymore. Application component do no need to extend any 
+    special interface. Instead of initComponent() please use com.intellij.util.messages.MessageBus 
+    and corresponding topics. Instead of disposeComponent() please use com.intellij.openapi.Disposable. 
+    If for some reasons replacing disposeComponent() / initComponent() is not a option, BaseComponent 
+    can be extended.
 
+ */
 
 public class FrcApplicationComponentImpl implements FrcApplicationComponent
 {

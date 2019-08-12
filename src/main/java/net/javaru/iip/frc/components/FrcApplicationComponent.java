@@ -18,14 +18,14 @@ package net.javaru.iip.frc.components;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.ApplicationComponent;
+import com.intellij.openapi.components.BaseComponent;
 import com.intellij.openapi.diagnostic.Logger;
 
 import net.javaru.iip.frc.FrcPluginGlobals;
 
 
 
-public interface FrcApplicationComponent extends ApplicationComponent
+public interface FrcApplicationComponent extends BaseComponent
 {
     @NotNull
     @Override

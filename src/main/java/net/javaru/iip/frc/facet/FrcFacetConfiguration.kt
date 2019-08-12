@@ -20,10 +20,6 @@ import com.intellij.facet.FacetConfiguration
 import com.intellij.facet.ui.FacetEditorContext
 import com.intellij.facet.ui.FacetEditorTab
 import com.intellij.facet.ui.FacetValidatorsManager
-import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.util.InvalidDataException
-import com.intellij.openapi.util.WriteExternalException
-import org.jdom.Element
 
 
 // TODO need to implement the PersistentStateComponent
@@ -31,8 +27,6 @@ class FrcFacetConfiguration : FacetConfiguration// ,PersistentStateComponent<Frc
 {
     companion object
     {
-        private val LOG = Logger.getInstance(FrcFacetConfiguration::class.java)
-
         private val NO_EDITOR_TABS: Array<FacetEditorTab> = emptyArray<FacetEditorTab>()
     }
 
@@ -45,24 +39,4 @@ class FrcFacetConfiguration : FacetConfiguration// ,PersistentStateComponent<Frc
         //return new FacetEditorTab[] {new FrcFacetEditorTab(facetEditorContext, FrcFacetSettings.Settings.INSTANCE())};
         return NO_EDITOR_TABS
     }
-
-
-    @Deprecated("Is deprecated in API interface ")
-    @Throws(InvalidDataException::class)
-    override fun readExternal(element: Element)
-    {
-        LOG.trace("[FRC] Deprecated (and no op) method" + javaClass.simpleName + ".readExternal() called. (Is deprecated in API interface.)")
-        /* no op */
-    }
-
-
-    @Deprecated("Is deprecated in API interface ")
-    @Throws(WriteExternalException::class)
-    override fun writeExternal(element: Element)
-    {
-        LOG.trace("[FRC] Deprecated (and no op) method" + javaClass.simpleName + ".writeExternal() called. (Is deprecated in API interface.)")
-        /* no op */
-    }
-
-    
 }

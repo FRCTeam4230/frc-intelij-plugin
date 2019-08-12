@@ -20,6 +20,7 @@ import com.intellij.openapi.application.ex.ApplicationInfoEx
 import com.intellij.openapi.application.impl.ApplicationInfoImpl
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.BuildNumber
+import com.intellij.util.PlatformUtils
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications
@@ -64,13 +65,18 @@ object FrcPluginVersionManager
                 else
                     "The next release of the <strong>FRC Plugin</strong> will require IntelliJ IDEA v2019.2.x or later."
 
+                val suffix = if (PlatformUtils.isIdeaUltimate())
+                    " As a reminder, the FRC plugin works with the free Community Edition of IntelliJ IDEA. "
+                else
+                    ""
+                
                 val notifyType = if (newVersionAvailable) FrcNotificationType.ACTIONABLE_WARN else FrcNotificationType.ACTIONABLE_INFO
                 
                 
                 FrcNotifications.notify(notifyType,
                                         "$firstSentence " +
                                         "This is due to some significant changes to the IntelliJ IDEA plugin API being leveraged. " +
-                                        "Please upgrade to the latest version of IntelliJ IDEA at your convenience. Thanks.",
+                                        "Please upgrade to the latest version of IntelliJ IDEA at your convenience.$suffix Thanks.",
                                         project = project)
 
                 FrcApplicationSettings.INSTANCE().notify19Up = now.toString()

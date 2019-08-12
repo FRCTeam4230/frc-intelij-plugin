@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
 
 group = "net.javaru.iip.frc"
-version = "0.8.191-SNAPSHOT"
+version = "0.8.0.192-SNAPSHOT"
 
 //buildscript {
 //    build.loadExtraPropertiesOf(project)
@@ -44,7 +44,7 @@ plugins {
     base
     java
     kotlin("jvm") version "1.3.41"  // It's best to kep the major.minor version consistent with the latest version of IntelliJ IDEA (and update the valid IDEA versions as appropriate)
-    id("org.jetbrains.intellij") version "0.3.12" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
+    id("org.jetbrains.intellij") version "0.4.10" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
     // v0.4 -- 0.4.2 breaks the copyright configuration. can't find any notes about changes 
     id("org.jetbrains.gradle.plugin.idea-ext") version "0.3" // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
 }
@@ -89,7 +89,7 @@ intellij {
     // IntelliJ IDEA dependency
     version = ideaVersion
     // Bundled plugin dependencies - comma separated list
-    //setPlugins("ant")
+    setPlugins("java", "Gradle")  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/ 
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
     updateSinceUntilBuild = false
     sameSinceUntilBuild = isEAP.toBoolean() || useSameSinceUntilBuild.toBoolean()

@@ -34,7 +34,7 @@
     
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <!-- Minimum ('since-build') and maximum ('until-build') build of IDEA compatible with the plugin -->
-    <idea-version since-build="191" until-build="191.*"/>
+    <idea-version since-build="192"/> <!-- Leaving until-build open ended until a 193 branch is created -->
 
     <description><![CDATA[
         <p>
@@ -136,7 +136,7 @@
     <!-- The unique identifiers of the plugins on which this plugin depends. -->
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
-    <!-- TODO: Make AntSupport Required ? -->
+    <depends>org.jetbrains.plugins.gradle</depends>
     <!--<depends>AntSupport</depends>-->
 
     <!-- Optional dependency on another plugin.

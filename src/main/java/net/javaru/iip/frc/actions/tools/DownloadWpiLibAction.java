@@ -37,7 +37,7 @@ import static net.javaru.iip.frc.components.FrcProjectComponentImpl.cancelWpiLib
 
 
 
-public class DownloadWpiLibAction extends AbstractFrcToolsAction
+public class DownloadWpiLibAction extends AbstractFrcToolsLegacyAction
 {
     private static final Logger LOG = Logger.getInstance(DownloadWpiLibAction.class);
 

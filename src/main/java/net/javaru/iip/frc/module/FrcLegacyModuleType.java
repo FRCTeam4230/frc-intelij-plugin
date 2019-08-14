@@ -37,13 +37,13 @@ import net.javaru.iip.frc.FrcIcons;
 
 
 
-public class FrcModuleType extends ModuleType<FrcModuleBuilder>
+public class FrcLegacyModuleType extends ModuleType<FrcLegacyModuleBuilder>
 {
-    private static final Logger LOG = Logger.getInstance(FrcModuleType.class);
+    private static final Logger LOG = Logger.getInstance(FrcLegacyModuleType.class);
 
-    public static final String FRC_MODULE_TYPE_ID = "FRC_Module";
+    public static final String FRC_MODULE_TYPE_ID = "FRC_Legacy_Module";
 
-    public FrcModuleType()
+    public FrcLegacyModuleType()
     {
         super(FRC_MODULE_TYPE_ID);
     }
@@ -51,19 +51,19 @@ public class FrcModuleType extends ModuleType<FrcModuleBuilder>
 
     @NotNull
     @Override
-    public FrcModuleBuilder createModuleBuilder()
+    public FrcLegacyModuleBuilder createModuleBuilder()
     {
-        return new FrcModuleBuilder();
+        return new FrcLegacyModuleBuilder();
     }
 
 
 //    @NotNull
 //    @Override
 //    public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext,
-//                                                @NotNull FrcModuleBuilder moduleBuilder,
+//                                                @NotNull FrcLegacyModuleBuilder moduleBuilder,
 //                                                @NotNull ModulesProvider modulesProvider)
 //    {
-//        return new ModuleWizardStep[]{new FrcModuleWizardStep(moduleBuilder, wizardContext)};
+//        return new ModuleWizardStep[]{new FrcLegacyModuleWizardStep(moduleBuilder, wizardContext)};
 //    }
 
 

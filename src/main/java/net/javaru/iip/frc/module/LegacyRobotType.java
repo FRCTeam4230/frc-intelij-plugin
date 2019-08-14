@@ -20,7 +20,7 @@ import org.intellij.lang.annotations.Language;
 
 
 
-public enum RobotType 
+public enum LegacyRobotType 
 {
     CommandBased("Command Based Robot", "<html>A robot project that allows robots to be implemented using the command based model to allow complex functionality to be developed from simpler functionality.</html>"),
     Iterative("Iterative Robot",        "<html>A robot project that allow robots to be implemented in an iterative manner synced to receiving driver station packets.</html>"),
@@ -33,7 +33,7 @@ public enum RobotType
     private final String description;
 
 
-    RobotType(String labelName, @Language("HTML") String description)
+    LegacyRobotType(String labelName, @Language("HTML") String description)
     {
         this.labelName = labelName;
         this.description = description;

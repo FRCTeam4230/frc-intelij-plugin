@@ -98,7 +98,7 @@ public class FrcModuleComponentImpl implements FrcModuleComponent
         // case where the user is adding a module to an open project rather than this moduleAdded() method being 
         // called as part of the initial project loading when opening a project. In the latter case, the
         // RioLogProjectService.update() is called via the ProjectComponent.projectOpened() method
-        if (myModule.getProject().isOpen())
+        if (myModule.getProject().isOpen() && FrcFacetKt.isFrcFacetedModule(myModule))
         {
             RioLogProjectService.getInstance(myModule.getProject()).update();
         }

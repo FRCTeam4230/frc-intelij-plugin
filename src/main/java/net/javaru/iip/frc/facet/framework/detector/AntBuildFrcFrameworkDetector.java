@@ -16,19 +16,11 @@
 
 package net.javaru.iip.frc.facet.framework.detector;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.jdom2.Attribute;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.filter.Filters;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.framework.detection.DetectedFrameworkDescription;
 import com.intellij.framework.detection.FileContentPattern;
@@ -40,6 +32,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.util.indexing.FileContent;
 
+import net.javaru.iip.frc.util.VirtualFileExtsKt;
+
 
 
 // Unused at this time because if I configure two detectors in the plugin.xml, it adds two instances 
@@ -50,8 +44,7 @@ public class AntBuildFrcFrameworkDetector extends FrcAbstractFrameworkDetector
 {
     private static final Logger LOG = Logger.getInstance(AntBuildFrcFrameworkDetector.class);
 
-    private final XPathExpression<Element> xPathExpression = XPathFactory.instance()
-                                                                         .compile("//project/property[@file] | //bookstore/import[@file]", Filters.element());
+   
 
 
     public AntBuildFrcFrameworkDetector()
@@ -84,29 +77,8 @@ public class AntBuildFrcFrameworkDetector extends FrcAbstractFrameworkDetector
 
         for (VirtualFile virtualFile : newFiles)
         {
-            try (InputStream inputStream = virtualFile.getInputStream())
-            {
-                final Document document = new SAXBuilder().build(inputStream);
-                final List<Element> elements = xPathExpression.evaluate(document);
-                for (Element element : elements)
-                {
-                    final Attribute attribute = element.getAttribute("file");
-                    String value = attribute.getValue();
-                    if (value != null)
-                    {
-                        value = value.toLowerCase();
-                        if (value.contains("wpilib") || value.contains("wpi-lib"))
-                        {
-                            foundFiles.add(virtualFile);
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                LOG.warn("[FRC] an exception occurred during facet detection (via Ant build detection): " + e.toString());
-            }
-        }
+            if (VirtualFileExtsKt.isWpiAntBuildFile(virtualFile)) { foundFiles.add(virtualFile); }
+        }       
 
         if (foundFiles.isEmpty())
         {

@@ -25,22 +25,22 @@ import com.intellij.openapi.diagnostic.Logger;
 
 
 
-public class FrcModuleWizardStep extends ModuleWizardStep
+public class FrcLegacyModuleWizardStep extends ModuleWizardStep
 {
-    private static final Logger LOG = Logger.getInstance(FrcModuleWizardStep.class);
+    private static final Logger LOG = Logger.getInstance(FrcLegacyModuleWizardStep.class);
 
     @NotNull
-    private final FrcModuleBuilder frcModuleBuilder;
+    private final FrcLegacyModuleBuilder frcLegacyModuleBuilder;
 
     @NotNull
     private final WizardContext wizardContext;
     
     @NotNull
-    private final FrcModuleWizardPanel wizardPanel = new FrcModuleWizardPanel();
+    private final FrcLegacyModuleWizardPanel wizardPanel = new FrcLegacyModuleWizardPanel();
 
-    public FrcModuleWizardStep(@NotNull FrcModuleBuilder frcModuleBuilder, @NotNull WizardContext wizardContext) 
+    public FrcLegacyModuleWizardStep(@NotNull FrcLegacyModuleBuilder frcLegacyModuleBuilder, @NotNull WizardContext wizardContext) 
     {
-        this.frcModuleBuilder = frcModuleBuilder;
+        this.frcLegacyModuleBuilder = frcLegacyModuleBuilder;
         this.wizardContext = wizardContext;
     }
 
@@ -55,8 +55,9 @@ public class FrcModuleWizardStep extends ModuleWizardStep
     @Override
     public void updateDataModel()
     {
-        final RobotType robotType = wizardPanel.getSelectedRobotType();
-        LOG.debug("[FRC] FrcModuleWizardPanel.getSelectedRobotType() returned '" + robotType + "'. Updating data model (i.e. frcModuleBuilder)");
-        frcModuleBuilder.setRobotType(robotType);
+        final LegacyRobotType legacyRobotType = wizardPanel.getSelectedRobotType();
+        LOG.debug("[FRC] FrcLegacyModuleWizardPanel.getSelectedRobotType() returned '" + legacyRobotType
+                  + "'. Updating data model (i.e. frcLegacyModuleBuilder)");
+        frcLegacyModuleBuilder.setLegacyRobotType(legacyRobotType);
     }
 }

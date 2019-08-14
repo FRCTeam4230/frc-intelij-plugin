@@ -42,6 +42,7 @@ import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.util.indexing.FileContent;
 
+import net.javaru.iip.frc.facet.FrcFacetConfiguration;
 import net.javaru.iip.frc.wpilib.WpiLibConstants;
 
 
@@ -107,6 +108,7 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
         try
         {
             final List<VirtualFile> foundFiles = detectRobotClasses(newFiles, context);
+             
             return (foundFiles.isEmpty()) ? Collections.emptyList() : context.createDetectedFacetDescriptions(this, foundFiles);
         }
         catch (Exception e)
@@ -276,5 +278,21 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
             }
         }
         return false;
+    }
+    
+    
+    /**
+     * Override this method if only one facet of this type are allowed in a single module
+     *
+     * @param files files accepted by detector's filter
+     *
+     * @return configuration for detected facet
+     */
+    @Nullable
+    @Override
+    protected FrcFacetConfiguration createConfiguration(Collection<VirtualFile> files)
+    {
+        LOG.debug("[FRC] createConfiguration(files) called in RobotSubclassFrcFrameworkDetector");
+        return getFacetType().createDefaultConfiguration();
     }
 }

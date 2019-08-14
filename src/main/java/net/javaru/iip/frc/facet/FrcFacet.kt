@@ -21,10 +21,15 @@ import com.intellij.facet.Facet
 import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetType
 import com.intellij.facet.FacetTypeId
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProviderImpl
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
+import com.intellij.openapi.roots.ExternalProjectSystemRegistry
+import net.javaru.iip.frc.facet.FrcFacet.Companion.FACET_NAME
 import net.javaru.iip.frc.facet.FrcFacet.Companion.FACET_TYPE_ID
 import org.jetbrains.annotations.Contract
 
@@ -47,6 +52,29 @@ class FrcFacet(facetType: FacetType<FrcFacet, FrcFacetConfiguration>,
 
         fun getInstance(module: Module): FrcFacet? = FacetManager.getInstance(module).getFacetByType(FACET_TYPE_ID)
     }
+}
+
+fun Module.getOrAddFrcFacet(externalSystemId: String? = null, commitModel: Boolean = true): FrcFacet
+{
+    // Based on Kotlin Plugin:  org.jetbrains.kotlin.idea.facet.FacetUtilsKt#getOrCreateFacet 
+    val modelsProvider = IdeModifiableModelsProviderImpl(this.project)
+    val facetModel = modelsProvider.getModifiableFacetModel(this)
+    val facet = facetModel.findFacet(FACET_TYPE_ID, FACET_NAME) ?: with(FrcFacetType.instance) {
+        createFacet(this@getOrAddFrcFacet, FACET_NAME, createDefaultConfiguration(), null)
+    }.apply {
+        val externalSource = externalSystemId?.let{ ExternalProjectSystemRegistry.getInstance().getSourceById(it) }
+        facetModel.addFacet(this, externalSource)
+    }
+
+    if (commitModel)
+    {
+        ApplicationManager.getApplication().invokeLater{
+            runWriteAction {
+                facetModel.commit()
+            }
+        }
+    }
+    return facet
 }
 
 val allFrcFacetsForAllOpenProjects: ImmutableList<FrcFacet>

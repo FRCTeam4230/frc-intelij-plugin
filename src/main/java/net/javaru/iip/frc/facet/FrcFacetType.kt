@@ -18,6 +18,7 @@ package net.javaru.iip.frc.facet
 
 import com.intellij.facet.Facet
 import com.intellij.facet.FacetType
+import com.intellij.facet.FacetTypeRegistry
 import com.intellij.facet.ui.DefaultFacetSettingsEditor
 import com.intellij.openapi.module.JavaModuleType
 import com.intellij.openapi.module.Module
@@ -36,6 +37,10 @@ class FrcFacetType : FacetType<FrcFacet, FrcFacetConfiguration>(FrcFacet.FACET_T
     {
         val instance: FrcFacetType
             get() = findInstance(FrcFacetType::class.java)
+            // get() =  FacetTypeRegistry.getInstance().findFacetType(FrcFacet.FACET_TYPE_ID) as FrcFacetType  // an alternative methodology I found in the Kotlin Plugin: org/jetbrains/kotlin/idea/facet/KotlinFacetType.kt:25
+        
+        val INSTANCE2
+            get() = FacetTypeRegistry.getInstance().findFacetType(FrcFacet.FACET_TYPE_ID) as FrcFacetType
     }
     
     override fun createDefaultConfiguration(): FrcFacetConfiguration

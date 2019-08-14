@@ -25,12 +25,13 @@ import com.intellij.openapi.ui.Messages;
 
 import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.i18n.FrcBundle;
+import net.javaru.iip.frc.util.FrcProjectExtsKt;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionStatus;
 
 
 
-public class CheckSystemWpiLbVersionAction extends AbstractFrcToolsAction
+public class CheckSystemWpiLbVersionAction extends AbstractFrcToolsLegacyAction
 {
     private static final Logger LOG = Logger.getInstance(CheckSystemWpiLbVersionAction.class);
 
@@ -183,7 +184,8 @@ public class CheckSystemWpiLbVersionAction extends AbstractFrcToolsAction
         final Project project = e.getData(CommonDataKeys.PROJECT);
         e.getPresentation().setVisible(project != null
                                        && !project.isDisposed()
-                                       && FrcFacetKt.isFrcFacetedProject(project) 
+                                       && FrcFacetKt.isFrcFacetedProject(project) &&
+                                       !FrcProjectExtsKt.isGradleProject(project)  /* TODO: Need to reverse this and check if it is an Ant Based Project once the isAntBasedFrcProject method is implemented */
                                        //&& WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project)
         );
     }

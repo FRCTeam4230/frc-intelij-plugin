@@ -444,7 +444,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         }
         else
         {
-            LOG.debug("[FRC] Could not pragmatically invoke the RioLog stop action as either the actionToolbar or the rioLogStopAction is null.");
+            LOG.debug("[FRC] Could not programmatically invoke the RioLog stop action as either the actionToolbar or the rioLogStopAction is null.");
         }
     }
 
@@ -627,7 +627,6 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         {
             ApplicationManager.getApplication().invokeLater(() ->
                                                             {
-                                                                
                                                                 rioLogMonitorProcess.stop();
                                                                 
                                                                 myProcessHandler.destroyProcess();

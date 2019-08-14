@@ -27,25 +27,25 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 
 
 
-public class FrcModuleBuilder extends JavaModuleBuilder implements ModuleBuilderListener
+public class FrcLegacyModuleBuilder extends JavaModuleBuilder implements ModuleBuilderListener
 {
-    private static final Logger LOG = Logger.getInstance(FrcModuleBuilder.class);
+    private static final Logger LOG = Logger.getInstance(FrcLegacyModuleBuilder.class);
 
-    private static final FrcModuleType MODULE_TYPE = new FrcModuleType();
+    private static final FrcLegacyModuleType MODULE_TYPE = new FrcLegacyModuleType();
     
-    private RobotType robotType = RobotType.Sample;
+    private LegacyRobotType legacyRobotType = LegacyRobotType.Sample;
 
     @Override
     public void moduleCreated(@NotNull Module module)
     {
-        LOG.debug("[FRC] FrcModuleBuilder.moduleCreated() called with module: " + module.getName() + " at " + module.getModuleFilePath());
+        LOG.debug("[FRC] FrcLegacyModuleBuilder.moduleCreated() called with module: " + module.getName() + " at " + module.getModuleFilePath());
     }
 
 
     @Override
     public void setupRootModel(ModifiableRootModel modifiableRootModel) throws ConfigurationException
     {
-        LOG.debug("[FRC] FrcModuleBuilder.setupRootModel() called");
+        LOG.debug("[FRC] FrcLegacyModuleBuilder.setupRootModel() called");
         super.setupRootModel(modifiableRootModel);
     }
 
@@ -62,7 +62,7 @@ public class FrcModuleBuilder extends JavaModuleBuilder implements ModuleBuilder
     {
         // The default in super is: return getModuleTypeName();
         // This is the name tha appears on the left in the initial new project dialog
-        return "FRC Robot Project";
+        return "FRC LEGACY (pre 2019) Robot Project";
     }
 
 
@@ -78,8 +78,8 @@ public class FrcModuleBuilder extends JavaModuleBuilder implements ModuleBuilder
     
 
 
-    void setRobotType(@NotNull RobotType robotType)
+    void setLegacyRobotType(@NotNull LegacyRobotType legacyRobotType)
     {
-        this.robotType = robotType;
+        this.legacyRobotType = legacyRobotType;
     }
 }

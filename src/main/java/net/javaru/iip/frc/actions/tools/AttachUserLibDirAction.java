@@ -34,6 +34,7 @@ import com.intellij.openapi.roots.libraries.Library;
 import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.notify.FrcNotifications;
+import net.javaru.iip.frc.util.FrcProjectExtsKt;
 import net.javaru.iip.frc.util.IndexUtils;
 import net.javaru.iip.frc.util.LibDef;
 import net.javaru.iip.frc.util.LibDefBuilder;
@@ -57,6 +58,8 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
         e.getPresentation().setVisible(project != null &&
                                        !project.isDisposed() &&
                                        FrcFacetKt.isFrcFacetedProject(project) &&
+                                       !FrcProjectExtsKt.isGradleProject(project)
+                                       && /* TODO: Need to reverse this and check if it is an Ant Based Project once the isAntBasedFrcProject method is implemented*/
                                        !WpiLibLibrariesUtils.isUserLibAttachedViaReadAction(project));
     }
 

@@ -53,6 +53,7 @@ import net.javaru.iip.frc.riolog.RioLogProjectService;
 import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.FrcFileUtils;
+import net.javaru.iip.frc.util.FrcProjectExtsKt;
 import net.javaru.iip.frc.util.UriUtils;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
@@ -356,18 +357,23 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
                                                           if (knownFacetedProject || isFrcFacetedProject(project))
                                                           {
-                                                              if (notificationMap.get(AttachWpiLibQuery) == null && !WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project))
+                                                              if (!FrcProjectExtsKt.isGradleProject(project) && 
+                                                                  /* TODO: The ant project check always returns false at this time as a quick fix the breaking change.   */
+                                                                   FrcProjectExtsKt.isAntBasedFrcProject(project))
                                                               {
-                                                                  
-                                                                  if (WpiLibLibrariesUtils.isWpilibDownloadedToSystem())
-                                                                      { queueAttachWpilibQueryNotification(project); }
-                                                                  else 
-                                                                      { queueDownloadAndAttachWpilibNotification(project); }
-                                                              }
-
-                                                              if (notificationMap.get(AttachUserLibQuery) == null && !WpiLibLibrariesUtils.isUserLibAttachedViaReadAction(project))
-                                                              {
-                                                                  queueMissingUserLibQueryNotification(project);
+                                                                  if (notificationMap.get(AttachWpiLibQuery) == null && !WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project))
+                                                                  {
+                                                                      
+                                                                      if (WpiLibLibrariesUtils.isWpilibDownloadedToSystem())
+                                                                          { queueAttachWpilibQueryNotification(project); }
+                                                                      else 
+                                                                          { queueDownloadAndAttachWpilibNotification(project); }
+                                                                  }
+        
+                                                                  if (notificationMap.get(AttachUserLibQuery) == null && !WpiLibLibrariesUtils.isUserLibAttachedViaReadAction(project))
+                                                                  {
+                                                                      queueMissingUserLibQueryNotification(project);
+                                                                  }
                                                               }
                                                           }
                                                       });

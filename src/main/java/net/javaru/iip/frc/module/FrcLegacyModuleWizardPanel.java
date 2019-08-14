@@ -30,9 +30,9 @@ import net.javaru.iip.frc.util.FrcUiUtils;
 
 
 
-public class FrcModuleWizardPanel extends JPanel
+public class FrcLegacyModuleWizardPanel extends JPanel
 {
-    private static final Logger LOG = Logger.getInstance(FrcModuleWizardPanel.class);
+    private static final Logger LOG = Logger.getInstance(FrcLegacyModuleWizardPanel.class);
     private static final long serialVersionUID = -7663072295702631169L;
 
 
@@ -40,7 +40,7 @@ public class FrcModuleWizardPanel extends JPanel
     private JPanel selectRobotTypePanel;
     private ButtonGroup robotTypeButtonGroup;
 
-    public FrcModuleWizardPanel()
+    public FrcLegacyModuleWizardPanel()
     {
         super(new BorderLayout());
         add(rootPanel, BorderLayout.CENTER);
@@ -48,11 +48,11 @@ public class FrcModuleWizardPanel extends JPanel
 
     
     @NotNull
-    public RobotType getSelectedRobotType()
+    public LegacyRobotType getSelectedRobotType()
     {
         final ButtonModel selectedButtonModel = robotTypeButtonGroup.getSelection();
         //TODO: we want to make sure a button is actual selected. Need to implement a validate method. For now, below in initRobotTypeSelectionPanel() we set the 1st robot type as selected
-        return selectedButtonModel == null ? RobotType.Iterative : RobotType.valueOf(selectedButtonModel.getActionCommand());
+        return selectedButtonModel == null ? LegacyRobotType.Iterative : LegacyRobotType.valueOf(selectedButtonModel.getActionCommand());
     }
 
     private void createUIComponents()
@@ -62,19 +62,19 @@ public class FrcModuleWizardPanel extends JPanel
     
     private void initRobotTypeSelectionPanel()
     {
-        final RobotType[] robotTypes = RobotType.values();
-        final GridLayoutManager layoutManager = new GridLayoutManager(((robotTypes.length * 2) +1 ), 1, JBUI.emptyInsets(), -1, -1);
+        final LegacyRobotType[] legacyRobotTypes = LegacyRobotType.values();
+        final GridLayoutManager layoutManager = new GridLayoutManager(((legacyRobotTypes.length * 2) + 1 ), 1, JBUI.emptyInsets(), -1, -1);
         robotTypeButtonGroup = new ButtonGroup();
         selectRobotTypePanel = new JPanel(layoutManager);
         
 
         int currentRow = 0;
-        for (RobotType robotType : robotTypes)
+        for (LegacyRobotType legacyRobotType : legacyRobotTypes)
         {
-            JRadioButton button = new JRadioButton(FrcUiUtils.boldLabelText(robotType.getLabelName()));
-            button.setActionCommand(robotType.name());
+            JRadioButton button = new JRadioButton(FrcUiUtils.boldLabelText(legacyRobotType.getLabelName()));
+            button.setActionCommand(legacyRobotType.name());
             robotTypeButtonGroup.add(button);
-            if (robotType == robotTypes[0]) {button.setSelected(true);}
+            if (legacyRobotType == legacyRobotTypes[0]) {button.setSelected(true);}
             selectRobotTypePanel.add(button,
                                      new GridConstraints(currentRow++,
                                                          0,
@@ -89,7 +89,7 @@ public class FrcModuleWizardPanel extends JPanel
                                                          null,
                                                          2,
                                                          false));
-            JLabel label = new JLabel(robotType.getDescription());
+            JLabel label = new JLabel(legacyRobotType.getDescription());
             selectRobotTypePanel.add(label,
                                      new GridConstraints(currentRow++,
                                                          0,

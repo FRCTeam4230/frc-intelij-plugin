@@ -41,11 +41,11 @@ public class FrcLegacyModuleType extends ModuleType<FrcLegacyModuleBuilder>
 {
     private static final Logger LOG = Logger.getInstance(FrcLegacyModuleType.class);
 
-    public static final String FRC_MODULE_TYPE_ID = "FRC_Legacy_Module";
+    public static final String FRC_LEGACY_MODULE_TYPE_ID = "FRC_Legacy_Module";
 
     public FrcLegacyModuleType()
     {
-        super(FRC_MODULE_TYPE_ID);
+        super(FRC_LEGACY_MODULE_TYPE_ID);
     }
 
 

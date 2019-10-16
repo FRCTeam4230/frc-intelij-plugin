@@ -103,11 +103,12 @@ val runIde: RunIdeTask by tasks
 runIde {
     runIde.systemProperties = mapOf(
             //"key" to "value",
-            lookupSystemPropertyPair("frc.simulated.log.service.enabled", "false"),
-            lookupSystemPropertyPair("frc.simulated.log.service.use.configured.port", "false"),
-            lookupSystemPropertyPair("frc.use.wpilib.beta.site", "false"),
-            lookupSystemPropertyPair("frc.alt.wpilib.base.dir", ""),
-            lookupSystemPropertyPair("wpilib.base.dir", "")
+            systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, ".sandbox", "log.xml")),
+            systemPropertyGetOrDefault("frc.simulated.log.service.enabled", "false"),
+            systemPropertyGetOrDefault("frc.simulated.log.service.use.configured.port", "false"),
+            systemPropertyGetOrDefault("frc.use.wpilib.beta.site", "false"),
+            systemPropertyGetOrDefault("frc.alt.wpilib.base.dir", ""),
+            systemPropertyGetOrDefault("wpilib.base.dir", "")
                                    )
 }
 
@@ -170,8 +171,9 @@ repositories {
 
 
 dependencies {
-    val junit5Version = "5.3.1"
-
+    val junit5Version = "5.5.2"
+    val http4kVersion = "3.173.0"
+    
     compile(kotlin("stdlib", kotlinVersion))
     compile(kotlin("reflect", kotlinVersion))
     testImplementation(kotlin("test", kotlinVersion))
@@ -179,6 +181,15 @@ dependencies {
     compile("commons-io:commons-io:2.6")
     compile("org.apache.commons:commons-lang3:3.7")
     compile("com.jcraft:jsch:0.1.54")
+    // Klaxon is a library to parse JSON in Kotlin.  https://github.com/cbeust/klaxon   Available in jcenter bintray: https://jcenter.bintray.com/com/beust/klaxon/   Help available in the #klaxon channel of the Kotlin Slack Workspace
+    compile("com.beust:klaxon:5.0.9")
+    // https://www.http4k.org 
+    compile("org.http4k:http4k-core:$http4kVersion")
+    //compile("org.http4k:http4k-client-okhttp:$http4kVersion")
+    compile("org.http4k:http4k-client-apache:$http4kVersion")
+    compile("org.http4k:http4k-client-apache-async:$http4kVersion")
+    //compile("org.http4k:http4k-server-jetty:$http4kVersion")
+    compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junit5Version")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
@@ -192,4 +203,12 @@ inline fun <reified T : Task> task(noinline configuration: T.() -> Unit) = tasks
 // allows for the standard task syntax after declaring something like:  val publishPlugin: PublishTask by tasks
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
 
-fun lookupSystemPropertyPair(key: String, default: String) = Pair<String, String>(key, System.getProperty(key, default))
+fun systemPropertyGetOrDefault(key: String, default: String) = Pair<String, String>(key, System.getProperty(key, default))
+
+fun resolvePath(base:String, vararg children: String): String
+{
+    var file = File(base)
+    children.forEach { file = file.resolve(it) }
+    return file.absolutePath.toString()
+}
+

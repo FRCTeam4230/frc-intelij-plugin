@@ -1,0 +1,7 @@
+= Project Templates
+
+
+
+
+
+This directory contains the source for the project templates. They are not directly used by the plugin. They are edited here, and are then manually zipped up. The ZIP archives are then (manually) placed in the `src/main/resources/projectTemplates` directory (and configured in a `<projectTemplate>` element in the `plugin.xml file) for use by the code. There is an outstanding to do task to automate this process as part of the build.

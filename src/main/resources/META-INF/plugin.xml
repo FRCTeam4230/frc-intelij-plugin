@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2015-2018 the original author or authors
+  ~ Copyright 2015-2019 the original author or authors
   ~
   ~     Licensed under the Apache License, Version 2.0 (the "License");
   ~     you may not use this file except in compliance with the License.
@@ -182,6 +182,7 @@
     <!-- Ref: http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_extensions_and_extension_points.html -->
     <extensionPoints>
         <!--<extensionPoint name="fooExtensionPoint" beanClass="com.foo.impl.FooExtensionBean" />-->
+        <extensionPoint name="net.javaru.iip.frc.frameworkSupport" interface="net.javaru.iip.frc.facet.framework.FrcJavaFrameworkSupportProvider" />
     </extensionPoints>
 
     
@@ -237,18 +238,27 @@
         <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
 
         <!-- LEGACY PROJECT WIZARD (i.e. ant based pre 2019 season)-->
-        <!--<moduleType id="FrcModuleType" implementationClass="net.javaru.iip.frc.module.legacyFrcLegacyModuleType" />-->
-        <!--<moduleBuilder id="FrcModuleBuilder" builderClass="net.javaru.iip.frc.module.legacyFrcLegacyModuleBuilder" order="first" />-->
-        <!--<projectTemplate projectType="FRC_Module" templatePath="projectTemplates/legacy/robots/FRC_Command_Based_Robot.zip" />-->
-        <!--<projectTemplate projectType="FRC_Module" templatePath="projectTemplates/legacy/robots/FRC_Iterative_Robot.zip" />-->
-        <!--<projectTemplate projectType="FRC_Module" templatePath="projectTemplates/legacy/robots/FRC_Timed_Robot.zip" />-->
-        <!--<projectTemplate projectType="FRC_Module" templatePath="projectTemplates/legacy/robots/FRC_Sample_Robot.zip" />-->
+        <!--<moduleType id="FrcLegacyModuleType" implementationClass="net.javaru.iip.frc.module.legacy.FrcLegacyModuleType" />-->
+        <!--<moduleBuilder id="FrcLegacyModuleBuilder" builderClass="net.javaru.iip.frc.module.legacy.FrcLegacyModuleBuilder" order="first" />-->
+        <!--<projectTemplate projectType="FRC_Legacy_Module" templatePath="projectTemplates/legacy/robots/FRC_Command_Based_Robot.zip" />-->
+        <!--<projectTemplate projectType="FRC_Legacy_Module" templatePath="projectTemplates/legacy/robots/FRC_Iterative_Robot.zip" />-->
+        <!--<projectTemplate projectType="FRC_Legacy_Module" templatePath="projectTemplates/legacy/robots/FRC_Timed_Robot.zip" />-->
+        <!--<projectTemplate projectType="FRC_Legacy_Module" templatePath="projectTemplates/legacy/robots/FRC_Sample_Robot.zip" />-->
+
+        <!-- Module type ID must match that defined in the FrcModuleType class -->
+        <moduleType id="FRC_Module" implementationClass="net.javaru.iip.frc.wizard.FrcModuleType" order="first" />
+        <moduleBuilder id="FrcModuleBuilder" builderClass="net.javaru.iip.frc.wizard.FrcModuleBuilder" order="first" />
 
         <externalProjectDataService id="FrcDependencyDataService" implementation="net.javaru.iip.frc.facet.importer.FrcDependencyDataService" />
         
-        <!--<frameworkSupport implementation="net.javaru.iip.frc.facet.framework.FrcFrameworkSupportProvider" />-->
+<!--        <frameworkSupport   implementation="net.javaru.iip.frc.facet.framework.FrcFrameworkSupportProvider" />-->
+        
         <framework.detector implementation="net.javaru.iip.frc.facet.framework.detector.RobotSubclassFrcFrameworkDetector" />
     </extensions>
+    
+<!--    <extensions defaultExtensionNs="net.javaru.idea.frc">-->
+<!--        <frameworkSupport implementation="net.javaru.iip.frc.facet.framework.FrcJavaFrameworkSupportProvider" />-->
+<!--    </extensions>-->
 
     
     

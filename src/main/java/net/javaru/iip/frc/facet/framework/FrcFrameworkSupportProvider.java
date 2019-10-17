@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -16,56 +16,91 @@
 
 package net.javaru.iip.frc.facet.framework;
 
-import com.intellij.facet.ui.FacetBasedFrameworkSupportProvider;
-import com.intellij.ide.util.frameworkSupport.FrameworkVersion;
+import javax.swing.*;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.plugins.gradle.frameworkSupport.BuildScriptDataBuilder;
+import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
+import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
+import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
+import com.intellij.ide.util.projectWizard.ModuleBuilder;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.extensions.ExtensionPointName;
+import com.intellij.openapi.externalSystem.model.project.ProjectId;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleType;
+import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 
-import net.javaru.iip.frc.facet.FrcFacet;
-import net.javaru.iip.frc.facet.FrcFacetType;
+import net.javaru.iip.frc.wizard.FrcModuleBuilder;
+
+import static org.jetbrains.plugins.gradle.service.project.wizard.GradleModuleBuilder.getBuildScriptData;
 
 
 
 //NOTE: Configured in plugin.xml 
-public class FrcFrameworkSupportProvider extends FacetBasedFrameworkSupportProvider<FrcFacet>
+public abstract class FrcFrameworkSupportProvider  extends FrameworkSupportInModuleProvider
 {
-    //For example, see StrutsFrameworkSupportProvider fot Structs2 plugin in jetbrains open source plugins
+    
+    //  Example: see org.jetbrains.plugins.gradle.frameworkSupport.GradleFrameworkSupportProvider
+    //  There is also a FacetBasedFrameworkSupportProvider<FrcFacet> an example of which is StrutsFrameworkSupportProvider fot Structs2 plugin in jetbrains open source plugins
+    
     
     private static final Logger LOG = Logger.getInstance(FrcFrameworkSupportProvider.class);
-
-
-    protected FrcFrameworkSupportProvider()
+    
+    public static final ExtensionPointName<FrcFrameworkSupportProvider> EP_NAME = ExtensionPointName.create("net.javaru.iip.frc.frameworkSupport");
+    
+    
+    public abstract void addSupport(@NotNull ProjectId projectId,
+                                    @NotNull Module module,
+                                    @NotNull ModifiableRootModel rootModel,
+                                    @NotNull ModifiableModelsProvider modifiableModelsProvider,
+                                    @NotNull BuildScriptDataBuilder buildScriptData);
+    
+    
+    public JComponent createComponent()
     {
-        super(FrcFacetType.Companion.getInstance());
+        return null;
     }
-
-
+    
+    
+    @NotNull
     @Override
-    protected void setupConfiguration(FrcFacet facet, ModifiableRootModel rootModel, FrameworkVersion version)
+    public FrameworkSupportInModuleConfigurable createConfigurable(@NotNull FrameworkSupportModel model)
     {
-        // This method is called after "Finished" is clicked in the new Project Wizard. 
-        // It is call stacktrace is:
-        //        at net.javaru.iip.frc.facet.framework.FrcFrameworkSupportProvider.setupConfiguration(FrcFrameworkSupportProvider.java:46)
-        //        at net.javaru.iip.frc.facet.framework.FrcFrameworkSupportProvider.setupConfiguration(FrcFrameworkSupportProvider.java:30)
-        //        at com.intellij.facet.ui.FacetBasedFrameworkSupportProvider.addSupport(FacetBasedFrameworkSupportProvider.java:108)
-        //        at com.intellij.ide.util.frameworkSupport.FrameworkSupportConfigurableBase.addSupport(FrameworkSupportConfigurableBase.java:121)
-        //        at com.intellij.ide.util.newProjectWizard.AddSupportForFrameworksPanel.addSupport(AddSupportForFrameworksPanel.java:449)
-        //        at com.intellij.ide.projectWizard.ProjectTypeStep$6.update(ProjectTypeStep.java:198)
-        //        at com.intellij.ide.util.projectWizard.ModuleBuilder.setupModule(ModuleBuilder.java:265)
-        //        at com.intellij.ide.util.projectWizard.ModuleBuilder.createModule(ModuleBuilder.java:256)
-        //        at com.intellij.ide.util.projectWizard.ModuleBuilder.createAndCommitIfNeeded(ModuleBuilder.java:294)
-        //        at com.intellij.ide.util.projectWizard.ModuleBuilder.lambda$commitModule$3(ModuleBuilder.java:337)
-        //        at com.intellij.ide.util.projectWizard.ModuleBuilder$$Lambda$677 .1296299083.compute(Unknown Source:-1)
-        //        at com.intellij.openapi.application.impl.ApplicationImpl.runWriteAction(ApplicationImpl.java:1027)
-        //        at com.intellij.ide.util.projectWizard.ModuleBuilder.commitModule(ModuleBuilder.java:336)
-        //        at com.intellij.ide.util.projectWizard.ModuleBuilder.commit(ModuleBuilder.java:322)
-        //        at com.intellij.ide.util.projectWizard.JavaModuleBuilder.commit(JavaModuleBuilder.java:179)
-        //        at com.intellij.ide.impl.NewProjectUtil.doCreate(NewProjectUtil.java:149)
-        //        at com.intellij.ide.impl.NewProjectUtil.createFromWizard(NewProjectUtil.java:76)
-        //        at com.intellij.ide.impl.NewProjectUtil.createNewProject(NewProjectUtil.java:71)
-        //        at com.intellij.ide.actions.NewProjectAction.actionPerformed(NewProjectAction.java:36)
-        LOG.debug("[FRC] FrcFrameworkSupportProvider.setupConfiguration() called");
-        //TODO Let's see about auto downloading/attaching WpiLib and user lib
-        //     Will need to coordinate with the code that detects unattached libs (in FrcProjectComponentImpl I believe) so that the user is not prompted while this is happening
+        return new FrameworkSupportInModuleConfigurable()
+        {
+            @Nullable
+            @Override
+            public JComponent createComponent()
+            {
+                return FrcFrameworkSupportProvider.this.createComponent();
+            }
+    
+    
+            @Override
+            public void addSupport(@NotNull Module module,
+                                   @NotNull ModifiableRootModel rootModel,
+                                   @NotNull ModifiableModelsProvider modifiableModelsProvider)
+            {
+                final BuildScriptDataBuilder buildScriptData = getBuildScriptData(module);
+                if (buildScriptData != null)
+                {
+                    ModuleBuilder builder = model.getModuleBuilder();
+                    @SuppressWarnings("CastToConcreteClass")
+                    ProjectId projectId = builder instanceof FrcModuleBuilder ? ((FrcModuleBuilder) builder).getProjectId()
+                                                                              : new ProjectId(null, module.getName(), null);
+                    FrcFrameworkSupportProvider.this.addSupport(projectId, module, rootModel, modifiableModelsProvider, buildScriptData);
+                }
+            }
+        };
+    }
+    
+    
+    @Override
+    public boolean isEnabledForModuleType(@NotNull ModuleType moduleType)
+    {
+        return false;
     }
 }

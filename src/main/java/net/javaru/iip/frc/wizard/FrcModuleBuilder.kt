@@ -14,141 +14,111 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.wizard;
+package net.javaru.iip.frc.wizard
 
-import javax.swing.*;
+import com.intellij.ide.util.projectWizard.JavaModuleBuilder
+import com.intellij.ide.util.projectWizard.ModuleBuilderListener
+import com.intellij.ide.util.projectWizard.ModuleWizardStep
+import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.externalSystem.model.project.ProjectData
+import com.intellij.openapi.externalSystem.model.project.ProjectId
+import com.intellij.openapi.module.JavaModuleType
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleType
+import com.intellij.openapi.options.ConfigurationException
+import com.intellij.openapi.roots.ModifiableRootModel
+import com.intellij.openapi.roots.ui.configuration.ModulesProvider
+import com.intellij.openapi.util.Disposer
+import net.javaru.iip.frc.FrcIcons.FRC
+import javax.swing.Icon
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
-import com.intellij.ide.util.projectWizard.ModuleBuilderListener;
-import com.intellij.ide.util.projectWizard.ModuleWizardStep;
-import com.intellij.ide.util.projectWizard.WizardContext;
-import com.intellij.openapi.Disposable;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.externalSystem.model.project.ProjectData;
-import com.intellij.openapi.externalSystem.model.project.ProjectId;
-import com.intellij.openapi.module.JavaModuleType;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleType;
-import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.roots.ModifiableRootModel;
-import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
-import com.intellij.openapi.util.Disposer;
-
-import net.javaru.iip.frc.FrcIcons.FRC;
-
-
-
-public class FrcModuleBuilder extends JavaModuleBuilder implements ModuleBuilderListener
+class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 {
-    private static final Logger LOG = Logger.getInstance(FrcModuleBuilder.class);
-    
-    private WizardContext myWizardContext;
-    @Nullable
-    private ProjectData myParentProject;
-    private boolean myInheritGroupId;
-    private boolean myInheritVersion;
-    private ProjectId myProjectId;
-    private String rootProjectPath;
-    private boolean myUseKotlinDSL;
-    private final FrcModuleConfig config = new FrcModuleConfig();
-    
-    @Override
-    public String getParentGroup()
+    private var myWizardContext: WizardContext? = null
+    private var myParentProject: ProjectData? = null
+    private val myInheritGroupId = false
+    private val myInheritVersion = false
+    private var myProjectId: ProjectId? = null
+    private val rootProjectPath: String? = null
+    private val myUseKotlinDSL = false
+    val config = FrcModuleConfig()
+    override fun getParentGroup(): String
     {
-        return JavaModuleType.BUILD_TOOLS_GROUP;
+        return JavaModuleType.BUILD_TOOLS_GROUP
     }
-    
-    
-    @Override
-    public int getWeight()
+
+    override fun getWeight(): Int
     {
-        return JavaModuleBuilder.BUILD_SYSTEM_WEIGHT;
+        return BUILD_SYSTEM_WEIGHT
     }
-    
-    
-    @Override
-    public ModuleType<?> getModuleType() { return FrcModuleType.getInstance(); /*return StdModuleTypes.JAVA;*/ }
-    
-    
-    
-    @Override
-    public void moduleCreated(@NotNull Module module)
+
+    override fun getModuleType(): ModuleType<*>?
+    {
+        return FrcModuleType.getInstance() /*return StdModuleTypes.JAVA;*/
+    }
+
+    override fun moduleCreated(module: Module)
     {
         // This method is from the ModuleBuilderListener
-        LOG.debug("[FRC] FrcModuleBuilder.moduleCreated() called with module: " + module.getName() + " at " + module.getModuleFilePath());
+
+        LOG.debug("[FRC] FrcModuleBuilder.moduleCreated() called with module: " + module.name + " at " + module.moduleFilePath)
         // Module Configuration work could be done here
+
     }
-    
-    
-    @Override
-    public String getPresentableName()
+
+    override fun getPresentableName(): String
     {
         // The default in super is: return getModuleTypeName();
         // This is the name that appears (on the left) in the initial new project dialog where all the possible project types/options are shown  
-        return "FRC Robot Project";
+
+        return "FRC Robot Project"
     }
-    
-    
-    @Override
+
     // The icon used (on the left) in the initial new project dialog where all the possible project types/options are shown
-    public Icon getNodeIcon() { return FRC.FIRST_ICON_MEDIUM_16; }
-    
-    
-    
-    @Override
-    public String getGroupName()
+    override fun getNodeIcon(): Icon
     {
-        return FrcModuleConstantsKt.MODULE_BUILDER_GROUP_NAME;
+        return FRC.FIRST_ICON_MEDIUM_16
     }
-    
-    @Override
-    public void setupRootModel(@NotNull ModifiableRootModel modifiableRootModel) throws ConfigurationException
+
+    override fun getGroupName(): String
     {
-        LOG.debug("[FRC] FrcModuleBuilder.setupRootModel() called");
-        super.setupRootModel(modifiableRootModel);
+        return MODULE_BUILDER_GROUP_NAME
     }
-    
-    
-    @Override
-    public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull ModulesProvider modulesProvider)
+
+    @Throws(ConfigurationException::class)
+    override fun setupRootModel(modifiableRootModel: ModifiableRootModel)
     {
-        this.myWizardContext = wizardContext;
-        return new ModuleWizardStep[] {new FrcModuleWizardStep(this, wizardContext)};
+        LOG.debug("[FRC] FrcModuleBuilder.setupRootModel() called")
+        super.setupRootModel(modifiableRootModel)
     }
-    
-    
-    public void setParentProject(@Nullable ProjectData parentProject)
+
+    override fun createWizardSteps(wizardContext: WizardContext, modulesProvider: ModulesProvider): Array<ModuleWizardStep>
     {
-        myParentProject = parentProject;
+        myWizardContext = wizardContext
+        return arrayOf(FrcModuleWizardStep(this, wizardContext))
     }
-    
-    
-    public ProjectId getProjectId()
+
+    fun setParentProject(parentProject: ProjectData?)
     {
-        return myProjectId;
+        myParentProject = parentProject
     }
-    
-    
-    public void setProjectId(@NotNull ProjectId projectId)
-    {
-        myProjectId = projectId;
-    }
-    
-    
-    public FrcModuleConfig getConfig() { return config; }
-    
-    
+
+    var projectId: ProjectId?
+        get() = myProjectId
+        set(projectId)
+        {
+            myProjectId = projectId
+        }
+
     /**
      * Custom UI to be shown on the first wizard page
      *
      * @param context
      * @param parentDisposable
      */
-    @Nullable
-    @Override
-    public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable)
+    override fun getCustomOptionsStep(context: WizardContext, parentDisposable: Disposable): ModuleWizardStep?
     {
         //TODO: Write this 'getCustomOptionsStep' overridden method
         //     This determines the potential frameworks  that can be selected (like kotlin, groovy, Thymeleaf, Ruby, yada yada yada
@@ -161,13 +131,21 @@ public class FrcModuleBuilder extends JavaModuleBuilder implements ModuleBuilder
         //     in the gradle-groovy-integration.xml file.
         //     in turn that file is defined as an optional depends in the gradle-java-integration.xml file when defining "org.intellij.groovy" as an (optional) dependency
         //     For Java, I would want it to be a required provider rather than an optional that is preselected. Not sure if I need to "add" it behind the scenes or not.
-        LOG.trace("[FRC] FrcModuleBuilder.getCustomOptionsStep() called");
+
+        LOG.trace("[FRC] FrcModuleBuilder.getCustomOptionsStep() called")
         /*return super.getCustomOptionsStep(context, parentDisposable);*/
-        
-        
+
+
         //final FrcFrameworksWizardStep step = new FrcFrameworksWizardStep(context, this, config);
-        final FrcFrameworksBlankWizardStep step = new FrcFrameworksBlankWizardStep();
-        Disposer.register(parentDisposable, step);
-        return step;
+
+
+        val step = FrcFrameworksBlankWizardStep()
+        Disposer.register(parentDisposable, step)
+        return step
+    }
+
+    companion object
+    {
+        private val LOG = Logger.getInstance(FrcModuleBuilder::class.java)
     }
 }

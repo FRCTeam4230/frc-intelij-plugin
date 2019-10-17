@@ -61,12 +61,13 @@ public class FrcModuleWizardStep extends ModuleWizardStep
     private JTextField teamNumberTextField;
     private JPanel robotTemplatePanel;
     
+    
     public FrcModuleWizardStep(@NotNull FrcModuleBuilder builder, @NotNull WizardContext context)
     {
         LOG.trace("[FRC] FrcModuleWizardStep constructor has been called.");
         this.myBuilder = builder;
         this.myContext = context;
-        this.myProjectOrNull = context.getProject();
+        this.myProjectOrNull = context.getProject(); 
         myParentProjectForm = new FrcParentProjectForm(context, parentProject -> updateComponents());
         initComponents();
         loadSettings();
@@ -149,12 +150,13 @@ public class FrcModuleWizardStep extends ModuleWizardStep
     public boolean validate() throws ConfigurationException
     {
         LOG.trace("[FRC] FrcModuleWizardStep.validate() has been called.");
-        if (StringUtil.isEmptyOrSpaces(teamNumberTextField.getText()))
+        if (!FrcApplicationSettings.Settings.isValidTeamNumber(teamNumberTextField.getText()))
         {
             ApplicationManager.getApplication().invokeLater(
                     () -> IdeFocusManager.getInstance(myProjectOrNull).requestFocus(teamNumberTextField, true));
-            throw new ConfigurationException("Please specify the team number to use.");
+            throw new ConfigurationException("Please specify a valid team number to use. This is used for communications with the roboRIO.");
         }
+        
         return true;
     }
     
@@ -166,8 +168,7 @@ public class FrcModuleWizardStep extends ModuleWizardStep
 //        ProjectData parentProject = myParentProjectForm.getParentProject();
 //        ProjectId projectId = myBuilder.getProjectId();
     
-        // We may need to update this when the team number changed from an application setting to a project setting
-        UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(FrcApplicationSettings.Settings.INSTANCE().getTeamNumber()));
+        UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getConfig().getTeamNumber()));
         
         updateComponents();
     }
@@ -187,6 +188,7 @@ public class FrcModuleWizardStep extends ModuleWizardStep
                                              "robot", // TODO: we should add a prompt for the project name which can default to "robot"
                                              "1.0"));
     
+        myBuilder.getConfig().setTeamNumber(Integer.parseInt(teamNumberTextField.getText()));
         if (StringUtil.isNotEmpty(myBuilder.getProjectId().getArtifactId()))
         {
             myContext.setProjectName(myBuilder.getProjectId().getArtifactId());

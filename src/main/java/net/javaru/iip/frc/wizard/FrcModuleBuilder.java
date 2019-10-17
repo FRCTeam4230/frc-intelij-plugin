@@ -52,7 +52,7 @@ public class FrcModuleBuilder extends JavaModuleBuilder implements ModuleBuilder
     private ProjectId myProjectId;
     private String rootProjectPath;
     private boolean myUseKotlinDSL;
-    
+    private final FrcModuleConfig config = new FrcModuleConfig();
     
     @Override
     public String getParentGroup()
@@ -137,7 +137,7 @@ public class FrcModuleBuilder extends JavaModuleBuilder implements ModuleBuilder
     }
     
     
-    
+    public FrcModuleConfig getConfig() { return config; }
     
     
     /**
@@ -165,7 +165,7 @@ public class FrcModuleBuilder extends JavaModuleBuilder implements ModuleBuilder
         /*return super.getCustomOptionsStep(context, parentDisposable);*/
         
         
-        //final FrcFrameworksWizardStep step = new FrcFrameworksWizardStep(context, this);
+        //final FrcFrameworksWizardStep step = new FrcFrameworksWizardStep(context, this, config);
         final FrcFrameworksBlankWizardStep step = new FrcFrameworksBlankWizardStep();
         Disposer.register(parentDisposable, step);
         return step;

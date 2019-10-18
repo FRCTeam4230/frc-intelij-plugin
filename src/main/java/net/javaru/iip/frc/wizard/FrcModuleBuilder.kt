@@ -44,21 +44,30 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     private val rootProjectPath: String? = null
     private val myUseKotlinDSL = false
     val config = FrcModuleConfig()
-    override fun getParentGroup(): String
-    {
-        return JavaModuleType.BUILD_TOOLS_GROUP
-    }
 
-    override fun getWeight(): Int
-    {
-        return BUILD_SYSTEM_WEIGHT
-    }
+    override fun getGroupName(): String = MODULE_BUILDER_GROUP_NAME 
+    override fun getParentGroup(): String = JavaModuleType.JAVA_GROUP // This is the top group in the New Project Wizard, and for now it makes sense to be part of it
 
-    override fun getModuleType(): ModuleType<*>?
-    {
-        return FrcModuleType.getInstance() /*return StdModuleTypes.JAVA;*/
-    }
+    /**
+     * This is the name that appears (on the left) in the initial new project dialog where all the possible project/module types/options are shown.
+     * The default in super is: `return getModuleTypeName()`.
+     */
+    override fun getPresentableName(): String = "FRC Robot Project"
 
+    // The icon used (on the left) in the initial new project dialog where all the possible project types/options are shown
+    override fun getNodeIcon(): Icon = FRC.FIRST_ICON_MEDIUM_16
+    
+    /**
+     * Value that determines where in the list (within the Group) the module shows.
+     * Higher numbers appear at the top, lower numbers at the bottom.
+     * The items in IntelliJ IDEA Community are from top to bottom `Java`, `JavaFX`, `Android`, `IntelliJ Platform Plugin` 
+     * The items in IntelliJ IDEA Ultimate are from top to bottom: (Dependent upon plugins installed) `Java`, `flexmark-java extension`, `Java Enterprise`, `JBoss`, `Spring`, JavaFX`, `Android`, `IntelliJ Platform Plugin`
+     * We'll use 0 and get placed aty the bottom which I think is more consistent in the long run.
+     */
+    override fun getWeight(): Int = 0
+    override fun getModuleType(): ModuleType<*>? = FrcModuleType.getInstance() /* = StdModuleTypes.JAVA;*/
+    
+    
     override fun moduleCreated(module: Module)
     {
         // This method is from the ModuleBuilderListener
@@ -68,24 +77,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 
     }
 
-    override fun getPresentableName(): String
-    {
-        // The default in super is: return getModuleTypeName();
-        // This is the name that appears (on the left) in the initial new project dialog where all the possible project types/options are shown  
 
-        return "FRC Robot Project"
-    }
-
-    // The icon used (on the left) in the initial new project dialog where all the possible project types/options are shown
-    override fun getNodeIcon(): Icon
-    {
-        return FRC.FIRST_ICON_MEDIUM_16
-    }
-
-    override fun getGroupName(): String
-    {
-        return MODULE_BUILDER_GROUP_NAME
-    }
 
     @Throws(ConfigurationException::class)
     override fun setupRootModel(modifiableRootModel: ModifiableRootModel)

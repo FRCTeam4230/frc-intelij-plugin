@@ -236,12 +236,13 @@
 
         <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
 
-        <!--<moduleType id="FrcModuleType" implementationClass="net.javaru.iip.frc.module.FrcLegacyModuleType" />-->
-        <!--<moduleBuilder id="FrcModuleBuilder" builderClass="net.javaru.iip.frc.module.FrcLegacyModuleBuilder" order="first" />-->
-        <!--<projectTemplate projectType="FRC_Module" templatePath="projectTemplates/robots/FRC_Command_Based_Robot.zip" />-->
-        <!--<projectTemplate projectType="FRC_Module" templatePath="projectTemplates/robots/FRC_Iterative_Robot.zip" />-->
-        <!--<projectTemplate projectType="FRC_Module" templatePath="projectTemplates/robots/FRC_Timed_Robot.zip" />-->
-        <!--<projectTemplate projectType="FRC_Module" templatePath="projectTemplates/robots/FRC_Sample_Robot.zip" />-->
+        <!-- LEGACY PROJECT WIZARD (i.e. ant based pre 2019 season)-->
+        <!--<moduleType id="FrcModuleType" implementationClass="net.javaru.iip.frc.module.legacyFrcLegacyModuleType" />-->
+        <!--<moduleBuilder id="FrcModuleBuilder" builderClass="net.javaru.iip.frc.module.legacyFrcLegacyModuleBuilder" order="first" />-->
+        <!--<projectTemplate projectType="FRC_Module" templatePath="projectTemplates/legacy/robots/FRC_Command_Based_Robot.zip" />-->
+        <!--<projectTemplate projectType="FRC_Module" templatePath="projectTemplates/legacy/robots/FRC_Iterative_Robot.zip" />-->
+        <!--<projectTemplate projectType="FRC_Module" templatePath="projectTemplates/legacy/robots/FRC_Timed_Robot.zip" />-->
+        <!--<projectTemplate projectType="FRC_Module" templatePath="projectTemplates/legacy/robots/FRC_Sample_Robot.zip" />-->
 
         <externalProjectDataService id="FrcDependencyDataService" implementation="net.javaru.iip.frc.facet.importer.FrcDependencyDataService" />
         

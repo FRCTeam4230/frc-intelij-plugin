@@ -119,6 +119,9 @@ public final class FrcIcons
     
     public static class WpiLib
     {
+        /** A SVG file of the new (2019+) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_SVG = loadIcon("/icons/wpi/wpilib.svg");
+        
         /** A WpiLib ico Icon file with 16x16 through 256x256 icons of the new (2019+) WpiLib 'official' icon.  */
         public static final Icon WPI_LIB_ICO_16_THRU_256 = loadIcon("/icons/wpi/wpilib-256.ico");
         

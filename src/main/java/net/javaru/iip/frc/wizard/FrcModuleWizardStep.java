@@ -30,13 +30,19 @@ import com.intellij.openapi.externalSystem.model.project.ProjectData;
 import com.intellij.openapi.externalSystem.model.project.ProjectId;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.util.lang.JavaVersion;
 
 import net.javaru.iip.frc.FrcIcons.FRC;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.UiUtilsKt;
+
+import static net.javaru.iip.frc.i18n.FrcBundle.message;
+
 
 
 // This is the content that gets displayed ion the initial new project dialog when the "FRC Robot Project" node is selected. 
@@ -154,9 +160,46 @@ public class FrcModuleWizardStep extends ModuleWizardStep
         {
             ApplicationManager.getApplication().invokeLater(
                     () -> IdeFocusManager.getInstance(myProjectOrNull).requestFocus(teamNumberTextField, true));
-            throw new ConfigurationException("Please specify a valid team number to use. This is used for communications with the roboRIO.");
+            throw new ConfigurationException(message("frc.ui.wizard.mws.validate.teamNumberRequired.message"),
+                                             message("frc.ui.wizard.mws.validate.teamNumberRequired.title"));
         }
         
+        final Sdk sdk = myContext.getProjectJdk();
+        if (sdk instanceof ProjectJdkImpl)
+        {
+            try
+            {
+               
+                final ProjectJdkImpl jdk = (ProjectJdkImpl) sdk;
+                final String jdkVersionString = jdk.getVersionString();
+                final JavaVersion javaVersion = JavaVersion.tryParse(jdkVersionString);
+                //final LanguageLevel languageLevel = LanguageLevel.parse(jdkVersionString);
+    
+                
+                // There is also a JavaVersion in the Gradle API code: org.gradle.api.JavaVersion;
+                
+                //TODO get required minimum Java level from selected template of build year
+                final JavaVersion requiredMinimumJavaVersion = JavaVersion.compose(11);
+                
+                
+                if (javaVersion != null && !javaVersion.isAtLeast(requiredMinimumJavaVersion.feature))
+                {
+                    final String message = message("frc.ui.wizard.mws.validate.minJavaVersion.message",
+                                                   requiredMinimumJavaVersion,
+                                                   requiredMinimumJavaVersion.feature, 
+                                                   javaVersion,
+                                                   javaVersion.feature);
+                    final String title = message("frc.ui.wizard.mws.validate.minJavaVersion.title");
+                    throw new ConfigurationException(message, title);
+                }
+            }
+            catch (Exception e)
+            {
+                if (e instanceof ConfigurationException) { throw e; }
+                LOG.warn("Could not validate minimum JDK version due to the exception: " + e.toString(), e);
+            }
+        }
+    
         return true;
     }
     

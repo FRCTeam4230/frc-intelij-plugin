@@ -31,20 +31,37 @@ import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider
 import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.openapi.vfs.VirtualFile
 import net.javaru.iip.frc.FrcIcons.FRC
+import net.javaru.iip.frc.util.getPluginResourceAsStream
+import net.javaru.iip.frc.util.removeBasePath
+import org.apache.commons.io.FileUtils
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 import javax.swing.Icon
 
 class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 {
+    private val resourceBase = Paths.get("wizard/default-files/")
+    
     private var myWizardContext: WizardContext? = null
     private var myParentProject: ProjectData? = null
-    private val myInheritGroupId = false
-    private val myInheritVersion = false
+//    private val myInheritGroupId = false
+//    private val myInheritVersion = false
     private var myProjectId: ProjectId? = null
-    private val rootProjectPath: String? = null
+    private var rootProjectPath: String? = null
+    
+    
     private val myUseKotlinDSL = false
+    private val myShowGradleConfig = true;
+    
     val config = FrcModuleConfig()
-
+    
     override fun getGroupName(): String = MODULE_BUILDER_GROUP_NAME 
     override fun getParentGroup(): String = JavaModuleType.JAVA_GROUP // This is the top group in the New Project Wizard, and for now it makes sense to be part of it
 
@@ -71,20 +88,134 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     override fun moduleCreated(module: Module)
     {
         // This method is from the ModuleBuilderListener
-
-        LOG.debug("[FRC] FrcModuleBuilder.moduleCreated() called with module: " + module.name + " at " + module.moduleFilePath)
+        LOG.trace("[FRC] FrcModuleBuilder.moduleCreated() called with module: " + module.name + " at " + module.moduleFilePath)
         // Module Configuration work could be done here
 
     }
 
-
+    override fun setupModule(module: Module?)
+    {
+        // This implementation is heavily based on the impl in GradleModelBuilder, along with a bit from  the KtorModuleBuilder impl in the JetBrains ktor plugin
+        LOG.trace("[FRC] FrcModuleBuilder.setupModule() called")
+        super.setupModule(module) // this will call (our overridden) setupRootModel method
+        
+        //assert(rootProjectPath != null) { "project root path was null" }
+        
+    }
 
     @Throws(ConfigurationException::class)
-    override fun setupRootModel(modifiableRootModel: ModifiableRootModel)
+    override fun setupRootModel(rootModel: ModifiableRootModel)
     {
-        LOG.debug("[FRC] FrcModuleBuilder.setupRootModel() called")
-        super.setupRootModel(modifiableRootModel)
+        // This implementation is heavily based on the impl in AbstractGradleModuleBuilder (v2019.3+, was previously GradleModelBuilder), along with a bit from the KtorModuleBuilder impl in the JetBrains ktor plugin
+        // This method gets called by the setupModule method
+        LOG.trace("[FRC] FrcModuleBuilder.setupRootModel() called")
+
+        /*
+            We need to setup the following:
+            A) The following are typically identical between templates
+                1) Gradle 
+                    - nice to have would be to add dependencies such as logging
+                    - Files:
+                        a) build.gradle     (or build.gradle.kts)       
+                            - potentially modifiable
+                            - will need to replace robot main class if we allow for alternate base package
+                        b) settings.gradle  (or settings.gradle.kts)
+                            - need to set frcYear (i.e. 2019, 2020, etc)
+                            - set public folder?
+                        c) gradlew
+                        d) gradlew.bat
+                        e) gradle/wrapper/gradle-wrapper.jar
+                        f) gradle/wrapper/gradle-wrapper.properties
+                2) .vscode
+                    - this is a nice to have
+                    - Files
+                        a) .vscode/launch.json
+                        b) .vscode/settings.json
+                3) .wpilib
+                    - Will have replacements for team number and project year
+                    - Files:
+                        a) wpilib_preferences.json
+                    
+            B) Template Specific files:
+                1) src/main/deploy/example.txt
+                    - Same across all projects
+                2) Main.java
+                    - typically does not change per project
+                    - A future nice to have would be to allow for a different "Robot" class name which would require this to be
+                3) Robot.java
+                    - differs per template
+                4) Other Java classes and packages
+            
+            
+        */
+        
+
+        val modelContentRootDir = createAndGetRoot() ?: return
+        rootModel.addContentEntry(modelContentRootDir)
+
+        // This is a to  do comment in GradleModuleBuilder that this sdk work should be moved to generic ModuleBuilder
+        if (myJdk != null) rootModel.sdk = myJdk else rootModel.inheritSdk()
+
+        val project = rootModel.project
+
+        rootProjectPath = if (myParentProject != null)
+        {
+            myParentProject!!.linkedExternalProjectPath
+        }
+        else
+        {
+            FileUtil.toCanonicalPath(if (myWizardContext!!.isCreatingNewProject) project.basePath else modelContentRootDir.path)
+        }
+        assert(rootProjectPath != null) { "rootProjectPath is null"}
+
+//        val gradleBuildFile = setupGradleBuildFile(modelContentRootDir)
+//        val gradleSettingsFile = setupGradleSettingsFile(modelContentRootDir)
+
+        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("settings.gradle"))
+        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("build.gradle"))
+        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("gradlew"))
+        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("gradlew.bat"))
+        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("gradle/wrapper/gradle-wrapper.jar"))
+        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("gradle/wrapper/gradle-wrapper.properties"))
+        modelContentRootDir.refresh(false, true)
+        
+        LOG.trace("FrcModuleBuilder.setupRootModel() completed")
     }
+    
+    private fun copyResourceToModuleRoot(modelContentRootDir: VirtualFile, resourcePath: Path): VirtualFile?
+    {
+        try
+        {
+            val targetRelativePath = resourcePath.removeBasePath(resourceBase)
+            val pluginResourceInputStream = getPluginResourceAsStream(resourcePath)
+            if (pluginResourceInputStream == null)
+            {
+                LOG.warn("[FRC] Could not find resource '$resourcePath'")
+                return null
+            }
+
+            val rootDir = VfsUtil.virtualToIoFile(modelContentRootDir).toPath()
+            val target = rootDir.resolve(targetRelativePath)  
+            Files.createDirectories(target.parent)
+            val file = target.toFile()
+            FileUtils.copyInputStreamToFile(pluginResourceInputStream, file)
+            return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file)
+        }
+        catch (e: Exception)
+        {
+            LOG.warn("[FRC] Could not copy resource '$resourcePath' to the module root dir '$modelContentRootDir' due to an exception. Cause Summary: $e", e)
+            return null
+        }
+    }
+
+    
+    private fun createAndGetRoot(): VirtualFile?
+    {
+        val path = contentEntryPath?.let { FileUtil.toSystemIndependentName(it) } ?: return null
+        return LocalFileSystem.getInstance().refreshAndFindFileByPath(File(path).apply { mkdirs() }.absolutePath)
+    }
+    
+    
 
     override fun createWizardSteps(wizardContext: WizardContext, modulesProvider: ModulesProvider): Array<ModuleWizardStep>
     {

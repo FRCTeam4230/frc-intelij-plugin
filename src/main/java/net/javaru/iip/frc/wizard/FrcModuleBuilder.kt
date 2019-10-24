@@ -50,7 +50,7 @@ import javax.swing.Icon
 
 class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 {
-    private val defaultFilesResourceBase = Paths.get("wizard/default-files/")
+    private val defaultFilesResourceBase = Paths.get("frc-wizard-templates/default-files/")
     private val gradleGroovyDslResourceBase = defaultFilesResourceBase.resolve("gradle/groovy-dsl")
     private val gradleKotlinDslResourceBase = defaultFilesResourceBase.resolve("gradle/kotlin-dsl")
     private val gradleWrapperResourceBase = defaultFilesResourceBase.resolve("gradle/gradle-wrapper")

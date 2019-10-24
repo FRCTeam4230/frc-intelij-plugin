@@ -19,6 +19,7 @@ package net.javaru.iip.frc.wizard;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.ide.util.PropertiesComponent;
@@ -33,7 +34,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.util.lang.JavaVersion;
 
@@ -225,14 +225,15 @@ public class FrcModuleWizardStep extends ModuleWizardStep
         myContext.setProjectBuilder(myBuilder);
         ProjectData parentProject = myParentProjectForm.getParentProject();
         myBuilder.setParentProject(parentProject);
+        final String configuredTeamNum = teamNumberTextField.getText();
+        myBuilder.getDataModel().setTeamNumber(Integer.parseInt(configuredTeamNum));
+        
+        myBuilder.setProjectId(new ProjectId("frc.team" + configuredTeamNum,
+                                             "robot-" + configuredTeamNum,
+                                             myBuilder.getDataModel().getFrcYear() + ".0"));
     
-        // TODO: Need to think about how to set these... or determine if they are truly needed.... I'm thinking the version number should be the WpiLib year
-        myBuilder.setProjectId(new ProjectId("frc." + teamNumberTextField.getText(),
-                                             "robot", // TODO: we should add a prompt for the project name which can default to "robot"
-                                             "1.0"));
-    
-        myBuilder.getDataModel().setTeamNumber(Integer.parseInt(teamNumberTextField.getText()));
-        if (StringUtil.isNotEmpty(myBuilder.getProjectId().getArtifactId()))
+        
+        if (myBuilder.getProjectId() != null && StringUtils.isNotEmpty(myBuilder.getProjectId().getArtifactId()))
         {
             myContext.setProjectName(myBuilder.getProjectId().getArtifactId());
         }

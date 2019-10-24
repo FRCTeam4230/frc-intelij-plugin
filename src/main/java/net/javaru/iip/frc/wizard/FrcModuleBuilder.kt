@@ -59,8 +59,12 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     private val gradleWrapperResourceBase = defaultFilesResourceBase.resolve(gradleWrapperSubPath)
     private val configsSubPath = "configs"
     private val configsResourceBase = defaultFilesResourceBase.resolve(configsSubPath)
-    private val codeSubPath = Paths.get("code")
-    private val codeResourceBase = defaultFilesResourceBase.resolve(codeSubPath)
+    private val commonCodeSubPath = Paths.get("code/common-code")
+    private val commonCodeResourceBase = defaultFilesResourceBase.resolve(commonCodeSubPath)
+    private val javaCodeSubPath = Paths.get("code/java-code")
+    private val javaCodeResourceBase = defaultFilesResourceBase.resolve(javaCodeSubPath)    
+    private val kotlinCodeSubPath = Paths.get("code/kotlin-code")
+    private val kotlinCodeResourceBase = defaultFilesResourceBase.resolve(kotlinCodeSubPath)
     
     private val fmConfig = freemarkerConfiguration(this, "/")
     
@@ -199,8 +203,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             copyResourceToModuleRoot(modelContentRootDir, configsResourceBase, Paths.get(".vscode/settings.json.ftl"))
         }
 
-        copyResourceToModuleRoot(modelContentRootDir, codeResourceBase, Paths.get("src/main/deploy/example.txt.ftl"))
-        copyResourceToModuleRoot(modelContentRootDir, codeResourceBase, Paths.get("src/main/java/base-package/Main.java.ftl"))
+        copyResourceToModuleRoot(modelContentRootDir, commonCodeResourceBase, Paths.get("src/main/deploy/example.txt.ftl"))
+        copyResourceToModuleRoot(modelContentRootDir, javaCodeResourceBase, Paths.get("src/main/java/base-package/Main.java.ftl"))
         
         modelContentRootDir.refresh(false, true)
         

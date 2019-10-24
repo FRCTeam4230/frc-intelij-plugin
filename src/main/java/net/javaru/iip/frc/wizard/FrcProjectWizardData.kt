@@ -19,11 +19,15 @@ package net.javaru.iip.frc.wizard
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl
+import java.nio.file.Path
+import java.nio.file.Paths
 
+const val DEFAULT_BASE_PACKAGE = "frc.robot"
 
 class FrcProjectWizardData(
                     var teamNumber: Int = FrcApplicationSettings.INSTANCE().teamNumber,
-                    var robotMainClassFQ: String = "frc.robot.Main",
+                    var robotMainClassSimpleName: String = "Main",
+                    var basePackage: String = DEFAULT_BASE_PACKAGE,
                     var wpilibVersion: WpiLibVersion = WpiLibVersionImpl.parse("2019.4.1"),
                     var gradleDistributionUrl: String = "https\\://services.gradle.org/distributions/gradle-5.0-bin.zip",
                     var frcYear: String = wpilibVersion.major.toString()
@@ -32,5 +36,12 @@ class FrcProjectWizardData(
     val teamNumberString: String
         get() = teamNumber.toString()
 
-
+    val basePackageAsDirString: String
+        get() = basePackage.replace('.', '/')
+    
+    val basePackageAsDirPath: Path
+        get() = Paths.get(basePackageAsDirString)
+    
+    val robotMainClassFQ: String
+        get() = if (basePackage.isEmpty()) robotMainClassSimpleName else "${basePackage}.${robotMainClassSimpleName}"
 }

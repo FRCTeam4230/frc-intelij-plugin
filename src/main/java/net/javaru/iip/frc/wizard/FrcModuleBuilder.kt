@@ -51,10 +51,16 @@ import javax.swing.Icon
 class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 {
     private val defaultFilesResourceBase = Paths.get("frc-wizard-templates/default-files/")
-    private val gradleGroovyDslResourceBase = defaultFilesResourceBase.resolve("gradle/groovy-dsl")
-    private val gradleKotlinDslResourceBase = defaultFilesResourceBase.resolve("gradle/kotlin-dsl")
-    private val gradleWrapperResourceBase = defaultFilesResourceBase.resolve("gradle/gradle-wrapper")
-    private val configsResourceBase = defaultFilesResourceBase.resolve("configs")
+    private val gradleGroovyDslSubPath = Paths.get("gradle/groovy-dsl")
+    private val gradleGroovyDslResourceBase = defaultFilesResourceBase.resolve(gradleGroovyDslSubPath)
+    private val gradleKotlinDslSubPath = Paths.get("gradle/kotlin-dsl")
+    private val gradleKotlinDslResourceBase = defaultFilesResourceBase.resolve(gradleKotlinDslSubPath)
+    private val gradleWrapperSubPath = Paths.get("gradle/gradle-wrapper")
+    private val gradleWrapperResourceBase = defaultFilesResourceBase.resolve(gradleWrapperSubPath)
+    private val configsSubPath = "configs"
+    private val configsResourceBase = defaultFilesResourceBase.resolve(configsSubPath)
+    private val codeSubPath = Paths.get("code")
+    private val codeResourceBase = defaultFilesResourceBase.resolve(codeSubPath)
     
     private val fmConfig = freemarkerConfiguration(this, "/")
     
@@ -192,6 +198,9 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             copyResourceToModuleRoot(modelContentRootDir, configsResourceBase, Paths.get(".vscode/launch.json.ftl"))
             copyResourceToModuleRoot(modelContentRootDir, configsResourceBase, Paths.get(".vscode/settings.json.ftl"))
         }
+
+        copyResourceToModuleRoot(modelContentRootDir, codeResourceBase, Paths.get("src/main/deploy/example.txt.ftl"))
+        copyResourceToModuleRoot(modelContentRootDir, codeResourceBase, Paths.get("src/main/java/base-package/Main.java.ftl"))
         
         modelContentRootDir.refresh(false, true)
         
@@ -220,8 +229,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 return null
             }
 
-            val rootDir = VfsUtil.virtualToIoFile(modelContentRootDir).toPath()
-            val target = rootDir.resolve(resourceRelativePath)  
+            val target = resolveTargetPath(modelContentRootDir, resourceRelativePath)
             Files.createDirectories(target.parent)
             val file = target.toFile()
             FileUtils.copyInputStreamToFile(pluginResourceInputStream, file)
@@ -240,8 +248,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         try
         {
             val targetRelativePath = templateRelativePath.resolveSibling(templatePath.fileName.toString().removeSuffix(FM_TEMPLATE_EXT))
-            val rootDir = VfsUtil.virtualToIoFile(modelContentRootDir).toPath()
-            val target = rootDir.resolve(targetRelativePath)
+            val target = resolveTargetPath(modelContentRootDir, targetRelativePath)
             val template = fmConfig.getTemplate(FilenameUtils.separatorsToUnix(templatePath.toString()))
 
             Files.createDirectories(target.parent)
@@ -259,7 +266,39 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             return null
         }
     }
+
+    private fun resolveTargetPath(modelContentRootDir: VirtualFile, targetRelativePath: Path): Path
+    {
+        val target = VfsUtil.virtualToIoFile(modelContentRootDir).toPath().resolve(targetRelativePath)
+        return normalizeTargetPathWithPackageDir(target)
+    }
+
+    private fun normalizeTargetPathWithPackageDir(target: Path): Path
+    {
+        val basePackage = "base-package/"
+        val pathString = FilenameUtils.separatorsToUnix(target.toString())
+        return if (pathString.contains(basePackage))
+        {
+            val normalizedPathString: String = if (dataModel.basePackage.isEmpty())
+            {
+                val start = pathString.indexOf(basePackage)
+                val end = start + basePackage.length
+                pathString.removeRange(start, end)
+            }
+            else
+            {
+                pathString.replace(basePackage, "${FilenameUtils.separatorsToUnix(dataModel.basePackageAsDirString)}/")
+            }
+
+            Paths.get(normalizedPathString)
+        }
+        else
+        {
+            target
+        }
+    }
     
+
     private fun createAndGetRoot(): VirtualFile?
     {
         val path = contentEntryPath?.let { FileUtil.toSystemIndependentName(it) } ?: return null

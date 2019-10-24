@@ -19,7 +19,10 @@ package net.javaru.iip.frc.freemarker
 import freemarker.template.Configuration
 import freemarker.template.TemplateExceptionHandler
 import net.javaru.iip.frc.FrcIcons
+import org.apache.commons.lang3.BooleanUtils
 
+// todoc document this System property
+val DEBUG_MODE = BooleanUtils.toBoolean(System.getProperty("frc.freemarker.debug", "false"))
 const val FM_TEMPLATE_EXT = ".ftl"
 
 /**
@@ -52,15 +55,9 @@ fun freemarkerConfiguration(basePackagePath: String = "/", resourceLoaderClass: 
     // we just need a class on our classpath, so we use FrcIcons as a convenient class
     cfg.setClassForTemplateLoading(resourceLoaderClass, basePackagePath)
     cfg.defaultEncoding = "UTF-8"
-
     // Sets how errors will appear.
-    //cfg.templateExceptionHandler = TemplateExceptionHandler.DEBUG_HANDLER
-    cfg.templateExceptionHandler = TemplateExceptionHandler.RETHROW_HANDLER
-
-    // Don't log exceptions inside FreeMarker that it will throw at you anyway:
-    cfg.logTemplateExceptions = false
-//    val tcHTML = TemplateConfiguration()
-//    tcHTML.outputFormat = HTMLOutputFormat.INSTANCE
-//    cfg.templateConfigurations = ConditionalTemplateConfigurationFactory(PathGlobMatcher("templates/html/**"), tcHTML)
+    cfg.templateExceptionHandler = if  (DEBUG_MODE) TemplateExceptionHandler.DEBUG_HANDLER else TemplateExceptionHandler . RETHROW_HANDLER 
+    // Sets if exceptions are logged in the processed templates 
+    cfg.logTemplateExceptions = DEBUG_MODE
     return cfg
 }

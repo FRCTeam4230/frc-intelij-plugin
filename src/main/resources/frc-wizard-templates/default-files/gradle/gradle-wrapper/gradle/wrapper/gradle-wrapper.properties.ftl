@@ -5,16 +5,7 @@
     Template Language Refernce: https://freemarker.apache.org/docs/ref.html
     Template Author's Guide:    https://freemarker.apache.org/docs/dgui.html
 -->
-<#--
-    Uncomment next block(freemarker comments) for debugging.
-    See https://freemarker.apache.org/docs/pgui_config_outputformatsautoesc.html
-        https://freemarker.apache.org/docs/dgui_misc_autoescaping.html
- -->
-<#--<!--
-Output format: '${.output_format}';
-Output encoding: '${.output_encoding}';
-Auto-escaping: '${.auto_esc?c}';
-&ndash;&gt;-->
+<#--  To DEBUG templates, set system property 'frc.freemarker.debug' to true when luanching IntelliJ IDEA -->
 </#compress>
 distributionBase=GRADLE_USER_HOME
 distributionPath=permwrapper/dists

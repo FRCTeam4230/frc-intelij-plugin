@@ -36,18 +36,23 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import net.javaru.iip.frc.FrcIcons.FRC
+import net.javaru.iip.frc.freemarker.FM_TEMPLATE_EXT
+import net.javaru.iip.frc.freemarker.freemarkerConfiguration
 import net.javaru.iip.frc.util.getPluginResourceAsStream
 import net.javaru.iip.frc.util.removeBasePath
 import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FilenameUtils
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.*
 import javax.swing.Icon
 
 class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 {
     private val resourceBase = Paths.get("wizard/default-files/")
+    private val fmConfig = freemarkerConfiguration(this, "/")
     
     private var myWizardContext: WizardContext? = null
     private var myParentProject: ProjectData? = null
@@ -59,6 +64,9 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     
     private val myUseKotlinDSL = false
     private val myShowGradleConfig = true;
+    
+    //TODO: this needs to be created from the wizard step form
+    private val dataModel = FrcProjectWizardData()
     
     val config = FrcModuleConfig()
     
@@ -168,21 +176,28 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
         assert(rootProjectPath != null) { "rootProjectPath is null"}
 
-//        val gradleBuildFile = setupGradleBuildFile(modelContentRootDir)
-//        val gradleSettingsFile = setupGradleSettingsFile(modelContentRootDir)
-
-        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("settings.gradle"))
-        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("build.gradle"))
+        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("build.gradle.ftl"))
+        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("settings.gradle.ftl"))
         copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("gradlew"))
         copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("gradlew.bat"))
         copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("gradle/wrapper/gradle-wrapper.jar"))
-        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("gradle/wrapper/gradle-wrapper.properties"))
+        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("gradle/wrapper/gradle-wrapper.properties.ftl"))
         modelContentRootDir.refresh(false, true)
         
         LOG.trace("FrcModuleBuilder.setupRootModel() completed")
     }
-    
+
+
     private fun copyResourceToModuleRoot(modelContentRootDir: VirtualFile, resourcePath: Path): VirtualFile?
+    {
+        return if (resourcePath.fileName.toString().endsWith(FM_TEMPLATE_EXT))
+            doCopyFremarkerTemplateToModuleRoot(modelContentRootDir, resourcePath)
+        else
+            doCopyResourceToModuleRoot(modelContentRootDir, resourcePath)
+    }
+
+
+    private fun doCopyResourceToModuleRoot(modelContentRootDir: VirtualFile, resourcePath: Path): VirtualFile?
     {
         try
         {
@@ -208,6 +223,30 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
     }
 
+    private fun doCopyFremarkerTemplateToModuleRoot(modelContentRootDir: VirtualFile, templatePath: Path): VirtualFile?
+    {
+        try
+        {
+            val templateRelativePath = templatePath.removeBasePath(resourceBase)
+            val targetRelativePath = templateRelativePath.resolveSibling(templatePath.fileName.toString().removeSuffix(FM_TEMPLATE_EXT))
+            val rootDir = VfsUtil.virtualToIoFile(modelContentRootDir).toPath()
+            val target = rootDir.resolve(targetRelativePath)
+            val template = fmConfig.getTemplate(FilenameUtils.separatorsToUnix(templatePath.toString()))
+            
+            Files.newBufferedWriter(target, Charsets.UTF_8).use {
+                val environment = template.createProcessingEnvironment(hashMapOf("data" to dataModel), it)
+                environment.outputEncoding = Charsets.UTF_8.toString()
+                environment.locale = Locale.ENGLISH
+                environment.process()
+            }
+            return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(target.toFile())
+        }
+        catch(e: Exception)
+        {
+            LOG.warn("[FRC] Could not process resource template '$templatePath' for the module root dir '$modelContentRootDir' due to an exception. Cause Summary: $e", e)
+            return null
+        }
+    }
     
     private fun createAndGetRoot(): VirtualFile?
     {

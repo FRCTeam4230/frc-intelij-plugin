@@ -1,0 +1,23 @@
+<#ftl output_format="plainText" encoding="UTF-8"> <#-- Output formats: https://freemarker.apache.org/docs/dgui_misc_autoescaping.html -->
+<#compress>
+<#-- @ftlvariable name="data" type="net.javaru.iip.frc.wizard.FrcProjectWizardData" -->
+<#--    
+    Template Language Refernce: https://freemarker.apache.org/docs/ref.html
+    Template Author's Guide:    https://freemarker.apache.org/docs/dgui.html
+-->
+<#--
+    Uncomment next block(freemarker comments) for debugging.
+    See https://freemarker.apache.org/docs/pgui_config_outputformatsautoesc.html
+        https://freemarker.apache.org/docs/dgui_misc_autoescaping.html
+ -->
+<#--<!--
+Output format: '${.output_format}';
+Output encoding: '${.output_encoding}';
+Auto-escaping: '${.auto_esc?c}';
+&ndash;&gt;-->
+</#compress>
+distributionBase=GRADLE_USER_HOME
+distributionPath=permwrapper/dists
+distributionUrl=${data.gradleDistributionUrl}
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=permwrapper/dists

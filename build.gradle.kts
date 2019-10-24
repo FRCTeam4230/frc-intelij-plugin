@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -190,6 +190,7 @@ dependencies {
     compile("org.http4k:http4k-client-apache-async:$http4kVersion")
     //compile("org.http4k:http4k-server-jetty:$http4kVersion")
     compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.0")
+    compile("org.freemarker:freemarker:2.3.29")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junit5Version")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junit5Version")

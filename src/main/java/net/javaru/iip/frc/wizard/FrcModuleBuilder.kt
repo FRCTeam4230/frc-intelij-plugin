@@ -39,7 +39,6 @@ import net.javaru.iip.frc.FrcIcons.FRC
 import net.javaru.iip.frc.freemarker.FM_TEMPLATE_EXT
 import net.javaru.iip.frc.freemarker.freemarkerConfiguration
 import net.javaru.iip.frc.util.getPluginResourceAsStream
-import net.javaru.iip.frc.util.removeBasePath
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import java.io.File
@@ -51,7 +50,11 @@ import javax.swing.Icon
 
 class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 {
-    private val resourceBase = Paths.get("wizard/default-files/")
+    private val defaultFilesResourceBase = Paths.get("wizard/default-files/")
+    private val gradleGroovyDslResourceBase = defaultFilesResourceBase.resolve("gradle/groovy-dsl")
+    private val gradleKotlinDslResourceBase = defaultFilesResourceBase.resolve("gradle/kotlin-dsl")
+    private val gradleWrapperResourceBase = defaultFilesResourceBase.resolve("gradle/gradle-wrapper")
+    
     private val fmConfig = freemarkerConfiguration(this, "/")
     
     private var myWizardContext: WizardContext? = null
@@ -176,32 +179,32 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
         assert(rootProjectPath != null) { "rootProjectPath is null"}
 
-        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("build.gradle.ftl"))
-        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("settings.gradle.ftl"))
-        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("gradlew"))
-        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("gradlew.bat"))
-        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("gradle/wrapper/gradle-wrapper.jar"))
-        copyResourceToModuleRoot(modelContentRootDir, resourceBase.resolve("gradle/wrapper/gradle-wrapper.properties.ftl"))
+        copyResourceToModuleRoot(modelContentRootDir, gradleGroovyDslResourceBase, Paths.get("build.gradle.ftl"))
+        copyResourceToModuleRoot(modelContentRootDir, gradleGroovyDslResourceBase, Paths.get("settings.gradle.ftl"))
+        copyResourceToModuleRoot(modelContentRootDir, gradleWrapperResourceBase, Paths.get("gradlew"))
+        copyResourceToModuleRoot(modelContentRootDir, gradleWrapperResourceBase, Paths.get("gradlew.bat"))
+        copyResourceToModuleRoot(modelContentRootDir, gradleWrapperResourceBase, Paths.get("gradle/wrapper/gradle-wrapper.jar"))
+        copyResourceToModuleRoot(modelContentRootDir, gradleWrapperResourceBase, Paths.get("gradle/wrapper/gradle-wrapper.properties.ftl"))
         modelContentRootDir.refresh(false, true)
         
         LOG.trace("FrcModuleBuilder.setupRootModel() completed")
     }
 
 
-    private fun copyResourceToModuleRoot(modelContentRootDir: VirtualFile, resourcePath: Path): VirtualFile?
+    private fun copyResourceToModuleRoot(modelContentRootDir: VirtualFile, resourceBase: Path, resourceRelativePath: Path): VirtualFile?
     {
-        return if (resourcePath.fileName.toString().endsWith(FM_TEMPLATE_EXT))
-            doCopyFremarkerTemplateToModuleRoot(modelContentRootDir, resourcePath)
+        return if (resourceRelativePath.fileName.toString().endsWith(FM_TEMPLATE_EXT))
+            doCopyFreemarkerTemplateToModuleRoot(modelContentRootDir, resourceBase, resourceRelativePath)
         else
-            doCopyResourceToModuleRoot(modelContentRootDir, resourcePath)
+            doCopyResourceToModuleRoot(modelContentRootDir, resourceBase, resourceRelativePath)
     }
 
 
-    private fun doCopyResourceToModuleRoot(modelContentRootDir: VirtualFile, resourcePath: Path): VirtualFile?
+    private fun doCopyResourceToModuleRoot(modelContentRootDir: VirtualFile, resourceBase: Path, resourceRelativePath: Path): VirtualFile?
     {
+        val resourcePath = resourceBase.resolve(resourceRelativePath)
         try
         {
-            val targetRelativePath = resourcePath.removeBasePath(resourceBase)
             val pluginResourceInputStream = getPluginResourceAsStream(resourcePath)
             if (pluginResourceInputStream == null)
             {
@@ -210,7 +213,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             }
 
             val rootDir = VfsUtil.virtualToIoFile(modelContentRootDir).toPath()
-            val target = rootDir.resolve(targetRelativePath)  
+            val target = rootDir.resolve(resourceRelativePath)  
             Files.createDirectories(target.parent)
             val file = target.toFile()
             FileUtils.copyInputStreamToFile(pluginResourceInputStream, file)
@@ -223,11 +226,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
     }
 
-    private fun doCopyFremarkerTemplateToModuleRoot(modelContentRootDir: VirtualFile, templatePath: Path): VirtualFile?
+    private fun doCopyFreemarkerTemplateToModuleRoot(modelContentRootDir: VirtualFile, resourceBase: Path, templateRelativePath: Path): VirtualFile?
     {
+        val templatePath = resourceBase.resolve(templateRelativePath)
         try
         {
-            val templateRelativePath = templatePath.removeBasePath(resourceBase)
             val targetRelativePath = templateRelativePath.resolveSibling(templatePath.fileName.toString().removeSuffix(FM_TEMPLATE_EXT))
             val rootDir = VfsUtil.virtualToIoFile(modelContentRootDir).toPath()
             val target = rootDir.resolve(targetRelativePath)

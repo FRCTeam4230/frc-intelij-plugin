@@ -16,16 +16,21 @@
 
 package net.javaru.iip.frc.wizard
 
+import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl
 
 
 class FrcProjectWizardData(
+                    var teamNumber: Int = FrcApplicationSettings.INSTANCE().teamNumber,
                     var robotMainClassFQ: String = "frc.robot.Main",
                     var wpilibVersion: WpiLibVersion = WpiLibVersionImpl.parse("2019.4.1"),
                     var gradleDistributionUrl: String = "https\\://services.gradle.org/distributions/gradle-5.0-bin.zip",
                     var frcYear: String = wpilibVersion.major.toString()
                           )
 {
-    
+    val teamNumberString: String
+        get() = teamNumber.toString()
+
+
 }

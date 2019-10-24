@@ -211,7 +211,7 @@ public class FrcModuleWizardStep extends ModuleWizardStep
 //        ProjectData parentProject = myParentProjectForm.getParentProject();
 //        ProjectId projectId = myBuilder.getProjectId();
     
-        UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getConfig().getTeamNumber()));
+        UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getDataModel().getTeamNumber()));
         
         updateComponents();
     }
@@ -231,7 +231,7 @@ public class FrcModuleWizardStep extends ModuleWizardStep
                                              "robot", // TODO: we should add a prompt for the project name which can default to "robot"
                                              "1.0"));
     
-        myBuilder.getConfig().setTeamNumber(Integer.parseInt(teamNumberTextField.getText()));
+        myBuilder.getDataModel().setTeamNumber(Integer.parseInt(teamNumberTextField.getText()));
         if (StringUtil.isNotEmpty(myBuilder.getProjectId().getArtifactId()))
         {
             myContext.setProjectName(myBuilder.getProjectId().getArtifactId());

@@ -54,6 +54,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     private val gradleGroovyDslResourceBase = defaultFilesResourceBase.resolve("gradle/groovy-dsl")
     private val gradleKotlinDslResourceBase = defaultFilesResourceBase.resolve("gradle/kotlin-dsl")
     private val gradleWrapperResourceBase = defaultFilesResourceBase.resolve("gradle/gradle-wrapper")
+    private val configsResourceBase = defaultFilesResourceBase.resolve("configs")
     
     private val fmConfig = freemarkerConfiguration(this, "/")
     
@@ -66,12 +67,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     
     
     private val myUseKotlinDSL = false
+    private val myIncludeVsCodeConfigs = true
     private val myShowGradleConfig = true;
     
     //TODO: this needs to be created from the wizard step form
-    private val dataModel = FrcProjectWizardData()
-    
-    val config = FrcModuleConfig()
+    val dataModel = FrcProjectWizardData()
     
     override fun getGroupName(): String = MODULE_BUILDER_GROUP_NAME 
     override fun getParentGroup(): String = JavaModuleType.JAVA_GROUP // This is the top group in the New Project Wizard, and for now it makes sense to be part of it
@@ -185,6 +185,14 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         copyResourceToModuleRoot(modelContentRootDir, gradleWrapperResourceBase, Paths.get("gradlew.bat"))
         copyResourceToModuleRoot(modelContentRootDir, gradleWrapperResourceBase, Paths.get("gradle/wrapper/gradle-wrapper.jar"))
         copyResourceToModuleRoot(modelContentRootDir, gradleWrapperResourceBase, Paths.get("gradle/wrapper/gradle-wrapper.properties.ftl"))
+
+        copyResourceToModuleRoot(modelContentRootDir, configsResourceBase, Paths.get(".wpilib/wpilib_preferences.json.ftl"))
+        if (myIncludeVsCodeConfigs)
+        {
+            copyResourceToModuleRoot(modelContentRootDir, configsResourceBase, Paths.get(".vscode/launch.json.ftl"))
+            copyResourceToModuleRoot(modelContentRootDir, configsResourceBase, Paths.get(".vscode/settings.json.ftl"))
+        }
+        
         modelContentRootDir.refresh(false, true)
         
         LOG.trace("FrcModuleBuilder.setupRootModel() completed")
@@ -235,7 +243,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             val rootDir = VfsUtil.virtualToIoFile(modelContentRootDir).toPath()
             val target = rootDir.resolve(targetRelativePath)
             val template = fmConfig.getTemplate(FilenameUtils.separatorsToUnix(templatePath.toString()))
-            
+
+            Files.createDirectories(target.parent)
             Files.newBufferedWriter(target, Charsets.UTF_8).use {
                 val environment = template.createProcessingEnvironment(hashMapOf("data" to dataModel), it)
                 environment.outputEncoding = Charsets.UTF_8.toString()

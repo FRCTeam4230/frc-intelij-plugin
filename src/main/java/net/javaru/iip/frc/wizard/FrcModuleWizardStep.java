@@ -35,6 +35,8 @@ import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBList;
 import com.intellij.util.lang.JavaVersion;
 
 import net.javaru.iip.frc.FrcIcons.FRC;
@@ -66,6 +68,8 @@ public class FrcModuleWizardStep extends ModuleWizardStep
     private JPanel myAddToPanel;
     private JTextField teamNumberTextField;
     private JPanel robotTemplatePanel;
+    private JBList<FrcWizardRobotTemplateDefinition> templatesJBList;
+    private JBLabel templateDescriptionLabel;
     
     
     public FrcModuleWizardStep(@NotNull FrcModuleBuilder builder, @NotNull WizardContext context)
@@ -89,6 +93,7 @@ public class FrcModuleWizardStep extends ModuleWizardStep
     
         // We may need to update this when the team number changed from an application setting to a project setting
         UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(FrcApplicationSettings.Settings.INSTANCE().getTeamNumber()));
+        initRobotTemplatesList();
     }
     
     
@@ -281,5 +286,32 @@ public class FrcModuleWizardStep extends ModuleWizardStep
     public void disposeUIResources()
     {
         Disposer.dispose(myParentProjectForm);
+    }
+    
+    
+    private void initRobotTemplatesList()
+    {
+        final FrcWizardRobotTemplateDefinition[] robotTemplates = FrcWizardRobotTemplateDefinition.values();
+        templatesJBList.setListData(robotTemplates);
+        templatesJBList.setSelectedIndex(0);
+        updateTemplateDescription(templatesJBList);
+        
+        templatesJBList.addListSelectionListener(e -> {
+            final Object source = e.getSource();
+            if (source instanceof JBList)
+            {
+                @SuppressWarnings("unchecked")
+                final JBList<FrcWizardRobotTemplateDefinition> theList = (JBList<FrcWizardRobotTemplateDefinition>) source;
+                updateTemplateDescription(theList);
+            }
+        });
+    }
+    
+    
+    protected void updateTemplateDescription(JBList<FrcWizardRobotTemplateDefinition> theList)
+    {
+        final int index = theList.getLeadSelectionIndex();
+        final FrcWizardRobotTemplateDefinition templateDefinition = theList.getModel().getElementAt(index);
+        templateDescriptionLabel.setText(templateDefinition.getDisplayNameAndDescription());
     }
 }

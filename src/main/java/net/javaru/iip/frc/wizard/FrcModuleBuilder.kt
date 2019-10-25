@@ -208,7 +208,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         
         modelContentRootDir.refresh(false, true)
         
-        LOG.trace("FrcModuleBuilder.setupRootModel() completed")
+        LOG.trace("[FRC] FrcModuleBuilder.setupRootModel() completed")
     }
 
 

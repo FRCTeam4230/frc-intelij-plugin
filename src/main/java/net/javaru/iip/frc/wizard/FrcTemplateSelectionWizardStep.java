@@ -69,6 +69,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     private JPanel exampleTemplatesPane;
     private JBList<FrcWizardTemplateDefinition> projectTemplatesJBList;
     private JBList<FrcWizardTemplateDefinition> exampleTemplatesJBList;
+    private JBLabel projectTemplatesPaneLabel;
     
     
     public FrcTemplateSelectionWizardStep(@NotNull FrcModuleBuilder builder,

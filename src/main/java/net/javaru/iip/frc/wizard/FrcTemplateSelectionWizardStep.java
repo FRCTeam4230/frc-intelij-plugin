@@ -224,14 +224,14 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     @Override
     public void updateStep()
     {
-        LOG.trace("[FRC] Entering FrcModuleWizardStep.updateStep()");
+        LOG.trace("[FRC] Entering FrcTemplateSelectionWizardStep.updateStep()");
 //        ProjectData parentProject = myParentProjectForm.getParentProject();
 //        ProjectId projectId = myBuilder.getProjectId();
     
 //        UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getDataModel().getTeamNumber()));
     
         updateComponents();
-        LOG.trace("[FRC] Exiting FrcModuleWizardStep.updateStep()");
+        LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.updateStep()");
     }
     
     
@@ -239,7 +239,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     @Override
     public void updateDataModel()
     {
-        LOG.trace("[FRC] FrcModuleWizardStep.updateDataModel() has been called.");
+        LOG.trace("[FRC] FrcTemplateSelectionWizardStep.updateDataModel() has been called.");
         myContext.setProjectBuilder(myBuilder);
         ProjectData parentProject = myParentProjectForm.getParentProject();
         myBuilder.setParentProject(parentProject);
@@ -273,7 +273,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     
     private void updateComponents()
     {
-        LOG.trace("[FRC] FrcModuleWizardStep.updateComponents() has been called.");
+        LOG.trace("[FRC] FrcTemplateSelectionWizardStep.updateComponents() has been called.");
         final boolean isAddToVisible = myParentProjectForm.isVisible();
         
         myParentProjectForm.updateComponents();

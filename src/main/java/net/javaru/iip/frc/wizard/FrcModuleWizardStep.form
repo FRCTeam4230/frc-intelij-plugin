@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="net.javaru.iip.frc.wizard.FrcModuleWizardStep">
-  <grid id="27dc6" binding="myMainPanel" layout-manager="GridLayoutManager" row-count="3" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="27dc6" binding="myMainPanel" layout-manager="GridLayoutManager" row-count="6" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
       <xy x="20" y="20" width="500" height="400"/>
     </constraints>
     <properties/>
-    <border type="none"/>
+    <border type="none">
+      <font/>
+    </border>
     <children>
       <component id="721b1" class="javax.swing.JLabel">
         <constraints>
@@ -31,25 +33,31 @@
       </component>
       <grid id="a0a23" binding="robotTemplatePanel" layout-manager="CardLayout" hgap="0" vgap="0">
         <constraints>
-          <grid row="1" column="0" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="4" column="0" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties/>
-        <border type="none" title-resource-bundle="i18n/FrcBundle" title-key="frc.ui.wizard.mws.robotTemplatePanelTitle"/>
+        <border type="none" title-resource-bundle="i18n/FrcBundle" title-key="frc.ui.wizard.mws.projectTemplateSelectionPanel.title"/>
         <children>
-          <component id="2affd" class="com.intellij.ui.components.JBList" binding="templatesJBList">
+          <component id="2affd" class="com.intellij.ui.components.JBList" binding="projectTemplatesJBList">
             <constraints>
-              <card name="templatesJBListCard"/>
+              <card name="projectTemplatesListCard"/>
             </constraints>
             <properties>
               <selectionMode value="0"/>
             </properties>
+          </component>
+          <component id="61fe0" class="com.intellij.ui.components.JBList" binding="exampleTemplatesJBList">
+            <constraints>
+              <card name="exampleTemplatesListCard"/>
+            </constraints>
+            <properties/>
           </component>
         </children>
       </grid>
       <grid id="d1af0" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
-          <grid row="2" column="0" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="5" column="0" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties/>
         <border type="none"/>
@@ -70,7 +78,7 @@
           <grid id="c6bca" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="1" use-parent-layout="false">
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
                 <maximum-size width="600" height="-1"/>
               </grid>
             </constraints>
@@ -99,6 +107,33 @@
           <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
       </hspacer>
+      <component id="d422b" class="javax.swing.JRadioButton" binding="projectTemplatesRadioButton">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.mws.templatesRadioButton.name"/>
+          <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.mws.templatesRadioButton.tooltip"/>
+        </properties>
+      </component>
+      <component id="900f2" class="javax.swing.JRadioButton" binding="exampleTemplatesRadioButton">
+        <constraints>
+          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.mws.examplesRadioButton.name"/>
+          <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.mws.examplesRadioButton.tooltip"/>
+        </properties>
+      </component>
+      <component id="6db9d" class="com.intellij.ui.components.JBLabel" binding="projectTemplatesRadioButtonGroupLabel">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.mws.templatesRadioButtonGroupLabel.text"/>
+          <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.mws.templatesRadioButton.tooltip"/>
+        </properties>
+      </component>
     </children>
   </grid>
 </form>

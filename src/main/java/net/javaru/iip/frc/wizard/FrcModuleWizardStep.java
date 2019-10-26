@@ -16,8 +16,11 @@
 
 package net.javaru.iip.frc.wizard;
 
+import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -54,6 +57,9 @@ public class FrcModuleWizardStep extends ModuleWizardStep
 {
     private static final Logger LOG = Logger.getInstance(FrcModuleWizardStep.class);
     
+    private static final String PROJECTS_CARD_NAME = "projectTemplatesListCard"; // must march the value entered in the form (in the UI Designer)
+    private static final String EXAMPLES_CARD_NAME = "exampleTemplatesListCard"; // must march the value entered in the form (in the UI Designer)
+    
     @NotNull
     private final FrcModuleBuilder myBuilder;
     @NotNull
@@ -68,8 +74,14 @@ public class FrcModuleWizardStep extends ModuleWizardStep
     private JPanel myAddToPanel;
     private JTextField teamNumberTextField;
     private JPanel robotTemplatePanel;
-    private JBList<FrcWizardRobotTemplateDefinition> templatesJBList;
+    private String activeCard = "";
+    private JBList<FrcWizardTemplateDefinition> projectTemplatesJBList;
+    private JBList<FrcWizardTemplateDefinition> exampleTemplatesJBList;
     private JBLabel templateDescriptionLabel;
+    private ButtonGroup templatesTypeButtonGroup;
+    private JRadioButton projectTemplatesRadioButton;
+    private JRadioButton exampleTemplatesRadioButton;
+    private JBLabel projectTemplatesRadioButtonGroupLabel;
     
     
     public FrcModuleWizardStep(@NotNull FrcModuleBuilder builder, @NotNull WizardContext context)
@@ -93,7 +105,8 @@ public class FrcModuleWizardStep extends ModuleWizardStep
     
         // We may need to update this when the team number changed from an application setting to a project setting
         UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(FrcApplicationSettings.Settings.INSTANCE().getTeamNumber()));
-        initRobotTemplatesList();
+        initRadioButtonGroup();
+        initTemplatesLists();
     }
     
     
@@ -288,30 +301,102 @@ public class FrcModuleWizardStep extends ModuleWizardStep
         Disposer.dispose(myParentProjectForm);
     }
     
-    
-    private void initRobotTemplatesList()
+    private void initRadioButtonGroup()
     {
-        final FrcWizardRobotTemplateDefinition[] robotTemplates = FrcWizardRobotTemplateDefinition.values();
-        templatesJBList.setListData(robotTemplates);
-        templatesJBList.setSelectedIndex(0);
-        updateTemplateDescription(templatesJBList);
+        ItemListener templatesButtonGroupChangeListener = e -> {
+            final AbstractButton button = (AbstractButton) e.getSource();
+            final ButtonModel model = button.getModel();
+            final String actionCommand = model.getActionCommand();
+            final CardLayout cards = (CardLayout) robotTemplatePanel.getLayout();
+            if (actionCommand.equals(FrcWizardProjectTemplateDefinition.class.getSimpleName()))
+            {
+                showCard( PROJECTS_CARD_NAME);
+            }
+            else if (actionCommand.equals(FrcWizardExampleTemplateDefinition.class.getSimpleName()))
+            {
+                showCard(EXAMPLES_CARD_NAME);
+            }
+            else
+            {
+                LOG.warn("Unknown Radio Button actionCommand of '" + actionCommand + "' returned. Defaulting to the Project Templates.");
+                showCard( PROJECTS_CARD_NAME);
+                templatesTypeButtonGroup.setSelected(projectTemplatesRadioButton.getModel(), true);
+            }
+        };
         
-        templatesJBList.addListSelectionListener(e -> {
+        
+        projectTemplatesRadioButton.setSelected(true);
+        exampleTemplatesRadioButton.setSelected(false);
+        
+        projectTemplatesRadioButton.addItemListener(templatesButtonGroupChangeListener);
+        exampleTemplatesRadioButton.addItemListener(templatesButtonGroupChangeListener);
+        
+        projectTemplatesRadioButton.setActionCommand(FrcWizardProjectTemplateDefinition.class.getSimpleName());
+        exampleTemplatesRadioButton.setActionCommand(FrcWizardExampleTemplateDefinition.class.getSimpleName());
+        
+        templatesTypeButtonGroup = new ButtonGroup();
+        templatesTypeButtonGroup.add(projectTemplatesRadioButton);
+        templatesTypeButtonGroup.add(exampleTemplatesRadioButton);
+        templatesTypeButtonGroup.setSelected(projectTemplatesRadioButton.getModel(), true);
+    }
+    
+    
+    private void initTemplatesLists()
+    {
+        ListSelectionListener templatesListSelectionListener = e -> {
             final Object source = e.getSource();
             if (source instanceof JBList)
             {
                 @SuppressWarnings("unchecked")
-                final JBList<FrcWizardRobotTemplateDefinition> theList = (JBList<FrcWizardRobotTemplateDefinition>) source;
+                final JBList<FrcWizardTemplateDefinition> theList = (JBList<FrcWizardTemplateDefinition>) source;
                 updateTemplateDescription(theList);
             }
-        });
+        };
+        
+        final FrcWizardTemplateDefinition[] projectTemplates = FrcWizardProjectTemplateDefinition.values();
+        projectTemplatesJBList.setListData(projectTemplates);
+        projectTemplatesJBList.setSelectedIndex(0);
+        projectTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
+        
+        final FrcWizardTemplateDefinition[] exampleTemplates = FrcWizardExampleTemplateDefinition.values();
+        exampleTemplatesJBList.setListData(exampleTemplates);
+        exampleTemplatesJBList.setSelectedIndex(0);
+        exampleTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
+    
+        showCard( PROJECTS_CARD_NAME);
+        
     }
     
     
-    protected void updateTemplateDescription(JBList<FrcWizardRobotTemplateDefinition> theList)
+    private void showCard(String cardName)
+    {
+        final CardLayout cardLayout = (CardLayout) robotTemplatePanel.getLayout();
+        cardLayout.show(robotTemplatePanel, cardName);
+        activeCard = cardName;
+        if (cardName.equals(PROJECTS_CARD_NAME))
+        {
+            updateTemplateDescription(projectTemplatesJBList);
+        }
+        else if (cardName.equals(EXAMPLES_CARD_NAME))
+        {
+            updateTemplateDescription(exampleTemplatesJBList);
+        }
+        else
+        {
+            LOG.warn("Unknown Card name (for Card Layout). Defaulting to the Projects Card");
+            cardLayout.show(robotTemplatePanel, PROJECTS_CARD_NAME);
+            updateTemplateDescription(projectTemplatesJBList);
+            templatesTypeButtonGroup.setSelected(projectTemplatesRadioButton.getModel(), true);
+        }
+    }
+    
+    
+    protected void updateTemplateDescription(JBList<FrcWizardTemplateDefinition> theList)
     {
         final int index = theList.getLeadSelectionIndex();
-        final FrcWizardRobotTemplateDefinition templateDefinition = theList.getModel().getElementAt(index);
+        final FrcWizardTemplateDefinition templateDefinition = theList.getModel().getElementAt(index);
         templateDescriptionLabel.setText(templateDefinition.getDisplayNameAndDescription());
     }
+    
+    
 }

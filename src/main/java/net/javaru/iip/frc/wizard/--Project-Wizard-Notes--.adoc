@@ -1,0 +1,15 @@
+= Project Wizard Notes
+:icons: font
+:sectanchors:
+:sectlinks:
+:toc:
+
+== WPI Templates
+* The WPI project templates are found in the WPI https://github.com/wpilibsuite/allwpilib[allwpilib] project
+** There's a https://github.com/wpilibsuite/allwpilib/tree/master/wpilibjExamples[wpilibjExamples] module
+** The examples and templates, and commands, are divided up into directories of those names
+** There's a json file, for example  `templates.json` [.small]#(allwpilib/wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/templates/templates.json)#, `examples.json`, and commands.jso that list each template/example. This has the name and description in it.
+** There is then a directory for each particular example
+
+== Gradle Templates
+* The gradle templates are in the https://github.com/wpilibsuite/vscode-wpilib[vscode-wpilib] project

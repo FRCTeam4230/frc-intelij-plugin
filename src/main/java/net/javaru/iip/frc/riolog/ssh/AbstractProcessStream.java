@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -33,9 +33,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
+
+import net.javaru.iip.frc.util.FrcIoExtsKt;
 
 
 
@@ -135,7 +136,7 @@ public abstract class AbstractProcessStream implements ProcessStream,
             }
             finally
             {
-                IOUtils.closeQuietly(inputStream);
+                FrcIoExtsKt.closeQuietly(inputStream);
                 outputStream = null;
 
                 // While I believe we have fully prevented it, in previous versions there was
@@ -145,7 +146,7 @@ public abstract class AbstractProcessStream implements ProcessStream,
                 Future<Void> future = executor.submit(() ->
                                                       {
                                                           LOG.debug("[FRC] Closing reader");
-                                                          IOUtils.closeQuietly(reader);
+                                                          FrcIoExtsKt.closeQuietly(reader);
                                                           LOG.debug("[FRC] Reader has been closed");
                                                           return null;
                                                       });
@@ -281,7 +282,7 @@ public abstract class AbstractProcessStream implements ProcessStream,
     public void stop()
     {
         state = State.STOPPED;
-        IOUtils.closeQuietly(outputStream);
+        FrcIoExtsKt.closeQuietly(outputStream);
         stopRunnable(inputProcessor, lineReadingFuture);
         stopRunnable(queueProcessor, queueProcessorFuture);
 

@@ -29,17 +29,14 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.externalSystem.model.project.ProjectData;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBTabbedPane;
-import com.intellij.util.lang.JavaVersion;
 
 import net.javaru.iip.frc.FrcIcons.FRC;
-
-import static net.javaru.iip.frc.i18n.FrcBundle.message;
+import net.javaru.iip.frc.i18n.FrcMessageKey;
+import net.javaru.iip.frc.util.FrcUtilsKt;
 
 
 
@@ -171,52 +168,16 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     @Override
     public boolean validate() throws ConfigurationException
     {
-//        LOG.trace("[FRC] Entering FrcTemplateSelectionWizardStep.validate()");
-//        if (!FrcApplicationSettings.Settings.isValidTeamNumber(teamNumberTextField.getText()))
-//        {
-//            ApplicationManager.getApplication().invokeLater(
-//                    () -> IdeFocusManager.getInstance(myProjectOrNull).requestFocus(teamNumberTextField, true));
-//            throw new ConfigurationException(message("frc.ui.wizard.mws.validate.teamNumberRequired.message"),
-//                                             message("frc.ui.wizard.mws.validate.teamNumberRequired.title"));
-//        }
+        LOG.trace("[FRC] Entering FrcTemplateSelectionWizardStep.validate()");
+        //TODO get required minimum Java level from selected template, and if none there, then from the 
+        //     JAVA_VERSION key in C:\Users\Public\frc${frcYear}\jdk\release 
+        FrcUtilsKt.validateMinimumJavaVersion(myBuilder,
+                                              myContext,
+                                              11,
+                                              FrcMessageKey.of("frc.ui.wizard.validate.minJavaVersion.additionalMessage.goBack"));
         
-        final Sdk sdk = myContext.getProjectJdk();
-        if (sdk instanceof ProjectJdkImpl)
-        {
-            try
-            {
-                
-                final ProjectJdkImpl jdk = (ProjectJdkImpl) sdk;
-                final String jdkVersionString = jdk.getVersionString();
-                final JavaVersion javaVersion = JavaVersion.tryParse(jdkVersionString);
-                //final LanguageLevel languageLevel = LanguageLevel.parse(jdkVersionString);
-                
-                
-                // There is also a JavaVersion in the Gradle API code: org.gradle.api.JavaVersion;
-                
-                //TODO get required minimum Java level from selected template of build year
-                final JavaVersion requiredMinimumJavaVersion = JavaVersion.compose(11);
-                
-                
-                if (javaVersion != null && !javaVersion.isAtLeast(requiredMinimumJavaVersion.feature))
-                {
-                    final String message = message("frc.ui.wizard.mws.validate.minJavaVersion.message",
-                                                   requiredMinimumJavaVersion,
-                                                   requiredMinimumJavaVersion.feature,
-                                                   javaVersion,
-                                                   javaVersion.feature);
-                    final String title = message("frc.ui.wizard.mws.validate.minJavaVersion.title");
-                    throw new ConfigurationException(message, title);
-                }
-            }
-            catch (Exception e)
-            {
-                if (e instanceof ConfigurationException) { throw e; }
-                LOG.warn("Could not validate minimum JDK version due to the exception: " + e.toString(), e);
-            }
-        }
-    
-        LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.validate() (Gracefully)");
+        
+        LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.validate() (Gracefully with no validation errors)");
         return true;
     }
     

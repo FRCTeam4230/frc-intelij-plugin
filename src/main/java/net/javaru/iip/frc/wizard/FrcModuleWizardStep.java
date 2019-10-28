@@ -34,16 +34,15 @@ import com.intellij.openapi.externalSystem.model.project.ProjectData;
 import com.intellij.openapi.externalSystem.model.project.ProjectId;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
-import com.intellij.util.lang.JavaVersion;
 
 import net.javaru.iip.frc.FrcIcons.FRC;
+import net.javaru.iip.frc.i18n.FrcMessageKey;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
+import net.javaru.iip.frc.util.FrcUtilsKt;
 import net.javaru.iip.frc.util.UiUtilsKt;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
@@ -93,12 +92,13 @@ public class FrcModuleWizardStep extends ModuleWizardStep
         myParentProjectForm = new FrcParentProjectForm(context, parentProject -> updateComponents());
         initComponents();
         loadSettings();
+        LOG.trace("[FRC] FrcModuleWizardStep constructor has completed.");
     }
     
     
     private void initComponents()
     {
-        LOG.trace("[FRC] FrcModuleWizardStep.initComponents() has been called.");
+        LOG.trace("[FRC] Entering FrcModuleWizardStep.initComponents()");
         myAddToPanel.add(myParentProjectForm.getComponent());
         ActionListener updatingListener = e -> updateComponents();
         // TODO add the Action Listener to any components that need to take action upon updating
@@ -107,15 +107,18 @@ public class FrcModuleWizardStep extends ModuleWizardStep
         UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(FrcApplicationSettings.Settings.INSTANCE().getTeamNumber()));
         initRadioButtonGroup();
         initTemplatesLists();
+        LOG.trace("[FRC] Entering FrcModuleWizardStep.initComponents()");
     }
     
     
     @Override
     public void onStepLeaving()
     {
-        LOG.trace("[FRC] FrcModuleWizardStep.onStepLeaving() has been called.");
+        LOG.trace("[FRC] Entering FrcModuleWizardStep.onStepLeaving()");
         // TODO what other work needs to be done here?
         saveSettings();
+        LOG.trace("[FRC] Exiting FrcModuleWizardStep.onStepLeaving()");
+    
     }
     
     
@@ -173,7 +176,7 @@ public class FrcModuleWizardStep extends ModuleWizardStep
     @Override
     public boolean validate() throws ConfigurationException
     {
-        LOG.trace("[FRC] FrcModuleWizardStep.validate() has been called.");
+        LOG.trace("[FRC] Entering FrcModuleWizardStep.validate()");
         if (!FrcApplicationSettings.Settings.isValidTeamNumber(teamNumberTextField.getText()))
         {
             ApplicationManager.getApplication().invokeLater(
@@ -181,43 +184,14 @@ public class FrcModuleWizardStep extends ModuleWizardStep
             throw new ConfigurationException(message("frc.ui.wizard.mws.validate.teamNumberRequired.message"),
                                              message("frc.ui.wizard.mws.validate.teamNumberRequired.title"));
         }
-        
-        final Sdk sdk = myContext.getProjectJdk();
-        if (sdk instanceof ProjectJdkImpl)
-        {
-            try
-            {
-               
-                final ProjectJdkImpl jdk = (ProjectJdkImpl) sdk;
-                final String jdkVersionString = jdk.getVersionString();
-                final JavaVersion javaVersion = JavaVersion.tryParse(jdkVersionString);
-                //final LanguageLevel languageLevel = LanguageLevel.parse(jdkVersionString);
     
-                
-                // There is also a JavaVersion in the Gradle API code: org.gradle.api.JavaVersion;
-                
-                //TODO get required minimum Java level from selected template of build year
-                final JavaVersion requiredMinimumJavaVersion = JavaVersion.compose(11);
-                
-                
-                if (javaVersion != null && !javaVersion.isAtLeast(requiredMinimumJavaVersion.feature))
-                {
-                    final String message = message("frc.ui.wizard.mws.validate.minJavaVersion.message",
-                                                   requiredMinimumJavaVersion,
-                                                   requiredMinimumJavaVersion.feature, 
-                                                   javaVersion,
-                                                   javaVersion.feature);
-                    final String title = message("frc.ui.wizard.mws.validate.minJavaVersion.title");
-                    throw new ConfigurationException(message, title);
-                }
-            }
-            catch (Exception e)
-            {
-                if (e instanceof ConfigurationException) { throw e; }
-                LOG.warn("Could not validate minimum JDK version due to the exception: " + e.toString(), e);
-            }
-        }
+        //TODO get required minimum Java level from selected template - and perhaps change the validation message
+        FrcUtilsKt.validateMinimumJavaVersion(myBuilder, 
+                                              myContext, 
+                                              11,
+                                              FrcMessageKey.of("frc.ui.wizard.validate.minJavaVersion.additionalMessage.goBack"));
     
+        LOG.trace("[FRC] Exiting FrcModuleWizardStep.validate() (Gracefully with no validation errors)");
         return true;
     }
     
@@ -225,13 +199,14 @@ public class FrcModuleWizardStep extends ModuleWizardStep
     @Override
     public void updateStep()
     {
-        LOG.trace("[FRC] FrcModuleWizardStep.updateStep() has been called.");
+        LOG.trace("[FRC] Entering FrcModuleWizardStep.updateStep()");
 //        ProjectData parentProject = myParentProjectForm.getParentProject();
 //        ProjectId projectId = myBuilder.getProjectId();
     
         UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getDataModel().getTeamNumber()));
         
         updateComponents();
+        LOG.trace("[FRC] Exiting FrcModuleWizardStep.updateStep()");
     }
     
     
@@ -239,7 +214,7 @@ public class FrcModuleWizardStep extends ModuleWizardStep
     @Override
     public void updateDataModel()
     {
-        LOG.trace("[FRC] FrcModuleWizardStep.updateDataModel() has been called.");
+        LOG.trace("[FRC] Entering FrcModuleWizardStep.updateDataModel()");
         myContext.setProjectBuilder(myBuilder);
         ProjectData parentProject = myParentProjectForm.getParentProject();
         myBuilder.setParentProject(parentProject);
@@ -267,15 +242,17 @@ public class FrcModuleWizardStep extends ModuleWizardStep
                 myContext.setProjectFileDirectory(myProjectOrNull.getBasePath() + '/' + myContext.getProjectName());
             }
         }
+        LOG.trace("[FRC] Exiting FrcModuleWizardStep.updateDataModel()");
     }
     
     
     private void updateComponents()
     {
-        LOG.trace("[FRC] FrcModuleWizardStep.updateComponents() has been called.");
+        LOG.trace("[FRC] Entering FrcModuleWizardStep.updateComponents()");
         final boolean isAddToVisible = myParentProjectForm.isVisible();
     
         myParentProjectForm.updateComponents();
+        LOG.trace("[FRC] Exiting FrcModuleWizardStep.updateComponents()");
     }
     
     

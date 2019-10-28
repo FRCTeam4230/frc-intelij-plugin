@@ -357,7 +357,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         //final FrcFrameworksWizardStep step = new FrcFrameworksWizardStep(context, this, config);
 
 
-        val step = FrcFrameworksBlankWizardStep()
+        val step = FrcFrameworksBlankWizardStep(this, context)
         Disposer.register(parentDisposable, step)
         return step
     }

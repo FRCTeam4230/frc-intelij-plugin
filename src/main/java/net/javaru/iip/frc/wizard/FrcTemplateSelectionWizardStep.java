@@ -37,6 +37,8 @@ import com.intellij.ui.components.JBTabbedPane;
 import net.javaru.iip.frc.FrcIcons.FRC;
 import net.javaru.iip.frc.i18n.FrcMessageKey;
 import net.javaru.iip.frc.util.FrcUtilsKt;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
 
 
 
@@ -67,6 +69,9 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     private JBList<FrcWizardTemplateDefinition> projectTemplatesJBList;
     private JBList<FrcWizardTemplateDefinition> exampleTemplatesJBList;
     private JBLabel projectTemplatesPaneLabel;
+    private JPanel wpilibVersionSelectionPanel;
+    private JBLabel wpilibVersionSelectionLabel;
+    private JComboBox<WpiLibVersion> wpilibVersionComboBox;
     
     
     public FrcTemplateSelectionWizardStep(@NotNull FrcModuleBuilder builder,
@@ -94,8 +99,8 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         // TODO DELETABLE 
 //        // We may need to update this when the team number changed from an application setting to a project setting
 //        UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(FrcApplicationSettings.Settings.INSTANCE().getTeamNumber()));
-        
-        
+    
+        initWpiLibVersionComboBox();
         initTabPane();
         initTemplatesLists();
         LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.initComponents()");
@@ -206,10 +211,21 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         myContext.setProjectBuilder(myBuilder);
         ProjectData parentProject = myParentProjectForm.getParentProject();
         myBuilder.setParentProject(parentProject);
+        
+        WpiLibVersion wpilibVersion = (WpiLibVersion) wpilibVersionComboBox.getSelectedItem();
+        if (wpilibVersion != null)
+        {
+            dataModel.setWpilibVersion(wpilibVersion);
+        }
+        else 
+        {
+            LOG.warn("[FRC] wpilibVersionComboBox returned null for the selected item.");    
+        }
     
         FrcWizardTemplateDefinition templateDefinition = determineSelectedTemplate();
         dataModel.setFrcWizardTemplateDefinition(templateDefinition);
         LOG.debug("[FRC] FrcWizardTemplateDefinition set to: " + templateDefinition);
+        
         LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.updateDataModel()");
     }
     
@@ -262,44 +278,25 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     }
     
     
-//    private void initRadioButtonGroup()
-//    {
-//        ItemListener templatesButtonGroupChangeListener = e -> {
-//            final AbstractButton button = (AbstractButton) e.getSource();
-//            final ButtonModel model = button.getModel();
-//            final String actionCommand = model.getActionCommand();
-//            final CardLayout cards = (CardLayout) robotTemplatePanel.getLayout();
-//            if (actionCommand.equals(FrcWizardProjectTemplateDefinition.class.getSimpleName()))
-//            {
-//                showCard(PROJECTS_CARD_NAME);
-//            }
-//            else if (actionCommand.equals(FrcWizardExampleTemplateDefinition.class.getSimpleName()))
-//            {
-//                showCard(EXAMPLES_CARD_NAME);
-//            }
-//            else
-//            {
-//                LOG.warn("Unknown Radio Button actionCommand of '" + actionCommand + "' returned. Defaulting to the Project Templates.");
-//                showCard(PROJECTS_CARD_NAME);
-//                templatesTypeButtonGroup.setSelected(projectTemplatesRadioButton.getModel(), true);
-//            }
-//        };
-//        
-//        
-//        projectTemplatesRadioButton.setSelected(true);
-//        exampleTemplatesRadioButton.setSelected(false);
-//        
-//        projectTemplatesRadioButton.addItemListener(templatesButtonGroupChangeListener);
-//        exampleTemplatesRadioButton.addItemListener(templatesButtonGroupChangeListener);
-//        
-//        projectTemplatesRadioButton.setActionCommand(FrcWizardProjectTemplateDefinition.class.getSimpleName());
-//        exampleTemplatesRadioButton.setActionCommand(FrcWizardExampleTemplateDefinition.class.getSimpleName());
-//        
-//        templatesTypeButtonGroup = new ButtonGroup();
-//        templatesTypeButtonGroup.add(projectTemplatesRadioButton);
-//        templatesTypeButtonGroup.add(exampleTemplatesRadioButton);
-//        templatesTypeButtonGroup.setSelected(projectTemplatesRadioButton.getModel(), true);
-//    }
+    private void initWpiLibVersionComboBox()
+    {
+        //TODO: We need to 
+        //  a) get this list dynamically, sorting to to remove the alphas, etc. 
+        //  b) have UI option to only show the latest version fpr each year (on by default)
+        //  c) have a UI option to show/hide betas (off by default)
+        //  d) make modifications so that the FrcProjectWizardData.wpilibVersion defaults to the latest (non-beta) and then that the selected item (below) matches
+        WpiLibVersion[] versions = {
+                WpiLibVersionImpl.Companion.parse("2019.4.1"),
+                WpiLibVersionImpl.Companion.parse("2019.3.2"),
+                WpiLibVersionImpl.Companion.parse("2019.3.1"),
+                WpiLibVersionImpl.Companion.parse("2019.2.1"),
+                WpiLibVersionImpl.Companion.parse("2019.2.1")
+        };
+    
+        wpilibVersionComboBox.setModel(new DefaultComboBoxModel<>(versions));
+        wpilibVersionComboBox.setSelectedIndex(0);
+        
+    }
     
     private void initTabPane()
     {

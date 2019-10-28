@@ -28,7 +28,7 @@ class FrcProjectWizardData(
                     var teamNumber: Int = FrcApplicationSettings.INSTANCE().teamNumber,
                     var robotMainClassSimpleName: String = "Main",
                     var basePackage: String = DEFAULT_BASE_PACKAGE,
-                    var wpilibVersion: WpiLibVersion = WpiLibVersionImpl.parse("2019.4.1"),
+                    var wpilibVersion: WpiLibVersion = WpiLibVersionImpl.parse("2019.4.1"), // TODO Need to set the default dynamically. See notes in FrcTemplateSelectionWizardStep.updateDataModel() 
                     var gradleDistributionUrl: String = "https\\://services.gradle.org/distributions/gradle-5.0-bin.zip",
                     var frcYear: String = wpilibVersion.major.toString(),
                     var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizardProjectTemplateDefinition.CommandBased                          

@@ -70,6 +70,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
     private JPanel nextPanelToBeRenamed;
     private JBLabel basePackageLabel;
     private JBTextField basePackageTextField;
+    private JButton basePackageDefautButton;
     
     
     public FrcProjectSettingsWizardStep(@NotNull FrcModuleBuilder builder, @NotNull WizardContext context)
@@ -95,10 +96,11 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
         // We may need to update this when the team number changed from an application setting to a project setting
         UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getDataModel().getTeamNumber()));
         UiUtilsKt.setTextIfEmpty(basePackageTextField, myBuilder.getDataModel().getBasePackage());
+    
+        basePackageDefautButton.addActionListener(e -> basePackageTextField.setText(FrcProjectWizardDataKt.DEFAULT_BASE_PACKAGE));
         
         LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.initComponents()");
     }
-    
     
     @Override
     public void onStepLeaving()

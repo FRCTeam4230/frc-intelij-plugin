@@ -18,11 +18,15 @@ package net.javaru.iip.frc.util
 
 import com.intellij.ide.util.projectWizard.ModuleBuilder
 import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.lang.java.lexer.JavaLexer
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
+import com.intellij.openapi.util.text.StringUtil
+import com.intellij.pom.java.LanguageLevel
 import com.intellij.util.lang.JavaVersion
+import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.i18n.FrcBundle.message
 import net.javaru.iip.frc.i18n.FrcMessageKey
 
@@ -221,4 +225,40 @@ fun createTitleMessagePair(requiredMinimumJavaVersion: JavaVersion,
                           additionalMessage)
     
     return TitleMessagePair(title, message)
+}
+
+
+fun String?.isValidPackageName(javaVersion: JavaVersion = FrcPluginGlobals.DEFAULT_JAVA_VERSION): Boolean
+{
+    var languageLevel = LanguageLevel.parse(javaVersion.toString())
+    if (languageLevel == null)
+    {
+        LOG.warn("Could not parse JavaVersion '$javaVersion' to a language level. Will default to ${FrcPluginGlobals.DEFAULT_LANGUAGE_LEVEL} for checking package name validity")
+        languageLevel = FrcPluginGlobals.DEFAULT_LANGUAGE_LEVEL
+    }
+    return this.isValidPackageName(languageLevel!!)
+}
+
+@JvmOverloads
+fun String?.isValidPackageName(languageLevel: LanguageLevel = FrcPluginGlobals.DEFAULT_LANGUAGE_LEVEL): Boolean
+{
+    if (this == null) return false
+
+
+    var index = 0
+    while (true)
+    {
+        var index1: Int = this.indexOf('.', index)
+        if (index1 < 0) index1 = this.length
+        if (!isIdentifier(this.substring(index, index1), languageLevel)) return false
+        if (index1 == this.length) return true
+        index = index1 + 1
+    }
+}
+fun isIdentifier(text: String?, javaVersion: JavaVersion = FrcPluginGlobals.DEFAULT_JAVA_VERSION): Boolean = isIdentifier(text, LanguageLevel.parse(javaVersion.toString())!!)
+
+@JvmOverloads
+fun isIdentifier(text: String?, languageLevel: LanguageLevel = FrcPluginGlobals.DEFAULT_LANGUAGE_LEVEL): Boolean
+{
+    return text != null && StringUtil.isJavaIdentifier(text) && !JavaLexer.isKeyword(text, languageLevel)
 }

@@ -63,7 +63,6 @@ public class FrcModuleWizardStep extends ModuleWizardStep
     private final FrcModuleBuilder myBuilder;
     @NotNull
     private final WizardContext myContext;
-    
     @Nullable
     private final Project myProjectOrNull;
     

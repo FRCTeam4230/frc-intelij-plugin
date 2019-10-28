@@ -314,8 +314,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     override fun createWizardSteps(wizardContext: WizardContext, modulesProvider: ModulesProvider): Array<ModuleWizardStep>
     {
         myWizardContext = wizardContext
-        return arrayOf(FrcTemplateSelectionWizardStep(this, wizardContext), 
-                       FrcModuleWizardStep(this, wizardContext))
+        return arrayOf(FrcTemplateSelectionWizardStep(this, wizardContext),
+                       FrcProjectSettingsWizardStep(this, wizardContext))
     }
 
     fun setParentProject(parentProject: ProjectData?)

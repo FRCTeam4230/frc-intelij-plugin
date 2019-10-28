@@ -16,7 +16,7 @@
         </constraints>
         <properties>
           <labelFor value="4ff4f"/>
-          <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.mws.teamNumberLabel"/>
+          <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.mws.teamNumberLabel.text"/>
           <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.mws.teamNumberLabel.tooltip"/>
         </properties>
       </component>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -16,6 +16,11 @@
 
 package net.javaru.iip.frc;
 
+import com.intellij.pom.java.LanguageLevel;
+import com.intellij.util.lang.JavaVersion;
+
+
+
 public class FrcPluginGlobals
 {
     @SuppressWarnings("unused")
@@ -24,6 +29,9 @@ public class FrcPluginGlobals
 
     public static final int TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL = 12;
     public static final int TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT = 8;
+    
+    public static final LanguageLevel DEFAULT_LANGUAGE_LEVEL = LanguageLevel.JDK_11;
+    public static final JavaVersion DEFAULT_JAVA_VERSION = DEFAULT_LANGUAGE_LEVEL.toJavaVersion();
 
     private FrcPluginGlobals() { }
 }

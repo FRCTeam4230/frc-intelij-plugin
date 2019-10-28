@@ -30,7 +30,8 @@ class FrcProjectWizardData(
                     var basePackage: String = DEFAULT_BASE_PACKAGE,
                     var wpilibVersion: WpiLibVersion = WpiLibVersionImpl.parse("2019.4.1"),
                     var gradleDistributionUrl: String = "https\\://services.gradle.org/distributions/gradle-5.0-bin.zip",
-                    var frcYear: String = wpilibVersion.major.toString()
+                    var frcYear: String = wpilibVersion.major.toString(),
+                    var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizardProjectTemplateDefinition.CommandBased                          
                           )
 {
     val teamNumberString: String

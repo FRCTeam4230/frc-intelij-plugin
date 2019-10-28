@@ -200,44 +200,43 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     @Override
     public void updateDataModel()
     {
-        LOG.trace("[FRC] FrcTemplateSelectionWizardStep.updateDataModel() has been called.");
+        LOG.trace("[FRC] Entering FrcTemplateSelectionWizardStep.updateDataModel()");
+        final FrcProjectWizardData dataModel = myBuilder.getDataModel();
+        
         myContext.setProjectBuilder(myBuilder);
         ProjectData parentProject = myParentProjectForm.getParentProject();
         myBuilder.setParentProject(parentProject);
-        
-//        final String configuredTeamNum = teamNumberTextField.getText();
-//        myBuilder.getDataModel().setTeamNumber(Integer.parseInt(configuredTeamNum));
-//        
-//        myBuilder.setProjectId(new ProjectId("frc.team" + configuredTeamNum,
-//                                             "robot-" + configuredTeamNum,
-//                                             myBuilder.getDataModel().getFrcYear() + ".0"));
-//        
-//        
-//        if (myBuilder.getProjectId() != null && StringUtils.isNotEmpty(myBuilder.getProjectId().getArtifactId()))
-//        {
-//            myContext.setProjectName(myBuilder.getProjectId().getArtifactId());
-//        }
-//        
-//        if (parentProject != null)
-//        {
-//            myContext.setProjectFileDirectory(parentProject.getLinkedExternalProjectPath() + '/' + myContext.getProjectName());
-//        }
-//        else
-//        {
-//            if (myProjectOrNull != null)
-//            {
-//                myContext.setProjectFileDirectory(myProjectOrNull.getBasePath() + '/' + myContext.getProjectName());
-//            }
-//        }
+    
+        FrcWizardTemplateDefinition templateDefinition = determineSelectedTemplate();
+        dataModel.setFrcWizardTemplateDefinition(templateDefinition);
+        LOG.debug("[FRC] FrcWizardTemplateDefinition set to: " + templateDefinition);
+        LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.updateDataModel()");
+    }
+    
+    
+    private FrcWizardTemplateDefinition determineSelectedTemplate()
+    {
+        final int selectedIndex = templateListsTabbedPane.getSelectedIndex();
+        final JBList<FrcWizardTemplateDefinition> templatesJBList;
+        if (selectedIndex == EXAMPLES_TAB_INDEX)
+        {
+            templatesJBList = exampleTemplatesJBList;
+        }
+        else
+        {
+            templatesJBList = projectTemplatesJBList;
+        }
+        return templatesJBList.getSelectedValue();
     }
     
     
     private void updateComponents()
     {
-        LOG.trace("[FRC] FrcTemplateSelectionWizardStep.updateComponents() has been called.");
+        LOG.trace("[FRC] Entering FrcTemplateSelectionWizardStep.updateComponents()");
         final boolean isAddToVisible = myParentProjectForm.isVisible();
         
         myParentProjectForm.updateComponents();
+        LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.updateComponents()");
     }
     
     

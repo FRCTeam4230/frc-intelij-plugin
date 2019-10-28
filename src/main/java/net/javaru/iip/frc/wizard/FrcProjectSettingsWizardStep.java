@@ -65,9 +65,9 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
     private final FrcParentProjectForm myParentProjectForm;
     
     private JPanel rootPanel;
-    private JPanel teamInformationPanel;
+    private JPanel robotDetalsPanel;
     private JBTextField teamNumberTextField;
-    private JPanel packageInformationPanel;
+    private JPanel nextPanelToBeRenamed;
     private JBLabel basePackageLabel;
     private JBTextField basePackageTextField;
     

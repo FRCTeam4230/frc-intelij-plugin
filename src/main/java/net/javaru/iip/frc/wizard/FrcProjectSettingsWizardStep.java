@@ -17,6 +17,8 @@
 package net.javaru.iip.frc.wizard;
 
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import javax.swing.*;
 
 import org.apache.commons.lang3.StringUtils;
@@ -71,6 +73,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
     private JBLabel basePackageLabel;
     private JBTextField basePackageTextField;
     private JButton basePackageDefautButton;
+    private JBLabel teamNumberWarningIconLabel;
     
     
     public FrcProjectSettingsWizardStep(@NotNull FrcModuleBuilder builder, @NotNull WizardContext context)
@@ -93,14 +96,76 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
         ActionListener updatingListener = e -> updateComponents();
         // TODO add the Action Listener to any components that need to take action upon updating
         
-        // We may need to update this when the team number changed from an application setting to a project setting
-        UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getDataModel().getTeamNumber()));
+       
+        initTeamNumberField();
         UiUtilsKt.setTextIfEmpty(basePackageTextField, myBuilder.getDataModel().getBasePackage());
     
         basePackageDefautButton.addActionListener(e -> basePackageTextField.setText(FrcProjectWizardDataKt.DEFAULT_BASE_PACKAGE));
         
+        
         LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.initComponents()");
     }
+    
+    
+    private void initTeamNumberField()
+    {
+        // We may need to update this when the team number changed from an application setting to a project setting
+        UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getDataModel().getTeamNumber()));
+        updateTeamNumberWarningVisibility();
+        
+        teamNumberTextField.addKeyListener(new KeyListener()
+        {
+            private String previousText = teamNumberTextField.getText();
+    
+            @Override
+            public void keyTyped(KeyEvent e) { }
+            @Override
+            public void keyPressed(KeyEvent e) { }
+    
+    
+            @Override
+            public void keyReleased(KeyEvent e)
+            {
+                String updatedText = StringUtils.replaceAll(teamNumberTextField.getText().trim(), "\\s", "").trim();
+               teamNumberTextField.setText(updatedText); // set to the trimmed value - this mostly handles values pasted in with spaces
+                if (StringUtils.isBlank(updatedText))
+                {
+                    // We all the filed to be blanked out (which is not a valid team number), but the updateTeamNumberWarningVisibility called at the end of this method will turn on the warning icon
+                    previousText = updatedText;
+                }
+                else
+                {
+                    try
+                    {
+                        Long.parseLong(updatedText); // handle case of extra digits while editing the field by checking for a valid Long rather than an Int
+                        // it is a valid number, so update the previousText for the next loop through
+                        previousText = updatedText;
+                    }
+                    catch (NumberFormatException ignore)
+                    {
+                        //not a valid integer; so replace the text with the previous value (effectively deleting the invalid character)
+                        teamNumberTextField.setText(previousText.trim());
+                    }
+                }
+                updateTeamNumberWarningVisibility();
+            }
+        });
+    }
+    
+    private void updateTeamNumberWarningVisibility()
+    {
+        try
+        {
+            teamNumberWarningIconLabel.setVisible(!FrcApplicationSettings.Settings.isValidTeamNumber(teamNumberTextField.getText()));
+        }
+        catch (Exception e)
+        {
+            teamNumberWarningIconLabel.setVisible(false);         
+            LOG.warn("[FRC] could not update team number warning icon visibility due to an exception: " + e.toString());
+        }
+    }
+    
+   
     
     @Override
     public void onStepLeaving()

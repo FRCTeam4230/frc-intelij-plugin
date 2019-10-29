@@ -67,12 +67,12 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
     private final FrcParentProjectForm myParentProjectForm;
     
     private JPanel rootPanel;
-    private JPanel robotDetalsPanel;
+    private JPanel robotDetailsPanel;
     private JBTextField teamNumberTextField;
     private JPanel nextPanelToBeRenamed;
     private JBLabel basePackageLabel;
     private JBTextField basePackageTextField;
-    private JButton basePackageDefautButton;
+    private JButton basePackageDefaultButton;
     private JBLabel teamNumberWarningIconLabel;
     
     
@@ -100,7 +100,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
         initTeamNumberField();
         UiUtilsKt.setTextIfEmpty(basePackageTextField, myBuilder.getDataModel().getBasePackage());
     
-        basePackageDefautButton.addActionListener(e -> basePackageTextField.setText(FrcProjectWizardDataKt.DEFAULT_BASE_PACKAGE));
+        basePackageDefaultButton.addActionListener(e -> basePackageTextField.setText(FrcProjectWizardDataKt.DEFAULT_BASE_PACKAGE));
         
         
         LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.initComponents()");

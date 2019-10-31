@@ -74,6 +74,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
     private JBTextField basePackageTextField;
     private JButton basePackageDefaultButton;
     private JBLabel teamNumberWarningIconLabel;
+    private JCheckBox includeVsCodeConfigsCheckBox;
     
     
     public FrcProjectSettingsWizardStep(@NotNull FrcModuleBuilder builder, @NotNull WizardContext context)
@@ -98,10 +99,11 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
         
        
         initTeamNumberField();
-        UiUtilsKt.setTextIfEmpty(basePackageTextField, myBuilder.getDataModel().getBasePackage());
+        final FrcProjectWizardData dataModel = myBuilder.getDataModel();
+        UiUtilsKt.setTextIfEmpty(basePackageTextField, dataModel.getBasePackage());
     
         basePackageDefaultButton.addActionListener(e -> basePackageTextField.setText(FrcProjectWizardDataKt.DEFAULT_BASE_PACKAGE));
-        
+        includeVsCodeConfigsCheckBox.setSelected(dataModel.getIncludeVsCodeConfigs());
         
         LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.initComponents()");
     }
@@ -321,6 +323,8 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
         dataModel.setTeamNumber(Integer.parseInt(configuredTeamNum));
         
         dataModel.setBasePackage(basePackageTextField.getText().trim());
+        
+        dataModel.setIncludeVsCodeConfigs(includeVsCodeConfigsCheckBox.isSelected());
         
         myBuilder.setProjectId(new ProjectId("frc.team" + configuredTeamNum,
                                              "robot-" + configuredTeamNum,

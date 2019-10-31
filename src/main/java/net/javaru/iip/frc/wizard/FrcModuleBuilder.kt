@@ -35,10 +35,14 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import freemarker.template.Template
 import net.javaru.iip.frc.FrcIcons.FRC
-import net.javaru.iip.frc.freemarker.FM_TEMPLATE_EXT
+import net.javaru.iip.frc.freemarker.FM_TEMPLATE_EXT_WITH_DOT
 import net.javaru.iip.frc.freemarker.freemarkerConfiguration
+import net.javaru.iip.frc.util.getPluginResource
 import net.javaru.iip.frc.util.getPluginResourceAsStream
+import net.javaru.iip.frc.util.reader
+import net.javaru.iip.frc.util.removeBasePath
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import java.io.File
@@ -50,7 +54,8 @@ import javax.swing.Icon
 
 class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 {
-    private val defaultFilesResourceBase = Paths.get("frc-wizard-templates/default-files/")
+    private val frcWizardTemplatesBaseDir = Paths.get("frc-wizard-templates")
+    private val defaultFilesResourceBase = frcWizardTemplatesBaseDir.resolve("default-files/")
     private val gradleGroovyDslSubPath = Paths.get("gradle/groovy-dsl")
     private val gradleGroovyDslResourceBase = defaultFilesResourceBase.resolve(gradleGroovyDslSubPath)
     private val gradleKotlinDslSubPath = Paths.get("gradle/kotlin-dsl")
@@ -59,6 +64,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     private val gradleWrapperResourceBase = defaultFilesResourceBase.resolve(gradleWrapperSubPath)
     private val configsSubPath = "configs"
     private val configsResourceBase = defaultFilesResourceBase.resolve(configsSubPath)
+    private val vsCodeConfigsSubPath = "vs-code-configs"
+    private val vsCodeConfigsResourceBase = defaultFilesResourceBase.resolve(vsCodeConfigsSubPath)
     private val commonCodeSubPath = Paths.get("code/common-code")
     private val commonCodeResourceBase = defaultFilesResourceBase.resolve(commonCodeSubPath)
     private val javaCodeSubPath = Paths.get("code/java-code")
@@ -77,7 +84,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     
     
     private val myUseKotlinDSL = false
-    private val myIncludeVsCodeConfigs = true
+    
     private val myShowGradleConfig = true;
     
     //TODO: this needs to be created from the wizard step form
@@ -189,32 +196,96 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
         assert(rootProjectPath != null) { "rootProjectPath is null"}
 
-        copyResourceToModuleRoot(modelContentRootDir, gradleGroovyDslResourceBase, Paths.get("build.gradle.ftl"))
-        copyResourceToModuleRoot(modelContentRootDir, gradleGroovyDslResourceBase, Paths.get("settings.gradle.ftl"))
-        copyResourceToModuleRoot(modelContentRootDir, gradleWrapperResourceBase, Paths.get("gradlew"))
-        copyResourceToModuleRoot(modelContentRootDir, gradleWrapperResourceBase, Paths.get("gradlew.bat"))
-        copyResourceToModuleRoot(modelContentRootDir, gradleWrapperResourceBase, Paths.get("gradle/wrapper/gradle-wrapper.jar"))
-        copyResourceToModuleRoot(modelContentRootDir, gradleWrapperResourceBase, Paths.get("gradle/wrapper/gradle-wrapper.properties.ftl"))
-
-        copyResourceToModuleRoot(modelContentRootDir, configsResourceBase, Paths.get(".wpilib/wpilib_preferences.json.ftl"))
-        if (myIncludeVsCodeConfigs)
+        //TODO Need to enhance the calls to the defaults check if the template has overridden any of the files
+        copyAllResourcesToModuleRoot(modelContentRootDir, gradleGroovyDslResourceBase)
+        copyAllResourcesToModuleRoot(modelContentRootDir, gradleWrapperResourceBase)
+        copyAllResourcesToModuleRoot(modelContentRootDir, configsResourceBase)
+        copyAllResourcesToModuleRoot(modelContentRootDir, commonCodeResourceBase)
+        copyAllResourcesToModuleRoot(modelContentRootDir, javaCodeResourceBase)
+        if (dataModel.includeVsCodeConfigs)
         {
-            copyResourceToModuleRoot(modelContentRootDir, configsResourceBase, Paths.get(".vscode/launch.json.ftl"))
-            copyResourceToModuleRoot(modelContentRootDir, configsResourceBase, Paths.get(".vscode/settings.json.ftl"))
+            copyAllResourcesToModuleRoot(modelContentRootDir, vsCodeConfigsResourceBase)
         }
-
-        copyResourceToModuleRoot(modelContentRootDir, commonCodeResourceBase, Paths.get("src/main/deploy/example.txt.ftl"))
-        copyResourceToModuleRoot(modelContentRootDir, javaCodeResourceBase, Paths.get("src/main/java/base-package/Main.java.ftl"))
+        
+        val selectedTemplateResourceBase = frcWizardTemplatesBaseDir.resolve(dataModel.frcWizardTemplateDefinition.templateResourcesDirName()).resolve(javaCodeSubPath)
+        copyAllResourcesToModuleRoot(modelContentRootDir, selectedTemplateResourceBase)
         
         modelContentRootDir.refresh(false, true)
         
         LOG.trace("[FRC] FrcModuleBuilder.setupRootModel() completed")
     }
 
+    private fun copyAllResourcesToModuleRoot(modelContentRootDir: VirtualFile, resourceDirBase: Path)
+    {
+        val pluginResourceDirUrl = getPluginResource(resourceDirBase)
+        LOG.debug("[FRC] pluginResourceDir URL = $pluginResourceDirUrl")
+
+        if (pluginResourceDirUrl == null)
+        {
+            LOG.warn("[FRC] Could  not find resourceDir '$resourceDirBase' for 'copy all template files' operation.")
+        }
+        else
+        {
+            val srcFqBaseDir = VfsUtil.findFileByURL(pluginResourceDirUrl)
+            if (srcFqBaseDir == null)
+            {
+                LOG.debug("[FRC] Could not convert URL '$pluginResourceDirUrl' to a VirtualFile for 'copy all wizard template files' operation.")
+            }
+            else
+            {
+                val list = VfsUtil.collectChildrenRecursively(srcFqBaseDir).filter { !it.isDirectory }.forEach {
+                    val resourceRelativePath = Paths.get(it.toString().removePrefix("$srcFqBaseDir")).removeBasePath(Paths.get("/"))
+                    if (resourceRelativePath.fileName.toString().endsWith(FM_TEMPLATE_EXT_WITH_DOT))
+                        copyFreemarkerTemplate(modelContentRootDir, it, srcFqBaseDir)
+                    else
+                        copyNonTemplateFile(modelContentRootDir, it, srcFqBaseDir)
+                }
+            }
+        }
+    }
+
+    
+    private fun copyNonTemplateFile(modelContentRootDir: VirtualFile, srcFqVf: VirtualFile, srcFqBaseDir: VirtualFile): VirtualFile?
+    {
+        try
+        {
+            val endPath = Paths.get(srcFqVf.toString().removePrefix("$srcFqBaseDir")).removeBasePath(Paths.get("/"))
+            val target = resolveTargetPath(modelContentRootDir, endPath)
+            Files.createDirectories(target.parent)
+            val file = target.toFile()
+            
+            
+            FileUtils.copyInputStreamToFile(srcFqVf.inputStream, file)
+            return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file)
+        }
+        catch (e: Exception)
+        {
+            LOG.warn("[FRC] Could not copy new project wizard file '$srcFqVf' to new project root '${modelContentRootDir}' exception: $e", e)
+            return null;
+        }
+    }
+    
+    private fun copyFreemarkerTemplate(modelContentRootDir: VirtualFile, srcFqVf: VirtualFile, srcFqBaseDir: VirtualFile)
+    {
+        try
+        {
+            val srcEndPath = Paths.get(srcFqVf.toString().removePrefix("$srcFqBaseDir")).removeBasePath(Paths.get("/"))
+            val fmTemplateName = srcEndPath.fileName.toString()
+            val targetEndPath = srcEndPath.resolveSibling(fmTemplateName.removeSuffix(FM_TEMPLATE_EXT_WITH_DOT))
+            val target = resolveTargetPath(modelContentRootDir, targetEndPath)
+            val template = Template(FilenameUtils.separatorsToUnix(srcEndPath.toString()), srcFqVf.reader(), fmConfig)
+            processFreemarkerTemplate(template, target)
+        }
+        catch (e: Exception)
+        {
+            LOG.warn("[FRC] Could not copy new project wizard template file '$srcFqVf' to new project root '${modelContentRootDir}' exception: $e", e)
+        }
+
+    }
 
     private fun copyResourceToModuleRoot(modelContentRootDir: VirtualFile, resourceBase: Path, resourceRelativePath: Path): VirtualFile?
     {
-        return if (resourceRelativePath.fileName.toString().endsWith(FM_TEMPLATE_EXT))
+        return if (resourceRelativePath.fileName.toString().endsWith(FM_TEMPLATE_EXT_WITH_DOT))
             doCopyFreemarkerTemplateToModuleRoot(modelContentRootDir, resourceBase, resourceRelativePath)
         else
             doCopyResourceToModuleRoot(modelContentRootDir, resourceBase, resourceRelativePath)
@@ -251,7 +322,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         val templatePath = resourceBase.resolve(templateRelativePath)
         try
         {
-            val targetRelativePath = templateRelativePath.resolveSibling(templatePath.fileName.toString().removeSuffix(FM_TEMPLATE_EXT))
+            val targetRelativePath = templateRelativePath.resolveSibling(templatePath.fileName.toString().removeSuffix(FM_TEMPLATE_EXT_WITH_DOT))
             val target = resolveTargetPath(modelContentRootDir, targetRelativePath)
             val template = fmConfig.getTemplate(FilenameUtils.separatorsToUnix(templatePath.toString()))
 
@@ -266,9 +337,30 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
         catch(e: Exception)
         {
-            LOG.warn("[FRC] Could not process resource template '$templatePath' for the module root dir '$modelContentRootDir' due to an exception. Cause Summary: $e", e)
+            //LOG.warn("[FRC] Could not process resource template '$templatePath' for the module root dir '$modelContentRootDir' due to an exception. Cause Summary: $e", e)
             return null
         }
+    }
+    
+    private fun processFreemarkerTemplate(fmTemplate: Template, target: Path): VirtualFile?
+    {
+        try
+        {
+            Files.createDirectories(target.parent)
+            Files.newBufferedWriter(target, Charsets.UTF_8).use {
+                val environment = fmTemplate.createProcessingEnvironment(hashMapOf("data" to dataModel), it)
+                environment.outputEncoding = Charsets.UTF_8.toString()
+                environment.locale = Locale.ENGLISH
+                environment.process()
+            }
+            return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(target.toFile())
+        }
+        catch (e: Exception)
+        {
+            LOG.warn("'[FRC] Could not process new project wizard freemarker template '${fmTemplate.sourceName}' to destination '$target' due to the exception: $e", e)
+            return null
+        }
+
     }
 
     private fun resolveTargetPath(modelContentRootDir: VirtualFile, targetRelativePath: Path): Path

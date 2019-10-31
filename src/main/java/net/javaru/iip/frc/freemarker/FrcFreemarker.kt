@@ -23,7 +23,9 @@ import org.apache.commons.lang3.BooleanUtils
 
 // todoc document this System property
 val DEBUG_MODE = BooleanUtils.toBoolean(System.getProperty("frc.freemarker.debug", "false"))
-const val FM_TEMPLATE_EXT = ".ftl"
+
+const val FM_TEMPLATE_EXT_NO_DOT = "ftl"
+const val FM_TEMPLATE_EXT_WITH_DOT = ".$FM_TEMPLATE_EXT_NO_DOT"
 
 /**
  * @param resourceLoaderClass a class to be used for resource loading. This basically just needs to be any class within the plugin.

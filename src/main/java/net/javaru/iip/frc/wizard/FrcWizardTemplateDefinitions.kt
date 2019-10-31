@@ -45,7 +45,7 @@ interface FrcWizardTemplateDefinition
     val displayNameAndDescription: String
 
     /** The base name of the template's resource directory. It is highly recommended that this value not include any spaces. */
-    fun templateResourcesDirname(): String
+    fun templateResourcesDirName(): String
 }
 
 enum class FrcWizardProjectTemplateDefinition(
@@ -71,7 +71,7 @@ enum class FrcWizardProjectTemplateDefinition(
     override fun toString(): String = displayName
 
    
-    override fun templateResourcesDirname(): String = name.decapitalize()
+    override fun templateResourcesDirName(): String = name.decapitalize()
 }
 
 enum class FrcWizardExampleTemplateDefinition(
@@ -109,5 +109,5 @@ enum class FrcWizardExampleTemplateDefinition(
 
     override fun toString(): String = displayName
 
-    override fun templateResourcesDirname(): String = name.decapitalize()
+    override fun templateResourcesDirName(): String = name.decapitalize()
 }

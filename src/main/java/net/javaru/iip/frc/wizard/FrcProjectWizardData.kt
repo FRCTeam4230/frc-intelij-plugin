@@ -31,7 +31,8 @@ class FrcProjectWizardData(
                     var wpilibVersion: WpiLibVersion = WpiLibVersionImpl.parse("2019.4.1"), // TODO Need to set the default dynamically. See notes in FrcTemplateSelectionWizardStep.updateDataModel() 
                     var gradleDistributionUrl: String = "https\\://services.gradle.org/distributions/gradle-5.0-bin.zip",
                     var frcYear: String = wpilibVersion.major.toString(),
-                    var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizardProjectTemplateDefinition.CommandBased                          
+                    var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizardProjectTemplateDefinition.CommandBased,
+                    var includeVsCodeConfigs: Boolean = true
                           )
 {
     val teamNumberString: String

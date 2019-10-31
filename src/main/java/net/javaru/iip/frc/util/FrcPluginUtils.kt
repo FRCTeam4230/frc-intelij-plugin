@@ -19,12 +19,15 @@ package net.javaru.iip.frc.util
 import com.intellij.ide.plugins.cl.PluginClassLoader
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.diagnostic.Logger
 import net.javaru.iip.frc.FrcIcons
 import org.apache.commons.io.FilenameUtils
 import java.io.InputStream
 import java.net.URL
 import java.nio.file.Path
 
+private object FrcPluginUtils
+private val LOG = Logger.getInstance(FrcPluginUtils::class.java)
 
 inline fun invokeLater(crossinline func: () -> Unit)
 {
@@ -41,9 +44,38 @@ inline fun invokeLater(crossinline func: () -> Unit)
 @JvmOverloads
 fun getPluginClassloader(clazz: Class<*> = FrcIcons::class.java): PluginClassLoader = clazz.classLoader as PluginClassLoader
 
+@WillNotThrowException
 fun getPluginResource(path: Path): URL? = getPluginResource(path.toString())
-fun getPluginResource(path: String): URL? = getPluginClassloader().getResource(FilenameUtils.separatorsToUnix(path))
+
+@WillNotThrowException
+fun getPluginResource(path: String): URL?
+{
+    return try
+    {
+        getPluginClassloader().getResource(FilenameUtils.separatorsToUnix(path))
+    }
+    catch (e: Exception)
+    {
+        LOG.warn("Could not getPluginResource (as URL) for '$path' due to an exception: $e", e)
+        null
+    }
+}
+
+@WillNotThrowException
 fun getPluginResourceAsStream(path: Path): InputStream? = getPluginResourceAsStream(path.toString())
-fun getPluginResourceAsStream(path: String): InputStream? = getPluginClassloader().getResourceAsStream(FilenameUtils.separatorsToUnix(path))
+
+@WillNotThrowException
+fun getPluginResourceAsStream(path: String): InputStream?
+{
+    return try
+    {
+        getPluginClassloader().getResourceAsStream(FilenameUtils.separatorsToUnix(path))
+    }
+    catch (e: Exception)
+    {
+        LOG.warn("Could not getPluginResourceAsStream for '$path' due to an exception: $e", e)
+        null
+    }
+}
 
 

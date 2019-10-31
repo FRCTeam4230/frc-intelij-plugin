@@ -29,6 +29,7 @@ import org.jdom2.filter.Filters
 import org.jdom2.input.SAXBuilder
 import org.jdom2.xpath.XPathFactory
 import java.io.File
+import java.nio.charset.Charset
 import java.nio.file.Path
 
 
@@ -111,7 +112,7 @@ private fun getOrCreateVfFile(parent: String, path: String): VirtualFile?
     return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file)
 }
 
-
+fun VirtualFile.reader(charset: Charset = Charsets.UTF_8) = this.inputStream.reader(charset)
 
 
 

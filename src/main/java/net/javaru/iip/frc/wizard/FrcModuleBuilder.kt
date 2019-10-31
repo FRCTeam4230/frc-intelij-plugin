@@ -40,7 +40,6 @@ import net.javaru.iip.frc.FrcIcons.FRC
 import net.javaru.iip.frc.freemarker.FM_TEMPLATE_EXT_WITH_DOT
 import net.javaru.iip.frc.freemarker.freemarkerConfiguration
 import net.javaru.iip.frc.util.getPluginResource
-import net.javaru.iip.frc.util.getPluginResourceAsStream
 import net.javaru.iip.frc.util.reader
 import net.javaru.iip.frc.util.removeBasePath
 import org.apache.commons.io.FileUtils
@@ -265,6 +264,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
     }
     
+    
     private fun copyFreemarkerTemplate(modelContentRootDir: VirtualFile, srcFqVf: VirtualFile, srcFqBaseDir: VirtualFile)
     {
         try
@@ -283,64 +283,6 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 
     }
 
-    private fun copyResourceToModuleRoot(modelContentRootDir: VirtualFile, resourceBase: Path, resourceRelativePath: Path): VirtualFile?
-    {
-        return if (resourceRelativePath.fileName.toString().endsWith(FM_TEMPLATE_EXT_WITH_DOT))
-            doCopyFreemarkerTemplateToModuleRoot(modelContentRootDir, resourceBase, resourceRelativePath)
-        else
-            doCopyResourceToModuleRoot(modelContentRootDir, resourceBase, resourceRelativePath)
-    }
-
-
-    private fun doCopyResourceToModuleRoot(modelContentRootDir: VirtualFile, resourceBase: Path, resourceRelativePath: Path): VirtualFile?
-    {
-        val resourcePath = resourceBase.resolve(resourceRelativePath)
-        try
-        {
-            val pluginResourceInputStream = getPluginResourceAsStream(resourcePath)
-            if (pluginResourceInputStream == null)
-            {
-                LOG.warn("[FRC] Could not find resource '$resourcePath'")
-                return null
-            }
-
-            val target = resolveTargetPath(modelContentRootDir, resourceRelativePath)
-            Files.createDirectories(target.parent)
-            val file = target.toFile()
-            FileUtils.copyInputStreamToFile(pluginResourceInputStream, file)
-            return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file)
-        }
-        catch (e: Exception)
-        {
-            LOG.warn("[FRC] Could not copy resource '$resourcePath' to the module root dir '$modelContentRootDir' due to an exception. Cause Summary: $e", e)
-            return null
-        }
-    }
-
-    private fun doCopyFreemarkerTemplateToModuleRoot(modelContentRootDir: VirtualFile, resourceBase: Path, templateRelativePath: Path): VirtualFile?
-    {
-        val templatePath = resourceBase.resolve(templateRelativePath)
-        try
-        {
-            val targetRelativePath = templateRelativePath.resolveSibling(templatePath.fileName.toString().removeSuffix(FM_TEMPLATE_EXT_WITH_DOT))
-            val target = resolveTargetPath(modelContentRootDir, targetRelativePath)
-            val template = fmConfig.getTemplate(FilenameUtils.separatorsToUnix(templatePath.toString()))
-
-            Files.createDirectories(target.parent)
-            Files.newBufferedWriter(target, Charsets.UTF_8).use {
-                val environment = template.createProcessingEnvironment(hashMapOf("data" to dataModel), it)
-                environment.outputEncoding = Charsets.UTF_8.toString()
-                environment.locale = Locale.ENGLISH
-                environment.process()
-            }
-            return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(target.toFile())
-        }
-        catch(e: Exception)
-        {
-            //LOG.warn("[FRC] Could not process resource template '$templatePath' for the module root dir '$modelContentRootDir' due to an exception. Cause Summary: $e", e)
-            return null
-        }
-    }
     
     private fun processFreemarkerTemplate(fmTemplate: Template, target: Path): VirtualFile?
     {

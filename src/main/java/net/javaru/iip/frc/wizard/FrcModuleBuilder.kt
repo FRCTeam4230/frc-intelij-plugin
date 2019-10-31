@@ -194,6 +194,9 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             FileUtil.toCanonicalPath(if (myWizardContext!!.isCreatingNewProject) project.basePath else modelContentRootDir.path)
         }
         assert(rootProjectPath != null) { "rootProjectPath is null"}
+        
+        
+        // TODO add option to include a .gitignore file
 
         //TODO Need to enhance the calls to the defaults check if the template has overridden any of the files
         copyAllResourcesToModuleRoot(modelContentRootDir, gradleGroovyDslResourceBase)

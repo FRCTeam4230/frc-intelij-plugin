@@ -63,8 +63,10 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     private val gradleWrapperResourceBase = defaultFilesResourceBase.resolve(gradleWrapperSubPath)
     private val configsSubPath = "configs"
     private val configsResourceBase = defaultFilesResourceBase.resolve(configsSubPath)
+    private val extrasSubPath = "extras"
+    private val extrasResourceBase = defaultFilesResourceBase.resolve(extrasSubPath)
     private val vsCodeConfigsSubPath = "vs-code-configs"
-    private val vsCodeConfigsResourceBase = defaultFilesResourceBase.resolve(vsCodeConfigsSubPath)
+    private val vsCodeConfigsResourceBase = extrasResourceBase.resolve(vsCodeConfigsSubPath)
     private val commonCodeSubPath = Paths.get("code/common-code")
     private val commonCodeResourceBase = defaultFilesResourceBase.resolve(commonCodeSubPath)
     private val javaCodeSubPath = Paths.get("code/java-code")

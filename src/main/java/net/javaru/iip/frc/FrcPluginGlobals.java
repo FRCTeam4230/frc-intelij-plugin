@@ -30,8 +30,8 @@ public class FrcPluginGlobals
     public static final int TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL = 12;
     public static final int TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT = 8;
     
-    public static final LanguageLevel DEFAULT_LANGUAGE_LEVEL = LanguageLevel.JDK_11;
-    public static final JavaVersion DEFAULT_JAVA_VERSION = DEFAULT_LANGUAGE_LEVEL.toJavaVersion();
+    public static final LanguageLevel DEFAULT_MIN_REQUIRED_LANGUAGE_LEVEL = LanguageLevel.JDK_11;
+    public static final JavaVersion DEFAULT_MIN_REQUIRED_JAVA_VERSION = DEFAULT_MIN_REQUIRED_LANGUAGE_LEVEL.toJavaVersion();
 
     private FrcPluginGlobals() { }
 }

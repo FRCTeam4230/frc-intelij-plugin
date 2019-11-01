@@ -19,6 +19,8 @@ package net.javaru.iip.frc.wizard
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder
 import com.intellij.ide.util.projectWizard.ModuleBuilderListener
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
+import com.intellij.ide.util.projectWizard.SdkSettingsStep
+import com.intellij.ide.util.projectWizard.SettingsStep
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.diagnostic.Logger
@@ -28,18 +30,27 @@ import com.intellij.openapi.module.JavaModuleType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.options.ConfigurationException
+import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.projectRoots.SdkTypeId
+import com.intellij.openapi.projectRoots.impl.JavaSdkImpl
+import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider
+import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.util.containers.ContainerUtil
 import freemarker.template.Template
 import net.javaru.iip.frc.FrcIcons.FRC
+import net.javaru.iip.frc.FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION
 import net.javaru.iip.frc.freemarker.FM_TEMPLATE_EXT_WITH_DOT
 import net.javaru.iip.frc.freemarker.freemarkerConfiguration
 import net.javaru.iip.frc.util.getPluginResource
+import net.javaru.iip.frc.util.isValidJavaVersion
+import net.javaru.iip.frc.util.isValidJdk
 import net.javaru.iip.frc.util.reader
 import net.javaru.iip.frc.util.removeBasePath
 import org.apache.commons.io.FileUtils
@@ -73,8 +84,28 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     private val javaCodeResourceBase = defaultFilesResourceBase.resolve(javaCodeSubPath)    
     private val kotlinCodeSubPath = Paths.get("code/kotlin-code")
     private val kotlinCodeResourceBase = defaultFilesResourceBase.resolve(kotlinCodeSubPath)
-    
+
+    private val mySdkChangedListeners: MutableList<Runnable> = ContainerUtil.createLockFreeCopyOnWriteList()
     private val fmConfig = freemarkerConfiguration(this, "/")
+    /** 
+     * Tracks the configured SDK since the `myJdk` property (in the super class `ModuleBuilder`) and the value in `WizardContext.getProjectJdk()` 
+     * is not set until we pass the initial step. 
+     * We need to certain to keep this updated based on activities. A null value indicates not only that an SDK has not been selected,
+     * but more likely a valid one (Type * Version) is not available in the listing.
+     */
+    var selectedSdk: Sdk? = null
+        set(sdk) 
+        {
+            LOG.trace("[FRC] setter called with value of '$sdk'  Previous value was '$field'")
+            if (field != sdk)
+            {
+                field = sdk
+                for (runnable in mySdkChangedListeners)
+                {
+                    runnable.run()
+                }
+            }
+        }
     
     private var myWizardContext: WizardContext? = null
     private var myParentProject: ProjectData? = null
@@ -377,30 +408,63 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
      */
     override fun getCustomOptionsStep(context: WizardContext, parentDisposable: Disposable): ModuleWizardStep?
     {
-        //TODO: Write this 'getCustomOptionsStep' overridden method
-        //     This determines the potential frameworks  that can be selected (like kotlin, groovy, Thymeleaf, Ruby, yada yada yada
-        //     Notice that when setProviders is called  "java" is set for the "preselected" parameter    In IDEA project: service/project/wizard/GradleFrameworksWizardStep.java:99 as well as  service/project/wizard/GradleFrameworksWizardStep.java:91 for the Kotlin DSL
-        //     Others are dynamically loaded via extension point definitions as far as I can tell.
-        //     So this is likely where we will want to put Kotlin 
-        //     It looks like these ultimately get defined/configured via an extension is the plugin.xml
-        //     For example with Gradle, there is:
-        //           <frameworkSupport implementation="org.jetbrains.plugins.gradle.frameworkSupport.GradleGroovyFrameworkSupportProvider"/>
-        //     in the gradle-groovy-integration.xml file.
-        //     in turn that file is defined as an optional depends in the gradle-java-integration.xml file when defining "org.intellij.groovy" as an (optional) dependency
-        //     For Java, I would want it to be a required provider rather than an optional that is preselected. Not sure if I need to "add" it behind the scenes or not.
-
+        // This determines the potential frameworks  that can be selected (like kotlin, groovy, Thymeleaf, Ruby, yada yada yada
+        // Notice that when setProviders is called  "java" is set for the "preselected" parameter    In IDEA project: service/project/wizard/GradleFrameworksWizardStep.java:99 as well as  service/project/wizard/GradleFrameworksWizardStep.java:91 for the Kotlin DSL
+        // Others are dynamically loaded via extension point definitions as far as I can tell.
+        // So this is likely where we will want to put Kotlin 
+        // It looks like these ultimately get defined/configured via an extension is the plugin.xml
+        // For example with Gradle, there is:
+        //       <frameworkSupport implementation="org.jetbrains.plugins.gradle.frameworkSupport.GradleGroovyFrameworkSupportProvider"/>
+        // in the gradle-groovy-integration.xml file.
+        // in turn that file is defined as an optional depends in the gradle-java-integration.xml file when defining "org.intellij.groovy" as an (optional) dependency
+        // For Java, I would want it to be a required provider rather than an optional that is preselected. Not sure if I need to "add" it behind the scenes or not.
         LOG.trace("[FRC] FrcModuleBuilder.getCustomOptionsStep() called")
-        /*return super.getCustomOptionsStep(context, parentDisposable);*/
-
-
-        //final FrcFrameworksWizardStep step = new FrcFrameworksWizardStep(context, this, config);
-
-
         val step = FrcFrameworksBlankWizardStep(this, context)
         Disposer.register(parentDisposable, step)
         return step
     }
 
+
+    override fun modifyProjectTypeStep(settingsStep: SettingsStep): ModuleWizardStep
+    {
+        // Implementation based on to the following forum answer:
+        //     https://intellij-support.jetbrains.com/hc/en-us/community/posts/360006464099-Valdating-slected-Project-SDK-version-on-the-first-wizard-page?page=1#community_comment_360000894059
+        //     Please see:                   com.jetbrains.python.module.PythonModuleBuilder#modifyProjectTypeStep 
+        //     and implement your logic in:  com.intellij.ide.util.projectWizard.SdkSettingsStep#onSdkSelected
+
+        
+        // The parent ModuleBuilder class also has the  `boolean isSuitableSdkType(SdkTypeId sdkType)`  method, but that is limited to the type, so no version info
+        
+        // We apply filters so that only JDKs that meet the required version level show in the "Project SDK" drop down list
+        LOG.trace("[FRC] Executing FrcModuleBuilder.modifyProjectTypeStep()")
+        return object : SdkSettingsStep(settingsStep, 
+                                        this, 
+                                        Condition { id: SdkTypeId -> JavaSdkImpl.getInstance() === id },
+                                        Condition {  sdk:Sdk -> (sdk as ProjectJdkImpl).isValidJavaVersion(DEFAULT_MIN_REQUIRED_JAVA_VERSION)})
+        {
+            override fun onSdkSelected(sdk: Sdk?)
+            {
+                // this gets called when ever the selected SDK changes, including when the new project wizard is first opened (and FRC project is selected because it was last used)
+                // So we don't want to pop up a (modal) dialog. But we can set an internal "selected SDK tracking" property and then use that value in the validate method
+                // If no valid JDK is available in the list (after filtering), this method is simply NOT called. (i.e. it is not called with a null value)
+                LOG.trace("[FRC] onSdkSelected called with sdk: sdk='$sdk' [type='${sdk?.sdkType}' version='${sdk?.versionString}' name = '${sdk?.name}'" )
+                selectedSdk = sdk
+            }
+        }
+    }
+
+    
+
+    fun addSdkChangedListener(runnable: Runnable?)
+    {
+        if (runnable != null)
+        {
+            mySdkChangedListeners.add(runnable)
+        }
+    }
+    
+    fun isSelectedSdkValid(): Boolean = selectedSdk.isValidJdk()
+    
     companion object
     {
         private val LOG = Logger.getInstance(FrcModuleBuilder::class.java)

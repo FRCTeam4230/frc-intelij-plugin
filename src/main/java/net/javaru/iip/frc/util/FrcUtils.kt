@@ -27,6 +27,7 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.util.lang.JavaVersion
 import net.javaru.iip.frc.FrcPluginGlobals
+import net.javaru.iip.frc.FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION
 import net.javaru.iip.frc.i18n.FrcBundle.message
 import net.javaru.iip.frc.i18n.FrcMessageKey
 
@@ -184,15 +185,11 @@ fun validateMinimumJavaVersion(moduleBuilder: ModuleBuilder,
     {
         try
         {
-            val jdkVersionString = sdk.versionString
-            val configuredJavaVersion = JavaVersion.tryParse(jdkVersionString)
-            //final LanguageLevel languageLevel = LanguageLevel.parse(jdkVersionString);
-            // There is also a JavaVersion in the Gradle API code: org.gradle.api.JavaVersion;
-
-
-            if (configuredJavaVersion != null && !configuredJavaVersion.isAtLeast(requiredMinimumJavaVersion.feature))
+            if (!sdk.isValidJavaVersion(requiredMinimumJavaVersion))
             {
-                val titleMsgPair = createTitleMessagePair(requiredMinimumJavaVersion, configuredJavaVersion, additionalMessageKey)
+                val jdkVersionString = sdk.versionString
+                val configuredJavaVersion = JavaVersion.tryParse(jdkVersionString)
+                val titleMsgPair = createInvalidJdkTitleMessagePair(requiredMinimumJavaVersion, configuredJavaVersion, additionalMessageKey)
                 throw ConfigurationException(titleMsgPair.message, titleMsgPair.title)
             }
         }
@@ -208,11 +205,26 @@ fun validateMinimumJavaVersion(moduleBuilder: ModuleBuilder,
     return true
 }
 
+fun ProjectJdkImpl.isValidJavaVersion(requiredMinimumJavaVersionFeatureLevel: Int): Boolean
+{
+    val jdkVersionString = versionString!!
+    val jdkVersion = JavaVersion.tryParse(jdkVersionString)
 
-fun createTitleMessagePair(requiredMinimumJavaVersion: JavaVersion,
-                           configuredJavaVersion: JavaVersion,
-                           additionalMessageKey: FrcMessageKey?
-                          ): TitleMessagePair
+    return (jdkVersion != null && jdkVersion.isAtLeast(requiredMinimumJavaVersionFeatureLevel))
+}
+
+
+
+@JvmOverloads
+fun Sdk?.isValidJdk(requiredMinimumJavaVersion: JavaVersion = DEFAULT_MIN_REQUIRED_JAVA_VERSION): Boolean = if (this != null && this is ProjectJdkImpl) this.isValidJavaVersion(requiredMinimumJavaVersion) else false
+
+
+fun ProjectJdkImpl.isValidJavaVersion(requiredMinimumJavaVersion: JavaVersion): Boolean = isValidJavaVersion(requiredMinimumJavaVersion.feature)
+
+fun createInvalidJdkTitleMessagePair(requiredMinimumJavaVersion: JavaVersion,
+                                     configuredJavaVersion: JavaVersion?,
+                                     additionalMessageKey: FrcMessageKey?
+                                    ): TitleMessagePair
 {
     val title = message("frc.ui.wizard.validate.minJavaVersion.title")
     
@@ -220,27 +232,27 @@ fun createTitleMessagePair(requiredMinimumJavaVersion: JavaVersion,
     val message = message("frc.ui.wizard.validate.minJavaVersion.message",
                           requiredMinimumJavaVersion,
                           requiredMinimumJavaVersion.feature,
-                          configuredJavaVersion,
-                          configuredJavaVersion.feature,
+                          configuredJavaVersion ?: message("frc.ui.wizard.validate.minJavaVersion.noSdk"),
+                          configuredJavaVersion?.feature ?: "?",
                           additionalMessage)
     
     return TitleMessagePair(title, message)
 }
 
 
-fun String?.isValidPackageName(javaVersion: JavaVersion = FrcPluginGlobals.DEFAULT_JAVA_VERSION): Boolean
+fun String?.isValidPackageName(javaVersion: JavaVersion = FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION): Boolean
 {
     var languageLevel = LanguageLevel.parse(javaVersion.toString())
     if (languageLevel == null)
     {
-        LOG.warn("Could not parse JavaVersion '$javaVersion' to a language level. Will default to ${FrcPluginGlobals.DEFAULT_LANGUAGE_LEVEL} for checking package name validity")
-        languageLevel = FrcPluginGlobals.DEFAULT_LANGUAGE_LEVEL
+        LOG.warn("Could not parse JavaVersion '$javaVersion' to a language level. Will default to ${FrcPluginGlobals.DEFAULT_MIN_REQUIRED_LANGUAGE_LEVEL} for checking package name validity")
+        languageLevel = FrcPluginGlobals.DEFAULT_MIN_REQUIRED_LANGUAGE_LEVEL
     }
     return this.isValidPackageName(languageLevel!!)
 }
 
 @JvmOverloads
-fun String?.isValidPackageName(languageLevel: LanguageLevel = FrcPluginGlobals.DEFAULT_LANGUAGE_LEVEL): Boolean
+fun String?.isValidPackageName(languageLevel: LanguageLevel = FrcPluginGlobals.DEFAULT_MIN_REQUIRED_LANGUAGE_LEVEL): Boolean
 {
     if (this == null) return false
 
@@ -255,10 +267,10 @@ fun String?.isValidPackageName(languageLevel: LanguageLevel = FrcPluginGlobals.D
         index = index1 + 1
     }
 }
-fun isIdentifier(text: String?, javaVersion: JavaVersion = FrcPluginGlobals.DEFAULT_JAVA_VERSION): Boolean = isIdentifier(text, LanguageLevel.parse(javaVersion.toString())!!)
+fun isIdentifier(text: String?, javaVersion: JavaVersion = FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION): Boolean = isIdentifier(text, LanguageLevel.parse(javaVersion.toString())!!)
 
 @JvmOverloads
-fun isIdentifier(text: String?, languageLevel: LanguageLevel = FrcPluginGlobals.DEFAULT_LANGUAGE_LEVEL): Boolean
+fun isIdentifier(text: String?, languageLevel: LanguageLevel = FrcPluginGlobals.DEFAULT_MIN_REQUIRED_LANGUAGE_LEVEL): Boolean
 {
     return text != null && StringUtil.isJavaIdentifier(text) && !JavaLexer.isKeyword(text, languageLevel)
 }

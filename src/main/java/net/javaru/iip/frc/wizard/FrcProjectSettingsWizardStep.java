@@ -118,18 +118,16 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
         teamNumberTextField.addKeyListener(new KeyListener()
         {
             private String previousText = teamNumberTextField.getText();
-    
             @Override
             public void keyTyped(KeyEvent e) { }
             @Override
             public void keyPressed(KeyEvent e) { }
-    
-    
+            
             @Override
             public void keyReleased(KeyEvent e)
             {
                 String updatedText = StringUtils.replaceAll(teamNumberTextField.getText().trim(), "\\s", "").trim();
-               teamNumberTextField.setText(updatedText); // set to the trimmed value - this mostly handles values pasted in with spaces
+                teamNumberTextField.setText(updatedText); // set to the trimmed value - this mostly handles values pasted in with spaces
                 if (StringUtils.isBlank(updatedText))
                 {
                     // We all the filed to be blanked out (which is not a valid team number), but the updateTeamNumberWarningVisibility called at the end of this method will turn on the warning icon
@@ -270,7 +268,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
             final Sdk sdk = myContext.getProjectJdk();
             // For the most part, the language level is not too critical for validating a valid package name has been entered.
             // So we set a default level in the event we can not set it more explicitly
-            JavaVersion javaVersion = FrcPluginGlobals.DEFAULT_JAVA_VERSION;
+            JavaVersion javaVersion = FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION;
             if (sdk instanceof ProjectJdkImpl)
             {
                 ProjectJdkImpl jdk = (ProjectJdkImpl) sdk;

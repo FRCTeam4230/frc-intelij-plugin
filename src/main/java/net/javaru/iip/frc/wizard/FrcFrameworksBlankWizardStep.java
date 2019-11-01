@@ -26,7 +26,15 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.util.lang.JavaVersion;
+
+import net.javaru.iip.frc.FrcPluginGlobals;
+import net.javaru.iip.frc.util.FrcUtilsKt;
+import net.javaru.iip.frc.util.TitleMessagePair;
 
 
 
@@ -36,6 +44,9 @@ public class FrcFrameworksBlankWizardStep extends ModuleWizardStep implements Di
     
     
     private JPanel myPanel;
+    private JPanel frcLogoPanel;
+    private JBLabel sdkNoticeLabel;
+    private JBLabel invalidSdkSelectedLabel;
     @NotNull
     private final FrcModuleBuilder myBuilder;
     @NotNull
@@ -50,9 +61,16 @@ public class FrcFrameworksBlankWizardStep extends ModuleWizardStep implements Di
         this.myBuilder = builder;
         this.myContext = context;
         this.myProjectOrNull = context.getProject();
+        initComponents();
         LOG.trace("[FRC] Exiting FrcFrameworksBlankWizardStep constructor");
     }
     
+    
+    private void initComponents()
+    {
+        updateInvalidSdkLabelVisibility();
+        myBuilder.addSdkChangedListener(this::updateInvalidSdkLabelVisibility);
+    }
     
     @Override
     public void dispose()
@@ -81,18 +99,32 @@ public class FrcFrameworksBlankWizardStep extends ModuleWizardStep implements Di
     @Override
     public boolean validate() throws ConfigurationException
     {
-        // TODO: We need to get the min version programmatically. We can get it from C:\Users\Public\frc${frcYear}\jdk\release
+        if (!myBuilder.isSelectedSdkValid())
+        {
+            @Nullable
+            final Sdk sdk = myBuilder.getSelectedSdk();
+            // The build-in functionality opens a warning if there is no SDK selected. So we do not want to double prompt
+            // So we just handle an invalid version & non-JDK
+            if (sdk != null) 
+            {
+                JavaVersion configuredJavaVersion = null;
+                if (sdk instanceof ProjectJdkImpl)
+                {
+                    configuredJavaVersion = JavaVersion.tryParse(sdk.getVersionString());
+                }
         
-        // TODO: Implement validation properly
-        //  The validation does not work because the below Validate method tries to get the SDK from the wizardContext
-        //  However, that returns null because this validate method is called prior to the updateDataModel() method which sets the SDK as the first step is exited
-        //  I have a question posted on how we might be able to do this:
-        //     https://intellij-support.jetbrains.com/hc/en-us/community/posts/360006464099-Valdating-slected-Project-SDK-version-on-the-first-wizard-page
-    
+                final TitleMessagePair titleMsgPair =
+                        FrcUtilsKt.createInvalidJdkTitleMessagePair(FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION,
+                                                                    configuredJavaVersion,
+                                                                    null);
+                throw new ConfigurationException(titleMsgPair.getMessage(), titleMsgPair.getTitle());
+            }
+        }
         return true;
-//        return FrcUtilsKt.validateMinimumJavaVersion(myBuilder,
-//                                                     myContext,
-//                                                     11);
     }
     
+    protected void updateInvalidSdkLabelVisibility()
+    {
+        invalidSdkSelectedLabel.setVisible(!myBuilder.isSelectedSdkValid());
+    }
 }

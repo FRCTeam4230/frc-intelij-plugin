@@ -15,9 +15,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package <#if data.basePackage?has_content>${data.basePackage}import edu.wpi.first.wpilibj.command.Subsystem;
+package <#if data.basePackage?has_content>${data.basePackage}.</#if>subsystems;
 
-.</#if>subsystems;
+import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
  * An example subsystem.  You can replace me with your own Subsystem.

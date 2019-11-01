@@ -15,13 +15,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-<#if data.basePackage?has_content>package ${data.basePackage}import edu.wpi.first.wpilibj.RobotBase;
+<#if data.basePackage?has_content>package ${data.basePackage};</#if>
 
-;
-
-
-
-</#if>
+import edu.wpi.first.wpilibj.RobotBase;
 
 /**
  * Do NOT add any static variables to this class, or any initialization at all.

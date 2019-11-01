@@ -15,10 +15,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package <#if data.basePackage?has_content>${data.basePackage}import edu.wpi.first.wpilibj.command.Command;
-import frc.robot.Robot;
+package <#if data.basePackage?has_content>${data.basePackage}.</#if>commands;
 
-.</#if>commands;
+import edu.wpi.first.wpilibj.command.Command;
+import <#if data.basePackage?has_content>${data.basePackage}.Robot;</#if>
 
 /**
  * An example command.  You can replace me with your own command.
@@ -26,7 +26,7 @@ import frc.robot.Robot;
 public class ExampleCommand extends Command {
   public ExampleCommand() {
     // Use requires() here to declare subsystem dependencies
-    requires(Robot.m_subsystem);
+    requires(Robot.exampleSubsystem);
   }
 
   // Called just before this Command runs the first time

@@ -6,6 +6,7 @@ crio
 cscore
 ctr
 ctre
+deployable
 drivetrain
 firewire
 firstinspires
@@ -45,10 +46,13 @@ pid
 revrobotics
 rio
 riolog
+robo
 roborio
 screenstepslive
+sendable
 setpoint
 setpoints
+shuffleboard
 smartdashboard
 subsystem
 subtable

@@ -182,7 +182,6 @@
     <!-- Ref: http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_extensions_and_extension_points.html -->
     <extensionPoints>
         <!--<extensionPoint name="fooExtensionPoint" beanClass="com.foo.impl.FooExtensionBean" />-->
-        <extensionPoint name="net.javaru.iip.frc.frameworkSupport" interface="net.javaru.iip.frc.facet.framework.FrcJavaFrameworkSupportProvider" />
     </extensionPoints>
 
     
@@ -251,14 +250,10 @@
 
         <externalProjectDataService id="FrcDependencyDataService" implementation="net.javaru.iip.frc.facet.importer.FrcDependencyDataService" />
         
-<!--        <frameworkSupport   implementation="net.javaru.iip.frc.facet.framework.FrcFrameworkSupportProvider" />-->
-        
         <framework.detector implementation="net.javaru.iip.frc.facet.framework.detector.RobotSubclassFrcFrameworkDetector" />
     </extensions>
     
-<!--    <extensions defaultExtensionNs="net.javaru.idea.frc">-->
-<!--        <frameworkSupport implementation="net.javaru.iip.frc.facet.framework.FrcJavaFrameworkSupportProvider" />-->
-<!--    </extensions>-->
+
 
     
     

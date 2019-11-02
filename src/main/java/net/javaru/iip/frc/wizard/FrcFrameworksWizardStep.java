@@ -97,10 +97,6 @@ public class FrcFrameworksWizardStep extends ModuleWizardStep implements Disposa
     private void setFrcFrameworkSupportProviders()
     {
 //        List<FrameworkSupportInModuleProvider> providers = new ArrayList<>();
-//        Collections.addAll(providers, FrcFrameworkSupportProvider.EP_NAME.getExtensions());
-//        // TODO: Ideally, I do not think Java should be "optional" even if it is selected by default. This may just be a case of not using/including the FrcJavaFrameworkSupportProvider as I think it is only used to add to the gradle script as needed
-//        myFrameworksPanel.setProviders(providers, Collections.emptySet(), Collections.singleton("java" /* <-- this is FrcJavaFrameworkSupportProvider.ID*/ ));
-//    
     }
     
     

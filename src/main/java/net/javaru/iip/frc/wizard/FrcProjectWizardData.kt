@@ -25,15 +25,18 @@ import java.nio.file.Paths
 const val DEFAULT_BASE_PACKAGE = "frc.robot"
 
 class FrcProjectWizardData(
-                    var teamNumber: Int = FrcApplicationSettings.INSTANCE().teamNumber,
-                    var robotMainClassSimpleName: String = "Main",
-                    var basePackage: String = DEFAULT_BASE_PACKAGE,
-                    var wpilibVersion: WpiLibVersion = WpiLibVersionImpl.parse("2019.4.1"), // TODO Need to set the default dynamically. See notes in FrcTemplateSelectionWizardStep.updateDataModel() 
-                    var gradleDistributionUrl: String = "https\\://services.gradle.org/distributions/gradle-5.0-bin.zip",
-                    var frcYear: String = wpilibVersion.major.toString(),
-                    var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizardProjectTemplateDefinition.CommandBased,
-                    var includeVsCodeConfigs: Boolean = true,
-                    var doDirectGradleImport: Boolean = true  // Possible put in a default value the application settings
+        var teamNumber: Int = FrcApplicationSettings.INSTANCE().teamNumber,
+        /** The simple name of the Main class (not to be confused with the (primary) Robot class). This is the simple class that has the `main()` method.*/
+        var mainClassSimpleName: String = "Main",
+        /** The simple name of the primary Robot class (not to be confused with the Main class). This is the class that extends one of the WPILib `RobotBase` classes.*/
+        var robotClassSimpleName: String = "Robot",
+        var basePackage: String = DEFAULT_BASE_PACKAGE,
+        var wpilibVersion: WpiLibVersion = WpiLibVersionImpl.parse("2019.4.1"), // TODO Need to set the default dynamically. See notes in FrcTemplateSelectionWizardStep.updateDataModel() 
+        var gradleDistributionUrl: String = "https\\://services.gradle.org/distributions/gradle-5.0-bin.zip",
+        var frcYear: String = wpilibVersion.major.toString(),
+        var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizardProjectTemplateDefinition.CommandBased,
+        var includeVsCodeConfigs: Boolean = true,
+        var doDirectGradleImport: Boolean = true  // Possible put in a default value the application settings
                           )
 {
     val teamNumberString: String
@@ -45,6 +48,10 @@ class FrcProjectWizardData(
     val basePackageAsDirPath: Path
         get() = Paths.get(basePackageAsDirString)
     
-    val robotMainClassFQ: String
-        get() = if (basePackage.isEmpty()) robotMainClassSimpleName else "${basePackage}.${robotMainClassSimpleName}"
+    /** The Fully Qualified (FQ) name of the Main class (not to be confused with the (primary) Robot class). This is the simple class that has the `main()` method.*/
+    val mainClassFQ: String
+        get() = if (basePackage.isEmpty()) mainClassSimpleName else "${basePackage}.${mainClassSimpleName}"
+    /** The Fully Qualified (FQ) name of the primary Robot class (not to be confused with the Main class). This is the class that extends one of the WPILib `RobotBase` classes.*/
+    val robotClassFQ: String
+        get() = if (basePackage.isEmpty()) mainClassSimpleName else "${basePackage}.${mainClassSimpleName}"
 }

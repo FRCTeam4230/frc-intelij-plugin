@@ -18,7 +18,7 @@
 package ${data.basePackage}.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-import ${data.basePackage}.Robot;
+import ${data.basePackage}.${data.robotClassSimpleName};
 
 /**
  * An example command.  You can replace me with your own command.
@@ -26,7 +26,7 @@ import ${data.basePackage}.Robot;
 public class ExampleCommand extends Command {
   public ExampleCommand() {
     // Use requires() here to declare subsystem dependencies
-    requires(Robot.exampleSubsystem);
+    requires(${data.robotClassSimpleName}.exampleSubsystem);
   }
 
   // Called just before this Command runs the first time

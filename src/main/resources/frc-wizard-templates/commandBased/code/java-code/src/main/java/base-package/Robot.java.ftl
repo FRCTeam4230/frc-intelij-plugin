@@ -1,5 +1,5 @@
 <#ftl output_format="plainText" encoding="UTF-8">
-<#--noinspection WrongPackageStatement-->
+<#--noinspection WrongPackageStatement,ALL-->
 <#compress>
 <#-- @ftlvariable name="data" type="net.javaru.iip.frc.wizard.FrcProjectWizardData" -->
 <#--    
@@ -32,7 +32,7 @@ import ${data.basePackage}.subsystems.ExampleSubsystem;
  * creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class ${data.robotClassSimpleName} extends TimedRobot {
   public static ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
   public static OI oi;
 

@@ -1,5 +1,5 @@
 <#ftl output_format="plainText" encoding="UTF-8">
-<#--noinspection WrongPackageStatement-->
+<#--noinspection WrongPackageStatement,DanglingJavadoc-->
 <#compress>
 <#-- @ftlvariable name="data" type="net.javaru.iip.frc.wizard.FrcProjectWizardData" -->
 <#--    
@@ -24,16 +24,16 @@ import edu.wpi.first.wpilibj.RobotBase;
  * Unless you know what you are doing, do not modify this file except to
  * change the parameter class to the startRobot call.
  */
-public final class Main {
-  private Main() {
+public final class ${data.mainClassSimpleName} {
+  private ${data.mainClassSimpleName}() {
   }
 
   /**
    * Main initialization function. Do not perform any initialization here.
-   *
-   * <p>If you change your main robot class, change the parameter type.
+   * <p>
+   * If you change your main Robot class (name), change the parameter type.
    */
   public static void main(String... args) {
-    RobotBase.startRobot(Robot::new);
+    RobotBase.startRobot(${data.robotClassSimpleName}::new);
   }
 }

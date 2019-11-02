@@ -431,7 +431,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     {
         LOG.trace("[FRC] FrcModuleBuilder.createWizardSteps() called")
         myWizardContext = wizardContext
-        // These are the steps that come after the initial "build-in" step. 
+        // These are the steps that come after the initial "built-in" step. 
         // The FrcInitialCustomOptionsWizardStep shows as a pane in the initial built-in step
         return arrayOf(FrcTemplateSelectionWizardStep(this, wizardContext),
                        FrcProjectSettingsWizardStep(this, wizardContext))

@@ -15,7 +15,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-<#if data.basePackage?has_content>package ${data.basePackage};</#if>
+package ${data.basePackage};
 
 import edu.wpi.first.wpilibj.RobotBase;
 

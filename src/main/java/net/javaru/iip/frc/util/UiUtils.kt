@@ -18,6 +18,9 @@ package net.javaru.iip.frc.util
 
 import com.intellij.openapi.util.text.StringUtil
 import javax.swing.JTextField
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
+import javax.swing.text.JTextComponent
 
 /**
  * Sets the text of the supplied field to the supplied value iff the text field is blank.
@@ -32,3 +35,32 @@ fun JTextField.setTextIfEmpty(text: String?)
         this.text = StringUtil.notNullize(text)
     }
 }
+
+/**
+ * Adds a `DocumentListener` to the components; document that will call the supplied action anytime the text is changed.
+ */
+fun JTextComponent.addTextChangedListener(action: (text: String) -> Unit)
+{
+    document.addDocumentListener(object : DocumentListener
+                                 {
+                                     override fun changedUpdate(e: DocumentEvent?) = fire(e)
+                                     override fun insertUpdate(e: DocumentEvent?) = fire(e)
+                                     override fun removeUpdate(e: DocumentEvent?) = fire(e)
+                                     fun fire(e: DocumentEvent?) = action.invoke(text)
+                                 })
+}
+
+/**
+ * Adds a `DocumentListener` to the components; document that will call the supplied action anytime the text is changed.
+ */
+fun JTextComponent.addTextChangedListener(action: (e: DocumentEvent?, text: String) -> Unit)
+{
+    document.addDocumentListener(object : DocumentListener
+                                 {
+                                     override fun changedUpdate(e: DocumentEvent?) = fire(e)
+                                     override fun insertUpdate(e: DocumentEvent?) = fire(e)
+                                     override fun removeUpdate(e: DocumentEvent?) = fire(e)
+                                     fun fire(e: DocumentEvent?) = action.invoke(e, text)
+                                 })
+}
+

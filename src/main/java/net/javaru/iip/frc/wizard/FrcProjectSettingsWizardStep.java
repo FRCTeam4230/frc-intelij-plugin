@@ -35,7 +35,6 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.components.JBLabel;
@@ -75,6 +74,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
     private JButton basePackageDefaultButton;
     private JBLabel teamNumberWarningIconLabel;
     private JCheckBox includeVsCodeConfigsCheckBox;
+    private JBLabel basePackageWarningLabel;
     
     
     public FrcProjectSettingsWizardStep(@NotNull FrcModuleBuilder builder, @NotNull WizardContext context)
@@ -101,7 +101,10 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
         initTeamNumberField();
         final FrcProjectWizardData dataModel = myBuilder.getDataModel();
         UiUtilsKt.setTextIfEmpty(basePackageTextField, dataModel.getBasePackage());
-    
+        basePackageWarningLabel.setVisible(false);
+        UiUtilsKt.addTextChangedListener(basePackageTextField, text -> { basePackageWarningLabel.setVisible(StringUtils.isBlank(text));
+            return null;
+        });
         basePackageDefaultButton.addActionListener(e -> basePackageTextField.setText(FrcProjectWizardDataKt.DEFAULT_BASE_PACKAGE));
         includeVsCodeConfigsCheckBox.setSelected(dataModel.getIncludeVsCodeConfigs());
         
@@ -253,42 +256,49 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
     
         if (StringUtils.isBlank(basePackageName))
         {
-            final int answer = Messages.showYesNoDialog(
-                    getComponent(),
-                    message("frc.ui.wizard.projectSettingsStep.validate.emptyPackageName.message"),
-                    message("frc.ui.wizard.projectSettingsStep.validate.emptyPackageName.title"),
-                    Messages.getWarningIcon());
-            if (answer == Messages.YES)
-            {
-                return false;
-            }
+            throw new ConfigurationException(message("frc.ui.wizard.projectSettingsStep.validate.emptyPackageName.message"),
+                                             message("frc.ui.wizard.projectSettingsStep.validate.emptyPackageName.title"));
         }
         else
         {
-            final Sdk sdk = myContext.getProjectJdk();
-            // For the most part, the language level is not too critical for validating a valid package name has been entered.
-            // So we set a default level in the event we can not set it more explicitly
-            JavaVersion javaVersion = FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION;
-            if (sdk instanceof ProjectJdkImpl)
-            {
-                ProjectJdkImpl jdk = (ProjectJdkImpl) sdk;
-                JavaVersion parsedJavaVersion = JavaVersion.tryParse(jdk.getVersionString());
-                if (parsedJavaVersion != null)
-                {
-                    javaVersion = parsedJavaVersion;
-                }
-            }
-            final boolean isValidPackageName = FrcUtilsKt.isValidPackageName(basePackageName, javaVersion);
-            if (!isValidPackageName)
+            if (!isValidPackageName(basePackageName))
             {
                 throw new ConfigurationException(message("frc.ui.wizard.projectSettingsStep.validate.invalidPackageName.message", basePackageName),
                                                  message("frc.ui.wizard.projectSettingsStep.validate.invalidPackageName.title"));
             }
         }
-    
-    
         LOG.trace("[FRC] Exiting FrcProjectSettingsWizardStep.validate() (Gracefully with no validation errors)");
         return true;
+    }
+    
+    
+    protected boolean isValidPackageName(@Nullable String basePackageName)
+    {
+        if (StringUtils.isBlank(basePackageName))
+        {
+            return false;
+        }
+        
+        @Nullable
+        Sdk sdk = myContext.getProjectJdk();
+        if (sdk == null)
+        {
+            sdk = myBuilder.getSelectedSdk(); // may still be null
+        }
+        
+        // For the most part, the language level is not too critical for validating a valid package name has been entered.
+        // So we set a default level in the event we can not set it more explicitly
+        JavaVersion javaVersion = FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION;
+        if (sdk instanceof ProjectJdkImpl)
+        {
+            ProjectJdkImpl jdk = (ProjectJdkImpl) sdk;
+            JavaVersion parsedJavaVersion = JavaVersion.tryParse(jdk.getVersionString());
+            if (parsedJavaVersion != null)
+            {
+                javaVersion = parsedJavaVersion;
+            }
+        }
+        return FrcUtilsKt.isValidPackageName(basePackageName, javaVersion);
     }
     
     

@@ -15,7 +15,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-<#if data.basePackage?has_content>package ${data.basePackage};</#if>
+package ${data.basePackage};
 
 /**
  * This class is the glue that binds the controls on the physical operator

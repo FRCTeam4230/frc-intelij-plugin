@@ -15,15 +15,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-<#if data.basePackage?has_content>package ${data.basePackage};</#if>
+package ${data.basePackage};
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import <#if data.basePackage?has_content>${data.basePackage}.</#if>commands.ExampleCommand;
-import <#if data.basePackage?has_content>${data.basePackage}.</#if>subsystems.ExampleSubsystem;
+import ${data.basePackage}.commands.ExampleCommand;
+import ${data.basePackage}.subsystems.ExampleSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the

@@ -15,10 +15,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package <#if data.basePackage?has_content>${data.basePackage}.</#if>commands;
+package ${data.basePackage}.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-import <#if data.basePackage?has_content>${data.basePackage}.Robot;</#if>
+import ${data.basePackage}.Robot;
 
 /**
  * An example command.  You can replace me with your own command.

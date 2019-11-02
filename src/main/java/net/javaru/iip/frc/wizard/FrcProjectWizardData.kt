@@ -32,7 +32,8 @@ class FrcProjectWizardData(
                     var gradleDistributionUrl: String = "https\\://services.gradle.org/distributions/gradle-5.0-bin.zip",
                     var frcYear: String = wpilibVersion.major.toString(),
                     var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizardProjectTemplateDefinition.CommandBased,
-                    var includeVsCodeConfigs: Boolean = true
+                    var includeVsCodeConfigs: Boolean = true,
+                    var doDirectGradleImport: Boolean = true  // Possible put in a default value the application settings
                           )
 {
     val teamNumberString: String

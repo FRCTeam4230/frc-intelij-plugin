@@ -22,7 +22,10 @@ import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ide.util.projectWizard.SdkSettingsStep
 import com.intellij.ide.util.projectWizard.SettingsStep
 import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationsManager
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.model.project.ProjectId
@@ -36,6 +39,7 @@ import com.intellij.openapi.projectRoots.impl.JavaSdkImpl
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider
+import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
@@ -55,6 +59,7 @@ import net.javaru.iip.frc.util.reader
 import net.javaru.iip.frc.util.removeBasePath
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
+import org.jetbrains.plugins.gradle.service.project.GradleNotification
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -160,9 +165,50 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         super.setupModule(module) // this will call (our overridden) setupRootModel method
         
         //assert(rootProjectPath != null) { "project root path was null" }
-        
+
+        if(dataModel.doDirectGradleImport)
+        {
+            autoImportGradleProject(module)
+        }
     }
 
+    private fun autoImportGradleProject(module: Module?)
+    {
+        if (module?.project != null)
+        {
+            StartupManager.getInstance(module.project).runWhenProjectIsInitialized() {
+                try
+                {
+                    if (module.project.basePath != null)
+                    {
+
+                        val project = module.project
+                        val notificationsManager = NotificationsManager.getNotificationsManager()
+                        val notifications = notificationsManager.getNotificationsOfType(Notification::class.java, project)
+
+                        // unfortunately the notification does not have a unique ID, so we can only filter on the group. But it should be the only Gradle notification
+                        val gradleNotifications = notifications.filter { it.groupId == GradleNotification.NOTIFICATION_GROUP.displayId }
+                        if (gradleNotifications.size == 1)
+                        {
+                            gradleNotifications.forEach { it.expire() }
+                            // We only import if we found the notification. If we import and the user then clicks on the import action on the notification, the IDE throws an error
+                            ApplicationManager.getApplication().runWriteAction() {
+                                // TODO: When a change is made to only support IDEA v2910.3 or greater, we can use the linkAndRefreshGradleProject from it. Note that it is marked experimental in the EAP version
+                                // /* v2019.3 */ org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject(module.project.basePath!!, module.project)
+                                /* v2019.2 */ org.jetbrains.plugins.gradle.service.project.open.importProject(module.project.basePath!!, module.project)
+                            }
+                        }
+                    }
+                }
+                catch (e: Exception)
+                {
+                    LOG.warn("[FRC] Could not auto import Gradle project due to an exception: $e", e)
+                }
+            }
+        }
+    }
+
+    
     @Throws(ConfigurationException::class)
     override fun setupRootModel(rootModel: ModifiableRootModel)
     {

@@ -38,9 +38,9 @@ import net.javaru.iip.frc.util.TitleMessagePair;
 
 
 
-public class FrcFrameworksBlankWizardStep extends ModuleWizardStep implements Disposable
+public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implements Disposable
 {
-    private static final Logger LOG = Logger.getInstance(FrcFrameworksBlankWizardStep.class);
+    private static final Logger LOG = Logger.getInstance(FrcInitialCustomOptionsWizardStep.class);
     
     
     private JPanel myPanel;
@@ -54,15 +54,15 @@ public class FrcFrameworksBlankWizardStep extends ModuleWizardStep implements Di
     @Nullable
     private final Project myProjectOrNull;
     
-    public FrcFrameworksBlankWizardStep(@NotNull FrcModuleBuilder builder,
-                                        @NotNull WizardContext context)
+    public FrcInitialCustomOptionsWizardStep(@NotNull FrcModuleBuilder builder,
+                                             @NotNull WizardContext context)
     {
-        LOG.trace("[FRC] Entering FrcFrameworksBlankWizardStep constructor");
+        LOG.trace("[FRC] Entering FrcInitialCustomOptionsWizardStep constructor");
         this.myBuilder = builder;
         this.myContext = context;
         this.myProjectOrNull = context.getProject();
         initComponents();
-        LOG.trace("[FRC] Exiting FrcFrameworksBlankWizardStep constructor");
+        LOG.trace("[FRC] Exiting FrcInitialCustomOptionsWizardStep constructor");
     }
     
     

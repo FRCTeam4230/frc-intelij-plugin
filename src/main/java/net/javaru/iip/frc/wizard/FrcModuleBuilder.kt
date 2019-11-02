@@ -429,7 +429,10 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 
     override fun createWizardSteps(wizardContext: WizardContext, modulesProvider: ModulesProvider): Array<ModuleWizardStep>
     {
+        LOG.trace("[FRC] FrcModuleBuilder.createWizardSteps() called")
         myWizardContext = wizardContext
+        // These are the steps that come after the initial "build-in" step. 
+        // The FrcInitialCustomOptionsWizardStep shows as a pane in the initial built-in step
         return arrayOf(FrcTemplateSelectionWizardStep(this, wizardContext),
                        FrcProjectSettingsWizardStep(this, wizardContext))
     }
@@ -454,18 +457,23 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
      */
     override fun getCustomOptionsStep(context: WizardContext, parentDisposable: Disposable): ModuleWizardStep?
     {
-        // This determines the potential frameworks  that can be selected (like kotlin, groovy, Thymeleaf, Ruby, yada yada yada
-        // Notice that when setProviders is called  "java" is set for the "preselected" parameter    In IDEA project: service/project/wizard/GradleFrameworksWizardStep.java:99 as well as  service/project/wizard/GradleFrameworksWizardStep.java:91 for the Kotlin DSL
-        // Others are dynamically loaded via extension point definitions as far as I can tell.
-        // So this is likely where we will want to put Kotlin 
-        // It looks like these ultimately get defined/configured via an extension is the plugin.xml
-        // For example with Gradle, there is:
-        //       <frameworkSupport implementation="org.jetbrains.plugins.gradle.frameworkSupport.GradleGroovyFrameworkSupportProvider"/>
-        // in the gradle-groovy-integration.xml file.
-        // in turn that file is defined as an optional depends in the gradle-java-integration.xml file when defining "org.intellij.groovy" as an (optional) dependency
-        // For Java, I would want it to be a required provider rather than an optional that is preselected. Not sure if I need to "add" it behind the scenes or not.
+        // This *normally* determines the potential frameworks  that can be selected (like kotlin, groovy, Thymeleaf, Ruby, etc., etc., etc.
+        //     Notice that when setProviders is called  "java" is set for the "preselected" parameter    In IDEA project: service/project/wizard/GradleFrameworksWizardStep.java:99 as well as  service/project/wizard/GradleFrameworksWizardStep.java:91 for the Kotlin DSL
+        //     Others are dynamically loaded via extension point definitions as far as I can tell.
+        // Normally this is where we would put the option to select Kotlin
+        //     But since for us we are just adding something to build.gradle.ftl template and not anything more sophisticated (i.e. having to set things),
+        //     and we want to auto add Kotlin if a Kotlin template is selected, we will do this in a later step via a simple check box
+        //   
+        // It looks like typically  these can be defined/configured via an extension is the plugin.xml
+        //     For example with Gradle, there is:
+        //           <frameworkSupport implementation="org.jetbrains.plugins.gradle.frameworkSupport.GradleGroovyFrameworkSupportProvider"/>
+        //     in the gradle-groovy-integration.xml file.
+        //     in turn that file is defined as an optional depends in the gradle-java-integration.xml file when defining "org.intellij.groovy" as an (optional) dependency
+        //     this would allow other plugins to add frameworks for a project type. Note something we need to worry about
+        // So..... with all that said, we are not going to do a traditional "FrameworksWizardStep" or even an "options step",
+        //     but rather a fairly simple "show some information" step
         LOG.trace("[FRC] FrcModuleBuilder.getCustomOptionsStep() called")
-        val step = FrcFrameworksBlankWizardStep(this, context)
+        val step = FrcInitialCustomOptionsWizardStep(this, context)
         Disposer.register(parentDisposable, step)
         return step
     }

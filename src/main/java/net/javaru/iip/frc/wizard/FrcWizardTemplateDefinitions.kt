@@ -25,6 +25,7 @@ interface FrcWizardTemplateDefinition
 {
     /** Returns the display name for use in the UI's list of available templates. */
     val displayName: String
+    
     /* 
      * A 1 or 2 sentence description of the template. Implementations must return a value inside `<html>` tags. 
      * Inner HTML tags such as `<em>` are allowed. Implementations must return some value and never `null` or an
@@ -32,6 +33,7 @@ interface FrcWizardTemplateDefinition
      */
     @get:Language("HTML")
     val description: String
+    
     /** Returns the displayName and Description in the format:
      * 
      * `<html><strong>{displayName}</strong> : {description}</html>`
@@ -46,6 +48,12 @@ interface FrcWizardTemplateDefinition
 
     /** The base name of the template's resource directory. It is highly recommended that this value not include any spaces. */
     fun templateResourcesDirName(): String
+
+    /**
+     * Indicates if the project is designed to be a template for bootstrapping a Robot project, and not as an example project.
+     * Project Bootstrap Templates have more customization options presented at creation time.
+     */
+    fun isProjectBootstrapTemplate(): Boolean
 }
 
 enum class FrcWizardProjectTemplateDefinition(
@@ -69,9 +77,10 @@ enum class FrcWizardProjectTemplateDefinition(
         @get:Language("HTML") get() = "<html><strong>$displayName</strong> : $_description</html>"
 
     override fun toString(): String = displayName
-
    
     override fun templateResourcesDirName(): String = name.decapitalize()
+
+    override fun isProjectBootstrapTemplate(): Boolean = true
 }
 
 enum class FrcWizardExampleTemplateDefinition(
@@ -110,4 +119,6 @@ enum class FrcWizardExampleTemplateDefinition(
     override fun toString(): String = displayName
 
     override fun templateResourcesDirName(): String = name.decapitalize()
+
+    override fun isProjectBootstrapTemplate(): Boolean = false
 }

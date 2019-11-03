@@ -97,7 +97,7 @@
             </constraints>
             <properties>
               <icon value="general/balloonError.png"/>
-              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.validate.emptyPackageName.message"/>
+              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.validate.blankPackageName.message"/>
             </properties>
           </component>
         </children>

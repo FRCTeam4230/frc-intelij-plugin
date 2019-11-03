@@ -35,6 +35,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.components.JBLabel;
@@ -45,7 +46,8 @@ import net.javaru.iip.frc.FrcIcons.FRC;
 import net.javaru.iip.frc.FrcPluginGlobals;
 import net.javaru.iip.frc.i18n.FrcMessageKey;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
-import net.javaru.iip.frc.util.FrcUtilsKt;
+import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
+import net.javaru.iip.frc.util.FrcPsiNameHelper;
 import net.javaru.iip.frc.util.UiUtilsKt;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
@@ -100,6 +102,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
        
         initTeamNumberField();
         final FrcProjectWizardData dataModel = myBuilder.getDataModel();
+        
         UiUtilsKt.setTextIfEmpty(basePackageTextField, dataModel.getBasePackage());
         basePackageWarningLabel.setVisible(false);
         UiUtilsKt.addTextChangedListener(basePackageTextField, text -> { basePackageWarningLabel.setVisible(StringUtils.isBlank(text));
@@ -247,25 +250,22 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
         }
         
         //TODO get required minimum Java level from selected template - and perhaps change the validation message
-        FrcUtilsKt.validateMinimumJavaVersion(myBuilder,
-                                              myContext,
-                                              11,
-                                              FrcMessageKey.of("frc.ui.wizard.validate.minJavaVersion.additionalMessage.goBack"));
+        FrcJavaLangUtilsKt.validateMinimumJavaVersion(myBuilder,
+                                                      myContext,
+                                                      11,
+                                                      FrcMessageKey.of("frc.ui.wizard.validate.minJavaVersion.additionalMessage.goBack"));
+        
         
         final String basePackageName = basePackageTextField.getText().trim();
-    
         if (StringUtils.isBlank(basePackageName))
         {
-            throw new ConfigurationException(message("frc.ui.wizard.projectSettingsStep.validate.emptyPackageName.message"),
-                                             message("frc.ui.wizard.projectSettingsStep.validate.emptyPackageName.title"));
+            throw new ConfigurationException(message("frc.ui.wizard.projectSettingsStep.validate.blankPackageName.message"),
+                                             message("frc.ui.wizard.projectSettingsStep.validate.blankPackageName.title"));
         }
-        else
+        else if (!isValidPackageName(basePackageName))
         {
-            if (!isValidPackageName(basePackageName))
-            {
-                throw new ConfigurationException(message("frc.ui.wizard.projectSettingsStep.validate.invalidPackageName.message", basePackageName),
-                                                 message("frc.ui.wizard.projectSettingsStep.validate.invalidPackageName.title"));
-            }
+            throw new ConfigurationException(message("frc.ui.wizard.projectSettingsStep.validate.invalidPackageName.message", basePackageName),
+                                             message("frc.ui.wizard.projectSettingsStep.validate.invalidPackageName.title"));
         }
         LOG.trace("[FRC] Exiting FrcProjectSettingsWizardStep.validate() (Gracefully with no validation errors)");
         return true;
@@ -279,6 +279,15 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
             return false;
         }
         
+        return new FrcPsiNameHelper(determineJavaVersion()).isQualifiedName(basePackageName);
+    }
+    
+    
+    
+    
+    
+    private JavaVersion determineJavaVersion()
+    {
         @Nullable
         Sdk sdk = myContext.getProjectJdk();
         if (sdk == null)
@@ -298,8 +307,11 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
                 javaVersion = parsedJavaVersion;
             }
         }
-        return FrcUtilsKt.isValidPackageName(basePackageName, javaVersion);
+        return javaVersion;
     }
+    
+    
+    
     
     
     @Override

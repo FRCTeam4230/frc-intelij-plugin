@@ -42,7 +42,7 @@ import com.intellij.ui.components.JBList;
 import net.javaru.iip.frc.FrcIcons.FRC;
 import net.javaru.iip.frc.i18n.FrcMessageKey;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
-import net.javaru.iip.frc.util.FrcUtilsKt;
+import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
 import net.javaru.iip.frc.util.UiUtilsKt;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
@@ -185,10 +185,10 @@ public class FrcModuleWizardStep extends ModuleWizardStep
         }
     
         //TODO get required minimum Java level from selected template - and perhaps change the validation message
-        FrcUtilsKt.validateMinimumJavaVersion(myBuilder, 
-                                              myContext, 
-                                              11,
-                                              FrcMessageKey.of("frc.ui.wizard.validate.minJavaVersion.additionalMessage.goBack"));
+        FrcJavaLangUtilsKt.validateMinimumJavaVersion(myBuilder,
+                                                      myContext,
+                                                      11,
+                                                      FrcMessageKey.of("frc.ui.wizard.validate.minJavaVersion.additionalMessage.goBack"));
     
         LOG.trace("[FRC] Exiting FrcModuleWizardStep.validate() (Gracefully with no validation errors)");
         return true;

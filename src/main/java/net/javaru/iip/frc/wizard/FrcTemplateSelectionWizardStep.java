@@ -36,7 +36,7 @@ import com.intellij.ui.components.JBTabbedPane;
 
 import net.javaru.iip.frc.FrcIcons.FRC;
 import net.javaru.iip.frc.i18n.FrcMessageKey;
-import net.javaru.iip.frc.util.FrcUtilsKt;
+import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
 
@@ -176,10 +176,10 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         LOG.trace("[FRC] Entering FrcTemplateSelectionWizardStep.validate()");
         //TODO get required minimum Java level from selected template, and if none there, then from the 
         //     JAVA_VERSION key in C:\Users\Public\frc${frcYear}\jdk\release 
-        FrcUtilsKt.validateMinimumJavaVersion(myBuilder,
-                                              myContext,
-                                              11,
-                                              FrcMessageKey.of("frc.ui.wizard.validate.minJavaVersion.additionalMessage.goBack"));
+        FrcJavaLangUtilsKt.validateMinimumJavaVersion(myBuilder,
+                                                      myContext,
+                                                      11,
+                                                      FrcMessageKey.of("frc.ui.wizard.validate.minJavaVersion.additionalMessage.goBack"));
         
         
         LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.validate() (Gracefully with no validation errors)");

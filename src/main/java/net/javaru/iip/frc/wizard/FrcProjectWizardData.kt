@@ -23,13 +23,14 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 const val DEFAULT_BASE_PACKAGE = "frc.robot"
+const val DEFAULT_ROBOT_CLASS_NAME = "Robot"
 
 class FrcProjectWizardData(
         var teamNumber: Int = FrcApplicationSettings.INSTANCE().teamNumber,
         /** The simple name of the Main class (not to be confused with the (primary) Robot class). This is the simple class that has the `main()` method.*/
         var mainClassSimpleName: String = "Main",
         /** The simple name of the primary Robot class (not to be confused with the Main class). This is the class that extends one of the WPILib `RobotBase` classes.*/
-        var robotClassSimpleName: String = "Robot",
+        var robotClassSimpleName: String = DEFAULT_ROBOT_CLASS_NAME,  // if/whn we make settable, we need to change the template copying to rename the file!
         var basePackage: String = DEFAULT_BASE_PACKAGE,
         var wpilibVersion: WpiLibVersion = WpiLibVersionImpl.parse("2019.4.1"), // TODO Need to set the default dynamically. See notes in FrcTemplateSelectionWizardStep.updateDataModel() 
         var gradleDistributionUrl: String = "https\\://services.gradle.org/distributions/gradle-5.0-bin.zip",

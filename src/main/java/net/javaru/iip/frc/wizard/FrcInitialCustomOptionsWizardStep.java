@@ -33,7 +33,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.lang.JavaVersion;
 
 import net.javaru.iip.frc.FrcPluginGlobals;
-import net.javaru.iip.frc.util.FrcUtilsKt;
+import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
 import net.javaru.iip.frc.util.TitleMessagePair;
 
 
@@ -114,9 +114,9 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
                 }
         
                 final TitleMessagePair titleMsgPair =
-                        FrcUtilsKt.createInvalidJdkTitleMessagePair(FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION,
-                                                                    configuredJavaVersion,
-                                                                    null);
+                        FrcJavaLangUtilsKt.createInvalidJdkTitleMessagePair(FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION,
+                                                                            configuredJavaVersion,
+                                                                            null);
                 throw new ConfigurationException(titleMsgPair.getMessage(), titleMsgPair.getTitle());
             }
         }

@@ -29,6 +29,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.externalSystem.model.project.ProjectData;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
@@ -39,6 +40,8 @@ import net.javaru.iip.frc.i18n.FrcMessageKey;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
+
+import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
@@ -180,7 +183,21 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
                                                       myContext,
                                                       11,
                                                       FrcMessageKey.of("frc.ui.wizard.validate.minJavaVersion.additionalMessage.goBack"));
-        
+    
+    
+        final FrcWizardTemplateDefinition selectedTemplate = determineSelectedTemplate();
+        if(selectedTemplate.isDeprecated())
+        {
+            final int answer = Messages.showYesNoDialog(
+                    getComponent(),
+                    message("frc.ui.wizard.templateSelectionStep.validate.deprecatedTemplate.message", selectedTemplate.getDisplayName()),
+                    message("frc.ui.wizard.templateSelectionStep.validate.deprecatedTemplate.title"),
+                    Messages.getWarningIcon());
+            if (answer == Messages.YES)
+            {
+                return false;
+            }
+        }
         
         LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.validate() (Gracefully with no validation errors)");
         return true;

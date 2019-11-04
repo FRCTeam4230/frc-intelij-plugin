@@ -10,6 +10,7 @@
 
 === Developer notes
 * When committing Freemarker Template changes, do not allow IntelliJ IDEA to "Optimize Imports" (via said option in the commit dialog) as it will cause issues with the Freemarker templates with Java as the Template Data Language (reported via https://youtrack.jetbrains.com/issue/IDEA-226072[IDEA-226072])
+* *CHanges not picked up:* Sometimes after making a template change, upon testing, the change is not present. The template file did seem to change in both the `build` output and in the `.sandbox\plugins\FRC`, the change nevertheless appeared even after two restarts (i.e. two reruns of `clean build runIde`). Deleting IDEA's cache, by deleting the directory `.sandbox/system` seemed to solve the issue. So it appears IDEA was caching the resource and reusing the old version.
 
 === IntelliJ IDEA Project Template Data Language
 In addition to error checking the Freemarker template, IntelliJ IDEA can error check the underlying language the template is looking to output. It calls this the "Template Data Language". By default, it will assume "HTML" as the "Template Data Language" -- that is it assume your template is outputting HTML -- and will apply HTML syntax highlighting and error checking to the template data (in addition to the Freemarker syntax highlighting and error checking to the overall file). This means that for a Java file template a line like this is highlighted as an error:

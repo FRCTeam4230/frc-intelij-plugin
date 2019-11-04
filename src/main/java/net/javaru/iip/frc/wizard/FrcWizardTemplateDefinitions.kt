@@ -115,7 +115,7 @@ enum class FrcWizardExampleTemplateDefinition(
     SimpleVision("Simple Vision", "Demonstrates the use of the CameraServer class to stream from a USB Webcam without processing the images.", false, null),
     IntermediateVision("Intermediate Vision", "Demonstrates the use of the NIVision class to capture image from a Webcam, process them, and then send them to the dashboard.", false, null),
     AxisCameraSample("Axis Camera Sample", "An example program that acquires images from an Axis network camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display. This demonstrates the use of the AxisCamera class.", false, null),
-    ShuffleboardSample("Shuffleboard Sample", "An example program that adds data to various Shuffleboard tabs that demonstrates the Shuffleboard API.", false, null),
+    ShuffleboardSample("Shuffleboard Sample", "An example program that adds data to various Shuffleboard tabs, demonstrating the Shuffleboard API.", false, null),
     ;   
 
 

@@ -5,7 +5,7 @@
     Template Language Refernce: https://freemarker.apache.org/docs/ref.html
     Template Author's Guide:    https://freemarker.apache.org/docs/dgui.html
 -->
-<#--  To DEBUG templates, set system property 'frc.freemarker.debug' to true when luanching IntelliJ IDEA -->
+<#--  To DEBUG templates, set system property 'frc.freemarker.debug' to true when luanching the testing instance of IntelliJ IDEA -->
 </#compress>
 distributionBase=GRADLE_USER_HOME
 distributionPath=permwrapper/dists

@@ -45,6 +45,10 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     @SuppressWarnings({"PMD.SingularField", "FieldCanBeLocal"})
     private Thread visionThread;
 
+    /**
+     * This method is run when the robot is first started up and should be
+     * used for any initialization code.
+     */
     @Override
     public void robotInit()
     {

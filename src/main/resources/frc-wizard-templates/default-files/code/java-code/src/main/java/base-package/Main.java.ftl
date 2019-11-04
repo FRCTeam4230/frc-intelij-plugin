@@ -29,7 +29,7 @@ public final class ${data.mainClassSimpleName}
     private ${data.mainClassSimpleName}() {}
 
    /**
-    * Main initialization function. Do not perform any initialization here.
+    * Main initialization method. Do not perform any initialization here.
     * <p>
     * If you change your main Robot class (name), change the parameter type.
     */

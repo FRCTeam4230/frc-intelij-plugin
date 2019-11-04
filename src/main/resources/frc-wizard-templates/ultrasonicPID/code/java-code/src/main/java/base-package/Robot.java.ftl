@@ -34,22 +34,22 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
  */
 public class ${data.robotClassSimpleName} extends TimedRobot
 {
-    /** distance in inches the robot wants to stay from an object. */
+    /** Distance in inches the robot wants to stay from an object. */
     private static final double HOLD_DISTANCE = 12.0;
 
-    /** maximum distance in inches we expect the robot to see. */
+    /** Maximum distance in inches we expect the robot to see. */
     private static final double MAX_DISTANCE = 24.0;
 
-    /** factor to convert sensor values to a distance in inches. */
+    /** Factor to convert sensor values to a distance in inches. */
     private static final double VALUE_TO_INCHES = 0.125;
 
-    /** proportional speed constant. */
+    /** Proportional speed constant. */
     private static final double P = 7.0;
 
-    /** integral speed constant. */
+    /** Integral speed constant. */
     private static final double I = 0.018;
 
-    /** derivative speed constant. */
+    /** Derivative speed constant. */
     private static final double D = 1.5;
 
     private static final int LEFT_MOTOR_PORT = 0;

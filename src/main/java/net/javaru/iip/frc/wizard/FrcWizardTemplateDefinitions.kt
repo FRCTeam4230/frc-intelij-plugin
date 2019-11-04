@@ -85,7 +85,7 @@ enum class FrcWizardProjectTemplateDefinition(
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
    
-    override fun templateResourcesDirName(): String = name.decapitalize()
+    override fun templateResourcesDirName(): String = if (name.length >= 2 && Character.isUpperCase(name[0]) && Character.isUpperCase(name[1])) name else name.decapitalize()
 
     override fun isProjectBootstrapTemplate(): Boolean = true
 }
@@ -127,7 +127,7 @@ enum class FrcWizardExampleTemplateDefinition(
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
-    override fun templateResourcesDirName(): String = name.decapitalize()
+    override fun templateResourcesDirName(): String = if (name.length >= 2 && Character.isUpperCase(name[0]) && Character.isUpperCase(name[1])) name else name.decapitalize()
 
     override fun isProjectBootstrapTemplate(): Boolean = false
 }

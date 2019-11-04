@@ -24,10 +24,10 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 /**
- *  This is a sample program that uses mecanum drive with a gyro sensor to
- *  maintain rotation vectors in relation to the starting orientation of the
- *  robot (field-oriented controls).
- *  <p>
+ * This is a sample program that uses mecanum drive with a gyro sensor to
+ * maintain rotation vectors in relation to the starting orientation of the
+ * robot (field-oriented controls).
+ * <p>
  * The VM is configured to automatically run this class, and to call the
  * methods corresponding to each mode, as described in the TimedRobot
  * documentation. If you change the name of this class or the package after

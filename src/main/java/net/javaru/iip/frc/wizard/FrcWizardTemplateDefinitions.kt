@@ -109,7 +109,7 @@ enum class FrcWizardExampleTemplateDefinition(
     GyroMecanum("Gyro Mecanum", "Demonstrates how to perform mecanum drive with field oriented controls.", false, null),
     HIDRumble("HID Rumble", "Demonstrates how to make human interface devices rumble.", false, null),
     MotorController("Motor Controller", "Demonstrates controlling a single motor with a joystick.", false, null),
-    MotorControlWithEncoder("Motor Control With Encoder", "Demonstrates controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder.", false, null),
+    MotorControlWithEncoder("Motor Control with Encoder", "Demonstrates controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder.", false, null),
     GearsBot("GearsBot", "A fully functional example CommandBased program for WPIs GearsBot robot, ported to the new CommandBased library. This code can run on your computer if it supports simulation.", false, null),
     PacGoat("PacGoat", "A fully functional example CommandBased program for FRC Team 190's 2014 robot. This code can run on your computer if it supports simulation.", false, null),
     SimpleVision("Simple Vision", "Demonstrates the use of the CameraServer class to stream from a USB Webcam without processing the images.", false, null),

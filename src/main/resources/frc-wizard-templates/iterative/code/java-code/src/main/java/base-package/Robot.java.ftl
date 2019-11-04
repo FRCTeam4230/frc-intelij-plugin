@@ -1,5 +1,5 @@
 <#ftl output_format="plainText" encoding="UTF-8">
-<#--noinspection WrongPackageStatement,ALL-->
+<#--noinspection WrongPackageStatement,DanglingJavadoc-->
 <#compress>
 <#-- @ftlvariable name="data" type="net.javaru.iip.frc.wizard.FrcProjectWizardData" -->
 <#--    

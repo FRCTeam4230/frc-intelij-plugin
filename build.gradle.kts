@@ -172,7 +172,7 @@ repositories {
 
 dependencies {
     val junit5Version = "5.5.2"
-    val http4kVersion = "3.173.0"
+    val http4kVersion = "3.194.0"
     
     compile(kotlin("stdlib", kotlinVersion))
     compile(kotlin("reflect", kotlinVersion))

@@ -43,10 +43,10 @@ fun JTextComponent.addTextChangedListener(action: (text: String) -> Unit)
 {
     document.addDocumentListener(object : DocumentListener
                                  {
-                                     override fun changedUpdate(e: DocumentEvent?) = fire(e)
-                                     override fun insertUpdate(e: DocumentEvent?) = fire(e)
-                                     override fun removeUpdate(e: DocumentEvent?) = fire(e)
-                                     fun fire(e: DocumentEvent?) = action.invoke(text)
+                                     override fun changedUpdate(e: DocumentEvent?) = fire()
+                                     override fun insertUpdate(e: DocumentEvent?) = fire()
+                                     override fun removeUpdate(e: DocumentEvent?) = fire()
+                                     fun fire() = action.invoke(text)
                                  })
 }
 

@@ -35,13 +35,13 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.lang.JavaVersion;
 
+import kotlin.Unit;
 import net.javaru.iip.frc.FrcIcons.FRC;
 import net.javaru.iip.frc.FrcPluginGlobals;
 import net.javaru.iip.frc.i18n.FrcMessageKey;
@@ -77,6 +77,9 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
     private JBLabel teamNumberWarningIconLabel;
     private JCheckBox includeVsCodeConfigsCheckBox;
     private JBLabel basePackageWarningLabel;
+    private JPanel gitignorePanel;
+    private JCheckBox includeGitignoreFileCheckBox;
+    private JButton configureGitignoreButton;
     
     
     public FrcProjectSettingsWizardStep(@NotNull FrcModuleBuilder builder, @NotNull WizardContext context)
@@ -106,12 +109,30 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
         UiUtilsKt.setTextIfEmpty(basePackageTextField, dataModel.getBasePackage());
         basePackageWarningLabel.setVisible(false);
         UiUtilsKt.addTextChangedListener(basePackageTextField, text -> { basePackageWarningLabel.setVisible(StringUtils.isBlank(text));
-            return null;
+            return Unit.INSTANCE;
         });
         basePackageDefaultButton.addActionListener(e -> basePackageTextField.setText(FrcProjectWizardDataKt.DEFAULT_BASE_PACKAGE));
         includeVsCodeConfigsCheckBox.setSelected(dataModel.getIncludeVsCodeConfigs());
-        
+        includeGitignoreFileCheckBox.setSelected(dataModel.getGitIgnoreConfiguration().getIncludeGitIgnoreFile());
+        includeGitignoreFileCheckBox.addActionListener(e -> {dataModel.getGitIgnoreConfiguration().setIncludeGitIgnoreFile(includeGitignoreFileCheckBox.isSelected());});
+        configureGitignoreButton.setEnabled(dataModel.getGitIgnoreConfiguration().getIncludeGitIgnoreFile());
+        includeGitignoreFileCheckBox.addChangeListener(e -> configureGitignoreButton.setEnabled(includeGitignoreFileCheckBox.isSelected()));
+        configureGitignoreButton.addActionListener(e -> displayGitIgnoreConfigurationDialog());
         LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.initComponents()");
+    }
+    
+    
+    private void displayGitIgnoreConfigurationDialog()
+    {
+    
+        final FrcProjectWizardData dataModel = myBuilder.getDataModel();
+        final GitIgnoreConfiguration gitIgnoreConfiguration = dataModel.getGitIgnoreConfiguration().fullCopy();
+        final GitIgnoreOptionsDialogWrapper dialogWrapper = new GitIgnoreOptionsDialogWrapper(rootPanel, gitIgnoreConfiguration);
+        final boolean ok = dialogWrapper.showAndGet();
+        if (ok)
+        {
+            dataModel.setGitIgnoreConfiguration(gitIgnoreConfiguration); 
+        }
     }
     
     

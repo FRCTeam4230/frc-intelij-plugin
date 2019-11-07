@@ -53,17 +53,27 @@ import net.javaru.iip.frc.FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION
 import net.javaru.iip.frc.freemarker.FM_TEMPLATE_EXT_WITH_DOT
 import net.javaru.iip.frc.freemarker.freemarkerConfiguration
 import net.javaru.iip.frc.util.getPluginResource
+import net.javaru.iip.frc.util.getPluginResourceAsStream
 import net.javaru.iip.frc.util.isValidJavaVersion
 import net.javaru.iip.frc.util.isValidJdk
 import net.javaru.iip.frc.util.reader
 import net.javaru.iip.frc.util.removeBasePath
+import net.javaru.iip.frc.util.toCommaDelimitedString
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
+import org.http4k.client.ApacheClient
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.jetbrains.plugins.gradle.service.project.GradleNotification
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 import javax.swing.Icon
 
@@ -275,7 +285,6 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         assert(rootProjectPath != null) { "rootProjectPath is null"}
         
         
-        // TODO add option to include a .gitignore file
 
         //TODO Need to enhance the calls to the defaults check if the template has overridden any of the files
         copyAllResourcesToModuleRoot(modelContentRootDir, gradleGroovyDslResourceBase)
@@ -286,6 +295,20 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         if (dataModel.includeVsCodeConfigs)
         {
             copyAllResourcesToModuleRoot(modelContentRootDir, vsCodeConfigsResourceBase)
+        }
+        
+        if (dataModel.gitIgnoreConfiguration.includeGitIgnoreFile)
+        {
+            try
+            {
+                val gitIgnoreContent = generateGitIgnoreFileContent(dataModel.gitIgnoreConfiguration)
+                val file = Paths.get(modelContentRootDir.path).resolve(".gitignore")
+                Files.newBufferedWriter(file, Charsets.UTF_8).use { it.write(gitIgnoreContent) }
+            }
+            catch (e: Exception)
+            {
+                LOG.warn("[FRC] Unable to create .gitignore file due to an exception: $e", e)
+            }
         }
         
         val selectedTemplateResourceBase = frcWizardTemplatesBaseDir.resolve(dataModel.frcWizardTemplateDefinition.templateResourcesDirName()).resolve(javaCodeSubPath)
@@ -314,7 +337,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             }
             else
             {
-                val list = VfsUtil.collectChildrenRecursively(srcFqBaseDir).filter { !it.isDirectory }.forEach {
+                VfsUtil.collectChildrenRecursively(srcFqBaseDir).filter { !it.isDirectory }.forEach {
                     val resourceRelativePath = Paths.get(it.toString().removePrefix("$srcFqBaseDir")).removeBasePath(Paths.get("/"))
                     if (resourceRelativePath.fileName.toString().endsWith(FM_TEMPLATE_EXT_WITH_DOT))
                         copyFreemarkerTemplate(modelContentRootDir, it, srcFqBaseDir)
@@ -342,7 +365,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         catch (e: Exception)
         {
             LOG.warn("[FRC] Could not copy new project wizard file '$srcFqVf' to new project root '${modelContentRootDir}' exception: $e", e)
-            return null;
+            return null
         }
     }
     
@@ -425,6 +448,136 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         return LocalFileSystem.getInstance().refreshAndFindFileByPath(File(path).apply { mkdirs() }.absolutePath)
     }
     
+    private fun generateGitIgnoreFileContent(config: GitIgnoreConfiguration): String
+    {
+        val (templates: MutableList<String>, manualEntries: StringBuilder) = extractGitIgnoreTemplates(config)
+        val content = StringBuilder()
+        
+        if(templates.isNotEmpty())
+        {
+            var createFromCache = !config.generateFromSite
+            if (!createFromCache)
+            {
+                try
+                {
+                    val url = "https://gitignore.io/api/${templates.toCommaDelimitedString(false)}"
+                    val client = ApacheClient()
+                    val request = Request(Method.GET, url)
+                    val response = client(request)
+                    if (response.status.code != 200)
+                    {
+                        LOG.warn("[FRC] Did not get a successful response when querying gitignore.io in order dynamically create .gitignore file. Response status was ${response.status.code} : ${response.status.description}  Request URI was >>${request.uri}<<")
+                        createFromCache = true
+                    }
+                    else
+                    {
+                        content.appendln("# Dynamically generated by IntelliJ IDEA FRC Plugin on ${java.time.format.DateTimeFormatter.ofPattern("EEEE MMMM d, yyyy h:mm:ss a zzz").format(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))} using https://gitignore.io")
+                        content.appendln(response.bodyString())
+                    }
+                }
+                catch (e: Exception)
+                {
+                    LOG.warn("[FRC] An exception occurred when attempting to dynamically create .gitignore file from gitignore.io website. Will generate from cache. Cause Summary: $e", e)
+                    createFromCache = true
+                }
+            }
+
+            if (createFromCache)
+            {
+                content.appendln(generateGitIgnoreSiteContentFromCachedFiles(templates, config.additionalGitignoreTemplates))
+            }
+        }
+        
+        if (manualEntries.isNotBlank())
+        {
+            content.appendln("# === Entries from IntelliJ IDEA FRC Plugin New FRC Project Wizard ===")
+            content.appendln()
+            content.append(manualEntries)
+            content.appendln()
+            content.appendln()
+            content.appendln("# End entries from IntelliJ IDEA FRC Plugin")
+            content.appendln()
+        }
+        
+        return content.toString()
+    }
+
+
+   
+    private fun generateGitIgnoreSiteContentFromCachedFiles(templates: MutableList<String>, additionalTemplates: List<String>): String
+    {
+        val filteredTemplates = templates.filterNot { additionalTemplates.contains(it) }
+        val templatesString = filteredTemplates.toCommaDelimitedString(false)
+        val content = StringBuilder()
+
+        content.appendln()
+        content.appendln("# Created by https://www.gitignore.io/api/$templatesString")
+        content.appendln("# Edit at https://www.gitignore.io/?templates=$templatesString")
+        content.appendln()
+        filteredTemplates.sorted().forEach { templateName ->
+            val path = "frc-wizard-gitignore/$templateName.txt"
+            val inputStream = getPluginResourceAsStream(path)
+            if (inputStream == null) {
+                LOG.warn("[FRC] could not find gitignore cached template '$path' in plugin resources")
+            }
+            else {
+                inputStream.use { innerStream ->
+                    val reader = BufferedReader(InputStreamReader(innerStream, Charsets.UTF_8))
+                    reader.lines().forEach { line: String? ->
+                        content.appendln(line)
+                    }
+                }
+                content.appendln()
+            }
+        }
+        content.appendln()
+        content.appendln("# End of https://www.gitignore.io/api/$templatesString")
+        content.appendln()
+        content.appendln()
+        
+        return content.toString()
+    }
+    
+    
+    private fun extractGitIgnoreTemplates(config: GitIgnoreConfiguration): Pair<MutableList<String>, StringBuilder>
+    {
+        val manualEntries = StringBuilder()
+        val templates = mutableListOf<String>()
+
+        if (config.java) templates.add("java")
+        if (config.gradle) templates.add("gradle")
+
+
+        when (config.intellij)
+        {
+            IdeConfigOption.Share   -> templates.add("intellij+iml")
+            IdeConfigOption.Ignore  -> templates.add("intellij+all")
+            IdeConfigOption.NoEntry -> { /* Do nothing */ }
+        }
+
+        @Suppress("SpellCheckingInspection")
+        when (config.vscode)
+        {
+            IdeConfigOption.Share   -> templates.add("visualstudiocode")
+            IdeConfigOption.Ignore  -> manualEntries.append(
+                    """
+                        ### VisualStudioCode ###
+                        # Ignores the whole .vscode folder 
+                        .vscode/
+                        """.trimIndent())
+            IdeConfigOption.NoEntry -> { /* Do nothing */ }
+        }
+
+        //TODO add Eclipse and NetBeans ?
+
+        if (config.linux) templates.add("linux")
+        if (config.macOS) templates.add("macos")
+        if (config.windows) templates.add("windows")
+        if (config.cpp) templates.add("c++")
+
+        templates.addAll(config.additionalGitignoreTemplates)
+        return Pair(templates, manualEntries)
+    }
     
 
     override fun createWizardSteps(wizardContext: WizardContext, modulesProvider: ModulesProvider): Array<ModuleWizardStep>

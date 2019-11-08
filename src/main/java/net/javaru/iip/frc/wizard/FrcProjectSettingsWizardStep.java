@@ -17,6 +17,7 @@
 package net.javaru.iip.frc.wizard;
 
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.*;
@@ -49,6 +50,7 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
 import net.javaru.iip.frc.util.FrcPsiNameHelper;
 import net.javaru.iip.frc.util.UiUtilsKt;
+import net.javaru.iip.frc.wizard.FrcProjectWizardData.JUnitOption;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
@@ -80,6 +82,11 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
     private JPanel gitignorePanel;
     private JCheckBox includeGitignoreFileCheckBox;
     private JButton configureGitignoreButton;
+    private JPanel junitPanel;
+    private JCheckBox junitCheckBox;
+    private JRadioButton junit5RadioButton;
+    private JRadioButton junit5withVintageRadioButton;
+    private JRadioButton junit4RadioButton;
     
     
     public FrcProjectSettingsWizardStep(@NotNull FrcModuleBuilder builder, @NotNull WizardContext context)
@@ -118,6 +125,47 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
         configureGitignoreButton.setEnabled(dataModel.getGitIgnoreConfiguration().getIncludeGitIgnoreFile());
         includeGitignoreFileCheckBox.addChangeListener(e -> configureGitignoreButton.setEnabled(includeGitignoreFileCheckBox.isSelected()));
         configureGitignoreButton.addActionListener(e -> displayGitIgnoreConfigurationDialog());
+        
+        junit5RadioButton.setActionCommand(JUnitOption.JUnit5.name());
+        junit5withVintageRadioButton.setActionCommand(JUnitOption.JUnit5withVintage.name());
+        junit4RadioButton.setActionCommand(JUnitOption.JUnit4.name());
+        
+        
+        junitCheckBox.setSelected(dataModel.getIncludeJUnitSupport());
+        junit5RadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
+        junit5withVintageRadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
+        junit4RadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
+        
+        switch (dataModel.getJunitOption())
+        {
+            case JUnit5:
+                junit5RadioButton.setSelected(true);
+                break;
+            case JUnit5withVintage:
+                junit5withVintageRadioButton.setSelected(true);
+                break;
+            case JUnit4:
+                junit4RadioButton.setSelected(true);
+        }
+    
+        ItemListener junitVersionOptionChangeListener = e -> {
+            final AbstractButton button = (AbstractButton) e.getSource();
+            final ButtonModel model = button.getModel();
+            final String actionCommand = model.getActionCommand();
+            dataModel.setJunitOption(JUnitOption.valueOf(actionCommand));
+        };
+    
+        junit5RadioButton.addItemListener(junitVersionOptionChangeListener);
+        junit5withVintageRadioButton.addItemListener(junitVersionOptionChangeListener);
+        junit4RadioButton.addItemListener(junitVersionOptionChangeListener);
+    
+        junitCheckBox.addChangeListener(e -> {
+            dataModel.setIncludeJUnitSupport(junitCheckBox.isSelected());
+            junit5RadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
+            junit5withVintageRadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
+            junit4RadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
+        });
+        
         LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.initComponents()");
     }
     

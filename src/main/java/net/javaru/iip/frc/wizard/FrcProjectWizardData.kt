@@ -38,7 +38,11 @@ class FrcProjectWizardData(
         var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizardProjectTemplateDefinition.CommandBased,
         var includeVsCodeConfigs: Boolean = true,
         var gitIgnoreConfiguration: GitIgnoreConfiguration = GitIgnoreConfiguration(true, generateFromSite = true),
-        var doDirectGradleImport: Boolean = true  // Possible put in a default value the application settings
+        var includeJUnitSupport:Boolean = true,
+        var junitOption: JUnitOption = JUnitOption.JUnit5,
+        var junit5Version: String = "5.5.2",
+        var doDirectGradleImport: Boolean = true  // Possible put in a default value the application settings // TODO need to implement a way for users to set
+              
                           )
 {
     val teamNumberString: String
@@ -56,6 +60,11 @@ class FrcProjectWizardData(
     /** The Fully Qualified (FQ) name of the primary Robot class (not to be confused with the Main class). This is the class that extends one of the WPILib `RobotBase` classes.*/
     val robotClassFQ: String
         get() = if (basePackage.isEmpty()) mainClassSimpleName else "${basePackage}.${mainClassSimpleName}"
+    
+    fun junitIncludeVintageSupport(): Boolean = includeJUnitSupport && (junitOption == JUnitOption.JUnit5withVintage)
+    fun junitUseJUnitPlatform(): Boolean = includeJUnitSupport && (junitOption == JUnitOption.JUnit5 || junitOption == JUnitOption.JUnit5withVintage) 
+    fun junitIsJUnit4Only(): Boolean = includeJUnitSupport && (junitOption == JUnitOption.JUnit4)    
+    enum class JUnitOption() {JUnit5, JUnit5withVintage, JUnit4}
 }
 
 data class GitIgnoreConfiguration(

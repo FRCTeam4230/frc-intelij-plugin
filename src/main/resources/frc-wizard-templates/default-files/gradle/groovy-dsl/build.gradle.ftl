@@ -53,15 +53,33 @@ def includeDesktopSupport = false
 repositories {
     mavenCentral()
 }
+<#if data.junitUseJUnitPlatform()>
 
-// Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
-// Also defines JUnit 4.
+test {
+    useJUnitPlatform()
+}
+</#if>
+        
 dependencies {
+<#if data.junitUseJUnitPlatform()>
+    def junit5Version = '${data.junit5Version}'
+</#if>
     compile wpi.deps.wpilib()
     compile wpi.deps.vendor.java()
     nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
-    testCompile 'junit:junit:4.12'
+<#if data.junitIsJUnit4Only()>
+    testImplementation "junit:junit:4.12"
+</#if>
+<#if data.junitUseJUnitPlatform()>
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit5Version"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:$junit5Version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5Version"
+</#if>
+<#if data.junitIncludeVintageSupport()>
+    testImplementation "junit:junit:4.12"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$junit5Version"
+</#if>
 }
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')

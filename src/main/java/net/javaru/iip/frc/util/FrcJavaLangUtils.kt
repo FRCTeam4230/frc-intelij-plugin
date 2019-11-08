@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.util
 
-import com.intellij.ide.util.projectWizard.ModuleBuilder
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.options.ConfigurationException
@@ -51,7 +50,6 @@ That said, the PsiNameHelperImpl.getInstance()
  * Validates that the selected version of Java in the Wizard is at least that of the provided minimum. If the supplied minimum is null or an invalid version string,
  * a warning is logged and no validation occurs.
  *
- * @param moduleBuilder              the module builder
  * @param wizardContext              the wizard context
  * @param requiredMinimumJavaVersion the minimum version of java required
  *
@@ -62,8 +60,7 @@ That said, the PsiNameHelperImpl.getInstance()
  */
 @Throws(ConfigurationException::class)
 @JvmOverloads
-fun validateMinimumJavaVersion(moduleBuilder: ModuleBuilder,
-                               wizardContext: WizardContext,
+fun validateMinimumJavaVersion(wizardContext: WizardContext,
                                requiredMinimumJavaVersion: String?,
                                additionalMessageKey: FrcMessageKey? = null): Boolean
 {
@@ -79,14 +76,12 @@ fun validateMinimumJavaVersion(moduleBuilder: ModuleBuilder,
                  + "' could not be parsed into a Java version. Unable to validate the selected SDK (in the wizard) meets the minimum requirements.")
         return true
     }
-    return validateMinimumJavaVersion(moduleBuilder,
-                                                              wizardContext,
-                                                              minVersion,
-                                                              additionalMessageKey)
+    return validateMinimumJavaVersion(wizardContext,
+                                      minVersion,
+                                      additionalMessageKey)
 }
 
 /**
- * @param moduleBuilder                          the module builder
  * @param wizardContext                          the wizard context
  * @param requiredMinimumJavaVersionFeatureLevel the feature level of the minimum version of java required. For example '8' for '1.8.0_221' and '11' for '11.0.1' and '11.0.1.5'
  * @param minor                                  the minor value of the minimum version of java required. For example '0' for '1.8.0_221' and '11.0.1'
@@ -100,22 +95,19 @@ fun validateMinimumJavaVersion(moduleBuilder: ModuleBuilder,
  */
 @Throws(ConfigurationException::class)
 @JvmOverloads
-fun validateMinimumJavaVersion(moduleBuilder: ModuleBuilder,
-                               wizardContext: WizardContext,
+fun validateMinimumJavaVersion(wizardContext: WizardContext,
                                requiredMinimumJavaVersionFeatureLevel: Int,
                                minor: Int,
                                update: Int,
                                build: Int,
                                additionalMessageKey: FrcMessageKey? = null): Boolean
 {
-    return validateMinimumJavaVersion(moduleBuilder,
-                                      wizardContext,
+    return validateMinimumJavaVersion(wizardContext,
                                       JavaVersion.compose(requiredMinimumJavaVersionFeatureLevel, minor, update, build, false),
                                       additionalMessageKey)
 }
 
 /**
- * @param moduleBuilder                          the module builder
  * @param wizardContext                          the wizard context
  * @param requiredMinimumJavaVersionFeatureLevel the feature level of the minimum version of java required. For example '8' for '1.8.0_221' and '11' for '11.0.1' and '11.0.1.5'
  *
@@ -126,13 +118,11 @@ fun validateMinimumJavaVersion(moduleBuilder: ModuleBuilder,
  */
 @Throws(ConfigurationException::class)
 @JvmOverloads
-fun validateMinimumJavaVersion(moduleBuilder: ModuleBuilder,
-                               wizardContext: WizardContext,
+fun validateMinimumJavaVersion(wizardContext: WizardContext,
                                requiredMinimumJavaVersionFeatureLevel: Int,
                                additionalMessageKey: FrcMessageKey? = null): Boolean
 {
-    return validateMinimumJavaVersion(moduleBuilder,
-                                      wizardContext,
+    return validateMinimumJavaVersion(wizardContext,
                                       JavaVersion.compose(requiredMinimumJavaVersionFeatureLevel),
                                       additionalMessageKey)
 }
@@ -141,7 +131,6 @@ fun validateMinimumJavaVersion(moduleBuilder: ModuleBuilder,
  * Validates that the selected version of Java in the Wizard is at least that of trhe provided minimum. If the supplied minimum is null,
  * a warning is logged and no validation occurs.
  *
- * @param moduleBuilder              the module builder
  * @param wizardContext              the wizard context
  * @param requiredMinimumJavaVersion the minimum version of java required
  * @param additionalMessageKey       a message key data object to be used to append an additional information to the configuration error message. 
@@ -156,8 +145,7 @@ fun validateMinimumJavaVersion(moduleBuilder: ModuleBuilder,
  */
 @Throws(ConfigurationException::class)
 @JvmOverloads
-fun validateMinimumJavaVersion(moduleBuilder: ModuleBuilder,
-                               wizardContext: WizardContext,
+fun validateMinimumJavaVersion(wizardContext: WizardContext,
                                requiredMinimumJavaVersion: JavaVersion?,
                                additionalMessageKey: FrcMessageKey? = null): Boolean
 {

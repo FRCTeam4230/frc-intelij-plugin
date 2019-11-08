@@ -179,8 +179,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         LOG.trace("[FRC] Entering FrcTemplateSelectionWizardStep.validate()");
         //TODO get required minimum Java level from selected template, and if none there, then from the 
         //     JAVA_VERSION key in C:\Users\Public\frc${frcYear}\jdk\release 
-        FrcJavaLangUtilsKt.validateMinimumJavaVersion(myBuilder,
-                                                      myContext,
+        FrcJavaLangUtilsKt.validateMinimumJavaVersion(myContext,
                                                       11,
                                                       FrcMessageKey.of("frc.ui.wizard.validate.minJavaVersion.additionalMessage.goBack"));
     

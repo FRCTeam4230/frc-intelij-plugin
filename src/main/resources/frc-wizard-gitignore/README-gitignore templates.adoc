@@ -1,0 +1,34 @@
+These files are the "heart" of the template outputs from https://www.gitignore.io/api/{template} We do however remove the two header lines and the single footer line. This is so we can combine them into a single output adding the header and footer lines for the entire output.
+
+For example, https://www.gitignore.io/api/foo might generate:
+
+[source, .gitignore]
+----
+# Created by https://www.gitignore.io/api/foo
+# Edit at https://www.gitignore.io/?templates=foo
+
+### Foo ###
+# Some Comment
+tmp/
+foo.*
+bar.*
+
+# Log files
+*.log
+
+# End of https://www.gitignore.io/api/foo
+----
+
+Out `foo.txt` file would just contain:
+
+[source,.gitignore]
+----
+### Foo ###
+# Some Comment
+tmp/
+foo.*
+bar.*
+
+# Log files
+*.log
+----

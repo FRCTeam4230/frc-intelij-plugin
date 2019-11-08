@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,7 +31,8 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
-import net.javaru.iip.frc.util.FrcUtils;
+import net.javaru.iip.frc.util.FrcIoExtsKt;
+import net.javaru.iip.frc.util.FrcUtilsKt;
 
 import static net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService.SystemPropertyKeys.SIMULATED_LOG_SERVICE_ENABLED_PROP_KEY;
 import static net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService.SystemPropertyKeys.SIMULATED_LOG_SERVICE_PORT_PROP_KEY;
@@ -108,8 +108,8 @@ public class RioLogUdpSocketManagerApplicationService
                 {
                     ((MulticastSocket) socket).leaveGroup(getSimulatedServiceGroupAddress());
                 }
-                FrcUtils.executeQuietly(socket::disconnect);
-                IOUtils.closeQuietly(socket);
+                FrcUtilsKt.executeQuietly(socket::disconnect);
+                FrcIoExtsKt.closeQuietly(socket);
             }
         }
         catch (Exception e)

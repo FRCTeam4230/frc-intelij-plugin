@@ -17,6 +17,9 @@
 package net.javaru.iip.frc.util
 
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import org.jetbrains.plugins.gradle.settings.GradleSettings
 
@@ -55,8 +58,9 @@ fun Project?.isGradleProject(): Boolean
     return try
     {
         // copied from   org/jetbrains/plugins/gradle/execution/GradleConsoleFilterProvider.java:59
-        // Need to determine if there is a better way to do this.
-        // I've asked here: https://intellij-support.jetbrains.com/hc/en-us/community/posts/360004424640-Determine-if-a-project-is-a-Gradle-Project
+        // When asked if this was ok methodology on forums: https://intellij-support.jetbrains.com/hc/en-us/community/posts/360004424640-Determine-if-a-project-is-a-Gradle-Project
+        // The response was yes that that works, as would
+        //     ExternalSystemApiUtil.isExternalSystemAwareModule(GradleConstants.SYSTEM_ID, module)
         if (this == null) false else !GradleSettings.getInstance(this).linkedProjectsSettings.isEmpty()
     }
     catch (e: Exception)
@@ -64,4 +68,32 @@ fun Project?.isGradleProject(): Boolean
         LOG.warn("An exception occurred when checking if a project in is a Gradle Based Project. Cause Summary: $e", e)
         false
     }
+}
+
+fun Project.backgroundTask(
+        name: String,
+        indeterminate: Boolean = true,
+        cancellable: Boolean = false,
+        background: Boolean = false,
+        callback: (indicator: ProgressIndicator) -> Unit
+                          )
+{
+    ProgressManager.getInstance().run(object : Task.Backgroundable(this, name, cancellable, { background })
+                                      {
+                                          override fun shouldStartInBackground() = background
+
+                                          override fun run(indicator: ProgressIndicator)
+                                          {
+                                              try
+                                              {
+                                                  if (indeterminate) indicator.isIndeterminate = true
+                                                  callback(indicator)
+                                              }
+                                              catch (e: Throwable)
+                                              {
+                                                  e.printStackTrace()
+                                                  throw e
+                                              }
+                                          }
+                                      })
 }

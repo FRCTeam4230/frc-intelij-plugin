@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.Transient
 import net.javaru.iip.frc.util.UriUtils
@@ -77,7 +78,8 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                    */
                                   var rioRestartRegexString: String = "(?ium).*Launching.*FRCUserProgram\\.jar.*", /* TODO Need to update for Gradle based deploy*/
                                   /* Tracking for notification of the 2019 update requirement */
-                                  var notify19Up: String = "2019-01-01"
+                                  var notify19Up: String = "2019-01-01",
+                                  var enableGradleImportUponNewProjectCreation: Boolean = true
                                  ) : PersistentStateComponent<FrcApplicationSettings>
 {
     companion object Settings
@@ -100,7 +102,7 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
         {
             return try
             {
-                isValidTeamNumber(Integer.valueOf(teamNumberString))
+                !StringUtil.isEmptyOrSpaces(teamNumberString) && isValidTeamNumber(Integer.valueOf(teamNumberString))
             }
             catch (ignore: NumberFormatException)
             {

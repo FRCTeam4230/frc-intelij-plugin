@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class FrcBundle
     //private static final Logger LOG = Logger.getInstance(FrcBundle.class);
     
     @NonNls
-    private static final String BUNDLE_NAME = "i18n.FrcBundle";
+    static final String BUNDLE_NAME = "i18n.FrcBundle";
     private static Reference<ResourceBundle> ourBundle;
 
 
@@ -66,6 +66,12 @@ public class FrcBundle
         return BundleBase.message(getBundle(), key, params);
     }
 
+    
+    @NotNull
+    public static String message(@NotNull FrcMessageKey messageKey)
+    {
+        return message(messageKey.getKey(), messageKey.getParams());
+    }
 
     @Nullable
     @Contract("_,!null,_ -> !null")
@@ -75,7 +81,12 @@ public class FrcBundle
     {
         return BundleBase.messageOrDefault(getBundle(), key, defaultValue, params);
     }
-
+    
+    
+    public static String messageOrDefault(@NotNull FrcMessageKey messageKey, @Nullable final String defaultValue)
+    {
+        return BundleBase.messageOrDefault(getBundle(), messageKey.getKey(), defaultValue, messageKey.getParams());
+    }
 
     @Nullable
     public static String messageOrNull(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key,
@@ -85,6 +96,14 @@ public class FrcBundle
         return (key.equals(value)) ? null :value;
     }
     
+    
+    @Nullable
+    public static String messageOrNull(@NotNull FrcMessageKey messageKey)
+    {
+        String value = messageOrDefault(messageKey.getKey(), messageKey.getKey(), messageKey.getParams());
+        return (messageKey.getKey().equals(value)) ? null : value;
+    
+    }
 
     /**
      * Gets a resource bundled message and returns it in inside HTML tags centering the text for use on a Swing label. 
@@ -96,6 +115,7 @@ public class FrcBundle
      * @param params any parameters used within the message
      * @return the localized message inside HTML tags centering the text
      */
+    @NotNull
     public static String messageLabelCentered(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params)
     {
         return FrcUiUtils.centerLabelText(message(key, params));

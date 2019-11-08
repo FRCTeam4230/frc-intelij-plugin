@@ -96,7 +96,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     public void projectOpened()
     {
         
-        // IMPORTANT: Keep in mine the project is not yet fully initialized. 
+        // IMPORTANT: Keep in mind the project is not yet fully initialized. 
         //            As such, some activities can not occur yet. Use:
         //               StartupManager.getInstance(myProject).registerPostStartupActivity(() -> someMethod(myProject));
         

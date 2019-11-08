@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package net.javaru.iip.frc.wpilib.version
 
 import com.google.common.collect.ImmutableList
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion.PreReleaseModifier
+import org.apache.commons.lang3.RandomUtils
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
@@ -74,7 +75,22 @@ internal class WpiLibVersionTest
                 { assertEquals(expected.preReleaseModifierVersion, actual.preReleaseModifierVersion, "PreReleaseModifierVersion") }
                  )
     }
-
+    
+    @Test
+    fun parseOneOffs()
+    {
+        // TODO: These parse ok, but they some do not sort properly. Need to modify the version classes, then add these to the list to be sorted
+        //       See Issue #34 and the notes in Issue #23
+        assertAll(
+                
+                { assertNotNull(WpiLibVersionImpl.parse("2020.1.1-beta-1"))},
+                { assertNotNull(WpiLibVersionImpl.parse("2020.1.1-beta-2"))},
+                { assertNotNull(WpiLibVersionImpl.parse("2019.1.1-beta-4-pre1"))},
+                { assertNotNull(WpiLibVersionImpl.parse("2019.1.1-beta-4a"))},
+                { assertNotNull(WpiLibVersionImpl.parse("2019.1.1-beta-4b"))},
+                { assertNotNull(WpiLibVersionImpl.parse("2019.1.1-beta-4c"))}
+                 )
+    }
 
     @RepeatedTest(5)
     fun compareTo()
@@ -97,6 +113,16 @@ internal class WpiLibVersionTest
                  )
     }
 
+    @ParameterizedTest
+    @MethodSource("areNotEqualProvider")
+    fun areNotEqual(tested: WpiLibVersion, other: WpiLibVersion)
+    {
+        assertAll(
+                { assertFalse(tested == other, "version '$tested' should not equal version '$other' but did")}
+                 )
+       
+    }
+    
     @ParameterizedTest
     @MethodSource("isNewerThanProvider")
     fun isNewerThan(x: WpiLibVersion, y: WpiLibVersion, expectedIsXNewerThanY: Boolean)
@@ -291,6 +317,19 @@ internal class WpiLibVersionTest
             return args
         }
 
+        @JvmStatic
+        fun areNotEqualProvider(): Iterable<Arguments>
+        {
+            val args = ArrayList<Arguments>()
+            versionList.forEachIndexed { index, wpiLibVersion -> 
+                var randomIndex: Int
+                do {
+                    randomIndex = RandomUtils.nextInt(0, versionList.size)
+                } while (randomIndex == index)
+                args.add(Arguments.of(wpiLibVersion, versionList.get(randomIndex)))
+            }
+            return args;
+        }
 
         @JvmStatic
         fun parseProvider(): Iterable<Arguments>

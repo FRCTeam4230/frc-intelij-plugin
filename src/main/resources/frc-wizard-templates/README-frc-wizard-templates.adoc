@@ -1,0 +1,31 @@
+= FRC Wizard Templates
+:toc:
+:imagesdir: assets/images
+:homepage: http://asciidoctor.org
+:icons: font
+:sectanchors:
+:sectlinks:
+
+== Freemarker Notes
+
+=== Developer notes
+* When committing Freemarker Template changes, do not allow IntelliJ IDEA to "Optimize Imports" (via said option in the commit dialog) as it will cause issues with the Freemarker templates with Java as the Template Data Language (reported via https://youtrack.jetbrains.com/issue/IDEA-226072[IDEA-226072])
+* *CHanges not picked up:* Sometimes after making a template change, upon testing, the change is not present. The template file did seem to change in both the `build` output and in the `.sandbox\plugins\FRC`, the change nevertheless appeared even after two restarts (i.e. two reruns of `clean build runIde`). Deleting IDEA's cache, by deleting the directory `.sandbox/system` seemed to solve the issue. So it appears IDEA was caching the resource and reusing the old version.
+
+=== IntelliJ IDEA Project Template Data Language
+In addition to error checking the Freemarker template, IntelliJ IDEA can error check the underlying language the template is looking to output. It calls this the "Template Data Language". By default, it will assume "HTML" as the "Template Data Language" -- that is it assume your template is outputting HTML -- and will apply HTML syntax highlighting and error checking to the template data (in addition to the Freemarker syntax highlighting and error checking to the overall file). This means that for a Java file template a line like this is highlighted as an error:
+[source]
+----
+List<String> names = new ArrayList<>();
+----
+It will see the `<String>` as an "Unknown html tag 'String'",. It will also have an error at the end of the document for a unclosed element. We can tell IntelliJ IDEA that our `Robot.java.ftl` file is using Java as its Template Data Language and thus all the data in it should be interpreted as producing Java and not HTML. (It is unfortunate that IntelliJ IDEA does not pick up the 'java' in the .java.ftl extension and automatically apply "Java" as the Template Data Language.)
+
+We can do this on a per file basis, a per directory basis, as well as changing the default for the project from HTML to Java. Given that most of our templates are Java, it is generally easier to make the default for the project "Java" and then specify specific Data Template Languages for some directories -- such as "Groovy" for the "frc-wizard-templates/default-files/gradle/groovy-dsl" directory -- or fpr a specific file  "Groovy" for the "build.gradle.ftl" file. You can make these settings in __**File | Settings | Languages & Frameworks | Template Data Languages**__ For an individual file, you can quickly get to this setting by putting your cursor on an highlighted error (such as `<String>` in the above example) and open the Quick Fix window via `Alt+Enter` and selecting the "__Change HTML template data language to...__" option. This will open the "Template Data Language" settings dialog with the path to the file prepopulated. Finally, even when the default Data Language is set to "<None>" in the "Template Data Language" settings, it seems like IntelliJ IDEA still uses HTML as the Data Language.
+
+Because our Java templates place the package statement in an if block and uses a placeholder for the base package, IntelliJ IDEA will highlight an error (on the class name) saying "Missing package statement". We can supress this for the file with a comment at the very top of the file just after the `<#ftl>` root tag. For example:
+
+[source]
+----
+<#ftl output_format="plainText" encoding="UTF-8">
+<#--noinspection WrongPackageStatement-->
+----

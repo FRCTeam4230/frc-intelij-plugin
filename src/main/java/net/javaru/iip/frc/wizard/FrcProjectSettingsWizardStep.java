@@ -18,8 +18,6 @@ package net.javaru.iip.frc.wizard;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import javax.swing.*;
 
 import org.apache.commons.lang3.StringUtils;
@@ -188,50 +186,22 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
     {
         // We may need to update this when the team number changed from an application setting to a project setting
         UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getDataModel().getTeamNumber()));
-        updateTeamNumberWarningVisibility();
+        updateTeamNumberWarningVisibility(FrcApplicationSettings.Settings.isValidTeamNumber(teamNumberTextField.getText()));
         
-        teamNumberTextField.addKeyListener(new KeyListener()
-        {
-            private String previousText = teamNumberTextField.getText();
+        teamNumberTextField.addKeyListener(new TeamNumberKeyChangeListener(teamNumberTextField) {
             @Override
-            public void keyTyped(KeyEvent e) { }
-            @Override
-            public void keyPressed(KeyEvent e) { }
-            
-            @Override
-            public void keyReleased(KeyEvent e)
+            public void makeUpdates(@NotNull String text, boolean isValidTeamNumber)
             {
-                String updatedText = StringUtils.replaceAll(teamNumberTextField.getText().trim(), "\\s", "").trim();
-                teamNumberTextField.setText(updatedText); // set to the trimmed value - this mostly handles values pasted in with spaces
-                if (StringUtils.isBlank(updatedText))
-                {
-                    // We all the filed to be blanked out (which is not a valid team number), but the updateTeamNumberWarningVisibility called at the end of this method will turn on the warning icon
-                    previousText = updatedText;
-                }
-                else
-                {
-                    try
-                    {
-                        Long.parseLong(updatedText); // handle case of extra digits while editing the field by checking for a valid Long rather than an Int
-                        // it is a valid number, so update the previousText for the next loop through
-                        previousText = updatedText;
-                    }
-                    catch (NumberFormatException ignore)
-                    {
-                        //not a valid integer; so replace the text with the previous value (effectively deleting the invalid character)
-                        teamNumberTextField.setText(previousText.trim());
-                    }
-                }
-                updateTeamNumberWarningVisibility();
+                updateTeamNumberWarningVisibility(isValidTeamNumber);
             }
         });
     }
     
-    private void updateTeamNumberWarningVisibility()
+    private void updateTeamNumberWarningVisibility(boolean isValidTeamNumber)
     {
         try
         {
-            teamNumberWarningIconLabel.setVisible(!FrcApplicationSettings.Settings.isValidTeamNumber(teamNumberTextField.getText()));
+            teamNumberWarningIconLabel.setVisible(!isValidTeamNumber);
         }
         catch (Exception e)
         {
@@ -316,6 +286,24 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
                     () -> IdeFocusManager.getInstance(myProjectOrNull).requestFocus(teamNumberTextField, true));
             throw new ConfigurationException(message("frc.ui.wizard.mws.validate.teamNumberRequired.message"),
                                              message("frc.ui.wizard.mws.validate.teamNumberRequired.title"));
+        }
+        else if (!FrcApplicationSettings.Settings.INSTANCE().isTeamNumberConfigured())
+        {
+            int projectTeamNumber = 0;
+            try
+            {
+                projectTeamNumber = Integer.parseInt(teamNumberTextField.getText());
+            }
+            catch (NumberFormatException e)
+            {
+                LOG.warn("[FRC] Could not parse configured team number of '" + teamNumberTextField.getText() + "' despite it having just passed validation." );
+            }
+            final TeamNumberDialogWrapper dialogWrapper = new TeamNumberDialogWrapper(rootPanel, projectTeamNumber);
+            final boolean ok = dialogWrapper.showAndGet();
+            if (ok)
+            {
+                FrcApplicationSettings.Settings.INSTANCE().setTeamNumber(dialogWrapper.getTeamNumberForAppSettings());
+            }
         }
         
         //TODO get required minimum Java level from selected template - and perhaps change the validation message

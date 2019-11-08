@@ -52,6 +52,7 @@ import net.javaru.iip.frc.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION
 import net.javaru.iip.frc.freemarker.FM_TEMPLATE_EXT_WITH_DOT
 import net.javaru.iip.frc.freemarker.freemarkerConfiguration
+import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.util.getPluginResource
 import net.javaru.iip.frc.util.getPluginResourceAsStream
 import net.javaru.iip.frc.util.isValidJavaVersion
@@ -176,22 +177,31 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         
         //assert(rootProjectPath != null) { "project root path was null" }
 
-        if(dataModel.doDirectGradleImport)
+        if(FrcApplicationSettings.INSTANCE().enableGradleImportUponNewProjectCreation)
         {
+            LOG.info("[FRC] Programmatic Gradle Import of new FRC Project is enabled in Application Settings. Executing Gradle Import")
             autoImportGradleProject(module)
+        }
+        else
+        {
+            LOG.info("[FRC] Programmatic Gradle Import of new FRC Project is NOT enabled in Application Settings. A gradle import will not occur.")
+
         }
     }
 
     private fun autoImportGradleProject(module: Module?)
     {
-        if (module?.project != null)
+        if (module?.project == null)
+        {
+            LOG.warn("[FRC] project or module is null. Cannot programmatically import Gradle project.")
+        }
+        else
         {
             StartupManager.getInstance(module.project).runWhenProjectIsInitialized() {
                 try
                 {
                     if (module.project.basePath != null)
                     {
-
                         val project = module.project
                         val notificationsManager = NotificationsManager.getNotificationsManager()
                         val notifications = notificationsManager.getNotificationsOfType(Notification::class.java, project)
@@ -212,7 +222,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 }
                 catch (e: Exception)
                 {
-                    LOG.warn("[FRC] Could not auto import Gradle project due to an exception: $e", e)
+                    LOG.warn("[FRC] Could not programmatically import Gradle project due to an exception: $e", e)
                 }
             }
         }

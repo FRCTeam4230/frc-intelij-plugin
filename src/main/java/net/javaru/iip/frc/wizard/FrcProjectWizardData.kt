@@ -40,9 +40,7 @@ class FrcProjectWizardData(
         var gitIgnoreConfiguration: GitIgnoreConfiguration = GitIgnoreConfiguration(true, generateFromSite = true),
         var includeJUnitSupport:Boolean = true,
         var junitOption: JUnitOption = JUnitOption.JUnit5,
-        var junit5Version: String = "5.5.2",
-        var doDirectGradleImport: Boolean = true  // Possible put in a default value the application settings // TODO need to implement a way for users to set
-              
+        var junit5Version: String = "5.5.2"
                           )
 {
     val teamNumberString: String

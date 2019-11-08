@@ -68,8 +68,11 @@ public class FrcApplicationSettingsForm
     private JButton sshPasswordToDefaultButton;
     private JBTextField roboRioFieldLocalHostName;
     private JButton fieldLocalHostNameDefaultValueButton;
-
-
+    private JPanel projectWizardSettingsPanel;
+    private JCheckBox enableGradleImportUponNewProjectCreationCheckBox;
+    private JBLabel teamNumberAdditopnalInfoLabel;
+    
+    
     public FrcApplicationSettingsForm()
     {
         initForm();
@@ -86,6 +89,7 @@ public class FrcApplicationSettingsForm
         initTeamNumberField();
         initRoboRioComponents();
         initSshSettingComponents();
+        initProjectWizardSettings();
 
 //        portToDefaultValueButton.addActionListener(e -> setUdpPortToDefault());
     }
@@ -130,6 +134,7 @@ public class FrcApplicationSettingsForm
         final boolean teamNumberHasChanged = frcApplicationSettings.getTeamNumber() != internalFrcApplicationSettings.getTeamNumber();
         frcApplicationSettings.setTeamNumber(internalFrcApplicationSettings.getTeamNumber());
         frcApplicationSettings.setRioLogUdpPort(internalFrcApplicationSettings.getRioLogUdpPort());
+        frcApplicationSettings.setEnableGradleImportUponNewProjectCreation(internalFrcApplicationSettings.getEnableGradleImportUponNewProjectCreation());
         
         frcRoboRioSettings.setRoboRioHost_USB(internalFrcRoboRioSettings.getRoboRioHost_USB());
         frcRoboRioSettings.setRoboRioHost_IP(internalFrcRoboRioSettings.getRoboRioHost_IP());
@@ -539,6 +544,14 @@ public class FrcApplicationSettingsForm
                                                           });
     }
 
+    private void initProjectWizardSettings()
+    {
+        enableGradleImportUponNewProjectCreationCheckBox.setSelected(internalFrcApplicationSettings.getEnableGradleImportUponNewProjectCreation());
+    
+        enableGradleImportUponNewProjectCreationCheckBox.addActionListener(e-> {
+            internalFrcApplicationSettings.setEnableGradleImportUponNewProjectCreation(enableGradleImportUponNewProjectCreationCheckBox.isSelected());
+        });
+    }
 
     private void resetSshSettingsFields()
     {

@@ -45,9 +45,9 @@
         <p> </p>
         <p>
             This plugin will work with either the free open-sourced <em>Community Edition</em> or the 
-            licensed <em>Ultimate Edition</em> of IntelliJ IDEA. As of v0.6, <strong>this plugin requires 
-            IntelliJ IDEA v2017.3 or later.</strong> However, support for v2017.3 up to and including v208.3
-            will soon be dropped.
+            licensed <em>Ultimate Edition</em> of IntelliJ IDEA. As of v0.8, <strong>this plugin requires 
+            IntelliJ IDEA v2019.2 or later.</strong> Moving forward, I will be limiting support to only
+            the latest IntelliJ IDEA release or two.
         </p>
         <p> </p>
         <p>
@@ -65,29 +65,31 @@
     ]]></description>
 
     <change-notes><![CDATA[
-    
-      <strong>NEXT VERSION</strong> <br>
+      <strong>v0.8</strong> <br>
+      &nbsp;&nbsp;&bull; Implemented <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/28">Feature #28</a>, adding a robust new FRC Robot Project
+      Wizard.<br>
       &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/21">Issue #21</a>, improving the plugin's comparability with
-      GradleRIO based projects. <br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9702; A <em>New Robot Project</em> wizard still needs to be implemented for GradleRIO projects. Follow 
-      <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/28">Issue #28</a> for more information.<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9702; This change introduced a minor regression. When an FRC project is opened, the RIO Log Net Console is auto starting (i.e.
-      attempts to connect to the roboRIO). This is due to a refresh being issued during project opening that did not previously occur (due to the differences in 
-      how a Gradle project is opened versus an Ant based project). Given this is a minor inconvenience, this release was not delayed before fixing. You can watch 
-      <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/28">Issue #28</a> to monitor the progress on this issue.<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9702; GradleRIO importing is a little glitchy in IntelliJ IDEA v2017.3 through and including v 2018.3. It works, but 
-      not smoothly. I will attempt to find a fix, but did not want to delay this release. That said, please see the next bullet.<br> 
-      &nbsp;&nbsp;&bull; Due to IntelliJ IDEA Plugin changes in both v2019.1.x and 2019.2.x, separate versions are being published for v2017.3 through 2018.3, v2019.1.x, 
-      and v2019.2.x. The different versions will be noted as a fourth number in the version string. For example for this version, there is v0.8,0.173, v0.8.0.191, and v0.8.0.192. 
-      Functionality across the versions is identical. And the IntelliJ IDEA Plugin Manager will install the correct one.<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9702; <em>I will likely discontinue support for v2017.3 through 2018.3 in the near future</em>. Having to test against multiple versions 
-      and maintaining numerous code branches in order to support multiple versions will be too time consuming. I'd rather spend the time adding features. Since the Plugin works 
-      with the free Community Edition of IntelliJ IDEA, there should not be any hindrances in people upgrading. So please upgrade to the latest major version of 
-      IntelliJ IDEA at your convenience. Thanks.<br> 
-      &nbsp;&nbsp;&bull; Miscellaneous changes and improvements<br>   
+      year 2019+ GradleRIO based projects. <br>
+      &nbsp;&nbsp;&bull; Added several words to the FRC spellcheck dictionary.<br>
+      &nbsp;&nbsp;&bull; Dropping support for IntelliJ IDEA v2017.3 through and including 2019.1. Starting with this plugin version, 
+      <strong>only IntelliJ IDEA v2019.2 and later are now supported.</strong>Please see
+      <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/21#note_242234956">this comment</a> in Issue #21 for details.<br>
+      &nbsp;&nbsp;&bull; Miscellaneous changes and improvements<br>
+      <strong>Known Issue:</strong> The RIOLog Net Console still uses an application wide team number setting. If you create a project with an alternate team
+      number, the RIOLog Net Console
+      will <em>not</em> connect to the roboRIO using that alternate team number. As a workaround, you must modify the team number in the Application settings,
+      which affects all open projects. See
+      <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/37">Issue #37</a> to track progress on fixing this.<br>
+      <br>
+      <strong>v0.7.5</strong> <br>
+      &nbsp;&nbsp;&bull; Partial, and slightly glitchy, support for year 2019+ GradleRIO projects for IntelliJ IDEA v2017.3 through v2019.1.
+      For full Gradle RIO support, upgrade to IntelliJ IDEA v2019.2.x and v0.8 of this FRC Plugin.
+      Please see <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/21#note_242234956">this comment</a> in Issue #21 for details.<br>
+      &nbsp;&nbsp;&bull; This is the last release for IntelliJ IDEA versions older than v2019.2. Please upgrade to v2019.2.<br>
       <br>
       <strong>v0.7.1</strong> <br>
-      &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/19">Issue #19</a>, a NPE that sometimes occurred when initializing the FRC framework<br>
+      &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/19">Issue #19</a>, a NPE that sometimes occurred when
+      initializing the FRC framework<br>
       <br>
       <strong>v0.7</strong> <br>
       &nbsp;&nbsp;&bull; Added RIOLog monitoring for WPILib's new (for 2018) TCP implementation (<a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/7">Issue #7</a>)<br>

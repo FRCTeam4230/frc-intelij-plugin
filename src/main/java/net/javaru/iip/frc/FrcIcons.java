@@ -22,6 +22,9 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.IconLoader;
 
+// "Working with Icons and Images" in the SDK DevGuide: http://www.jetbrains.org/intellij/sdk/docs/reference_guide/work_with_icons_and_images.html
+// Icon design guidelines: https://jetbrains.design/intellij/principles/icons/
+// SVG images are supported since v2018.2
 
 
 public final class FrcIcons
@@ -31,7 +34,6 @@ public final class FrcIcons
 
     public static class FRC
     {
-
         /** FIRST Logo sized 60 x 42. */
         public static final Icon FIRST_LOGO_60x42 = loadIcon("/icons/first/FRIST_logo_60x42.png"); // 60x42
         
@@ -118,6 +120,50 @@ public final class FrcIcons
 
     }
     
+    public static class WpiLib
+    {
+        /** A SVG file of the new (2019+) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_SVG = loadIcon("/icons/wpi/wpilib.svg");
+        
+        /** A WpiLib ico Icon file with 16x16 through 256x256 icons of the new (2019+) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_ICO_16_THRU_256 = loadIcon("/icons/wpi/wpilib-256.ico");
+        
+        /** A 16x16 Icon of the new (2019+) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_16 = loadIcon("/icons/wpi/wpilib-16.png");
+        
+        /** A 24x24 Icon of the new (2019+) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_24 = loadIcon("/icons/wpi/wpilib-24.png");
+        
+        /** A 32x32 Icon of the new (2019+) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_32 = loadIcon("/icons/wpi/wpilib-32.png");
+        
+        /** A 40x40 Icon of the new (2019+) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_40 = loadIcon("/icons/wpi/wpilib-40.png");
+        
+        /** A 48x48 Icon of the new (2019+) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_48 = loadIcon("/icons/wpi/wpilib-48.png");
+        
+        /** A 64x64 Icon of the new (2019+) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_64 = loadIcon("/icons/wpi/wpilib-64.png");
+        
+        /** A 96x96 Icon of the new (2019+) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_96 = loadIcon("/icons/wpi/wpilib-96.png");
+        
+        /** A 128x128 Icon of the new (2019+) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_128 = loadIcon("/icons/wpi/wpilib-128.png");
+        
+        /** A 192x192 Icon of the new (2019+) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_192 = loadIcon("/icons/wpi/wpilib-192.png");
+        
+        /** A 256x256 Icon of the new (2019+) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_256 = loadIcon("/icons/wpi/wpilib-256.png");
+        
+        /** A 16x16 Icon of the legacy (i.e. pre 2019) Wpi 'official' icon.  */
+        public static final Icon WPI_LIB_LEGACY_16 = loadIcon("/icons/wpi/wpi-16.png");
+        
+        /** A 16x16 ico file Icon of the legacy (i.e. pre 2019) Wpi 'official' icon.  */
+        public static final Icon WPI_LIB_LEGACY_16_ICO = loadIcon("/icons/wpi/wpi-16.ico");
+    }
 
     public static Icon loadIcon(String path)
     {
@@ -130,7 +176,7 @@ public final class FrcIcons
             // IntelliJ IDEA will still log an independent error in the Events window, but by using a replacement icon, 
             // it will prevent things (such as actions) from completely breaking because an icon was not loaded. We
             // use what is basically a blank icon as it seems like a good substitute.
-            LOG.warn("[FRC] An exception occurred when loading the icon from '" + path + "'. Cause Summary: " + throwable.toString());
+            LOG.warn("[FRC] An exception occurred when loading the icon from '" + path + "'; Cause Summary: " + throwable.toString());
             return AllIcons.Nodes.EmptyNode;
         }
     }

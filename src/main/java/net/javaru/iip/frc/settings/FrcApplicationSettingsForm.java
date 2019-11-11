@@ -70,7 +70,7 @@ public class FrcApplicationSettingsForm
     private JButton fieldLocalHostNameDefaultValueButton;
     private JPanel projectWizardSettingsPanel;
     private JCheckBox enableGradleImportUponNewProjectCreationCheckBox;
-    private JBLabel teamNumberAdditopnalInfoLabel;
+    private JBLabel teamNumberAdditionalInfoLabel;
     
     
     public FrcApplicationSettingsForm()

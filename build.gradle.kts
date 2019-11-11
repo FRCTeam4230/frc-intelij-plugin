@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
 
 group = "net.javaru.iip.frc"
-version = "0.8.0.192"
+version = "0.9.0.000-SNAPSHOT"
 
 //buildscript {
 //    build.loadExtraPropertiesOf(project)

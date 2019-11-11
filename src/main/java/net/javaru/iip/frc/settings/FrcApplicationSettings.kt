@@ -121,13 +121,13 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
 
     override fun getState(): FrcApplicationSettings
     {
-        LOG.trace("[FRC] FrcApplicationSettings.getState() called. Returning current state of: " + toString())
+        LOG.trace("[FRC] FrcApplicationSettings.getState() called. Returning current state of: ${toString()}")
         return this
     }
 
     override fun loadState(state: FrcApplicationSettings)
     {
-        LOG.trace("[FRC] FrcApplicationSettings.loadState() called with state object of: " + state)
+        LOG.trace("[FRC] FrcApplicationSettings.loadState() called with state object of: $state")
         XmlSerializerUtil.copyBean(state, this)
     }
 

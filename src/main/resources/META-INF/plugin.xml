@@ -65,6 +65,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
+      <strong>v0.8.1</strong> <br>
+      &nbsp;&nbsp;&bull; Fixed <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/40">Issue #40</a>, a potential NPE when clicking on the 
+      "Configure FRC Team Number" action on the IntelliJ IDEA Welcome Screen<br>
+      <br>
       <strong>v0.8</strong> <br>
       &nbsp;&nbsp;&bull; Implemented <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/28">Feature #28</a>, adding a robust new FRC Robot Project
       Wizard.<br>

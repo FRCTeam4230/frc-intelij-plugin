@@ -359,7 +359,7 @@
                     icon="AllIcons.General.User" />
             <action id="frc.tools.CheckWpiLbVersionStatusAction"
                     class="net.javaru.iip.frc.actions.tools.CheckSystemWpiLbVersionAction"
-                    icon="/icons/wpi/wpi.png"/>
+                    icon="/icons/wpi/wpilib-16.png"/>
             <action id="frc.tools.DownloadWpiLibAction"
                     class="net.javaru.iip.frc.actions.tools.DownloadWpiLibAction"
                     icon="AllIcons.Actions.Download"

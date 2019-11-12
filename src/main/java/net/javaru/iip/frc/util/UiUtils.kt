@@ -16,7 +16,10 @@
 
 package net.javaru.iip.frc.util
 
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
+import com.intellij.openapi.wm.ex.WindowManagerEx
+import java.awt.Component
 import javax.swing.JTextField
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
@@ -64,3 +67,35 @@ fun JTextComponent.addTextChangedListener(action: (e: DocumentEvent?, text: Stri
                                  })
 }
 
+/**
+ * Finds the `IdeFrame` for the supplied project (which may be null when no project is 
+ * opened). In the event that cannot be found, it attempts to find the most recently
+ * focused component for the project is found. In the event that cannot be found, it
+ * attempts to find the most recently focused window. In the event that cannot be 
+ * found, `null` is returned. Primarily meant for use when needing a parent component 
+ * for use when opening a dialog window.
+ * 
+ * @receiver project – may be null when no project is opened.
+ */
+fun Project?.findIdeFrameOrAlternateParentComponent(): Component?
+{
+    val windowManager = WindowManagerEx.getInstanceEx()
+    
+    var parentComponent: Component? = null
+    val ideFrame = windowManager.findFrameFor(this)
+    if (ideFrame != null)
+    {
+        parentComponent = ideFrame.component
+    }
+    if (parentComponent == null)
+    {
+        parentComponent = windowManager.getFocusedComponent(this)
+    }
+    
+    if (parentComponent == null)
+    {
+        parentComponent = windowManager.mostRecentFocusedWindow
+    }
+    
+    return parentComponent
+}

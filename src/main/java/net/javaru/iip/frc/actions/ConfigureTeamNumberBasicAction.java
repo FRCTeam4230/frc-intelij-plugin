@@ -16,8 +16,11 @@
 
 package net.javaru.iip.frc.actions;
 
+import java.awt.*;
 import java.io.IOException;
+import javax.swing.*;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
@@ -30,8 +33,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.InputValidator;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.wm.IdeFrame;
-import com.intellij.openapi.wm.ex.WindowManagerEx;
 
 import net.javaru.iip.frc.FrcIcons.FRC;
 import net.javaru.iip.frc.FrcPluginGlobals;
@@ -39,6 +40,7 @@ import net.javaru.iip.frc.components.FrcProjectComponentImpl;
 import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
+import net.javaru.iip.frc.util.UiUtilsKt;
 import net.javaru.iip.frc.wpilib.WpiLibPaths;
 import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
 
@@ -59,24 +61,47 @@ public class ConfigureTeamNumberBasicAction extends AnAction
 
     public static void openConfigureTeamNumberDialog(@Nullable Project project)
     {
-        IdeFrame ideFrame = WindowManagerEx.getInstanceEx().findFrameFor(project);
-
-        final FrcApplicationSettings settings = FrcApplicationSettings.Settings.INSTANCE();
-
-        final String teamNumString = Messages.showInputDialog(ideFrame.getComponent(),
-                                                              FrcBundle.message("frc.ui.dialogs.enterTeamNumberPrompt"),
-                                                              FrcPluginGlobals.FRC_PLUGIN_NAME,
-                                                              FRC.FIRST_ICON_DIALOG_WINDOW,
-                                                              (settings.isTeamNumberConfigured() ? "" + settings.getTeamNumber() : ""),
-                                                              new InputValidator()
+        
+    
+        final InputValidator validator = new InputValidator()
         {
             @Override
             public boolean checkInput(String inputString) { return FrcApplicationSettings.Settings.isValidTeamNumber(inputString); }
-
-
+    
+    
             @Override
             public boolean canClose(String inputString) { return FrcApplicationSettings.Settings.isValidTeamNumber(inputString); }
-        });
+        };
+    
+        final FrcApplicationSettings settings = FrcApplicationSettings.Settings.INSTANCE();
+        
+        @Nullable
+        final Component parentComponent = UiUtilsKt.findIdeFrameOrAlternateParentComponent(project);
+        final String message = FrcBundle.message("frc.ui.dialogs.enterTeamNumberPrompt");
+        final String title = FrcPluginGlobals.FRC_PLUGIN_NAME;
+        final Icon icon = FRC.FIRST_ICON_DIALOG_WINDOW;
+        final String initialValue = settings.isTeamNumberConfigured() ? "" + settings.getTeamNumber() : "";
+        
+        final String teamNumString;
+        if (parentComponent != null)
+        {
+            
+            teamNumString = Messages.showInputDialog(parentComponent,
+                                                     message,
+                                                     title,
+                                                     icon,
+                                                     initialValue,
+                                                     validator);
+        }
+        else
+        {
+            teamNumString = Messages.showInputDialog(message,
+                                                     title,
+                                                     icon,
+                                                     initialValue,
+                                                     validator);
+        }
+        
 
         if (teamNumString != null && FrcApplicationSettings.Settings.isValidTeamNumber(teamNumString))
         {
@@ -88,7 +113,7 @@ public class ConfigureTeamNumberBasicAction extends AnAction
 
 
     @Override
-    public void update(AnActionEvent e)
+    public void update(@NotNull AnActionEvent e)
     {
         super.update(e);
         e.getPresentation().setIcon(FRC.FIRST_ICON_MEDIUM_16);

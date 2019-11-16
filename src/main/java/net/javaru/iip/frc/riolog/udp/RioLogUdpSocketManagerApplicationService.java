@@ -74,7 +74,7 @@ public class RioLogUdpSocketManagerApplicationService
        
     public DatagramSocket getSocket(@NotNull Project project) throws IOException
     {
-        return getSocket(project, FrcApplicationSettings.Settings.INSTANCE().getRioLogUdpPort());
+        return getSocket(project, FrcApplicationSettings.getInstance().getRioLogUdpPort());
     }
 
     

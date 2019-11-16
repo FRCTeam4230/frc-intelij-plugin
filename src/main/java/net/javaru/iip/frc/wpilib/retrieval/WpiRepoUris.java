@@ -62,7 +62,7 @@ class WpiRepoUris
     @NotNull
     public static URI getBetaRepoUri()
     {
-        return FrcApplicationSettings.Settings.INSTANCE().getWpiEclipsePluginBetaRepoUri();
+        return FrcApplicationSettings.getInstance().getWpiEclipsePluginBetaRepoUri();
     }
 
 
@@ -77,7 +77,7 @@ class WpiRepoUris
     @NotNull
     public static URI getReleaseRepoUri()
     {
-        return FrcApplicationSettings.Settings.INSTANCE().getWpiEclipsePluginReleaseRepoUri();
+        return FrcApplicationSettings.getInstance().getWpiEclipsePluginReleaseRepoUri();
     }
 
 

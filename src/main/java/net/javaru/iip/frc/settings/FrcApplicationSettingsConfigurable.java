@@ -27,13 +27,15 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 
 import net.javaru.iip.frc.i18n.FrcBundle;
-import net.javaru.iip.frc.riolog.RioLogProjectService;
+import net.javaru.iip.frc.settings.forms.FrcApplicationSettingsForm;
 
 
 
 // This class is registered in the plugin.xml as an <applicationConfigurable>
 public class FrcApplicationSettingsConfigurable implements SearchableConfigurable 
 {
+    public static final String ID = "preferences.language.FRC"; // Needs to match the is in the plugin.xml <applicationConfigurable>
+    
     private static final Logger LOG = Logger.getInstance(FrcApplicationSettingsConfigurable.class);
 
     private FrcApplicationSettingsForm myForm;
@@ -81,19 +83,12 @@ public class FrcApplicationSettingsConfigurable implements SearchableConfigurabl
     @Override
     public void apply() throws ConfigurationException
     {
-        myForm.applyTo(FrcApplicationSettings.Settings.INSTANCE(), 
-                       FrcRoboRioSettings.Settings.INSTANCE(), 
-                       FrcSshSettings.Settings.INSTANCE());
-        // TODO This needs to be enhanced so it does not start the rioLog is it is not currently running. But it does need to update it... or set a flag so that on next click of the "start" button it updates
-        RioLogProjectService.updateAllOpenProjects();
+        myForm.applyTo(FrcApplicationSettings.getInstance());
     }
 
 
     @Override
-    public void reset() { myForm.load(FrcApplicationSettings.Settings.INSTANCE(), 
-                                      FrcRoboRioSettings.Settings.INSTANCE(),
-                                      FrcSshSettings.Settings.INSTANCE()); 
-    }
+    public void reset() { myForm.resetForm(); }
 
 
     @Override
@@ -104,6 +99,6 @@ public class FrcApplicationSettingsConfigurable implements SearchableConfigurabl
     @Override
     public String getId() // Specified in SearchableConfigurable
     {
-        return "frc.application.settings";
+        return ID;
     }
 }

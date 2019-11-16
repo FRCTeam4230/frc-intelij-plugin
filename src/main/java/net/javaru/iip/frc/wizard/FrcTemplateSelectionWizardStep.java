@@ -101,7 +101,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         
         // TODO DELETABLE 
 //        // We may need to update this when the team number changed from an application setting to a project setting
-//        UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(FrcApplicationSettings.Settings.INSTANCE().getTeamNumber()));
+//        UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(FrcFacetSettings.getInstance().getTeamNumber()));
     
         initWpiLibVersionComboBox();
         initTabPane();

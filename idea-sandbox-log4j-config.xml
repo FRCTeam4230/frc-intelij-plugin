@@ -79,7 +79,7 @@
     </appender>
 
     <logger name="#net.javaru.iip">
-        <level value="DEBUG" />
+        <level value="TRACE" />
     </logger>
 
 

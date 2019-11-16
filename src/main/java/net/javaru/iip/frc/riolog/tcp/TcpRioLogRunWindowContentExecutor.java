@@ -60,7 +60,7 @@ public class TcpRioLogRunWindowContentExecutor extends AbstractRioLogContentExec
     @NotNull
     protected AbstractRioLogMonitorProcess createRioLogMonitoringProcess()
     {
-        return new TcpRioLogMonitorProcess(this::invokeClearAll, this::invokeStop);
+        return new TcpRioLogMonitorProcess(myProject, this::invokeClearAll, this::invokeStop);
     }
 
 
@@ -68,7 +68,7 @@ public class TcpRioLogRunWindowContentExecutor extends AbstractRioLogContentExec
     @Override
     protected AbstractRioLogMonitorProcess createAnnouncementRioLogMonitoringProcess()
     {
-        return new AnnouncementRioLogMonitorProcess(this::invokeClearAll,
+        return new AnnouncementRioLogMonitorProcess(myProject, this::invokeClearAll,
                                                     this::invokeStop,
                                                     new StringBuffer("\n")
                                                         .append(FrcBundle.message("frc.riolog.first.start.message.tcp")));

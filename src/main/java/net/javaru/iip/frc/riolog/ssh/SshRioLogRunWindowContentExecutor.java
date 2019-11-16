@@ -64,7 +64,7 @@ public class SshRioLogRunWindowContentExecutor extends AbstractRioLogContentExec
     @NotNull
     protected AbstractRioLogMonitorProcess createRioLogMonitoringProcess()
     {
-        return new SshRioLogMonitorProcess(this::invokeClearAll, this::invokeStop);
+        return new SshRioLogMonitorProcess(myProject, this::invokeClearAll, this::invokeStop);
     }
 
 
@@ -72,7 +72,7 @@ public class SshRioLogRunWindowContentExecutor extends AbstractRioLogContentExec
     @Override
     protected AbstractRioLogMonitorProcess createAnnouncementRioLogMonitoringProcess()
     {
-        return new AnnouncementRioLogMonitorProcess(this::invokeClearAll,
+        return new AnnouncementRioLogMonitorProcess(myProject, this::invokeClearAll,
                                                     this::invokeStop,
                                                     new StringBuffer("\n")
                                                         .append(FrcBundle.message("frc.riolog.first.start.message.ssh"))

@@ -54,7 +54,7 @@ public class ShowFrcApplicationSettingsAction extends AnAction
     {
         super.update(e);
 //        e.getPresentation().setIcon(FrcIcons.FIRST_ICON_MEDIUM_16);
-//        final FrcApplicationSettings settings = FrcApplicationSettings.Settings.INSTANCE();
+//        final FrcApplicationSettings settings = FrcFacetSettings.getInstance();
 //        e.getPresentation().setVisible(!settings.isTeamNumberConfigured() && settings.getRunCount() <= 5);
     }
 }

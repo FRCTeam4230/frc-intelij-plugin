@@ -37,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.Iterators;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -62,14 +63,16 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
 
 
     /**
+     *
+     * @param project the project the monitoring process is running for
      * @param clearConsoleRunnable Runnable that programmatically 'clicks' the clear button on the Executor window.
      * @param stopRioLogRunnable   Runnable that programmatically 'clicks' the stop button on the Executor window.
      *
      * @throws IllegalStateException If an initialization issue occurs
      */
-    public SshRioLogMonitorProcess(@NotNull Runnable clearConsoleRunnable, @NotNull Runnable stopRioLogRunnable) throws IllegalStateException
+    public SshRioLogMonitorProcess(@NotNull Project project, @NotNull Runnable clearConsoleRunnable, @NotNull Runnable stopRioLogRunnable) throws IllegalStateException
     {
-        super(clearConsoleRunnable, stopRioLogRunnable);
+        super(project, clearConsoleRunnable, stopRioLogRunnable);
     }
 
     @NotNull
@@ -382,11 +385,10 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
                 if (!isConnectedFully())
                 {
                     // TODO - make connection order configurable, or preferably let's make them in parallel now that the proof of concept has proven out
-                    final Iterator<String> hosts = Iterators.forArray(FrcRoboRioSettings.Settings.INSTANCE().getRoboRioHost_mDNS(),
-                                                                      FrcRoboRioSettings.Settings.INSTANCE().getRoboRioHost_DNS(),
-                                                                      FrcRoboRioSettings.Settings.INSTANCE().getRoboRioHost_USB(),
-                                                                      FrcRoboRioSettings.Settings.INSTANCE().getRoboRioHost_IP());
-
+                    final Iterator<String> hosts = Iterators.forArray(FrcRoboRioSettings.getInstance(project).getRoboRioHost_mDNS(),
+                                                                      FrcRoboRioSettings.getInstance(project).getRoboRioHost_DNS(),
+                                                                      FrcRoboRioSettings.getInstance(project).getRoboRioHost_USB(),
+                                                                      FrcRoboRioSettings.getInstance(project).getRoboRioHost_IP());
                     while (!isConnectedFully() && hosts.hasNext())
                     {
                         connect(hosts.next(), true);
@@ -601,10 +603,10 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         int getPort() { return port; }
 
 
-        String getUsername() { return FrcSshSettings.Settings.INSTANCE().getSshUsername(); }
+        String getUsername() { return FrcSshSettings.getInstance(project).getSshUsername(); }
 
 
-        String getTailCommand() { return FrcSshSettings.Settings.INSTANCE().getSshTailCommand(); }
+        String getTailCommand() { return FrcSshSettings.getInstance(project).getSshTailCommand(); }
 
 
         @Override
@@ -619,7 +621,7 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         public String getPassword()
         {
             LOG.debug("[FRC] UserInfo.getPassword() called");
-            return FrcSshSettings.Settings.INSTANCE().getSshPassword();
+            return FrcSshSettings.getInstance(project).getSshPassword();
         }
 
 

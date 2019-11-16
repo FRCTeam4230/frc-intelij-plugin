@@ -42,6 +42,7 @@ import com.intellij.ui.components.JBList;
 import net.javaru.iip.frc.FrcIcons.FRC;
 import net.javaru.iip.frc.i18n.FrcMessageKey;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
+import net.javaru.iip.frc.settings.FrcTeamNumberKt;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
 import net.javaru.iip.frc.util.UiUtilsKt;
 
@@ -103,7 +104,7 @@ public class FrcModuleWizardStep extends ModuleWizardStep
         // TODO add the Action Listener to any components that need to take action upon updating
     
         // We may need to update this when the team number changed from an application setting to a project setting
-        UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(FrcApplicationSettings.Settings.INSTANCE().getTeamNumber()));
+        UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(FrcApplicationSettings.getInstance().getTeamNumber()));
         initRadioButtonGroup();
         initTemplatesLists();
         LOG.trace("[FRC] Entering FrcModuleWizardStep.initComponents()");
@@ -176,7 +177,7 @@ public class FrcModuleWizardStep extends ModuleWizardStep
     public boolean validate() throws ConfigurationException
     {
         LOG.trace("[FRC] Entering FrcModuleWizardStep.validate()");
-        if (!FrcApplicationSettings.Settings.isValidTeamNumber(teamNumberTextField.getText()))
+        if (!FrcTeamNumberKt.isValidTeamNumber(teamNumberTextField.getText()))
         {
             ApplicationManager.getApplication().invokeLater(
                     () -> IdeFocusManager.getInstance(myProjectOrNull).requestFocus(teamNumberTextField, true));

@@ -44,7 +44,7 @@ public class ConfigureTeamNumberStatusAwareAction extends ConfigureTeamNumberBas
         if (inputEvent == null)
         {
             // We are in the process of initializing
-            initiallyVisible = !FrcApplicationSettings.Settings.INSTANCE().isTeamNumberConfigured();
+            initiallyVisible = !FrcApplicationSettings.getInstance().isTeamNumberConfigured();
         }
         return initiallyVisible;
     }

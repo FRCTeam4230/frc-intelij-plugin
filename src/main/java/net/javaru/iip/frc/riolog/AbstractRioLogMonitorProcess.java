@@ -41,6 +41,7 @@ import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.openapi.project.Project;
 import com.intellij.util.concurrency.Semaphore;
 
 import net.javaru.iip.frc.notify.FrcNotifications;
@@ -74,7 +75,9 @@ public abstract class AbstractRioLogMonitorProcess extends Process
     protected PrintWriter consoleWriter;
     protected PrintWriter fileWriter;
     private RioLogMonitoringRunnable rioLogMonitor;
-
+    @NotNull
+    protected  final Project project;
+    
     /**
      * Runnable that programmatically 'clicks' the clear button on the Executor window.
      */
@@ -92,13 +95,18 @@ public abstract class AbstractRioLogMonitorProcess extends Process
 
     /**
      * 
+     *
+     * @param project the project the monitoring process is running for
      * @param clearConsoleRunnable Runnable that programmatically 'clicks' the clear button on the Executor window.
      * @param stopRioLogRunnable Runnable that programmatically 'clicks' the stop button on the Executor window.
      *                           
      * @throws IllegalStateException  If an initialization issue occurs
      */
-    protected AbstractRioLogMonitorProcess(@NotNull Runnable clearConsoleRunnable, @NotNull Runnable stopRioLogRunnable) throws IllegalStateException
+    protected AbstractRioLogMonitorProcess(@NotNull Project project,
+                                           @NotNull Runnable clearConsoleRunnable,
+                                           @NotNull Runnable stopRioLogRunnable) throws IllegalStateException
     {
+        this.project = project;
         this.clearConsoleRunnable = clearConsoleRunnable;
         this.stopRioLogRunnable = stopRioLogRunnable;
         myWaitSemaphore = new Semaphore();
@@ -106,7 +114,7 @@ public abstract class AbstractRioLogMonitorProcess extends Process
     }
 
 
-    protected static FrcApplicationSettings getSettings() {return FrcApplicationSettings.Settings.INSTANCE(); }
+    protected static FrcApplicationSettings getSettings() {return FrcApplicationSettings.getInstance(); }
     
 
     public void start()

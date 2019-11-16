@@ -33,6 +33,7 @@ import java.util.function.Consumer;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.riolog.AbstractRioLogMonitorProcess;
 import net.javaru.iip.frc.riolog.tcp.message.ErrorMessage;
@@ -53,14 +54,16 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
     
     
     /**
+     *
+     * @param project the project the monitoring process is running for
      * @param clearConsoleRunnable Runnable that programmatically 'clicks' the clear button on the Executor window.
      * @param stopRioLogRunnable   Runnable that programmatically 'clicks' the stop button on the Executor window.
      *
      * @throws IllegalStateException If an initialization issue occurs
      */
-    public TcpRioLogMonitorProcess(@NotNull Runnable clearConsoleRunnable, @NotNull Runnable stopRioLogRunnable) throws IllegalStateException
+    public TcpRioLogMonitorProcess(@NotNull  Project project, @NotNull Runnable clearConsoleRunnable, @NotNull Runnable stopRioLogRunnable) throws IllegalStateException
     {
-        super(clearConsoleRunnable, stopRioLogRunnable);
+        super(project, clearConsoleRunnable, stopRioLogRunnable);
     }
 
 
@@ -410,7 +413,7 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
             Socket mySocket;
             try
             {
-                mySocket = TcpRioSocketConnectorApplicationService.getInstance().connect();
+                mySocket = TcpRioSocketConnectorProjectService.getInstance(project).connect();
             }
             catch (InterruptedException e)
             {
@@ -509,7 +512,7 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         public void stop()
         {
             cleanup.set(true);
-            TcpRioSocketConnectorApplicationService.getInstance().stopConnectionAttempts();
+            TcpRioSocketConnectorProjectService.getInstance(project).stopConnectionAttempts();
             closeSocket();
             Thread.currentThread().interrupt();
         }

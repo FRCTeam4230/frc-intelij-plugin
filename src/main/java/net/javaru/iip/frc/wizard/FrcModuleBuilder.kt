@@ -177,7 +177,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         
         //assert(rootProjectPath != null) { "project root path was null" }
 
-        if(FrcApplicationSettings.INSTANCE().enableGradleImportUponNewProjectCreation)
+        if(FrcApplicationSettings.getInstance().enableGradleImportUponNewProjectCreation)
         {
             LOG.info("[FRC] Programmatic Gradle Import of new FRC Project is enabled in Application Settings. Executing Gradle Import")
             autoImportGradleProject(module)

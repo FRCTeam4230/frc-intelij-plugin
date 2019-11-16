@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.BooleanUtils;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.riolog.AbstractRioLogMonitorProcess;
 
@@ -42,14 +43,16 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
                                                                                                   Boolean.FALSE.toString()));
 
     /**
+     *
+     * @param project the project the monitoring process is running for
      * @param clearConsoleRunnable Runnable that programmatically 'clicks' the clear button on the Executor window.
      * @param stopRioLogRunnable   Runnable that programmatically 'clicks' the stop button on the Executor window.
      *
      * @throws IllegalStateException If an initialization issue occurs
      */
-    public UdpRioLogMonitorProcess(@NotNull Runnable clearConsoleRunnable, @NotNull Runnable stopRioLogRunnable) throws IllegalStateException
+    public UdpRioLogMonitorProcess(@NotNull Project project, @NotNull Runnable clearConsoleRunnable, @NotNull Runnable stopRioLogRunnable) throws IllegalStateException
     {
-        super(clearConsoleRunnable, stopRioLogRunnable);
+        super(project, clearConsoleRunnable, stopRioLogRunnable);
     }
 
 

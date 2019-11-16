@@ -26,7 +26,7 @@ data class FrcFacetSettings(val unusedPlaceholder: Int = 0) : PersistentStateCom
 {
     companion object Settings
     {
-        fun INSTANCE(): FrcFacetSettings
+        fun getInstance(): FrcFacetSettings
         {
             return ServiceManager.getService(FrcFacetSettings::class.java)
         }
@@ -34,23 +34,6 @@ data class FrcFacetSettings(val unusedPlaceholder: Int = 0) : PersistentStateCom
         fun clone(original: FrcFacetSettings): FrcFacetSettings
         {
             return original.copy()
-        }
-
-        fun isValidTeamNumber(teamNumberString: String): Boolean
-        {
-            try
-            {
-                return isValidTeamNumber(Integer.valueOf(teamNumberString))
-            }
-            catch (ignore: NumberFormatException)
-            {
-                return false
-            }
-        }
-
-        fun isValidTeamNumber(teamNumber: Int): Boolean
-        {
-            return teamNumber > 0
         }
     }
 

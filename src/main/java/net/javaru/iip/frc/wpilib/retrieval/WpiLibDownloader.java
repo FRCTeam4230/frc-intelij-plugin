@@ -225,7 +225,7 @@ public class WpiLibDownloader
 
         LOG.debug("[FRC] Creating / Updating wpilib.properties file at: " + file);
      
-        if (!FrcApplicationSettings.Settings.INSTANCE().isTeamNumberConfigured())
+        if (!FrcApplicationSettings.getInstance().isTeamNumberConfigured())
         {
             ApplicationManager.getApplication().invokeAndWait(WpiLibDownloader::promptForTeamNumber);
         }
@@ -255,7 +255,7 @@ public class WpiLibDownloader
             writer.println("#Don't add new properties, they will be deleted by the eclipse and/or IntelliJ IDEA plugin.");
             writer.println(new SimpleDateFormat("'#'EEE MMM dd HH:mm:ss zzz yyyy").format(new Date()));
             writer.println("version=current");
-            writer.println("team-number=" + FrcApplicationSettings.Settings.INSTANCE().getTeamNumber());
+            writer.println("team-number=" + FrcApplicationSettings.getInstance().getTeamNumber());
         }
     }
     
@@ -291,7 +291,7 @@ public class WpiLibDownloader
         if (teamNumberInput != null)
         {
             final int num = Integer.parseInt(teamNumberInput);
-            FrcApplicationSettings.Settings.INSTANCE().setTeamNumber(num);
+            FrcApplicationSettings.getInstance().setTeamNumber(num);
         }
         else
         {

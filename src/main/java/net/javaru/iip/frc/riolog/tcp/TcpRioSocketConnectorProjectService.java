@@ -34,8 +34,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.settings.FrcRoboRioSettings;
 
@@ -46,11 +48,13 @@ import net.javaru.iip.frc.settings.FrcRoboRioSettings;
     https://github.com/wpilibsuite/EclipsePlugins/blob/master/edu.wpi.first.wpilib.plugins.riolog/src/netconsole2/RioConnector.java
 */
 
-public class TcpRioSocketConnectorApplicationService
+public class TcpRioSocketConnectorProjectService
 {
-    private static final Logger LOG = Logger.getInstance(TcpRioSocketConnectorApplicationService.class);
+    private static final Logger LOG = Logger.getInstance(TcpRioSocketConnectorProjectService.class);
 
-    private Pattern dsPattern = Pattern.compile("\"robotIP\"[^:]*:[^0-9]*([0-9]+)");
+    private static Pattern dsPattern = Pattern.compile("\"robotIP\"[^:]*:[^0-9]*([0-9]+)");
+    
+    private final Project project;
     
     private final Lock lock = new ReentrantLock();
     private final Condition cvDone = lock.newCondition();
@@ -63,13 +67,13 @@ public class TcpRioSocketConnectorApplicationService
     private static final int TOTAL_TIMEOUT_SEC = 5;
 
 
-    public static TcpRioSocketConnectorApplicationService getInstance()
+    public static TcpRioSocketConnectorProjectService getInstance(@NotNull Project project)
     {
-        return ServiceManager.getService(TcpRioSocketConnectorApplicationService.class);
+        return ServiceManager.getService(project, TcpRioSocketConnectorProjectService.class);
     }
 
 
-    private TcpRioSocketConnectorApplicationService() { }
+    private TcpRioSocketConnectorProjectService(@NotNull Project project) { this.project = project; }
 
 
     public Socket connect() throws InterruptedException
@@ -85,7 +89,7 @@ public class TcpRioSocketConnectorApplicationService
             lock.unlock();
         }
 
-        final FrcRoboRioSettings roboRioSettings = FrcRoboRioSettings.Settings.INSTANCE();
+        final FrcRoboRioSettings roboRioSettings = FrcRoboRioSettings.getInstance(project);
         // start connection attempts to various address possibilities
         startConnect(new byte[] {(byte) 127, 0, 0, 1});                     // 127.0.1.1                          localhost loopback
         startConnect(roboRioSettings.getRoboRioHost_USB_asIpByteArray());   // 172.22.11.2                        USB Static IP

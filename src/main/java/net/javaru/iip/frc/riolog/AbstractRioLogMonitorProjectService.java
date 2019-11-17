@@ -76,7 +76,7 @@ public abstract class AbstractRioLogMonitorProjectService
             }
         }
 
-        final FrcApplicationSettings frcSettings = FrcApplicationSettings.Settings.INSTANCE();
+        final FrcApplicationSettings frcSettings = FrcApplicationSettings.getInstance();
         final boolean useRunWindow = !frcSettings.getUseFrcToolWindow();
         
         final int configuredPort = frcSettings.getRioLogUdpPort();

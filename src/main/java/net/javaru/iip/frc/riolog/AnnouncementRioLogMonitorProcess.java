@@ -18,6 +18,7 @@ package net.javaru.iip.frc.riolog;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 
 
 
@@ -30,15 +31,20 @@ public class AnnouncementRioLogMonitorProcess extends AbstractRioLogMonitorProce
 
 
     /**
+     *
+     * @param project the project the monitoring process is running for
      * @param clearConsoleRunnable Runnable that programmatically 'clicks' the clear button on the Executor window.
      * @param stopRioLogRunnable   Runnable that programmatically 'clicks' the stop button on the Executor window.
      * @param message              The message to display on the RioLog console                            
      *
      * @throws IllegalStateException If an initialization issue occurs
      */
-    public AnnouncementRioLogMonitorProcess(@NotNull Runnable clearConsoleRunnable, @NotNull Runnable stopRioLogRunnable, @NotNull CharSequence message) throws IllegalStateException
+    public AnnouncementRioLogMonitorProcess(@NotNull Project project,
+                                            @NotNull Runnable clearConsoleRunnable,
+                                            @NotNull Runnable stopRioLogRunnable,
+                                            @NotNull CharSequence message) throws IllegalStateException
     {
-        super(clearConsoleRunnable,stopRioLogRunnable);
+        super(project, clearConsoleRunnable, stopRioLogRunnable);
         this.message = message;
     }
 

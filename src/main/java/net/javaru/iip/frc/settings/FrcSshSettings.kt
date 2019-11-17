@@ -17,35 +17,40 @@
 package net.javaru.iip.frc.settings
 
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.project.Project
 import com.intellij.util.xmlb.XmlSerializerUtil
 import net.javaru.iip.frc.riolog.RioLogGlobals
 
-const val SSH_USERNAME_DEFAULT: String = "admin";
-const val SSH_PASSWORD_DEFAULT: String = "";
+const val SSH_USERNAME_DEFAULT: String = "admin"
+const val SSH_PASSWORD_DEFAULT: String = ""
 
 // NOTE: This class is registered as an <applicationService> in the plugin.xml
-@State(name = "FrcSsh", storages = [(Storage("frc.xml"))])
-data class FrcSshSettings(var sshUsername: String = SSH_USERNAME_DEFAULT,
-                          var sshPassword: String = SSH_PASSWORD_DEFAULT,
-                          var sshTailCommand: String = RioLogGlobals.DEFAULT_TAIL_COMMAND
-                         ) : PersistentStateComponent<FrcSshSettings>
+@State(name = "FrcSsh", storages = [(Storage("frc/frc.xml"))])
+data class FrcSshSettings @JvmOverloads constructor(
+        var sshUsername: String = SSH_USERNAME_DEFAULT,
+        var sshPassword: String = SSH_PASSWORD_DEFAULT,
+        var sshTailCommand: String = RioLogGlobals.DEFAULT_TAIL_COMMAND
+                                                   ) : PersistentStateComponent<FrcSshSettings>
 {
 
     companion object Settings
     {
-        fun INSTANCE(): FrcSshSettings
+        @JvmStatic
+        fun getInstance(project: Project) = project.service<FrcSshSettings>()
+
+        @JvmStatic
+        fun getImmutableInstance(project: Project): ImmutableFrcSshSettings
         {
-            return ServiceManager.getService(FrcSshSettings::class.java)
+            val (sshUsername, sshPassword, sshTailCommand) = getInstance(project)
+            return ImmutableFrcSshSettings(sshUsername, sshPassword, sshTailCommand)
         }
 
-        fun clone(original: FrcSshSettings): FrcSshSettings
-        {
-            return original.copy()
-        }
+        @JvmStatic
+        fun clone(original: FrcSshSettings): FrcSshSettings = original.copy()
     }
 
     private val LOG = Logger.getInstance(FrcSshSettings::class.java)
@@ -58,7 +63,11 @@ data class FrcSshSettings(var sshUsername: String = SSH_USERNAME_DEFAULT,
 
     override fun loadState(state: FrcSshSettings)
     {
-        LOG.trace("[FRC] FrcSshSettings.loadState() called with state object of: " + state)
+        LOG.trace("[FRC] FrcSshSettings.loadState() called with state object of: $state")
         XmlSerializerUtil.copyBean(state, this)
     }
 }
+
+data class ImmutableFrcSshSettings internal constructor(val sshUsername: String,
+                                                        val sshPassword: String,
+                                                        val sshTailCommand: String) 

@@ -84,7 +84,7 @@ public class FrcApplicationComponentImpl implements FrcApplicationComponent
         Logger baseLogger = Logger.getInstance("#net.javaru.iip.frc");
         baseLogger.info("[FRC] >>> isDebugEnabled = " + baseLogger.isDebugEnabled() + "  isTraceEnabled = " + baseLogger.isTraceEnabled() + " <<<");
 
-        final FrcApplicationSettings settings = FrcApplicationSettings.Settings.INSTANCE();
+        final FrcApplicationSettings settings = FrcApplicationSettings.getInstance();
         settings.incrementRunCount();
         
         if (!settings.isTeamNumberConfigured() && settings.getPrc() <= TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL)

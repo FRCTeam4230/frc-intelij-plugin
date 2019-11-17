@@ -21,17 +21,15 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.Transient
+import net.javaru.iip.frc.FrcPluginGlobals.MAX_RUN_COUNT_TO_SAVE
 import net.javaru.iip.frc.util.UriUtils
 import org.apache.commons.lang3.StringUtils
 import java.net.URI
 import java.nio.file.InvalidPathException
 import java.nio.file.Path
 import java.nio.file.Paths
-
-const val UN_CONFIGURED_TEAM_NUMBER: Int = 0
 
 const val DEFAULT_RIO_LOG_UDP_PORT: Int = 6666
 
@@ -88,31 +86,16 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
         val DEFAULT_WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI: URI = UriUtils.createUri("http://first.wpi.edu/FRC/roborio/release/eclipse/")
         val DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI: URI = UriUtils.createUri("http://first.wpi.edu/FRC/roborio/beta/eclipse/")
 
-        fun INSTANCE(): FrcApplicationSettings
+        @JvmStatic
+        fun getInstance(): FrcApplicationSettings
         {
             return ServiceManager.getService(FrcApplicationSettings::class.java)
         }
 
+        @JvmStatic
         fun clone(original: FrcApplicationSettings): FrcApplicationSettings
         {
             return original.copy()
-        }
-
-        fun isValidTeamNumber(teamNumberString: String): Boolean
-        {
-            return try
-            {
-                !StringUtil.isEmptyOrSpaces(teamNumberString) && isValidTeamNumber(Integer.valueOf(teamNumberString))
-            }
-            catch (ignore: NumberFormatException)
-            {
-                false
-            }
-        }
-        
-        fun isValidTeamNumber(teamNumber: Int): Boolean
-        {
-            return teamNumber > 0
         }
     }
 
@@ -121,20 +104,20 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
 
     override fun getState(): FrcApplicationSettings
     {
-        LOG.trace("[FRC] FrcApplicationSettings.getState() called. Returning current state of: " + toString())
+        LOG.trace("[FRC] FrcApplicationSettings.getState() called. Returning current state of: ${toString()}")
         return this
     }
 
     override fun loadState(state: FrcApplicationSettings)
     {
-        LOG.trace("[FRC] FrcApplicationSettings.loadState() called with state object of: " + state)
+        LOG.trace("[FRC] FrcApplicationSettings.loadState() called with state object of: $state")
         XmlSerializerUtil.copyBean(state, this)
     }
 
     @Transient
     fun isTeamNumberConfigured(): Boolean { return teamNumber > 0 }
 
-    fun incrementRunCount() { prc++ }
+    fun incrementRunCount() { if (prc < MAX_RUN_COUNT_TO_SAVE) {prc++} }
 }
 
 // Used when initializing the wpilib directory

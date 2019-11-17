@@ -26,13 +26,15 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 
-import net.javaru.iip.frc.settings.FrcApplicationSettingsKt;
+import net.javaru.iip.frc.settings.FrcTeamNumberKt;
+import net.javaru.iip.frc.settings.TeamNumberFormChangeListener;
+import net.javaru.iip.frc.settings.TeamNumberKeyChangeListener;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
-public class TeamNumberDialogWrapper extends DialogWrapper
+public class TeamNumberDialogWrapper extends DialogWrapper implements TeamNumberFormChangeListener
 {
     private static final Logger LOG = Logger.getInstance(TeamNumberDialogWrapper.class);
     
@@ -90,20 +92,20 @@ public class TeamNumberDialogWrapper extends DialogWrapper
     
         actualNumberRadioButton.addItemListener(itemListener);
         variantNumberRadioButton.addItemListener(itemListener);
-    
-        teamNumberInputTextField.addKeyListener(new TeamNumberKeyChangeListener(teamNumberInputTextField) {
-            @Override
-            public void makeUpdates(@NotNull String text, boolean isValidTeamNumber)
-            {
-                isInputTeamNumberValid = isValidTeamNumber;
-                if (variantNumberRadioButton.isSelected())
-                {
-                    setOKActionEnabled(isValidTeamNumber);
-                }
-            }
-        });
+        // The TeamNumberKeyChangeListener calls the 'onTeamNumberFormChange' method upon changes to the team number text field
+        teamNumberInputTextField.addKeyListener(new TeamNumberKeyChangeListener(teamNumberInputTextField, this));
     }
     
+    
+    @Override // Called by the TeamNumberKeyChangeListener
+    public void onTeamNumberFormChange(@NotNull String text, boolean isValidTeamNumber, @NotNull  String previousText)
+    {
+        isInputTeamNumberValid = isValidTeamNumber;
+        if (variantNumberRadioButton.isSelected())
+        {
+            setOKActionEnabled(isValidTeamNumber);
+        }
+    }
     
     /**
      * Factory method. It creates panel with dialog options. Options panel is located at the
@@ -135,6 +137,6 @@ public class TeamNumberDialogWrapper extends DialogWrapper
                 LOG.warn("[FRC] Could not parse '" + text + "' to a team number");
             }
         }
-        return FrcApplicationSettingsKt.UN_CONFIGURED_TEAM_NUMBER;
+        return FrcTeamNumberKt.UN_CONFIGURED_TEAM_NUMBER;
     }
 }

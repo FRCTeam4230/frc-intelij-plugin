@@ -139,7 +139,7 @@ class FrcNotifications private constructor()
                     ConfigureTeamNumberBasicAction.openConfigureTeamNumberDialog(project)
                 }
 
-                if (FrcApplicationSettings.INSTANCE().isTeamNumberConfigured())
+                if (FrcApplicationSettings.getInstance().isTeamNumberConfigured())
                 {
                     theNotification.expire()
                 }
@@ -160,7 +160,7 @@ class FrcNotifications private constructor()
             //                                                            ConfigureTeamNumberBasicAction.openConfigureTeamNumberDialog(project);
             //                                                        }
             //
-            //                                                        if (FrcApplicationSettings.Settings.INSTANCE().isTeamNumberConfigured())
+            //                                                        if (FrcFacetSettings.getInstance().isTeamNumberConfigured())
             //                                                        {
             //                                                            theNotification.expire();
             //                                                        }

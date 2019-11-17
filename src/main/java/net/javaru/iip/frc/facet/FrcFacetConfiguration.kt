@@ -37,7 +37,7 @@ class FrcFacetConfiguration : FacetConfiguration// ,PersistentStateComponent<Frc
     override fun createEditorTabs(facetEditorContext: FacetEditorContext, validatorsManager: FacetValidatorsManager): Array<FacetEditorTab>
     {
         //TODO Need to implement the FrcFacetEditorTab
-        //return new FacetEditorTab[] {new FrcFacetEditorTab(facetEditorContext, FrcFacetSettings.Settings.INSTANCE())};
+        //return new FacetEditorTab[] {new FrcFacetEditorTab(facetEditorContext, FrcFacetSettings.getInstance())};
         return NO_EDITOR_TABS
     }
 }

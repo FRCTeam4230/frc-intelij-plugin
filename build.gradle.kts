@@ -103,7 +103,8 @@ val runIde: RunIdeTask by tasks
 runIde {
     runIde.systemProperties = mapOf(
             //"key" to "value",
-            systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, ".sandbox", "log.xml")),
+            //systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, ".sandbox", "log.xml")),
+            systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, "idea-sandbox-log4j-config.xml")),
             systemPropertyGetOrDefault("frc.simulated.log.service.enabled", "false"),
             systemPropertyGetOrDefault("frc.simulated.log.service.use.configured.port", "false"),
             systemPropertyGetOrDefault("frc.use.wpilib.beta.site", "false"),

@@ -40,6 +40,7 @@ import net.javaru.iip.frc.components.FrcProjectComponentImpl;
 import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
+import net.javaru.iip.frc.settings.FrcTeamNumberKt;
 import net.javaru.iip.frc.util.UiUtilsKt;
 import net.javaru.iip.frc.wpilib.WpiLibPaths;
 import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
@@ -66,14 +67,14 @@ public class ConfigureTeamNumberBasicAction extends AnAction
         final InputValidator validator = new InputValidator()
         {
             @Override
-            public boolean checkInput(String inputString) { return FrcApplicationSettings.Settings.isValidTeamNumber(inputString); }
+            public boolean checkInput(String inputString) { return FrcTeamNumberKt.isValidTeamNumber(inputString); }
     
     
             @Override
-            public boolean canClose(String inputString) { return FrcApplicationSettings.Settings.isValidTeamNumber(inputString); }
+            public boolean canClose(String inputString) { return FrcTeamNumberKt.isValidTeamNumber(inputString); }
         };
     
-        final FrcApplicationSettings settings = FrcApplicationSettings.Settings.INSTANCE();
+        final FrcApplicationSettings settings = FrcApplicationSettings.getInstance();
         
         @Nullable
         final Component parentComponent = UiUtilsKt.findIdeFrameOrAlternateParentComponent(project);
@@ -103,7 +104,7 @@ public class ConfigureTeamNumberBasicAction extends AnAction
         }
         
 
-        if (teamNumString != null && FrcApplicationSettings.Settings.isValidTeamNumber(teamNumString))
+        if (teamNumString != null && FrcTeamNumberKt.isValidTeamNumber(teamNumString))
         {
             settings.setTeamNumber(Integer.parseInt(teamNumString));
             performTeamNumberChangeUpdates();
@@ -122,10 +123,12 @@ public class ConfigureTeamNumberBasicAction extends AnAction
     
     protected boolean shouldBeVisible(AnActionEvent e)
     {
-        final FrcApplicationSettings settings = FrcApplicationSettings.Settings.INSTANCE();
+        final FrcApplicationSettings settings = FrcApplicationSettings.getInstance();
         return (!settings.isTeamNumberConfigured() && settings.getPrc() <= TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL);
     }
     
+    //TODO Need to remove this legacy functionality
+    @Deprecated
     public static void performTeamNumberChangeUpdates()
     {
         ApplicationManager.getApplication().runWriteAction(() -> {

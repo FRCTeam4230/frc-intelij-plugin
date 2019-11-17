@@ -100,7 +100,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         //            As such, some activities can not occur yet. Use:
         //               StartupManager.getInstance(myProject).registerPostStartupActivity(() -> someMethod(myProject));
         
-        final FrcApplicationSettings appSettings = FrcApplicationSettings.Settings.INSTANCE();
+        final FrcApplicationSettings appSettings = FrcApplicationSettings.getInstance();
         
         LOG.debug("[FRC] " + getClass().getSimpleName() + ".projectOpened() called for project " + myProject);
         LOG.debug("[FRC] wpiLibDir: " + appSettings.getWpiLibDir());
@@ -383,7 +383,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     private static void notifyToConfigureTeamNumIfNecessary(@NotNull Project project, boolean knownFacetedProject)
     {
         final Map<NotificationKey, Notification> notificationMap = getNotificationMapForProject(project);
-        final FrcApplicationSettings settings = FrcApplicationSettings.Settings.INSTANCE();
+        final FrcApplicationSettings settings = FrcApplicationSettings.getInstance();
 
         final boolean shouldNotify = !settings.isTeamNumberConfigured()
                                      &&

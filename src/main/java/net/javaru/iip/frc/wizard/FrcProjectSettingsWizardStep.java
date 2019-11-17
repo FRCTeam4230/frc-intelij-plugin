@@ -45,6 +45,9 @@ import net.javaru.iip.frc.FrcIcons.FRC;
 import net.javaru.iip.frc.FrcPluginGlobals;
 import net.javaru.iip.frc.i18n.FrcMessageKey;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
+import net.javaru.iip.frc.settings.FrcTeamNumberKt;
+import net.javaru.iip.frc.settings.TeamNumberFormChangeListener;
+import net.javaru.iip.frc.settings.TeamNumberKeyChangeListener;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
 import net.javaru.iip.frc.util.FrcPsiNameHelper;
 import net.javaru.iip.frc.util.UiUtilsKt;
@@ -54,7 +57,7 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
-public class FrcProjectSettingsWizardStep extends ModuleWizardStep
+public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements TeamNumberFormChangeListener
 {
     private static final Logger LOG = Logger.getInstance(FrcProjectSettingsWizardStep.class);
     
@@ -186,15 +189,16 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
     {
         // We may need to update this when the team number changed from an application setting to a project setting
         UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getDataModel().getTeamNumber()));
-        updateTeamNumberWarningVisibility(FrcApplicationSettings.Settings.isValidTeamNumber(teamNumberTextField.getText()));
-        
-        teamNumberTextField.addKeyListener(new TeamNumberKeyChangeListener(teamNumberTextField) {
-            @Override
-            public void makeUpdates(@NotNull String text, boolean isValidTeamNumber)
-            {
-                updateTeamNumberWarningVisibility(isValidTeamNumber);
-            }
-        });
+        updateTeamNumberWarningVisibility(FrcTeamNumberKt.isValidTeamNumber(teamNumberTextField.getText()));
+        // The TeamNumberKeyChangeListener calls the 'onTeamNumberFormChange' method upon changes to the team number text field
+        teamNumberTextField.addKeyListener(new TeamNumberKeyChangeListener(teamNumberTextField, this));
+    }
+    
+    
+    @Override // Called by the TeamNumberKeyChangeListener
+    public void onTeamNumberFormChange(@NotNull String text, boolean isValidTeamNumber, @NotNull String previousText)
+    {
+        updateTeamNumberWarningVisibility(isValidTeamNumber);
     }
     
     private void updateTeamNumberWarningVisibility(boolean isValidTeamNumber)
@@ -280,14 +284,14 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
     public boolean validate() throws ConfigurationException
     {
         LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.validate()");
-        if (!FrcApplicationSettings.Settings.isValidTeamNumber(teamNumberTextField.getText()))
+        if (!FrcTeamNumberKt.isValidTeamNumber(teamNumberTextField.getText()))
         {
             ApplicationManager.getApplication().invokeLater(
                     () -> IdeFocusManager.getInstance(myProjectOrNull).requestFocus(teamNumberTextField, true));
             throw new ConfigurationException(message("frc.ui.wizard.mws.validate.teamNumberRequired.message"),
                                              message("frc.ui.wizard.mws.validate.teamNumberRequired.title"));
         }
-        else if (!FrcApplicationSettings.Settings.INSTANCE().isTeamNumberConfigured())
+        else if (!FrcApplicationSettings.getInstance().isTeamNumberConfigured())
         {
             int projectTeamNumber = 0;
             try
@@ -302,7 +306,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep
             final boolean ok = dialogWrapper.showAndGet();
             if (ok)
             {
-                FrcApplicationSettings.Settings.INSTANCE().setTeamNumber(dialogWrapper.getTeamNumberForAppSettings());
+                FrcApplicationSettings.getInstance().setTeamNumber(dialogWrapper.getTeamNumberForAppSettings());
             }
         }
         

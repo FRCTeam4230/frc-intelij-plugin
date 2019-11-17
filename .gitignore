@@ -19,13 +19,7 @@ runtime\.properties$
 .*workspace\.xml$
 .*[\.-]?HOLD.*
 .sandbox/
-.sandbox-HOLD/
-.sandbox-TEMP/
-.sandbox-2019.1/
-.sandbox-2019.2/
-.sandbox-2019.3/
-.sandbox-2020.2/
-.sandbox-2020.3/
+.sandbox-*
 
 
 syntax: glob

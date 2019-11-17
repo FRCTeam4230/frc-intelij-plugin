@@ -38,7 +38,7 @@ public class WpiLibPaths
 
     public static Path getWpiLibRootDir()
     {
-        return FrcApplicationSettings.Settings.INSTANCE().getWpiLibDir();
+        return FrcApplicationSettings.getInstance().getWpiLibDir();
     }
 
 

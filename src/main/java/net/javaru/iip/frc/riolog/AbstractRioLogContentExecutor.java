@@ -737,7 +737,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         @Override
         public boolean isSelected(AnActionEvent e)
         {
-            return FrcApplicationSettings.Settings.INSTANCE().getClearRioLogOnRobotRestart();
+            return FrcApplicationSettings.getInstance().getClearRioLogOnRobotRestart();
         }
 
 
@@ -746,7 +746,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         {
             try
             {
-                FrcApplicationSettings.Settings.INSTANCE().setClearRioLogOnRobotRestart(state);
+                FrcApplicationSettings.getInstance().setClearRioLogOnRobotRestart(state);
             }
             catch (Exception ex)
             {

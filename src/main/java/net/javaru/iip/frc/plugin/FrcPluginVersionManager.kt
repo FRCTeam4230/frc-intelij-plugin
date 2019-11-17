@@ -43,7 +43,7 @@ object FrcPluginVersionManager
         val now = LocalDate.now()
         if (baselineVersion < 192 )
         {
-            val lastNotify = LocalDate.parse(FrcApplicationSettings.INSTANCE().notify19Up)
+            val lastNotify = LocalDate.parse(FrcApplicationSettings.getInstance().notify19Up)
             val isFrcProject = project.isFrcFacetedProject()
 
             // Notify every 3 days FRC projects forever, or 
@@ -79,7 +79,7 @@ object FrcPluginVersionManager
                                         "Please upgrade to the latest version of IntelliJ IDEA at your convenience.$suffix Thanks.",
                                         project = project)
 
-                FrcApplicationSettings.INSTANCE().notify19Up = now.toString()
+                FrcApplicationSettings.getInstance().notify19Up = now.toString()
             }
         }
     }

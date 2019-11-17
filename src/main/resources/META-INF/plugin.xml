@@ -215,15 +215,24 @@
 
         <applicationService id="FRC.FrcApplicationSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcApplicationSettings" />
         <applicationService id="FRC.FrcNotificationsSettings"   serviceImplementation="net.javaru.iip.frc.settings.FrcNotificationsSettings" />
-        <applicationService id="FRC.FrcRoboRioSettings"         serviceImplementation="net.javaru.iip.frc.settings.FrcRoboRioSettings" />
-        <applicationService id="FRC.FrcSshSettings"             serviceImplementation="net.javaru.iip.frc.settings.FrcSshSettings" />
-        
         <applicationService id="FRC.RioLogUdpSocketManagerApplicationService" serviceImplementation="net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService" />
-        <applicationService id="FRC.TcpRioSocketConnectorApplicationService" serviceImplementation="net.javaru.iip.frc.riolog.tcp.TcpRioSocketConnectorApplicationService" />
+
+        <applicationConfigurable id="preferences.language.FRC" 
+                                 instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable" 
+                                 groupId="language" />
         
-        <applicationConfigurable id="FRC.FrcApplicationSettingsConfigurable" instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable" groupId="language" />
+        <!-- Commenting out for now. Rethinking that these should be at the module/facet level rather than project level. -->
+        <!--<projectConfigurable id="preferences.language.FRC.project"
+                             instance="net.javaru.iip.frc.settings.FrcProjectSettingsConfigurable"
+                             groupId="language"
+                             parentId="preferences.language.FRC" />-->
+        
 
-
+        <projectService id="FRC.TcpRioSocketConnectorProjectService" serviceImplementation="net.javaru.iip.frc.riolog.tcp.TcpRioSocketConnectorProjectService" />
+        <projectService id="FRC.FrcProjectSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcProjectGeneralSettings" />
+        <projectService id="FRC.FrcRoboRioSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcRoboRioSettings" />
+        <projectService id="FRC.FrcSshSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcSshSettings" />
+        
         <projectService id="FRC.RioLogConsoleProjectService"
                         serviceInterface="net.javaru.iip.frc.riolog.RioLogProjectService"
                         serviceImplementation="net.javaru.iip.frc.riolog.RioLogProjectService" />

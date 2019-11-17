@@ -60,7 +60,7 @@ public class UdpRioLogRunWindowContentExecutor extends AbstractRioLogContentExec
     @NotNull
     protected AbstractRioLogMonitorProcess createRioLogMonitoringProcess()
     {
-        return new UdpRioLogMonitorProcess(this::invokeClearAll, this::invokeStop);
+        return new UdpRioLogMonitorProcess(myProject, this::invokeClearAll, this::invokeStop);
     }
 
 
@@ -68,7 +68,7 @@ public class UdpRioLogRunWindowContentExecutor extends AbstractRioLogContentExec
     @Override
     protected AbstractRioLogMonitorProcess createAnnouncementRioLogMonitoringProcess()
     {
-        return new AnnouncementRioLogMonitorProcess(this::invokeClearAll,
+        return new AnnouncementRioLogMonitorProcess(myProject, this::invokeClearAll,
                                                     this::invokeStop,
                                                     new StringBuffer("\n")
                                                         .append(FrcBundle.message("frc.riolog.first.start.message.udp"))

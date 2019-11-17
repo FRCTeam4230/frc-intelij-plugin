@@ -26,7 +26,7 @@ const val DEFAULT_BASE_PACKAGE = "frc.robot"
 const val DEFAULT_ROBOT_CLASS_NAME = "Robot"
 
 class FrcProjectWizardData(
-        var teamNumber: Int = FrcApplicationSettings.INSTANCE().teamNumber,
+        var teamNumber: Int = FrcApplicationSettings.getInstance().teamNumber,
         /** The simple name of the Main class (not to be confused with the (primary) Robot class). This is the simple class that has the `main()` method.*/
         var mainClassSimpleName: String = "Main",
         /** The simple name of the primary Robot class (not to be confused with the Main class). This is the class that extends one of the WPILib `RobotBase` classes.*/

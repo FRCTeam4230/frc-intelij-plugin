@@ -16,10 +16,8 @@
 
 package net.javaru.iip.frc.wpilib
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import net.javaru.iip.frc.settings.FrcApplicationSettings
-import java.nio.file.Paths
 import java.time.temporal.ChronoUnit
 
 //A Data class representation of the WpiLibPreferences JSON file
@@ -30,14 +28,26 @@ data class WpiLibPreferences(var enableCppIntellisense: Boolean = false,
                              )
 
 
-fun readWpiLibPreferences(project: Project)
+fun readWpiLibPreferences(project: Project): WpiLibPreferences
 {
-    // TODO handle the de
-    ApplicationManager.getApplication().runReadAction { 
-        val basePath = project.basePath
-        if (basePath != null)
-        {
-            Paths.get(basePath)
-        }
-    }
+//    if (project == ProjectManager.getInstance().defaultProject)
+//    {
+        return WpiLibPreferences()
+//    }
+//    
+//    ApplicationManager.getApplication().runReadAction {
+//        var basePath: Path? = null;
+//        val basePathString = project.basePath
+//        
+//        if (basePathString != null)
+//        {
+//            basePath = Paths.get(basePathString)
+//        }
+//        
+//        if (basePath == null || !basePath.exists())
+//        {
+//            val projectDir = project.guessProjectDir()
+//            if (projectDir != null)
+//        }
+//    }
 }

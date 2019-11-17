@@ -37,8 +37,6 @@ public class RoboRioConfigurationForm implements TeamNumberFormChangeListener
     private static final Logger LOG = Logger.getInstance(RoboRioConfigurationForm.class);
     
     @NotNull
-    private FrcProjectGeneralSettings internalFrcProjectGeneralSettings;
-    @NotNull
     private FrcRoboRioSettings internalFrcRoboRioSettings;
     @NotNull
     private final Project project;
@@ -57,11 +55,11 @@ public class RoboRioConfigurationForm implements TeamNumberFormChangeListener
     private JBTextField roboRioIpAddress;
     private JButton roboRioIpAddressDefaultValueButton;
     
+    private int internalRoboRioTeamNumber;
     
     public RoboRioConfigurationForm(@NotNull Project project)
     {
         this.project = project;
-        internalFrcProjectGeneralSettings = FrcProjectGeneralSettings.clone(FrcProjectGeneralSettings.getInstance(project));
         internalFrcRoboRioSettings = FrcRoboRioSettings.clone(FrcRoboRioSettings.getInstance(project));
         initForm();
         resetAll();
@@ -99,7 +97,6 @@ public class RoboRioConfigurationForm implements TeamNumberFormChangeListener
     public void resetForm(@NotNull FrcProjectGeneralSettings frcProjectGeneralSettings,
                           @NotNull FrcRoboRioSettings frcRoboRioSettings)
     {
-        internalFrcProjectGeneralSettings = FrcProjectGeneralSettings.clone(frcProjectGeneralSettings);
         internalFrcRoboRioSettings = FrcRoboRioSettings.clone(frcRoboRioSettings);
         resetAll();
     }
@@ -137,7 +134,7 @@ public class RoboRioConfigurationForm implements TeamNumberFormChangeListener
             }
         });
         mDnsHostNameDefaultValueButton.addActionListener(e -> {
-            final String defaultValue = internalFrcRoboRioSettings.getRoboRioHostDefault_mDNS(internalFrcProjectGeneralSettings);
+            final String defaultValue = internalFrcRoboRioSettings.getRoboRioHostDefault_mDNS();
             roboRioMDnsHostName.setText(defaultValue);
             internalFrcRoboRioSettings.setRoboRioHost_mDNS(defaultValue);
         });
@@ -160,7 +157,7 @@ public class RoboRioConfigurationForm implements TeamNumberFormChangeListener
             }
         });
         dnsHostNameDefaultValueButton.addActionListener(e -> {
-            final String defaultValue = internalFrcRoboRioSettings.getRoboRioHostDefault_DNS(internalFrcProjectGeneralSettings);
+            final String defaultValue = internalFrcRoboRioSettings.getRoboRioHostDefault_DNS();
             roboRioDnsHostName.setText(defaultValue);
             internalFrcRoboRioSettings.setRoboRioHost_DNS(defaultValue);
         });
@@ -182,7 +179,7 @@ public class RoboRioConfigurationForm implements TeamNumberFormChangeListener
             }
         });
         fieldLocalHostNameDefaultValueButton.addActionListener(e -> {
-            final String defaultValue = internalFrcRoboRioSettings.getRoboRioHostDefault_FieldLocal(internalFrcProjectGeneralSettings);
+            final String defaultValue = internalFrcRoboRioSettings.getRoboRioHostDefault_FieldLocal();
             roboRioFieldLocalHostName.setText(defaultValue);
             internalFrcRoboRioSettings.setRoboRioHost_FieldLocal(defaultValue);
         });
@@ -205,7 +202,7 @@ public class RoboRioConfigurationForm implements TeamNumberFormChangeListener
             }
         });
         roboRioIpAddressDefaultValueButton.addActionListener(e -> {
-            final String defaultValue = internalFrcRoboRioSettings.getRoboRioHostDefault_IP(internalFrcProjectGeneralSettings);
+            final String defaultValue = internalFrcRoboRioSettings.getRoboRioHostDefault_IP();
             roboRioIpAddress.setText(defaultValue);
             internalFrcRoboRioSettings.setRoboRioHost_IP(defaultValue);
         });
@@ -258,16 +255,12 @@ public class RoboRioConfigurationForm implements TeamNumberFormChangeListener
     
     private void updateFieldsWithNewTeamNumber(int newTeamNum)
     {
-        internalFrcProjectGeneralSettings.setTeamNumber(newTeamNum);
-        if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_mDNS()) { roboRioMDnsHostName.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_mDNS(
-                internalFrcProjectGeneralSettings)); }
-        if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_DNS()) { roboRioDnsHostName.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_DNS(
-                internalFrcProjectGeneralSettings)); }
-        if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_FieldLocal()) { roboRioFieldLocalHostName.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_FieldLocal(
-                internalFrcProjectGeneralSettings)); }
+        internalFrcRoboRioSettings.setTeamNumber(newTeamNum);
+        if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_mDNS()) { roboRioMDnsHostName.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_mDNS(newTeamNum)); }
+        if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_DNS()) { roboRioDnsHostName.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_DNS(newTeamNum)); }
+        if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_FieldLocal()) { roboRioFieldLocalHostName.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_FieldLocal(newTeamNum)); }
         if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_USB()) { roboRioStaticUsbIp.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_USB()); }
-        if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_IP()) { roboRioIpAddress.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_IP(
-                internalFrcProjectGeneralSettings)); }
+        if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_IP()) { roboRioIpAddress.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_IP(newTeamNum));}
     }
     
     
@@ -276,8 +269,6 @@ public class RoboRioConfigurationForm implements TeamNumberFormChangeListener
     public synchronized void applyTo(@NotNull FrcProjectGeneralSettings frcProjectGeneralSettings,
                                      @NotNull FrcRoboRioSettings frcRoboRioSettings)
     {
-        LOG.debug("[FRC] Before applying form frcApplicationSettings of\n" + internalFrcProjectGeneralSettings
-                  + "\nto current/previous frcApplicationSettings of\n" + frcProjectGeneralSettings);
         LOG.debug("[FRC] Before applying form frcRoboRioSettings of\n" + internalFrcRoboRioSettings + "\nto current/previous frcRoboRioSettings of\n" + frcRoboRioSettings);
     
         // *** APPLY INTERNAL CHANGES TO THE SETTING INSTANCES
@@ -287,14 +278,12 @@ public class RoboRioConfigurationForm implements TeamNumberFormChangeListener
         frcRoboRioSettings.setRoboRioHost_DNS(internalFrcRoboRioSettings.getRoboRioHost_DNS());
         frcRoboRioSettings.setRoboRioHost_mDNS(internalFrcRoboRioSettings.getRoboRioHost_mDNS());
         
-        LOG.debug("[FRC] After  applying form frcApplicationSettings of\n" + internalFrcProjectGeneralSettings
-                  + "\nto current/previous frcApplicationSettings of\n" + frcProjectGeneralSettings);
+        
         LOG.debug("[FRC] After  applying form frcRoboRioSettings of\n" + internalFrcRoboRioSettings + "\nto current/previous frcRoboRioSettings of\n" + frcRoboRioSettings);
         
         // ** NO CHANGES TO SETTINGS OBJECTS BELOW THIS
     
         //Reset the internal state to the updated setting
-        internalFrcProjectGeneralSettings = FrcProjectGeneralSettings.clone(frcProjectGeneralSettings);
         internalFrcRoboRioSettings = FrcRoboRioSettings.clone(frcRoboRioSettings);
     }
     
@@ -302,8 +291,7 @@ public class RoboRioConfigurationForm implements TeamNumberFormChangeListener
     
     public boolean isModified()
     {
-        final boolean modified = !FrcProjectGeneralSettings.getInstance(project).equals(internalFrcProjectGeneralSettings) ||
-                                 !FrcRoboRioSettings.getInstance(project).equals(internalFrcRoboRioSettings);
+        final boolean modified = !FrcRoboRioSettings.getInstance(project).equals(internalFrcRoboRioSettings);
         LOG.trace("[FRC] RoboRioConfigurationForm.isModified returning " + modified);
         return modified;
     }

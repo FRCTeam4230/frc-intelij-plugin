@@ -28,7 +28,7 @@ class FrcProjectSettingsConfigurable(val project:Project): SearchableConfigurabl
     
     companion object
     {
-        val ID = "preferences.language.FRC.project" // Needs to match the is in the plugin.xml <projectConfigurable>
+        const val ID = "preferences.language.FRC.project" // Needs to match the is in the plugin.xml <projectConfigurable>
     }
     
     /**

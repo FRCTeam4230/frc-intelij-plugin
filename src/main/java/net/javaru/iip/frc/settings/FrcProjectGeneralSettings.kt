@@ -17,9 +17,9 @@
 package net.javaru.iip.frc.settings
 
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
@@ -28,8 +28,8 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 // NOTE: This class is registered as a <projectService> in the plugin.xml
 @State(name = "FrcProjectGeneralSettings", storages = [(Storage("frc/frc.xml"))])
 data class FrcProjectGeneralSettings @JvmOverloads constructor(
-        private val project: Project,
-        var teamNumber: Int = initTeamNumber(project)
+       
+        var teamNumber: Int = check() /*initTeamNumber(project) */
                                                               ) : PersistentStateComponent<FrcProjectGeneralSettings>
 {
 
@@ -38,10 +38,12 @@ data class FrcProjectGeneralSettings @JvmOverloads constructor(
         val LOG = Logger.getInstance(FrcProjectGeneralSettings::class.java)
         
         @JvmStatic
-        fun getInstance(project: Project): FrcProjectGeneralSettings = ServiceManager.getService(project, FrcProjectGeneralSettings::class.java)
+        fun getInstance(project: Project) = project.service<FrcProjectGeneralSettings>() 
 
         @JvmStatic
         fun clone(original: FrcProjectGeneralSettings): FrcProjectGeneralSettings = original.copy()
+        
+        private fun check(): Int = UN_CONFIGURED_TEAM_NUMBER
         
         private fun initTeamNumber(project: Project): Int
         {

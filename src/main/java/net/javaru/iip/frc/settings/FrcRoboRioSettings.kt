@@ -19,9 +19,9 @@
 package net.javaru.iip.frc.settings
 
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.xmlb.XmlSerializerUtil
@@ -44,7 +44,7 @@ private const val USE_DEFAULT_HOST_PLACEHOLDER = "<<<Use Default Host>>>"
 // NOTE: This class is registered as an <projectService> in the plugin.xml
 @State(name = "FrcRoboRio", storages = [(Storage("frc/frc.xml"))])
 data class FrcRoboRioSettings @JvmOverloads constructor(
-        private val project: Project,
+        @com.intellij.util.xmlb.annotations.Transient var teamNumber: Int = FrcApplicationSettings.getInstance().teamNumber,
         var roboRioHostRawMDns: String = USE_DEFAULT_HOST_PLACEHOLDER,
         var roboRioHostRawDns: String = USE_DEFAULT_HOST_PLACEHOLDER,
         var roboRioHostRawIp: String = USE_DEFAULT_HOST_PLACEHOLDER,
@@ -55,20 +55,30 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
     init
     {
         // TODO need to listen for applied team number changes, modify settings, and then publish URL/IP address change 
+        
+        
     }
+
+    
     
     @Suppress("unused", "MemberVisibilityCanPrivate")
     companion object Settings
     {
         @JvmStatic
-        fun getInstance(project: Project): FrcRoboRioSettings = ServiceManager.getService(project, FrcRoboRioSettings::class.java)
-        
-        @JvmStatic
-        fun getImmutableInstance(project: Project): ImmutableFrcRoboRioSettings
+        fun getInstance(project: Project): FrcRoboRioSettings
         {
-            val (_, roboRioHostRawMDns, roboRioHostRawDns, roboRioHostRawIp, roboRioHostRawUsb, roboRioHostRawFieldLocal) = getInstance(project)
-            return ImmutableFrcRoboRioSettings(roboRioHostRawMDns, roboRioHostRawDns, roboRioHostRawIp, roboRioHostRawUsb, roboRioHostRawFieldLocal)
+            val settings = project.service<FrcRoboRioSettings>()
+            // TODO - MAJOR - NEED TO READ FROM WpiLibPreferences JSON FILE. Whether here of in FrcProjectGeneralSettings  
+            settings.teamNumber = FrcProjectGeneralSettings.getInstance(project).teamNumber
+            return settings
         }
+        
+//        @JvmStatic
+//        fun getImmutableInstance(project: Project): ImmutableFrcRoboRioSettings
+//        {
+//            val (_ roboRioHostRawMDns, roboRioHostRawDns, roboRioHostRawIp, roboRioHostRawUsb, roboRioHostRawFieldLocal) = getInstance(project)
+//            return ImmutableFrcRoboRioSettings(roboRioHostRawMDns, roboRioHostRawDns, roboRioHostRawIp, roboRioHostRawUsb, roboRioHostRawFieldLocal)
+//        }
 
         @JvmStatic
         fun clone(original: FrcRoboRioSettings): FrcRoboRioSettings = original.copy()
@@ -99,6 +109,7 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
 
     // ==== mDNS Host Helpers ====
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun setRoboRioHost_mDNS(roboRioHostMDns: String)
     {
         roboRioHostRawMDns =
@@ -112,6 +123,7 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
                 }
     }
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun getRoboRioHost_mDNS(): String
     {
         return if (USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawMDns)
@@ -124,14 +136,18 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
         }
     }
 
-    fun getRoboRioHostDefault_mDNS(frcProjectGeneralSettings: FrcProjectGeneralSettings = FrcProjectGeneralSettings.getInstance(project)): String = createRoboRioHostDefault_mDNS(frcProjectGeneralSettings.teamNumber)
+    @JvmOverloads
+    @com.intellij.util.xmlb.annotations.Transient
+    fun getRoboRioHostDefault_mDNS(roboRioTeamNumber: Int = teamNumber): String = createRoboRioHostDefault_mDNS(roboRioTeamNumber)
 
-    fun createRoboRioHostDefault_mDNS(teamNumber: Int): String = String.format(ROBORIO_HOST_mDNS_TEMPLATE, teamNumber)
+    private fun createRoboRioHostDefault_mDNS(teamNumber: Int): String = String.format(ROBORIO_HOST_mDNS_TEMPLATE, teamNumber)
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun isRoboRioHostTheDefault_mDNS(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawMDns
 
     // ==== DNS Host Helpers ====
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun setRoboRioHost_DNS(roboRioHostDns: String)
     {
         roboRioHostRawDns =
@@ -145,6 +161,7 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
                 }
     }
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun getRoboRioHost_DNS(): String
     {
         return if (USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawDns)
@@ -157,15 +174,19 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
         }
     }
 
-    fun getRoboRioHostDefault_DNS(frcProjectGeneralSettings: FrcProjectGeneralSettings = FrcProjectGeneralSettings.getInstance(project)): String = createRoboRioHostDefault_DNS(frcProjectGeneralSettings.teamNumber)
+    @JvmOverloads
+    @com.intellij.util.xmlb.annotations.Transient
+    fun getRoboRioHostDefault_DNS(roboRioTeamNumber: Int = teamNumber): String = createRoboRioHostDefault_DNS(roboRioTeamNumber)
 
-    fun createRoboRioHostDefault_DNS(teamNumber: Int): String = String.format(ROBORIO_HOST_DNS_TEMPLATE, teamNumber)
+    private fun createRoboRioHostDefault_DNS(teamNumber: Int): String = String.format(ROBORIO_HOST_DNS_TEMPLATE, teamNumber)
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun isRoboRioHostTheDefault_DNS(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawDns
 
 
     // ==== FieldLocal Host Helpers ====
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun setRoboRioHost_FieldLocal(roboRioHostFieldLocal: String)
     {
         roboRioHostRawFieldLocal =
@@ -179,6 +200,7 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
                 }
     }
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun getRoboRioHost_FieldLocal(): String
     {
         return if (USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawFieldLocal)
@@ -191,15 +213,19 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
         }
     }
 
-    fun getRoboRioHostDefault_FieldLocal(frcProjectGeneralSettings: FrcProjectGeneralSettings = FrcProjectGeneralSettings.getInstance(project)): String = createRoboRioHostDefault_FieldLocal(frcProjectGeneralSettings.teamNumber)
+    @JvmOverloads
+    @com.intellij.util.xmlb.annotations.Transient
+    fun getRoboRioHostDefault_FieldLocal(roboRioTeamNumber: Int = teamNumber): String = createRoboRioHostDefault_FieldLocal(roboRioTeamNumber)
 
-    fun createRoboRioHostDefault_FieldLocal(teamNumber: Int): String = String.format(ROBORIO_HOST_FIELD_LOCAL_TEMPLATE, teamNumber)
+    private fun createRoboRioHostDefault_FieldLocal(teamNumber: Int): String = String.format(ROBORIO_HOST_FIELD_LOCAL_TEMPLATE, teamNumber)
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun isRoboRioHostTheDefault_FieldLocal(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawFieldLocal
 
 
     // ==== IP Host Helpers ====
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun setRoboRioHost_IP(roboRioHostIp: String)
     {
         roboRioHostRawIp =
@@ -213,6 +239,7 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
                 }
     }
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun getRoboRioHost_IP(): String
     {
         return if (USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawIp)
@@ -225,24 +252,29 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
         }
     }
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun getRoboRioHost_IP_asIpByteArray(): ByteArray
     {
         return getRoboRioHost_IP().ipAddressToByteArray()
     }
 
-    fun getRoboRioHostDefault_IP(frcProjectGeneralSettings: FrcProjectGeneralSettings = FrcProjectGeneralSettings.getInstance(project)): String = createRoboRioHostDefault_IP(frcProjectGeneralSettings.teamNumber)
+    @JvmOverloads
+    @com.intellij.util.xmlb.annotations.Transient
+    fun getRoboRioHostDefault_IP(roboRioTeamNumber: Int = teamNumber): String = createRoboRioHostDefault_IP(roboRioTeamNumber)
 
-    fun createRoboRioHostDefault_IP(teamNumber: Int): String
+    private fun createRoboRioHostDefault_IP(teamNumber: Int): String
     {
         val high = teamNumber / 100
         val low = teamNumber % 100
         return String.format(ROBORIO_HOST_IP_TEMPLATE, high, low)
     }
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun isRoboRioHostTheDefault_IP(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawIp
 
     // ==== USB Host Helpers ====
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun setRoboRioHost_USB(roboRioHostUsb: String)
     {
         roboRioHostRawUsb =
@@ -256,6 +288,7 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
                 }
     }
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun getRoboRioHost_USB(): String
     {
         return if (USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawUsb)
@@ -268,14 +301,16 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
         }
     }
 
+    @com.intellij.util.xmlb.annotations.Transient
     fun getRoboRioHost_USB_asIpByteArray(): ByteArray
     {
         return getRoboRioHost_USB().ipAddressToByteArray()
     }
-    
+
+    @com.intellij.util.xmlb.annotations.Transient
     fun getRoboRioHostDefault_USB(): String = ROBORIO_HOST_USB_DEFAULT
 
-
+    @com.intellij.util.xmlb.annotations.Transient
     fun isRoboRioHostTheDefault_USB(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawUsb
 }
 

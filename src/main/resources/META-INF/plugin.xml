@@ -65,6 +65,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+      <strong>NEXT VERSION</strong> <br>
+      &nbsp;&nbsp;&bull; Deprecated the custom FrcModuleType used by the custom FRC Project Wizard and instead have the wizard create JavaModuleType projects.
+      This change will have very minimal impact to users, but improves some functionality. See  <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/41">Enhancement #41</a>
+      for additional details.<br>
+      <br>
       <strong>v0.8.1</strong> <br>
       &nbsp;&nbsp;&bull; Fixed <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/40">Issue #40</a>, a potential NPE when clicking on the 
       "Configure FRC Team Number" action on the IntelliJ IDEA Welcome Screen<br>

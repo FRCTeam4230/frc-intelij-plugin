@@ -34,6 +34,11 @@ import net.javaru.iip.frc.FrcIcons.FRC;
 
 
 
+// While deprecated, we need to leave it in to prevent errors when projects that were created using it are opened.
+// It's use was limited to a few weeks in Nov 2019 in v0.8.0 & v0.8.1, and was removed in the next release later in November.
+// Still, let's keep it around until at least May 2023 (i.e. 3 build seasons)
+@SuppressWarnings("DeprecatedIsStillUsed") 
+@Deprecated // See Issue #41: https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/41
 public class FrcModuleType extends ModuleType<FrcModuleBuilder>
 {
     // The Module type ID must match that defined in the id attribute of the moduleType extension definition in the plugin.xml file

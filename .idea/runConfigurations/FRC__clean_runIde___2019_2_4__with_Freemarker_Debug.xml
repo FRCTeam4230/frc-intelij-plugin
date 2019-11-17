@@ -1,11 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="FRC [runIde] (Latest EAP Snapshot - Community)" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="FRC [clean runIde] (2019.2.4) with Freemarker Debug" type="GradleRunConfiguration" factoryName="Gradle">
     <log_file alias="idea.log" path="$PROJECT_DIR$/.sandbox/system/log/idea.log" />
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="-PideaVersion=IC-LATEST-EAP-SNAPSHOT" />
+      <option name="scriptParameters" value="-PideaVersion=IC-2019.2.4 --no-build-cache" />
       <option name="taskDescriptions">
         <list />
       </option>
@@ -17,7 +17,7 @@
           <option value="runIde" />
         </list>
       </option>
-      <option name="vmOptions" value="-Dfrc.simulated.log.service.enabled=false -Dfrc.simulated.log.service.use.configured.port=true -Dfrc.use.wpilib.beta.site=false" />
+      <option name="vmOptions" value="-Dfrc.freemarker.debug=true" />
     </ExternalSystemSettings>
     <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
     <method v="2" />

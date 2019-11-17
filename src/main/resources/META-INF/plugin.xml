@@ -216,11 +216,12 @@
         <applicationConfigurable id="preferences.language.FRC" 
                                  instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable" 
                                  groupId="language" />
-
-        <projectConfigurable id="preferences.language.FRC.project"
+        
+        <!-- Commenting out for now. Rethinking that these should be at the module/facet level rather than project level. -->
+        <!--<projectConfigurable id="preferences.language.FRC.project"
                              instance="net.javaru.iip.frc.settings.FrcProjectSettingsConfigurable"
                              groupId="language"
-                             parentId="preferences.language.FRC" />
+                             parentId="preferences.language.FRC" />-->
         
 
         <projectService id="FRC.TcpRioSocketConnectorProjectService" serviceImplementation="net.javaru.iip.frc.riolog.tcp.TcpRioSocketConnectorProjectService" />

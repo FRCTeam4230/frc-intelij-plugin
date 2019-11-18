@@ -45,8 +45,14 @@ plugins {
     java
     kotlin("jvm") version "1.3.41"  // It's best to kep the major.minor version consistent with the latest version of IntelliJ IDEA (and update the valid IDEA versions as appropriate)
     id("org.jetbrains.intellij") version "0.4.13" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
-    // v0.4 -- 0.4.2 breaks the copyright configuration. can't find any notes about changes 
-    id("org.jetbrains.gradle.plugin.idea-ext") version "0.3" // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.  https://github.com/jetbrains/gradle-idea-ext-plugin    https://plugins.gradle.org/plugin/org.jetbrains.gradle.plugin.idea-ext
+
+    // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
+    //    https://github.com/jetbrains/gradle-idea-ext-plugin
+    //    https://plugins.gradle.org/plugin/org.jetbrains.gradle.plugin.idea-ext
+    //    v0.4 -- 0.4.1 breaks the copyright configuration. Fixed in v 0.4.2 https://github.com/JetBrains/gradle-idea-ext-plugin/issues/33
+    //    But I'm still having issues. Likely I need to change the Kotlin DSL. But have not had the time to dig into it. More notes below where used.
+    //    v0.6.1+ requires IntelliJ IDEA 2019.2
+    id("org.jetbrains.gradle.plugin.idea-ext") version "0.3"    
 }
 
 
@@ -129,8 +135,12 @@ publishPlugin {
 // Configure some IDEA Project settings
 idea {
     // https://github.com/JetBrains/gradle-idea-ext-plugin
-    // Note, the DSL apparently changed in v0.4 since if I upgrade to it or later, the following breaks. But I cannot find any documentation on the change and have not ug into the code to see what needs to change
-    //       Looks like the new v0.5 DSL is (now) documented here: https://github.com/JetBrains/gradle-idea-ext-plugin/wiki/DSL-spec-v.-0.5 
+    // Note: The DSL apparently changed in v0.4 since if I upgrade to it or later, the following breaks. 
+    //       But I have not had the time to dig into it and see what needs to change
+    //       The DSL spec is documented on the project's wiki, but it is no the most stellar documentation, 
+    //       and is only for the Groovy based DSL. When I find some time I can look at modifying.
+    //       https://github.com/JetBrains/gradle-idea-ext-plugin/wiki
+    //       This issue has some links to help using with the Kotlin Gradle DSL:  https://github.com/JetBrains/gradle-idea-ext-plugin/issues/44
     project {
         (this as ExtensionAware)
         configure<ProjectSettings> {

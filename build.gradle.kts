@@ -175,7 +175,7 @@ idea {
 
 repositories {
     mavenCentral()
-    maven("http://dl.bintray.com/jetbrains/intellij-plugin-service")
+    maven("https://dl.bintray.com/jetbrains/intellij-plugin-service")
     maven("https://plugins.gradle.org/m2/")
     jcenter()
 }

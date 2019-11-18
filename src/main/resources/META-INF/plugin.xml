@@ -239,19 +239,15 @@
         <projectService id="FRC.FrcSshSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcSshSettings" />
         
         <projectService id="FRC.RioLogConsoleProjectService"
-                        serviceInterface="net.javaru.iip.frc.riolog.RioLogProjectService"
                         serviceImplementation="net.javaru.iip.frc.riolog.RioLogProjectService" />
 
         <projectService id="FRC.TcpRioLogConsoleProjectService"
-                        serviceInterface="net.javaru.iip.frc.riolog.tcp.TcpRioLogMonitorProjectService"
                         serviceImplementation="net.javaru.iip.frc.riolog.tcp.TcpRioLogMonitorProjectService" />
 
         <projectService id="FRC.UdpRioLogConsoleProjectService"
-                        serviceInterface="net.javaru.iip.frc.riolog.udp.UdpRioLogMonitorProjectService"
                         serviceImplementation="net.javaru.iip.frc.riolog.udp.UdpRioLogMonitorProjectService" />
 
         <projectService id="FRC.SshRioLogConsoleProjectService"
-                        serviceInterface="net.javaru.iip.frc.riolog.ssh.SshRioLogMonitorProjectService"
                         serviceImplementation="net.javaru.iip.frc.riolog.ssh.SshRioLogMonitorProjectService" />
 
         <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
@@ -271,6 +267,7 @@
             See notes in the FrcModuleType class ans in issue #41: https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/41
             Module type ID must match that defined in the FrcModuleType class.
         -->
+        <!--suppress DeprecatedClassUsageInspection -->
         <moduleType id="FRC_Module" implementationClass="net.javaru.iip.frc.wizard.FrcModuleType" order="first" />
         <moduleBuilder id="FrcModuleBuilder" builderClass="net.javaru.iip.frc.wizard.FrcModuleBuilder" order="last" />
 
@@ -369,11 +366,11 @@
                text="FRC"
                class="net.javaru.iip.frc.actions.tools.FrcToolsActionGroup"
                popup="true"
-               icon="/icons/first/FIRST_icon_16x16.png"
-        >
+               icon="/icons/first/FIRST_icon_16x16.png">
             <action id="frc.tools.AttachWpilibAction"
                     class="net.javaru.iip.frc.actions.tools.AttachWpilibAction"
                     icon="AllIcons.Nodes.PpLib" />
+            <!--suppress PluginXmlCapitalization -->
             <action id="frc.tools.AttachUserLibDirAction"
                     class="net.javaru.iip.frc.actions.tools.AttachUserLibDirAction"
                     icon="AllIcons.General.User" />
@@ -382,8 +379,7 @@
                     icon="/icons/wpi/wpilib-16.png"/>
             <action id="frc.tools.DownloadWpiLibAction"
                     class="net.javaru.iip.frc.actions.tools.DownloadWpiLibAction"
-                    icon="AllIcons.Actions.Download"
-                     />
+                    icon="AllIcons.Actions.Download" />
             
             <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after" />
         </group>
@@ -391,8 +387,7 @@
         <group id="FRC.FrcRioLogActionsGroup"
                class="net.javaru.iip.frc.actions.tools.riolog.FrcRioLogActionGroup"
                popup="true"
-               icon="/icons/riolog/riolog.png"
-               >
+               icon="/icons/riolog/riolog.png">
 
             <action id="frc.tools.ShowTcp"
                     class="net.javaru.iip.frc.actions.tools.ShowRioLogTcpConsoleAction" />
@@ -409,8 +404,7 @@
                text="FRC"
                class="net.javaru.iip.frc.actions.create.FrcCreateComponentsActionGroup"
                popup="true"
-               icon="/icons/first/FIRST_icon_16x16.png"
-        >
+               icon="/icons/first/FIRST_icon_16x16.png">
             <separator />
             <action id="frc.action.new.basic.command" 
                     class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicCommandClassAction" />
@@ -420,6 +414,7 @@
                     class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicSubsystemClassAction" />
             <action id="frc.action.new.basic.pidSubsystem"
                     class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicPidSubsystemClassAction" />
+            <!--suppress PluginXmlCapitalization -->
             <action id="frc.action.new.basic.trigger"
                     class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicTriggerClassAction" />
 

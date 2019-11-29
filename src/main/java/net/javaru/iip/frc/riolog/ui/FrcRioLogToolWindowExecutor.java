@@ -23,6 +23,7 @@ import com.intellij.execution.Executor;
 import com.intellij.execution.ExecutorRegistry;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.IconLoader;
 
 import net.javaru.iip.frc.FrcIcons;
 
@@ -32,6 +33,7 @@ import net.javaru.iip.frc.FrcIcons;
 // Access is obtained via:  ExecutionManager.getInstance(myProject);
 // For example, as used in AbstractRioLogContentExecutor:  
 //           ExecutionManager.getInstance(myProject).getContentManager().showRunContent(myExecutor, myRunContentDescriptor);
+// Also see com.intellij.execution.executors.DefaultRunExecutor for examples
 public class FrcRioLogToolWindowExecutor extends Executor
 {
     private static final Logger LOG = Logger.getInstance(FrcRioLogToolWindowExecutor.class);
@@ -55,7 +57,7 @@ public class FrcRioLogToolWindowExecutor extends Executor
 
 
     @Override
-    public Icon getDisabledIcon() { return AllIcons.Process.DisabledRun; }
+    public Icon getDisabledIcon() { return IconLoader.getDisabledIcon(getIcon()); /* As done in  com.intellij.execution.executors.DefaultRunExecutor */ }
 
 
     @Override

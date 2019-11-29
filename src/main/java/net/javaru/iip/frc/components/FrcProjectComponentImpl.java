@@ -171,6 +171,8 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
     private boolean frcFreshTemplateProjectCheckAndCleanup()
     {
+        if (FrcProjectExtsKt.isGradleProject(myProject)) return false;
+        
         boolean isFreshTemplateProject = false;
         try
         {
@@ -184,7 +186,10 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                 {
                     FrcFileUtils.deleteSafely(projectTemplateFile, this);
                     // This is assuming a standard template was used...
-                    final VirtualFile srcDir = myProject.getBaseDir().findChild("src");
+                    //final VirtualFile srcDir = myProject.getBaseDir().findChild("src");
+                    final VirtualFile projectDir = com.intellij.openapi.project.ProjectUtil.guessProjectDir(myProject);
+                    if (projectDir == null) { return false; } // Not much else we can do... and besides, this is functionality for the old Ant based project templates and can be removed at some point
+                    final VirtualFile srcDir = projectDir.findChild("src");
                     if (srcDir != null && srcDir.exists())
                     {
                         final VirtualFile frcDir = srcDir.findChild("frc");

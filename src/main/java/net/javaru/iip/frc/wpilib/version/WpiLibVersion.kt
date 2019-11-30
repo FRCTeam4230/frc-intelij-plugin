@@ -35,9 +35,18 @@ interface WpiLibVersion : Comparable<WpiLibVersion>
 
     val preReleaseModifierVersion: Int?
     
+    val preReleaseModifierSubVersion: String
+    
+    val preReleasePreviewVersion: Int?
+    
     fun isPreRelease(): Boolean
     {
         return preReleaseModifier != null
+    }
+    
+    fun isPreReleasePreview(): Boolean
+    {
+        return isPreRelease() && preReleasePreviewVersion != null
     }
     
     override fun compareTo(other: WpiLibVersion): Int
@@ -52,6 +61,10 @@ interface WpiLibVersion : Comparable<WpiLibVersion>
                         if (other.isPreRelease()) other.preReleaseModifier!!.ordinal else Integer.MAX_VALUE)
                 .append(if (this.isPreRelease()) this.preReleaseModifierVersion else Integer.MAX_VALUE,
                         if (other.isPreRelease()) other.preReleaseModifierVersion else Integer.MAX_VALUE)
+                .append(if (this.isPreRelease()) this.preReleaseModifierSubVersion else "",
+                        if (other.isPreRelease()) other.preReleaseModifierSubVersion else "")
+                .append(if (this.isPreReleasePreview()) this.preReleasePreviewVersion else Integer.MAX_VALUE,
+                        if (other.isPreReleasePreview()) other.preReleasePreviewVersion else Integer.MAX_VALUE)
                 .toComparison()
 
     }

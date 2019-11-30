@@ -20,7 +20,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder
 import org.apache.commons.lang3.builder.HashCodeBuilder
 import org.apache.commons.lang3.builder.ToStringBuilder
 import org.apache.commons.lang3.builder.ToStringStyle
-import java.util.regex.Pattern
 
 
 class WpiLibVersionImpl private constructor(override val versionString: String,
@@ -29,12 +28,14 @@ class WpiLibVersionImpl private constructor(override val versionString: String,
                                             override val minor: Int,
                                             override val patch: Int,
                                             override val preReleaseModifier: WpiLibVersion.PreReleaseModifier?,
-                                            override val preReleaseModifierVersion: Int?) : WpiLibVersion
+                                            override val preReleaseModifierVersion: Int?,
+                                            override val preReleaseModifierSubVersion: String = "",
+                                            override val preReleasePreviewVersion: Int?) : WpiLibVersion
 {
 
     override fun cloneIt(): WpiLibVersion
     {
-        return WpiLibVersionImpl(this.versionString, this.generation, this.major, this.minor, this.patch, this.preReleaseModifier, this.preReleaseModifierVersion)
+        return WpiLibVersionImpl(this.versionString, this.generation, this.major, this.minor, this.patch, this.preReleaseModifier, this.preReleaseModifierVersion, this.preReleaseModifierSubVersion, this.preReleasePreviewVersion)
     }
 
 
@@ -56,6 +57,8 @@ class WpiLibVersionImpl private constructor(override val versionString: String,
                 .append("patch", patch)
                 .append("preReleaseModifier", preReleaseModifier)
                 .append("preReleaseModifierVersion", preReleaseModifierVersion)
+                .append("preReleaseModifierSubVersion", preReleaseModifierSubVersion)
+                .append("preReleasePreviewVersion", preReleasePreviewVersion)
                 .toString()
     }
 
@@ -76,6 +79,8 @@ class WpiLibVersionImpl private constructor(override val versionString: String,
                 .append(versionString, that.versionString)
                 .append(preReleaseModifier, that.preReleaseModifier)
                 .append(preReleaseModifierVersion, that.preReleaseModifierVersion)
+                .append(preReleaseModifierSubVersion, that.preReleaseModifierSubVersion)
+                .append(preReleasePreviewVersion, that.preReleasePreviewVersion)
                 .isEquals
     }
 
@@ -90,33 +95,16 @@ class WpiLibVersionImpl private constructor(override val versionString: String,
                 .append(patch)
                 .append(preReleaseModifier)
                 .append(preReleaseModifierVersion)
+                .append(preReleaseModifierSubVersion)
+                .append(preReleasePreviewVersion)
                 .toHashCode()
     }
 
     companion object
     {
 
-        private val pre2017Pattern = Pattern.compile("([\\d]{1,2})\\.([\\d]{1,2})\\.([\\d]{1,2})\\.([\\d]{12})")
-        private val post2017Pattern = Pattern.compile(
-                "(?<major>[\\d]{4})\\.(?<minor>[\\d]{1,2})(\\.(?<patch>[\\d]{1,2})(?<preAll>[-.](?<preName>alpha|beta|rc)([-.](?<preVer>[\\d]{1,2}))?)?)?")
-
-        // E X A M P L E S
-        // == PRE 2017 ==
-        // 0.1.0.201502241928
-        // 0.1.0.201602112135
-        // 0.1.0.201603020231
-        // == 2017 on ==
-        // 2017.1.1.alpha-1   // there actually are no alpha releases, but we handle just in case
-        // 2017.1.1.alpha-2
-        // 2017.1.1.beta-1
-        // 2017.1.1.beta-2
-        // 2017.1.1.beta-3
-        // 2017.1.1.beta-4
-        // 2017.1.1.rc-1
-        // 2017.1.1.rc-2
-        // 2017.1.1
-        // 2017.2.1
-        // 2018.1.1.beta-5
+        private val pre2017Pattern = """([\d]{1,2})\.([\d]{1,2})\.([\d]{1,2})\.([\d]{12})""".toRegex().toPattern()
+        private val post2017Pattern = """(?<major>[\d]{4})\.(?<minor>[\d]{1,2})(\.(?<patch>[\d]{1,2})(?<preAll>[-.](?<preName>alpha|beta|rc)([-.]?(?<preVersion>[\d]{1,2}))?)?(?<preSubVersion>[a-z])?(?<previewAll>[-.](pre|p-)[-]?(?<previewVer>[\d]*))?)?""".toRegex(RegexOption.IGNORE_CASE).toPattern()
 
 
         @Throws(IllegalArgumentException::class)
@@ -131,7 +119,10 @@ class WpiLibVersionImpl private constructor(override val versionString: String,
                                          if (matcher.group("minor") != null) Integer.parseInt(matcher.group("minor")) else 0,
                                          if (matcher.group("patch") != null) Integer.parseInt(matcher.group("patch")) else 0,
                                          if (matcher.group("preAll") != null) WpiLibVersion.PreReleaseModifier.valueOf(matcher.group("preName")) else null,
-                                         if (matcher.group("preVer") != null) Integer.parseInt(matcher.group("preVer")) else null)
+                                         if (matcher.group("preVersion") != null) Integer.parseInt(matcher.group("preVersion")) else null,
+                                         if (matcher.group("preSubVersion") != null) matcher.group("preSubVersion") else "",
+                                         if (matcher.group("previewAll") != null) Integer.parseInt(matcher.group("previewVer")) else null
+                                         )
             }
             else
             {
@@ -143,7 +134,7 @@ class WpiLibVersionImpl private constructor(override val versionString: String,
                                              2015,
                                              Integer.parseInt(dateTimeString.substring(0, 4)),
                                              Integer.parseInt(dateTimeString.substring(4, 6)),
-                                             Integer.parseInt(dateTimeString.substring(6, 12)), null, null)
+                                             Integer.parseInt(dateTimeString.substring(6, 12)), null, null, "", null)
                 }
                 else
                 {

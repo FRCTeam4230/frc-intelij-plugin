@@ -33,6 +33,14 @@ import java.util.stream.Stream
 internal class WpiLibVersionTest
 {
     @Test
+    fun quick()
+    {
+        val version = WpiLibVersionImpl.parse("2020.1.1.beta-3a")
+        val x = version.preReleaseModifierVersion
+        println("x = '${x}'")
+    }
+    
+    @Test
     fun usesGradle()
     {
         assertAll(
@@ -41,7 +49,7 @@ internal class WpiLibVersionTest
                 { assertFalse(v2017_1_1.usesGradle()) },
                 { assertFalse(v2018_1_1_beta_2.usesGradle()) },
                 { assertFalse(v2018_6_1.usesGradle()) },
-                { assertTrue(v2019_0_0.usesGradle()) },
+                { assertTrue(v2019_0_1.usesGradle()) },
                 { assertTrue(v2019_1_1.usesGradle()) },
                 { assertTrue(v2020_1_1.usesGradle()) }
                  )
@@ -56,7 +64,7 @@ internal class WpiLibVersionTest
                 { assertTrue(v2017_1_1.usesAnt()) },
                 { assertTrue(v2018_1_1_beta_2.usesAnt()) },
                 { assertTrue(v2018_6_1.usesAnt()) },
-                { assertFalse(v2019_0_0.usesAnt()) },
+                { assertFalse(v2019_0_1.usesAnt()) },
                 { assertFalse(v2019_1_1.usesAnt()) },
                 { assertFalse(v2020_1_1.usesAnt()) }
                  )
@@ -241,7 +249,9 @@ internal class WpiLibVersionTest
                                          override val minor: Int,
                                          override val patch: Int,
                                          override val preReleaseModifier: PreReleaseModifier?,
-                                         override val preReleaseModifierVersion: Int?) : WpiLibVersion
+                                         override val preReleaseModifierVersion: Int?,
+                                         override val preReleaseModifierSubVersion: String = "",
+                                         override val preReleasePreviewVersion: Int?) : WpiLibVersion
     {
 
 
@@ -251,7 +261,7 @@ internal class WpiLibVersionTest
 
         override fun cloneIt(): WpiLibVersion
         {
-            return ExpectedWpiLibVersion(this.generation, this.major, this.minor, this.patch, this.preReleaseModifier, this.preReleaseModifierVersion)
+            return ExpectedWpiLibVersion(this.generation, this.major, this.minor, this.patch, this.preReleaseModifier, this.preReleaseModifierVersion, this.preReleaseModifierSubVersion, this.preReleasePreviewVersion)
         }
     }
 
@@ -337,36 +347,59 @@ internal class WpiLibVersionTest
             val args = ArrayList<Arguments>()
             var expected: WpiLibVersion
 
-            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.alpha, 5)
+            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.alpha, 5, "", null)
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-alpha-5")))
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.alpha-5")))
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-alpha.5")))
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.alpha.5")))
 
-            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.beta, 5)
+            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.beta, 5, "", null)
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta-5")))
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta-5")))
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta.5")))
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta.5")))
 
-            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.rc, 5)
+            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.rc, 5, "", null)
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-rc-5")))
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.rc-5")))
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-rc.5")))
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.rc.5")))
 
-            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.beta, null)
+            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.beta, null, "", null)
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta")))
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta")))
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta")))
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta")))
 
-            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, null, null)
+            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, null, null, "", null)
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2")))
 
-            expected = ExpectedWpiLibVersion(2017, 2018, 1, 0, null, null)
+            expected = ExpectedWpiLibVersion(2017, 2018, 1, 0, null, null, "", null)
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1")))
 
+            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.beta, 5, "a", null)
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta-5a")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta-5a")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta.5a")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta.5a")))
+            
+            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.beta, 5, "", 2)
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta-5-pre2")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta-5-pre2")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta.5-pre2")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta.5-pre2")))
+            
+            expected = ExpectedWpiLibVersion(2017, 2018, 1, 2, PreReleaseModifier.beta, 5, "", 2)
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta-5-pre-2")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta-5-pre-2")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta.5-pre-2")))
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta.5-pre-2")))
+
+            expected = ExpectedWpiLibVersion(2017, 2019, 1, 1, PreReleaseModifier.beta, 3, "", 2)
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2019.1.1-beta-3-p-2")))
+            
+            
+            
             return args
         }
 
@@ -421,10 +454,23 @@ internal class WpiLibVersionTest
         private val v2018_5_1 = WpiLibVersionImpl.parse("2018.5.1")
         private val v2018_5_2 = WpiLibVersionImpl.parse("2018.5.2")
         private val v2018_6_1 = WpiLibVersionImpl.parse("2018.6.1")
-        private val v2019_0_0 = WpiLibVersionImpl.parse("2019.0.0")
+//        private val v2019_0_0_alpha_1    = WpiLibVersionImpl.parse("2019.0.0-alpha-1")
+//        private val v2019_0_0_alpha_2    = WpiLibVersionImpl.parse("2019.0.0-alpha-2")
+//        private val v2019_0_0_alpha_3    = WpiLibVersionImpl.parse("2019.0.0-alpha-3")
+//        private val v2019_0_0_beta0_pre1 = WpiLibVersionImpl.parse("2019.0.0-beta0-pre1")
+//        private val v2019_0_0_beta0_pre3 = WpiLibVersionImpl.parse("2019.0.0-beta0-pre3")
+//        private val v2019_0_0_beta0_pre4 = WpiLibVersionImpl.parse("2019.0.0-beta0-pre4")
+//        private val v2019_0_0_beta0_pre5 = WpiLibVersionImpl.parse("2019.0.0-beta0-pre5")
+//        private val v2019_0_0_beta0_pre6 = WpiLibVersionImpl.parse("2019.0.0-beta0-pre6")
+//        private val v2019_1_1_beta_1     = WpiLibVersionImpl.parse("2019.1.1-beta-1")
         private val v2019_0_1 = WpiLibVersionImpl.parse("2019.0.1")
+        private val v2019_1_1_rc_1 = WpiLibVersionImpl.parse("2019.1.1-rc-1")
         private val v2019_1_1 = WpiLibVersionImpl.parse("2019.1.1")
         private val v2019_1_2 = WpiLibVersionImpl.parse("2019.1.2")
+        private val v2020_1_1_beta_1  = WpiLibVersionImpl.parse("2020.1.1-beta-1")
+        private val v2020_1_1_beta_2  = WpiLibVersionImpl.parse("2020.1.1-beta-2")
+        private val v2020_1_1_beta_3  = WpiLibVersionImpl.parse("2020.1.1-beta-3")
+        private val v2020_1_1_beta_3a = WpiLibVersionImpl.parse("2020.1.1-beta-3a")
         private val v2020_1_1 = WpiLibVersionImpl.parse("2020.1.1")
         private val v2020_1_2 = WpiLibVersionImpl.parse("2020.1.2")
 
@@ -485,14 +531,70 @@ internal class WpiLibVersionTest
             list.add(v2018_5_1)
             list.add(v2018_5_2)
             list.add(v2018_6_1)
-            list.add(v2019_0_0)
-            list.add(v2019_0_1)
+//            list.add(v2019_0_0_alpha_1)
+//            list.add(v2019_0_0_alpha_2)
+//            list.add(v2019_0_0_alpha_3)
+//            list.add(v2019_0_0_beta0_pre1)
+//            list.add(v2019_0_0_beta0_pre3)
+//            list.add(v2019_0_0_beta0_pre4)
+//            list.add(v2019_0_0_beta0_pre5)
+//            list.add(v2019_0_0_beta0_pre6)
+//            list.add(v2019_1_1_beta_1)
+//            list.add(v2019_0_1)
+            list.add(v2019_1_1_rc_1)
             list.add(v2019_1_1)
             list.add(v2019_1_2)
+            list.add(v2020_1_1_beta_1)
+            list.add(v2020_1_1_beta_2)
+            list.add(v2020_1_1_beta_3)
+            list.add(v2020_1_1_beta_3a)
             list.add(v2020_1_1)
             list.add(v2020_1_2)
 
             versionList = list.build()
         }
     }
+    
+    /*
+        ===NOTES===
+        Extracted from Gradle Plugin UI
+            2018.06.21                 2018-06-21
+            2019.0.0-alpha-1           2018-06-28
+            2019.0.0-alpha-2           2018-07-01
+            2019.0.0-alpha-3           2018-07-22
+            2019.0.0-beta0-pre1        2018-09-28
+            2019.0.0-beta0-pre3        2018-10-06
+            2019.0.0-beta0-pre4        2018-10-15
+            2019.0.0-beta0-pre5        2018-10-17
+            2019.0.0-beta0-pre6        2018-10-18
+            2019.1.1-beta-1            2018-10-19
+            2019.1.1-beta-2a           2018-11-13
+            2019.1.1-beta-3-p-2        2018-12-03
+            2019.1.1-beta-3-pre3       2018-12-05
+            2019.1.1-beta-3-pre4       2018-12-05
+            2019.1.1-beta-3-pre5       2018-12-05
+            2019.1.1-beta-3-pre6       2018-12-07
+            2019.1.1-beta-3-pre7       2018-12-09
+            2019.1.1-beta-3-pre8       2018-12-13
+            2019.1.1-beta-3-pre9       2018-12-13
+            2019.1.1-beta-3            2018-12-10
+            2019.1.1-beta-3a           2018-12-10
+            2019.1.1-beta-4-pre1       2018-12-14
+            2019.1.1-beta-4-pre2       2018-12-15
+            2019.1.1-beta-4-pre4       2018-12-15
+            2019.1.1-beta-4            2018-12-16
+            2019.1.1-beta-4a           2018-12-17
+            2019.1.1-beta-4b           2019-12-27
+            2019.1.1-beta-4c           2019-01-01
+x           2019.1.1-rc-1              2019-01-02
+            2019.1.1                   2019-01-04
+            2019.2.1                   2019-11-15
+            2019.3.1                   2019-02-15
+            2019.3.2                   2019-02-15
+            2019.4.1                   2019-02-26
+x           2020.1.1-beta-1            2019-10-12
+x           2020.1.1-beta-2            2019-10-28
+x           2020.1.1-beta-3            2019-11-22
+x           2020.1.1-beta-3a           2019-11-23
+    */
 }

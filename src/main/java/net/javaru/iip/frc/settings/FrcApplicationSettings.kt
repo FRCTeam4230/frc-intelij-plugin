@@ -24,9 +24,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.Transient
 import net.javaru.iip.frc.FrcPluginGlobals.MAX_RUN_COUNT_TO_SAVE
-import net.javaru.iip.frc.util.UriUtils
 import org.apache.commons.lang3.StringUtils
-import java.net.URI
 import java.nio.file.InvalidPathException
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -49,8 +47,6 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                   var rioLogUdpPort: Int = DEFAULT_RIO_LOG_UDP_PORT,
                                   /* Plugin Run Count (PRC) */
                                   var prc: Int = 0,
-                                  var wpiEclipsePluginReleaseRepoUri: URI = DEFAULT_WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI,
-                                  var wpiEclipsePluginBetaRepoUri: URI = DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI,
                                   var useFrcToolWindow: Boolean = true,
                                   var clearRioLogOnRobotRestart: Boolean = false,
                                   var logNetConsoleToFile: Boolean = false,
@@ -79,10 +75,6 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
 {
     companion object Settings
     {
-        //The trailing slash is important so the uri.resolves method sees the last entry as a directory and not the endpoint
-        val DEFAULT_WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI: URI = UriUtils.createUri("http://first.wpi.edu/FRC/roborio/release/eclipse/")
-        val DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI: URI = UriUtils.createUri("http://first.wpi.edu/FRC/roborio/beta/eclipse/")
-
         @JvmStatic
         fun getInstance(): FrcApplicationSettings
         {

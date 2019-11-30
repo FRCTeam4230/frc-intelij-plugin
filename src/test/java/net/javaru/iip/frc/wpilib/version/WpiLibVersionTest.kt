@@ -32,13 +32,13 @@ import java.util.stream.Stream
 
 internal class WpiLibVersionTest
 {
-    @Test
-    fun quick()
-    {
-        val version = WpiLibVersionImpl.parse("2020.1.1.beta-3a")
-        val x = version.preReleaseModifierVersion
-        println("x = '${x}'")
-    }
+//    @Test
+//    fun quick()
+//    {
+//        val version = WpiLibVersionImpl.parse("2018.06.21")
+//        val x = version.minor
+//        println("x = '${x}'")
+//    }
     
     @Test
     fun usesGradle()
@@ -48,7 +48,8 @@ internal class WpiLibVersionTest
                 { assertFalse(v16_03.usesGradle()) },
                 { assertFalse(v2017_1_1.usesGradle()) },
                 { assertFalse(v2018_1_1_beta_2.usesGradle()) },
-                { assertFalse(v2018_6_1.usesGradle()) },
+                { assertFalse(v2018_5_1.usesGradle()) },
+                { assertTrue(v2018_06_21.usesGradle()) },
                 { assertTrue(v2019_0_1.usesGradle()) },
                 { assertTrue(v2019_1_1.usesGradle()) },
                 { assertTrue(v2020_1_1.usesGradle()) }
@@ -63,7 +64,8 @@ internal class WpiLibVersionTest
                 { assertTrue(v16_03.usesAnt()) },
                 { assertTrue(v2017_1_1.usesAnt()) },
                 { assertTrue(v2018_1_1_beta_2.usesAnt()) },
-                { assertTrue(v2018_6_1.usesAnt()) },
+                { assertTrue(v2018_5_1.usesAnt()) },
+                { assertFalse(v2018_06_21.usesAnt()) },
                 { assertFalse(v2019_0_1.usesAnt()) },
                 { assertFalse(v2019_1_1.usesAnt()) },
                 { assertFalse(v2020_1_1.usesAnt()) }
@@ -392,9 +394,23 @@ internal class WpiLibVersionTest
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2-beta.5-pre-2")))
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.1.2.beta.5-pre-2")))
 
-            expected = ExpectedWpiLibVersion(2017, 2019, 1, 1, PreReleaseModifier.beta, 3, "", 2)
+            expected = ExpectedWpiLibVersion(2019, 2019, 1, 1, PreReleaseModifier.beta, 3, "", 2)
             args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2019.1.1-beta-3-p-2")))
             
+            expected = ExpectedWpiLibVersion(2019, 2018, 6, 21, null, null, "", null)
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2018.06.21"))) // The first GradleRIO release after WPI took over the project. We classify it as a generation 2019.
+            
+            expected = ExpectedWpiLibVersion(2019, 2019, 0, 0, PreReleaseModifier.alpha, 1, "", null)
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2019.0.0-alpha-1"))) // The second GradleRIO release after WPI took over the project, a few days after 2018.06.21
+            
+            expected = ExpectedWpiLibVersion(2019, 2019, 1, 1, PreReleaseModifier.rc, 1, "", null)
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2019.1.1-rc-1")))
+            
+            expected = ExpectedWpiLibVersion(2019, 2019, 1, 1, null, null, "", null)
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2019.1.1")))
+            
+            expected = ExpectedWpiLibVersion(2019, 2020, 2, 3, null, null, "", null)
+            args.add(Arguments.of(expected, WpiLibVersionImpl.parse("2020.2.3")))
             
             
             return args
@@ -469,7 +485,7 @@ internal class WpiLibVersionTest
         private val v2018_4_1 = WpiLibVersionImpl.parse("2018.4.1")
         private val v2018_5_1 = WpiLibVersionImpl.parse("2018.5.1")
         private val v2018_5_2 = WpiLibVersionImpl.parse("2018.5.2")
-        private val v2018_6_1 = WpiLibVersionImpl.parse("2018.6.1")
+        private val v2018_06_21 = WpiLibVersionImpl.parse("2018.06.21")
         private val v2019_0_0_alpha_1    = WpiLibVersionImpl.parse("2019.0.0-alpha-1")
         private val v2019_0_0_alpha_2    = WpiLibVersionImpl.parse("2019.0.0-alpha-2")
         private val v2019_0_0_alpha_3    = WpiLibVersionImpl.parse("2019.0.0-alpha-3")
@@ -572,7 +588,7 @@ internal class WpiLibVersionTest
             list.add(v2018_4_1)
             list.add(v2018_5_1)
             list.add(v2018_5_2)
-            list.add(v2018_6_1)
+            list.add(v2018_06_21)
             list.add(v2019_0_0_alpha_1)
             list.add(v2019_0_0_alpha_2)
             list.add(v2019_0_0_alpha_3)

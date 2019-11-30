@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -21,6 +21,14 @@ import org.apache.commons.lang3.builder.CompareToBuilder
 
 interface WpiLibVersion : Comparable<WpiLibVersion>
 {
+    /**
+     * The version generation:
+     *   - 2015 : indicates a 2015 or 2016 version when a timestamp version number was used, such as `0.1.0.201502241928` 
+     *   - 2017 : indicates a 2017 or 2018 version when WpiLib was still part of the Eclipse Plugin, but a "year for the major version" based version was used such as `2017.1.1`
+     *   - 2019 : indicates a 2019+ version when GradleRIO started to be used and the WPI Lib became a Gradle dependency. The format is generally the same as a 2017 generation, but we 
+     *     identify it as a new generation. Note that the version `2018.06.21` is a 2019 generation as it was the first release by WPI upon taking over the GradleRIO project. A few
+     *     days later `2019.0.0-alpha-1` was released.
+     */
     val generation: Int
 
     val versionString: String

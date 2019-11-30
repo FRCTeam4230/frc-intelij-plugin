@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -113,16 +113,21 @@ class WpiLibVersionImpl private constructor(override val versionString: String,
             var matcher = post2017Pattern.matcher(version.toLowerCase())
             if (matcher.find())
             {
+                val major = Integer.parseInt(matcher.group("major"))
+                // WPI released v2018.06.21 as the first GradleRIO version on 2018-06-21. This is when they 
+                // appear to have taken the project over, prior to its first use in the 2019 build season.   
+                // The next release was 2019.0.0-alpha-1 a few days later on 2018-06-28 
+                val generation = if (major >= 2019 || version == "2018.06.21") 2019 else 2017
                 return WpiLibVersionImpl(version,
-                                         2017,
-                                         Integer.parseInt(matcher.group("major")),
+                                         generation,
+                                         major,
                                          if (matcher.group("minor") != null) Integer.parseInt(matcher.group("minor")) else 0,
                                          if (matcher.group("patch") != null) Integer.parseInt(matcher.group("patch")) else 0,
                                          if (matcher.group("preAll") != null) WpiLibVersion.PreReleaseModifier.valueOf(matcher.group("preName")) else null,
                                          if (matcher.group("preVersion") != null) Integer.parseInt(matcher.group("preVersion")) else null,
                                          if (matcher.group("preSubVersion") != null) matcher.group("preSubVersion") else "",
                                          if (matcher.group("previewAll") != null) Integer.parseInt(matcher.group("previewVer")) else null
-                                         )
+                                        )
             }
             else
             {

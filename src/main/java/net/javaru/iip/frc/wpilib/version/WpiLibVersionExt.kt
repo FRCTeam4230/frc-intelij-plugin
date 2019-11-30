@@ -19,11 +19,8 @@ package net.javaru.iip.frc.wpilib.version
 
 private val WPILIB_2018_VERSION_CHECK = WpiLibVersionImpl.parse("2017.9999.0")
 
-private val WPILIB_GRADLE_CHECK = WpiLibVersionImpl.parse("2019.0.0.alpha-1")
-
-
 fun WpiLibVersion.is2018OrLater(): Boolean = this.isNewerThan(WPILIB_2018_VERSION_CHECK)
 
-fun WpiLibVersion.usesGradle(): Boolean = this.isSameOrNewerThan(WPILIB_GRADLE_CHECK)
+fun WpiLibVersion.usesGradle(): Boolean = this.generation >= 2019
 
-fun WpiLibVersion.usesAnt(): Boolean = this.isOlderThan(WPILIB_GRADLE_CHECK)
+fun WpiLibVersion.usesAnt(): Boolean = this.generation < 2019

@@ -80,25 +80,12 @@ internal class WpiLibVersionTest
                 { assertEquals(expected.minor, actual.minor, "Minor") },
                 { assertEquals(expected.patch, actual.patch, "Path") },
                 { assertEquals(expected.preReleaseModifier, actual.preReleaseModifier, "PreReleaseModifier") },
-                { assertEquals(expected.preReleaseModifierVersion, actual.preReleaseModifierVersion, "PreReleaseModifierVersion") }
+                { assertEquals(expected.preReleaseModifierVersion, actual.preReleaseModifierVersion, "PreReleaseModifierVersion") },
+                { assertEquals(expected.preReleaseModifierSubVersion, actual.preReleaseModifierSubVersion, "preReleaseModifierSubVersion") },
+                { assertEquals(expected.preReleasePreviewVersion, actual.preReleasePreviewVersion, "preReleasePreviewVersion") }
                  )
     }
     
-    @Test
-    fun parseOneOffs()
-    {
-        // TODO: These parse ok, but they some do not sort properly. Need to modify the version classes, then add these to the list to be sorted
-        //       See Issue #34 and the notes in Issue #23
-        assertAll(
-                
-                { assertNotNull(WpiLibVersionImpl.parse("2020.1.1-beta-1"))},
-                { assertNotNull(WpiLibVersionImpl.parse("2020.1.1-beta-2"))},
-                { assertNotNull(WpiLibVersionImpl.parse("2019.1.1-beta-4-pre1"))},
-                { assertNotNull(WpiLibVersionImpl.parse("2019.1.1-beta-4a"))},
-                { assertNotNull(WpiLibVersionImpl.parse("2019.1.1-beta-4b"))},
-                { assertNotNull(WpiLibVersionImpl.parse("2019.1.1-beta-4c"))}
-                 )
-    }
 
     @RepeatedTest(5)
     fun compareTo()
@@ -129,6 +116,16 @@ internal class WpiLibVersionTest
                 { assertFalse(tested == other, "version '$tested' should not equal version '$other' but did")}
                  )
        
+    }
+    
+    @ParameterizedTest
+    @MethodSource("isPreReleaseProvider")
+    fun isPreRelease(ver: WpiLibVersion, isPreReleaseExpected: Boolean, isPreReleasePreviewExpected: Boolean)
+    {
+        assertAll(
+                {assertEquals(isPreReleaseExpected, ver.isPreRelease(), "Wrong result for ${ver.versionString}.isPreRelease(). Expected $isPreReleaseExpected")},
+                {assertEquals(isPreReleasePreviewExpected, ver.isPreReleasePreview(), "Wrong result for ${ver.versionString}.isPreReleasePreview(). Expected $isPreReleasePreviewExpected")}
+                 )
     }
     
     @ParameterizedTest
@@ -265,7 +262,7 @@ internal class WpiLibVersionTest
         }
     }
 
-    @Suppress("unused")
+    @Suppress("unused", "BooleanLiteralArgument")
     companion object
     {
 
@@ -336,9 +333,9 @@ internal class WpiLibVersionTest
                 do {
                     randomIndex = RandomUtils.nextInt(0, versionList.size)
                 } while (randomIndex == index)
-                args.add(Arguments.of(wpiLibVersion, versionList.get(randomIndex)))
+                args.add(Arguments.of(wpiLibVersion, versionList[randomIndex]))
             }
-            return args;
+            return args
         }
 
         @JvmStatic
@@ -400,6 +397,25 @@ internal class WpiLibVersionTest
             
             
             
+            return args
+        }
+        
+        @JvmStatic
+        fun isPreReleaseProvider(): Iterable<Arguments>
+        {
+            val args = ArrayList<Arguments>()
+            // version, isPreRelease, isPreview
+            args.add(Arguments.of(v2019_0_0_alpha_1, true, false))
+            args.add(Arguments.of(v2019_0_0_beta0_pre1, true, true))
+            args.add(Arguments.of(v2019_1_1_beta_1, true, false))
+            args.add(Arguments.of(v2019_1_1_beta_2a, true, false))
+            args.add(Arguments.of(v2019_1_1_beta_3_pre1, true, true))
+            args.add(Arguments.of(v2019_1_1_beta_3_p_2, true, true))
+            args.add(Arguments.of(v2019_1_1_beta_3, true, false))
+            args.add(Arguments.of(v2019_1_1, false, false))
+            args.add(Arguments.of(v2018_1_1_rc_1, true, false))
+            args.add(Arguments.of(v2019_1_1_beta_99, true, false))
+            args.add(Arguments.of(v2019_1_1_rc_1, true, false))
             return args
         }
 

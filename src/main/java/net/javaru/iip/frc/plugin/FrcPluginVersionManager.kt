@@ -16,16 +16,7 @@
 
 package net.javaru.iip.frc.plugin
 
-import com.intellij.openapi.application.ex.ApplicationInfoEx
-import com.intellij.openapi.application.impl.ApplicationInfoImpl
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.BuildNumber
-import com.intellij.util.PlatformUtils
-import net.javaru.iip.frc.facet.isFrcFacetedProject
-import net.javaru.iip.frc.notify.FrcNotificationType
-import net.javaru.iip.frc.notify.FrcNotifications
-import net.javaru.iip.frc.settings.FrcApplicationSettings
-import java.time.LocalDate
 
 
 object FrcPluginVersionManager
@@ -35,52 +26,53 @@ object FrcPluginVersionManager
         // TODO This is a temp hard coded hack to get a notification out now. This needs to be improved.
         //      Want some functionality that automatic informs people when there is a new update that requires a newer version of IntelliJ IDEA.
 
-        val appInfo = ApplicationInfoEx.getInstanceEx() as ApplicationInfoImpl
-        val build: BuildNumber = appInfo.build
-        val baselineVersion = build.baselineVersion
-
-
-        val now = LocalDate.now()
-        if (baselineVersion < 192 )
-        {
-            val lastNotify = LocalDate.parse(FrcApplicationSettings.getInstance().notify19Up)
-            val isFrcProject = project.isFrcFacetedProject()
-
-            // Notify every 3 days FRC projects forever, or 
-            // every 21 days for non FRC projects, but only until May 2020. (After that we only notify for FRC projects)
-            val notify =
-                    ( isFrcProject && lastNotify.plusDays(2).isBefore(LocalDate.now()) )
-                    || 
-                    ( lastNotify.plusDays(20).isBefore(LocalDate.now()) && now.isBefore(LocalDate.parse("2020-05-01")) )
-
-
-
-            if (notify)
-            {
-                //TODO - rather than using a Date (and having to be absolutely sure we have a new version out by then), we want to ti query the Jetbrains Plugin service
-                val newVersionAvailable = now.isAfter(LocalDate.parse("2019-09-15"))
-                
-                val firstSentence = if (newVersionAvailable)
-                    "<strong>A new version of the FRC Plugin is available, but it requires IntelliJ IDEA v2019.2.x or later.</strong>"
-                else
-                    "The next release of the <strong>FRC Plugin</strong> will require IntelliJ IDEA v2019.2.x or later."
-
-                val suffix = if (PlatformUtils.isIdeaUltimate())
-                    " As a reminder, the FRC plugin works with the free Community Edition of IntelliJ IDEA. "
-                else
-                    ""
-                
-                val notifyType = if (newVersionAvailable) FrcNotificationType.ACTIONABLE_WARN else FrcNotificationType.ACTIONABLE_INFO
-                
-                
-                FrcNotifications.notify(notifyType,
-                                        "$firstSentence " +
-                                        "This is due to some significant changes to the IntelliJ IDEA plugin API being leveraged. " +
-                                        "Please upgrade to the latest version of IntelliJ IDEA at your convenience.$suffix Thanks.",
-                                        project = project)
-
-                FrcApplicationSettings.getInstance().notify19Up = now.toString()
-            }
-        }
+//        val appInfo = ApplicationInfoEx.getInstanceEx() as ApplicationInfoImpl
+//        val build: BuildNumber = appInfo.build
+//        val baselineVersion = build.baselineVersion
+//
+//
+//        val now = LocalDate.now()
+//        if (baselineVersion < 192 )
+//        {
+//            val lastNotify = LocalDate.parse(FrcApplicationSettings.getInstance().notify19Up)
+//            val isFrcProject = project.isFrcFacetedProject()
+//
+//            // Notify every 3 days FRC projects forever, or 
+//            // every 21 days for non FRC projects, but only until May 2020. (After that we only notify for FRC projects)
+//            val notify =
+//                    ( isFrcProject && lastNotify.plusDays(2).isBefore(LocalDate.now()) )
+//                    || 
+//                    ( lastNotify.plusDays(20).isBefore(LocalDate.now()) && now.isBefore(LocalDate.parse("2020-05-01")) )
+//
+//
+//
+//            if (notify)
+//            {
+//                //TODO - rather than using a Date (and having to be absolutely sure we have a new version out by then), we want to ti query the Jetbrains Plugin service
+//                val newVersionAvailable = now.isAfter(LocalDate.parse("2019-09-15"))
+//                
+//                val firstSentence = if (newVersionAvailable)
+//                    "<strong>A new version of the FRC Plugin is available, but it requires IntelliJ IDEA v2019.2.x or later.</strong>"
+//                else
+//                    "The next release of the <strong>FRC Plugin</strong> will require IntelliJ IDEA v2019.2.x or later."
+//
+//                val suffix = if (PlatformUtils.isIdeaUltimate())
+//                    " As a reminder, the FRC plugin works with the free Community Edition of IntelliJ IDEA. "
+//                else
+//                    ""
+//                
+//                val notifyType = if (newVersionAvailable) FrcNotificationType.ACTIONABLE_WARN else FrcNotificationType.ACTIONABLE_INFO
+//                
+//                
+//                FrcNotifications.notify(notifyType,
+//                                        "$firstSentence " +
+//                                        "This is due to some significant changes to the IntelliJ IDEA plugin API being leveraged. " +
+//                                        "Please upgrade to the latest version of IntelliJ IDEA at your convenience.$suffix Thanks.",
+//                                        project = project)
+//
+//                // In settings:  var notify19Up: String = "2019-01-01",       
+//                FrcApplicationSettings.getInstance().notify19Up = now.toString()
+//            }
+//        }
     }
 }

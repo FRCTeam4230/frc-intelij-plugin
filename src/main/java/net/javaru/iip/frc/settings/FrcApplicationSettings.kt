@@ -68,8 +68,6 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                    *            ➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
                                    */
                                   var rioRestartRegexString: String = "(?ium).*Launching.*FRCUserProgram\\.jar.*", /* TODO Need to update for Gradle based deploy*/
-                                  /* Tracking for notification of the 2019 update requirement */
-                                  var notify19Up: String = "2019-01-01",
                                   var enableGradleImportUponNewProjectCreation: Boolean = true
                                  ) : PersistentStateComponent<FrcApplicationSettings>
 {

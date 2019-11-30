@@ -106,6 +106,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
         checkIssue8Refresh();
     
+        //TODO the checkPluginUpdateStatus function needs to be rewritten, It currently is an empty function.
         FrcPluginVersionManager.INSTANCE.checkPluginUpdateStatus(myProject);
         
         final boolean isTemplateFirstOpen = frcFreshTemplateProjectCheckAndCleanup();

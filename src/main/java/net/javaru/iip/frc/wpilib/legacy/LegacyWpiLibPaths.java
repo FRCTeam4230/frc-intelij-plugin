@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.wpilib;
+package net.javaru.iip.frc.wpilib.legacy;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -24,13 +24,13 @@ import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
 
-import net.javaru.iip.frc.settings.FrcApplicationSettings;
+import net.javaru.iip.frc.settings.FrcApplicationSettingsKt;
 
 
 
-public class WpiLibPaths
+public class LegacyWpiLibPaths
 {
-    private static final Logger LOG = Logger.getInstance(WpiLibPaths.class);
+    private static final Logger LOG = Logger.getInstance(LegacyWpiLibPaths.class);
     
     public static final String DEFAULT_CURRENT_VERSION_NAME = "current";
 
@@ -38,7 +38,7 @@ public class WpiLibPaths
 
     public static Path getWpiLibRootDir()
     {
-        return FrcApplicationSettings.getInstance().getWpiLibDir();
+        return FrcApplicationSettingsKt.determineWpiLibDir();
     }
 
 

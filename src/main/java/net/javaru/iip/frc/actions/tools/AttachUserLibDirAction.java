@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ import net.javaru.iip.frc.util.LibDefBuilder;
 import net.javaru.iip.frc.util.LibDirType;
 import net.javaru.iip.frc.util.LibraryUtilsKt;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
-import net.javaru.iip.frc.wpilib.WpiLibPaths;
+import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibPaths;
 
 
 
@@ -102,8 +102,8 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
                     else
                     {
                         final LibDef libDef = new LibDefBuilder(module, "WPILib User Lib Directory")
-                                .addDir(WpiLibPaths.getUserLibDir(), LibDirType.BIN, LibDirType.SRC, LibDirType.DOC)
-                                .addDir(WpiLibPaths.getUserDocsDir(), LibDirType.DOC)
+                                .addDir(LegacyWpiLibPaths.getUserLibDir(), LibDirType.BIN, LibDirType.SRC, LibDirType.DOC)
+                                .addDir(LegacyWpiLibPaths.getUserDocsDir(), LibDirType.DOC)
                                 .build();
                         LibraryUtilsKt.attachDirectoryBasedLibrary(libDef);
                         if (notifyOnCompletion)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@ import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.settings.FrcTeamNumberKt;
 import net.javaru.iip.frc.util.UiUtilsKt;
-import net.javaru.iip.frc.wpilib.WpiLibPaths;
-import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
+import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibPaths;
+import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloader;
 
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL;
 
@@ -134,7 +134,7 @@ public class ConfigureTeamNumberBasicAction extends AnAction
         ApplicationManager.getApplication().runWriteAction(() -> {
             try
             {
-                WpiLibDownloader.updateOrCreateWpilibPropertiesFile();
+                LegacyWpiLibDownloader.updateOrCreateWpilibPropertiesFile();
             }
             catch (IOException e)
             {
@@ -142,10 +142,10 @@ public class ConfigureTeamNumberBasicAction extends AnAction
                     FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP()
                                               .createNotification("FRC",
                                             "Team Number Update Failure",
-                                            "The '" + WpiLibPaths.getWpilibPropertiesFile() + "' file could not be updated with "
-                                            + "the change to the team number. You will need to manually update the 'team-number' "
-                                            + "property in the file in order for your robot deploys to work. Update Failure Cause: "
-                                            + e.toString(),
+                                                                  "The '" + LegacyWpiLibPaths.getWpilibPropertiesFile() + "' file could not be updated with "
+                                                                  + "the change to the team number. You will need to manually update the 'team-number' "
+                                                                  + "property in the file in order for your robot deploys to work. Update Failure Cause: "
+                                                                  + e.toString(),
                                             NotificationType.ERROR);
                 final Project[] projects = ProjectManager.getInstance().getOpenProjects();
                 for (Project project : projects)

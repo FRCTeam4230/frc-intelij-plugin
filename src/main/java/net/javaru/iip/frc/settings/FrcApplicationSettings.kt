@@ -43,15 +43,12 @@ const val ALT_WPILIB_BASE_DIR_SYS_PROP: String = "frc.alt.wpilib.base.dir"
 
 const val USE_WPILIB_BETA_SITE: String = "frc.use.wpilib.beta.site"
 
-private val calculatedWpiLibDir: Path = determineWpiLibDir()
-
 // NOTE: This class is registered as an <applicationService> in the plugin.xml
 @State(name = "FrcPlugin", storages = [(Storage("frc.xml"))])
 data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBER,
                                   var rioLogUdpPort: Int = DEFAULT_RIO_LOG_UDP_PORT,
                                   /* Plugin Run Count (PRC) */
                                   var prc: Int = 0,
-                                  var wpiLibDir: Path = calculatedWpiLibDir,
                                   var wpiEclipsePluginReleaseRepoUri: URI = DEFAULT_WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI,
                                   var wpiEclipsePluginBetaRepoUri: URI = DEFAULT_WPI_ECLIPSE_PLUGIN_BETA_REPO_URI,
                                   var useFrcToolWindow: Boolean = true,
@@ -120,8 +117,8 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
     fun incrementRunCount() { if (prc < MAX_RUN_COUNT_TO_SAVE) {prc++} }
 }
 
-// Used when initializing the wpilib directory
-private fun determineWpiLibDir(): Path
+
+fun determineWpiLibDir(): Path
 {
     val logger = Logger.getInstance(FrcApplicationSettings::class.java)
     var basePath: Path? = null

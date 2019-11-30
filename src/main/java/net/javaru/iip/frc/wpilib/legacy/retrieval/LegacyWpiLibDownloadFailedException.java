@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -14,33 +14,33 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.wpilib.retrieval;
+package net.javaru.iip.frc.wpilib.legacy.retrieval;
 
-public class WpiLibDownloadFailedException extends RuntimeException
+public class LegacyWpiLibDownloadFailedException extends RuntimeException
 {
     public static final String DEFAULT_MESSAGE = "Download of WPILib failed.";
     private static final long serialVersionUID = 1979652530740028621L;
 
 
-    public WpiLibDownloadFailedException()
+    public LegacyWpiLibDownloadFailedException()
     {
         super(DEFAULT_MESSAGE);
     }
 
 
-    public WpiLibDownloadFailedException(Throwable cause)
+    public LegacyWpiLibDownloadFailedException(Throwable cause)
     {
         super(DEFAULT_MESSAGE, cause);
     }
 
 
-    public WpiLibDownloadFailedException(String message)
+    public LegacyWpiLibDownloadFailedException(String message)
     {
         super(message);
     }
 
 
-    public WpiLibDownloadFailedException(String message, Throwable cause)
+    public LegacyWpiLibDownloadFailedException(String message, Throwable cause)
     {
         super(message, cause);
     }

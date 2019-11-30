@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -48,8 +48,8 @@ import net.javaru.iip.frc.util.LibDefBuilder;
 import net.javaru.iip.frc.util.LibDirType;
 import net.javaru.iip.frc.util.LibraryUtilsKt;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
-import net.javaru.iip.frc.wpilib.WpiLibPaths;
-import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
+import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibPaths;
+import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloader;
 
 
 
@@ -108,7 +108,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                         }
 
 
-                        final Path wpiJavaLibDir = WpiLibPaths.getJavaLibDir();
+                        final Path wpiJavaLibDir = LegacyWpiLibPaths.getJavaLibDir();
                         try
                         {
                             Files.createDirectories(wpiJavaLibDir);
@@ -134,7 +134,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                                     @Override
                                     public void run(@NotNull ProgressIndicator indicator)
                                     {
-                                        WpiLibDownloader.downloadLatest();
+                                        LegacyWpiLibDownloader.downloadLatest();
                                     }
                                 }.queue();
                             }

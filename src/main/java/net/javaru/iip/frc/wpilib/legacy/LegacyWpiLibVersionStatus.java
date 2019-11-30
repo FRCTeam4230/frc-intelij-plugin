@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.wpilib.version;
+package net.javaru.iip.frc.wpilib.legacy;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,15 +22,16 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 
 
 
 /**
  * A class that provides the current version of WPILib in its three forms: attached, downloaded, available for download. 
  * It also has convenience/utility methods for working with the versions. To create/construct, use the factory method
- * {@link WpiLibVersionStatus#getCurrentVersionStatus(Project) WpiLibVersionStatus#getCurrentVersionStatus(@Nullable Project)}.
+ * {@link LegacyWpiLibVersionStatus#getCurrentVersionStatus(Project) LegacyWpiLibVersionStatus#getCurrentVersionStatus(@Nullable Project)}.
  */
-public class WpiLibVersionStatus
+public class LegacyWpiLibVersionStatus
 {
     @Nullable
     private final Project project;
@@ -58,13 +59,13 @@ public class WpiLibVersionStatus
     //TODO i18n
     
     // use getCurrentVersionStatus(Project)
-    private WpiLibVersionStatus(@Nullable Project project,
-                                boolean wpiLibAttached,
-                                @Nullable WpiLibVersion attachedVersion,
-                                boolean wpiLibDownloaded,
-                                @Nullable WpiLibVersion downloadedVersion,
-                                @Nullable WpiLibVersion availableVersion, 
-                                boolean availableVersionChecked)
+    private LegacyWpiLibVersionStatus(@Nullable Project project,
+                                      boolean wpiLibAttached,
+                                      @Nullable WpiLibVersion attachedVersion,
+                                      boolean wpiLibDownloaded,
+                                      @Nullable WpiLibVersion downloadedVersion,
+                                      @Nullable WpiLibVersion availableVersion,
+                                      boolean availableVersionChecked)
     {
         this.project = project;
         this.wpiLibAttached = wpiLibAttached;
@@ -118,7 +119,7 @@ public class WpiLibVersionStatus
     }
 
 
-    public static WpiLibVersionStatus getCurrentVersionStatus(@Nullable Project project)
+    public static LegacyWpiLibVersionStatus getCurrentVersionStatus(@Nullable Project project)
     {
         return getCurrentVersionStatus(project, true);
     }
@@ -128,7 +129,7 @@ public class WpiLibVersionStatus
      * @param project the project, if any, to check the attached version for
      * @return the current versions of the WPILib
      */
-    public static WpiLibVersionStatus getCurrentVersionStatus(@Nullable Project project, boolean checkLatestAvailable)
+    public static LegacyWpiLibVersionStatus getCurrentVersionStatus(@Nullable Project project, boolean checkLatestAvailable)
     {
         WpiLibVersion attachedVersion = null;
         WpiLibVersion downloadedVersion = null;
@@ -164,7 +165,7 @@ public class WpiLibVersionStatus
         }
         catch (Exception ignore) {}
         
-        return new WpiLibVersionStatus(project, wpiLibAttached, attachedVersion, wpiLibDownloaded, downloadedVersion, availableVersion, checkLatestAvailable);
+        return new LegacyWpiLibVersionStatus(project, wpiLibAttached, attachedVersion, wpiLibDownloaded, downloadedVersion, availableVersion, checkLatestAvailable);
     }
 
 
@@ -208,7 +209,7 @@ public class WpiLibVersionStatus
     public boolean isNewerVersionAvailableThanAttached()
     {
         final boolean isNewerAvailable = availableVersion != null && attachedVersion != null && availableVersion.isNewerThan(attachedVersion);
-        Logger.getInstance(WpiLibVersionStatus.class).debug("[FRC] isNewerVersionAvailableThanAttached() = " + isNewerAvailable + " for avail of " + availableVersionSummary + " and attached of " + attachedVersionSummary );
+        Logger.getInstance(LegacyWpiLibVersionStatus.class).debug("[FRC] isNewerVersionAvailableThanAttached() = " + isNewerAvailable + " for avail of " + availableVersionSummary + " and attached of " + attachedVersionSummary );
         return isNewerAvailable;
     }
     

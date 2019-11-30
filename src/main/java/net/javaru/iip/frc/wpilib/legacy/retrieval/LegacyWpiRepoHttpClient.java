@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.wpilib.retrieval;
+package net.javaru.iip.frc.wpilib.legacy.retrieval;
 
 
 import java.io.BufferedInputStream;
@@ -47,9 +47,9 @@ import com.intellij.openapi.util.io.FileUtil;
 
 
 
-class WpiRepoHttpClient
+class LegacyWpiRepoHttpClient
 {
-    private static final Logger LOG = Logger.getInstance(WpiRepoHttpClient.class);
+    private static final Logger LOG = Logger.getInstance(LegacyWpiRepoHttpClient.class);
 
 
     public static Document fetchXmlResourceAsDocument(@NotNull URI uri) throws IOException, JDOMException

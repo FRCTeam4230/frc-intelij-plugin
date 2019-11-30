@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -56,11 +56,12 @@ import com.intellij.psi.impl.compiled.ClassFileDecompiler;
 import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.util.FindClassUtils;
 import net.javaru.iip.frc.util.FrcFileUtils;
-import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
+import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibPaths;
+import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloader;
+import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibVersionStatus;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionExtKt;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
-import net.javaru.iip.frc.wpilib.version.WpiLibVersionStatus;
 
 import static net.javaru.iip.frc.util.FindClassUtils.isLibraryPresent;
 
@@ -78,12 +79,12 @@ public class WpiLibLibrariesUtils
 
 
     /**
-     * A convenience method to call {@code return WpiLibVersionStatus.getCurrentVersionStatus(project)}.
-     * @return the current WpiLibVersionStatus 
+     * A convenience method to call {@code return LegacyWpiLibVersionStatus.getCurrentVersionStatus(project)}.
+     * @return the current LegacyWpiLibVersionStatus 
      */
-    public static WpiLibVersionStatus getCurrentWpiLibVersionStatus(@Nullable Project project)
+    public static LegacyWpiLibVersionStatus getCurrentWpiLibVersionStatus(@Nullable Project project)
     {
-        return WpiLibVersionStatus.getCurrentVersionStatus(project);
+        return LegacyWpiLibVersionStatus.getCurrentVersionStatus(project);
     }
     
     
@@ -200,7 +201,7 @@ public class WpiLibLibrariesUtils
     {
         try
         {
-            return FrcFileUtils.directoryHasJars(WpiLibPaths.getJavaLibDir(), true);
+            return FrcFileUtils.directoryHasJars(LegacyWpiLibPaths.getJavaLibDir(), true);
         }
         catch (IOException e)
         {
@@ -217,7 +218,7 @@ public class WpiLibLibrariesUtils
     
     public static boolean isCommonDownloadedToSystem()
     {
-        final Path commonSharedDir = WpiLibPaths.getCommonCurrentVersionSharedDir();
+        final Path commonSharedDir = LegacyWpiLibPaths.getCommonCurrentVersionSharedDir();
         final File[] files = commonSharedDir.toFile().listFiles();
         return files != null && files.length > 0;
     }
@@ -310,7 +311,7 @@ public class WpiLibLibrariesUtils
     @Nullable
     public static Library findExistingWpilibJavaLibDirLibrary(@NotNull Module module)
     {
-        final Path libDir = WpiLibPaths.getJavaLibDir();
+        final Path libDir = LegacyWpiLibPaths.getJavaLibDir();
         return findExistingDirBasedLibrary(module, libDir);
     }
     
@@ -336,7 +337,7 @@ public class WpiLibLibrariesUtils
     @Nullable
     public static Library findExistingUserLibDirLibrary(@NotNull Module module)
     {
-        final Path userLibDir = WpiLibPaths.getUserLibDir();
+        final Path userLibDir = LegacyWpiLibPaths.getUserLibDir();
         return findExistingDirBasedLibrary(module, userLibDir);
     }
 
@@ -411,7 +412,7 @@ public class WpiLibLibrariesUtils
     {
         try
         {
-            return FrcFileUtils.directoryHasJars(WpiLibPaths.getUserLibDir(), true) && !isUserLibAttached(project);
+            return FrcFileUtils.directoryHasJars(LegacyWpiLibPaths.getUserLibDir(), true) && !isUserLibAttached(project);
         }
         catch (IOException e)
         {
@@ -431,7 +432,7 @@ public class WpiLibLibrariesUtils
     @Nullable
     public static WpiLibVersion determineAvailableWpiLibVersion()
     {
-        return WpiLibDownloader.getLatestVersionAvailable();
+        return LegacyWpiLibDownloader.getLatestVersionAvailable();
     }
     
 
@@ -518,7 +519,7 @@ public class WpiLibLibrariesUtils
         {
             try
             {
-                final Path sourcesJar = WpiLibPaths.getJavaLibDir().resolve("WPILib-sources.jar");
+                final Path sourcesJar = LegacyWpiLibPaths.getJavaLibDir().resolve("WPILib-sources.jar");
                 if (Files.isReadable(sourcesJar))
                 {
                     try (JarFile jarFile = new JarFile(sourcesJar.toFile()))
@@ -553,7 +554,7 @@ public class WpiLibLibrariesUtils
                 {
                     LOG.debug("[FRC] Could not extract WPILib version from source JAR as the file is not readable: " + sourcesJar);
                     // We don't have the sources JAR
-                    final Path classesJar = WpiLibPaths.getJavaLibDir().resolve("WPILib.jar");
+                    final Path classesJar = LegacyWpiLibPaths.getJavaLibDir().resolve("WPILib.jar");
                     if (Files.isReadable(classesJar))
                     {
                         final Path tempFile = Files.createTempFile("WpiLibVersion", ".class");

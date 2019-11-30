@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.wpilib.retrieval;
+package net.javaru.iip.frc.wpilib.legacy.retrieval;
 
 import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
@@ -53,16 +53,16 @@ import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.UnzipUtils;
 import net.javaru.iip.frc.util.UriUtils;
-import net.javaru.iip.frc.wpilib.WpiLibPaths;
+import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibPaths;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionExtKt;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
 
 
 
-public class WpiLibDownloader
+public class LegacyWpiLibDownloader
 {
-    private static final Logger LOG = Logger.getInstance(WpiLibDownloader.class);
+    private static final Logger LOG = Logger.getInstance(LegacyWpiLibDownloader.class);
 
 
     /**
@@ -70,15 +70,15 @@ public class WpiLibDownloader
      * Thus if the use beta site is enabled, either the latest beta or the latest release will be returned.
      * @return the latest JavaFeatureDescriptor (which includes a version property) and the repo URI it came from
      */
-    public static ImmutablePair<JavaFeatureDescriptor, URI> downloadLatestJavaDescriptor() throws WpiLibDownloadFailedException
+    public static ImmutablePair<JavaFeatureDescriptor, URI> downloadLatestJavaDescriptor() throws LegacyWpiLibDownloadFailedException
     {
         try
         {
-            final URI betaRepoUri = WpiRepoUris.getBetaRepoUri();
-            final URI releaseRepoUri = WpiRepoUris.getReleaseRepoUri();
+            final URI betaRepoUri = LegacyWpiRepoUris.getBetaRepoUri();
+            final URI releaseRepoUri = LegacyWpiRepoUris.getReleaseRepoUri();
             
             @Nullable
-            final JavaFeatureDescriptor betaDescriptor = WpiRepoUris.useBetaRepo() ? parseSiteXml(fetchSiteXml(betaRepoUri), betaRepoUri) : null ;
+            final JavaFeatureDescriptor betaDescriptor = LegacyWpiRepoUris.useBetaRepo() ? parseSiteXml(fetchSiteXml(betaRepoUri), betaRepoUri) : null ;
             final JavaFeatureDescriptor releaseDescriptor = parseSiteXml(fetchSiteXml(releaseRepoUri), releaseRepoUri);
             
             if (betaDescriptor == null || releaseDescriptor.getVersion().isNewerThan(betaDescriptor.getVersion()))
@@ -93,7 +93,7 @@ public class WpiLibDownloader
         catch (Exception e)
         {
             LOG.warn("[FRC] Could not check for the latest version of WPILib. Cause Summary: " + e.toString(), e);
-            throw new WpiLibDownloadFailedException(e);
+            throw new LegacyWpiLibDownloadFailedException(e);
         }
     }
 
@@ -115,7 +115,7 @@ public class WpiLibDownloader
         }
     }
     
-    public static void downloadLatest() throws WpiLibDownloadFailedException
+    public static void downloadLatest() throws LegacyWpiLibDownloadFailedException
     {
         try
         {
@@ -128,14 +128,14 @@ public class WpiLibDownloader
             final JavaFeatureDescriptor javaFeatureDescriptor = latest.getKey();
             LOG.info("[FRC] Current WPILib version (as indicated in 'site.xml') is '" + javaFeatureDescriptor.getVersion() + "'");
 
-            //final Document javaFeatureXml = WpiRepoHttpClient.fetchXmlResourceAsDocument(javaFeatureDescriptor.getUri());
+            //final Document javaFeatureXml = LegacyWpiRepoHttpClient.fetchXmlResourceAsDocument(javaFeatureDescriptor.getUri());
 
             // For now, as a quick hit to get the download working, we are not going to get and a parse the 
             // the feature XML and traverse down the chain. We know we wan the java and core JARs. We'll hard
             // code the names for now.
             // TODO: parse the site.xml in the event things change like they did in 2018 ;)
 
-            final URI siteXmlUri = WpiRepoUris.getSiteUri(latest.getValue());
+            final URI siteXmlUri = LegacyWpiRepoUris.getSiteUri(latest.getValue());
 
             final URI javaJarUri = UriUtils.resolveSiblingResource(siteXmlUri,
                                                                    String.format("plugins/edu.wpi.first.wpilib.plugins.java_%s.jar",
@@ -148,30 +148,30 @@ public class WpiLibDownloader
 
             LOG.info("[FRC] Using javaJarUri: " + javaJarUri);
             LOG.info("[FRC] Using coreJarUri: " + coreJarUri);
-            final Path javaJarFilePath = WpiRepoHttpClient.downloadAndSaveToTemp(javaJarUri);
-            final Path coreJarFilePath = WpiRepoHttpClient.downloadAndSaveToTemp(coreJarUri);
+            final Path javaJarFilePath = LegacyWpiRepoHttpClient.downloadAndSaveToTemp(javaJarUri);
+            final Path coreJarFilePath = LegacyWpiRepoHttpClient.downloadAndSaveToTemp(coreJarUri);
             // The java.zip file has 3 directories in it:  ant;  javadoc;  lib;  And is extracted in 'current' so we end up with: 
             //      C:\Users\UserName\wpilib\java\current\ant   C:\Users\UserName\wpilib\java\current\javadoc   C:\Users\UserName\wpilib\java\current\lib
-            extractZipFileContainedInZipFile(javaJarFilePath, "resources/java.zip", WpiLibPaths.getJavaCurrentDir());
+            extractZipFileContainedInZipFile(javaJarFilePath, "resources/java.zip", LegacyWpiLibPaths.getJavaCurrentDir());
             // The tools.zip content needs to go into C:\Users\UserName\wpilib\tools  so we end up with C:\Users\UserName\wpilib\tools\plugins  and  C:\Users\UserName\wpilib\tools\*.jar 
-            extractZipFileContainedInZipFile(coreJarFilePath, "resources/tools.zip", WpiLibPaths.getToolsDir());
+            extractZipFileContainedInZipFile(coreJarFilePath, "resources/tools.zip", LegacyWpiLibPaths.getToolsDir());
 
             // common.zip was added in 2018 and contains the JRE that is deployed to the roboRIO upon building
             //     It's content goes to C:\Users\UserName\wpilib\common
             //     We ultimately end up with C:\Users\UserName\wpilib\common\current\lib\linux\athena\shared which contains a number or *.so files
             if (WpiLibVersionExtKt.is2018OrLater(javaFeatureDescriptor.getVersion()))
             {
-                extractZipFileContainedInZipFile(coreJarFilePath, "resources/common.zip", WpiLibPaths.getCommonCurrentVersionDir());
+                extractZipFileContainedInZipFile(coreJarFilePath, "resources/common.zip", LegacyWpiLibPaths.getCommonCurrentVersionDir());
             }
             
-            Files.createDirectories(WpiLibPaths.getUserLibDir());
+            Files.createDirectories(LegacyWpiLibPaths.getUserLibDir());
             
             LOG.debug("[FRC] Download & extraction of latest wpilib completed");
         }
         catch (Exception e)
         {
             LOG.warn("[FRC] Could not download latest version of WPILib. Cause Summary: " + e.toString(), e);
-            throw new WpiLibDownloadFailedException(e);
+            throw new LegacyWpiLibDownloadFailedException(e);
         }
 
     }
@@ -179,8 +179,8 @@ public class WpiLibDownloader
 
     public static Document fetchSiteXml(@NotNull URI repoBaseUri) throws IOException, JDOMException
     {
-        final URI siteXmlUri = WpiRepoUris.getSiteUri(repoBaseUri);
-        final Document siteDocument = WpiRepoHttpClient.fetchXmlResourceAsDocument(siteXmlUri);
+        final URI siteXmlUri = LegacyWpiRepoUris.getSiteUri(repoBaseUri);
+        final Document siteDocument = LegacyWpiRepoHttpClient.fetchXmlResourceAsDocument(siteXmlUri);
         return siteDocument;
     }
 
@@ -194,7 +194,7 @@ public class WpiLibDownloader
         final String versionString = javaFeatureElement.getAttribute("version").getValue();
         WpiLibVersion version = WpiLibVersionImpl.Companion.parse(versionString);
         final String javaFeatureRelativeUrl = javaFeatureElement.getAttribute("url").getValue();
-        final URI javaFeatureUri = UriUtils.resolveSiblingResource(WpiRepoUris.getSiteUri(repoBaseUri), javaFeatureRelativeUrl);
+        final URI javaFeatureUri = UriUtils.resolveSiblingResource(LegacyWpiRepoUris.getSiteUri(repoBaseUri), javaFeatureRelativeUrl);
 
         return new JavaFeatureDescriptor(id, version, javaFeatureUri);
     }
@@ -221,13 +221,13 @@ public class WpiLibDownloader
 
     public static void updateOrCreateWpilibPropertiesFile() throws IOException
     {
-        final Path file = WpiLibPaths.getWpilibPropertiesFile();
+        final Path file = LegacyWpiLibPaths.getWpilibPropertiesFile();
 
         LOG.debug("[FRC] Creating / Updating wpilib.properties file at: " + file);
      
         if (!FrcApplicationSettings.getInstance().isTeamNumberConfigured())
         {
-            ApplicationManager.getApplication().invokeAndWait(WpiLibDownloader::promptForTeamNumber);
+            ApplicationManager.getApplication().invokeAndWait(LegacyWpiLibDownloader::promptForTeamNumber);
         }
 
         if (Files.exists(file))

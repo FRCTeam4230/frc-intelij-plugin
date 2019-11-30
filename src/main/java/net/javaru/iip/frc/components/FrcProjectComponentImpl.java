@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -56,8 +56,8 @@ import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.util.FrcProjectExtsKt;
 import net.javaru.iip.frc.util.UriUtils;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
+import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibVersionStatus;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
-import net.javaru.iip.frc.wpilib.version.WpiLibVersionStatus;
 
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT;
 import static net.javaru.iip.frc.actions.tools.DownloadWpiLibAction.NOTIFICATIONS_SUBTITLE;
@@ -100,14 +100,10 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         //            As such, some activities can not occur yet. Use:
         //               StartupManager.getInstance(myProject).registerPostStartupActivity(() -> someMethod(myProject));
         
-        final FrcApplicationSettings appSettings = FrcApplicationSettings.getInstance();
-        
         LOG.debug("[FRC] " + getClass().getSimpleName() + ".projectOpened() called for project " + myProject);
-        LOG.debug("[FRC] wpiLibDir: " + appSettings.getWpiLibDir());
         
         registerMessageBusListeners();
 
-        
         checkIssue8Refresh();
     
         FrcPluginVersionManager.INSTANCE.checkPluginUpdateStatus(myProject);
@@ -319,36 +315,49 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
             RioLogProjectService.getInstance(myProject).activateTcp();
             notifyToConfigureTeamNumIfNecessary(myProject, true);
-
-            final WpiLibVersionStatus versionStatus = WpiLibVersionStatus.getCurrentVersionStatus(myProject, true);
-
-            if (isFreshFrcTemplateProject)
+    
+            if (FrcProjectExtsKt.isAntBasedFrcProject(myProject))
             {
-                if (!versionStatus.isWpiLibDownloaded() || versionStatus.isNewerVersionAvailableThanDownloaded())
-                {
-                    if (!versionStatus.isWpiLibDownloaded())
-                    {
-                        queueLatestWpiLibVersionIsBeingDownloadedNotification(myProject);
-                    }
-                    DownloadWpiLibAction.downloadLatestInBackground(myProject,
-                                                                    true,
-                                                                    false);
-                }
-                else
-                {
-                    AttachWpilibAction.attachWpiLib(myProject, false, true);
-                }
-                AttachUserLibDirAction.attachUserLib(myProject, false);
-                
+                checkLegacyWpiLibraryStatus(isFreshFrcTemplateProject);
             }
             else
             {
-                checkProjectFrcStatus(myProject, true, false);
+                // TODO - check gradle RIO version status
             }
         }
     }
-
-
+    
+    
+    private void checkLegacyWpiLibraryStatus(boolean isFreshFrcTemplateProject)
+    {
+        final LegacyWpiLibVersionStatus versionStatus = LegacyWpiLibVersionStatus.getCurrentVersionStatus(myProject, true);
+        
+        if (isFreshFrcTemplateProject)
+        {
+            if (!versionStatus.isWpiLibDownloaded() || versionStatus.isNewerVersionAvailableThanDownloaded())
+            {
+                if (!versionStatus.isWpiLibDownloaded())
+                {
+                    queueLatestWpiLibVersionIsBeingDownloadedNotification(myProject);
+                }
+                DownloadWpiLibAction.downloadLatestInBackground(myProject,
+                                                                true,
+                                                                false);
+            }
+            else
+            {
+                AttachWpilibAction.attachWpiLib(myProject, false, true);
+            }
+            AttachUserLibDirAction.attachUserLib(myProject, false);
+            
+        }
+        else
+        {
+            checkProjectFrcStatus(myProject, true, false);
+        }
+    }
+    
+    
     public static void checkProjectFrcStatus(@NotNull Project project, boolean knownFacetedProject, boolean checkTeamNumConfigStatus)
     {
         // TODO add check for if a new version of WPILib is available
@@ -409,7 +418,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     }
 
     public static Notification queueNewerWpiLibVersionIsAvailable(@NotNull Project project,
-                                                                  @NotNull WpiLibVersionStatus versionStatus)
+                                                                  @NotNull LegacyWpiLibVersionStatus versionStatus)
     {
         return queueNewerWpiLibVersionIsAvailable(project, versionStatus.getAttachedVersion(), versionStatus.getAvailableVersion());    
     }

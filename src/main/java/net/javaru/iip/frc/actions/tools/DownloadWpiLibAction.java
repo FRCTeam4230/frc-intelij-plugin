@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ import com.intellij.openapi.project.Project;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.util.IndexUtils;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
-import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloadFailedException;
-import net.javaru.iip.frc.wpilib.retrieval.WpiLibDownloader;
+import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloadFailedException;
+import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloader;
 
 import static net.javaru.iip.frc.components.FrcProjectComponentImpl.cancelWpiLibIsDownloadingNotifications;
 
@@ -89,7 +89,7 @@ public class DownloadWpiLibAction extends AbstractFrcToolsLegacyAction
             {
                 LOG.info("[FRC] Downloading latest WPILib...");
                 LOG.debug("[FRC] wasAttached = " + wasAttached);
-                WpiLibDownloader.downloadLatest();
+                LegacyWpiLibDownloader.downloadLatest();
                 if (project != null)
                 {
                     isAttached = WpiLibLibrariesUtils.isWpilibJavaLibDirAttachedViaReadAction(project);
@@ -169,7 +169,7 @@ public class DownloadWpiLibAction extends AbstractFrcToolsLegacyAction
                 // A nice TODO: make the replacement of files a transaction with rollback if possible
                 String content = "Cause: ";
 
-                if (error instanceof WpiLibDownloadFailedException)
+                if (error instanceof LegacyWpiLibDownloadFailedException)
                 {
                     content += (error.getCause() != null) ? error.getCause().toString() : error.getMessage();
                 }

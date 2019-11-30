@@ -47,15 +47,42 @@ interface WpiLibVersion : Comparable<WpiLibVersion>
     
     val preReleasePreviewVersion: Int?
     
-    fun isPreRelease(): Boolean
-    {
-        return preReleaseModifier != null
-    }
+    /** Indicates the version is a (full) release and not a pre-release (such as RC, Beta, or Alpha). */
+    fun isRelease(): Boolean = preReleaseModifier == null
+
+    /** Indicates the version is some type of pre-release such as RC, Beta, or Alpha, **excluding** preview releases such as `2019.1.1-beta-2-pre3`. */
+    fun isPreRelease(): Boolean = preReleaseModifier != null && preReleasePreviewVersion == null
+
+    /** Indicates the version is some type of pre-release such as RC, Beta, or Alpha, **including** preview releases such as `2019.1.1-beta-2-pre3`. */
+    fun isPreReleaseIncludingPreviews(): Boolean = preReleaseModifier != null
+
+    /** Indicates the version is a preview of some type of pre-release such as RC, Beta, or Alpha, such as `2019.1.1-beta-2-pre3`. A non preview pre-release, such as `2019.1.1-beta-3a` would return false as it is not a preview. */
+    fun isPreReleasePreview(): Boolean = preReleaseModifier != null && preReleasePreviewVersion != null
+
+    /** Indicates the version is either a full release, or a release candidate,  **excluding** preview releases such as `2020.1.2-rc-1-pre1`.*/
+    fun isReleaseOrReleaseCandidate(): Boolean = isRelease() || isReleaseCandidate()
+
+    /** Indicates the version is either a full release, or a release candidate,  **including** preview releases such as `2020.1.2-rc-1-pre1`.*/
+    fun isReleaseOrReleaseCandidateOrRcPreview(): Boolean = isRelease() || isReleaseCandidateOrRcPreview()
+
+    /** Indicates the version is a release candidate,  **excluding** preview releases such as `v2019_1_2_rc_1_pre1`.*/
+    fun isReleaseCandidate(): Boolean = preReleaseModifier == PreReleaseModifier.rc && !isPreReleasePreview()
+
+    /** Indicates the version is a release candidate,  **including** preview releases such as `2020.1.2-rc-1-pre1`.*/
+    fun isReleaseCandidateOrRcPreview(): Boolean = preReleaseModifier == PreReleaseModifier.rc
+
+    /** Indicates the version is a beta release,  **excluding** preview releases such as `2019.1.1-beta-2-pre3`.*/
+    fun isBeta(): Boolean = preReleaseModifier == PreReleaseModifier.beta && !isPreReleasePreview()
+
+    /** Indicates the version is a beta release,  **including** preview releases such as `2019.1.1-beta-2-pre3`.*/
+    fun isBetaOrBetaPreview(): Boolean = preReleaseModifier == PreReleaseModifier.beta
+
+    /** Indicates the version is a alpha release,  **excluding** preview releases such as `2019.0.0-alpha-3-pre1`.*/
+    fun isAlpha(): Boolean = preReleaseModifier == PreReleaseModifier.alpha && !isPreReleasePreview()
+
+    /** Indicates the version is a alpha release,  **excluding** preview releases such as `2019.0.0-alpha-3-pre1`.*/
+    fun isAlphaOrAlphaPreview(): Boolean = preReleaseModifier == PreReleaseModifier.alpha
     
-    fun isPreReleasePreview(): Boolean
-    {
-        return isPreRelease() && preReleasePreviewVersion != null
-    }
     
     override fun compareTo(other: WpiLibVersion): Int
     {
@@ -65,12 +92,12 @@ interface WpiLibVersion : Comparable<WpiLibVersion>
                 .append(this.major, other.major)
                 .append(this.minor, other.minor)
                 .append(this.patch, other.patch)
-                .append(if (this.isPreRelease()) this.preReleaseModifier!!.ordinal else Integer.MAX_VALUE,
-                        if (other.isPreRelease()) other.preReleaseModifier!!.ordinal else Integer.MAX_VALUE)
-                .append(if (this.isPreRelease()) this.preReleaseModifierVersion else Integer.MAX_VALUE,
-                        if (other.isPreRelease()) other.preReleaseModifierVersion else Integer.MAX_VALUE)
-                .append(if (this.isPreRelease()) this.preReleaseModifierSubVersion else "",
-                        if (other.isPreRelease()) other.preReleaseModifierSubVersion else "")
+                .append(if (this.isPreReleaseIncludingPreviews()) this.preReleaseModifier!!.ordinal else Integer.MAX_VALUE,
+                        if (other.isPreReleaseIncludingPreviews()) other.preReleaseModifier!!.ordinal else Integer.MAX_VALUE)
+                .append(if (this.isPreReleaseIncludingPreviews()) this.preReleaseModifierVersion else Integer.MAX_VALUE,
+                        if (other.isPreReleaseIncludingPreviews()) other.preReleaseModifierVersion else Integer.MAX_VALUE)
+                .append(if (this.isPreReleaseIncludingPreviews()) this.preReleaseModifierSubVersion else "",
+                        if (other.isPreReleaseIncludingPreviews()) other.preReleaseModifierSubVersion else "")
                 .append(if (this.isPreReleasePreview()) this.preReleasePreviewVersion else Integer.MAX_VALUE,
                         if (other.isPreReleasePreview()) other.preReleasePreviewVersion else Integer.MAX_VALUE)
                 .toComparison()

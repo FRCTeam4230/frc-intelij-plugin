@@ -17,17 +17,34 @@
 package net.javaru.iip.frc.wpilib.version
 
 import com.google.common.collect.ImmutableList
+import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2018_06_21
+import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_0_0_alpha_1
+import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_0_0_beta0_pre1
+import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_0_1
+import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_1_1
+import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_1_1_beta_1
+import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_1_1_beta_2a
+import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_1_1_beta_3
+import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_1_1_beta_3_p_2
+import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_1_1_beta_3_pre1
+import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_1_1_beta_99
+import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_1_1_rc_1
+import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2020_1_1
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion.PreReleaseModifier
 import org.apache.commons.lang3.RandomUtils
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
+import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.ArgumentsProvider
+import org.junit.jupiter.params.provider.ArgumentsSource
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.*
 import java.util.stream.Stream
+import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting as GRV
 
 
 internal class WpiLibVersionTest
@@ -124,9 +141,12 @@ internal class WpiLibVersionTest
     @MethodSource("isPreReleaseProvider")
     fun isPreRelease(ver: WpiLibVersion, isPreReleaseExpected: Boolean, isPreReleasePreviewExpected: Boolean)
     {
+        val isEither = isPreReleaseExpected || isPreReleasePreviewExpected
         assertAll(
                 {assertEquals(isPreReleaseExpected, ver.isPreRelease(), "Wrong result for ${ver.versionString}.isPreRelease(). Expected $isPreReleaseExpected")},
-                {assertEquals(isPreReleasePreviewExpected, ver.isPreReleasePreview(), "Wrong result for ${ver.versionString}.isPreReleasePreview(). Expected $isPreReleasePreviewExpected")}
+                {assertEquals(isPreReleasePreviewExpected, ver.isPreReleasePreview(), "Wrong result for ${ver.versionString}.isPreReleasePreview(). Expected $isPreReleasePreviewExpected")},
+                {assertEquals(isEither, ver.isPreReleaseIncludingPreviews(), "Wrong result for ${ver.versionString}.isPreReleaseIncludingPreviews(). Expected $isEither")}
+                
                  )
     }
     
@@ -242,7 +262,51 @@ internal class WpiLibVersionTest
                  )
     }
 
-
+    @ParameterizedTest
+    @ArgumentsSource(GRV.AllVersionProvider::class)
+    fun isRelease(version: WpiLibVersion) = assertEquals(GRV.releasesOnlyList.contains(version), version.isRelease(), "isRelease check failed")
+    
+    @ParameterizedTest
+    @ArgumentsSource(GRV.AllVersionProvider::class)
+    fun isReleaseCandidateOrRcPreview(version: WpiLibVersion) = assertEquals(GRV.releaseCandidatesOnlyList.contains(version), version.isReleaseCandidateOrRcPreview(), "isReleaseCandidateOrRcPreview check failed")
+    
+    @ParameterizedTest
+    @ArgumentsSource(GRV.AllVersionProvider::class)
+    fun isReleaseCandidate(version: WpiLibVersion) = assertEquals(GRV.releaseCandidatesNoPreviewsList.contains(version), version.isReleaseCandidate(), "isReleaseCandidate check failed")
+    
+    @ParameterizedTest
+    @ArgumentsSource(GRV.AllVersionProvider::class)
+    fun isReleaseOrReleaseCandidateOrRcPreview(version: WpiLibVersion) = assertEquals(GRV.releaseAndReleaseCandidatesList.contains(version), version.isReleaseOrReleaseCandidateOrRcPreview(), "isReleaseOrReleaseCandidateOrRcPreview check failed")
+    
+    @ParameterizedTest
+    @ArgumentsSource(GRV.AllVersionProvider::class)
+    fun isReleaseOrReleaseCandidate(version: WpiLibVersion) = assertEquals(GRV.releaseAndReleaseCandidatesNoPreviewsList.contains(version), version.isReleaseOrReleaseCandidate(), "isReleaseOrReleaseCandidate check failed")
+    
+    @ParameterizedTest
+    @ArgumentsSource(GRV.AllVersionProvider::class)
+    fun isBetaOrBetaPreview(version: WpiLibVersion) = assertEquals(GRV.betasAllList.contains(version), version.isBetaOrBetaPreview(), "isBetaOrBetaPreview check failed")
+    
+    @ParameterizedTest
+    @ArgumentsSource(GRV.AllVersionProvider::class)
+    fun isBeta(version: WpiLibVersion) = assertEquals(GRV.betasNoPreviewsList.contains(version), version.isBeta(), "isBeta check failed")
+    
+    @ParameterizedTest
+    @ArgumentsSource(GRV.AllVersionProvider::class)
+    fun isAlphaOrAlphaPreview(version: WpiLibVersion) = assertEquals(GRV.alphasAllList.contains(version), version.isAlphaOrAlphaPreview(), "isAlphaOrAlphaPreview check failed")
+    
+    @ParameterizedTest
+    @ArgumentsSource(GRV.AllVersionProvider::class)
+    fun isAlpha(version: WpiLibVersion) = assertEquals(GRV.alphasNoPreviewsList.contains(version), version.isAlpha(), "isAlpha check failed")
+    
+    
+    @Test
+    fun temp()
+    {
+        assertEquals(GRV.versions, GRV.skeleton)
+    }
+    
+    // =====================================================================================================================================
+    
     internal class ExpectedWpiLibVersion(override val generation: Int,
                                          override val major: Int,
                                          override val minor: Int,
@@ -270,7 +334,7 @@ internal class WpiLibVersionTest
 
         @JvmStatic
         fun versionListProvider(): Stream<Arguments> = versionList.stream().map { Arguments.of(it) }
-
+        
         @JvmStatic
         fun isNewerThanProvider(): Iterable<Arguments> = createArgsList(false, true)
 
@@ -421,17 +485,17 @@ internal class WpiLibVersionTest
         {
             val args = ArrayList<Arguments>()
             // version, isPreRelease, isPreview
-            args.add(Arguments.of(v2019_0_0_alpha_1, true, false))
-            args.add(Arguments.of(v2019_0_0_beta0_pre1, true, true))
-            args.add(Arguments.of(v2019_1_1_beta_1, true, false))
-            args.add(Arguments.of(v2019_1_1_beta_2a, true, false))
-            args.add(Arguments.of(v2019_1_1_beta_3_pre1, true, true))
-            args.add(Arguments.of(v2019_1_1_beta_3_p_2, true, true))
-            args.add(Arguments.of(v2019_1_1_beta_3, true, false))
-            args.add(Arguments.of(v2019_1_1, false, false))
-            args.add(Arguments.of(v2018_1_1_rc_1, true, false))
-            args.add(Arguments.of(v2019_1_1_beta_99, true, false))
-            args.add(Arguments.of(v2019_1_1_rc_1, true, false))
+            args.add(Arguments.of(v2019_0_0_alpha_1,        true,  false))
+            args.add(Arguments.of(v2019_0_0_beta0_pre1,     false, true))
+            args.add(Arguments.of(v2019_1_1_beta_1,         true,  false))
+            args.add(Arguments.of(v2019_1_1_beta_2a,        true,  false))
+            args.add(Arguments.of(v2019_1_1_beta_3_pre1,    false, true))
+            args.add(Arguments.of(v2019_1_1_beta_3_p_2,     false, true))
+            args.add(Arguments.of(v2019_1_1_beta_3,         true,  false))
+            args.add(Arguments.of(v2019_1_1,                false, false))
+            args.add(Arguments.of(v2018_1_1_rc_1,           true,  false))
+            args.add(Arguments.of(v2019_1_1_beta_99,        true,  false))
+            args.add(Arguments.of(v2019_1_1_rc_1,           true,  false))
             return args
         }
 
@@ -485,52 +549,8 @@ internal class WpiLibVersionTest
         private val v2018_4_1 = WpiLibVersionImpl.parse("2018.4.1")
         private val v2018_5_1 = WpiLibVersionImpl.parse("2018.5.1")
         private val v2018_5_2 = WpiLibVersionImpl.parse("2018.5.2")
-        private val v2018_06_21 = WpiLibVersionImpl.parse("2018.06.21")
-        private val v2019_0_0_alpha_1    = WpiLibVersionImpl.parse("2019.0.0-alpha-1")
-        private val v2019_0_0_alpha_2    = WpiLibVersionImpl.parse("2019.0.0-alpha-2")
-        private val v2019_0_0_alpha_3    = WpiLibVersionImpl.parse("2019.0.0-alpha-3")
-        private val v2019_0_0_beta0_pre1 = WpiLibVersionImpl.parse("2019.0.0-beta0-pre1")
-        private val v2019_0_0_beta0_pre3 = WpiLibVersionImpl.parse("2019.0.0-beta0-pre3")
-        private val v2019_0_0_beta0_pre4 = WpiLibVersionImpl.parse("2019.0.0-beta0-pre4")
-        private val v2019_0_0_beta0_pre5 = WpiLibVersionImpl.parse("2019.0.0-beta0-pre5")
-        private val v2019_0_0_beta0_pre6 = WpiLibVersionImpl.parse("2019.0.0-beta0-pre6")
-        private val v2019_0_1 = WpiLibVersionImpl.parse("2019.0.1")
-        private val v2019_1_1_beta_1     = WpiLibVersionImpl.parse("2019.1.1-beta-1")
-        private val v2019_1_1_beta_2a     = WpiLibVersionImpl.parse("2019.1.1-beta-2a")
-        private val v2019_1_1_beta_3_pre1  = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre1")
-        private val v2019_1_1_beta_3_p_2  = WpiLibVersionImpl.parse("2019.1.1-beta-3-p-2")
-        private val v2019_1_1_beta_3_pre3 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre3")
-        private val v2019_1_1_beta_3_pre4 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre4")
-        private val v2019_1_1_beta_3_pre5 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre5")
-        private val v2019_1_1_beta_3_pre6 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre6")
-        private val v2019_1_1_beta_3_pre7 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre7")
-        private val v2019_1_1_beta_3_pre8 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre8")
-        private val v2019_1_1_beta_3_pre9 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre9")
-        private val v2019_1_1_beta_3_pre10 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre10")
-        private val v2019_1_1_beta_3      = WpiLibVersionImpl.parse("2019.1.1-beta-3")
-        private val v2019_1_1_beta_3a     = WpiLibVersionImpl.parse("2019.1.1-beta-3a")
-        private val v2019_1_1_beta_4_pre1 = WpiLibVersionImpl.parse("2019.1.1-beta-4-pre1")
-        private val v2019_1_1_beta_4_pre2 = WpiLibVersionImpl.parse("2019.1.1-beta-4-pre2")
-        private val v2019_1_1_beta_4_pre4 = WpiLibVersionImpl.parse("2019.1.1-beta-4-pre4")
-        private val v2019_1_1_beta_4      = WpiLibVersionImpl.parse("2019.1.1-beta-4")
-        private val v2019_1_1_beta_4a     = WpiLibVersionImpl.parse("2019.1.1-beta-4a")
-        private val v2019_1_1_beta_4b     = WpiLibVersionImpl.parse("2019.1.1-beta-4b")
-        private val v2019_1_1_beta_4c     = WpiLibVersionImpl.parse("2019.1.1-beta-4c")
-        private val v2019_1_1_beta_5     = WpiLibVersionImpl.parse("2019.1.1-beta-5")
-        private val v2019_1_1_beta_99     = WpiLibVersionImpl.parse("2019.1.1-beta-99")
-        private val v2019_1_1_rc_1 = WpiLibVersionImpl.parse("2019.1.1-rc-1")
-        private val v2019_1_1 = WpiLibVersionImpl.parse("2019.1.1")
-        private val v2019_1_2 = WpiLibVersionImpl.parse("2019.1.2")
-        private val v2019_2_1 = WpiLibVersionImpl.parse("2019.2.1")
-        private val v2019_3_1 = WpiLibVersionImpl.parse("2019.3.1")
-        private val v2019_3_2 = WpiLibVersionImpl.parse("2019.3.2")
-        private val v2019_4_1 = WpiLibVersionImpl.parse("2019.4.1")
-        private val v2020_1_1_beta_1  = WpiLibVersionImpl.parse("2020.1.1-beta-1")
-        private val v2020_1_1_beta_2  = WpiLibVersionImpl.parse("2020.1.1-beta-2")
-        private val v2020_1_1_beta_3  = WpiLibVersionImpl.parse("2020.1.1-beta-3")
-        private val v2020_1_1_beta_3a = WpiLibVersionImpl.parse("2020.1.1-beta-3a")
-        private val v2020_1_1 = WpiLibVersionImpl.parse("2020.1.1")
-        private val v2020_1_2 = WpiLibVersionImpl.parse("2020.1.2")
+        
+        // POST 2018 version are in the GradleRioVersions Object below
 
         private val versionList: ImmutableList<WpiLibVersion>
 
@@ -588,52 +608,7 @@ internal class WpiLibVersionTest
             list.add(v2018_4_1)
             list.add(v2018_5_1)
             list.add(v2018_5_2)
-            list.add(v2018_06_21)
-            list.add(v2019_0_0_alpha_1)
-            list.add(v2019_0_0_alpha_2)
-            list.add(v2019_0_0_alpha_3)
-            list.add(v2019_0_0_beta0_pre1)
-            list.add(v2019_0_0_beta0_pre3)
-            list.add(v2019_0_0_beta0_pre4)
-            list.add(v2019_0_0_beta0_pre5)
-            list.add(v2019_0_0_beta0_pre6)
-            list.add(v2019_0_1)
-            list.add(v2019_1_1_beta_1)
-            list.add(v2019_1_1_beta_2a)
-            list.add(v2019_1_1_beta_3_pre1)
-            list.add(v2019_1_1_beta_3_p_2)
-            list.add(v2019_1_1_beta_3_pre3)
-            list.add(v2019_1_1_beta_3_pre4)
-            list.add(v2019_1_1_beta_3_pre5)
-            list.add(v2019_1_1_beta_3_pre6)
-            list.add(v2019_1_1_beta_3_pre7)
-            list.add(v2019_1_1_beta_3_pre8)
-            list.add(v2019_1_1_beta_3_pre9)
-            list.add(v2019_1_1_beta_3_pre10)
-            list.add(v2019_1_1_beta_3)
-            list.add(v2019_1_1_beta_3a)
-            list.add(v2019_1_1_beta_4_pre1)
-            list.add(v2019_1_1_beta_4_pre2)
-            list.add(v2019_1_1_beta_4_pre4)
-            list.add(v2019_1_1_beta_4)
-            list.add(v2019_1_1_beta_4a)
-            list.add(v2019_1_1_beta_4b)
-            list.add(v2019_1_1_beta_4c)
-            list.add(v2019_1_1_beta_5)
-            list.add(v2019_1_1_beta_99)
-            list.add(v2019_1_1_rc_1)
-            list.add(v2019_1_1)
-            list.add(v2019_1_2)
-            list.add(v2019_2_1)
-            list.add(v2019_3_1)
-            list.add(v2019_3_2)
-            list.add(v2019_4_1)
-            list.add(v2020_1_1_beta_1)
-            list.add(v2020_1_1_beta_2)
-            list.add(v2020_1_1_beta_3)
-            list.add(v2020_1_1_beta_3a)
-            list.add(v2020_1_1)
-            list.add(v2020_1_2)
+            GRV.versions.forEach { list.add(it) }
 
             versionList = list.build()
         }
@@ -681,4 +656,429 @@ internal class WpiLibVersionTest
             2020.1.1-beta-3            2019-11-22
             2020.1.1-beta-3a           2019-11-23
     */
+}
+
+
+
+
+
+
+object GradleRioVersionsForTesting
+{
+    val v2018_06_21 = WpiLibVersionImpl.parse("2018.06.21")
+    val v2019_0_0_alpha_1 = WpiLibVersionImpl.parse("2019.0.0-alpha-1")
+    val v2019_0_0_alpha_2_pre1 = WpiLibVersionImpl.parse("2019.0.0-alpha-2-pre1")
+    val v2019_0_0_alpha_2 = WpiLibVersionImpl.parse("2019.0.0-alpha-2")
+    val v2019_0_0_alpha_3 = WpiLibVersionImpl.parse("2019.0.0-alpha-3")
+    val v2019_0_0_beta0_pre1 = WpiLibVersionImpl.parse("2019.0.0-beta0-pre1")
+    val v2019_0_0_beta0_pre3 = WpiLibVersionImpl.parse("2019.0.0-beta0-pre3")
+    val v2019_0_0_beta0_pre4 = WpiLibVersionImpl.parse("2019.0.0-beta0-pre4")
+    val v2019_0_0_beta0_pre5 = WpiLibVersionImpl.parse("2019.0.0-beta0-pre5")
+    val v2019_0_0_beta0_pre6 = WpiLibVersionImpl.parse("2019.0.0-beta0-pre6")
+    val v2019_0_1 = WpiLibVersionImpl.parse("2019.0.1")
+    val v2019_1_1_beta_1 = WpiLibVersionImpl.parse("2019.1.1-beta-1")
+    val v2019_1_1_beta_2a = WpiLibVersionImpl.parse("2019.1.1-beta-2a")
+    val v2019_1_1_beta_3_pre1 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre1")
+    val v2019_1_1_beta_3_p_2 = WpiLibVersionImpl.parse("2019.1.1-beta-3-p-2")
+    val v2019_1_1_beta_3_pre3 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre3")
+    val v2019_1_1_beta_3_pre4 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre4")
+    val v2019_1_1_beta_3_pre5 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre5")
+    val v2019_1_1_beta_3_pre6 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre6")
+    val v2019_1_1_beta_3_pre7 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre7")
+    val v2019_1_1_beta_3_pre8 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre8")
+    val v2019_1_1_beta_3_pre9 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre9")
+    val v2019_1_1_beta_3_pre10 = WpiLibVersionImpl.parse("2019.1.1-beta-3-pre10")
+    val v2019_1_1_beta_3 = WpiLibVersionImpl.parse("2019.1.1-beta-3")
+    val v2019_1_1_beta_3a = WpiLibVersionImpl.parse("2019.1.1-beta-3a")
+    val v2019_1_1_beta_4_pre1 = WpiLibVersionImpl.parse("2019.1.1-beta-4-pre1")
+    val v2019_1_1_beta_4_pre2 = WpiLibVersionImpl.parse("2019.1.1-beta-4-pre2")
+    val v2019_1_1_beta_4_pre4 = WpiLibVersionImpl.parse("2019.1.1-beta-4-pre4")
+    val v2019_1_1_beta_4 = WpiLibVersionImpl.parse("2019.1.1-beta-4")
+    val v2019_1_1_beta_4a = WpiLibVersionImpl.parse("2019.1.1-beta-4a")
+    val v2019_1_1_beta_4b = WpiLibVersionImpl.parse("2019.1.1-beta-4b")
+    val v2019_1_1_beta_4c = WpiLibVersionImpl.parse("2019.1.1-beta-4c")
+    val v2019_1_1_beta_5 = WpiLibVersionImpl.parse("2019.1.1-beta-5")
+    val v2019_1_1_beta_99 = WpiLibVersionImpl.parse("2019.1.1-beta-99")
+    val v2019_1_1_rc_1 = WpiLibVersionImpl.parse("2019.1.1-rc-1")
+    val v2019_1_1 = WpiLibVersionImpl.parse("2019.1.1")
+    val v2019_1_2 = WpiLibVersionImpl.parse("2019.1.2")
+    val v2019_2_1 = WpiLibVersionImpl.parse("2019.2.1")
+    val v2019_3_1_rc = WpiLibVersionImpl.parse("2019.3.1-rc")
+    val v2019_3_1 = WpiLibVersionImpl.parse("2019.3.1")
+    val v2019_3_2_rc = WpiLibVersionImpl.parse("2019.3.2-rc")
+    val v2019_3_2_rc2 = WpiLibVersionImpl.parse("2019.3.2-rc2")
+    val v2019_3_2 = WpiLibVersionImpl.parse("2019.3.2")
+    val v2019_4_1_rc1 = WpiLibVersionImpl.parse("2019.4.1-rc1")
+    val v2019_4_1_rc2 = WpiLibVersionImpl.parse("2019.4.1-rc2")
+    val v2019_4_1_rc3 = WpiLibVersionImpl.parse("2019.4.1-rc3")
+    val v2019_4_1 = WpiLibVersionImpl.parse("2019.4.1")
+    val v2020_1_1_beta_1 = WpiLibVersionImpl.parse("2020.1.1-beta-1")
+    val v2020_1_1_beta_2 = WpiLibVersionImpl.parse("2020.1.1-beta-2")
+    val v2020_1_1_beta_3 = WpiLibVersionImpl.parse("2020.1.1-beta-3")
+    val v2020_1_1_beta_3a = WpiLibVersionImpl.parse("2020.1.1-beta-3a")
+    val v2020_1_1 = WpiLibVersionImpl.parse("2020.1.1")
+    val v2020_1_2_rc_1_pre1 = WpiLibVersionImpl.parse("2020.1.2-rc-1-pre1")
+    val v2020_1_2_rc_1 = WpiLibVersionImpl.parse("2020.1.2-rc-1")
+    val v2020_1_2 = WpiLibVersionImpl.parse("2020.1.2")
+
+    @JvmStatic
+    val versions by lazy {
+        val builder = ImmutableList.builder<WpiLibVersion>()
+        builder.add(v2018_06_21)
+        builder.add(v2019_0_0_alpha_1)
+        builder.add(v2019_0_0_alpha_2_pre1)
+        builder.add(v2019_0_0_alpha_2)
+        builder.add(v2019_0_0_alpha_3)
+        builder.add(v2019_0_0_beta0_pre1)
+        builder.add(v2019_0_0_beta0_pre3)
+        builder.add(v2019_0_0_beta0_pre4)
+        builder.add(v2019_0_0_beta0_pre5)
+        builder.add(v2019_0_0_beta0_pre6)
+        builder.add(v2019_0_1)
+        builder.add(v2019_1_1_beta_1)
+        builder.add(v2019_1_1_beta_2a)
+        builder.add(v2019_1_1_beta_3_pre1)
+        builder.add(v2019_1_1_beta_3_p_2)
+        builder.add(v2019_1_1_beta_3_pre3)
+        builder.add(v2019_1_1_beta_3_pre4)
+        builder.add(v2019_1_1_beta_3_pre5)
+        builder.add(v2019_1_1_beta_3_pre6)
+        builder.add(v2019_1_1_beta_3_pre7)
+        builder.add(v2019_1_1_beta_3_pre8)
+        builder.add(v2019_1_1_beta_3_pre9)
+        builder.add(v2019_1_1_beta_3_pre10)
+        builder.add(v2019_1_1_beta_3)
+        builder.add(v2019_1_1_beta_3a)
+        builder.add(v2019_1_1_beta_4_pre1)
+        builder.add(v2019_1_1_beta_4_pre2)
+        builder.add(v2019_1_1_beta_4_pre4)
+        builder.add(v2019_1_1_beta_4)
+        builder.add(v2019_1_1_beta_4a)
+        builder.add(v2019_1_1_beta_4b)
+        builder.add(v2019_1_1_beta_4c)
+        builder.add(v2019_1_1_beta_5)
+        builder.add(v2019_1_1_beta_99)
+        builder.add(v2019_1_1_rc_1)
+        builder.add(v2019_1_1)
+        builder.add(v2019_1_2)
+        builder.add(v2019_2_1)
+        builder.add(v2019_3_1_rc)
+        builder.add(v2019_3_1)
+        builder.add(v2019_3_2_rc)
+        builder.add(v2019_3_2_rc2)
+        builder.add(v2019_3_2)
+        builder.add(v2019_4_1_rc1)
+        builder.add(v2019_4_1_rc2)
+        builder.add(v2019_4_1_rc3)
+        builder.add(v2019_4_1)
+        builder.add(v2020_1_1_beta_1)
+        builder.add(v2020_1_1_beta_2)
+        builder.add(v2020_1_1_beta_3)
+        builder.add(v2020_1_1_beta_3a)
+        builder.add(v2020_1_1)
+        builder.add(v2020_1_2_rc_1_pre1)
+        builder.add(v2020_1_2_rc_1)
+        builder.add(v2020_1_2)
+
+        builder.build()
+    }
+
+    class AllVersionProvider : ArgumentsProvider
+    {
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = versions.stream().map { Arguments.of(it) }
+    }
+    
+    
+    @JvmStatic
+    val releasesOnlyList by lazy {
+        val builder = ImmutableList.builder<WpiLibVersion>()
+        builder.add(GRV.v2018_06_21)
+        builder.add(GRV.v2019_0_1)
+        builder.add(GRV.v2019_1_1)
+        builder.add(GRV.v2019_1_2)
+        builder.add(GRV.v2019_2_1)
+        builder.add(GRV.v2019_3_1)
+        builder.add(GRV.v2019_3_2)
+        builder.add(GRV.v2019_4_1)
+        builder.add(GRV.v2020_1_1)
+        builder.add(GRV.v2020_1_2)
+
+        builder.build()
+    }
+
+    class ReleaseOnlyProvider: ArgumentsProvider 
+    {
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = releasesOnlyList.stream().map { Arguments.of(it) }
+    }
+
+    @JvmStatic
+    val releaseCandidatesOnlyList by lazy {
+        val builder = ImmutableList.builder<WpiLibVersion>()
+        builder.add(v2019_1_1_rc_1)
+        builder.add(v2019_3_1_rc)
+        builder.add(v2019_3_2_rc)
+        builder.add(v2019_3_2_rc2)
+        builder.add(v2019_4_1_rc1)
+        builder.add(v2019_4_1_rc2)
+        builder.add(v2019_4_1_rc3)
+        builder.add(v2020_1_2_rc_1_pre1)
+        builder.add(v2020_1_2_rc_1)
+
+        builder.build()
+    }
+
+    class ReleaseCandidatesOnlyProvider : ArgumentsProvider
+    {
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = releaseCandidatesOnlyList.stream().map { Arguments.of(it) }
+    }
+    
+    @JvmStatic
+    val releaseCandidatesNoPreviewsList by lazy {
+        val builder = ImmutableList.builder<WpiLibVersion>()
+        builder.add(v2019_1_1_rc_1)
+        builder.add(v2019_3_1_rc)
+        builder.add(v2019_3_2_rc)
+        builder.add(v2019_3_2_rc2)
+        builder.add(v2019_4_1_rc1)
+        builder.add(v2019_4_1_rc2)
+        builder.add(v2019_4_1_rc3)
+        builder.add(v2020_1_2_rc_1)
+
+        builder.build()
+    }
+
+    class ReleaseCandidatesNoPreviewsProvider : ArgumentsProvider
+    {
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = releaseCandidatesOnlyList.stream().map { Arguments.of(it) }
+    }
+
+    @JvmStatic
+    val releaseAndReleaseCandidatesList by lazy {
+        val builder = ImmutableList.builder<WpiLibVersion>()
+        builder.add(v2018_06_21)
+        builder.add(v2019_0_1)
+        builder.add(v2019_1_1_rc_1)
+        builder.add(v2019_1_1)
+        builder.add(v2019_1_2)
+        builder.add(v2019_2_1)
+        builder.add(v2019_3_1_rc)
+        builder.add(v2019_3_1)
+        builder.add(v2019_3_2_rc)
+        builder.add(v2019_3_2_rc2)
+        builder.add(v2019_3_2)
+        builder.add(v2019_4_1_rc1)
+        builder.add(v2019_4_1_rc2)
+        builder.add(v2019_4_1_rc3)
+        builder.add(v2019_4_1)
+        builder.add(v2020_1_1)
+        builder.add(v2020_1_2_rc_1_pre1)
+        builder.add(v2020_1_2_rc_1)
+        builder.add(v2020_1_2)
+        
+        builder.build()
+    }
+
+    class ReleaseAndReleaseCandidatesProvider : ArgumentsProvider
+    {
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = releaseAndReleaseCandidatesList.stream().map { Arguments.of(it) }
+    }
+    
+    @JvmStatic
+    val releaseAndReleaseCandidatesNoPreviewsList by lazy {
+        val builder = ImmutableList.builder<WpiLibVersion>()
+        builder.add(v2018_06_21)
+        builder.add(v2019_0_1)
+        builder.add(v2019_1_1_rc_1)
+        builder.add(v2019_1_1)
+        builder.add(v2019_1_2)
+        builder.add(v2019_2_1)
+        builder.add(v2019_3_1_rc)
+        builder.add(v2019_3_1)
+        builder.add(v2019_3_2_rc)
+        builder.add(v2019_3_2_rc2)
+        builder.add(v2019_3_2)
+        builder.add(v2019_4_1_rc1)
+        builder.add(v2019_4_1_rc2)
+        builder.add(v2019_4_1_rc3)
+        builder.add(v2019_4_1)
+        builder.add(v2020_1_1)
+        builder.add(v2020_1_2_rc_1)
+        builder.add(v2020_1_2)
+        
+        builder.build()
+    }
+
+    class ReleaseAndReleaseCandidatesNoPreviewsProvider : ArgumentsProvider
+    {
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = releaseAndReleaseCandidatesList.stream().map { Arguments.of(it) }
+    }
+    
+    
+    @JvmStatic
+    val betasAllList by lazy {
+        val builder = ImmutableList.builder<WpiLibVersion>()
+        builder.add(v2019_0_0_beta0_pre1)
+        builder.add(v2019_0_0_beta0_pre3)
+        builder.add(v2019_0_0_beta0_pre4)
+        builder.add(v2019_0_0_beta0_pre5)
+        builder.add(v2019_0_0_beta0_pre6)
+        builder.add(v2019_1_1_beta_1)
+        builder.add(v2019_1_1_beta_2a)
+        builder.add(v2019_1_1_beta_3_pre1)
+        builder.add(v2019_1_1_beta_3_p_2)
+        builder.add(v2019_1_1_beta_3_pre3)
+        builder.add(v2019_1_1_beta_3_pre4)
+        builder.add(v2019_1_1_beta_3_pre5)
+        builder.add(v2019_1_1_beta_3_pre6)
+        builder.add(v2019_1_1_beta_3_pre7)
+        builder.add(v2019_1_1_beta_3_pre8)
+        builder.add(v2019_1_1_beta_3_pre9)
+        builder.add(v2019_1_1_beta_3_pre10)
+        builder.add(v2019_1_1_beta_3)
+        builder.add(v2019_1_1_beta_3a)
+        builder.add(v2019_1_1_beta_4_pre1)
+        builder.add(v2019_1_1_beta_4_pre2)
+        builder.add(v2019_1_1_beta_4_pre4)
+        builder.add(v2019_1_1_beta_4)
+        builder.add(v2019_1_1_beta_4a)
+        builder.add(v2019_1_1_beta_4b)
+        builder.add(v2019_1_1_beta_4c)
+        builder.add(v2019_1_1_beta_5)
+        builder.add(v2019_1_1_beta_99)
+        builder.add(v2020_1_1_beta_1)
+        builder.add(v2020_1_1_beta_2)
+        builder.add(v2020_1_1_beta_3)
+        builder.add(v2020_1_1_beta_3a)
+
+        builder.build()
+    }
+
+    class BetasAllProvider : ArgumentsProvider
+    {
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = betasAllList.stream().map { Arguments.of(it) }
+    }
+    
+    @JvmStatic
+    val betasNoPreviewsList by lazy {
+        val builder = ImmutableList.builder<WpiLibVersion>()
+        builder.add(v2019_1_1_beta_1)
+        builder.add(v2019_1_1_beta_2a)
+        builder.add(v2019_1_1_beta_3)
+        builder.add(v2019_1_1_beta_3a)
+        builder.add(v2019_1_1_beta_4)
+        builder.add(v2019_1_1_beta_4a)
+        builder.add(v2019_1_1_beta_4b)
+        builder.add(v2019_1_1_beta_4c)
+        builder.add(v2019_1_1_beta_5)
+        builder.add(v2019_1_1_beta_99)
+        builder.add(v2020_1_1_beta_1)
+        builder.add(v2020_1_1_beta_2)
+        builder.add(v2020_1_1_beta_3)
+        builder.add(v2020_1_1_beta_3a)
+
+        builder.build()
+    }
+
+    class BetasNoPreviewsListProvider : ArgumentsProvider
+    {
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = betasNoPreviewsList.stream().map { Arguments.of(it) }
+    }
+    
+    @JvmStatic
+    val alphasAllList by lazy {
+        val builder = ImmutableList.builder<WpiLibVersion>()
+        builder.add(v2019_0_0_alpha_1)
+        builder.add(v2019_0_0_alpha_2_pre1)
+        builder.add(v2019_0_0_alpha_2)
+        builder.add(v2019_0_0_alpha_3)
+        builder.build()
+    }
+
+    class AlphasAllListProvider : ArgumentsProvider
+    {
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = alphasAllList.stream().map { Arguments.of(it) }
+    }
+    
+    @JvmStatic
+    val alphasNoPreviewsList by lazy {
+        val builder = ImmutableList.builder<WpiLibVersion>()
+        builder.add(v2019_0_0_alpha_1)
+        builder.add(v2019_0_0_alpha_2)
+        builder.add(v2019_0_0_alpha_3)
+        builder.build()
+    }
+
+    class AlphasNoPreviewProvider : ArgumentsProvider
+    {
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = alphasNoPreviewsList.stream().map { Arguments.of(it) }
+    }
+    
+    @JvmStatic
+    val skeleton by lazy {
+        val builder = ImmutableList.builder<WpiLibVersion>()
+        builder.add(v2018_06_21)
+        builder.add(v2019_0_0_alpha_1)
+        builder.add(v2019_0_0_alpha_2_pre1)
+        builder.add(v2019_0_0_alpha_2)
+        builder.add(v2019_0_0_alpha_3)
+        builder.add(v2019_0_0_beta0_pre1)
+        builder.add(v2019_0_0_beta0_pre3)
+        builder.add(v2019_0_0_beta0_pre4)
+        builder.add(v2019_0_0_beta0_pre5)
+        builder.add(v2019_0_0_beta0_pre6)
+        builder.add(v2019_0_1)
+        builder.add(v2019_1_1_beta_1)
+        builder.add(v2019_1_1_beta_2a)
+        builder.add(v2019_1_1_beta_3_pre1)
+        builder.add(v2019_1_1_beta_3_p_2)
+        builder.add(v2019_1_1_beta_3_pre3)
+        builder.add(v2019_1_1_beta_3_pre4)
+        builder.add(v2019_1_1_beta_3_pre5)
+        builder.add(v2019_1_1_beta_3_pre6)
+        builder.add(v2019_1_1_beta_3_pre7)
+        builder.add(v2019_1_1_beta_3_pre8)
+        builder.add(v2019_1_1_beta_3_pre9)
+        builder.add(v2019_1_1_beta_3_pre10)
+        builder.add(v2019_1_1_beta_3)
+        builder.add(v2019_1_1_beta_3a)
+        builder.add(v2019_1_1_beta_4_pre1)
+        builder.add(v2019_1_1_beta_4_pre2)
+        builder.add(v2019_1_1_beta_4_pre4)
+        builder.add(v2019_1_1_beta_4)
+        builder.add(v2019_1_1_beta_4a)
+        builder.add(v2019_1_1_beta_4b)
+        builder.add(v2019_1_1_beta_4c)
+        builder.add(v2019_1_1_beta_5)
+        builder.add(v2019_1_1_beta_99)
+        builder.add(v2019_1_1_rc_1)
+        builder.add(v2019_1_1)
+        builder.add(v2019_1_2)
+        builder.add(v2019_2_1)
+        builder.add(v2019_3_1_rc)
+        builder.add(v2019_3_1)
+        builder.add(v2019_3_2_rc)
+        builder.add(v2019_3_2_rc2)
+        builder.add(v2019_3_2)
+        builder.add(v2019_4_1_rc1)
+        builder.add(v2019_4_1_rc2)
+        builder.add(v2019_4_1_rc3)
+        builder.add(v2019_4_1)
+        builder.add(v2020_1_1_beta_1)
+        builder.add(v2020_1_1_beta_2)
+        builder.add(v2020_1_1_beta_3)
+        builder.add(v2020_1_1_beta_3a)
+        builder.add(v2020_1_1)
+        builder.add(v2020_1_2_rc_1_pre1)
+        builder.add(v2020_1_2_rc_1)
+        builder.add(v2020_1_2)
+        
+
+        builder.build()
+    }
+
+    class Provider : ArgumentsProvider
+    {
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = skeleton.stream().map { Arguments.of(it) }
+    }
+    
 }

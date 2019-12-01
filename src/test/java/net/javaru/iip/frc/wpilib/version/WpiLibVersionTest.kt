@@ -264,39 +264,39 @@ internal class WpiLibVersionTest
 
     @ParameterizedTest
     @ArgumentsSource(GRV.AllVersionProvider::class)
-    fun isRelease(version: WpiLibVersion) = assertEquals(GRV.releasesOnlyList.contains(version), version.isRelease(), "isRelease check failed")
+    fun isRelease(version: WpiLibVersion) = assertEquals(GRV.releases.contains(version), version.isRelease(), "isRelease check failed")
     
     @ParameterizedTest
     @ArgumentsSource(GRV.AllVersionProvider::class)
-    fun isReleaseCandidateOrRcPreview(version: WpiLibVersion) = assertEquals(GRV.releaseCandidatesOnlyList.contains(version), version.isReleaseCandidateOrRcPreview(), "isReleaseCandidateOrRcPreview check failed")
+    fun isReleaseCandidateOrRcPreview(version: WpiLibVersion) = assertEquals(GRV.releaseCandidatesIncludingPreviews.contains(version), version.isReleaseCandidateOrRcPreview(), "isReleaseCandidateOrRcPreview check failed")
     
     @ParameterizedTest
     @ArgumentsSource(GRV.AllVersionProvider::class)
-    fun isReleaseCandidate(version: WpiLibVersion) = assertEquals(GRV.releaseCandidatesNoPreviewsList.contains(version), version.isReleaseCandidate(), "isReleaseCandidate check failed")
+    fun isReleaseCandidate(version: WpiLibVersion) = assertEquals(GRV.releaseCandidates.contains(version), version.isReleaseCandidate(), "isReleaseCandidate check failed")
     
     @ParameterizedTest
     @ArgumentsSource(GRV.AllVersionProvider::class)
-    fun isReleaseOrReleaseCandidateOrRcPreview(version: WpiLibVersion) = assertEquals(GRV.releaseAndReleaseCandidatesList.contains(version), version.isReleaseOrReleaseCandidateOrRcPreview(), "isReleaseOrReleaseCandidateOrRcPreview check failed")
+    fun isReleaseOrReleaseCandidateOrRcPreview(version: WpiLibVersion) = assertEquals(GRV.releaseAndReleaseCandidatesIncludingPreviews.contains(version), version.isReleaseOrReleaseCandidateOrRcPreview(), "isReleaseOrReleaseCandidateOrRcPreview check failed")
     
     @ParameterizedTest
     @ArgumentsSource(GRV.AllVersionProvider::class)
-    fun isReleaseOrReleaseCandidate(version: WpiLibVersion) = assertEquals(GRV.releaseAndReleaseCandidatesNoPreviewsList.contains(version), version.isReleaseOrReleaseCandidate(), "isReleaseOrReleaseCandidate check failed")
+    fun isReleaseOrReleaseCandidate(version: WpiLibVersion) = assertEquals(GRV.releaseAndReleaseCandidates.contains(version), version.isReleaseOrReleaseCandidate(), "isReleaseOrReleaseCandidate check failed")
     
     @ParameterizedTest
     @ArgumentsSource(GRV.AllVersionProvider::class)
-    fun isBetaOrBetaPreview(version: WpiLibVersion) = assertEquals(GRV.betasAllList.contains(version), version.isBetaOrBetaPreview(), "isBetaOrBetaPreview check failed")
+    fun isBetaOrBetaPreview(version: WpiLibVersion) = assertEquals(GRV.betasIncludingPreviews.contains(version), version.isBetaOrBetaPreview(), "isBetaOrBetaPreview check failed")
     
     @ParameterizedTest
     @ArgumentsSource(GRV.AllVersionProvider::class)
-    fun isBeta(version: WpiLibVersion) = assertEquals(GRV.betasNoPreviewsList.contains(version), version.isBeta(), "isBeta check failed")
+    fun isBeta(version: WpiLibVersion) = assertEquals(GRV.betas.contains(version), version.isBeta(), "isBeta check failed")
     
     @ParameterizedTest
     @ArgumentsSource(GRV.AllVersionProvider::class)
-    fun isAlphaOrAlphaPreview(version: WpiLibVersion) = assertEquals(GRV.alphasAllList.contains(version), version.isAlphaOrAlphaPreview(), "isAlphaOrAlphaPreview check failed")
+    fun isAlphaOrAlphaPreview(version: WpiLibVersion) = assertEquals(GRV.alphasIncludingPreviews.contains(version), version.isAlphaOrAlphaPreview(), "isAlphaOrAlphaPreview check failed")
     
     @ParameterizedTest
     @ArgumentsSource(GRV.AllVersionProvider::class)
-    fun isAlpha(version: WpiLibVersion) = assertEquals(GRV.alphasNoPreviewsList.contains(version), version.isAlpha(), "isAlpha check failed")
+    fun isAlpha(version: WpiLibVersion) = assertEquals(GRV.alphas.contains(version), version.isAlpha(), "isAlpha check failed")
     
     
     @Test
@@ -658,11 +658,6 @@ internal class WpiLibVersionTest
     */
 }
 
-
-
-
-
-
 object GradleRioVersionsForTesting
 {
     val v2018_06_21 = WpiLibVersionImpl.parse("2018.06.21")
@@ -790,7 +785,7 @@ object GradleRioVersionsForTesting
     
     
     @JvmStatic
-    val releasesOnlyList by lazy {
+    val releases by lazy {
         val builder = ImmutableList.builder<WpiLibVersion>()
         builder.add(GRV.v2018_06_21)
         builder.add(GRV.v2019_0_1)
@@ -806,13 +801,13 @@ object GradleRioVersionsForTesting
         builder.build()
     }
 
-    class ReleaseOnlyProvider: ArgumentsProvider 
+    class ReleaseProvider: ArgumentsProvider 
     {
-        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = releasesOnlyList.stream().map { Arguments.of(it) }
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = releases.stream().map { Arguments.of(it) }
     }
 
     @JvmStatic
-    val releaseCandidatesOnlyList by lazy {
+    val releaseCandidatesIncludingPreviews by lazy {
         val builder = ImmutableList.builder<WpiLibVersion>()
         builder.add(v2019_1_1_rc_1)
         builder.add(v2019_3_1_rc)
@@ -827,13 +822,13 @@ object GradleRioVersionsForTesting
         builder.build()
     }
 
-    class ReleaseCandidatesOnlyProvider : ArgumentsProvider
+    class ReleaseCandidatesIncludingPreviewsProvider : ArgumentsProvider
     {
-        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = releaseCandidatesOnlyList.stream().map { Arguments.of(it) }
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = releaseCandidatesIncludingPreviews.stream().map { Arguments.of(it) }
     }
     
     @JvmStatic
-    val releaseCandidatesNoPreviewsList by lazy {
+    val releaseCandidates by lazy {
         val builder = ImmutableList.builder<WpiLibVersion>()
         builder.add(v2019_1_1_rc_1)
         builder.add(v2019_3_1_rc)
@@ -849,11 +844,11 @@ object GradleRioVersionsForTesting
 
     class ReleaseCandidatesNoPreviewsProvider : ArgumentsProvider
     {
-        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = releaseCandidatesOnlyList.stream().map { Arguments.of(it) }
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = releaseCandidatesIncludingPreviews.stream().map { Arguments.of(it) }
     }
 
     @JvmStatic
-    val releaseAndReleaseCandidatesList by lazy {
+    val releaseAndReleaseCandidatesIncludingPreviews by lazy {
         val builder = ImmutableList.builder<WpiLibVersion>()
         builder.add(v2018_06_21)
         builder.add(v2019_0_1)
@@ -878,13 +873,13 @@ object GradleRioVersionsForTesting
         builder.build()
     }
 
-    class ReleaseAndReleaseCandidatesProvider : ArgumentsProvider
+    class ReleaseAndReleaseCandidatesIncludingPreviewsProvider : ArgumentsProvider
     {
-        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = releaseAndReleaseCandidatesList.stream().map { Arguments.of(it) }
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = releaseAndReleaseCandidatesIncludingPreviews.stream().map { Arguments.of(it) }
     }
     
     @JvmStatic
-    val releaseAndReleaseCandidatesNoPreviewsList by lazy {
+    val releaseAndReleaseCandidates by lazy {
         val builder = ImmutableList.builder<WpiLibVersion>()
         builder.add(v2018_06_21)
         builder.add(v2019_0_1)
@@ -908,14 +903,13 @@ object GradleRioVersionsForTesting
         builder.build()
     }
 
-    class ReleaseAndReleaseCandidatesNoPreviewsProvider : ArgumentsProvider
+    class ReleaseAndReleaseCandidatesProvider : ArgumentsProvider
     {
-        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = releaseAndReleaseCandidatesList.stream().map { Arguments.of(it) }
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = releaseAndReleaseCandidatesIncludingPreviews.stream().map { Arguments.of(it) }
     }
     
-    
     @JvmStatic
-    val betasAllList by lazy {
+    val betasIncludingPreviews by lazy {
         val builder = ImmutableList.builder<WpiLibVersion>()
         builder.add(v2019_0_0_beta0_pre1)
         builder.add(v2019_0_0_beta0_pre3)
@@ -953,13 +947,13 @@ object GradleRioVersionsForTesting
         builder.build()
     }
 
-    class BetasAllProvider : ArgumentsProvider
+    class BetasIncludingPreviewsProvider : ArgumentsProvider
     {
-        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = betasAllList.stream().map { Arguments.of(it) }
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = betasIncludingPreviews.stream().map { Arguments.of(it) }
     }
     
     @JvmStatic
-    val betasNoPreviewsList by lazy {
+    val betas by lazy {
         val builder = ImmutableList.builder<WpiLibVersion>()
         builder.add(v2019_1_1_beta_1)
         builder.add(v2019_1_1_beta_2a)
@@ -979,13 +973,13 @@ object GradleRioVersionsForTesting
         builder.build()
     }
 
-    class BetasNoPreviewsListProvider : ArgumentsProvider
+    class BetasProvider : ArgumentsProvider
     {
-        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = betasNoPreviewsList.stream().map { Arguments.of(it) }
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = betas.stream().map { Arguments.of(it) }
     }
     
     @JvmStatic
-    val alphasAllList by lazy {
+    val alphasIncludingPreviews by lazy {
         val builder = ImmutableList.builder<WpiLibVersion>()
         builder.add(v2019_0_0_alpha_1)
         builder.add(v2019_0_0_alpha_2_pre1)
@@ -994,13 +988,13 @@ object GradleRioVersionsForTesting
         builder.build()
     }
 
-    class AlphasAllListProvider : ArgumentsProvider
+    class AlphasIncludingPreviewsProvider : ArgumentsProvider
     {
-        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = alphasAllList.stream().map { Arguments.of(it) }
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = alphasIncludingPreviews.stream().map { Arguments.of(it) }
     }
     
     @JvmStatic
-    val alphasNoPreviewsList by lazy {
+    val alphas by lazy {
         val builder = ImmutableList.builder<WpiLibVersion>()
         builder.add(v2019_0_0_alpha_1)
         builder.add(v2019_0_0_alpha_2)
@@ -1010,7 +1004,7 @@ object GradleRioVersionsForTesting
 
     class AlphasNoPreviewProvider : ArgumentsProvider
     {
-        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = alphasNoPreviewsList.stream().map { Arguments.of(it) }
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = alphas.stream().map { Arguments.of(it) }
     }
     
     @JvmStatic

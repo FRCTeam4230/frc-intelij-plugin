@@ -17,6 +17,7 @@
 package net.javaru.iip.frc.util
 
 import com.intellij.openapi.diagnostic.Logger
+import java.time.LocalDate
 
 private object FrcUtils
 
@@ -44,6 +45,19 @@ fun executeQuietly(callable: Runnable)
 }
 
 
+fun getCurrentBuildYear(): Int = LocalDate.now().year
+
+/**
+ * Returns the current build year, return the next build year if it is within `{days}` until that year. 
+ * For example, if is December 20, 2019, and the default 14 days is used, this method will return 2020 
+ * since it is within 14 days until the end of the year.
+ */
+fun getAdjustedBuildYear(days: Long = 14):Int = LocalDate.now().plusDays(days).year
+
+/**
+ * Gets the next build year.
+ */
+fun getPendingBuildYear(): Int = getCurrentBuildYear() + 1
 
 
 

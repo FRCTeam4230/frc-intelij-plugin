@@ -16,11 +16,10 @@
 
 package net.javaru.iip.frc.wpilib.version
 
-import org.apache.commons.lang3.builder.EqualsBuilder
-import org.apache.commons.lang3.builder.HashCodeBuilder
-import org.apache.commons.lang3.builder.ToStringBuilder
-import org.apache.commons.lang3.builder.ToStringStyle
+import com.intellij.openapi.diagnostic.Logger
+import net.javaru.iip.frc.util.mapNoException
 
+private val LOG = Logger.getInstance(WpiLibVersionImpl::class.java)
 
 class WpiLibVersionImpl private constructor(override val versionString: String,
                                             override val generation: Int,
@@ -30,74 +29,12 @@ class WpiLibVersionImpl private constructor(override val versionString: String,
                                             override val preReleaseModifier: WpiLibVersion.PreReleaseModifier?,
                                             override val preReleaseModifierVersion: Int?,
                                             override val preReleaseModifierSubVersion: String = "",
-                                            override val preReleasePreviewVersion: Int?) : WpiLibVersion
+                                            override val preReleasePreviewVersion: Int?) : AbstractWpiLibVersion()
 {
 
     override fun cloneIt(): WpiLibVersion
     {
         return WpiLibVersionImpl(this.versionString, this.generation, this.major, this.minor, this.patch, this.preReleaseModifier, this.preReleaseModifierVersion, this.preReleaseModifierSubVersion, this.preReleasePreviewVersion)
-    }
-
-
-    override fun toString(): String
-    {
-        return versionString
-    }
-
-
-    @Suppress("unused")
-    @JvmOverloads
-    fun toStringDetailed(style: ToStringStyle = ToStringStyle.SHORT_PREFIX_STYLE): String
-    {
-        return ToStringBuilder(this, style)
-                .append("version", versionString)
-                .append("generation", generation)
-                .append("major", major)
-                .append("minor", minor)
-                .append("patch", patch)
-                .append("preReleaseModifier", preReleaseModifier)
-                .append("preReleaseModifierVersion", preReleaseModifierVersion)
-                .append("preReleaseModifierSubVersion", preReleaseModifierSubVersion)
-                .append("preReleasePreviewVersion", preReleasePreviewVersion)
-                .toString()
-    }
-
-    
-    override fun equals(other: Any?): Boolean
-    {
-        if (this === other) return true
-
-        if (other == null || javaClass != other.javaClass) return false
-
-        val that = other as WpiLibVersionImpl?
-
-        return EqualsBuilder()
-                .append(generation, that!!.generation)
-                .append(major, that.major)
-                .append(minor, that.minor)
-                .append(patch, that.patch)
-                .append(versionString, that.versionString)
-                .append(preReleaseModifier, that.preReleaseModifier)
-                .append(preReleaseModifierVersion, that.preReleaseModifierVersion)
-                .append(preReleaseModifierSubVersion, that.preReleaseModifierSubVersion)
-                .append(preReleasePreviewVersion, that.preReleasePreviewVersion)
-                .isEquals
-    }
-
-
-    override fun hashCode(): Int
-    {
-        return HashCodeBuilder(17, 37)
-                .append(versionString)
-                .append(generation)
-                .append(major)
-                .append(minor)
-                .append(patch)
-                .append(preReleaseModifier)
-                .append(preReleaseModifierVersion)
-                .append(preReleaseModifierSubVersion)
-                .append(preReleasePreviewVersion)
-                .toHashCode()
     }
 
     companion object
@@ -143,11 +80,18 @@ class WpiLibVersionImpl private constructor(override val versionString: String,
                 }
                 else
                 {
-                    throw IllegalArgumentException("Cannot parse the version string '$version'")
-
+                    throw IllegalArgumentException("Cannot parse the version string '$version' to a WpiLibVersionImpl instance.")
                 }
 
             }
         }
+
+        /**
+         * Converts the list of version strings to a List of `WpiLibVersion`s. Any invalid version strings are ignored/dropped 
+         * (but logged at the warm level).
+         */
+        fun parse(versionStrings: Collection<String>): List<WpiLibVersion> = versionStrings.mapNoException { parse(it) }
     }
 }
+
+

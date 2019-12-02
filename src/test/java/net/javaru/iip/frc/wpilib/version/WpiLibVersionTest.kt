@@ -32,6 +32,7 @@ import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_1_1_r
 import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2020_1_1
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion.PreReleaseModifier
 import org.apache.commons.lang3.RandomUtils
+import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
@@ -42,8 +43,8 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
 import org.junit.jupiter.params.provider.MethodSource
-import java.util.*
 import java.util.stream.Stream
+import kotlin.streams.toList
 import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting as GRV
 
 
@@ -105,6 +106,20 @@ internal class WpiLibVersionTest
                  )
     }
     
+    @Test
+    fun parseList()
+    {
+        val versionStrings = versionList.stream().map { it.versionString }.toList()
+        val versionStrings2 = ArrayList(versionStrings)
+        versionStrings2.add("2020.99.99")
+        versionStrings2.add("an.invalid.version.string.for.testing")
+        val expected2 = ArrayList(versionList)
+        expected2.add(ExpectedWpiLibVersion(2019, 2020, 99, 99))
+        assertAll(
+            { assertEquals(versionList, WpiLibVersionImpl.parse(versionStrings), "Could not convert list of version strings to a list of WpiLibVersion objects")},
+            { assertEquals(expected2, WpiLibVersionImpl.parse(versionStrings2), "Could not convert list of version strings with an invalid string to a list of WpiLibVersion objects")}
+                 )
+    }
 
     @RepeatedTest(5)
     fun compareTo()
@@ -311,17 +326,15 @@ internal class WpiLibVersionTest
                                          override val major: Int,
                                          override val minor: Int,
                                          override val patch: Int,
-                                         override val preReleaseModifier: PreReleaseModifier?,
-                                         override val preReleaseModifierVersion: Int?,
+                                         override val preReleaseModifier: PreReleaseModifier? = null,
+                                         override val preReleaseModifierVersion: Int? = null,
                                          override val preReleaseModifierSubVersion: String = "",
-                                         override val preReleasePreviewVersion: Int?) : WpiLibVersion
+                                         override val preReleasePreviewVersion: Int? = null) : AbstractWpiLibVersion()
     {
-
-
-        override val versionString: String
-            get() = throw UnsupportedOperationException("Not supported fo test impl")
-
-
+        override val versionString: String by lazy {
+            createStandardVersionString()
+        }
+        
         override fun cloneIt(): WpiLibVersion
         {
             return ExpectedWpiLibVersion(this.generation, this.major, this.minor, this.patch, this.preReleaseModifier, this.preReleaseModifierVersion, this.preReleaseModifierSubVersion, this.preReleasePreviewVersion)
@@ -552,10 +565,7 @@ internal class WpiLibVersionTest
         
         // POST 2018 version are in the GradleRioVersions Object below
 
-        private val versionList: ImmutableList<WpiLibVersion>
-
-        init
-        {
+        private val versionList = run {
             val list = ImmutableList.builder<WpiLibVersion>()
 
             list.add(v15)
@@ -609,8 +619,7 @@ internal class WpiLibVersionTest
             list.add(v2018_5_1)
             list.add(v2018_5_2)
             GRV.versions.forEach { list.add(it) }
-
-            versionList = list.build()
+            list.build()
         }
     }
     

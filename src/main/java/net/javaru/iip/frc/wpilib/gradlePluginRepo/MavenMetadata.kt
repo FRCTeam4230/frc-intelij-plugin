@@ -67,10 +67,10 @@ fun parseMavenMetadata(@Language("XML") mavenMetadata: String): MavenMetadata?
         null
     }
     
-    return if (document == null) null else mavenMetadata(document)
+    return if (document == null) null else parseMavenMetadata(document)
 }
 
-fun mavenMetadata(document: Document?): MavenMetadata?
+fun parseMavenMetadata(document: Document?): MavenMetadata?
 {
     if (document == null) 
     {

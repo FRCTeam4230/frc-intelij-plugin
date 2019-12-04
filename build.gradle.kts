@@ -89,6 +89,13 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+tasks.named<Test>("test") {
+    // https://docs.gradle.org/current/userguide/java_testing.html#java_testing
+    useJUnitPlatform {
+        excludeTags("slow")
+    }
+}
+
 // The Gradle plugin for writing intellij plugins
 intellij {
     pluginName = "FRC"

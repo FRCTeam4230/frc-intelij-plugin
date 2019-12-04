@@ -21,6 +21,7 @@ import net.javaru.iip.frc.util.mapExceptionFreeAndNotNull
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl
 import org.intellij.lang.annotations.Language
+import org.jdom2.Document
 import org.jdom2.filter.Filters
 import org.jdom2.input.SAXBuilder
 import org.jdom2.xpath.XPathFactory
@@ -31,8 +32,8 @@ import java.time.format.DateTimeFormatter
 
 val LOG = Logger.getInstance(MavenMetadata::class.java)
 
-val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-val dateTimeZonedFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss z");
+val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
+val dateTimeZonedFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss z")
 
 data class MavenMetadata(val groupId: String,
                          val artifactId: String,
@@ -50,26 +51,45 @@ data class WpiLibMavenMetadata(val mavenMetadata: MavenMetadata)
     val versionAsWpiLibVersion = WpiLibVersionImpl.parse(mavenMetadata.version)
     val latestAsWpiLibVersion = WpiLibVersionImpl.parse(mavenMetadata.latest)
     val releaseAsWpiLibVersion = WpiLibVersionImpl.parse(mavenMetadata.release)
-    val lastUpdatedAsDateTime = ZonedDateTime.parse("${mavenMetadata.lastUpdated} UTC", dateTimeZonedFormatter)
+    val lastUpdatedAsDateTime: ZonedDateTime = ZonedDateTime.parse("${mavenMetadata.lastUpdated} UTC", dateTimeZonedFormatter)
 }
 
 fun parseMavenMetadata(@Language("XML") mavenMetadata: String): MavenMetadata?
 {
-    return try
+    val document = try
     {
         val saxBuilder = SAXBuilder()
-        val document = saxBuilder.build(StringReader(mavenMetadata))
+         saxBuilder.build(StringReader(mavenMetadata))
+    }
+    catch (e: Exception)
+    {
+        LOG.warn("[FRC] Could not convert the mavenMetadata XML to a Document object. Cause Details: $e", e)
+        null
+    }
+    
+    return if (document == null) null else mavenMetadata(document)
+}
 
+fun mavenMetadata(document: Document?): MavenMetadata?
+{
+    if (document == null) 
+    {
+        LOG.warn("[FRC] Could not parse the mavenMetadata Document to a MavenMetadata object as a null document was received.")
+        return null
+    }
+    
+    return try
+    {
         val xPathFactory = XPathFactory.instance()
         val expression = xPathFactory.compile("//metadata", Filters.element())
         val metadataElement = expression.evaluateFirst(document)
 
         val groupIdElement = metadataElement.getChild("groupId")
         val groupId = groupIdElement.textNormalize
-        
+
         val artifactIdElement = metadataElement.getChild("artifactId")
         val artifactId = artifactIdElement.textNormalize
-        
+
         val versionElement = metadataElement.getChild("version")
         val version = versionElement.textNormalize
 
@@ -80,7 +100,7 @@ fun parseMavenMetadata(@Language("XML") mavenMetadata: String): MavenMetadata?
 
         val releaseElement = versioningElement.getChild("release")
         val release = releaseElement.textNormalize
-        
+
         val lastUpdatedElement = versioningElement.getChild("lastUpdated")
         val lastUpdated = lastUpdatedElement.textNormalize
 
@@ -88,12 +108,12 @@ fun parseMavenMetadata(@Language("XML") mavenMetadata: String): MavenMetadata?
         val versionsElement = versioningElement.getChild("versions")
         val versionElements = versionsElement.getChildren("version")
         val versions = versionElements.mapExceptionFreeAndNotNull { it?.textNormalize }
-        
+
         MavenMetadata(groupId, artifactId, version, latest, release, versions, lastUpdated)
     }
     catch (e: Exception)
     {
-        LOG.warn("[FRC] Could not parse the mavenMetadata string to a list of WpiLibVersions: $e", e)
+        LOG.warn("[FRC] Could not parse the mavenMetadata document to a MavenMetadata object. Cause Details: $e", e)
         null
     }
 }

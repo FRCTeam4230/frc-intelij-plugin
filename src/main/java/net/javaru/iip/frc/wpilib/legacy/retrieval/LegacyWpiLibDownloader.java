@@ -49,6 +49,7 @@ import com.intellij.openapi.ui.Messages;
 
 import net.javaru.iip.frc.FrcIcons.FRC;
 import net.javaru.iip.frc.components.FrcProjectComponentImpl;
+import net.javaru.iip.frc.net.FrcHttpClient;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.UnzipUtils;
@@ -127,7 +128,7 @@ public class LegacyWpiLibDownloader
             final JavaFeatureDescriptor javaFeatureDescriptor = latest.getKey();
             LOG.info("[FRC] Current WPILib version (as indicated in 'site.xml') is '" + javaFeatureDescriptor.getVersion() + "'");
 
-            //final Document javaFeatureXml = LegacyWpiRepoHttpClient.fetchXmlResourceAsDocument(javaFeatureDescriptor.getUri());
+            //final Document javaFeatureXml = FrcHttpClient.fetchXmlResourceAsDocument(javaFeatureDescriptor.getUri());
 
             // For now, as a quick hit to get the download working, we are not going to get and a parse the 
             // the feature XML and traverse down the chain. We know we wan the java and core JARs. We'll hard
@@ -143,8 +144,8 @@ public class LegacyWpiLibDownloader
 
             LOG.info("[FRC] Using javaJarUri: " + javaJarUri);
             LOG.info("[FRC] Using coreJarUri: " + coreJarUri);
-            final Path javaJarFilePath = LegacyWpiRepoHttpClient.downloadAndSaveToTemp(javaJarUri);
-            final Path coreJarFilePath = LegacyWpiRepoHttpClient.downloadAndSaveToTemp(coreJarUri);
+            final Path javaJarFilePath = FrcHttpClient.downloadAndSaveToTemp(javaJarUri);
+            final Path coreJarFilePath = FrcHttpClient.downloadAndSaveToTemp(coreJarUri);
             // The java.zip file has 3 directories in it:  ant;  javadoc;  lib;  And is extracted in 'current' so we end up with: 
             //      C:\Users\UserName\wpilib\java\current\ant   C:\Users\UserName\wpilib\java\current\javadoc   C:\Users\UserName\wpilib\java\current\lib
             extractZipFileContainedInZipFile(javaJarFilePath, "resources/java.zip", LegacyWpiLibPaths.getJavaCurrentDir());
@@ -175,7 +176,7 @@ public class LegacyWpiLibDownloader
     public static Document fetchSiteXml(@NotNull URI repoBaseUri) throws IOException, JDOMException
     {
         final URI siteXmlUri = LegacyWpiRepoUris.getSiteUri(repoBaseUri);
-        final Document siteDocument = LegacyWpiRepoHttpClient.fetchXmlResourceAsDocument(siteXmlUri);
+        final Document siteDocument = FrcHttpClient.fetchXmlResourceAsDocument(siteXmlUri);
         return siteDocument;
     }
 

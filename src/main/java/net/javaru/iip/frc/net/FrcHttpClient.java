@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.wpilib.legacy.retrieval;
+package net.javaru.iip.frc.net;
 
 
 import java.io.BufferedInputStream;
@@ -47,9 +47,9 @@ import com.intellij.openapi.util.io.FileUtil;
 
 
 
-class LegacyWpiRepoHttpClient
+public class FrcHttpClient
 {
-    private static final Logger LOG = Logger.getInstance(LegacyWpiRepoHttpClient.class);
+    private static final Logger LOG = Logger.getInstance(FrcHttpClient.class);
 
 
     public static Document fetchXmlResourceAsDocument(@NotNull URI uri) throws IOException, JDOMException

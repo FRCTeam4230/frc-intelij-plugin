@@ -22,15 +22,15 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.jetbrains.annotations.NotNull;
 
 import net.javaru.iip.frc.settings.FrcApplicationSettingsKt;
-import net.javaru.iip.frc.util.UriUtils;
+import net.javaru.iip.frc.util.UriUtilsKt;
 
 
 
 class LegacyWpiRepoUris
 {
     public static final String SITE_XML = "site.xml";
-    private static final URI WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI = UriUtils.createUri("http://first.wpi.edu/FRC/roborio/release/eclipse/");
-    private static final URI WPI_ECLIPSE_PLUGIN_BETA_REPO_URI = UriUtils.createUri("http://first.wpi.edu/FRC/roborio/beta/eclipse/");
+    private static final URI WPI_ECLIPSE_PLUGIN_RELEASE_REPO_URI = UriUtilsKt.createUri("http://first.wpi.edu/FRC/roborio/release/eclipse/");
+    private static final URI WPI_ECLIPSE_PLUGIN_BETA_REPO_URI = UriUtilsKt.createUri("http://first.wpi.edu/FRC/roborio/beta/eclipse/");
 
     /**
      * Returns the full WPI Eclipse Repo URI configured for use (either release or beta). For example: http://first.wpi.edu/FRC/roborio/release/eclipse/

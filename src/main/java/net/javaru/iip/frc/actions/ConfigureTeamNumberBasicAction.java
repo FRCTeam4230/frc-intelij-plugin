@@ -48,7 +48,6 @@ import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloader;
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL;
 
 
-
 public class ConfigureTeamNumberBasicAction extends AnAction
 {
     @Override

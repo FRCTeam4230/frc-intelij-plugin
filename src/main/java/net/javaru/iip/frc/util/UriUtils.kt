@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -13,90 +13,86 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  */
+package net.javaru.iip.frc.util
 
-package net.javaru.iip.frc.util;
+import com.intellij.openapi.diagnostic.Logger
+import org.apache.commons.lang3.StringUtils
+import java.net.URI
+import java.net.URISyntaxException
+import java.nio.file.Paths
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+private object UriUtils
+private val LOG = Logger.getInstance(UriUtils::class.java)
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import com.intellij.openapi.diagnostic.Logger;
-
-
-
-public final class UriUtils 
+/**
+ * Creates a `URI` from ` `URL` throwing a Runtime based `IllegalArgumentException` in the event the URI
+ * cannot be created.
+ */
+@Throws(IllegalArgumentException::class)
+fun createUri(url: String): URI
 {
-    private static final Logger LOG = Logger.getInstance(UriUtils.class);
-
-
-    private UriUtils() { }
-
-
-    @NotNull
-    public static URI resolveSiblingResource(@NotNull URI uri, @NotNull String siblingResource) throws RuntimeException
+    return try
     {
-        try
-        {
-            LOG.debug("    [FRC] uri =          " +  uri);
-
-
-            final String pathString = uri.getPath();
-            final Path path = Paths.get(pathString);
-            LOG.debug("    [FRC] path =         " +  path);
-            LOG.debug("    [FRC] host =         " +  uri.getHost());
-
-            //The File System wil "normalize" to the proper forward or back slash
-            final Path rootPath = Paths.get("/");
-            final URI siblingUri;
-            if (rootPath.equals(path) || StringUtils.isBlank(path.toString()))
-            {
-                siblingUri = new URI(uri.getScheme(),
-                                     uri.getHost(),
-                                     '/' + siblingResource,
-                                     null);
-            }
-            else
-            {
-                Path sibling = path.resolveSibling(siblingResource);
-                siblingUri = new URI(uri.getScheme(),
-                                     uri.getHost(),
-                                     sibling.toString().replace('\\', '/'),
-                                     null);
-            }
-            LOG.debug("    [FRC] siblingUri =   " +  siblingUri);
-            return siblingUri;
-        }
-        catch (URISyntaxException e)
-        {
-            throw new RuntimeException("Could not resolve sibling URI. Cause summary: " + e.toString(), e);
-        }
+        URI(url)
     }
-
-    
-    @Nullable
-    public static String extractResourceName(@NotNull URI uri)
+    catch (e: Exception)
     {
-        final String uriString = uri.toString();
-        final int indexOfLastSlash = uriString.lastIndexOf('/');
-        return indexOfLastSlash > 0 ? uriString.substring(indexOfLastSlash + 1) : null;
+        val baseMsg = "Could not create a URI from the URL '$url' due to the exception: $e"
+        LOG.warn("[FRC] $baseMsg")
+        throw IllegalArgumentException(baseMsg, e)
     }
+}
 
-
-    @NotNull
-    public static URI createUri(String url) throws IllegalArgumentException
+/**
+ * Resolves a sibling URI, paying attention to whether a relative or absolute siblingResource is passed in.
+ * For example given a `receiver` URI of `https://example.com/data/foo.txt`:
+ * - Relative: `uri.resolveSiblingResource("images/chart.png")`  -->  https://example.com/data/images/chart.png
+ * - Absolute: `uri.resolveSiblingResource("/images/chart.png")` -->  https://example.com/images/chart.png
+ */
+@Deprecated("Use URI.resolve() instead", ReplaceWith("URI.resolve(siblingResource)"), level = DeprecationLevel.ERROR)
+@Throws(RuntimeException::class)
+fun URI.resolveSiblingResource(siblingResource: String): URI
+{
+    return try
     {
-        try
+        LOG.debug("    [FRC] uri =          $this")
+        val pathString = path
+        val path = Paths.get(pathString)
+        LOG.debug("    [FRC] path =         $path")
+        LOG.debug("    [FRC] host =         $host")
+        //The File System wil "normalize" to the proper forward or back slash
+        val rootPath = Paths.get("/")
+        val siblingUri: URI
+        siblingUri = if (rootPath == path || StringUtils.isBlank(path.toString()))
         {
-            return new URI(url);
+            URI(scheme,
+                host, "/$siblingResource",
+                null)
         }
-        catch (Exception e)
+        else
         {
-            LOG.warn("[FRC] Could not create URL from '" + url + '\'');
-            throw new IllegalArgumentException("Could not create URL from '" + url + "'. Cause summary: " + e.toString(), e);
+            val sibling = path.resolveSibling(siblingResource)
+            URI(scheme,
+                host,
+                sibling.toString().replace('\\', '/'),
+                null)
         }
+        LOG.debug("    [FRC] siblingUri =   $siblingUri")
+        siblingUri
     }
+    catch (e: URISyntaxException)
+    {
+        val baseMsg = "Could not resolve sibling URI '$siblingResource' for URI '$this' due to the exception: $e."
+        LOG.warn("[FRC] $baseMsg")
+        throw RuntimeException(baseMsg, e)
+    }
+}
+
+
+
+fun extractResourceName(uri: URI): String?
+{
+    val uriString = uri.toString()
+    val indexOfLastSlash = uriString.lastIndexOf('/')
+    return if (indexOfLastSlash > 0) uriString.substring(indexOfLastSlash + 1) else null
 }

@@ -52,7 +52,6 @@ import net.javaru.iip.frc.components.FrcProjectComponentImpl;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.UnzipUtils;
-import net.javaru.iip.frc.util.UriUtils;
 import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibPaths;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionExtKt;
@@ -137,14 +136,10 @@ public class LegacyWpiLibDownloader
 
             final URI siteXmlUri = LegacyWpiRepoUris.getSiteUri(latest.getValue());
 
-            final URI javaJarUri = UriUtils.resolveSiblingResource(siteXmlUri,
-                                                                   String.format("plugins/edu.wpi.first.wpilib.plugins.java_%s.jar",
-                                                                                 javaFeatureDescriptor.getVersion().getVersionString()));
+            final URI javaJarUri = siteXmlUri.resolve(String.format("plugins/edu.wpi.first.wpilib.plugins.java_%s.jar", javaFeatureDescriptor.getVersion().getVersionString()));
 
 
-            final URI coreJarUri = UriUtils.resolveSiblingResource(siteXmlUri,
-                                                                   String.format("plugins/edu.wpi.first.wpilib.plugins.core_%s.jar",
-                                                                                 javaFeatureDescriptor.getVersion().getVersionString()));
+            final URI coreJarUri = siteXmlUri.resolve(String.format("plugins/edu.wpi.first.wpilib.plugins.core_%s.jar", javaFeatureDescriptor.getVersion().getVersionString()));
 
             LOG.info("[FRC] Using javaJarUri: " + javaJarUri);
             LOG.info("[FRC] Using coreJarUri: " + coreJarUri);
@@ -194,7 +189,7 @@ public class LegacyWpiLibDownloader
         final String versionString = javaFeatureElement.getAttribute("version").getValue();
         WpiLibVersion version = WpiLibVersionImpl.Companion.parse(versionString);
         final String javaFeatureRelativeUrl = javaFeatureElement.getAttribute("url").getValue();
-        final URI javaFeatureUri = UriUtils.resolveSiblingResource(LegacyWpiRepoUris.getSiteUri(repoBaseUri), javaFeatureRelativeUrl);
+        final URI javaFeatureUri = LegacyWpiRepoUris.getSiteUri(repoBaseUri).resolve(javaFeatureRelativeUrl);
 
         return new JavaFeatureDescriptor(id, version, javaFeatureUri);
     }

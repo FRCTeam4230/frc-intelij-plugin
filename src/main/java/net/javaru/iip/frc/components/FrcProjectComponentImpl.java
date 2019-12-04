@@ -54,7 +54,7 @@ import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.util.FrcProjectExtsKt;
-import net.javaru.iip.frc.util.UriUtils;
+import net.javaru.iip.frc.util.UriUtilsKt;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibVersionStatus;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
@@ -226,7 +226,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                                       (notification, event) -> {
                                                                           if ("openIssue".equals(event.getDescription()))
                                                                           {
-                                                                              BrowserLauncherImpl.getInstance().browse(UriUtils.createUri("https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/8"));
+                                                                              BrowserLauncherImpl.getInstance().browse(UriUtilsKt.createUri("https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/8"));
                                                                           }
                                                                       }
             );

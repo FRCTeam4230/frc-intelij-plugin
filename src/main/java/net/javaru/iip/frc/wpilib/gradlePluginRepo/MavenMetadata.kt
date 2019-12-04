@@ -17,7 +17,7 @@
 package net.javaru.iip.frc.wpilib.gradlePluginRepo
 
 import com.intellij.openapi.diagnostic.Logger
-import net.javaru.iip.frc.util.mapNoException
+import net.javaru.iip.frc.util.mapExceptionFreeAndNotNull
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl
 import org.intellij.lang.annotations.Language
@@ -87,7 +87,7 @@ fun parseMavenMetadata(@Language("XML") mavenMetadata: String): MavenMetadata?
 
         val versionsElement = versioningElement.getChild("versions")
         val versionElements = versionsElement.getChildren("version")
-        val versions = versionElements.mapNoException { it?.textNormalize }
+        val versions = versionElements.mapExceptionFreeAndNotNull { it?.textNormalize }
         
         MavenMetadata(groupId, artifactId, version, latest, release, versions, lastUpdated)
     }

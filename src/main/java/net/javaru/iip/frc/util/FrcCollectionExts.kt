@@ -23,23 +23,39 @@ val COL_EXT_LOG = Logger.getInstance("#net.javaru.iip.frc.util.FrcCollectionExts
 /**
  * Returns a list containing only the results of applying the given [transform] function
  * to each element in the original collection that do not throw an exception during
- * transformation. Input elements that cause an exception to occur during transformation
- * are dropped/ignored, other than logging a warning.
+ * transformation. Input elements that throw an exception to during transformation
+ * are dropped/ignored, other than logging a warning. Additionally, transformation 
+ * results that are `null` are also (silently) dropped/ignored.
+ * 
+ * @param transform the function that transforms the input [T] to the nullable output [R]
+ * @param loggingAction the optional action to log the fact that an exception occurred. The default is to log a warning.
+ * @param T the "input" element type to transform
+ * @param R the result type of the transforming of `T`
  */
-inline fun <T, R : Any> Iterable<T>.mapNoException(transform: (T) -> R?): List<R>
+inline fun <T, R : Any> Iterable<T>.mapExceptionFreeAndNotNull(loggingAction: (T, Throwable) -> Unit = { element: T, t: Throwable -> COL_EXT_LOG.warn("[FRC] Could not transform '${element}' due to an exception: $t", t)},
+                                                               transform: (T) -> R?): List<R>
 {
-    return mapNoExceptionTo(ArrayList<R>(), transform)
+    @Suppress("RemoveExplicitTypeArguments") // Having the <R> in the ArrayList constructor helps with clarity
+    return mapExceptionFreeAndNotNullTo(ArrayList<R>(), loggingAction, transform)
 }
 
 
 
 /**
  * Applies the given [transform] function to each element in the original collection
- * and appends only the items that do not cause an exception during transformation to
- * the given [destination]. Input elements that cause an exception to occur during
- * transformation are dropped/ignored, other than logging a warning.
+ * and appends only the items to the given [destination] that do not cause an exception 
+ * during transformation. Input elements that throw an exception during transformation 
+ * are dropped/ignored, other than logging a warning. Additionally, transformation results 
+ * that are `null` are also (silently) dropped/ignored.
+ * 
+ * @param transform the function that transforms the input [T] to the nullable output [R]
+ * @param loggingAction the optional action to log the fact that an exception occurred. The default is to log a warning.
+ * @param T the "input" element type to transform
+ * @param R the result type of the transforming of `T`
  */
-inline fun <T, R : Any, C : MutableCollection<in R>> Iterable<T>.mapNoExceptionTo(destination: C, transform: (T) -> R?): C
+inline fun <T, R : Any, C : MutableCollection<in R>> Iterable<T>.mapExceptionFreeAndNotNullTo(destination: C,
+                                                                                              loggingAction: (T, Throwable) -> Unit = {element: T, t: Throwable -> COL_EXT_LOG.warn("[FRC] Could not transform '${element}' due to an exception: $t", t)},
+                                                                                              transform: (T) -> R?): C
 {
     forEach { element ->
         try
@@ -48,7 +64,7 @@ inline fun <T, R : Any, C : MutableCollection<in R>> Iterable<T>.mapNoExceptionT
         }
         catch (t: Throwable)
         {
-            COL_EXT_LOG.warn("[FRC] Could not transform '${element}' due to an exception: $t")
+            loggingAction.invoke(element, t)
         }
     }
     return destination

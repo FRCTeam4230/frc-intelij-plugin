@@ -17,7 +17,7 @@
 package net.javaru.iip.frc.wpilib.version
 
 import com.intellij.openapi.diagnostic.Logger
-import net.javaru.iip.frc.util.mapNoException
+import net.javaru.iip.frc.util.mapExceptionFreeAndNotNull
 
 private val LOG = Logger.getInstance(WpiLibVersionImpl::class.java)
 
@@ -90,7 +90,7 @@ class WpiLibVersionImpl private constructor(override val versionString: String,
          * Converts the list of version strings to a List of `WpiLibVersion`s. Any invalid version strings are ignored/dropped 
          * (but logged at the warm level).
          */
-        fun parse(versionStrings: Collection<String>): List<WpiLibVersion> = versionStrings.mapNoException { parse(it) }
+        fun parse(versionStrings: Collection<String>): List<WpiLibVersion> = versionStrings.mapExceptionFreeAndNotNull { parse(it) }
     }
 }
 

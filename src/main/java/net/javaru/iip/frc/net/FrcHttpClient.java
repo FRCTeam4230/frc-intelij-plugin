@@ -28,7 +28,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -41,7 +40,6 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
 
@@ -109,17 +107,17 @@ public class FrcHttpClient
     }
 
 
-    /**
-     * Custom request interceptor can be used for modifying outgoing requests. One possible usage is to
-     * add specific header to each request according to authentication scheme used.
-     *
-     * @return specific request interceptor or null by default
-     */
-    @Nullable
-    protected HttpRequestInterceptor createRequestInterceptor()
-    {
-        return null;
-    }
+//    /**
+//     * Custom request interceptor can be used for modifying outgoing requests. One possible usage is to
+//     * add specific header to each request according to authentication scheme used.
+//     *
+//     * @return specific request interceptor or null by default
+//     */
+//    @Nullable
+//    protected HttpRequestInterceptor createRequestInterceptor()
+//    {
+//        return null;
+//    }
 
 
     public static Path downloadAndSaveToTemp(URI uri) throws IOException
@@ -169,7 +167,7 @@ public class FrcHttpClient
                 LOG.info("[FRC] Copying '" + resourceFileName + "' to destination path '" + destinationPath + "'");
                 try (
                     final BufferedInputStream inputStream = new BufferedInputStream(httpEntity.getContent());
-                    final BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(destinationPath));
+                    final BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(destinationPath))
                 )
                 {
                     FileUtil.copy(inputStream, outputStream);

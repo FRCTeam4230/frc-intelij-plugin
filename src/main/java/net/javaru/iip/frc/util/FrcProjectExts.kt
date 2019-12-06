@@ -17,6 +17,8 @@
 package net.javaru.iip.frc.util
 
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -30,11 +32,11 @@ private val LOG = Logger.getInstance("#net.javaru.iip.frc.util.ProjectExts")
 
 fun Project?.isAntBasedFrcProject(): Boolean
 {
-    return if (this == null) 
+    return if (this == null)
         false
-    else 
+    else
     {
-        
+
         // TODO - Need to implement this feature
 //        try
 //        {
@@ -96,4 +98,15 @@ fun Project.backgroundTask(
                                               }
                                           }
                                       })
+}
+
+/**
+ * Convenience extension that returns the modules for a project, returning an empty array if the project is `null`.
+ * It simply safely calls `ModuleManager.getInstance(project).modules`
+ */
+fun Project?.getModules(): Array<Module>
+{
+    val modules = this?.let { ModuleManager.getInstance(it).modules }
+    return modules ?: emptyArray()
+
 }

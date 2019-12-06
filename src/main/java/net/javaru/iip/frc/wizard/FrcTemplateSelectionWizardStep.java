@@ -49,8 +49,6 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
 {
     private static final Logger LOG = Logger.getInstance(FrcTemplateSelectionWizardStep.class);
-    private static final String PROJECTS_TAB_NAME = "projectTemplatesListTab"; // must march the value entered in the form (in the UI Designer)
-    private static final String EXAMPLES_TAB_NAME = "exampleTemplatesListTab"; // must march the value entered in the form (in the UI Designer)
     public static final int PROJECTS_TAB_INDEX = 0;
     public static final int EXAMPLES_TAB_INDEX = 1;
     

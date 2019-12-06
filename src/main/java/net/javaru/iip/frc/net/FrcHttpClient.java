@@ -94,8 +94,8 @@ public class FrcHttpClient
     {
         RequestConfig.Builder builder = RequestConfig.custom()
                                                      .setCookieSpec(CookieSpecs.IGNORE_COOKIES)
-                                                     .setConnectTimeout(15_000)
-                                                     .setSocketTimeout(15_000);
+                                                     .setConnectTimeout(3_000)
+                                                     .setSocketTimeout(3_000);
 
         //TODO: Add a use Proxy option ?
         //if (isUseProxy())

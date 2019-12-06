@@ -17,6 +17,7 @@
 package net.javaru.iip.frc.wizard;
 
 import java.awt.event.ActionListener;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
 
@@ -38,8 +39,8 @@ import com.intellij.ui.components.JBTabbedPane;
 import net.javaru.iip.frc.FrcIcons.FRC;
 import net.javaru.iip.frc.i18n.FrcMessageKey;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
+import net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
-import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
@@ -297,21 +298,16 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     private void initWpiLibVersionComboBox()
     {
         //TODO: We need to 
-        //  a) get this list dynamically, sorting to to remove the alphas, etc. 
+        //  a) filter the list to remove the alphas, etc. 
         //  b) have UI option to only show the latest version fpr each year (on by default)
         //  c) have a UI option to show/hide betas (off by default)
         //  d) make modifications so that the FrcProjectWizardData.wpilibVersion defaults to the latest (non-beta) and then that the selected item (below) matches
-        WpiLibVersion[] versions = {
-                WpiLibVersionImpl.Companion.parse("2019.4.1"),
-                WpiLibVersionImpl.Companion.parse("2019.3.2"),
-                WpiLibVersionImpl.Companion.parse("2019.3.1"),
-                WpiLibVersionImpl.Companion.parse("2019.2.1"),
-                WpiLibVersionImpl.Companion.parse("2019.2.1")
-        };
+    
+        final List<WpiLibVersion> versionList = GradleRioMavenMetadataState.getInstance(true).getWpiLibMavenMetadata().getWpiLibVersionsDescending();
+        final WpiLibVersion[] versions = versionList.toArray(new WpiLibVersion[0]);
     
         wpilibVersionComboBox.setModel(new DefaultComboBoxModel<>(versions));
         wpilibVersionComboBox.setSelectedIndex(0);
-        
     }
     
     private void initTabPane()

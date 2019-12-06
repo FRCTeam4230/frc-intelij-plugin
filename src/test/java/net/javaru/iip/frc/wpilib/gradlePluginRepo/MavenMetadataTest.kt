@@ -21,6 +21,7 @@ import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_0_0_a
 import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2020_1_1_beta_3a
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 
@@ -48,6 +49,21 @@ internal class MavenMetadataTest
                 { assertEquals(v2020_1_1_beta_3a, actual.wpiLibVersions.last(), "Wrong last version value") },
                 { assertEquals("20191123193733", dateTimeFormatter.format(actual.lastUpdatedAsDateTime), "Wrong lastUpdatedAsDateTime") }
                  )
+    }
+    
+    @Test
+    fun testSerialization()
+    {
+        val mavenMetadataJSON = mavenMetadata.toJson(true)
+        assertEquals(mavenMetadata, MavenMetadata.fromJson(mavenMetadataJSON), "Could not round trip serialize the mavenMetadata object")
+    }
+
+    @Test
+    @Tag("slow")
+    fun fetchWpiLibGradlePluginMavenMetadataTest()
+    {
+        val metadata = fetchGradleRioMavenMetadata()
+        assertNotNull(metadata, "Could not download the latest WpiLib Gradle Plugin maven-metadata.")
     }
     
     companion object

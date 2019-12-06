@@ -14,17 +14,14 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.wpilib.gradlePluginRepo
+package net.javaru.iip.frc.util
 
-import net.javaru.iip.frc.net.FrcHttpClient
-import java.net.URI
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.ObjectWriter
+import com.fasterxml.jackson.datatype.guava.GuavaModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 
-val wpiLibGradlePluginMavenMetadataURI = URI("https://plugins.gradle.org/m2/edu/wpi/first/GradleRIO/edu.wpi.first.GradleRIO.gradle.plugin/maven-metadata.xml")
 
-fun fetchWpiLibGradlePluginMavenMetadata(): WpiLibMavenMetadata?
-{
-    val mavenMetadataDocument = FrcHttpClient.fetchXmlResourceAsDocument(wpiLibGradlePluginMavenMetadataURI)
-    val mavenMetadata = parseMavenMetadata(mavenMetadataDocument)
-    return if (mavenMetadata == null) null else WpiLibMavenMetadata(mavenMetadata)
-}
+val mapper: ObjectMapper = ObjectMapper().registerKotlinModule().registerModule(GuavaModule())//.registerModule(JodaModule())!!
 
+val prettyPrintWriter: ObjectWriter = mapper.writerWithDefaultPrettyPrinter()

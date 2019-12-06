@@ -191,6 +191,7 @@ repositories {
 dependencies {
     val junit5Version = "5.5.2"
     val http4kVersion = "3.194.0"
+    val jacksonVersion = "2.10.1"
     
     compile(kotlin("stdlib", kotlinVersion))
     compile(kotlin("reflect", kotlinVersion))
@@ -207,8 +208,11 @@ dependencies {
     compile("org.http4k:http4k-client-apache:$http4kVersion")
     compile("org.http4k:http4k-client-apache-async:$http4kVersion")
     //compile("org.http4k:http4k-server-jetty:$http4kVersion")
-    compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.0")
-    compile("org.freemarker:freemarker:2.3.29")
+    
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatypes-collections:$jacksonVersion")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava:$jacksonVersion")
+    implementation("org.freemarker:freemarker:2.3.29")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junit5Version")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junit5Version")

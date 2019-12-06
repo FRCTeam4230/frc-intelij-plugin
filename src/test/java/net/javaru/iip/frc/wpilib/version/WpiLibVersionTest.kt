@@ -32,7 +32,6 @@ import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_1_1_r
 import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2020_1_1
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion.PreReleaseModifier
 import org.apache.commons.lang3.RandomUtils
-import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
@@ -303,6 +302,30 @@ internal class WpiLibVersionTest
     
     @ParameterizedTest
     @ArgumentsSource(GRV.AllVersionProvider::class)
+    fun isBetaOrReleaseCandidate(version: WpiLibVersion)
+    {
+        val expectedSet = HashSet<WpiLibVersion>()
+        expectedSet.addAll(GRV.betas)
+        expectedSet.addAll(GRV.releaseCandidates)
+        val expected = expectedSet.toList().sorted()
+        assertEquals(expected.contains(version), version.isBetaOrReleaseCandidate(), "isBetaOrReleaseCandidate check failed")
+    }
+    
+    @ParameterizedTest
+    @ArgumentsSource(GRV.AllVersionProvider::class)
+    fun isReleaseOrBetaOrReleaseCandidate(version: WpiLibVersion)
+    {
+        val expectedSet = HashSet<WpiLibVersion>()
+        expectedSet.addAll(GRV.betas)
+        expectedSet.addAll(GRV.releaseCandidates)
+        expectedSet.addAll(GRV.releases)
+        val expected = expectedSet.toList().sorted()
+        assertEquals(expected.contains(version), version.isReleaseOrBetaOrReleaseCandidate(), "isReleaseOrBetaOrReleaseCandidate check failed")
+    }
+    
+    
+    @ParameterizedTest
+    @ArgumentsSource(GRV.AllVersionProvider::class)
     fun isBeta(version: WpiLibVersion) = assertEquals(GRV.betas.contains(version), version.isBeta(), "isBeta check failed")
     
     @ParameterizedTest
@@ -331,6 +354,19 @@ internal class WpiLibVersionTest
                                          override val preReleaseModifierSubVersion: String = "",
                                          override val preReleasePreviewVersion: Int? = null) : AbstractWpiLibVersion()
     {
+        
+        override fun getCorrespondingReleaseVersion(): WpiLibVersion
+        {
+            return if (isPreRelease())
+            {
+                ExpectedWpiLibVersion(generation, major, minor, patch, null, null, "", null)
+            }
+            else
+            {
+                this
+            }
+        }
+
         override val versionString: String by lazy {
             createStandardVersionString()
         }

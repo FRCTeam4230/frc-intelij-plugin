@@ -83,6 +83,12 @@ interface WpiLibVersion : Comparable<WpiLibVersion>
     /** Indicates the version is a beta release,  **including** preview releases such as `2019.1.1-beta-2-pre3`.*/
     fun isBetaOrBetaPreview(): Boolean = preReleaseModifier == PreReleaseModifier.beta
 
+    /** Indicates the version is a beta release or a release candidate,  **excluding** preview releases such as `2019.1.1-beta-2-pre3`.*/
+    fun isBetaOrReleaseCandidate(): Boolean = isBeta() || isReleaseCandidate()
+    
+    /** Indicates the version is a release, a beta release, or a release candidate,  **excluding** preview releases such as `2019.1.1-beta-2-pre3`.*/
+    fun isReleaseOrBetaOrReleaseCandidate(): Boolean = isBeta() || isReleaseCandidate() || isRelease()
+    
     /** Indicates the version is a alpha release,  **excluding** preview releases such as `2019.0.0-alpha-3-pre1`.*/
     fun isAlpha(): Boolean = preReleaseModifier == PreReleaseModifier.alpha && !isPreReleasePreview()
 
@@ -107,8 +113,14 @@ interface WpiLibVersion : Comparable<WpiLibVersion>
                 .append(if (this.isPreReleasePreview()) this.preReleasePreviewVersion else Integer.MAX_VALUE,
                         if (other.isPreReleasePreview()) other.preReleasePreviewVersion else Integer.MAX_VALUE)
                 .toComparison()
-
     }
+    
+    /** 
+     * For a pre-release, this returns the (anticipated) corresponding release version. 
+     * For example, for `2019.1.2-beta-3` it would return `2019.1.2`. For non pre-release
+     * versions, it simply returns itself.
+     */
+    fun getCorrespondingReleaseVersion(): WpiLibVersion
 
 
     @Suppress("EnumEntryName")

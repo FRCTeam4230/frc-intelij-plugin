@@ -41,6 +41,7 @@ import net.javaru.iip.frc.i18n.FrcMessageKey;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
 import net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersionFiltersKt;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
@@ -296,16 +297,27 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     private void initWpiLibVersionComboBox()
     {
         //TODO: We need to 
-        //  a) filter the list to remove the alphas, etc. 
-        //  b) have UI option to only show the latest version fpr each year (on by default)
+        // ✔a) filter the list to remove the alphas, etc. 
+        //  b) have UI option to only show the latest version fpr each year (on by default) (com/intellij/find/impl/FindPopupPanel.java:1625)
         //  c) have a UI option to show/hide betas (off by default)
-        //  d) make modifications so that the FrcProjectWizardData.wpilibVersion defaults to the latest (non-beta) and then that the selected item (below) matches
+        // ✔d) make modifications so that the FrcProjectWizardData.wpilibVersion defaults to the latest and then that the selected item (below) matches
     
         final List<WpiLibVersion> versionList = GradleRioMavenMetadataState.getInstance(true).getWpiLibMavenMetadata().getWpiLibVersionsDescending();
-        final WpiLibVersion[] versions = versionList.toArray(new WpiLibVersion[0]);
-    
+        
+        // Filter the list to include only releases, and the latest one if it is a release candidate or beta (for an unreleased version)
+        final List<WpiLibVersion> filteredList = WpiLibVersionFiltersKt.filterToDefaultListing(versionList);
+        final WpiLibVersion[] versions = filteredList.toArray(new WpiLibVersion[0]);
         wpilibVersionComboBox.setModel(new DefaultComboBoxModel<>(versions));
-        wpilibVersionComboBox.setSelectedIndex(0);
+        int index = 0; // default to the first item in the list
+        if (filteredList.isEmpty())
+        {
+            index = -1; // if by some rare chance the list is empty, we set to the -1 flag to say don;t select anything.
+        }
+        else if (filteredList.size() >= 2 && filteredList.get(0).isPreRelease())
+        {
+            index = 1; // if the first item is a beta or RC we select the second item, i.e. the latest non beta/RC
+        }
+        wpilibVersionComboBox.setSelectedIndex(index);
     }
     
     private void initTabPane()

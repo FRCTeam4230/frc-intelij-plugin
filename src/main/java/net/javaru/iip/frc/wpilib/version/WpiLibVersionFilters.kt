@@ -20,6 +20,9 @@ import net.javaru.iip.frc.util.getAdjustedBuildYear
 import net.javaru.iip.frc.util.getCurrentBuildYear
 import java.util.stream.Stream
 
+/** The 2018 transitional release (when WPI took over the development of GradleRIO). */
+val ver2018_06_21 = WpiLibVersionImpl.parse("2018.06.21")
+
 /**
  * Returns a List containing only elements matching the given [WpiLibVersionFilter].
  */
@@ -50,6 +53,57 @@ fun Iterable<WpiLibVersion>.filterOutVersions(filter: WpiLibVersionFilter): List
 fun Stream<WpiLibVersion>.filterOutVersions(filter: WpiLibVersionFilter): Stream<WpiLibVersion>
 {
     return this.filter { filter.not().predicate().invoke(it) }
+}
+
+/**
+ * For the given year, filters out all but the latest version for that year.
+ * If [excludePreReleases] is set to true, pre-releases (betas, release candidates, etc) are 
+ * excluded so that the latest "full" release is returned.
+ */
+@JvmOverloads
+fun Iterable<WpiLibVersion>.filterOutAllButLatestForYear(year: Int, excludePreReleases:Boolean  = true): List<WpiLibVersion>
+{
+    // find the latest for the year
+    var listForYear = this.filterVersions(YearFilter(year))
+    if (excludePreReleases)
+    {
+        listForYear = listForYear.filterVersions(IsReleaseFilter)
+    }
+    if (listForYear.isEmpty()) return this.toList() // No versions for the specified year
+
+    val yearMutableList = listForYear.toMutableList()
+    yearMutableList.sortDescending()
+    val latestVersionForYear = yearMutableList[0]
+    
+    return this.filter { 
+        if (it.major != year) true
+        else it == latestVersionForYear 
+    }
+}
+
+/**
+ * Filter the Iterable to include: only releases, and the latest version if it is a release candidate or beta and. 
+ * It also filters out the transitional `2018.06.21` version. Finally, it sorts the list in descending order'
+ * so the latest version is first.
+ */
+fun Iterable<WpiLibVersion>.filterToDefaultListing(): List<WpiLibVersion>
+{
+    val versionList = this.toList().sortedDescending()
+    val filteredList = versionList.filterVersions(IsReleaseFilter).filterOutVersions(Is2018TransitionalRelease)
+    
+    
+    return if (versionList.isNotEmpty() && !filteredList.contains(versionList[0]) && versionList[0].isBetaOrReleaseCandidate())
+    {
+        // the latest version is not included, and thus is likely a beat or release version.
+        val mutableList = filteredList.toMutableList()
+        mutableList.add(versionList[0])
+        mutableList.sortDescending()
+        mutableList
+    }
+    else
+    {
+        filteredList
+    }
 }
 
 
@@ -113,6 +167,12 @@ interface WpiLibVersionFilter
             }
         }
     }
+}
+
+
+object Is2018TransitionalRelease: WpiLibVersionFilter
+{
+    override fun predicate(): (WpiLibVersion) -> Boolean = { wpiLibVersion -> wpiLibVersion == ver2018_06_21 }
 }
 
 object IsReleaseFilter: WpiLibVersionFilter

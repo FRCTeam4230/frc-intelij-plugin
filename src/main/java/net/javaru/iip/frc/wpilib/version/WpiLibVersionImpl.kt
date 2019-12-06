@@ -37,6 +37,17 @@ class WpiLibVersionImpl private constructor(override val versionString: String,
         return WpiLibVersionImpl(this.versionString, this.generation, this.major, this.minor, this.patch, this.preReleaseModifier, this.preReleaseModifierVersion, this.preReleaseModifierSubVersion, this.preReleasePreviewVersion)
     }
 
+    override fun getCorrespondingReleaseVersion(): WpiLibVersion
+    {
+        return if (isPreRelease())
+        {
+            WpiLibVersionImpl("${major}.${minor}.${patch}", generation, major, minor, patch, null, null, "", null)
+        }
+        else
+        {
+            this
+        }
+    }
     companion object
     {
 

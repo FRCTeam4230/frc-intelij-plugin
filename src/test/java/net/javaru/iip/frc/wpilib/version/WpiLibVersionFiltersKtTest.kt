@@ -24,7 +24,6 @@ import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting as GRV
 
 internal class WpiLibVersionFiltersKtTest
 {
-
     @Test
     fun filterVersions()
     {
@@ -52,6 +51,7 @@ internal class WpiLibVersionFiltersKtTest
                 { assertEquals(expected, GRV.versions.filterVersions(WpiLibVersionFilter.and(IsBetaFilter, YearFilter(2019))), "failed for WpiLibVersionFilter.and(filter1, filter2)") }
                  )
     }
+    
     @Test
     fun filterAndNotTest()
     {
@@ -80,8 +80,297 @@ internal class WpiLibVersionFiltersKtTest
     }
 
     @Test
-    fun filterOutVersions()
+    fun filterOutVersions() = assertEquals(GRV.betas, GRV.betasIncludingPreviews.filterOutVersions(IsPreReleasePreviewFilter))
+    
+    @Test
+    fun filterOutTransitionalVersions() = assertEquals(listOf(GRV.v2018_06_21), GRV.versions.filterVersions(Is2018TransitionalRelease))
+    
+    @Test
+    fun filterOutAllButLatestForYear()
     {
-        assertEquals(GRV.betas, GRV.betasIncludingPreviews.filterOutVersions(IsPreReleasePreviewFilter))
+
+        val inputFull = listOf(
+            GRV.v2018_06_21,
+            GRV.v2019_0_0_alpha_1,
+            GRV.v2019_0_0_alpha_2_pre1,
+            GRV.v2019_0_0_alpha_2,
+            GRV.v2019_0_0_alpha_3,
+            GRV.v2019_0_0_beta0_pre1,
+            GRV.v2019_0_0_beta0_pre3,
+            GRV.v2019_0_0_beta0_pre4,
+            GRV.v2019_0_0_beta0_pre5,
+            GRV.v2019_0_0_beta0_pre6,
+            GRV.v2019_0_1,
+            GRV.v2019_1_1_beta_1,
+            GRV.v2019_1_1_beta_2a,
+            GRV.v2019_1_1_beta_3_pre1,
+            GRV.v2019_1_1_beta_3_p_2,
+            GRV.v2019_1_1_beta_3_pre3,
+            GRV.v2019_1_1_beta_3_pre4,
+            GRV.v2019_1_1_beta_3_pre5,
+            GRV.v2019_1_1_beta_3_pre6,
+            GRV.v2019_1_1_beta_3_pre7,
+            GRV.v2019_1_1_beta_3_pre8,
+            GRV.v2019_1_1_beta_3_pre9,
+            GRV.v2019_1_1_beta_3_pre10,
+            GRV.v2019_1_1_beta_3,
+            GRV.v2019_1_1_beta_3a,
+            GRV.v2019_1_1_beta_4_pre1,
+            GRV.v2019_1_1_beta_4_pre2,
+            GRV.v2019_1_1_beta_4_pre4,
+            GRV.v2019_1_1_beta_4,
+            GRV.v2019_1_1_beta_4a,
+            GRV.v2019_1_1_beta_4b,
+            GRV.v2019_1_1_beta_4c,
+            GRV.v2019_1_1_beta_5,
+            GRV.v2019_1_1_beta_99,
+            GRV.v2019_1_1_rc_1,
+            GRV.v2019_1_1,
+            GRV.v2019_1_2,
+            GRV.v2019_2_1,
+            GRV.v2019_3_1_rc,
+            GRV.v2019_3_1,
+            GRV.v2019_3_2_rc,
+            GRV.v2019_3_2_rc2,
+            GRV.v2019_3_2,
+            GRV.v2019_4_1_rc1,
+            GRV.v2019_4_1_rc2,
+            GRV.v2019_4_1_rc3,
+            GRV.v2019_4_1,
+            GRV.v2020_1_1_beta_1,
+            GRV.v2020_1_1_beta_2,
+            GRV.v2020_1_1_beta_3,
+            GRV.v2020_1_1_beta_3a,
+            GRV.v2020_1_1,
+            GRV.v2020_1_2_rc_1_pre1,
+            GRV.v2020_1_2_rc_1,
+            GRV.v2020_1_2)
+
+        val expectedLatestFor2020 = listOf(
+            GRV.v2018_06_21,
+            GRV.v2019_0_0_alpha_1,
+            GRV.v2019_0_0_alpha_2_pre1,
+            GRV.v2019_0_0_alpha_2,
+            GRV.v2019_0_0_alpha_3,
+            GRV.v2019_0_0_beta0_pre1,
+            GRV.v2019_0_0_beta0_pre3,
+            GRV.v2019_0_0_beta0_pre4,
+            GRV.v2019_0_0_beta0_pre5,
+            GRV.v2019_0_0_beta0_pre6,
+            GRV.v2019_0_1,
+            GRV.v2019_1_1_beta_1,
+            GRV.v2019_1_1_beta_2a,
+            GRV.v2019_1_1_beta_3_pre1,
+            GRV.v2019_1_1_beta_3_p_2,
+            GRV.v2019_1_1_beta_3_pre3,
+            GRV.v2019_1_1_beta_3_pre4,
+            GRV.v2019_1_1_beta_3_pre5,
+            GRV.v2019_1_1_beta_3_pre6,
+            GRV.v2019_1_1_beta_3_pre7,
+            GRV.v2019_1_1_beta_3_pre8,
+            GRV.v2019_1_1_beta_3_pre9,
+            GRV.v2019_1_1_beta_3_pre10,
+            GRV.v2019_1_1_beta_3,
+            GRV.v2019_1_1_beta_3a,
+            GRV.v2019_1_1_beta_4_pre1,
+            GRV.v2019_1_1_beta_4_pre2,
+            GRV.v2019_1_1_beta_4_pre4,
+            GRV.v2019_1_1_beta_4,
+            GRV.v2019_1_1_beta_4a,
+            GRV.v2019_1_1_beta_4b,
+            GRV.v2019_1_1_beta_4c,
+            GRV.v2019_1_1_beta_5,
+            GRV.v2019_1_1_beta_99,
+            GRV.v2019_1_1_rc_1,
+            GRV.v2019_1_1,
+            GRV.v2019_1_2,
+            GRV.v2019_2_1,
+            GRV.v2019_3_1_rc,
+            GRV.v2019_3_1,
+            GRV.v2019_3_2_rc,
+            GRV.v2019_3_2_rc2,
+            GRV.v2019_3_2,
+            GRV.v2019_4_1_rc1,
+            GRV.v2019_4_1_rc2,
+            GRV.v2019_4_1_rc3,
+            GRV.v2019_4_1,
+            GRV.v2020_1_2)
+
+        val expectedLatestFor2019 = listOf(
+                GRV.v2018_06_21,
+                GRV.v2019_4_1,
+                GRV.v2020_1_1_beta_1,
+                GRV.v2020_1_1_beta_2,
+                GRV.v2020_1_1_beta_3,
+                GRV.v2020_1_1_beta_3a,
+                GRV.v2020_1_1,
+                GRV.v2020_1_2_rc_1_pre1,
+                GRV.v2020_1_2_rc_1,
+                GRV.v2020_1_2)
+        
+        val expectedChained = listOf(
+                GRV.v2018_06_21,
+                GRV.v2019_4_1,
+                GRV.v2020_1_2
+                             )
+        assertAll(
+                { assertEquals(expectedLatestFor2020, inputFull.filterOutAllButLatestForYear(2020), "Failed for 2020") },
+                { assertEquals(expectedLatestFor2019, inputFull.filterOutAllButLatestForYear(2019), "Failed for 2019") },
+                { assertEquals(inputFull, inputFull.filterOutAllButLatestForYear(2018), "Failed for 2018") },
+                { assertEquals(expectedChained, inputFull.filterOutAllButLatestForYear(2018).filterOutAllButLatestForYear(2019).filterOutAllButLatestForYear(2020), "Failed for chained years") }
+                 )
+    }
+    
+    @Test
+    fun filterToDefaultListing()
+    {
+        val expectedWithFinal = listOf(
+                GRV.v2019_0_1,
+                GRV.v2019_1_1,
+                GRV.v2019_1_2,
+                GRV.v2019_2_1,
+                GRV.v2019_3_1,
+                GRV.v2019_3_2,
+                GRV.v2019_4_1,
+                GRV.v2020_1_1,
+                GRV.v2020_1_2).sortedDescending()
+        
+        val inputForUnreleasedRC = listOf(
+            GRV.v2018_06_21,
+            GRV.v2019_0_0_alpha_1,
+            GRV.v2019_0_0_alpha_2_pre1,
+            GRV.v2019_0_0_alpha_2,
+            GRV.v2019_0_0_alpha_3,
+            GRV.v2019_0_0_beta0_pre1,
+            GRV.v2019_0_0_beta0_pre3,
+            GRV.v2019_0_0_beta0_pre4,
+            GRV.v2019_0_0_beta0_pre5,
+            GRV.v2019_0_0_beta0_pre6,
+            GRV.v2019_0_1,
+            GRV.v2019_1_1_beta_1,
+            GRV.v2019_1_1_beta_2a,
+            GRV.v2019_1_1_beta_3_pre1,
+            GRV.v2019_1_1_beta_3_p_2,
+            GRV.v2019_1_1_beta_3_pre3,
+            GRV.v2019_1_1_beta_3_pre4,
+            GRV.v2019_1_1_beta_3_pre5,
+            GRV.v2019_1_1_beta_3_pre6,
+            GRV.v2019_1_1_beta_3_pre7,
+            GRV.v2019_1_1_beta_3_pre8,
+            GRV.v2019_1_1_beta_3_pre9,
+            GRV.v2019_1_1_beta_3_pre10,
+            GRV.v2019_1_1_beta_3,
+            GRV.v2019_1_1_beta_3a,
+            GRV.v2019_1_1_beta_4_pre1,
+            GRV.v2019_1_1_beta_4_pre2,
+            GRV.v2019_1_1_beta_4_pre4,
+            GRV.v2019_1_1_beta_4,
+            GRV.v2019_1_1_beta_4a,
+            GRV.v2019_1_1_beta_4b,
+            GRV.v2019_1_1_beta_4c,
+            GRV.v2019_1_1_beta_5,
+            GRV.v2019_1_1_beta_99,
+            GRV.v2019_1_1_rc_1,
+            GRV.v2019_1_1,
+            GRV.v2019_1_2,
+            GRV.v2019_2_1,
+            GRV.v2019_3_1_rc,
+            GRV.v2019_3_1,
+            GRV.v2019_3_2_rc,
+            GRV.v2019_3_2_rc2,
+            GRV.v2019_3_2,
+            GRV.v2019_4_1_rc1,
+            GRV.v2019_4_1_rc2,
+            GRV.v2019_4_1_rc3,
+            GRV.v2019_4_1,
+            GRV.v2020_1_1_beta_1,
+            GRV.v2020_1_1_beta_2,
+            GRV.v2020_1_1_beta_3,
+            GRV.v2020_1_1_beta_3a,
+            GRV.v2020_1_1,
+            GRV.v2020_1_2_rc_1_pre1,
+            GRV.v2020_1_2_rc_1
+                                         )
+        
+        val expectedForUnreleasedRC = listOf(
+            GRV.v2019_0_1,
+            GRV.v2019_1_1,
+            GRV.v2019_1_2,
+            GRV.v2019_2_1,
+            GRV.v2019_3_1,
+            GRV.v2019_3_2,
+            GRV.v2019_4_1,
+            GRV.v2020_1_1,
+            GRV.v2020_1_2_rc_1
+                                            ).sortedDescending()
+
+        val inputForUnreleasedBeta = listOf(
+                GRV.v2018_06_21,
+                GRV.v2019_0_0_alpha_1,
+                GRV.v2019_0_0_alpha_2_pre1,
+                GRV.v2019_0_0_alpha_2,
+                GRV.v2019_0_0_alpha_3,
+                GRV.v2019_0_0_beta0_pre1,
+                GRV.v2019_0_0_beta0_pre3,
+                GRV.v2019_0_0_beta0_pre4,
+                GRV.v2019_0_0_beta0_pre5,
+                GRV.v2019_0_0_beta0_pre6,
+                GRV.v2019_0_1,
+                GRV.v2019_1_1_beta_1,
+                GRV.v2019_1_1_beta_2a,
+                GRV.v2019_1_1_beta_3_pre1,
+                GRV.v2019_1_1_beta_3_p_2,
+                GRV.v2019_1_1_beta_3_pre3,
+                GRV.v2019_1_1_beta_3_pre4,
+                GRV.v2019_1_1_beta_3_pre5,
+                GRV.v2019_1_1_beta_3_pre6,
+                GRV.v2019_1_1_beta_3_pre7,
+                GRV.v2019_1_1_beta_3_pre8,
+                GRV.v2019_1_1_beta_3_pre9,
+                GRV.v2019_1_1_beta_3_pre10,
+                GRV.v2019_1_1_beta_3,
+                GRV.v2019_1_1_beta_3a,
+                GRV.v2019_1_1_beta_4_pre1,
+                GRV.v2019_1_1_beta_4_pre2,
+                GRV.v2019_1_1_beta_4_pre4,
+                GRV.v2019_1_1_beta_4,
+                GRV.v2019_1_1_beta_4a,
+                GRV.v2019_1_1_beta_4b,
+                GRV.v2019_1_1_beta_4c,
+                GRV.v2019_1_1_beta_5,
+                GRV.v2019_1_1_beta_99,
+                GRV.v2019_1_1_rc_1,
+                GRV.v2019_1_1,
+                GRV.v2019_1_2,
+                GRV.v2019_2_1,
+                GRV.v2019_3_1_rc,
+                GRV.v2019_3_1,
+                GRV.v2019_3_2_rc,
+                GRV.v2019_3_2_rc2,
+                GRV.v2019_3_2,
+                GRV.v2019_4_1_rc1,
+                GRV.v2019_4_1_rc2,
+                GRV.v2019_4_1_rc3,
+                GRV.v2019_4_1,
+                GRV.v2020_1_1_beta_1,
+                GRV.v2020_1_1_beta_2,
+                GRV.v2020_1_1_beta_3,
+                GRV.v2020_1_1_beta_3a)
+
+        val expectedForUnreleasedBeta = listOf(
+                GRV.v2019_0_1,
+                GRV.v2019_1_1,
+                GRV.v2019_1_2,
+                GRV.v2019_2_1,
+                GRV.v2019_3_1,
+                GRV.v2019_3_2,
+                GRV.v2019_4_1,
+                GRV.v2020_1_1_beta_3a).sortedDescending()
+        
+        assertAll(
+                { assertEquals(expectedWithFinal, GRV.versions.filterToDefaultListing(), "Failure for full list with a final released version")},
+                { assertEquals(expectedForUnreleasedRC, inputForUnreleasedRC.filterToDefaultListing(), "Failure for list with a unreleased Release Candidate")},
+                { assertEquals(expectedForUnreleasedBeta, inputForUnreleasedBeta.filterToDefaultListing(), "Failure for list with a unreleased Beta")}
+                 )
     }
 }

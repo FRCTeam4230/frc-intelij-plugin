@@ -26,6 +26,7 @@ import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.facet.Facet;
@@ -163,6 +164,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     @Override
     public boolean isThisProjectFrcFaceted() { return FrcFacetKt.isFrcFacetedProject(myProject); }
 
+    @Contract("null -> false")
     public static boolean isFrcFacetedProject(@Nullable Project project) {return FrcFacetKt.isFrcFacetedProject(project);}
 
 

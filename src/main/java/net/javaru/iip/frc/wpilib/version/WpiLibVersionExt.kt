@@ -19,7 +19,8 @@ package net.javaru.iip.frc.wpilib.version
 
 private val WPILIB_2018_VERSION_CHECK = WpiLibVersionImpl.parse("2017.9999.0")
 
-fun WpiLibVersion.is2018OrLater(): Boolean = this.isNewerThan(WPILIB_2018_VERSION_CHECK)
+/** Checks if a WpiLibVersion is a 2018 Project. (Was needed to be aware of a Ant build change made in 2018, but is not applicable to the new 2019 GradleRIO builds.) */
+fun WpiLibVersion.is2018Project(): Boolean = this.isNewerThan(WPILIB_2018_VERSION_CHECK) && !this.usesGradle()
 
 fun WpiLibVersion.usesGradle(): Boolean = this.generation >= 2019
 

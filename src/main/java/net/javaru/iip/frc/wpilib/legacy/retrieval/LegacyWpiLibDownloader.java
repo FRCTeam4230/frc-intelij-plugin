@@ -155,7 +155,7 @@ public class LegacyWpiLibDownloader
             // common.zip was added in 2018 and contains the JRE that is deployed to the roboRIO upon building
             //     It's content goes to C:\Users\UserName\wpilib\common
             //     We ultimately end up with C:\Users\UserName\wpilib\common\current\lib\linux\athena\shared which contains a number or *.so files
-            if (WpiLibVersionExtKt.is2018OrLater(javaFeatureDescriptor.getVersion()))
+            if (WpiLibVersionExtKt.is2018Project(javaFeatureDescriptor.getVersion()))
             {
                 extractZipFileContainedInZipFile(coreJarFilePath, "resources/common.zip", LegacyWpiLibPaths.getCommonCurrentVersionDir());
             }

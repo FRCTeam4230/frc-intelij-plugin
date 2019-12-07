@@ -232,7 +232,7 @@ public class WpiLibLibrariesUtils
     public static boolean is2018CommonRefreshNeeded()
     {
         final WpiLibVersion downloadedVersion = determineSystemAvailableWpiLibVersion();
-        return downloadedVersion != null && WpiLibVersionExtKt.is2018OrLater(downloadedVersion) && !isCommonDownloadedToSystem();
+        return downloadedVersion != null && WpiLibVersionExtKt.is2018Project(downloadedVersion) && !isCommonDownloadedToSystem();
     }
 
     public static boolean is2018CommonRefreshNeededViaReadAction()

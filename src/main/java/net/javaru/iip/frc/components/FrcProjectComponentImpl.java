@@ -65,7 +65,8 @@ import static net.javaru.iip.frc.actions.tools.DownloadWpiLibAction.NOTIFICATION
 import static net.javaru.iip.frc.components.FrcProjectComponentImpl.NotificationKey.*;
 
 
-// TODO: This projectComponent has become an ugly mess. Let's clean it up. A lot of the notification work can be moved to a dedicated notification class.
+// TODO: Issue #45: This projectComponent has a lot of technical debt, and frankly has become an ugly mess. Let's clean it up. We can migrate to Kotlin at the same time.
+//       Issue #46: A lot of the notification work can be moved to a dedicated notification class/package.
 
 public class FrcProjectComponentImpl implements FrcProjectComponent
 {

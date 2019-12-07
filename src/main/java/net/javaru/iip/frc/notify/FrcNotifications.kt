@@ -33,7 +33,7 @@ import java.util.*
 import javax.swing.Icon
 import javax.swing.event.HyperlinkEvent
 
-// TODO - Issue #46: Refactor & Improve the Notifiction internal infrastructure. There's some technical debt here
+// TODO - Issue #46: Refactor & Improve the Notification internal infrastructure. There's some technical debt here
 @Suppress("unused")
 enum class FrcNotificationType(val group: NotificationGroup, val notificationType: NotificationType, val icon: Icon)
 { 

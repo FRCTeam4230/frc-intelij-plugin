@@ -22,6 +22,7 @@ import com.intellij.json.psi.JsonNumberLiteral
 import com.intellij.json.psi.JsonObject
 import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.json.psi.JsonValue
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbService
@@ -44,8 +45,8 @@ const val wpiLibDirName = ".wpilib"
 const val wpiLibPreferencesFileName: String = "wpilib_preferences.json"
 const val teamNumberPropertyName = "teamNumber"
 const val projectYearPropertyName = "projectYear"
-const val currentLanguagePropertyName = "currentLanguage"
-const val enableCppIntellisensePropertyName = "enableCppIntellisense"
+//const val currentLanguagePropertyName = "currentLanguage"
+//const val enableCppIntellisensePropertyName = "enableCppIntellisense"
 
 
 fun findLikelyWpiLibPreferencesPsiFileAsJsonFile(project: Project): JsonFile?
@@ -98,7 +99,6 @@ fun findWpiLibPreferencesPsiFiles(project: Project, filter: (module: Module) -> 
     try
     {
         DumbService.getInstance(project).runReadActionInSmartMode {
-            val psiManager = PsiManager.getInstance(project)
             val modules = project.getModules()
             modules.filter { filter.invoke(it) }.forEach { module: Module ->
                 foundFiles.addAll(findWpiLibPreferencesPsiFiles(module))
@@ -198,24 +198,30 @@ fun getConfiguredProjectYear(wpiLibPreferences: JsonFile): String? = getStringPr
 @Suppress("SameParameterValue")
 private fun getIntPropertyValue(wpiLibPreferences: JsonFile, propertyName: String): Int?
 {
-    val jsonValue = getJsonValue(wpiLibPreferences, propertyName)
-    val jsonNumberLiteral = jsonValue as JsonNumberLiteral?
-    return jsonNumberLiteral?.value?.toInt()
+    return runReadAction {
+        val jsonValue = getJsonValue(wpiLibPreferences, propertyName)
+        val jsonNumberLiteral = jsonValue as JsonNumberLiteral?
+        jsonNumberLiteral?.value?.toInt()
+    }
 }
 
 
 @Suppress("SameParameterValue")
 private fun getStringPropertyValue(wpiLibPreferences: JsonFile, propertyName: String): String?
 {
-    val jsonValue = getJsonValue(wpiLibPreferences, propertyName)
-    val jsonStringLiteral = jsonValue as JsonStringLiteral?
-    return jsonStringLiteral?.value
+    return runReadAction {
+        val jsonValue = getJsonValue(wpiLibPreferences, propertyName)
+        val jsonStringLiteral = jsonValue as JsonStringLiteral?
+        jsonStringLiteral?.value
+    }
 }
 
 private fun getJsonValue(wpiLibPreferences: JsonFile, propertyName: String): JsonValue?
 {
-    val toplevelValue = wpiLibPreferences.topLevelValue
-    val jsonObject = toplevelValue as JsonObject?
-    val jsonProperty = jsonObject?.findProperty(propertyName)
-    return jsonProperty?.value
+    return runReadAction {
+        val toplevelValue = wpiLibPreferences.topLevelValue
+        val jsonObject = toplevelValue as JsonObject?
+        val jsonProperty = jsonObject?.findProperty(propertyName)
+        jsonProperty?.value
+    }
 }

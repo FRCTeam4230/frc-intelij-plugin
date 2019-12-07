@@ -35,24 +35,9 @@ fun Project?.isAntBasedFrcProject(): Boolean
     return if (this == null)
         false
     else
-    {
-
-        // TODO - Need to implement this feature
-//        try
-//        {
-//            val modules = ModuleManager.getInstance(this).modules
-//            for (module in modules)
-//            {
-//                val file: VirtualFile =  module.
-//            }
-//        }
-//        catch(e:Exception)
-//        {
-//            LOG.warn("An exception occurred when checking if a project in is an Ant Based FRC Project. Cause Summary: $e", e)
-//            return false
-//        }
-        return false
-    }
+        // TODO: This works for now since there are only two possibilities: Legacy Ant or GradleRIO. But that may change some day
+        //       We should probably check if there is an build file present. But that is super low priority for now.
+        !this.isGradleProject()
 }
 
 fun Project?.isGradleProject(): Boolean

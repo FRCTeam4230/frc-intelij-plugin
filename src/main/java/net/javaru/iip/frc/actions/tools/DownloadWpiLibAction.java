@@ -33,7 +33,7 @@ import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloadFailedException;
 import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloader;
 
-import static net.javaru.iip.frc.components.FrcProjectComponentImpl.cancelWpiLibIsDownloadingNotifications;
+import static net.javaru.iip.frc.components.FrcProjectComponentImpl.cancelLegacyWpiLibIsDownloadingNotifications;
 
 
 
@@ -146,7 +146,7 @@ public class DownloadWpiLibAction extends AbstractFrcToolsLegacyAction
                     notification = createNoActionSuccessNotification();
                 }
 
-                cancelWpiLibIsDownloadingNotifications(myProject);
+                cancelLegacyWpiLibIsDownloadingNotifications(myProject);
                 
                 if (notification != null)
                 {

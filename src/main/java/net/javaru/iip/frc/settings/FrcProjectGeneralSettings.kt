@@ -22,7 +22,6 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectManager
 import com.intellij.util.xmlb.XmlSerializerUtil
 
 // NOTE: This class is registered as a <projectService> in the plugin.xml
@@ -50,7 +49,7 @@ data class FrcProjectGeneralSettings @JvmOverloads constructor(
             LOG.debug("[FRC] initializing team number for project: $project   Type: ${project::class.java}")
             try
             {
-                if (project != ProjectManager.getInstance().defaultProject)
+                if (!project.isDefault)
                 {
                     // TODO Need to get from the WpiLibPreferences data class once that is done
                 }

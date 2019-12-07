@@ -16,16 +16,9 @@
 
 package net.javaru.iip.frc.components;
 
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.filter.Filters;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +35,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupManager;
-import com.intellij.openapi.vfs.VirtualFile;
 
 import net.javaru.iip.frc.actions.tools.AttachUserLibDirAction;
 import net.javaru.iip.frc.actions.tools.AttachWpilibAction;
@@ -53,16 +45,17 @@ import net.javaru.iip.frc.plugin.FrcPluginVersionManager;
 import net.javaru.iip.frc.riolog.RioLogProjectService;
 import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
-import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.util.FrcProjectExtsKt;
 import net.javaru.iip.frc.util.UriUtilsKt;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
+import net.javaru.iip.frc.wpilib.WpiLibPreferencesKt;
 import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibVersionStatus;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT;
 import static net.javaru.iip.frc.actions.tools.DownloadWpiLibAction.NOTIFICATIONS_SUBTITLE;
 import static net.javaru.iip.frc.components.FrcProjectComponentImpl.NotificationKey.*;
+import static net.javaru.iip.frc.settings.FrcTeamNumberKt.UN_CONFIGURED_TEAM_NUMBER;
 
 
 // TODO: Issue #45: This projectComponent has a lot of technical debt, and frankly has become an ugly mess. Let's clean it up. We can migrate to Kotlin at the same time.
@@ -74,7 +67,8 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
     @NotNull
     private final Project myProject;
-        
+    
+    private int teamNumberForProject = UN_CONFIGURED_TEAM_NUMBER;
 
     private final static Map<Project, Map<NotificationKey, Notification>> notificationsTracker =  new HashMap<>(); 
     
@@ -110,14 +104,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     
         //TODO the checkPluginUpdateStatus function needs to be rewritten, It currently is an empty function.
         FrcPluginVersionManager.INSTANCE.checkPluginUpdateStatus(myProject);
-        
-        final boolean isTemplateFirstOpen = frcFreshTemplateProjectCheckAndCleanup();
-
-        // TODO: See if we need to call RioLogProjectService.update(myProject) in any way. FrcModuleComponentImpl.moduleAdded(), which we need if someone adds a module to an existing project, and moduleAdded is called during a project opening
-        // RioLogProjectService.update(myProject);
-
-        // For example, see com.intellij.framework.detection.impl.FrameworkDetectionManager#projectOpened
-        StartupManager.getInstance(myProject).registerPostStartupActivity(() -> this.runPostStartupActivities(isTemplateFirstOpen));
+        StartupManager.getInstance(myProject).registerPostStartupActivity(this::runPostStartupActivities);
     }
 
 
@@ -167,50 +154,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
     @Contract("null -> false")
     public static boolean isFrcFacetedProject(@Nullable Project project) {return FrcFacetKt.isFrcFacetedProject(project);}
-
-
-    private boolean frcFreshTemplateProjectCheckAndCleanup()
-    {
-        if (FrcProjectExtsKt.isGradleProject(myProject)) return false;
-        
-        boolean isFreshTemplateProject = false;
-        try
-        {
-            final VirtualFile projectFile = myProject.getProjectFile();
-            if (projectFile != null)
-            {
-                final VirtualFile ideaDir = projectFile.getParent();
-                final VirtualFile projectTemplateFile = ideaDir.findChild("project-template.xml");
-                isFreshTemplateProject = isFrcProjectTemplate(projectTemplateFile);
-                if (isFreshTemplateProject)
-                {
-                    FrcFileUtils.deleteSafely(projectTemplateFile, this);
-                    // This is assuming a standard template was used...
-                    //final VirtualFile srcDir = myProject.getBaseDir().findChild("src");
-                    final VirtualFile projectDir = com.intellij.openapi.project.ProjectUtil.guessProjectDir(myProject);
-                    if (projectDir == null) { return false; } // Not much else we can do... and besides, this is functionality for the old Ant based project templates and can be removed at some point
-                    final VirtualFile srcDir = projectDir.findChild("src");
-                    if (srcDir != null && srcDir.exists())
-                    {
-                        final VirtualFile frcDir = srcDir.findChild("frc");
-                        if (frcDir != null && frcDir.exists())
-                        {
-                            final VirtualFile teamDir = frcDir.findChild("team0000");
-                            FrcFileUtils.deleteSafelyIfEmpty(teamDir, this);
-                            FrcFileUtils.deleteSafelyIfEmpty(frcDir, this);
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            LOG.warn("[FRC] Could not check for and/or cleanup template files. Cause: " + e.toString(), e);
-        }
-
-        return isFreshTemplateProject;
-    }
-
+    
 
     private void checkIssue8Refresh()
     {
@@ -273,131 +217,63 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         }
     }
     
-    private boolean isFrcProjectTemplate(@Nullable VirtualFile projectTemplateFile)
-    {
-        if (projectTemplateFile != null && projectTemplateFile.exists())
-        {
-            try (final InputStream inputStream = projectTemplateFile.getInputStream())
-            {
-                Document document = new SAXBuilder().build(inputStream);
-                final XPathFactory xPathFactory = XPathFactory.instance();
-                XPathExpression<Element> expression = xPathFactory.compile("/template/input-field", Filters.element());
-                final Element inputFieldElement = expression.evaluateFirst(document);
-                if (inputFieldElement != null)
-                {
-                    final String defaultValue = inputFieldElement.getAttributeValue("default");
-                    if (defaultValue != null && defaultValue.toLowerCase().contains("frc"))
-                    {
-                        return true;
-                    }
-                    // check the icon as a secondary check
-                    expression = xPathFactory.compile("/template/icon-path", Filters.element());
-                    final Element iconElement = expression.evaluateFirst(document);
-                    if (iconElement != null)
-                    {
-                        final String iconPath = iconElement.getValue();
-                        return iconPath != null && iconPath.toLowerCase().contains("/icons/first/first_icon"); 
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                LOG.warn("Could not determine isFrcProjectTemplate due to an Exception: " + e.toString(), e);
-            }
-        }
-        return false;
-    }
     
-    private void runPostStartupActivities(final boolean isFreshFrcTemplateProject)
+    private void runPostStartupActivities()
     {
         // TODO: Need some additional work to handle the variety of cases, especially a new version is available for download.
         
-        boolean isFrcProject = isFreshFrcTemplateProject || isFrcFacetedProject(myProject);
+        boolean isFrcProject = isFrcFacetedProject(myProject);
         if (isFrcProject)
         {
-            LOG.debug("[FRC] isFreshFrcTemplateProject = " + isFreshFrcTemplateProject);
-
+            this.teamNumberForProject = WpiLibPreferencesKt.getConfiguredTeamNumber(myProject);
             RioLogProjectService.getInstance(myProject).activateTcp();
             notifyToConfigureTeamNumIfNecessary(myProject, true);
-    
-            if (FrcProjectExtsKt.isAntBasedFrcProject(myProject))
-            {
-                checkLegacyWpiLibraryStatus(isFreshFrcTemplateProject);
-            }
-            else
-            {
-                // TODO - check gradle RIO version status
-            }
-        }
-    }
-    
-    
-    private void checkLegacyWpiLibraryStatus(boolean isFreshFrcTemplateProject)
-    {
-        final LegacyWpiLibVersionStatus versionStatus = LegacyWpiLibVersionStatus.getCurrentVersionStatus(myProject, true);
-        
-        if (isFreshFrcTemplateProject)
-        {
-            if (!versionStatus.isWpiLibDownloaded() || versionStatus.isNewerVersionAvailableThanDownloaded())
-            {
-                if (!versionStatus.isWpiLibDownloaded())
-                {
-                    queueLatestWpiLibVersionIsBeingDownloadedNotification(myProject);
-                }
-                DownloadWpiLibAction.downloadLatestInBackground(myProject,
-                                                                true,
-                                                                false);
-            }
-            else
-            {
-                AttachWpilibAction.attachWpiLib(myProject, false, true);
-            }
-            AttachUserLibDirAction.attachUserLib(myProject, false);
-            
-        }
-        else
-        {
             checkProjectFrcStatus(myProject, true, false);
         }
     }
-    
+   
     
     public static void checkProjectFrcStatus(@NotNull Project project, boolean knownFacetedProject, boolean checkTeamNumConfigStatus)
     {
         // TODO add check for if a new version of WPILib is available
         DumbService.getInstance(project).runWhenSmart(() ->
                                                       {
-                                                          final Map<NotificationKey, Notification> notificationMap = getNotificationMapForProject(project);
                                                           if (checkTeamNumConfigStatus)
                                                           {
                                                               notifyToConfigureTeamNumIfNecessary(project, knownFacetedProject);
                                                           }
-
-                                                          if (knownFacetedProject || isFrcFacetedProject(project))
-                                                          {
-                                                              if (!FrcProjectExtsKt.isGradleProject(project) && 
-                                                                  /* TODO: The ant project check always returns false at this time as a quick fix the breaking change.   */
-                                                                   FrcProjectExtsKt.isAntBasedFrcProject(project))
-                                                              {
-                                                                  if (notificationMap.get(AttachWpiLibQuery) == null && !WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project))
-                                                                  {
-                                                                      
-                                                                      if (WpiLibLibrariesUtils.isWpilibDownloadedToSystem())
-                                                                          { queueAttachWpilibQueryNotification(project); }
-                                                                      else 
-                                                                          { queueDownloadAndAttachWpilibNotification(project); }
-                                                                  }
-        
-                                                                  if (notificationMap.get(AttachUserLibQuery) == null && !WpiLibLibrariesUtils.isUserLibAttachedViaReadAction(project))
-                                                                  {
-                                                                      queueMissingUserLibQueryNotification(project);
-                                                                  }
-                                                              }
-                                                          }
+    
+                                                          checkLegacyProjectLibraryAttachmentStatus(project, knownFacetedProject);
                                                       });
     }
-
-
+    
+    
+    /**
+     * Checks if a project is a legacy Ant based project, and if so, checks if the WPI Library and/or the User Library need to be attached.
+     * @param project the project
+     * @param knownFacetedProject if the project is already known to be an FrcFaceted project
+     */
+    private static void checkLegacyProjectLibraryAttachmentStatus(@NotNull Project project, boolean knownFacetedProject)
+    {
+        if ((knownFacetedProject || isFrcFacetedProject(project))  && FrcProjectExtsKt.isAntBasedFrcProject(project)) /* TODO: The ant project check needs improvement. Right now it just checks it is not a gradle project  */
+        {
+            final Map<NotificationKey, Notification> notificationMap = getNotificationMapForProject(project);
+            if (notificationMap.get(AttachWpiLibQuery) == null && !WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project))
+            {
+                if (WpiLibLibrariesUtils.isWpilibDownloadedToSystem())
+                    { queueAttachWpilibQueryNotification(project); }
+                else 
+                    { queueDownloadAndAttachWpilibNotification(project); }
+            }
+    
+            if (notificationMap.get(AttachUserLibQuery) == null && !WpiLibLibrariesUtils.isUserLibAttachedViaReadAction(project))
+            {
+                queueMissingUserLibQueryNotification(project);
+            }
+        }
+    }
+    
+    
     private static void notifyToConfigureTeamNumIfNecessary(@NotNull Project project, boolean knownFacetedProject)
     {
         final Map<NotificationKey, Notification> notificationMap = getNotificationMapForProject(project);
@@ -421,13 +297,15 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         }
     }
 
+    // TODO: Rework for Gradle RIO Version
     public static Notification queueNewerWpiLibVersionIsAvailable(@NotNull Project project,
                                                                   @NotNull LegacyWpiLibVersionStatus versionStatus)
     {
         return queueNewerWpiLibVersionIsAvailable(project, versionStatus.getAttachedVersion(), versionStatus.getAvailableVersion());    
     }
-
-
+    
+    
+    // TODO: Rework for Gradle RIO Version
     public static Notification queueNewerWpiLibVersionIsAvailable(@NotNull Project project,
                                                                   @Nullable WpiLibVersion attachedVersion,
                                                                   @Nullable WpiLibVersion availableVersion)
@@ -465,7 +343,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         return notification;
     }
     
-    private static Notification queueDownloadAndAttachWpilibNotification(@NotNull Project project)
+    private static void queueDownloadAndAttachWpilibNotification(@NotNull Project project)
     {
         final Notification notification = new Notification(FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP().getDisplayId(),
                                                            FrcNotifications.Companion.getIconInfo(),
@@ -484,7 +362,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         );
         Notifications.Bus.notify(notification, null);
         getNotificationMapForProject(project).put(AttachWpiLibQuery, notification);
-        return notification;
+        //return notification;
     }
 
 
@@ -534,27 +412,9 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         getNotificationMapForProject(project).put(AttachUserLibQuery, notification);
         return notification;
     }
-
-
-    @SuppressWarnings("UnusedReturnValue")
-    public static Notification queueLatestWpiLibVersionIsBeingDownloadedNotification(@Nullable Project project)
-    {
-        final Notification notification = FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP()
-                                                                    .createNotification(FrcNotifications.Title,
-                                                                                        "WPILib",
-                                                                                        "The latest version of the WPILib is being downloaded.",
-                                                                                        NotificationType.INFORMATION,
-                                                                                        null);
-        Notifications.Bus.notify(notification, null);
-        if (project != null)
-        {
-            getNotificationMapForProject(project).put(DownloadNewWpiLibVersionQuery, notification);
-        }
-        return notification;
-    }
-
     
-    public static void cancelWpiLibIsDownloadingNotifications(@NotNull Project project)
+    
+    public static void cancelLegacyWpiLibIsDownloadingNotifications(@NotNull Project project)
     {
         final Map<NotificationKey, Notification> notificationMap = getNotificationMapForProject(project);
         final Notification notification = notificationMap.remove(DownloadNewWpiLibVersionQuery);
@@ -616,7 +476,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         }
 
 
-        private void updateForFrcFacet(@NotNull Facet facet)
+        private void updateForFrcFacet(@NotNull Facet<?> facet)
         { 
             if (FrcFacetKt.isFrcFacet(facet))
             {

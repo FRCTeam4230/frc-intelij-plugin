@@ -46,7 +46,6 @@ import net.javaru.iip.frc.riolog.RioLogProjectService;
 import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.settings.FrcProjectTeamNumberService;
-import net.javaru.iip.frc.settings.TeamNumberChangeListenerServiceForFrcRoboRioSettings;
 import net.javaru.iip.frc.util.FrcProjectExtsKt;
 import net.javaru.iip.frc.util.UriUtilsKt;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
@@ -224,7 +223,6 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         if (isFrcProject)
         {
             FrcProjectTeamNumberService.getInstance(myProject); // We need to initialize the registering of the VFS Change Listener so we can detect changes to the project team number
-            TeamNumberChangeListenerServiceForFrcRoboRioSettings.getInstance(myProject); // Need to get it to initialize       
             RioLogProjectService.getInstance(myProject).activateTcp();
             notifyToConfigureTeamNumIfNecessary(myProject, true);
             checkProjectFrcStatus(myProject, true, false);

@@ -28,7 +28,6 @@ import net.javaru.iip.frc.riolog.tcp.TcpRioLogMonitorProjectService;
 import net.javaru.iip.frc.riolog.udp.UdpRioLogMonitorProjectService;
 import net.javaru.iip.frc.settings.FrcProjectTeamNumberChangeListener;
 import net.javaru.iip.frc.settings.FrcProjectTeamNumberService;
-import net.javaru.iip.frc.settings.FrcRoboRioSettings;
 
 
 
@@ -154,7 +153,6 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
     public void onTeamNumberChange(int previousTeamNumber, int newTeamNumber)
     {
         LOG.debug("[FRC] RioLog Service Responding to a change in the Team Number from '" + previousTeamNumber + "' to '" + newTeamNumber + "'.");
-        FrcRoboRioSettings.getInstance(myProject).setTeamNumber(newTeamNumber); // FrcRoboRioSettings has its own listener, but since we can't be sure of the call order, we set it here as well.
         updateAll();
     }
     

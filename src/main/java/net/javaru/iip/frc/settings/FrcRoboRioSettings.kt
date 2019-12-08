@@ -59,7 +59,7 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
         fun getInstance(project: Project): FrcRoboRioSettings
         {
             val settings = project.service<FrcRoboRioSettings>()
-            settings.teamNumber = FrcProjectTeamNumberService.getInstance(project).teamNumber
+            settings.project = project
             return settings
         }
         
@@ -68,17 +68,7 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
         fun clone(original: FrcRoboRioSettings): FrcRoboRioSettings = original.copy()
     }
 
-
-    /* TODO: ideally the team number should be a part of this data 
-             It should be gotten from the  FrcProjectTeamNumberService manages
-             But that will take some rework. For now it is here, and the 
-             TeamNumberChangeListenerServiceForFrcRoboRioSettings (code below and initialized in FrcProjectComponentIml)
-             keeps it updated from the FrcProjectTeamNumberService
-             It works ok, but is a bit messy
-     */
-    var teamNumber: Int = FrcApplicationSettings.getInstance().teamNumber
-    @com.intellij.util.xmlb.annotations.Transient set
-    @com.intellij.util.xmlb.annotations.Transient get
+    private var project: Project? = null
     
     private val LOG = Logger.getInstance(FrcRoboRioSettings::class.java)
 
@@ -94,6 +84,9 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
         XmlSerializerUtil.copyBean(state, this)
     }
 
+    // The project should never be null since it is immediately set when an instance is obtained. 
+    // But just in case we default to the Application level team number since in 90% of the time that will be OK
+    private fun teamNumber() = if (project != null) FrcProjectTeamNumberService.getInstance(project!!).teamNumber else FrcApplicationSettings.getInstance().teamNumber
     
     // NOTE: These helper methods break normal naming conventions by using 
     //       some snake_case rather than solely conventional camelCase.
@@ -132,7 +125,7 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
 
     @JvmOverloads
     @com.intellij.util.xmlb.annotations.Transient
-    fun getRoboRioHostDefault_mDNS(roboRioTeamNumber: Int = teamNumber): String = createRoboRioHostDefault_mDNS(roboRioTeamNumber)
+    fun getRoboRioHostDefault_mDNS(roboRioTeamNumber: Int = teamNumber()): String = createRoboRioHostDefault_mDNS(roboRioTeamNumber)
 
     private fun createRoboRioHostDefault_mDNS(teamNumber: Int): String = String.format(ROBORIO_HOST_mDNS_TEMPLATE, teamNumber)
 
@@ -170,7 +163,7 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
 
     @JvmOverloads
     @com.intellij.util.xmlb.annotations.Transient
-    fun getRoboRioHostDefault_DNS(roboRioTeamNumber: Int = teamNumber): String = createRoboRioHostDefault_DNS(roboRioTeamNumber)
+    fun getRoboRioHostDefault_DNS(roboRioTeamNumber: Int = teamNumber()): String = createRoboRioHostDefault_DNS(roboRioTeamNumber)
 
     private fun createRoboRioHostDefault_DNS(teamNumber: Int): String = String.format(ROBORIO_HOST_DNS_TEMPLATE, teamNumber)
 
@@ -209,7 +202,7 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
 
     @JvmOverloads
     @com.intellij.util.xmlb.annotations.Transient
-    fun getRoboRioHostDefault_FieldLocal(roboRioTeamNumber: Int = teamNumber): String = createRoboRioHostDefault_FieldLocal(roboRioTeamNumber)
+    fun getRoboRioHostDefault_FieldLocal(roboRioTeamNumber: Int = teamNumber()): String = createRoboRioHostDefault_FieldLocal(roboRioTeamNumber)
 
     private fun createRoboRioHostDefault_FieldLocal(teamNumber: Int): String = String.format(ROBORIO_HOST_FIELD_LOCAL_TEMPLATE, teamNumber)
 
@@ -254,7 +247,7 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
 
     @JvmOverloads
     @com.intellij.util.xmlb.annotations.Transient
-    fun getRoboRioHostDefault_IP(roboRioTeamNumber: Int = teamNumber): String = createRoboRioHostDefault_IP(roboRioTeamNumber)
+    fun getRoboRioHostDefault_IP(roboRioTeamNumber: Int = teamNumber()): String = createRoboRioHostDefault_IP(roboRioTeamNumber)
 
     private fun createRoboRioHostDefault_IP(teamNumber: Int): String
     {
@@ -313,23 +306,3 @@ data class ImmutableFrcRoboRioSettings internal constructor(val roboRioHostRawMD
                                                             val roboRioHostRawIp: String,
                                                             val roboRioHostRawUsb: String,
                                                             val roboRioHostRawFieldLocal: String)
-
-// TODO: This is a temporary work around to handle team number changes until we can remove it as a property in the FrcRoboRioSettings 
-class TeamNumberChangeListenerServiceForFrcRoboRioSettings private constructor(private val project: Project): FrcProjectTeamNumberChangeListener
-{
-    init
-    {
-        project.messageBus.connect().subscribe(FrcProjectTeamNumberService.PROJECT_TEAM_NUMBER_CHANGES, this)
-    }
-    
-    override fun onTeamNumberChange(previousTeamNumber: Int, newTeamNumber: Int)
-    {
-        FrcRoboRioSettings.getInstance(project).teamNumber = newTeamNumber
-    }
-
-    companion object
-    {
-        @JvmStatic
-        fun getInstance(project: Project) = project.service<TeamNumberChangeListenerServiceForFrcRoboRioSettings>()
-    }
-}

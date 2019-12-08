@@ -236,7 +236,6 @@
 
         <projectService id="FRC.TcpRioSocketConnectorProjectService" serviceImplementation="net.javaru.iip.frc.riolog.tcp.TcpRioSocketConnectorProjectService" />
         <projectService id="FRC.FrcProjectTeamNumberService" serviceImplementation="net.javaru.iip.frc.settings.FrcProjectTeamNumberService" />
-        <projectService id="FRC.TeamNumberChangeListenerServiceForFrcRoboRioSettings" serviceImplementation="net.javaru.iip.frc.settings.TeamNumberChangeListenerServiceForFrcRoboRioSettings" />
         <projectService id="FRC.FrcProjectSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcProjectGeneralSettings" />
         <projectService id="FRC.FrcRoboRioSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcRoboRioSettings" />
         <projectService id="FRC.FrcSshSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcSshSettings" />

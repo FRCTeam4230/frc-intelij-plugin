@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -26,6 +26,9 @@ import com.intellij.openapi.project.ProjectManager;
 import net.javaru.iip.frc.riolog.ssh.SshRioLogMonitorProjectService;
 import net.javaru.iip.frc.riolog.tcp.TcpRioLogMonitorProjectService;
 import net.javaru.iip.frc.riolog.udp.UdpRioLogMonitorProjectService;
+import net.javaru.iip.frc.settings.FrcProjectTeamNumberChangeListener;
+import net.javaru.iip.frc.settings.FrcProjectTeamNumberService;
+import net.javaru.iip.frc.settings.FrcRoboRioSettings;
 
 
 
@@ -41,7 +44,7 @@ import net.javaru.iip.frc.riolog.udp.UdpRioLogMonitorProjectService;
  * </pre>
  * There are also three static {@code update} methods that can be used when the caller has access to a facet, a module, or a project.
  */
-public class RioLogProjectService
+public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
 {
     private static final Logger LOG = Logger.getInstance(RioLogProjectService.class);
 
@@ -109,6 +112,7 @@ public class RioLogProjectService
     {
         LOG.debug("[FRC] RioLogProjectService constructor called.");
         this.myProject = myProject;
+        myProject.getMessageBus().connect().subscribe(FrcProjectTeamNumberService.getPROJECT_TEAM_NUMBER_CHANGES(), this);
         this.udpRioLogConsoleProjectService = UdpRioLogMonitorProjectService.getInstance(myProject);
         this.sshRioLogConsoleProjectService = SshRioLogMonitorProjectService.getInstance(myProject);
         this.tcpRioLogConsoleProjectService = TcpRioLogMonitorProjectService.getInstance(myProject);
@@ -144,7 +148,17 @@ public class RioLogProjectService
     }
 
     public synchronized void updateTcp() { tcpRioLogConsoleProjectService.update(); }
-
+    
+    
+    @Override
+    public void onTeamNumberChange(int previousTeamNumber, int newTeamNumber)
+    {
+        LOG.debug("[FRC] RioLog Service Responding to a change in the Team Number from '" + previousTeamNumber + "' to '" + newTeamNumber + "'.");
+        FrcRoboRioSettings.getInstance(myProject).setTeamNumber(newTeamNumber); // FrcRoboRioSettings has its own listener, but since we can't be sure of the call order, we set it here as well.
+        updateAll();
+    }
+    
+    
     public void activateUdp()
     {
         udpRioLogConsoleProjectService.activate();

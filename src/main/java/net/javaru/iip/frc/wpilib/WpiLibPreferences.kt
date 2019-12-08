@@ -18,10 +18,6 @@ package net.javaru.iip.frc.wpilib
 
 import com.esotericsoftware.minlog.Log
 import com.intellij.json.psi.JsonFile
-import com.intellij.json.psi.JsonNumberLiteral
-import com.intellij.json.psi.JsonObject
-import com.intellij.json.psi.JsonStringLiteral
-import com.intellij.json.psi.JsonValue
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
@@ -36,7 +32,11 @@ import com.intellij.psi.PsiFileSystemItem
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScopesCore
+import com.intellij.util.SmartList
+import net.javaru.iip.frc.settings.UN_CONFIGURED_TEAM_NUMBER
+import net.javaru.iip.frc.util.getIntPropertyValue
 import net.javaru.iip.frc.util.getModules
+import net.javaru.iip.frc.util.getStringPropertyValue
 
 private object WpiLibPreferencesFunctions
 private val LOG = Logger.getInstance(WpiLibPreferencesFunctions::class.java)
@@ -51,7 +51,8 @@ const val projectYearPropertyName = "projectYear"
 
 fun findLikelyWpiLibPreferencesPsiFileAsJsonFile(project: Project): JsonFile?
 {
-    return findLikelyWpiLibPreferencesPsiFile(project) as JsonFile
+    val psiFile = findLikelyWpiLibPreferencesPsiFile(project)
+    return if (psiFile is JsonFile) psiFile else null
 }
 
 fun findLikelyWpiLibPreferencesPsiFile(project: Project): PsiFile?
@@ -94,7 +95,7 @@ fun findWpiLibPreferencesPsiFiles(project: Project, filter: (module: Module) -> 
         But that would be highly unlikely.
         Note, any such files in either of the `resources` directory are not found.
      */
-    val foundFiles = mutableListOf<PsiFile>()
+    val foundFiles = SmartList<PsiFile>()
 
     try
     {
@@ -121,7 +122,7 @@ fun findWpiLibPreferencesPsiFiles(project: Project, filter: (module: Module) -> 
 
 fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
 {
-    val foundFiles = mutableListOf<PsiFile>()
+    val foundFiles = SmartList<PsiFile>()
     
     val project = module.project
 
@@ -172,56 +173,20 @@ fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
 }
 
 /**
- * Returns the configured teamNumber in the `wpilib_preferences.json` file, or -1 if it cannot be found.
+ * Returns the configured teamNumber in the `wpilib_preferences.json` file, or 0 `UN_CONFIGURED_TEAM_NUMBER` (i.e. 0) 
+ * if it cannot be found, or is not a valid integer value.
  */
 fun getConfiguredTeamNumber(project: Project): Int
 {
-    val jsonFile = findLikelyWpiLibPreferencesPsiFileAsJsonFile(project)
-    return if (jsonFile == null) -1 else getConfiguredTeamNumber(jsonFile)
+    return runReadAction {
+        findLikelyWpiLibPreferencesPsiFileAsJsonFile(project)?.getIntPropertyValue(teamNumberPropertyName) ?: UN_CONFIGURED_TEAM_NUMBER
+    }
 }
-
-/**
- * Returns the configured teamNumber in the `wpilib_preferences.json` file, or -1 if it cannot be found.
- */
-fun getConfiguredTeamNumber(wpiLibPreferences: JsonFile): Int = getIntPropertyValue(wpiLibPreferences, teamNumberPropertyName) ?: -1
 
 
 fun getConfiguredProjectYear(project: Project): String?
 {
-    val jsonFile = findLikelyWpiLibPreferencesPsiFileAsJsonFile(project)
-    return if (jsonFile == null) null else getConfiguredProjectYear(jsonFile)
-}
-
-fun getConfiguredProjectYear(wpiLibPreferences: JsonFile): String? = getStringPropertyValue(wpiLibPreferences, projectYearPropertyName)
-
-
-@Suppress("SameParameterValue")
-private fun getIntPropertyValue(wpiLibPreferences: JsonFile, propertyName: String): Int?
-{
     return runReadAction {
-        val jsonValue = getJsonValue(wpiLibPreferences, propertyName)
-        val jsonNumberLiteral = jsonValue as JsonNumberLiteral?
-        jsonNumberLiteral?.value?.toInt()
-    }
-}
-
-
-@Suppress("SameParameterValue")
-private fun getStringPropertyValue(wpiLibPreferences: JsonFile, propertyName: String): String?
-{
-    return runReadAction {
-        val jsonValue = getJsonValue(wpiLibPreferences, propertyName)
-        val jsonStringLiteral = jsonValue as JsonStringLiteral?
-        jsonStringLiteral?.value
-    }
-}
-
-private fun getJsonValue(wpiLibPreferences: JsonFile, propertyName: String): JsonValue?
-{
-    return runReadAction {
-        val toplevelValue = wpiLibPreferences.topLevelValue
-        val jsonObject = toplevelValue as JsonObject?
-        val jsonProperty = jsonObject?.findProperty(propertyName)
-        jsonProperty?.value
+        findLikelyWpiLibPreferencesPsiFileAsJsonFile(project)?.getStringPropertyValue(projectYearPropertyName)
     }
 }

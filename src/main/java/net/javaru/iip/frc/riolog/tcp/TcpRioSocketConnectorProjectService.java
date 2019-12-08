@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 
+import net.javaru.iip.frc.settings.FrcProjectTeamNumberService;
 import net.javaru.iip.frc.settings.FrcRoboRioSettings;
 
 
@@ -89,6 +90,8 @@ public class TcpRioSocketConnectorProjectService
             lock.unlock();
         }
 
+        final FrcProjectTeamNumberService teamNumberService = FrcProjectTeamNumberService.getInstance(project);
+        teamNumberService.getTeamNumber();
         final FrcRoboRioSettings roboRioSettings = FrcRoboRioSettings.getInstance(project);
         // start connection attempts to various address possibilities
         startConnect(new byte[] {(byte) 127, 0, 0, 1});                     // 127.0.1.1                          localhost loopback

@@ -255,7 +255,6 @@ public class RoboRioConfigurationForm implements TeamNumberFormChangeListener
     
     private void updateFieldsWithNewTeamNumber(int newTeamNum)
     {
-        internalFrcRoboRioSettings.setTeamNumber(newTeamNum);
         if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_mDNS()) { roboRioMDnsHostName.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_mDNS(newTeamNum)); }
         if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_DNS()) { roboRioDnsHostName.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_DNS(newTeamNum)); }
         if (internalFrcRoboRioSettings.isRoboRioHostTheDefault_FieldLocal()) { roboRioFieldLocalHostName.setText(internalFrcRoboRioSettings.getRoboRioHostDefault_FieldLocal(newTeamNum)); }

@@ -45,17 +45,17 @@ import net.javaru.iip.frc.plugin.FrcPluginVersionManager;
 import net.javaru.iip.frc.riolog.RioLogProjectService;
 import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
+import net.javaru.iip.frc.settings.FrcProjectTeamNumberService;
+import net.javaru.iip.frc.settings.TeamNumberChangeListenerServiceForFrcRoboRioSettings;
 import net.javaru.iip.frc.util.FrcProjectExtsKt;
 import net.javaru.iip.frc.util.UriUtilsKt;
 import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
-import net.javaru.iip.frc.wpilib.WpiLibPreferencesKt;
 import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibVersionStatus;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT;
 import static net.javaru.iip.frc.actions.tools.DownloadWpiLibAction.NOTIFICATIONS_SUBTITLE;
 import static net.javaru.iip.frc.components.FrcProjectComponentImpl.NotificationKey.*;
-import static net.javaru.iip.frc.settings.FrcTeamNumberKt.UN_CONFIGURED_TEAM_NUMBER;
 
 
 // TODO: Issue #45: This projectComponent has a lot of technical debt, and frankly has become an ugly mess. Let's clean it up. We can migrate to Kotlin at the same time.
@@ -68,8 +68,6 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
     @NotNull
     private final Project myProject;
     
-    private int teamNumberForProject = UN_CONFIGURED_TEAM_NUMBER;
-
     private final static Map<Project, Map<NotificationKey, Notification>> notificationsTracker =  new HashMap<>(); 
     
     
@@ -225,7 +223,8 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         boolean isFrcProject = isFrcFacetedProject(myProject);
         if (isFrcProject)
         {
-            this.teamNumberForProject = WpiLibPreferencesKt.getConfiguredTeamNumber(myProject);
+            FrcProjectTeamNumberService.getInstance(myProject); // We need to initialize the registering of the VFS Change Listener so we can detect changes to the project team number
+            TeamNumberChangeListenerServiceForFrcRoboRioSettings.getInstance(myProject); // Need to get it to initialize       
             RioLogProjectService.getInstance(myProject).activateTcp();
             notifyToConfigureTeamNumIfNecessary(myProject, true);
             checkProjectFrcStatus(myProject, true, false);

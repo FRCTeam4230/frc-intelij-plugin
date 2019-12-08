@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ private const val USE_DEFAULT_HOST_PLACEHOLDER = "<<<Use Default Host>>>"
 // NOTE: This class is registered as an <projectService> in the plugin.xml
 @State(name = "FrcRoboRio", storages = [(Storage("frc/frc.xml"))])
 data class FrcRoboRioSettings @JvmOverloads constructor(
+        /* TODO: the team number needs to be removed as a property of this data class  as it should always be whats in the wpilib_preferences.json file which the FrcProjectTeamNumberService manages*/
         @com.intellij.util.xmlb.annotations.Transient var teamNumber: Int = FrcApplicationSettings.getInstance().teamNumber,
         var roboRioHostRawMDns: String = USE_DEFAULT_HOST_PLACEHOLDER,
         var roboRioHostRawDns: String = USE_DEFAULT_HOST_PLACEHOLDER,
@@ -52,14 +53,6 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
         var roboRioHostRawFieldLocal: String = USE_DEFAULT_HOST_PLACEHOLDER
                                                        ) : PersistentStateComponent<FrcRoboRioSettings>
 {
-    init
-    {
-        // TODO need to listen for applied team number changes, modify settings, and then publish URL/IP address change 
-        
-        
-    }
-
-    
     
     @Suppress("unused", "MemberVisibilityCanPrivate")
     companion object Settings
@@ -68,21 +61,13 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
         fun getInstance(project: Project): FrcRoboRioSettings
         {
             val settings = project.service<FrcRoboRioSettings>()
-            // TODO - MAJOR - NEED TO READ FROM WpiLibPreferences JSON FILE. Whether here of in FrcProjectGeneralSettings  
-            settings.teamNumber = FrcProjectGeneralSettings.getInstance(project).teamNumber
+            settings.teamNumber = FrcProjectTeamNumberService.getInstance(project).teamNumber
             return settings
         }
         
-//        @JvmStatic
-//        fun getImmutableInstance(project: Project): ImmutableFrcRoboRioSettings
-//        {
-//            val (_ roboRioHostRawMDns, roboRioHostRawDns, roboRioHostRawIp, roboRioHostRawUsb, roboRioHostRawFieldLocal) = getInstance(project)
-//            return ImmutableFrcRoboRioSettings(roboRioHostRawMDns, roboRioHostRawDns, roboRioHostRawIp, roboRioHostRawUsb, roboRioHostRawFieldLocal)
-//        }
 
         @JvmStatic
         fun clone(original: FrcRoboRioSettings): FrcRoboRioSettings = original.copy()
-        
     }
 
 
@@ -319,3 +304,23 @@ data class ImmutableFrcRoboRioSettings internal constructor(val roboRioHostRawMD
                                                             val roboRioHostRawIp: String,
                                                             val roboRioHostRawUsb: String,
                                                             val roboRioHostRawFieldLocal: String)
+
+// TODO: This is a temporary work around to handle team number changes until we can remove it as a property in the FrcRoboRioSettings 
+class TeamNumberChangeListenerServiceForFrcRoboRioSettings private constructor(private val project: Project): FrcProjectTeamNumberChangeListener
+{
+    init
+    {
+        project.messageBus.connect().subscribe(FrcProjectTeamNumberService.PROJECT_TEAM_NUMBER_CHANGES, this)
+    }
+    
+    override fun onTeamNumberChange(previousTeamNumber: Int, newTeamNumber: Int)
+    {
+        FrcRoboRioSettings.getInstance(project).teamNumber = newTeamNumber
+    }
+
+    companion object
+    {
+        @JvmStatic
+        fun getInstance(project: Project) = project.service<TeamNumberChangeListenerServiceForFrcRoboRioSettings>()
+    }
+}

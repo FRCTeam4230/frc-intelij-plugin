@@ -44,8 +44,6 @@ private const val USE_DEFAULT_HOST_PLACEHOLDER = "<<<Use Default Host>>>"
 // NOTE: This class is registered as an <projectService> in the plugin.xml
 @State(name = "FrcRoboRio", storages = [(Storage("frc/frc.xml"))])
 data class FrcRoboRioSettings @JvmOverloads constructor(
-        /* TODO: the team number needs to be removed as a property of this data class  as it should always be whats in the wpilib_preferences.json file which the FrcProjectTeamNumberService manages*/
-        @com.intellij.util.xmlb.annotations.Transient var teamNumber: Int = FrcApplicationSettings.getInstance().teamNumber,
         var roboRioHostRawMDns: String = USE_DEFAULT_HOST_PLACEHOLDER,
         var roboRioHostRawDns: String = USE_DEFAULT_HOST_PLACEHOLDER,
         var roboRioHostRawIp: String = USE_DEFAULT_HOST_PLACEHOLDER,
@@ -71,6 +69,17 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
     }
 
 
+    /* TODO: ideally the team number should be a part of this data 
+             It should be gotten from the  FrcProjectTeamNumberService manages
+             But that will take some rework. For now it is here, and the 
+             TeamNumberChangeListenerServiceForFrcRoboRioSettings (code below and initialized in FrcProjectComponentIml)
+             keeps it updated from the FrcProjectTeamNumberService
+             It works ok, but is a bit messy
+     */
+    var teamNumber: Int = FrcApplicationSettings.getInstance().teamNumber
+    @com.intellij.util.xmlb.annotations.Transient set
+    @com.intellij.util.xmlb.annotations.Transient get
+    
     private val LOG = Logger.getInstance(FrcRoboRioSettings::class.java)
 
     override fun getState(): FrcRoboRioSettings

@@ -665,7 +665,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 // this gets called when ever the selected SDK changes, including when the new project wizard is first opened (and FRC project is selected because it was last used)
                 // So we don't want to pop up a (modal) dialog. But we can set an internal "selected SDK tracking" property and then use that value in the validate method
                 // If no valid JDK is available in the list (after filtering), this method is simply NOT called. (i.e. it is not called with a null value)
-                LOG.trace("[FRC] onSdkSelected called with sdk: sdk='$sdk' [type='${sdk?.sdkType}' version='${sdk?.versionString}' name = '${sdk?.name}'" )
+                @Suppress("SpellCheckingInspection")
+                LOG.debug("[FRC] onSdkSelected called with sdk: sdk='$sdk' [type='${sdk?.sdkType}' version='${sdk?.versionString}' name = '${sdk?.name}'  homePath = '${sdk?.homePath}' sdkModificator = '${sdk?.sdkModificator}'" )
                 selectedSdk = sdk
             }
         }

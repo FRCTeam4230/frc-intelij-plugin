@@ -192,10 +192,10 @@ fun JavaVersion?.extractLanguageLevel(): LanguageLevel = LanguageLevel.parse(toS
 
 fun ProjectJdkImpl.isValidJavaVersion(requiredMinimumJavaVersionFeatureLevel: Int): Boolean
 {
-    val jdkVersionString = versionString!!
-    val jdkVersion = JavaVersion.tryParse(jdkVersionString)
-
-    return (jdkVersion != null && jdkVersion.isAtLeast(requiredMinimumJavaVersionFeatureLevel))
+    val jdkVersion = JavaVersion.tryParse(this.versionString)
+    // We want to filter out other JavaSdkType (and JavaDependentSdkType) SDKs such as IdeaJdk (for plugin development) and even AndroidSdkType 
+    val isValidSdkType = this.sdkType is com.intellij.openapi.projectRoots.JavaSdk 
+    return (isValidSdkType && jdkVersion?.isAtLeast(requiredMinimumJavaVersionFeatureLevel) ?: false)
 }
 
 @JvmOverloads

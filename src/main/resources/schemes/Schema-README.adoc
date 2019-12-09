@@ -1,0 +1,16 @@
+
+
+The schema written by WPI is located at: 
+
+https://github.com/wpilibsuite/vscode-wpilib/blob/master/vscode-wpilib/resources/wpilibschema.json
+
+That schema is stored as `wpilibPreferencesDefault.schema.json`. However it is very basic in nature and does not provide any validation rules, descriptions, or default values. Therefore we've implemented the `wpilibPreferencesEnhanced.schema.json` schema with those. 
+
+Some links for writing JSON Schemas
+
+* https://json-schema.org[Main link to 'JSON Schema']
+* https://json-schema.org/learn/[Learning Resources]
+* https://tools.ietf.org/html/draft-handrews-json-schema-validation-01[The validation spec (v01)]
+* https://join.slack.com/t/json-schema/shared_invite/enQtNjc5NTk0MzkzODg5LTVlZGIxNmVhMGY2MWFlYTdiNDQ5NWFiZGUwOThhNmYxZDE0YzA5YjRiOTA5MGY4ZTZlZGZhZDFmYTY4NWM2N2Y[Join Slack Workspace]
+
+

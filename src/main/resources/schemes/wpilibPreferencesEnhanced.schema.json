@@ -1,0 +1,38 @@
+{
+    "title": "WPILibSettings",
+    "type": "object",
+    "required": [
+        "enableCppIntellisense",
+        "currentLanguage",
+        "projectYear",
+        "teamNumber"
+    ],
+    "properties": {
+        "enableCppIntellisense": {
+            "description": "If C++ Intellisense should be enabled (in VS Code). For Java projects, this should be set to false.",
+            "default": false,
+            "type": "boolean"
+        },
+        "currentLanguage": {
+            "description": "The programming language the project is using. Should be 'java' for Java & Kotlin projects.",
+            "default": "java",
+            "enum": ["java", "cpp"],
+            "type": "string"
+        },
+        "projectYear": {
+            "description": "The project year for the project. Examples: '2019, 'Beta2020-2', '2020'",
+            "examples": [
+                "2019",
+                "Beta2020-2",
+                "2020"],
+            "minLength": 4,
+            "type": "string"
+        },
+        "teamNumber": {
+            "description": "The team number as configured on the roboRIO.",
+            "exclusiveMinimum": 0,
+            "exclusiveMaximum": 25599,
+            "type": "integer"
+        }
+    }
+}

@@ -1,0 +1,18 @@
+{
+    "title": "WPILibSettings",
+    "type": "object",
+    "properties": {
+        "currentLanguage": {
+            "type": "string"
+        },
+        "teamNumber": {
+            "type": "integer"
+        },
+        "projectYear": {
+            "type": "string"
+        },
+        "enableCppIntellisense": {
+            "type": "boolean"
+        }
+    }
+}

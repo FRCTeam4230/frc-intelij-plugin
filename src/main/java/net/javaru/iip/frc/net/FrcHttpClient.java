@@ -42,6 +42,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.vcs.log.util.StopWatch;
 
 
 
@@ -65,9 +66,11 @@ public class FrcHttpClient
         final CloseableHttpClient httpClient = getHttpClient();
         final HttpClientContext httpClientContext = HttpClientContext.create();
         final HttpGet httpRequest = new HttpGet(uri);
+        final long start = System.currentTimeMillis();
         try (final CloseableHttpResponse httpResponse = httpClient.execute(httpRequest, httpClientContext))
         {
-            LOG.info("[FRC] http response status line was '" + httpResponse.getStatusLine() + "' for URI '" + uri + '\'');
+            final String duration = StopWatch.formatTime(System.currentTimeMillis() - start);
+            LOG.info("[FRC] http response status line was '" + httpResponse.getStatusLine() + "', taking " + duration + ", for URI '" + uri + '\'');
             final HttpEntity httpEntity = httpResponse.getEntity();
             final String xml = EntityUtils.toString(httpEntity, StandardCharsets.UTF_8);
             EntityUtils.consumeQuietly(httpEntity);
@@ -139,9 +142,11 @@ public class FrcHttpClient
         final CloseableHttpClient httpClient = getHttpClient();
         final HttpClientContext httpClientContext = HttpClientContext.create();
         final HttpGet httpRequest = new HttpGet(uri);
+        final long start = System.currentTimeMillis();
         try (final CloseableHttpResponse httpResponse = httpClient.execute(httpRequest, httpClientContext))
         {
-            LOG.info("[FRC] http response status line was '" + httpResponse.getStatusLine() + "' for URI '" + uri + '\'');
+            final String duration = StopWatch.formatTime(System.currentTimeMillis() - start);
+            LOG.info("[FRC] http response status line was '" + httpResponse.getStatusLine() + "', taking " + duration + ", for URI '" + uri + '\'');
             final HttpEntity httpEntity = httpResponse.getEntity();
             if (httpEntity == null)
             {

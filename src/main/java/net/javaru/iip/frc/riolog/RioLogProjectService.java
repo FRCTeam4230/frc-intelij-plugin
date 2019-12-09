@@ -130,7 +130,6 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
 
     public synchronized void updateAll()
     {
-        //For now, we are only going to update the primary console
         sshRioLogConsoleProjectService.update();
         udpRioLogConsoleProjectService.update();
         tcpRioLogConsoleProjectService.update();
@@ -153,7 +152,7 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
     public void onTeamNumberChange(int previousTeamNumber, int newTeamNumber)
     {
         LOG.debug("[FRC] RioLog Service Responding to a change in the Team Number from '" + previousTeamNumber + "' to '" + newTeamNumber + "'.");
-        updateAll();
+        update();
     }
     
     

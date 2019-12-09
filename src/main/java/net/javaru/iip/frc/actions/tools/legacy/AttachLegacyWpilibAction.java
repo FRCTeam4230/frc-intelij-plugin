@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.tools;
+package net.javaru.iip.frc.actions.tools.legacy;
 
 
 import java.io.IOException;
@@ -37,6 +37,7 @@ import com.intellij.openapi.progress.Task.Backgroundable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 
+import net.javaru.iip.frc.actions.tools.AbstractFrcToolsAction;
 import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.notify.FrcNotifications;
@@ -47,17 +48,17 @@ import net.javaru.iip.frc.util.LibDef;
 import net.javaru.iip.frc.util.LibDefBuilder;
 import net.javaru.iip.frc.util.LibDirType;
 import net.javaru.iip.frc.util.LibraryUtilsKt;
-import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
+import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibPaths;
 import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloader;
 
 
 
 
-public class AttachWpilibAction extends AbstractFrcToolsAction
+public class AttachLegacyWpilibAction extends AbstractFrcToolsAction
 {
     @SuppressWarnings("unused")
-    private static final Logger LOG = Logger.getInstance(AttachWpilibAction.class);
+    private static final Logger LOG = Logger.getInstance(AttachLegacyWpilibAction.class);
 
 
     @Override
@@ -68,7 +69,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                                        !project.isDisposed() &&
                                        FrcFacetKt.isFrcFacetedProject(project) &&
                                        !FrcProjectExtsKt.isGradleProject(project)  && /* TODO: Need to reverse this and check if it is an Ant Based Project once the isAntBasedFrcProject method is implemented*/
-                                       !WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project));
+                                       !LegacyWpiLibLibrariesUtils.isLegacyWpilibAttachedViaReadAction(project));
     }
 
 
@@ -94,7 +95,7 @@ public class AttachWpilibAction extends AbstractFrcToolsAction
                     if (frcFacet != null)
                     {
                         //TODO: need to see if it is present as a Project library, and if so, attach that
-                        if (WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(module))
+                        if (LegacyWpiLibLibrariesUtils.isLegacyWpilibAttachedViaReadAction(module))
                         {
                             Notifications.Bus.notify(new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
                                                                       FrcNotifications.Companion.getIconInfo(),

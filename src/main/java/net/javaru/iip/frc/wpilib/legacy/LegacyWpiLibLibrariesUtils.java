@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.wpilib;
+package net.javaru.iip.frc.wpilib.legacy;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,9 +56,8 @@ import com.intellij.psi.impl.compiled.ClassFileDecompiler;
 import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.util.FindClassUtils;
 import net.javaru.iip.frc.util.FrcFileUtils;
-import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibPaths;
+import net.javaru.iip.frc.wpilib.WpiLibConstants;
 import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloader;
-import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibVersionStatus;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionExtKt;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
@@ -67,9 +66,9 @@ import static net.javaru.iip.frc.util.FindClassUtils.isLibraryPresent;
 
 
 
-public class WpiLibLibrariesUtils
+public class LegacyWpiLibLibrariesUtils
 {
-    private static final Logger LOG = Logger.getInstance(WpiLibLibrariesUtils.class);
+    private static final Logger LOG = Logger.getInstance(LegacyWpiLibLibrariesUtils.class);
     
     // Network tables was completely rewritten for 2018. Jar changed from NetworkTables.jar to ntcore.jar
     public static final String NETWORK_TABLES_PRE_2018_CLASS_1 = "edu.wpi.first.wpilibj.networktables.NetworkTable";
@@ -88,12 +87,12 @@ public class WpiLibLibrariesUtils
     }
     
     
-    private static boolean isWpilibAttached(@NotNull Project project)
+    private static boolean isLegacyWpilibAttached(@NotNull Project project)
     {
         //noinspection SimplifiableIfStatement
         if (project.isInitialized())
         {
-            return isLibraryPresent(project, WpiLibConstants.ROBOT_BASE_FQN) ||
+            return FindClassUtils.isLibraryPresent(project, WpiLibConstants.ROBOT_BASE_FQN) ||
                    isLibraryPresent(project, WpiLibConstants.ITERATIVE_ROBOT_FQN) ||
                    isLibraryPresent(project, WpiLibConstants.VERSION_CLASS_FQN);
         }
@@ -105,9 +104,9 @@ public class WpiLibLibrariesUtils
     }
 
 
-    public static boolean isWpilibAttachedViaReadAction(@NotNull Project project)
+    public static boolean isLegacyWpilibAttachedViaReadAction(@NotNull Project project)
     {
-        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isWpilibAttached(project));
+        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isLegacyWpilibAttached(project));
     }
 
 
@@ -168,7 +167,7 @@ public class WpiLibLibrariesUtils
 
     private static boolean areAllPresent(@NotNull Project project)
     {
-        final boolean wpilibPresent = isWpilibAttached(project);
+        final boolean wpilibPresent = isLegacyWpilibAttached(project);
         final boolean networkTablesPresent = isNetworkTablesPresent(project);
         final boolean openCvPresent = isOpenCvPresent(project);
         final boolean csCorePresent = isCsCorePresent(project);
@@ -184,20 +183,20 @@ public class WpiLibLibrariesUtils
     }
 
 
-    private static boolean isWpilibAttached(@NotNull Module module)
+    private static boolean isLegacyWpilibAttached(@NotNull Module module)
     {
         return isLibraryPresent(module, WpiLibConstants.ROBOT_BASE_FQN) ||
                isLibraryPresent(module, WpiLibConstants.ITERATIVE_ROBOT_FQN);
     }
 
 
-    public static boolean isWpilibAttachedViaReadAction(@NotNull Module module)
+    public static boolean isLegacyWpilibAttachedViaReadAction(@NotNull Module module)
     {
-        return DumbService.getInstance(module.getProject()).runReadActionInSmartMode(() -> isWpilibAttached(module));
+        return DumbService.getInstance(module.getProject()).runReadActionInSmartMode(() -> isLegacyWpilibAttached(module));
     }
 
 
-    public static boolean isWpilibDownloadedToSystem()
+    public static boolean isLegacyWpilibDownloadedToSystem()
     {
         try
         {
@@ -210,9 +209,9 @@ public class WpiLibLibrariesUtils
     }
 
 
-    public static boolean isWpilibDownloadedToSystemViaReadAction()
+    public static boolean isLegacyWpilibDownloadedToSystemViaReadAction()
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) WpiLibLibrariesUtils::isWpilibDownloadedToSystem);
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) LegacyWpiLibLibrariesUtils::isLegacyWpilibDownloadedToSystem);
     }
 
     
@@ -225,19 +224,19 @@ public class WpiLibLibrariesUtils
     
     public static boolean isCommonDownloadedToSystemViaReadAction()
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) WpiLibLibrariesUtils::isCommonDownloadedToSystem);
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) LegacyWpiLibLibrariesUtils::isCommonDownloadedToSystem);
     }
 
 
     public static boolean is2018CommonRefreshNeeded()
     {
-        final WpiLibVersion downloadedVersion = determineSystemAvailableWpiLibVersion();
+        final WpiLibVersion downloadedVersion = determineSystemAvailableLegacyWpiLibVersion();
         return downloadedVersion != null && WpiLibVersionExtKt.is2018Project(downloadedVersion) && !isCommonDownloadedToSystem();
     }
 
     public static boolean is2018CommonRefreshNeededViaReadAction()
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) WpiLibLibrariesUtils::is2018CommonRefreshNeeded);
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) LegacyWpiLibLibrariesUtils::is2018CommonRefreshNeeded);
     }
 
     private static boolean isCsCorePresent(@NotNull Module module)
@@ -298,7 +297,7 @@ public class WpiLibLibrariesUtils
     private static boolean areAllPresent(@NotNull Module module)
     {
         // wpiutil.jar was added in v2018 and has only a single class - not check on it for now
-        return isWpilibAttached(module) && isNetworkTablesPresent(module) && isOpenCvPresent(module) && isCsCorePresent(module);
+        return isLegacyWpilibAttached(module) && isNetworkTablesPresent(module) && isOpenCvPresent(module) && isCsCorePresent(module);
     }
 
 
@@ -309,18 +308,18 @@ public class WpiLibLibrariesUtils
 
 
     @Nullable
-    public static Library findExistingWpilibJavaLibDirLibrary(@NotNull Module module)
+    public static Library findExistingLegacyWpilibJavaLibDirLibrary(@NotNull Module module)
     {
         final Path libDir = LegacyWpiLibPaths.getJavaLibDir();
         return findExistingDirBasedLibrary(module, libDir);
     }
     
-    private static boolean isWpilibJavaLibDirAttached(@NotNull Project project)
+    private static boolean isLegacyWpilibJavaLibDirAttached(@NotNull Project project)
     {
         final Module[] modules = ModuleManager.getInstance(project).getModules();
         for (Module module : modules)
         {
-            if (findExistingWpilibJavaLibDirLibrary(module) != null)
+            if (findExistingLegacyWpilibJavaLibDirLibrary(module) != null)
             {
                 return true;
             }
@@ -329,9 +328,9 @@ public class WpiLibLibrariesUtils
     }
 
 
-    public static boolean isWpilibJavaLibDirAttachedViaReadAction(@NotNull Project project)
+    public static boolean isLegacyWpilibJavaLibDirAttachedViaReadAction(@NotNull Project project)
     {
-        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isWpilibJavaLibDirAttached(project));
+        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isLegacyWpilibJavaLibDirAttached(project));
     }
 
     @Nullable
@@ -387,7 +386,7 @@ public class WpiLibLibrariesUtils
     }
 
 
-    private static boolean isUserLibAttached(@NotNull Project project)
+    private static boolean isLegacyUserLibAttached(@NotNull Project project)
     {
         final Module[] modules = ModuleManager.getInstance(project).getModules();
         for (Module module : modules)
@@ -402,17 +401,17 @@ public class WpiLibLibrariesUtils
 
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public static boolean isUserLibAttachedViaReadAction(@NotNull Project project)
+    public static boolean isLegacyUserLibAttachedViaReadAction(@NotNull Project project)
     {
-        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isUserLibAttached(project));
+        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isLegacyUserLibAttached(project));
     }
 
 
-    private static boolean isUserLibNonEmptyAndNotAttached(@NotNull Project project)
+    private static boolean isLegacyUserLibNonEmptyAndNotAttached(@NotNull Project project)
     {
         try
         {
-            return FrcFileUtils.directoryHasJars(LegacyWpiLibPaths.getUserLibDir(), true) && !isUserLibAttached(project);
+            return FrcFileUtils.directoryHasJars(LegacyWpiLibPaths.getUserLibDir(), true) && !isLegacyUserLibAttached(project);
         }
         catch (IOException e)
         {
@@ -423,35 +422,35 @@ public class WpiLibLibrariesUtils
     }
 
 
-    public static boolean isUserLibNonEmptyAndAttachedViaReadAction(@NotNull Project project)
+    public static boolean isLegacyUserLibNonEmptyAndAttachedViaReadAction(@NotNull Project project)
     {
-        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isUserLibNonEmptyAndNotAttached(project));
+        return DumbService.getInstance(project).runReadActionInSmartMode(() -> isLegacyUserLibNonEmptyAndNotAttached(project));
     }
 
 
     @Nullable
-    public static WpiLibVersion determineAvailableWpiLibVersion()
+    public static WpiLibVersion determineAvailableLegacyWpiLibVersion()
     {
         return LegacyWpiLibDownloader.getLatestVersionAvailable();
     }
     
 
     @Nullable
-    public static WpiLibVersion determineAttachedWpiLibVersionViaReadAction(@NotNull Project project)
+    public static WpiLibVersion determineAttachedLegacyWpiLibVersionViaReadAction(@NotNull Project project)
     {
-        return DumbService.getInstance(project).runReadActionInSmartMode(() -> determineAttachedWpiLibVersion(project));
+        return DumbService.getInstance(project).runReadActionInSmartMode(() -> determineAttachedLegacyWpiLibVersion(project));
     }
 
     @Nullable
-    public static WpiLibVersion determineAttachedWpiLibVersion(@NotNull Project project)
+    public static WpiLibVersion determineAttachedLegacyWpiLibVersion(@NotNull Project project)
     {
-        final String versionString = determineAttachedWpiLibVersionString(project);
+        final String versionString = determineLegacyAttachedWpiLibVersionString(project);
         return extractWpiLibVersionFromVersionString(versionString);
     }
 
-    public static String determineAttachedWpiLibVersionString(@NotNull Project project)
+    public static String determineLegacyAttachedWpiLibVersionString(@NotNull Project project)
     {
-        if (!isWpilibAttachedViaReadAction(project))
+        if (!isLegacyWpilibAttachedViaReadAction(project))
         {
             return FrcBundle.message("frc.wpilib.not.attached");
         }
@@ -490,28 +489,28 @@ public class WpiLibLibrariesUtils
 
  
     @Nullable
-    public static WpiLibVersion determineSystemAvailableWpiLibVersionViaReadAction()
+    public static WpiLibVersion determineSystemAvailableLegacyWpiLibVersionViaReadAction()
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<WpiLibVersion>) WpiLibLibrariesUtils::determineSystemAvailableWpiLibVersion);
+        return ApplicationManager.getApplication().runReadAction((Computable<WpiLibVersion>) LegacyWpiLibLibrariesUtils::determineSystemAvailableLegacyWpiLibVersion);
     }
     
     @Nullable
-    public static WpiLibVersion determineSystemAvailableWpiLibVersion()
+    public static WpiLibVersion determineSystemAvailableLegacyWpiLibVersion()
     {
-        final String versionString = determineSystemAvailableWpiLibVersionString();
+        final String versionString = determineSystemAvailableLegacyWpiLibVersionString();
         final WpiLibVersion version = extractWpiLibVersionFromVersionString(versionString);
         if (version != null) {LOG.debug("[FRC] WPILib version determined as " + version); }
         return version;
     }
 
-    public static String determineSystemAvailableWpiLibVersionStringViaReadAction()
+    public static String determineSystemAvailableLegacyWpiLibVersionStringViaReadAction()
     {
-        return ApplicationManager.getApplication().runReadAction((Computable<String>) WpiLibLibrariesUtils::determineSystemAvailableWpiLibVersionString);
+        return ApplicationManager.getApplication().runReadAction((Computable<String>) LegacyWpiLibLibrariesUtils::determineSystemAvailableLegacyWpiLibVersionString);
     }
     
-    public static String determineSystemAvailableWpiLibVersionString()
+    public static String determineSystemAvailableLegacyWpiLibVersionString()
     {
-        if (!isWpilibDownloadedToSystem())
+        if (!isLegacyWpilibDownloadedToSystem())
         {
             return FrcBundle.message("frc.wpilib.version.second.half.msg.not.on.system");
         }

@@ -36,9 +36,9 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupManager;
 
-import net.javaru.iip.frc.actions.tools.AttachUserLibDirAction;
-import net.javaru.iip.frc.actions.tools.AttachWpilibAction;
-import net.javaru.iip.frc.actions.tools.DownloadWpiLibAction;
+import net.javaru.iip.frc.actions.tools.legacy.AttachLegacyUserLibDirAction;
+import net.javaru.iip.frc.actions.tools.legacy.AttachLegacyWpilibAction;
+import net.javaru.iip.frc.actions.tools.legacy.DownloadLegacyWpiLibAction;
 import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.plugin.FrcPluginVersionManager;
@@ -48,12 +48,12 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.settings.FrcProjectTeamNumberService;
 import net.javaru.iip.frc.util.FrcProjectExtsKt;
 import net.javaru.iip.frc.util.UriUtilsKt;
-import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
+import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibVersionStatus;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT;
-import static net.javaru.iip.frc.actions.tools.DownloadWpiLibAction.NOTIFICATIONS_SUBTITLE;
+import static net.javaru.iip.frc.actions.tools.legacy.DownloadLegacyWpiLibAction.NOTIFICATIONS_SUBTITLE;
 import static net.javaru.iip.frc.components.FrcProjectComponentImpl.NotificationKey.*;
 
 
@@ -155,7 +155,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
 
     private void checkIssue8Refresh()
     {
-        if (isFrcFacetedProject(myProject) && WpiLibLibrariesUtils.is2018CommonRefreshNeededViaReadAction())
+        if (isFrcFacetedProject(myProject) && LegacyWpiLibLibrariesUtils.is2018CommonRefreshNeededViaReadAction())
         {
 
             final Notification refreshNotification = new Notification(FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP().getDisplayId(),
@@ -176,11 +176,11 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
             );
             Notifications.Bus.notify(refreshNotification, myProject);
 
-            DownloadWpiLibAction.downloadLatestInBackground(myProject,
-                                                            true,
-                                                            false,
-                                                            true,
-                                                            () -> {
+            DownloadLegacyWpiLibAction.downloadLatestInBackground(myProject,
+                                                                  true,
+                                                                  false,
+                                                                  true,
+                                                                  () -> {
                                                                 refreshNotification.expire();
                                                                 final Notification refreshCompletedNotification = new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP()
                                                                                                                                                              .getDisplayId(),
@@ -194,7 +194,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                                 Notifications.Bus.notify(refreshCompletedNotification, myProject);
 
                                                             },
-                                                            () -> {
+                                                                  () -> {
                                                                 refreshNotification.expire();
                                                                 final Notification refreshFailedNotification = new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP()
                                                                                                                                                           .getDisplayId(),
@@ -255,15 +255,15 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
         if ((knownFacetedProject || isFrcFacetedProject(project))  && FrcProjectExtsKt.isAntBasedFrcProject(project)) /* TODO: The ant project check needs improvement. Right now it just checks it is not a gradle project  */
         {
             final Map<NotificationKey, Notification> notificationMap = getNotificationMapForProject(project);
-            if (notificationMap.get(AttachWpiLibQuery) == null && !WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project))
+            if (notificationMap.get(AttachWpiLibQuery) == null && !LegacyWpiLibLibrariesUtils.isLegacyWpilibAttachedViaReadAction(project))
             {
-                if (WpiLibLibrariesUtils.isWpilibDownloadedToSystem())
+                if (LegacyWpiLibLibrariesUtils.isLegacyWpilibDownloadedToSystem())
                     { queueAttachWpilibQueryNotification(project); }
                 else 
                     { queueDownloadAndAttachWpilibNotification(project); }
             }
     
-            if (notificationMap.get(AttachUserLibQuery) == null && !WpiLibLibrariesUtils.isUserLibAttachedViaReadAction(project))
+            if (notificationMap.get(AttachUserLibQuery) == null && !LegacyWpiLibLibrariesUtils.isLegacyUserLibAttachedViaReadAction(project))
             {
                 queueMissingUserLibQueryNotification(project);
             }
@@ -328,7 +328,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                     theNotification.expire();
                                     if ("download".equals(event.getDescription()))
                                     {
-                                        DownloadWpiLibAction.downloadLatestInBackground(
+                                        DownloadLegacyWpiLibAction.downloadLatestInBackground(
                                             project,
                                             true,
                                             true);
@@ -353,7 +353,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                                theNotification.expire();
                                                                if ("download".equals(event.getDescription()))
                                                                {
-                                                                   DownloadWpiLibAction.downloadLatestInBackground(project, true, true);
+                                                                   DownloadLegacyWpiLibAction.downloadLatestInBackground(project, true, true);
                                                                }
                                                            }
         );
@@ -377,7 +377,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                                theNotification.expire();
                                                                if ("attach".equals(event.getDescription()))
                                                                {
-                                                                   AttachWpilibAction.attachWpiLib(project, false, true);
+                                                                   AttachLegacyWpilibAction.attachWpiLib(project, false, true);
                                                                }
                                                            }
         );
@@ -401,7 +401,7 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
                                                                theNotification.expire();
                                                                if ("attach".equals(event.getDescription()))
                                                                {
-                                                                   AttachUserLibDirAction.attachUserLib(project, false);
+                                                                   AttachLegacyUserLibDirAction.attachUserLib(project, false);
                                                                }
                                                            }
         );

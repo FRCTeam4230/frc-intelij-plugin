@@ -14,12 +14,13 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.tools;
+package net.javaru.iip.frc.actions.tools.legacy;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.project.Project;
 
+import net.javaru.iip.frc.actions.tools.AbstractFrcToolsAction;
 import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.util.FrcProjectExtsKt;
 

@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.tools;
+package net.javaru.iip.frc.actions.tools.legacy;
 
 
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +31,7 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.libraries.Library;
 
+import net.javaru.iip.frc.actions.tools.AbstractFrcToolsAction;
 import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.notify.FrcNotifications;
@@ -40,15 +41,15 @@ import net.javaru.iip.frc.util.LibDef;
 import net.javaru.iip.frc.util.LibDefBuilder;
 import net.javaru.iip.frc.util.LibDirType;
 import net.javaru.iip.frc.util.LibraryUtilsKt;
-import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
+import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibPaths;
 
 
 
 
-public class AttachUserLibDirAction extends AbstractFrcToolsAction
+public class AttachLegacyUserLibDirAction extends AbstractFrcToolsAction
 {
-    private static final Logger LOG = Logger.getInstance(AttachUserLibDirAction.class);
+    private static final Logger LOG = Logger.getInstance(AttachLegacyUserLibDirAction.class);
 
 
     @Override
@@ -60,7 +61,7 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
                                        FrcFacetKt.isFrcFacetedProject(project) &&
                                        !FrcProjectExtsKt.isGradleProject(project)
                                        && /* TODO: Need to reverse this and check if it is an Ant Based Project once the isAntBasedFrcProject method is implemented*/
-                                       !WpiLibLibrariesUtils.isUserLibAttachedViaReadAction(project));
+                                       !LegacyWpiLibLibrariesUtils.isLegacyUserLibAttachedViaReadAction(project));
     }
 
 
@@ -86,7 +87,7 @@ public class AttachUserLibDirAction extends AbstractFrcToolsAction
                 final FrcFacet frcFacet = facetManager.getFacetByType(FrcFacet.Companion.getFACET_TYPE_ID());
                 if (frcFacet != null)
                 {
-                    final Library existing = WpiLibLibrariesUtils.findExistingUserLibDirLibrary(module);
+                    final Library existing = LegacyWpiLibLibrariesUtils.findExistingUserLibDirLibrary(module);
                     if (existing != null)
                     {
                         Notifications.Bus.notify(new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),

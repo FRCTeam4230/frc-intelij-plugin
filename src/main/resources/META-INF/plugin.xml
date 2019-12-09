@@ -370,17 +370,17 @@
                popup="true"
                icon="/icons/first/FIRST_icon_16x16.png">
             <action id="frc.tools.AttachWpilibAction"
-                    class="net.javaru.iip.frc.actions.tools.AttachWpilibAction"
+                    class="net.javaru.iip.frc.actions.tools.legacy.AttachLegacyWpilibAction"
                     icon="AllIcons.Nodes.PpLib" />
             <!--suppress PluginXmlCapitalization -->
             <action id="frc.tools.AttachUserLibDirAction"
-                    class="net.javaru.iip.frc.actions.tools.AttachUserLibDirAction"
+                    class="net.javaru.iip.frc.actions.tools.legacy.AttachLegacyUserLibDirAction"
                     icon="AllIcons.General.User" />
             <action id="frc.tools.CheckWpiLbVersionStatusAction"
-                    class="net.javaru.iip.frc.actions.tools.CheckSystemWpiLbVersionAction"
+                    class="net.javaru.iip.frc.actions.tools.legacy.CheckSystemLegacyWpiLbVersionAction"
                     icon="/icons/wpi/wpilib-16.png"/>
             <action id="frc.tools.DownloadWpiLibAction"
-                    class="net.javaru.iip.frc.actions.tools.DownloadWpiLibAction"
+                    class="net.javaru.iip.frc.actions.tools.legacy.DownloadLegacyWpiLibAction"
                     icon="AllIcons.Actions.Download" />
             
             <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after" />

@@ -21,7 +21,6 @@ import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 
-import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 
 
@@ -140,10 +139,10 @@ public class LegacyWpiLibVersionStatus
         {
             try
             {
-                wpiLibAttached = WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project);
+                wpiLibAttached = LegacyWpiLibLibrariesUtils.isLegacyWpilibAttachedViaReadAction(project);
                 if (wpiLibAttached) 
                 {
-                    attachedVersion = WpiLibLibrariesUtils.determineAttachedWpiLibVersionViaReadAction(project);
+                    attachedVersion = LegacyWpiLibLibrariesUtils.determineAttachedLegacyWpiLibVersionViaReadAction(project);
                 }
             }
             catch (Exception ignore) {}
@@ -151,17 +150,17 @@ public class LegacyWpiLibVersionStatus
         
         try
         {
-            wpiLibDownloaded = WpiLibLibrariesUtils.isWpilibDownloadedToSystemViaReadAction();
+            wpiLibDownloaded = LegacyWpiLibLibrariesUtils.isLegacyWpilibDownloadedToSystemViaReadAction();
             if (wpiLibDownloaded)
             {
-                downloadedVersion = WpiLibLibrariesUtils.determineSystemAvailableWpiLibVersionViaReadAction();
+                downloadedVersion = LegacyWpiLibLibrariesUtils.determineSystemAvailableLegacyWpiLibVersionViaReadAction();
             }
         }
         catch (Exception ignore) {}
         
         try
         {
-            availableVersion = checkLatestAvailable ? WpiLibLibrariesUtils.determineAvailableWpiLibVersion() : null;
+            availableVersion = checkLatestAvailable ? LegacyWpiLibLibrariesUtils.determineAvailableLegacyWpiLibVersion() : null;
         }
         catch (Exception ignore) {}
         

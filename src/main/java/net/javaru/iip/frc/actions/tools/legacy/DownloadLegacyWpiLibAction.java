@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.tools;
+package net.javaru.iip.frc.actions.tools.legacy;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +29,7 @@ import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.util.IndexUtils;
-import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
+import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloadFailedException;
 import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloader;
 
@@ -37,9 +37,9 @@ import static net.javaru.iip.frc.components.FrcProjectComponentImpl.cancelLegacy
 
 
 
-public class DownloadWpiLibAction extends AbstractFrcToolsLegacyAction
+public class DownloadLegacyWpiLibAction extends AbstractFrcToolsLegacyAction
 {
-    private static final Logger LOG = Logger.getInstance(DownloadWpiLibAction.class);
+    private static final Logger LOG = Logger.getInstance(DownloadLegacyWpiLibAction.class);
 
     public static final String NOTIFICATIONS_SUBTITLE = "WPILib Download";
 
@@ -80,7 +80,7 @@ public class DownloadWpiLibAction extends AbstractFrcToolsLegacyAction
         
         new Backgroundable(project, "Downloading WPILib Update", false)
         {
-            final boolean wasAttached = project != null && WpiLibLibrariesUtils.isWpilibJavaLibDirAttachedViaReadAction(project);
+            final boolean wasAttached = project != null && LegacyWpiLibLibrariesUtils.isLegacyWpilibJavaLibDirAttachedViaReadAction(project);
             boolean isAttached = wasAttached;
             
 
@@ -92,7 +92,7 @@ public class DownloadWpiLibAction extends AbstractFrcToolsLegacyAction
                 LegacyWpiLibDownloader.downloadLatest();
                 if (project != null)
                 {
-                    isAttached = WpiLibLibrariesUtils.isWpilibJavaLibDirAttachedViaReadAction(project);
+                    isAttached = LegacyWpiLibLibrariesUtils.isLegacyWpilibJavaLibDirAttachedViaReadAction(project);
                     LOG.debug("[FRC] After download. isAttached = " + isAttached);
                 }
             }
@@ -111,7 +111,7 @@ public class DownloadWpiLibAction extends AbstractFrcToolsLegacyAction
                     if (autoAttach)
                     {
                         LOG.info("[FRC] Auto-attaching WPILib after download.");
-                        AttachWpilibAction.attachWpiLib(project, !wasAttached, true);
+                        AttachLegacyWpilibAction.attachWpiLib(project, !wasAttached, true);
                         notification = null;
                     }
                     else if (wasAttached)
@@ -132,8 +132,8 @@ public class DownloadWpiLibAction extends AbstractFrcToolsLegacyAction
                                                         {
                                                             if ("attach".equals(event.getDescription()))
                                                             {
-                                                                Logger.getInstance(DownloadWpiLibAction.class).debug("[FRC] Attaching WPILib library");
-                                                                AttachWpilibAction.attachWpiLib(project, true, true);
+                                                                Logger.getInstance(DownloadLegacyWpiLibAction.class).debug("[FRC] Attaching WPILib library");
+                                                                AttachLegacyWpilibAction.attachWpiLib(project, true, true);
                                                             }
                                                             theNotification.expire();
                                                         }

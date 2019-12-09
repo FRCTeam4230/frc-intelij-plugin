@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.tools;
+package net.javaru.iip.frc.actions.tools.legacy;
 
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -26,14 +26,14 @@ import com.intellij.openapi.ui.Messages;
 import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.util.FrcProjectExtsKt;
-import net.javaru.iip.frc.wpilib.WpiLibLibrariesUtils;
+import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibVersionStatus;
 
 
 
-public class CheckSystemWpiLbVersionAction extends AbstractFrcToolsLegacyAction
+public class CheckSystemLegacyWpiLbVersionAction extends AbstractFrcToolsLegacyAction
 {
-    private static final Logger LOG = Logger.getInstance(CheckSystemWpiLbVersionAction.class);
+    private static final Logger LOG = Logger.getInstance(CheckSystemLegacyWpiLbVersionAction.class);
 
 
     @Override
@@ -91,7 +91,7 @@ public class CheckSystemWpiLbVersionAction extends AbstractFrcToolsLegacyAction
             {
                 // CASE 1b: Attached, and it's the latest
                 
-                if (WpiLibLibrariesUtils.is2018CommonRefreshNeededViaReadAction())
+                if (LegacyWpiLibLibrariesUtils.is2018CommonRefreshNeededViaReadAction())
                 {
                     sb.append(indent).append("<b>While you have the latest version available, it needs to be refreshed to resolve a ").append("<br>");
                     sb.append(indent).append("previous issue &mdash; where some files where not properly extracted &mdash; which will ").append("<br>");
@@ -160,11 +160,11 @@ public class CheckSystemWpiLbVersionAction extends AbstractFrcToolsLegacyAction
            {
                if ("Attach".equals(yesText))
                {
-                   AttachWpilibAction.attachWpiLib(project, true, true);
+                   AttachLegacyWpilibAction.attachWpiLib(project, true, true);
                }
                else 
                {
-                   DownloadWpiLibAction.downloadLatestInBackground(project, true, true);
+                   DownloadLegacyWpiLibAction.downloadLatestInBackground(project, true, true);
                }
            }
        }
@@ -186,7 +186,7 @@ public class CheckSystemWpiLbVersionAction extends AbstractFrcToolsLegacyAction
                                        && !project.isDisposed()
                                        && FrcFacetKt.isFrcFacetedProject(project) &&
                                        !FrcProjectExtsKt.isGradleProject(project)  /* TODO: Need to reverse this and check if it is an Ant Based Project once the isAntBasedFrcProject method is implemented */
-                                       //&& WpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project)
+                                       //&& LegacyWpiLibLibrariesUtils.isWpilibAttachedViaReadAction(project)
         );
     }
 }

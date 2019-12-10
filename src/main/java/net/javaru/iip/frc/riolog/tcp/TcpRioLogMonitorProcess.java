@@ -89,6 +89,7 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         @Override
         public void run()
         {
+            //TODO This needs to be modified to check the FrcProjectTeamNumberService
             if (!getSettings().isTeamNumberConfigured())
             {
                 consoleWriter.println();

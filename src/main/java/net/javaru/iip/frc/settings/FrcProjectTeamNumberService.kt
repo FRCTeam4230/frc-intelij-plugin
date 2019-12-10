@@ -19,6 +19,7 @@ package net.javaru.iip.frc.settings
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
@@ -54,16 +55,20 @@ class FrcProjectTeamNumberService private constructor(val project:Project)
         
         // Examples: com/intellij/openapi/externalSystem/service/project/manage/SourceFolderManagerImpl.kt:115
         //           schemeManager/SchemeManagerFactoryImpl.kt:133  along with  com.intellij.configurationStore.schemeManager.SchemeFileTracker
+        // As noted in https://www.jetbrains.org/intellij/sdk/docs/basics/virtual_file_system.html#virtual-file-system-events
+        //      "VFS listeners are application level and will receive events for changes happening in all the projects opened by the user. 
+        //       You may need to filter out events that aren't relevant to your task (e.g., via ProjectFileIndex#isInContent())."
         project.messageBus.connect().subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener{
             override fun after(events: List<VFileEvent>)
             {
                 events.forEach { event: VFileEvent ->
-                    if (event.file?.name == wpiLibPreferencesFileName)
+                    val file = event.file
+                    if (file != null && ProjectFileIndex.getInstance(project).isInContent(file) && file.name == wpiLibPreferencesFileName)
                     {
                         val previousTeamNumber = teamNumber
                         teamNumber = getConfiguredTeamNumber(project)
                         // teamNumberChangeDispatcher.multicaster.onTeamNumberChange(previousTeamNumber, teamNumber)
-                        project.messageBus.syncPublisher(PROJECT_TEAM_NUMBER_CHANGES).onTeamNumberChange(previousTeamNumber, teamNumber)
+                        project.messageBus.syncPublisher(PROJECT_TEAM_NUMBER_CHANGES).onTeamNumberChange(project, previousTeamNumber, teamNumber)
                     }
                 }
             }
@@ -100,5 +105,5 @@ class FrcProjectTeamNumberService private constructor(val project:Project)
  */
 interface FrcProjectTeamNumberChangeListener: EventListener
 {
-    fun onTeamNumberChange(previousTeamNumber: Int, newTeamNumber: Int)
+    fun onTeamNumberChange(project: Project, previousTeamNumber: Int, newTeamNumber: Int)
 }

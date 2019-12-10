@@ -149,10 +149,13 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
     
     
     @Override
-    public void onTeamNumberChange(int previousTeamNumber, int newTeamNumber)
+    public void onTeamNumberChange(@NotNull Project project, int previousTeamNumber, int newTeamNumber)
     {
-        LOG.debug("[FRC] RioLog Service Responding to a change in the Team Number from '" + previousTeamNumber + "' to '" + newTeamNumber + "'.");
-        update();
+        if (project.equals(myProject))
+        {
+            LOG.debug("[FRC] RioLog Service Responding to a change in the Team Number from '" + previousTeamNumber + "' to '" + newTeamNumber + "'.");
+            update(); 
+        }
     }
     
     

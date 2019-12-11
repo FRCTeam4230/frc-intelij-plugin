@@ -16,8 +16,6 @@
 
 package net.javaru.iip.frc.wizard;
 
-import java.awt.event.ActionListener;
-import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
 
@@ -37,11 +35,10 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBTabbedPane;
 
 import net.javaru.iip.frc.FrcIcons.FRC;
+import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.i18n.FrcMessageKey;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
-import net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
-import net.javaru.iip.frc.wpilib.version.WpiLibVersionFiltersKt;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
@@ -72,9 +69,8 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     private JBList<FrcWizardTemplateDefinition> projectTemplatesJBList;
     private JBList<FrcWizardTemplateDefinition> exampleTemplatesJBList;
     private JBLabel projectTemplatesPaneLabel;
-    private JPanel wpilibVersionSelectionPanel;
-    private JBLabel wpilibVersionSelectionLabel;
-    private JComboBox<WpiLibVersion> wpilibVersionComboBox;
+    private JPanel wpilibVersionSelectedPanel;
+    private JBLabel wpilibVersionSelectedLabel;
     
     
     public FrcTemplateSelectionWizardStep(@NotNull FrcModuleBuilder builder,
@@ -94,16 +90,10 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     private void initComponents()
     {
         LOG.trace("[FRC] Entering FrcTemplateSelectionWizardStep.initComponents()");
-//        myAddToPanel.add(myParentProjectForm.getComponent());
-        
-        ActionListener updatingListener = e -> updateComponents();
-        // TODO add the Action Listener to any components that need to take action upon updating
-        
-        // TODO DELETABLE 
-//        // We may need to update this when the team number changed from an application setting to a project setting
-//        UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(FrcFacetSettings.getInstance().getTeamNumber()));
     
-        initWpiLibVersionComboBox();
+        // add the Action Listener to any components that need to take action upon updating
+        // ActionListener updatingListener = e -> updateComponents();
+
         initTabPane();
         initTemplatesLists();
         LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.initComponents()");
@@ -227,16 +217,6 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         myContext.setProjectBuilder(myBuilder);
         ProjectData parentProject = myParentProjectForm.getParentProject();
         myBuilder.setParentProject(parentProject);
-        
-        WpiLibVersion wpilibVersion = (WpiLibVersion) wpilibVersionComboBox.getSelectedItem();
-        if (wpilibVersion != null)
-        {
-            dataModel.setWpilibVersion(wpilibVersion);
-        }
-        else 
-        {
-            LOG.warn("[FRC] wpilibVersionComboBox returned null for the selected item.");    
-        }
     
         FrcWizardTemplateDefinition templateDefinition = determineSelectedTemplate();
         dataModel.setFrcWizardTemplateDefinition(templateDefinition);
@@ -265,8 +245,8 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     private void updateComponents()
     {
         LOG.trace("[FRC] Entering FrcTemplateSelectionWizardStep.updateComponents()");
-        final boolean isAddToVisible = myParentProjectForm.isVisible();
-        
+        // final boolean isAddToVisible = myParentProjectForm.isVisible();
+        updateWpiLibSelectedLabel();
         myParentProjectForm.updateComponents();
         LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.updateComponents()");
     }
@@ -294,30 +274,11 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     }
     
     
-    private void initWpiLibVersionComboBox()
+    private void updateWpiLibSelectedLabel()
     {
-        //TODO: We need to 
-        // ✔a) filter the list to remove the alphas, etc. 
-        //  b) have UI option to only show the latest version fpr each year (on by default) (com/intellij/find/impl/FindPopupPanel.java:1625)
-        //  c) have a UI option to show/hide betas (off by default)
-        // ✔d) make modifications so that the FrcProjectWizardData.wpilibVersion defaults to the latest and then that the selected item (below) matches
-    
-        final List<WpiLibVersion> versionList = GradleRioMavenMetadataState.getInstance(true).getWpiLibMavenMetadata().getWpiLibVersionsDescending();
-        
-        // Filter the list to include only releases, and the latest one if it is a release candidate or beta (for an unreleased version)
-        final List<WpiLibVersion> filteredList = WpiLibVersionFiltersKt.filterToDefaultListing(versionList);
-        final WpiLibVersion[] versions = filteredList.toArray(new WpiLibVersion[0]);
-        wpilibVersionComboBox.setModel(new DefaultComboBoxModel<>(versions));
-        int index = 0; // default to the first item in the list
-        if (filteredList.isEmpty())
-        {
-            index = -1; // if by some rare chance the list is empty, we set to the -1 flag to say don;t select anything.
-        }
-        else if (filteredList.size() >= 2 && filteredList.get(0).isPreRelease())
-        {
-            index = 1; // if the first item is a beta or RC we select the second item, i.e. the latest non beta/RC
-        }
-        wpilibVersionComboBox.setSelectedIndex(index);
+        final FrcProjectWizardData dataModel = myBuilder.getDataModel();
+        final WpiLibVersion wpilibVersion = dataModel.getWpilibVersion();
+        wpilibVersionSelectedLabel.setText(FrcBundle.message("frc.ui.wizard.templateSelectionStep.wpilibVersionSetToLabel.text", wpilibVersion));
     }
     
     private void initTabPane()

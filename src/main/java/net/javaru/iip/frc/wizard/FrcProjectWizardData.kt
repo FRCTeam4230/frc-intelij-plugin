@@ -34,7 +34,6 @@ class FrcProjectWizardData(
         var basePackage: String = DEFAULT_BASE_PACKAGE,
         var wpilibVersion: WpiLibVersion = GradleRioMavenMetadataState.getInstance().wpiLibMavenMetadata.releaseAsWpiLibVersion, 
         var gradleDistributionUrl: String = "https\\://services.gradle.org/distributions/gradle-5.0-bin.zip",
-        var frcYear: String = wpilibVersion.major.toString(),
         var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizardProjectTemplateDefinition.CommandBased,
         var includeVsCodeConfigs: Boolean = true,
         var gitIgnoreConfiguration: GitIgnoreConfiguration = GitIgnoreConfiguration(true, generateFromSite = true),
@@ -43,6 +42,10 @@ class FrcProjectWizardData(
         var junit5Version: String = "5.5.2"
                           )
 {
+
+    val frcYear: String
+        get() = wpilibVersion.major.toString()
+    
     val teamNumberString: String
         get() = teamNumber.toString()
 

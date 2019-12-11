@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.wizard;
 
+import java.util.List;
 import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +36,9 @@ import com.intellij.util.lang.JavaVersion;
 import net.javaru.iip.frc.FrcPluginGlobals;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
 import net.javaru.iip.frc.util.TitleMessagePair;
+import net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersionFiltersKt;
 
 
 
@@ -47,6 +51,9 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
     private JPanel frcLogoPanel;
     private JBLabel sdkNoticeLabel;
     private JBLabel invalidSdkSelectedLabel;
+    private JPanel wpiLibVersionPanel;
+    private JBLabel wpilibVersionSelectionLabel;
+    private JComboBox<WpiLibVersion> wpilibVersionComboBox;
     @NotNull
     private final FrcModuleBuilder myBuilder;
     @NotNull
@@ -70,6 +77,7 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
     {
         updateInvalidSdkLabelVisibility();
         myBuilder.addSdkChangedListener(this::updateInvalidSdkLabelVisibility);
+        initWpiLibVersionComboBox();
     }
     
     @Override
@@ -85,7 +93,19 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
     @Override
     public void updateDataModel()
     {
-                
+        LOG.trace("[FRC] Entering FrcInitialCustomOptionsWizardStep.updateDataModel()");
+        final FrcProjectWizardData dataModel = myBuilder.getDataModel();
+        WpiLibVersion wpilibVersion = (WpiLibVersion) wpilibVersionComboBox.getSelectedItem();
+        if (wpilibVersion != null)
+        {
+            dataModel.setWpilibVersion(wpilibVersion);
+            LOG.debug("[FRC] WpilibVersion set to '" + dataModel.getWpilibVersion() + "' on FrcProjectWizardData");
+        }
+        else
+        {
+            LOG.warn("[FRC] wpilibVersionComboBox returned null for the selected item.");
+        }
+        LOG.trace("[FRC] Exiting FrcInitialCustomOptionsWizardStep.updateDataModel()");
     }
     
     
@@ -126,5 +146,32 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
     protected void updateInvalidSdkLabelVisibility()
     {
         invalidSdkSelectedLabel.setVisible(!myBuilder.isSelectedSdkValid());
+    }
+    
+    
+    private void initWpiLibVersionComboBox()
+    {
+        //TODO: We need to 
+        // ✔a) filter the list to remove the alphas, etc. 
+        //  b) have UI option to only show the latest version fpr each year (on by default) (com/intellij/find/impl/FindPopupPanel.java:1625)
+        //  c) have a UI option to show/hide betas (off by default)
+        // ✔d) make modifications so that the FrcProjectWizardData.wpilibVersion defaults to the latest and then that the selected item (below) matches
+        
+        final List<WpiLibVersion> versionList = GradleRioMavenMetadataState.getInstance(true).getWpiLibMavenMetadata().getWpiLibVersionsDescending();
+        
+        // Filter the list to include only releases, and the latest one if it is a release candidate or beta (for an unreleased version)
+        final List<WpiLibVersion> filteredList = WpiLibVersionFiltersKt.filterToDefaultListing(versionList);
+        final WpiLibVersion[] versions = filteredList.toArray(new WpiLibVersion[0]);
+        wpilibVersionComboBox.setModel(new DefaultComboBoxModel<>(versions));
+        int index = 0; // default to the first item in the list
+        if (filteredList.isEmpty())
+        {
+            index = -1; // if by some rare chance the list is empty, we set to the -1 flag to say don;t select anything.
+        }
+        else if (filteredList.size() >= 2 && filteredList.get(0).isPreRelease())
+        {
+            index = 1; // if the first item is a beta or RC we select the second item, i.e. the latest non beta/RC
+        }
+        wpilibVersionComboBox.setSelectedIndex(index);
     }
 }

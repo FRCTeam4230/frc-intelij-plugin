@@ -18,10 +18,13 @@ package net.javaru.iip.frc.wpilib.version
 
 import net.javaru.iip.frc.util.getAdjustedBuildYear
 import net.javaru.iip.frc.util.getCurrentBuildYear
+import org.apache.commons.lang3.BooleanUtils
 import java.util.stream.Stream
 
 /** The 2018 transitional release (when WPI took over the development of GradleRIO). */
 val ver2018_06_21 = WpiLibVersionImpl.parse("2018.06.21")
+
+const val SHOW_BETAS_SYS_PROP_KEY = "frc.show.betas.in.new.project.wizard"
 
 /**
  * Returns a List containing only elements matching the given [WpiLibVersionFilter].
@@ -82,19 +85,25 @@ fun Iterable<WpiLibVersion>.filterOutAllButLatestForYear(year: Int, excludePreRe
 }
 
 /**
- * Filter the Iterable to include: only releases, and the latest version if it is a release candidate or beta and. 
- * It also filters out the transitional `2018.06.21` version. Finally, it sorts the list in descending order'
- * so the latest version is first.
+ * Filter the Iterable to include: only releases.  and the latest version if it is a release candidate. It also filters 
+ * out the transitional `2018.06.21` version. Finally, it sorts the list in descending order' so the latest version is 
+ * first. 
+ * 
+ * For now we will not show betas because there may be peculiarities with betas. For example, during the beta program of 2020,
+ * the `projectYear` in the wpilib_preferences.json file was "Beta2020-2" and not 2020. But I could find no mapping of
+ * the WpiLib Version to this value. It was basically a hard coded value in the code checking for it.
+ * 
  */
 fun Iterable<WpiLibVersion>.filterToDefaultListing(): List<WpiLibVersion>
 {
     val versionList = this.toList().sortedDescending()
-    val filteredList = versionList.filterVersions(IsReleaseFilter).filterOutVersions(Is2018TransitionalRelease)
+    val filter = if (BooleanUtils.toBoolean(System.getProperty(SHOW_BETAS_SYS_PROP_KEY, "false"))) IsReleaseOrRcOrBetaFilter else IsReleaseFilter
+    val filteredList = versionList.filterVersions(filter).filterOutVersions(Is2018TransitionalRelease)
     
     
-    return if (versionList.isNotEmpty() && !filteredList.contains(versionList[0]) && versionList[0].isBetaOrReleaseCandidate())
+    return if (versionList.isNotEmpty() && !filteredList.contains(versionList[0]) && versionList[0].isReleaseCandidate())
     {
-        // the latest version is not included, and thus is likely a beat or release version.
+        // the latest version is not included, and is a release candidate and we want to show it.
         val mutableList = filteredList.toMutableList()
         mutableList.add(versionList[0])
         mutableList.sortDescending()
@@ -194,6 +203,11 @@ object IsBetaFilter: WpiLibVersionFilter
 object IsPreReleasePreviewFilter: WpiLibVersionFilter
 {
     override fun predicate(): (WpiLibVersion) -> Boolean = { wpiLibVersion -> wpiLibVersion.isPreReleasePreview() }
+}
+
+object IsReleaseOrRcOrBetaFilter : WpiLibVersionFilter
+{
+    override fun predicate(): (WpiLibVersion) -> Boolean = { wpiLibVersion -> wpiLibVersion.isRelease() || wpiLibVersion.isReleaseCandidate() || wpiLibVersion.isBeta() }
 }
 
 object IsNotPreReleasePreviewFilter: WpiLibVersionFilter

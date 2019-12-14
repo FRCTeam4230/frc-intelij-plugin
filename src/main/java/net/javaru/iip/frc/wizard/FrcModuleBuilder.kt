@@ -61,6 +61,7 @@ import net.javaru.iip.frc.util.isValidJdk
 import net.javaru.iip.frc.util.reader
 import net.javaru.iip.frc.util.removeBasePath
 import net.javaru.iip.frc.util.toCommaDelimitedString
+import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import org.http4k.client.ApacheClient
@@ -81,27 +82,6 @@ import javax.swing.Icon
 
 class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 {
-    private val frcWizardTemplatesBaseDir = Paths.get("frc-wizard-templates")
-    private val defaultFilesResourceBase = frcWizardTemplatesBaseDir.resolve("default-files/")
-    private val gradleGroovyDslSubPath = Paths.get("gradle/groovy-dsl")
-    private val gradleGroovyDslResourceBase = defaultFilesResourceBase.resolve(gradleGroovyDslSubPath)
-    private val gradleKotlinDslSubPath = Paths.get("gradle/kotlin-dsl")
-    private val gradleKotlinDslResourceBase = defaultFilesResourceBase.resolve(gradleKotlinDslSubPath)
-    private val gradleWrapperSubPath = Paths.get("gradle/gradle-wrapper")
-    private val gradleWrapperResourceBase = defaultFilesResourceBase.resolve(gradleWrapperSubPath)
-    private val configsSubPath = "configs"
-    private val configsResourceBase = defaultFilesResourceBase.resolve(configsSubPath)
-    private val extrasSubPath = "extras"
-    private val extrasResourceBase = defaultFilesResourceBase.resolve(extrasSubPath)
-    private val vsCodeConfigsSubPath = "vs-code-configs"
-    private val vsCodeConfigsResourceBase = extrasResourceBase.resolve(vsCodeConfigsSubPath)
-    private val commonCodeSubPath = Paths.get("code/common-code")
-    private val commonCodeResourceBase = defaultFilesResourceBase.resolve(commonCodeSubPath)
-    private val javaCodeSubPath = Paths.get("code/java-code")
-    private val javaCodeResourceBase = defaultFilesResourceBase.resolve(javaCodeSubPath)    
-    private val kotlinCodeSubPath = Paths.get("code/kotlin-code")
-    private val kotlinCodeResourceBase = defaultFilesResourceBase.resolve(kotlinCodeSubPath)
-
     private val mySdkChangedListeners: MutableList<Runnable> = ContainerUtil.createLockFreeCopyOnWriteList()
     private val fmConfig = freemarkerConfiguration(this, "/")
     /** 
@@ -138,6 +118,28 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     
     //TODO: this needs to be created from the wizard step form
     val dataModel = FrcProjectWizardData()
+
+
+    private fun frcWizardTemplatesBaseDir(version: WpiLibVersion) = Paths.get("frc-wizard-templates").resolve(version.major.toString())
+    private fun defaultFilesResourceBase(version: WpiLibVersion) = frcWizardTemplatesBaseDir(version).resolve("default-files/")
+    private val gradleGroovyDslSubPath = Paths.get("gradle/groovy-dsl")
+    private fun gradleGroovyDslResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(gradleGroovyDslSubPath)
+    private val gradleKotlinDslSubPath = Paths.get("gradle/kotlin-dsl")
+    private fun gradleKotlinDslResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(gradleKotlinDslSubPath)
+    private val gradleWrapperSubPath = Paths.get("gradle/gradle-wrapper")
+    private fun gradleWrapperResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(gradleWrapperSubPath)
+    private val configsSubPath = "configs"
+    private fun configsResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(configsSubPath)
+    private val extrasSubPath = "extras"
+    private fun extrasResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(extrasSubPath)
+    private val vsCodeConfigsSubPath = "vs-code-configs"
+    private fun vsCodeConfigsResourceBase(version: WpiLibVersion) = extrasResourceBase(version).resolve(vsCodeConfigsSubPath)
+    private val commonCodeSubPath = Paths.get("code/common-code")
+    private fun commonCodeResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(commonCodeSubPath)
+    private val javaCodeSubPath = Paths.get("code/java-code")
+    private fun javaCodeResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(javaCodeSubPath)
+    private val kotlinCodeSubPath = Paths.get("code/kotlin-code")
+    private fun kotlinCodeResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(kotlinCodeSubPath)
     
     override fun getGroupName(): String = MODULE_BUILDER_GROUP_NAME 
     override fun getParentGroup(): String = JavaModuleType.JAVA_GROUP // This is the top group in the New Project Wizard, and for now it makes sense to be part of it
@@ -294,18 +296,18 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             FileUtil.toCanonicalPath(if (myWizardContext!!.isCreatingNewProject) project.basePath else modelContentRootDir.path)
         }
         assert(rootProjectPath != null) { "rootProjectPath is null"}
-        
-        
 
+
+        val wpilibVersion = dataModel.wpilibVersion
         //TODO Need to enhance the calls to the defaults check if the template has overridden any of the files
-        copyAllResourcesToModuleRoot(modelContentRootDir, gradleGroovyDslResourceBase)
-        copyAllResourcesToModuleRoot(modelContentRootDir, gradleWrapperResourceBase)
-        copyAllResourcesToModuleRoot(modelContentRootDir, configsResourceBase)
-        copyAllResourcesToModuleRoot(modelContentRootDir, commonCodeResourceBase)
-        copyAllResourcesToModuleRoot(modelContentRootDir, javaCodeResourceBase)
+        copyAllResourcesToModuleRoot(modelContentRootDir, gradleGroovyDslResourceBase(wpilibVersion))
+        copyAllResourcesToModuleRoot(modelContentRootDir, gradleWrapperResourceBase(wpilibVersion))
+        copyAllResourcesToModuleRoot(modelContentRootDir, configsResourceBase(wpilibVersion))
+        copyAllResourcesToModuleRoot(modelContentRootDir, commonCodeResourceBase(wpilibVersion))
+        copyAllResourcesToModuleRoot(modelContentRootDir, javaCodeResourceBase(wpilibVersion))
         if (dataModel.includeVsCodeConfigs)
         {
-            copyAllResourcesToModuleRoot(modelContentRootDir, vsCodeConfigsResourceBase)
+            copyAllResourcesToModuleRoot(modelContentRootDir, vsCodeConfigsResourceBase(wpilibVersion))
         }
         
         if (dataModel.gitIgnoreConfiguration.includeGitIgnoreFile)
@@ -322,7 +324,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             }
         }
         
-        val selectedTemplateResourceBase = frcWizardTemplatesBaseDir.resolve(dataModel.frcWizardTemplateDefinition.templateResourcesDirName()).resolve(javaCodeSubPath)
+        val selectedTemplateResourceBase = frcWizardTemplatesBaseDir(wpilibVersion).resolve(dataModel.frcWizardTemplateDefinition.templateResourcesDirName()).resolve(javaCodeSubPath)
         copyAllResourcesToModuleRoot(modelContentRootDir, selectedTemplateResourceBase)
         
         modelContentRootDir.refresh(false, true)

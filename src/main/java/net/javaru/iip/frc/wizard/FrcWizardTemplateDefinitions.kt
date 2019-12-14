@@ -50,6 +50,17 @@ interface FrcWizardTemplateDefinition
     val isDeprecated: Boolean
     
     val deprecationAlternative: String?
+    
+    /** 
+     * The `commandVersion` was introduced in 2020 when they created a new Command Based Robot implementation. A value of `1` 
+     * means it uses the old command classes from the `edu.wpi.first.wpilibj` package in the `wpilibOldCommands-java-2020-x.x.jar` 
+     * library and a value of `2` means it uses the new command classes from the `edu.wpi.first.wpilibj2` package (note the 2) in 
+     * the `wpilibNewCommands-java-2020-x.x.jar` library. There is a JSON file in the `vendordeps` directory that indicates which 
+     * dependency is pulled in (i.e. the wpilibOldCommands or wpilibNewCommands JAR). unfortunately, they also chose to make the 
+     * name of that JSON file different (although ultimately I do not think it matters), so we can't purely handle this in the template.
+     * For now, we are setting 2019 templates to a 0 as it may be useful for filtering in the pending new design.
+     */
+    val commandVersion: Int
 
     /** The base name of the template's resource directory. It is highly recommended that this value not include any spaces. */
     fun templateResourcesDirName(): String
@@ -80,18 +91,23 @@ fun exampleTemplateDefinitionsFor(year:Int): Array<FrcWizardTemplateDefinition>
 {
     return when (year)
     {
-        2019 -> FrcWizard2019ProjectTemplateDefinition.values() as Array<FrcWizardTemplateDefinition>
-        2020 -> FrcWizard2020ProjectTemplateDefinition.values() as Array<FrcWizardTemplateDefinition>
-        else -> FrcWizard2020ProjectTemplateDefinition.values() as Array<FrcWizardTemplateDefinition>
+        2019 -> FrcWizard2019ExampleTemplateDefinition.values() as Array<FrcWizardTemplateDefinition>
+        2020 -> FrcWizard2020ExampleTemplateDefinition.values() as Array<FrcWizardTemplateDefinition>
+        else -> FrcWizard2020ExampleTemplateDefinition.values() as Array<FrcWizardTemplateDefinition>
     }
 }
+
+// For "official" descriptions, see:
+//   https://github.com/wpilibsuite/allwpilib/blob/master/wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/examples/examples.json
+//   https://github.com/wpilibsuite/allwpilib/blob/master/wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/templates/templates.json
+
 
 enum class FrcWizard2019ProjectTemplateDefinition(
         override val displayName: String,
         @field:Language("HTML") @param:Language("HTML") private val _description: String,
         override val isDeprecated: Boolean,
-        override val deprecationAlternative: String?
-
+        override val deprecationAlternative: String?,
+        override val commandVersion: Int = 0
                                              ) : FrcWizardTemplateDefinition
 {
     CommandBased("Command Based Robot", "A robot project that allows robots to be implemented using the command based model to allow complex functionality to be developed from simpler functionality.", false, null),
@@ -119,8 +135,8 @@ enum class FrcWizard2019ExampleTemplateDefinition(
         override val displayName: String,
         @field:Language("HTML") @param:Language("HTML") private val _description: String,
         override val isDeprecated: Boolean,
-        override val deprecationAlternative: String?
-
+        override val deprecationAlternative: String?,
+        override val commandVersion: Int = 0
                                                  ) : FrcWizardTemplateDefinition
 {
     GettingStarted("Getting Started", "An example project which demonstrates the simplest autonomous and teleoperated routines.", false, null),
@@ -161,15 +177,15 @@ enum class FrcWizard2020ProjectTemplateDefinition(
         override val displayName: String,
         @field:Language("HTML") @param:Language("HTML") private val _description: String,
         override val isDeprecated: Boolean,
-        override val deprecationAlternative: String?
-
+        override val deprecationAlternative: String?,
+        override val commandVersion: Int = 1
                                                  ) : FrcWizardTemplateDefinition
 {
-    CommandBased("Command Based Robot", "A robot project that allows robots to be implemented using the command based model to allow complex functionality to be developed from simpler functionality.", false, null),
-    Iterative("Iterative Robot", "A robot project that allow robots to be implemented in an iterative manner synced to receiving driver station packets.", true, "Timed Robot"),
+    CommandBased("Command Based Robot (v2)", "A robot project that allows robots to be implemented using the command based model to allow complex functionality to be developed from simpler functionality. Updated for 2020, using components from the <tt>edu.wpi.first.wpilibj<strong>2</strong></tt> package from the <tt>wpilibNewCommands-java-2020-x.x.jar</tt>", false, null, commandVersion = 2),
+    CommandBasedOld("Old Command Based Robot (v1)", "A robot project that allows robots to be implemented using the command based model to allow complex functionality to be developed from simpler functionality. This is the original Command Robot introduced in 2012, using components from the <tt>edu.wpi.first.wpilibj</tt> package from the <tt>wpilibOldCommands-java-2020-x.x.jar</tt>", false, null, commandVersion = 1),
     Timed("Timed Robot", "A robot project that allows robots to be implemented in an iterative manner synced to a timer.", false, null),
     TimedSkeleton("Timed Skeleton (Advanced)", "A skeleton (stub) Timed Robot project.", false, null),
-    Sample("Sample Robot", "A robot project used for small sample programs or for highly advanced programs with more complete control over program flow. This is <em>not</em> a good choice to use for competition, especially for the inexperienced. Use Timed Robot or Command Based Robot instead.", false, null)
+    RobotBaseSkeleton("RobotBase Skeleton (Advanced)", "A skeleton (stub) for RobotBase, intended for highly advanced programmers, with more complete control over program flow.", false, null)
     ;
 
 
@@ -190,8 +206,8 @@ enum class FrcWizard2020ExampleTemplateDefinition(
         override val displayName: String,
         @field:Language("HTML") @param:Language("HTML") private val _description: String,
         override val isDeprecated: Boolean,
-        override val deprecationAlternative: String?
-
+        override val deprecationAlternative: String?,
+        override val commandVersion: Int = 1
                                                  ) : FrcWizardTemplateDefinition
 {
     GettingStarted("Getting Started", "An example project which demonstrates the simplest autonomous and teleoperated routines.", false, null),

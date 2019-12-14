@@ -302,7 +302,17 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         //TODO Need to enhance the calls to the defaults check if the template has overridden any of the files
         copyAllResourcesToModuleRoot(modelContentRootDir, gradleGroovyDslResourceBase(wpilibVersion))
         copyAllResourcesToModuleRoot(modelContentRootDir, gradleWrapperResourceBase(wpilibVersion))
-        copyAllResourcesToModuleRoot(modelContentRootDir, configsResourceBase(wpilibVersion))
+
+
+        val wpilibCommandsJsonFilter: (VirtualFile) -> Boolean = 
+                when(dataModel.frcWizardTemplateDefinition.commandVersion)
+                {
+                    1 -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") }    // reject New so we keep Old
+                    2-> { virtualFile -> !virtualFile.name.contains("WPILibOldCommands") }     // reject Old so we keep New
+                    else -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") && !virtualFile.name.contains("WPILibOldCommands") } // reject both
+                }
+        copyAllResourcesToModuleRoot(modelContentRootDir, configsResourceBase(wpilibVersion), wpilibCommandsJsonFilter)
+
         copyAllResourcesToModuleRoot(modelContentRootDir, commonCodeResourceBase(wpilibVersion))
         copyAllResourcesToModuleRoot(modelContentRootDir, javaCodeResourceBase(wpilibVersion))
         if (dataModel.includeVsCodeConfigs)
@@ -332,7 +342,9 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         LOG.trace("[FRC] FrcModuleBuilder.setupRootModel() completed")
     }
 
-    private fun copyAllResourcesToModuleRoot(modelContentRootDir: VirtualFile, resourceDirBase: Path)
+   
+    
+    private fun copyAllResourcesToModuleRoot(modelContentRootDir: VirtualFile, resourceDirBase: Path, keepFilter: (VirtualFile) -> Boolean = { true })
     {
         val pluginResourceDirUrl = getPluginResource(resourceDirBase)
         LOG.debug("[FRC] pluginResourceDir URL = $pluginResourceDirUrl")
@@ -350,7 +362,10 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             }
             else
             {
-                VfsUtil.collectChildrenRecursively(srcFqBaseDir).filter { !it.isDirectory }.forEach {
+                VfsUtil.collectChildrenRecursively(srcFqBaseDir)
+                    .filter { !it.isDirectory }
+                    .filter { keepFilter.invoke(it) }
+                    .forEach {
                     val resourceRelativePath = Paths.get(it.toString().removePrefix("$srcFqBaseDir")).removeBasePath(Paths.get("/"))
                     if (resourceRelativePath.fileName.toString().endsWith(FM_TEMPLATE_EXT_WITH_DOT))
                         copyFreemarkerTemplate(modelContentRootDir, it, srcFqBaseDir)

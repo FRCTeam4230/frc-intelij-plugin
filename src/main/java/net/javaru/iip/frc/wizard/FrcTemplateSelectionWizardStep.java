@@ -246,6 +246,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     {
         LOG.trace("[FRC] Entering FrcTemplateSelectionWizardStep.updateComponents()");
         // final boolean isAddToVisible = myParentProjectForm.isVisible();
+        updateTemplatesLists();
         updateWpiLibSelectedLabel();
         myParentProjectForm.updateComponents();
         LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.updateComponents()");
@@ -305,21 +306,26 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
                 updateTemplateDescription(theList);
             }
         };
-        
-        final FrcWizardTemplateDefinition[] projectTemplates = FrcWizard2019ProjectTemplateDefinition.values();
+        projectTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
+        exampleTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
+    }
+    
+    
+    private void updateTemplatesLists()
+    {
+        final WpiLibVersion wpilibVersion = myBuilder.getDataModel().getWpilibVersion();
+        final FrcWizardTemplateDefinition[] projectTemplates = FrcWizardTemplateDefinitionsKt.projectTemplateDefinitionsFor(wpilibVersion);
         projectTemplatesJBList.setListData(projectTemplates);
         projectTemplatesJBList.setSelectedIndex(0);
-        projectTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
         
-        final FrcWizardTemplateDefinition[] exampleTemplates = FrcWizard2019ExampleTemplateDefinition.values();
+        final FrcWizardTemplateDefinition[] exampleTemplates = FrcWizardTemplateDefinitionsKt.exampleTemplateDefinitionsFor(wpilibVersion);
         exampleTemplatesJBList.setListData(exampleTemplates);
         exampleTemplatesJBList.setSelectedIndex(0);
-        exampleTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
-    
+        
         templateListsTabbedPane.setSelectedIndex(PROJECTS_TAB_INDEX);
         updateTemplateDescription();
     }
-
+    
     
     protected void updateTemplateDescription()
     {

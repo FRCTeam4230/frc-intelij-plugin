@@ -166,9 +166,9 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
         int index = 0; // default to the first item in the list
         if (filteredList.isEmpty())
         {
-            index = -1; // if by some rare chance the list is empty, we set to the -1 flag to say don;t select anything.
+            index = -1; // if by some rare chance the list is empty, we set to the -1 flag to say don't select anything.
         }
-        else if (filteredList.size() >= 2 && filteredList.get(0).isPreRelease())
+        else if (filteredList.size() >= 2 && filteredList.get(0).isPreRelease() && !filteredList.get(1).isPreRelease())
         {
             index = 1; // if the first item is a beta or RC we select the second item, i.e. the latest non beta/RC
         }

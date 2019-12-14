@@ -306,12 +306,12 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
             }
         };
         
-        final FrcWizardTemplateDefinition[] projectTemplates = FrcWizardProjectTemplateDefinition.values();
+        final FrcWizardTemplateDefinition[] projectTemplates = FrcWizard2019ProjectTemplateDefinition.values();
         projectTemplatesJBList.setListData(projectTemplates);
         projectTemplatesJBList.setSelectedIndex(0);
         projectTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
         
-        final FrcWizardTemplateDefinition[] exampleTemplates = FrcWizardExampleTemplateDefinition.values();
+        final FrcWizardTemplateDefinition[] exampleTemplates = FrcWizard2019ExampleTemplateDefinition.values();
         exampleTemplatesJBList.setListData(exampleTemplates);
         exampleTemplatesJBList.setSelectedIndex(0);
         exampleTemplatesJBList.addListSelectionListener(templatesListSelectionListener);

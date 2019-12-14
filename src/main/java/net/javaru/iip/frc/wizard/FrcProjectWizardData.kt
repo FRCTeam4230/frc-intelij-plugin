@@ -19,6 +19,8 @@ package net.javaru.iip.frc.wizard
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
+import net.javaru.iip.frc.wpilib.version.firstRelease
+import net.javaru.iip.frc.wpilib.version.minVersion
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -32,9 +34,8 @@ class FrcProjectWizardData(
         /** The simple name of the primary Robot class (not to be confused with the Main class). This is the class that extends one of the WPILib `RobotBase` classes.*/
         var robotClassSimpleName: String = DEFAULT_ROBOT_CLASS_NAME,  // if/whn we make settable, we need to change the template copying to rename the file!
         var basePackage: String = DEFAULT_BASE_PACKAGE,
-        var wpilibVersion: WpiLibVersion = GradleRioMavenMetadataState.getInstance().wpiLibMavenMetadata.releaseAsWpiLibVersion, 
-        var gradleDistributionUrl: String = "https\\://services.gradle.org/distributions/gradle-5.0-bin.zip",
-        var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizardProjectTemplateDefinition.CommandBased,
+        var wpilibVersion: WpiLibVersion = GradleRioMavenMetadataState.getInstance().wpiLibMavenMetadata.releaseAsWpiLibVersion,
+        var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizard2019ProjectTemplateDefinition.CommandBased,
         var includeVsCodeConfigs: Boolean = true,
         var gitIgnoreConfiguration: GitIgnoreConfiguration = GitIgnoreConfiguration(true, generateFromSite = true),
         var includeJUnitSupport:Boolean = true,
@@ -43,6 +44,16 @@ class FrcProjectWizardData(
                           )
 {
 
+    /**
+     * The `projectYear` used in the `wpilib_preferences.json` file. Typically it is just the year such as `2020`, but it may be an alternate 
+     * value during the beta releases, such as `Beta2020` or `Beta2020-2`. There doesn't appear to be any pattern to it as in the WPI repo, it 
+     * is a hard coded value in [https://github.com/wpilibsuite/vscode-wpilib/blob/master/vscode-wpilib/resources/gradle/java/.wpilib/wpilib_preferences.json]
+     * and the change from `Beta2020` to `Beta2020-2` did not correlate to a WpiLib version/release.
+     */
+    val projectYear: String
+        get() = if (wpilibVersion.isNewerThan(minVersion(2020)) && wpilibVersion.isOlderThan(firstRelease(2020)) && wpilibVersion.isBetaOrBetaPreview()) "Beta2020-2" else wpilibVersion.major.toString()
+
+    /** The project year, such as `2019` or `2020`, as a String. */
     val frcYear: String
         get() = wpilibVersion.major.toString()
     
@@ -61,6 +72,16 @@ class FrcProjectWizardData(
     /** The Fully Qualified (FQ) name of the primary Robot class (not to be confused with the Main class). This is the class that extends one of the WPILib `RobotBase` classes.*/
     val robotClassFQ: String
         get() = if (basePackage.isEmpty()) mainClassSimpleName else "${basePackage}.${mainClassSimpleName}"
+
+    val gradleDistributionUrl: String
+        get() {
+            return when (wpilibVersion.major)
+            {
+                2019 -> """https\://services.gradle.org/distributions/gradle-5.0-bin.zip"""
+                2020 -> """https\://services.gradle.org/distributions/gradle-6.0.1-bin.zip"""
+                else -> """https\://services.gradle.org/distributions/gradle-6.0.1-bin.zip"""
+            }
+        } 
     
     fun junitIncludeVintageSupport(): Boolean = includeJUnitSupport && (junitOption == JUnitOption.JUnit5withVintage)
     fun junitUseJUnitPlatform(): Boolean = includeJUnitSupport && (junitOption == JUnitOption.JUnit5 || junitOption == JUnitOption.JUnit5withVintage) 

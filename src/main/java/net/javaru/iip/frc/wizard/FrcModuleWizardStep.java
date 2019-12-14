@@ -45,6 +45,7 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.settings.FrcTeamNumberKt;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
 import net.javaru.iip.frc.util.UiUtilsKt;
+import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
@@ -201,9 +202,7 @@ public class FrcModuleWizardStep extends ModuleWizardStep
         LOG.trace("[FRC] Entering FrcModuleWizardStep.updateStep()");
 //        ProjectData parentProject = myParentProjectForm.getParentProject();
 //        ProjectId projectId = myBuilder.getProjectId();
-    
         UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getDataModel().getTeamNumber()));
-        
         updateComponents();
         LOG.trace("[FRC] Exiting FrcModuleWizardStep.updateStep()");
     }
@@ -248,8 +247,9 @@ public class FrcModuleWizardStep extends ModuleWizardStep
     private void updateComponents()
     {
         LOG.trace("[FRC] Entering FrcModuleWizardStep.updateComponents()");
-        final boolean isAddToVisible = myParentProjectForm.isVisible();
-    
+        //final boolean isAddToVisible = myParentProjectForm.isVisible();
+        final FrcProjectWizardData dataModel = myBuilder.getDataModel();
+        updateTemplatesLists(dataModel.getWpilibVersion());
         myParentProjectForm.updateComponents();
         LOG.trace("[FRC] Exiting FrcModuleWizardStep.updateComponents()");
     }
@@ -284,11 +284,11 @@ public class FrcModuleWizardStep extends ModuleWizardStep
             final ButtonModel model = button.getModel();
             final String actionCommand = model.getActionCommand();
             final CardLayout cards = (CardLayout) robotTemplatePanel.getLayout();
-            if (actionCommand.equals(FrcWizardProjectTemplateDefinition.class.getSimpleName()))
+            if (actionCommand.equals(FrcWizard2019ProjectTemplateDefinition.class.getSimpleName()))
             {
                 showCard( PROJECTS_CARD_NAME);
             }
-            else if (actionCommand.equals(FrcWizardExampleTemplateDefinition.class.getSimpleName()))
+            else if (actionCommand.equals(FrcWizard2019ExampleTemplateDefinition.class.getSimpleName()))
             {
                 showCard(EXAMPLES_CARD_NAME);
             }
@@ -307,15 +307,14 @@ public class FrcModuleWizardStep extends ModuleWizardStep
         projectTemplatesRadioButton.addItemListener(templatesButtonGroupChangeListener);
         exampleTemplatesRadioButton.addItemListener(templatesButtonGroupChangeListener);
         
-        projectTemplatesRadioButton.setActionCommand(FrcWizardProjectTemplateDefinition.class.getSimpleName());
-        exampleTemplatesRadioButton.setActionCommand(FrcWizardExampleTemplateDefinition.class.getSimpleName());
+        projectTemplatesRadioButton.setActionCommand(FrcWizard2019ProjectTemplateDefinition.class.getSimpleName());
+        exampleTemplatesRadioButton.setActionCommand(FrcWizard2019ExampleTemplateDefinition.class.getSimpleName());
         
         templatesTypeButtonGroup = new ButtonGroup();
         templatesTypeButtonGroup.add(projectTemplatesRadioButton);
         templatesTypeButtonGroup.add(exampleTemplatesRadioButton);
         templatesTypeButtonGroup.setSelected(projectTemplatesRadioButton.getModel(), true);
     }
-    
     
     private void initTemplatesLists()
     {
@@ -328,19 +327,21 @@ public class FrcModuleWizardStep extends ModuleWizardStep
                 updateTemplateDescription(theList);
             }
         };
-        
-        final FrcWizardTemplateDefinition[] projectTemplates = FrcWizardProjectTemplateDefinition.values();
+        projectTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
+        exampleTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
+    }
+    
+    private void updateTemplatesLists(WpiLibVersion wpiLibVersion)
+    {
+        final FrcWizardTemplateDefinition[] projectTemplates = FrcWizardTemplateDefinitionsKt.projectTemplateDefinitionsFor(wpiLibVersion);
         projectTemplatesJBList.setListData(projectTemplates);
         projectTemplatesJBList.setSelectedIndex(0);
-        projectTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
         
-        final FrcWizardTemplateDefinition[] exampleTemplates = FrcWizardExampleTemplateDefinition.values();
+        final FrcWizardTemplateDefinition[] exampleTemplates = FrcWizardTemplateDefinitionsKt.exampleTemplateDefinitionsFor(wpiLibVersion);
         exampleTemplatesJBList.setListData(exampleTemplates);
         exampleTemplatesJBList.setSelectedIndex(0);
-        exampleTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
     
         showCard( PROJECTS_CARD_NAME);
-        
     }
     
     

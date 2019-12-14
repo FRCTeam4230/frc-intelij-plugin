@@ -134,7 +134,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     
     private val myUseKotlinDSL = false
     
-    private val myShowGradleConfig = true;
+    private val myShowGradleConfig = true
     
     //TODO: this needs to be created from the wizard step form
     val dataModel = FrcProjectWizardData()
@@ -159,7 +159,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
      * We'll use 0 and get placed aty the bottom which I think is more consistent in the long run.
      */
     override fun getWeight(): Int = 0
-    override fun getModuleType(): ModuleType<*>? = StdModuleTypes.JAVA;
+    override fun getModuleType(): ModuleType<*>? = StdModuleTypes.JAVA
     override fun getBuilderId(): String? = javaClass.name // This is critical since the default is to return the ModuleType's ID, which then results in the Java Wizard steps being used as our createWizardSteps() is never called.
     
     

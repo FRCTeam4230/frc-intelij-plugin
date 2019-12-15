@@ -184,8 +184,8 @@ enum class FrcWizard2020ProjectTemplateDefinition(
     CommandBased("Command Based Robot", "A robot project that allows robots to be implemented using the version 2 command based model to allow complex functionality to be developed from simpler functionality. This is the updated for 2020 Command Based Robot, using components from the <tt>edu.wpi.first.wpilibj<strong>2</strong></tt> package from the <tt>wpilibNewCommands-java-2020-x.x.jar</tt>", false, null, commandVersion = 2),
     CommandBasedOld("Old Command Based Robot", "A robot project that allows robots to be implemented using the version 1 command based model to allow complex functionality to be developed from simpler functionality. This is the original Command Based Robot introduced in 2012, using components from the <tt>edu.wpi.first.wpilibj</tt> package from the <tt>wpilibOldCommands-java-2020-x.x.jar</tt>", false, null, commandVersion = 1),
     Timed("Timed Robot", "A robot project that allows robots to be implemented in an iterative manner synced to a timer.", false, null),
-    TimedSkeleton("Timed Skeleton (Advanced)", "A skeleton (stub) Timed Robot project.", false, null),
-    RobotBaseSkeleton("RobotBase Skeleton (Advanced)", "A skeleton (stub) for RobotBase, intended for highly advanced programmers, with more complete control over program flow.", false, null)
+    TimedSkeleton("Timed Skeleton (Advanced)", "A skeleton (stub) Timed Robot project for advanced programmers.", false, null),
+    RobotBaseSkeleton("RobotBase Skeleton (Advanced)", "A skeleton (stub) for RobotBase, intended for <strong>highly advanced/experienced</strong> programmers, that provides more complete control over program flow.", false, null)
     ;
 
 

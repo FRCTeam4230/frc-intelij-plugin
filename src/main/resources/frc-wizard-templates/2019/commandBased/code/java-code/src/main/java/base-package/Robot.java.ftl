@@ -57,8 +57,8 @@ public class ${data.robotClassSimpleName} extends TimedRobot
      * This method is called every robot packet, no matter the mode. Use
      * this for items like diagnostics that you want ran during disabled,
      * autonomous, teleoperated and test.
-     *
-     * <p>This runs after the mode specific periodic methods, but before
+     * <p>
+     * This runs after the mode specific periodic methods, but before
      * LiveWindow and SmartDashboard integrated updating.
      */
     @Override
@@ -90,8 +90,8 @@ public class ${data.robotClassSimpleName} extends TimedRobot
      * chooser code works with the Java SmartDashboard. If you prefer the
      * LabVIEW Dashboard, remove all of the chooser code and uncomment the
      * getString code to get the auto name from the text box below the Gyro
-     *
-     * <p>You can add additional auto modes by adding additional commands to the
+     * <p>
+     * You can add additional auto modes by adding additional commands to the
      * chooser code above (like the commented example) or additional comparisons
      * to the switch structure below with additional strings & commands.
      */

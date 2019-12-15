@@ -433,11 +433,11 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     
     private void updateComponents()
     {
-        LOG.trace("[FRC] Entering FrcModuleWizardStep.updateComponents()");
+        LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.updateComponents()");
         final boolean isAddToVisible = myParentProjectForm.isVisible();
         
         myParentProjectForm.updateComponents();
-        LOG.trace("[FRC] Exiting FrcModuleWizardStep.updateComponents()");
+        LOG.trace("[FRC] Exiting FrcProjectSettingsWizardStep.updateComponents()");
     }
     
     

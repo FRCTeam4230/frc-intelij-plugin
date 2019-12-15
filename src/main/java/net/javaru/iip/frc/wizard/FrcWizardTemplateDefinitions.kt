@@ -105,16 +105,16 @@ fun exampleTemplateDefinitionsFor(year:Int): Array<FrcWizardTemplateDefinition>
 enum class FrcWizard2019ProjectTemplateDefinition(
         override val displayName: String,
         @field:Language("HTML") @param:Language("HTML") private val _description: String,
-        override val isDeprecated: Boolean,
-        override val deprecationAlternative: String?,
+        override val isDeprecated: Boolean = false,
+        override val deprecationAlternative: String? = null,
         override val commandVersion: Int = 0
                                              ) : FrcWizardTemplateDefinition
 {
-    CommandBased("Command Based Robot", "A robot project that allows robots to be implemented using the command based model to allow complex functionality to be developed from simpler functionality.", false, null),
+    CommandBased("Command Based Robot", "A robot project that allows robots to be implemented using the command based model to allow complex functionality to be developed from simpler functionality."),
     Iterative("Iterative Robot", "A robot project that allow robots to be implemented in an iterative manner synced to receiving driver station packets.", true, "Timed Robot"),
-    Timed("Timed Robot", "A robot project that allows robots to be implemented in an iterative manner synced to a timer.", false, null),
-    TimedSkeleton("Timed Skeleton (Advanced)", "A skeleton (stub) Timed Robot project.", false, null),
-    Sample("Sample Robot", "A robot project used for small sample programs or for highly advanced programs with more complete control over program flow. This is <em>not</em> a good choice to use for competition, especially for the inexperienced. Use Timed Robot or Command Based Robot instead.", false, null)
+    Timed("Timed Robot", "A robot project that allows robots to be implemented in an iterative manner synced to a timer."),
+    TimedSkeleton("Timed Skeleton (Advanced)", "A skeleton (stub) Timed Robot project."),
+    Sample("Sample Robot", "A robot project used for small sample programs or for highly advanced programs with more complete control over program flow. This is <em>not</em> a good choice to use for competition, especially for the inexperienced. Use Timed Robot or Command Based Robot instead.")
     ;
 
 
@@ -134,29 +134,29 @@ enum class FrcWizard2019ProjectTemplateDefinition(
 enum class FrcWizard2019ExampleTemplateDefinition(
         override val displayName: String,
         @field:Language("HTML") @param:Language("HTML") private val _description: String,
-        override val isDeprecated: Boolean,
-        override val deprecationAlternative: String?,
+        override val isDeprecated: Boolean = false,
+        override val deprecationAlternative: String? = null,
         override val commandVersion: Int = 0
                                                  ) : FrcWizardTemplateDefinition
 {
-    GettingStarted("Getting Started", "An example project which demonstrates the simplest autonomous and teleoperated routines.", false, null),
-    TankDrive("Tank Drive", "Demonstrates the use of the RobotDrive class doing teleop driving with tank steering (i.e. two joysticks).", false, null),
+    GettingStarted("Getting Started", "An example project which demonstrates the simplest autonomous and teleoperated routines."),
+    TankDrive("Tank Drive", "Demonstrates the use of the RobotDrive class doing teleop driving with tank steering (i.e. two joysticks)."),
     //ArcadeDrive("Arcade Drive", "Demonstrates the use of the DifferentialDrive class to drive a robot with arcade drive/steering (i.e. single joystick)."),
-    MecanumDrive("Mecanum Drive", "Demonstrate the use of the RobotDrive class doing teleop driving with a Mecanum drivetrain.", false, null),
-    Ultrasonic("Ultrasonic", "Demonstrates maintaining a set distance using an ultrasonic sensor.", false, null),
-    UltrasonicPID("Ultrasonic PID", "Demonstrates maintaining a set distance using an ultrasonic sensor and PID Control.", false, null),
-    PotentiometerPID("Potentiometer PID", "Demonstrates the use of a potentiometer and PID control to reach elevator position setpoints.", false, null),
-    Gyro("Gyro", "Demonstrates how to drive straight using a gyro sensor.", false, null),
-    GyroMecanum("Gyro Mecanum", "Demonstrates how to perform mecanum drive with field oriented controls.", false, null),
-    HIDRumble("HID Rumble", "Demonstrates how to make human interface devices rumble.", false, null),
-    MotorController("Motor Controller", "Demonstrates controlling a single motor with a joystick.", false, null),
-    MotorControlWithEncoder("Motor Control with Encoder", "Demonstrates controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder.", false, null),
-    GearsBot("GearsBot", "A fully functional example CommandBased program for WPIs GearsBot robot, ported to the new CommandBased library. This code can run on your computer if it supports simulation.", false, null),
-    PacGoat("PacGoat", "A fully functional example CommandBased program for FRC Team 190's 2014 robot. This code can run on your computer if it supports simulation.", false, null),
-    SimpleVision("Simple Vision", "Demonstrates the use of the CameraServer class to stream from a USB Webcam without processing the images.", false, null),
-    IntermediateVision("Intermediate Vision", "Demonstrates the use of the NIVision class to capture image from a Webcam, process them, and then send them to the dashboard.", false, null),
-    AxisCameraSample("Axis Camera Sample", "An example program that acquires images from an Axis network camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display. This demonstrates the use of the AxisCamera class.", false, null),
-    ShuffleboardSample("Shuffleboard Sample", "An example program that adds data to various Shuffleboard tabs, demonstrating the Shuffleboard API.", false, null),
+    MecanumDrive("Mecanum Drive", "Demonstrate the use of the RobotDrive class doing teleop driving with a Mecanum drivetrain."),
+    Ultrasonic("Ultrasonic", "Demonstrates maintaining a set distance using an ultrasonic sensor."),
+    UltrasonicPID("Ultrasonic PID", "Demonstrates maintaining a set distance using an ultrasonic sensor and PID Control."),
+    PotentiometerPID("Potentiometer PID", "Demonstrates the use of a potentiometer and PID control to reach elevator position setpoints."),
+    Gyro("Gyro", "Demonstrates how to drive straight using a gyro sensor."),
+    GyroMecanum("Gyro Mecanum", "Demonstrates how to perform mecanum drive with field oriented controls."),
+    HIDRumble("HID Rumble", "Demonstrates how to make human interface devices rumble."),
+    MotorController("Motor Controller", "Demonstrates controlling a single motor with a joystick."),
+    MotorControlWithEncoder("Motor Control with Encoder", "Demonstrates controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder."),
+    GearsBot("GearsBot", "A fully functional example CommandBased program for WPIs GearsBot robot, ported to the new CommandBased library. This code can run on your computer if it supports simulation."),
+    PacGoat("PacGoat", "A fully functional example CommandBased program for FRC Team 190's 2014 robot. This code can run on your computer if it supports simulation."),
+    SimpleVision("Simple Vision", "Demonstrates the use of the CameraServer class to stream from a USB Webcam without processing the images."),
+    IntermediateVision("Intermediate Vision", "Demonstrates the use of the NIVision class to capture image from a Webcam, process them, and then send them to the dashboard."),
+    AxisCameraSample("Axis Camera Sample", "An example program that acquires images from an Axis network camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display. This demonstrates the use of the AxisCamera class."),
+    ShuffleboardSample("Shuffleboard Sample", "An example program that adds data to various Shuffleboard tabs, demonstrating the Shuffleboard API."),
     ;   
 
 
@@ -176,16 +176,16 @@ enum class FrcWizard2019ExampleTemplateDefinition(
 enum class FrcWizard2020ProjectTemplateDefinition(
         override val displayName: String,
         @field:Language("HTML") @param:Language("HTML") private val _description: String,
-        override val isDeprecated: Boolean,
-        override val deprecationAlternative: String?,
+        override val isDeprecated: Boolean = false,
+        override val deprecationAlternative: String? = null,
         override val commandVersion: Int = 1
                                                  ) : FrcWizardTemplateDefinition
 {
-    CommandBased("Command Based Robot", "A robot project that allows robots to be implemented using the version 2 command based model to allow complex functionality to be developed from simpler functionality. This is the updated for 2020 Command Based Robot, using components from the <tt>edu.wpi.first.wpilibj<strong>2</strong></tt> package from the <tt>wpilibNewCommands-java-2020-x.x.jar</tt>", false, null, commandVersion = 2),
-    CommandBasedOld("Old Command Based Robot", "A robot project that allows robots to be implemented using the version 1 command based model to allow complex functionality to be developed from simpler functionality. This is the original Command Based Robot introduced in 2012, using components from the <tt>edu.wpi.first.wpilibj</tt> package from the <tt>wpilibOldCommands-java-2020-x.x.jar</tt>", false, null, commandVersion = 1),
-    Timed("Timed Robot", "A robot project that allows robots to be implemented in an iterative manner synced to a timer.", false, null),
-    TimedSkeleton("Timed Skeleton (Advanced)", "A skeleton (stub) Timed Robot project for advanced programmers.", false, null),
-    RobotBaseSkeleton("RobotBase Skeleton (Advanced)", "A skeleton (stub) for RobotBase, intended for <strong>highly advanced/experienced</strong> programmers, that provides more complete control over program flow.", false, null)
+    CommandBased("Command Based Robot", "A robot project that allows robots to be implemented using the version 2 command based model to allow complex functionality to be developed from simpler functionality. This is the updated for 2020 Command Based Robot, using components from the <tt>edu.wpi.first.wpilibj<strong>2</strong></tt> package from the <tt>wpilibNewCommands-java-2020-x.x.jar</tt>", commandVersion = 2),
+    CommandBasedOld("Old Command Based Robot", "A robot project that allows robots to be implemented using the version 1 command based model to allow complex functionality to be developed from simpler functionality. This is the original Command Based Robot introduced in 2012, using components from the <tt>edu.wpi.first.wpilibj</tt> package from the <tt>wpilibOldCommands-java-2020-x.x.jar</tt>", commandVersion = 1),
+    Timed("Timed Robot", "A robot project that allows robots to be implemented in an iterative manner synced to a timer."),
+    TimedSkeleton("Timed Skeleton (Advanced)", "A skeleton (stub) Timed Robot project for advanced programmers."),
+    RobotBaseSkeleton("RobotBase Skeleton (Advanced)", "A skeleton (stub) for RobotBase, intended for <strong>highly advanced/experienced</strong> programmers, that provides more complete control over program flow.")
     ;
 
 
@@ -205,29 +205,29 @@ enum class FrcWizard2020ProjectTemplateDefinition(
 enum class FrcWizard2020ExampleTemplateDefinition(
         override val displayName: String,
         @field:Language("HTML") @param:Language("HTML") private val _description: String,
-        override val isDeprecated: Boolean,
-        override val deprecationAlternative: String?,
+        override val isDeprecated: Boolean = false,
+        override val deprecationAlternative: String? = null,
         override val commandVersion: Int = 1
                                                  ) : FrcWizardTemplateDefinition
 {
-    GettingStarted("Getting Started", "An example project which demonstrates the simplest autonomous and teleoperated routines.", false, null),
-    TankDrive("Tank Drive", "Demonstrates the use of the RobotDrive class doing teleop driving with tank steering (i.e. two joysticks).", false, null),
-    //ArcadeDrive("Arcade Drive", "Demonstrates the use of the DifferentialDrive class to drive a robot with arcade drive/steering (i.e. single joystick)."),
-    MecanumDrive("Mecanum Drive", "Demonstrate the use of the RobotDrive class doing teleop driving with a Mecanum drivetrain.", false, null),
-    Ultrasonic("Ultrasonic", "Demonstrates maintaining a set distance using an ultrasonic sensor.", false, null),
-    UltrasonicPID("Ultrasonic PID", "Demonstrates maintaining a set distance using an ultrasonic sensor and PID Control.", false, null),
-    PotentiometerPID("Potentiometer PID", "Demonstrates the use of a potentiometer and PID control to reach elevator position setpoints.", false, null),
-    Gyro("Gyro", "Demonstrates how to drive straight using a gyro sensor.", false, null),
-    GyroMecanum("Gyro Mecanum", "Demonstrates how to perform mecanum drive with field oriented controls.", false, null),
-    HIDRumble("HID Rumble", "Demonstrates how to make human interface devices rumble.", false, null),
-    MotorController("Motor Controller", "Demonstrates controlling a single motor with a joystick.", false, null),
-    MotorControlWithEncoder("Motor Control with Encoder", "Demonstrates controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder.", false, null),
-    GearsBot("GearsBot", "A fully functional example CommandBased program for WPIs GearsBot robot, ported to the new CommandBased library. This code can run on your computer if it supports simulation.", false, null),
-    PacGoat("PacGoat", "A fully functional example CommandBased program for FRC Team 190's 2014 robot. This code can run on your computer if it supports simulation.", false, null),
-    SimpleVision("Simple Vision", "Demonstrates the use of the CameraServer class to stream from a USB Webcam without processing the images.", false, null),
-    IntermediateVision("Intermediate Vision", "Demonstrates the use of the NIVision class to capture image from a Webcam, process them, and then send them to the dashboard.", false, null),
-    AxisCameraSample("Axis Camera Sample", "An example program that acquires images from an Axis network camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display. This demonstrates the use of the AxisCamera class.", false, null),
-    ShuffleboardSample("Shuffleboard Sample", "An example program that adds data to various Shuffleboard tabs, demonstrating the Shuffleboard API.", false, null),
+    GettingStarted("Getting Started", "An example project which demonstrates the simplest autonomous and teleoperated routines."),
+    TankDrive("Tank Drive", "Demonstrates the use of the RobotDrive class doing teleop driving with tank steering (i.e. two joysticks)."),
+    ArcadeDrive("Arcade Drive", "Demonstrates the use of the DifferentialDrive class to drive a robot with Arcade Drive."),
+    MecanumDrive("Mecanum Drive", "Demonstrate the use of the RobotDrive class doing teleop driving with a Mecanum drivetrain."),
+    Ultrasonic("Ultrasonic", "Demonstrates maintaining a set distance using an ultrasonic sensor."),
+    UltrasonicPID("Ultrasonic PID", "Demonstrates maintaining a set distance using an ultrasonic sensor and PID Control."),
+    PotentiometerPID("Potentiometer PID", "Demonstrates the use of a potentiometer and PID control to reach elevator position setpoints."),
+    Gyro("Gyro", "Demonstrates how to drive straight using a gyro sensor."),
+    GyroMecanum("Gyro Mecanum", "Demonstrates how to perform mecanum drive with field oriented controls."),
+    HIDRumble("HID Rumble", "Demonstrates how to make human interface devices rumble."),
+    MotorController("Motor Controller", "Demonstrates controlling a single motor with a joystick."),
+    MotorControlWithEncoder("Motor Control with Encoder", "Demonstrates controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder."),
+    GearsBot("GearsBot", "A fully functional example CommandBased program for WPIs GearsBot robot, ported to the new CommandBased library. This code can run on your computer if it supports simulation."),
+    PacGoat("PacGoat", "A fully functional example CommandBased program for FRC Team 190's 2014 robot. This code can run on your computer if it supports simulation."),
+    SimpleVision("Simple Vision", "Demonstrates the use of the CameraServer class to stream from a USB Webcam without processing the images."),
+    IntermediateVision("Intermediate Vision", "Demonstrates the use of the NIVision class to capture image from a Webcam, process them, and then send them to the dashboard."),
+    AxisCameraSample("Axis Camera Sample", "An example program that acquires images from an Axis network camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display. This demonstrates the use of the AxisCamera class."),
+    ShuffleboardSample("Shuffleboard Sample", "An example program that adds data to various Shuffleboard tabs, demonstrating the Shuffleboard API."),
     ;
 
 

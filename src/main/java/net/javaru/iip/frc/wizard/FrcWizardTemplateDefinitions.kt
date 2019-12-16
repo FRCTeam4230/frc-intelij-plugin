@@ -71,6 +71,7 @@ interface FrcWizardTemplateDefinition
      */
     fun isProjectBootstrapTemplate(): Boolean
     
+    fun id(): String = "${templateResourcesDirName()}--$displayName"
 }
 
 

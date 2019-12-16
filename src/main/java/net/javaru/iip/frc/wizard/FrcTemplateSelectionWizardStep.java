@@ -267,19 +267,6 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
             Log.warn("[FRC] Exception when determining selected template in ne project wizard: " + e.toString(), e);
             return null;
         }
-    
-//        ==PREVIOUS IMPLEMENTATION==        
-//        final int selectedIndex = templateListsTabbedPane.getSelectedIndex();
-//        final JBList<FrcWizardTemplateDefinition> templatesJBList;
-//        if (selectedIndex == EXAMPLES_TAB_INDEX)
-//        {
-//            templatesJBList = exampleTemplatesJBList;
-//        }
-//        else
-//        {
-//            templatesJBList = projectTemplatesJBList;
-//        }
-//        return templatesJBList.getSelectedValue();
     }
     
     
@@ -356,6 +343,11 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         
         if (dataListNeedsUpdating(projectTemplates, projectTemplatesJBList) || dataListNeedsUpdating(exampleTemplates, exampleTemplatesJBList))
         {
+            @Nullable
+            final FrcWizardTemplateDefinition previouslySelectedTemplate = determineSelectedTemplate();
+            @Nullable
+            final Component previouslySelectedComponent = templateListsTabbedPane.getSelectedComponent();
+            
             // We set the selected Index first because updating the list data will fire our change listener to update the description
             // That change listener reads the selected index. There is a chance that the selected index is out of bounds 
             //    (because the new list is shorter, and the selected index was for an item near the end of the previous list)
@@ -365,8 +357,41 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
             exampleTemplatesJBList.setSelectedIndex(0);
             exampleTemplatesJBList.setListData(exampleTemplates);
             
-            // TODO: it would be nice to set the selected tab and template back to the previously selected item if it exists in the new list 
-            templateListsTabbedPane.setSelectedIndex(PROJECTS_TAB_INDEX);
+            if (previouslySelectedComponent != null)
+            {
+                templateListsTabbedPane.setSelectedComponent(previouslySelectedComponent);
+            }
+            else
+            {
+                templateListsTabbedPane.setSelectedIndex(PROJECTS_TAB_INDEX);
+            }
+            
+            // lets see if we can find the corresponding template and use select it.
+            if (previouslySelectedTemplate != null && previouslySelectedComponent != null)
+            {   
+                try
+                {
+                    final String previousId = previouslySelectedTemplate.id();
+                    final JPanel panel = (JPanel) previouslySelectedComponent;
+                    final Component component = panel.getComponent(0);
+                    @SuppressWarnings("unchecked")
+                    final JBList<FrcWizardTemplateDefinition> jbList = (JBList<FrcWizardTemplateDefinition>) component;
+                    final ListModel<FrcWizardTemplateDefinition> listModel = jbList.getModel();
+                    for (int i = 0; i < listModel.getSize(); i++)
+                    {
+                        final FrcWizardTemplateDefinition templateDefinition = listModel.getElementAt(i);
+                        if (templateDefinition.id().equals(previousId))
+                        {
+                            jbList.setSelectedValue(templateDefinition, true);
+                            break;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    LOG.info("[FRC] Exception when attempting to potentially set selected template to match previously selected template: " + e.toString());
+                }
+            }
             updateTemplateDescription();
         }
     }

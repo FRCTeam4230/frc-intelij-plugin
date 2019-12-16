@@ -312,13 +312,8 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     
     private void initTabPane()
     {
-        // When adding a Tab, you must update the updateTemplateDescription() method and the below count
-        if (templateListsTabbedPane.getTabCount() > 2)
-        {
-            LOG.error("[FRC] Tab count for Templates Tabbed Pane is greater than the expected count. This is likely due to some code changes. " 
-                      + "Please see the initTab() method for information on properly updating the code to add a tab.");
-        }
-        
+        // NOTE: its important that in the form the min width for the tabbed pane is set to 200 (or so), otherwise the tabs can end up stacked on top of each other in some situations, 
+        //        such as if the template names for the selected wpiLib version are shorter (than one tab's needed width for its name)
         templateListsTabbedPane.setSelectedIndex(PROJECTS_TAB_INDEX);
         templateListsTabbedPane.addChangeListener(e -> updateTemplateDescription());
     }

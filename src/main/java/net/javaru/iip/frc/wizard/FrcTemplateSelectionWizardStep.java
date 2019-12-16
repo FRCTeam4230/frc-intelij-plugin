@@ -16,11 +16,13 @@
 
 package net.javaru.iip.frc.wizard;
 
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import com.esotericsoftware.minlog.Log;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.WizardContext;
@@ -167,15 +169,33 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     public boolean validate() throws ConfigurationException
     {
         LOG.trace("[FRC] Entering FrcTemplateSelectionWizardStep.validate()");
-        //TODO get required minimum Java level from selected template, and if none there, then from the 
-        //     JAVA_VERSION key in C:\Users\Public\frc${frcYear}\jdk\release 
+        // TODO : https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/53 
+        //        Get required minimum Java level from selected template, and if none there, then from the 
+        //           JAVA_VERSION key in 
+        //            2019: C:\Users\Public\frc${frcYear}\jdk\release
+        //            2020+ C:\Users\Public\wpilib\${frcYear}\jdk\release 
+        //        From https://docs.wpilib.org/en/latest/docs/getting-started/getting-started-frc-control-system/wpilib-setup.html
+        //        The installation directory has changed for 2020. In 2019 the software was installed to  ~\frcYYYY where ~ is C:\Users\Public on Windows and YYYY is the FRC year. 
+        //        In 2020 and later it is installed to  ~\wpilib\YYYY  This lessens clutter when multiple years software are installed.
+        //        Regardless of whether All Users or Current User is chosen, the software is installed to C:\Users\Public\wpilib\YYYY where YYYY is the current FRC year. 
+        //            If you choose All Users, then shortcuts are installed to all users desktop and start menu and system environment variables are set. 
+        //            If Current User is chosen, then shortcuts and environment variables are set for only the current user.
         FrcJavaLangUtilsKt.validateMinimumJavaVersion(myContext,
                                                       11,
                                                       FrcMessageKey.of("frc.ui.wizard.validate.minJavaVersion.additionalMessage.goBack"));
     
-    
+        
+        // There's a situation where this gets called with a null value after the user goes back to the previous step, changes the wpilibVersion, and then comes forward again
+        //   So its called prior to the 
         final FrcWizardTemplateDefinition selectedTemplate = determineSelectedTemplate();
-        if(selectedTemplate.isDeprecated())
+        if (selectedTemplate == null)
+        {
+            Messages.showWarningDialog(getComponent(), 
+                                       message("frc.ui.wizard.templateSelectionStep.validate.noTemplateSelected.message"), 
+                                       message("frc.ui.wizard.templateSelectionStep.validate.noTemplateSelected.title"));
+            return false;
+        }
+        else if(selectedTemplate.isDeprecated())
         {
             final int answer = Messages.showYesNoDialog(
                     getComponent(),
@@ -188,7 +208,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
             }
         }
         
-        LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.validate() (Gracefully with no validation errors)");
+        LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.validate() gracefully with no validation errors");
         return true;
     }
     
@@ -219,26 +239,47 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         myBuilder.setParentProject(parentProject);
     
         FrcWizardTemplateDefinition templateDefinition = determineSelectedTemplate();
-        dataModel.setFrcWizardTemplateDefinition(templateDefinition);
+        if (templateDefinition != null)
+        {
+            dataModel.setFrcWizardTemplateDefinition(templateDefinition);
+            LOG.warn("[FRC] Could not set the template definition on the FrcProjectWizardData as 'determineSelectedTemplate' returned null");
+        }
         LOG.debug("[FRC] FrcWizardTemplateDefinition set to: " + templateDefinition);
         
         LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.updateDataModel()");
     }
     
-    
+    @Nullable
     private FrcWizardTemplateDefinition determineSelectedTemplate()
     {
-        final int selectedIndex = templateListsTabbedPane.getSelectedIndex();
-        final JBList<FrcWizardTemplateDefinition> templatesJBList;
-        if (selectedIndex == EXAMPLES_TAB_INDEX)
+        try
         {
-            templatesJBList = exampleTemplatesJBList;
+            final Component selectedComponent = templateListsTabbedPane.getSelectedComponent();
+            final JPanel panel = (JPanel) selectedComponent;
+            final Component component = panel.getComponent(0);
+            @SuppressWarnings("unchecked")
+            final JBList<FrcWizardTemplateDefinition> jbList = (JBList<FrcWizardTemplateDefinition>) component;
+            final FrcWizardTemplateDefinition selectedValue = jbList.getSelectedValue();
+            return selectedValue;
         }
-        else
+        catch (Exception e)
         {
-            templatesJBList = projectTemplatesJBList;
+            Log.warn("[FRC] Exception when determining selected template in ne project wizard: " + e.toString(), e);
+            return null;
         }
-        return templatesJBList.getSelectedValue();
+    
+//        ==PREVIOUS IMPLEMENTATION==        
+//        final int selectedIndex = templateListsTabbedPane.getSelectedIndex();
+//        final JBList<FrcWizardTemplateDefinition> templatesJBList;
+//        if (selectedIndex == EXAMPLES_TAB_INDEX)
+//        {
+//            templatesJBList = exampleTemplatesJBList;
+//        }
+//        else
+//        {
+//            templatesJBList = projectTemplatesJBList;
+//        }
+//        return templatesJBList.getSelectedValue();
     }
     
     
@@ -298,13 +339,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     private void initTemplatesLists()
     {
         ListSelectionListener templatesListSelectionListener = e -> {
-            final Object source = e.getSource();
-            if (source instanceof JBList)
-            {
-                @SuppressWarnings("unchecked")
-                final JBList<FrcWizardTemplateDefinition> theList = (JBList<FrcWizardTemplateDefinition>) source;
-                updateTemplateDescription(theList);
-            }
+            updateTemplateDescription();
         };
         projectTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
         exampleTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
@@ -313,42 +348,65 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     
     private void updateTemplatesLists()
     {
+        // We only want to update if:
+        //   1) the list has not yet been set (i.e. first time the step is appearing after the user selects the wpilibVersion and we now know what templates to use)
+        //   2) The user has gone back and changed the wpilibVersion such that it causes the list of templates to change
+        // We do NOT want to update the list if this is hit from the user using the "Previous" button to return to this step since if we update, their selection gets reset 
         final WpiLibVersion wpilibVersion = myBuilder.getDataModel().getWpilibVersion();
         final FrcWizardTemplateDefinition[] projectTemplates = FrcWizardTemplateDefinitionsKt.projectTemplateDefinitionsFor(wpilibVersion);
-        projectTemplatesJBList.setListData(projectTemplates);
-        projectTemplatesJBList.setSelectedIndex(0);
-        
         final FrcWizardTemplateDefinition[] exampleTemplates = FrcWizardTemplateDefinitionsKt.exampleTemplateDefinitionsFor(wpilibVersion);
-        exampleTemplatesJBList.setListData(exampleTemplates);
-        exampleTemplatesJBList.setSelectedIndex(0);
         
-        templateListsTabbedPane.setSelectedIndex(PROJECTS_TAB_INDEX);
-        updateTemplateDescription();
-    }
-    
-    
-    protected void updateTemplateDescription()
-    {
-        //templateListsTabbedPane.getSelectedComponent();
-        final int selectedIndex = templateListsTabbedPane.getSelectedIndex();
-        switch (selectedIndex)
+        if (dataListNeedsUpdating(projectTemplates, projectTemplatesJBList) || dataListNeedsUpdating(exampleTemplates, exampleTemplatesJBList))
         {
-            case PROJECTS_TAB_INDEX:
-                updateTemplateDescription(projectTemplatesJBList);
-                break;
-            case EXAMPLES_TAB_INDEX:
-                updateTemplateDescription(exampleTemplatesJBList);
-                break;
-            default:
-                LOG.warn("[FRC] Unknown selected tab index of " + selectedIndex + ". No action can be taken to update the template description");
+            // We set the selected Index first because updating the list data will fire our change listener to update the description
+            // That change listener reads the selected index. There is a chance that the selected index is out of bounds 
+            //    (because the new list is shorter, and the selected index was for an item near the end of the previous list)
+            projectTemplatesJBList.setSelectedIndex(0);
+            projectTemplatesJBList.setListData(projectTemplates);
+    
+            exampleTemplatesJBList.setSelectedIndex(0);
+            exampleTemplatesJBList.setListData(exampleTemplates);
+            
+            // TODO: it would be nice to set the selected tab and template back to the previously selected item if it exists in the new list 
+            templateListsTabbedPane.setSelectedIndex(PROJECTS_TAB_INDEX);
+            updateTemplateDescription();
         }
     }
     
-    protected void updateTemplateDescription(JBList<FrcWizardTemplateDefinition> theList)
+    private boolean dataListNeedsUpdating(FrcWizardTemplateDefinition[] neededProjectTemplates, JBList<FrcWizardTemplateDefinition> jbList)
     {
-        final int index = theList.getLeadSelectionIndex();
-        final FrcWizardTemplateDefinition templateDefinition = theList.getModel().getElementAt(index);
-        templateDescriptionLabel.setText(templateDefinition.getDisplayNameAndDescription());
+        final ListModel<FrcWizardTemplateDefinition> listModel = jbList.getModel();
+        if (neededProjectTemplates.length != listModel.getSize()) { return true;}
+        for (int i = 0; i < neededProjectTemplates.length; i++)
+        {
+            if (neededProjectTemplates[i] != listModel.getElementAt(i))
+            {
+                return true;
+            }
+        }
+        return false;
     }
     
+    protected void updateTemplateDescription()
+    {
+        try
+        {
+            final FrcWizardTemplateDefinition selectedTemplate = determineSelectedTemplate();
+            if (selectedTemplate != null)
+            {
+                templateDescriptionLabel.setText(selectedTemplate.getDisplayNameAndDescription());
+            }
+            else 
+            {
+                LOG.warn("[FRC] Could not determine selected template. Template description set to empty string.");
+                templateDescriptionLabel.setText("");
+            }
+            
+        }
+        catch (Exception e)
+        {
+            LOG.warn("[FRC] An exception occurred when attempting to update the template description: " + e.toString(), e);
+        }
+        
+    }
 }

@@ -112,11 +112,9 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     private var rootProjectPath: String? = null
     
     
-    private val myUseKotlinDSL = false
+//    private val myUseKotlinDSL = false
+//    private val myShowGradleConfig = true
     
-    private val myShowGradleConfig = true
-    
-    //TODO: this needs to be created from the wizard step form
     val dataModel = FrcProjectWizardData()
 
 

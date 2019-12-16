@@ -338,9 +338,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     
     private void initTemplatesLists()
     {
-        ListSelectionListener templatesListSelectionListener = e -> {
-            updateTemplateDescription();
-        };
+        ListSelectionListener templatesListSelectionListener = e -> updateTemplateDescription();
         projectTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
         exampleTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
     }

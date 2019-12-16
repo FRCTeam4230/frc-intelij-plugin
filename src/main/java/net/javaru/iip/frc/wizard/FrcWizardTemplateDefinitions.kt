@@ -213,10 +213,16 @@ enum class FrcWizard2020ExampleTemplateDefinition(
     GettingStarted("Getting Started", "An example project which demonstrates the simplest autonomous and teleoperated routines."),
     TankDrive("Tank Drive", "Demonstrates the use of the RobotDrive class doing teleop driving with tank steering (i.e. two joysticks)."),
     ArcadeDrive("Arcade Drive", "Demonstrates the use of the DifferentialDrive class to drive a robot with Arcade Drive."),
-    MecanumDrive("Mecanum Drive", "Demonstrate the use of the RobotDrive class doing teleop driving with a Mecanum drivetrain."),
+    MecanumDrive("Mecanum Drive", "Demonstrates the use of the RobotDrive class doing teleop driving with a Mecanum drivetrain."),
+    PdpCanMonitoring("PDP CAN Monitoring", "Demonstrates using CAN to monitor the voltage, current, and temperature in the Power Distribution Panel (PDP)."),
+    Solenoids("Solenoids", "Demonstrates controlling a single and double solenoid from Joystick buttons."),
+    Encoder("Encoder", "Demonstrates displaying the value of a quadrature encoder on the SmartDashboard."),
+    Relay("Relay", "Demonstrates controlling a Relay from Joystick buttons."),
     Ultrasonic("Ultrasonic", "Demonstrates maintaining a set distance using an ultrasonic sensor."),
     UltrasonicPID("Ultrasonic PID", "Demonstrates maintaining a set distance using an ultrasonic sensor and PID Control."),
     PotentiometerPID("Potentiometer PID", "Demonstrates the use of a potentiometer and PID control to reach elevator position setpoints."),
+    ElevatorTrapezoidProfiledPid("Elevator with trapezoid profiled PID", "An example to demonstrate the use of an encoder and trapezoid profiled PID control to reach elevator position setpoints."),
+    ElevatorProfiledPidController("Elevator with profiled PID controller", "An example to demonstrate the use of an encoder and profiled PID control to reach elevator position setpoints."),
     Gyro("Gyro", "Demonstrates how to drive straight using a gyro sensor."),
     GyroMecanum("Gyro Mecanum", "Demonstrates how to perform mecanum drive with field oriented controls."),
     HIDRumble("HID Rumble", "Demonstrates how to make human interface devices rumble."),
@@ -228,6 +234,8 @@ enum class FrcWizard2020ExampleTemplateDefinition(
     IntermediateVision("Intermediate Vision", "Demonstrates the use of the NIVision class to capture image from a Webcam, process them, and then send them to the dashboard."),
     AxisCameraSample("Axis Camera Sample", "An example program that acquires images from an Axis network camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display. This demonstrates the use of the AxisCamera class."),
     ShuffleboardSample("Shuffleboard Sample", "An example program that adds data to various Shuffleboard tabs, demonstrating the Shuffleboard API."),
+    TraditionalHatchbot("'Traditional' Hatchbot", "A fully-functional command-based hatch bot for the 2019 game using the new experimental (version 2) command API.  Written in the 'traditional' style, i.e. commands are given their own classes.", commandVersion = 2),
+    InlinedHatchbot("'Inlined' Hatchbot", "A fully-functional command-based hatch bot for the 2019 game using the new experimental (version 2) command API.  Written in the 'inlined' style, i.e. many commands are defined inline with lambdas.", commandVersion = 2)
     ;
 
 

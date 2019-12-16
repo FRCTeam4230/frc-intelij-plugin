@@ -85,8 +85,16 @@ class FrcProjectWizardData(
     
     fun junitIncludeVintageSupport(): Boolean = includeJUnitSupport && (junitOption == JUnitOption.JUnit5withVintage)
     fun junitUseJUnitPlatform(): Boolean = includeJUnitSupport && (junitOption == JUnitOption.JUnit5 || junitOption == JUnitOption.JUnit5withVintage) 
-    fun junitIsJUnit4Only(): Boolean = includeJUnitSupport && (junitOption == JUnitOption.JUnit4)    
+    fun junitIsJUnit4Only(): Boolean = includeJUnitSupport && (junitOption == JUnitOption.JUnit4)
+    
+    override fun toString(): String
+    {
+        return "FrcProjectWizardData(teamNumber=$teamNumber, mainClassSimpleName='$mainClassSimpleName', robotClassSimpleName='$robotClassSimpleName', basePackage='$basePackage', wpilibVersion=$wpilibVersion, frcWizardTemplateDefinition=$frcWizardTemplateDefinition, includeVsCodeConfigs=$includeVsCodeConfigs, gitIgnoreConfiguration=$gitIgnoreConfiguration, includeJUnitSupport=$includeJUnitSupport, junitOption=$junitOption, junit5Version='$junit5Version')"
+    }
+
     enum class JUnitOption() {JUnit5, JUnit5withVintage, JUnit4}
+    
+    
 }
 
 data class GitIgnoreConfiguration(

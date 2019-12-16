@@ -237,8 +237,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     {
         // This implementation is heavily based on the impl in AbstractGradleModuleBuilder (v2019.3+, was previously GradleModelBuilder), along with a bit from the KtorModuleBuilder impl in the JetBrains ktor plugin
         // This method gets called by the setupModule method
-        LOG.trace("[FRC] FrcModuleBuilder.setupRootModel() called")
-
+        LOG.debug("[FRC] FrcModuleBuilder.setupRootModel() called with template: '${dataModel.frcWizardTemplateDefinition.displayName}' from dir '${dataModel.frcWizardTemplateDefinition.templateResourcesDirName()}'")
+        LOG.trace("[FRC] Data Model: $dataModel")
         /*
             We need to setup the following:
             A) The following are typically identical between templates

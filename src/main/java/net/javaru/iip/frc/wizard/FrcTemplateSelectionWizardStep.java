@@ -66,13 +66,13 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     private JPanel templateListsOuterPanel;
     private JBLabel templateDescriptionLabel;
     private JBTabbedPane templateListsTabbedPane;
-    private JPanel projectTemplatesPane;
-    private JPanel exampleTemplatesPane;
-    private JBList<FrcWizardTemplateDefinition> projectTemplatesJBList;
-    private JBList<FrcWizardTemplateDefinition> exampleTemplatesJBList;
     private JBLabel projectTemplatesPaneLabel;
     private JPanel wpilibVersionSelectedPanel;
     private JBLabel wpilibVersionSelectedLabel;
+    private JScrollPane projectTemplatesScrollPane;
+    private JBList<FrcWizardTemplateDefinition> projectTemplatesJBList;
+    private JScrollPane projectExamplesScrollPane;
+    private JBList<FrcWizardTemplateDefinition> exampleTemplatesJBList;
     
     
     public FrcTemplateSelectionWizardStep(@NotNull FrcModuleBuilder builder,
@@ -255,16 +255,16 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         try
         {
             final Component selectedComponent = templateListsTabbedPane.getSelectedComponent();
-            final JPanel panel = (JPanel) selectedComponent;
-            final Component component = panel.getComponent(0);
+            final Container panel = (Container) selectedComponent;
+            final JViewport viewport = (JViewport) panel.getComponent(0);
             @SuppressWarnings("unchecked")
-            final JBList<FrcWizardTemplateDefinition> jbList = (JBList<FrcWizardTemplateDefinition>) component;
-            final FrcWizardTemplateDefinition selectedValue = jbList.getSelectedValue();
+            final JList<FrcWizardTemplateDefinition> jList = (JList<FrcWizardTemplateDefinition>) viewport.getComponent(0);
+            final FrcWizardTemplateDefinition selectedValue = jList.getSelectedValue();
             return selectedValue;
         }
         catch (Exception e)
         {
-            Log.warn("[FRC] Exception when determining selected template in ne project wizard: " + e.toString(), e);
+            Log.warn("[FRC] Exception when determining selected template in new project wizard: " + e.toString(), e);
             return null;
         }
     }
@@ -372,24 +372,25 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
                 try
                 {
                     final String previousId = previouslySelectedTemplate.id();
-                    final JPanel panel = (JPanel) previouslySelectedComponent;
-                    final Component component = panel.getComponent(0);
+                    final Container panel = (Container) previouslySelectedComponent;
+                    final JViewport viewport = (JViewport) panel.getComponent(0);
                     @SuppressWarnings("unchecked")
-                    final JBList<FrcWizardTemplateDefinition> jbList = (JBList<FrcWizardTemplateDefinition>) component;
-                    final ListModel<FrcWizardTemplateDefinition> listModel = jbList.getModel();
+                    final JList<FrcWizardTemplateDefinition> jList = (JList<FrcWizardTemplateDefinition>) viewport.getComponent(0);
+                    final ListModel<FrcWizardTemplateDefinition> listModel = jList.getModel();
+                    
                     for (int i = 0; i < listModel.getSize(); i++)
                     {
                         final FrcWizardTemplateDefinition templateDefinition = listModel.getElementAt(i);
                         if (templateDefinition.id().equals(previousId))
                         {
-                            jbList.setSelectedValue(templateDefinition, true);
+                            jList.setSelectedValue(templateDefinition, true);
                             break;
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    LOG.info("[FRC] Exception when attempting to potentially set selected template to match previously selected template: " + e.toString());
+                    LOG.info("[FRC] Exception when attempting to potentially set selected template to match previously selected template: " + e.toString(), e);
                 }
             }
             updateTemplateDescription();
@@ -414,22 +415,25 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     {
         try
         {
-            final FrcWizardTemplateDefinition selectedTemplate = determineSelectedTemplate();
-            if (selectedTemplate != null)
-            {
-                templateDescriptionLabel.setText(selectedTemplate.getDisplayNameAndDescription());
-            }
-            else 
-            {
-                LOG.warn("[FRC] Could not determine selected template. Template description set to empty string.");
-                templateDescriptionLabel.setText("");
-            }
-            
+            updateTemplateDescription(determineSelectedTemplate());
         }
         catch (Exception e)
         {
             LOG.warn("[FRC] An exception occurred when attempting to update the template description: " + e.toString(), e);
         }
-        
+    }
+    
+    
+    protected void updateTemplateDescription(@Nullable FrcWizardTemplateDefinition selectedTemplate)
+    {
+        if (selectedTemplate != null)
+        {
+            templateDescriptionLabel.setText(selectedTemplate.getDisplayNameAndDescription());
+        }
+        else 
+        {
+            templateDescriptionLabel.setText("");
+            LOG.debug("[FRC] selectedTemplate was null. Template description set to empty string.");
+        }
     }
 }

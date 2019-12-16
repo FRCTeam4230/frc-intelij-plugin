@@ -31,62 +31,34 @@
                 <properties/>
                 <border type="etched"/>
                 <children>
-                  <grid id="d8ecb" binding="projectTemplatesPane" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-                    <margin top="0" left="0" bottom="0" right="0"/>
+                  <scrollpane id="1317d" binding="projectTemplatesScrollPane">
                     <constraints>
-                      <tabbedpane title-resource-bundle="i18n/FrcBundle" title-key="frc.ui.wizard.templateSelectionStep.projectTemplatesPane.title">
-                        <tooltip resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.templateSelectionStep.projectTemplatesPane.tooltip"/>
-                      </tabbedpane>
+                      <tabbedpane title-resource-bundle="i18n/FrcBundle" title-key="frc.ui.wizard.templateSelectionStep.projectTemplatesPane.title"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="9f2fe" class="com.intellij.ui.components.JBList" binding="projectTemplatesJBList">
-                        <constraints>
-                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                        </constraints>
+                      <component id="3d01a" class="com.intellij.ui.components.JBList" binding="projectTemplatesJBList">
+                        <constraints/>
                         <properties/>
                       </component>
-                      <hspacer id="83463">
-                        <constraints>
-                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                        </constraints>
-                      </hspacer>
-                      <vspacer id="b23dd">
-                        <constraints>
-                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-                        </constraints>
-                      </vspacer>
                     </children>
-                  </grid>
-                  <grid id="fb382" binding="exampleTemplatesPane" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-                    <margin top="0" left="0" bottom="0" right="0"/>
+                  </scrollpane>
+                  <scrollpane id="c2295" binding="projectExamplesScrollPane">
                     <constraints>
-                      <tabbedpane title-resource-bundle="i18n/FrcBundle" title-key="frc.ui.wizard.templateSelectionStep.exampleTemplatesPane.title">
-                        <tooltip resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.templateSelectionStep.exampleTemplatesPane.tooltip"/>
-                      </tabbedpane>
+                      <tabbedpane title-resource-bundle="i18n/FrcBundle" title-key="frc.ui.wizard.templateSelectionStep.exampleTemplatesPane.title"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="2f960" class="com.intellij.ui.components.JBList" binding="exampleTemplatesJBList">
-                        <constraints>
-                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                        </constraints>
-                        <properties/>
+                      <component id="3738f" class="com.intellij.ui.components.JBList" binding="exampleTemplatesJBList">
+                        <constraints/>
+                        <properties>
+                          <model/>
+                        </properties>
                       </component>
-                      <hspacer id="c8f40">
-                        <constraints>
-                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                        </constraints>
-                      </hspacer>
-                      <vspacer id="624ea">
-                        <constraints>
-                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-                        </constraints>
-                      </vspacer>
                     </children>
-                  </grid>
+                  </scrollpane>
                 </children>
               </tabbedpane>
               <component id="181e9" class="com.intellij.ui.components.JBLabel">

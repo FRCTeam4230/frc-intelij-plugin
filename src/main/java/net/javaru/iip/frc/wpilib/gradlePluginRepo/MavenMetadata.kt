@@ -41,6 +41,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 
 val LOG = Logger.getInstance(MavenMetadata::class.java)
@@ -123,7 +124,30 @@ data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: 
                 updateFromRepo()
             }
             return ServiceManager.getService(GradleRioMavenMetadataState::class.java)
-        }   
+        }
+
+        /**
+         * @param maxAge the maximum age of the last update before an update from the Gradle repo needs to be made. 
+         *               Use `Duration.ofDays()`, `Duration.ofMinutes()`, etc. to create.
+         */
+        @JvmStatic
+        fun getInstance(maxAge: Duration): GradleRioMavenMetadataState
+        {
+            val state = ServiceManager.getService(GradleRioMavenMetadataState::class.java)
+             state.lastCheckedDateTime
+            val minutesBetween = ChronoUnit.MINUTES.between(state.lastCheckedDateTime, LocalDateTime.now())
+            val durationSinceLastUpdate = Duration.ofMinutes(minutesBetween)
+
+            return if (durationSinceLastUpdate >= maxAge)
+            {
+                getInstance(true)
+            }
+            else
+            {
+                state;
+            }
+        }
+        
 
         @JvmStatic
         fun clone(original: GradleRioMavenMetadataState): GradleRioMavenMetadataState

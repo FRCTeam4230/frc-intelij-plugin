@@ -16,6 +16,9 @@
 
 package net.javaru.iip.frc.wizard;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 import javax.swing.*;
 
@@ -157,8 +160,8 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
         //  c) have a UI option to show/hide betas (off by default)
         // ✔d) make modifications so that the FrcProjectWizardData.wpilibVersion defaults to the latest and then that the selected item (below) matches
         
-        final List<WpiLibVersion> versionList = GradleRioMavenMetadataState.getInstance(true).getWpiLibMavenMetadata().getWpiLibVersionsDescending();
-        
+        final Duration maxAge = calcMaxAgeDurationToUse();
+        final List<WpiLibVersion> versionList = GradleRioMavenMetadataState.getInstance(maxAge).getWpiLibMavenMetadata().getWpiLibVersionsDescending();
         // Filter the list to include only releases, and the latest one if it is a release candidate or beta (for an unreleased version)
         final List<WpiLibVersion> filteredList = WpiLibVersionFiltersKt.filterToDefaultListing(versionList);
         final WpiLibVersion[] versions = filteredList.toArray(new WpiLibVersion[0]);
@@ -174,4 +177,23 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
         }
         wpilibVersionComboBox.setSelectedIndex(index);
     }
+    
+    
+    private Duration calcMaxAgeDurationToUse()
+    {
+        // TODO need an application setting to set the maxAge Duration to use, and also add a refresh button on the listing in the wizard
+        final LocalDate now = LocalDate.now();
+        
+        // We want to update regularly during the initial build kickoff time period
+        if ((now.getMonth() == Month.DECEMBER && now.getDayOfMonth() > 20) || 
+            (now.getMonth() == Month.JANUARY && now.getDayOfMonth() >= 16))
+        {
+            return Duration.ZERO;
+        }
+        else 
+        {
+            return Duration.ofMinutes(15);
+        }
+    }
+        
 }

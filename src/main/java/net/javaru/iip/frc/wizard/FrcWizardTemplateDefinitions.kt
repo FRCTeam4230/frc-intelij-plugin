@@ -235,8 +235,12 @@ enum class FrcWizard2020ExampleTemplateDefinition(
     IntermediateVision("Intermediate Vision", "Demonstrates the use of the NIVision class to capture image from a Webcam, process them, and then send them to the dashboard."),
     AxisCameraSample("Axis Camera Sample", "An example program that acquires images from an Axis network camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display. This demonstrates the use of the AxisCamera class."),
     ShuffleboardSample("Shuffleboard Sample", "An example program that adds data to various Shuffleboard tabs, demonstrating the Shuffleboard API."),
-    TraditionalHatchbot("'Traditional' Hatchbot", "A fully-functional command-based hatch bot for the 2019 game using the new experimental (version 2) command API.  Written in the 'traditional' style, i.e. commands are given their own classes.", commandVersion = 2),
-    InlinedHatchbot("'Inlined' Hatchbot", "A fully-functional command-based hatch bot for the 2019 game using the new experimental (version 2) command API.  Written in the 'inlined' style, i.e. many commands are defined inline with lambdas.", commandVersion = 2)
+    TraditionalHatchbot("'Traditional' Hatchbot", "A fully-functional command-based hatch bot for the 2019 game using the new experimental (version 2) command framework/API.  Written in the 'traditional' style, i.e. commands are given their own classes.", commandVersion = 2),
+    InlinedHatchbot("'Inlined' Hatchbot", "A fully-functional command-based hatch bot for the 2019 game using the new experimental (version 2) command framework/API.  Written in the 'inlined' style, i.e. many commands are defined inline with lambdas.", commandVersion = 2),
+    SelectCommand("Select Command Example", "An example showing how to use the SelectCommand class from the experimental (version 2) command framework/API.", commandVersion = 2),
+    SchedulerEventLogging("Scheduler Event Logging", "An example showing how to use Shuffleboard to log Command events from the CommandScheduler in the experimental (version 2) command framework/API.", commandVersion = 2),
+    FrisbeeBot("FrisbeeBot", "An example robot project for a simple frisbee shooter for the 2013 FRC game, Ultimate Ascent, demonstrating use of PID functionality in the experimental (version 2) command framework/API.", commandVersion = 2),
+    GyroDriveCommands("Gyro Drive Commands", "An example (version 2) command-based robot project demonstrating simple PID functionality utilizing a gyroscope to keep a robot driving straight and to turn to specified angles.", commandVersion = 2),
     ;
 
 

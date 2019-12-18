@@ -41,7 +41,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     private final Solenoid solenoid = new Solenoid(0);
 
     // DoubleSolenoid corresponds to a double solenoid.
-    private final DoubleSolenoid m_doubleSolenoid = new DoubleSolenoid(1, 2);
+    private final DoubleSolenoid doubleSolenoid = new DoubleSolenoid(1, 2);
 
     private static final int SOLENOID_BUTTON = 1;
     private static final int DOUBLE_SOLENOID_FORWARD = 2;
@@ -64,10 +64,10 @@ public class ${data.robotClassSimpleName} extends TimedRobot
          */
         if (joystick.getRawButton(DOUBLE_SOLENOID_FORWARD))
         {
-            m_doubleSolenoid.set(DoubleSolenoid.Value.kForward);
+            doubleSolenoid.set(DoubleSolenoid.Value.kForward);
         } else if (joystick.getRawButton(DOUBLE_SOLENOID_REVERSE))
         {
-            m_doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
+            doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
         }
     }
 }

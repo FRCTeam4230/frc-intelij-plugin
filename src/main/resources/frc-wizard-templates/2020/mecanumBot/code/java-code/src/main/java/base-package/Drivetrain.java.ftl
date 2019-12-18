@@ -63,7 +63,7 @@ public class Drivetrain
     private final MecanumDriveKinematics kinematics =
             new MecanumDriveKinematics(frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
 
-    private final MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(kinematics, getAngle());
+    private final MecanumDriveOdometry odometry = new MecanumDriveOdometry(kinematics, getAngle());
 
     /**
      * Constructs a MecanumDrive and resets the gyro.
@@ -146,6 +146,6 @@ public class Drivetrain
      */
     public void updateOdometry()
     {
-        m_odometry.update(getAngle(), getCurrentState());
+        odometry.update(getAngle(), getCurrentState());
     }
 }

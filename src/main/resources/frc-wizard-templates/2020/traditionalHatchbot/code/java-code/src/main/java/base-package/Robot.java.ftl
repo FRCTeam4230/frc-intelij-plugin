@@ -35,7 +35,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     private RobotContainer robotContainer;
 
     /**
-     * This function is run when the robot is first started up and should be used for any
+     * This method is run when the robot is first started up and should be used for any
      * initialization code.
      */
     @Override
@@ -47,7 +47,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     }
 
     /**
-     * This function is called every robot packet, no matter the mode. Use this for items like
+     * This method is called every robot packet, no matter the mode. Use this for items like
      * diagnostics that you want ran during disabled, autonomous, teleoperated and test.
      * <p>
      * This runs after the mode specific periodic functions, but before
@@ -64,7 +64,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     }
 
     /**
-     * This function is called once each time the robot enters Disabled mode.
+     * This method is called once each time the robot enters Disabled mode.
      */
     @Override
     public void disabledInit()
@@ -99,7 +99,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     }
 
     /**
-     * This function is called periodically during autonomous.
+     * This method is called periodically during autonomous.
      */
     @Override
     public void autonomousPeriodic()
@@ -120,7 +120,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     }
 
     /**
-     * This function is called periodically during operator control.
+     * This method is called periodically during operator control.
      */
     @Override
     public void teleopPeriodic()
@@ -135,7 +135,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     }
 
     /**
-     * This function is called periodically during test mode.
+     * This method is called periodically during test mode.
      */
     @Override
     public void testPeriodic()

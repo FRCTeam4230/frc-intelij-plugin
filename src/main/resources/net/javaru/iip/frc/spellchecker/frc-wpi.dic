@@ -9,6 +9,7 @@ ctre
 deployable
 drivebase
 drivetrain
+feedforward
 firewire
 firstinspires
 fpga
@@ -39,12 +40,15 @@ networktable
 networktables
 objdetect
 odometry
+offboard
 omni
 omnidirectional
 omnimount
 omniwheel
 opencv
 pid
+pregenerated
+ramsete
 revrobotics
 rio
 riolog
@@ -64,6 +68,7 @@ teleoperate
 teleoperated
 teleoperator
 teleoperation
+toolsuite
 usb
 usfirst
 vendordeps
@@ -72,6 +77,8 @@ videotable
 vlan
 vscode
 watchdog
+waypoint
+waypoints
 webcam
 wpi
 wpil

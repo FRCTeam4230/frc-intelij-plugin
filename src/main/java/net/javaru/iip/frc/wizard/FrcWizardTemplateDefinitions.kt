@@ -244,6 +244,17 @@ enum class FrcWizard2020ExampleTemplateDefinition(
     SwerveBot("SwerveBot", "An example program for a swerve drive that uses swerve drive kinematics and odometry.", commandVersion = 2),
     MecanumBot("MecanumBot", "An example program for a mecanum drive that uses mecanum drive kinematics and odometry.", commandVersion = 2),
     DifferentialDriveBot("DifferentialDriveBot", "An example program for a differential drive that uses differential drive kinematics and odometry.", commandVersion = 2),
+    RamseteCommand("RamseteCommand", "An example (version 2) command-based robot demonstrating the use of a RamseteCommand to follow a pregenerated trajectory.", commandVersion = 2),
+    ArcadeDriveXboxController("Arcade Drive Xbox Controller", "Demonstrates the use of the DifferentialDrive class to drive a robot with Arcade Drive and an Xbox Controller"),
+    TankDriveXboxController("Tank Drive Xbox Controller", "Demonstrates the use of the DifferentialDrive class to drive a robot with Tank Drive and an Xbox Controller"),
+    DutyCycleEncoder("Duty Cycle Encoder", "Demonstrates the use of the Duty Cycle Encoder class.", commandVersion = 2),
+    DutyCycleInput("Duty Cycle Input", "Demonstrates the use of the Duty Cycle class.", commandVersion = 2),
+    AddressableLED("Addressable LED", "Demonstrates the use of the Addressable LED class.", commandVersion = 2),
+    ArmBot("ArmBot", "An example command-based robot demonstrating the use of a ProfiledPIDSubsystem to control an arm.", commandVersion = 2),
+    ArmBotOffboard("ArmBot Offboard", "An example command-based robot demonstrating the use of a TrapezoidProfileSubsystem to control an arm with an offboard PID.", commandVersion = 2),
+    DriveDistanceOffboard("Drive Distance Offboard", "An example command-based robot demonstrating the use of a TrapezoidProfileCommand to drive a robot a set distance with offboard PID on the drive.", commandVersion = 2),
+    MecanumControllerCommand("MecanumControllerCommand", "An example command-based robot demonstrating the use of a MecanumControllerCommand to follow a pregenerated trajectory.", commandVersion = 2),
+    SwerveControllerCommand("SwerveControllerCommand", "An example command-based robot demonstrating the use of a SwerveControllerCommand to follow a pregenerated trajectory.", commandVersion = 2),
     ;
 
 

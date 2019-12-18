@@ -69,11 +69,13 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     @Override
     public void disabledInit()
     {
+
     }
 
     @Override
     public void disabledPeriodic()
     {
+
     }
 
     /**
@@ -83,6 +85,19 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     public void autonomousInit()
     {
         autonomousCommand = robotContainer.getAutonomousCommand();
+
+       //String autoSelected = SmartDashboard.getString("Auto Selector", "Default Auto");
+       //switch (autoSelected)
+       //{
+       //    case "My Auto":
+       //        autonomousCommand = new MyAutoCommand();
+       //        break;
+       //    case "Default Auto":
+       //    default:
+       //        autonomousCommand = new ExampleCommand();
+       //        break;
+       //}
+
 
         // schedule the autonomous command (example)
         if (autonomousCommand != null)
@@ -97,6 +112,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     @Override
     public void autonomousPeriodic()
     {
+
     }
 
     @Override
@@ -118,6 +134,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     @Override
     public void teleopPeriodic()
     {
+
     }
 
     @Override
@@ -133,5 +150,6 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     @Override
     public void testPeriodic()
     {
+
     }
 }

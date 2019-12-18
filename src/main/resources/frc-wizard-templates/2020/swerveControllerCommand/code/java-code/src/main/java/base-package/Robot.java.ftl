@@ -49,8 +49,8 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     /**
      * This method is called every robot packet, no matter the mode. Use this for items like
      * diagnostics that you want ran during disabled, autonomous, teleoperated and test.
-     *
-     * <p>This runs after the mode specific periodic functions, but before
+     * <p>
+     * This runs after the mode specific periodic functions, but before
      * LiveWindow and SmartDashboard integrated updating.
      */
     @Override
@@ -84,6 +84,18 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     {
         autonomousCommand = robotContainer.getAutonomousCommand();
 
+        //String autoSelected = SmartDashboard.getString("Auto Selector", "Default Auto");
+        //switch (autoSelected)
+        //{
+        //    case "My Auto":
+        //        autonomousCommand = new MyAutoCommand();
+        //        break;
+        //    case "Default Auto":
+        //    default:
+        //        autonomousCommand = new ExampleCommand();
+        //        break;
+        //}
+
         // schedule the autonomous command (example)
         if (autonomousCommand != null)
         {
@@ -97,6 +109,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     @Override
     public void autonomousPeriodic()
     {
+        
     }
 
     @Override
@@ -118,6 +131,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     @Override
     public void teleopPeriodic()
     {
+
     }
 
     @Override
@@ -133,5 +147,6 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     @Override
     public void testPeriodic()
     {
+        
     }
 }

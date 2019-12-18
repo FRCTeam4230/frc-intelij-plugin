@@ -9,7 +9,7 @@
 <#--  To DEBUG templates, set system property 'frc.freemarker.debug' to true when luanching the testing instance of IntelliJ IDEA -->
 </#compress>
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -34,8 +34,8 @@ public final class Constants
         public static final int RIGHT_MOTOR_1_PORT = 2;
         public static final int RIGHT_MOTOR_2_PORT = 3;
 
-        public static final int[] LEFT_ENCODER_PORTS = new int[]{0, 1};
-        public static final int[] RIGHT_ENCODER_PORTS = new int[]{2, 3};
+        public static final int[] LEFT_ENCODER_PORTS = {0, 1};
+        public static final int[] RIGHT_ENCODER_PORTS = {2, 3};
         public static final boolean LEFT_ENCODER_REVERSED = false;
         public static final boolean RIGHT_ENCODER_REVERSED = true;
 
@@ -49,7 +49,7 @@ public final class Constants
     public static final class HatchConstants
     {
         public static final int HATCH_SOLENOID_MODULE = 0;
-        public static final int[] HATCH_SOLENOID_PORTS = new int[]{0, 1};
+        public static final int[] HATCH_SOLENOID_PORTS = {0, 1};
     }
 
     public static final class AutoConstants

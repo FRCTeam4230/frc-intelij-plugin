@@ -241,6 +241,9 @@ enum class FrcWizard2020ExampleTemplateDefinition(
     SchedulerEventLogging("Scheduler Event Logging", "An example showing how to use Shuffleboard to log Command events from the CommandScheduler in the experimental (version 2) command framework/API.", commandVersion = 2),
     FrisbeeBot("FrisbeeBot", "An example robot project for a simple frisbee shooter for the 2013 FRC game, Ultimate Ascent, demonstrating use of PID functionality in the experimental (version 2) command framework/API.", commandVersion = 2),
     GyroDriveCommands("Gyro Drive Commands", "An example (version 2) command-based robot project demonstrating simple PID functionality utilizing a gyroscope to keep a robot driving straight and to turn to specified angles.", commandVersion = 2),
+    SwerveBot("SwerveBot", "An example program for a swerve drive that uses swerve drive kinematics and odometry.", commandVersion = 2),
+    MecanumBot("MecanumBot", "An example program for a mecanum drive that uses mecanum drive kinematics and odometry.", commandVersion = 2),
+    DifferentialDriveBot("DifferentialDriveBot", "An example program for a differential drive that uses differential drive kinematics and odometry.", commandVersion = 2),
     ;
 
 

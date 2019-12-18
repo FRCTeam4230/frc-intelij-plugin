@@ -31,9 +31,9 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     @Override
     public void robotInit()
     {
-        // PWM port 0
+        // PWM port 9
         // Must be a PWM header, not MXP or DIO
-        led = new AddressableLED(0);
+        led = new AddressableLED(9);
 
         // Reuse buffer
         // Default to a length of 60, start empty output

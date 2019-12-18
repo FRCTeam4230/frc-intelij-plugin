@@ -45,7 +45,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     public static OI oi;
 
     /**
-     * This function is run when the robot is first started up and should be
+     * This method is run when the robot is first started up and should be
      * used for any initialization code.
      */
     @Override
@@ -75,7 +75,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     }
 
     /**
-     * This function is called periodically during autonomous.
+     * This method is called periodically during autonomous.
      */
     @Override
     public void autonomousPeriodic()
@@ -95,7 +95,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     }
 
     /**
-     * This function is called periodically during teleoperated mode.
+     * This method is called periodically during teleoperated mode.
      */
     @Override
     public void teleopPeriodic()
@@ -105,7 +105,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     }
 
     /**
-     * This function is called periodically during test mode.
+     * This method is called periodically during test mode.
      */
     @Override
     public void testPeriodic()

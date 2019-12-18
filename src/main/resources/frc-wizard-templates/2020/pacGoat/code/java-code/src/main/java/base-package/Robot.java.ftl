@@ -53,7 +53,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
 
     private SendableChooser<Command> autoChooser;
 
-    // This function is run when the robot is first started up and should be
+    // This method is run when the robot is first started up and should be
     // used for any initialization code.
     @Override
     public void robotInit()
@@ -85,7 +85,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
         autonomousCommand.start();
     }
 
-    // This function is called periodically during autonomous
+    // This method is called periodically during autonomous
     @Override
     public void autonomousPeriodic()
     {
@@ -106,7 +106,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
         }
     }
 
-    // This function is called periodically during operator control
+    // This method is called periodically during operator control
     @Override
     public void teleopPeriodic()
     {
@@ -114,7 +114,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
         log();
     }
 
-    // This function called periodically during test mode
+    // This method called periodically during test mode
     @Override
     public void testPeriodic()
     {
@@ -126,7 +126,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
         Robot.shooter.unlatch();
     }
 
-    // This function is called periodically while disabled
+    // This method is called periodically while disabled
     @Override
     public void disabledPeriodic()
     {

@@ -29,7 +29,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     private final Joystick joystick = new Joystick(1);
     private final ExampleSmartMotorController motor = new ExampleSmartMotorController(1);
     // Note: These gains are fake, and will have to be tuned for your robot.
-    private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(1, 1.5);
+    private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(1, 1.5);
 
     private final TrapezoidProfile.Constraints constraints =
             new TrapezoidProfile.Constraints(1.75, 0.75);
@@ -66,7 +66,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
 
         // Send setpoint to off board controller PID
         motor.setSetpoint(ExampleSmartMotorController.PIDMode.Position, setpoint.position,
-                feedForward.calculate(setpoint.velocity) / 12.0);
+                feedforward.calculate(setpoint.velocity) / 12.0);
     }
     
 }

@@ -67,7 +67,7 @@ public final class Constants
         public static final double I = 0;
         public static final double D = 0;
 
-        // On a real robot the feedForward constants should be empirically determined; these are
+        // On a real robot the feedforward constants should be empirically determined; these are
         // reasonable guesses.
         public static final double S_VOLTS = 0.05;
         public static final double V_VOLT_SECONDS_PER_ROTATION =

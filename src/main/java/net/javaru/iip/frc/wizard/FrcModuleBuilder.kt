@@ -93,7 +93,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     var selectedSdk: Sdk? = null
         set(sdk) 
         {
-            LOG.trace("[FRC] setter called with value of '$sdk'  Previous value was '$field'")
+            LOG.trace("[FRC] selectedSdk setter called with value of '$sdk'  Previous value was '$field'")
             if (field != sdk)
             {
                 field = sdk

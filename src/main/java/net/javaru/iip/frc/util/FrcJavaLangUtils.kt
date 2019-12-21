@@ -128,7 +128,7 @@ fun validateMinimumJavaVersion(wizardContext: WizardContext,
 }
 
 /**
- * Validates that the selected version of Java in the Wizard is at least that of trhe provided minimum. If the supplied minimum is null,
+ * Validates that the selected version of Java in the Wizard is at least that of the provided minimum. If the supplied minimum is null,
  * a warning is logged and no validation occurs.
  *
  * @param wizardContext              the wizard context

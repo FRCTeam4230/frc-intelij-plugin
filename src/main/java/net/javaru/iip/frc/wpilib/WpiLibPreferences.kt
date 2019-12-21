@@ -33,7 +33,7 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScopesCore
 import com.intellij.util.SmartList
-import net.javaru.iip.frc.settings.UN_CONFIGURED_TEAM_NUMBER
+import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.util.getIntPropertyValue
 import net.javaru.iip.frc.util.getModules
 import net.javaru.iip.frc.util.getStringPropertyValue
@@ -173,13 +173,17 @@ fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
 }
 
 /**
- * Returns the configured teamNumber in the `wpilib_preferences.json` file, or 0 `UN_CONFIGURED_TEAM_NUMBER` (i.e. 0) 
- * if it cannot be found, or is not a valid integer value.
+ * **Generally, this function is meant for use solely by the `FrcProjectTeamNumberService`. Other services and code should use
+ * the [Project.getProjectTeamNumber()] extension function available in the `FrcProjectTeamNumberService` file.**
+ * 
+ * Returns the configured teamNumber in the `wpilib_preferences.json` file, or the team number configured in the application settings,
+ * which may be `UN_CONFIGURED_TEAM_NUMBER` (i.e. 0), if the file is not found, the `teamNumber` key is not in the JSON file, or its 
+ * is not a valid integer value.
  */
-fun getConfiguredTeamNumber(project: Project): Int
+fun Project.getTeamNumberConfiguredInWpiLibPreferencesFile(): Int
 {
     return runReadAction {
-        findLikelyWpiLibPreferencesPsiFileAsJsonFile(project)?.getIntPropertyValue(teamNumberPropertyName) ?: UN_CONFIGURED_TEAM_NUMBER
+        findLikelyWpiLibPreferencesPsiFileAsJsonFile(this)?.getIntPropertyValue(teamNumberPropertyName) ?: FrcApplicationSettings.getInstance().teamNumber
     }
 }
 

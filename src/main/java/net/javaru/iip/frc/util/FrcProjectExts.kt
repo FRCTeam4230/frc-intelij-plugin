@@ -93,5 +93,9 @@ fun Project?.getModules(): Array<Module>
 {
     val modules = this?.let { ModuleManager.getInstance(it).modules }
     return modules ?: emptyArray()
-
 }
+
+/** Returns the 'main' Gradle module, i.e. `projectName.main` , or null if it cannot be found. */
+fun Project?.getMainModule(): Module? = this.getModules().firstOrNull { module -> module.name.endsWith(".main") }
+/** Returns the 'test' Gradle module, i.e. `projectName.test` , or null if it cannot be found. */
+fun Project?.getTestModule(): Module? = this.getModules().firstOrNull { module -> module.name.endsWith(".test") }

@@ -29,8 +29,10 @@ import net.javaru.iip.frc.FrcPluginGlobals.DEFAULT_MIN_REQUIRED_LANGUAGE_LEVEL
 import net.javaru.iip.frc.i18n.FrcBundle
 import net.javaru.iip.frc.i18n.FrcMessageKey
 
-
+// *************************
 // ALSO SEE FrcPsiNameHelper
+//          WpiLibHelpers.kt
+// *************************
 
 private object FrcJavaLanUtils
 private val LOG = Logger.getInstance(FrcJavaLanUtils::class.java)

@@ -18,9 +18,8 @@ package net.javaru.iip.frc.wizard
 
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState
+import net.javaru.iip.frc.wpilib.projectYearFor
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
-import net.javaru.iip.frc.wpilib.version.firstRelease
-import net.javaru.iip.frc.wpilib.version.minVersion
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -51,8 +50,8 @@ class FrcProjectWizardData(
      * and the change from `Beta2020` to `Beta2020-2` did not correlate to a WpiLib version/release.
      */
     val projectYear: String
-        get() = if (wpilibVersion.isNewerThan(minVersion(2020)) && wpilibVersion.isOlderThan(firstRelease(2020)) && wpilibVersion.isBetaOrBetaPreview()) "Beta2020-2" else wpilibVersion.major.toString()
-
+        get() = wpilibVersion.projectYearFor()
+                
     /** The project year, such as `2019` or `2020`, as a String. */
     val frcYear: String
         get() = wpilibVersion.major.toString()

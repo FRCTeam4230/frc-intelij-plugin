@@ -242,7 +242,10 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         if (templateDefinition != null)
         {
             dataModel.setFrcWizardTemplateDefinition(templateDefinition);
-            LOG.warn("[FRC] Could not set the template definition on the FrcProjectWizardData as 'determineSelectedTemplate' returned null");
+        }
+        else 
+        {
+            LOG.warn("[FRC] Could not set/update the template definition on the FrcProjectWizardData as 'determineSelectedTemplate' returned null");
         }
         LOG.debug("[FRC] FrcWizardTemplateDefinition set to: " + templateDefinition);
         

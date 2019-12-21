@@ -102,7 +102,6 @@ public class FrcBundle
     {
         String value = messageOrDefault(messageKey.getKey(), messageKey.getKey(), messageKey.getParams());
         return (messageKey.getKey().equals(value)) ? null : value;
-    
     }
 
     /**

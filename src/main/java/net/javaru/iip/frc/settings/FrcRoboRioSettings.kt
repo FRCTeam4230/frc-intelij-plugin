@@ -36,6 +36,20 @@ private const val ROBORIO_HOST_IP_TEMPLATE = "10.%d.%d.2"
 private const val ROBORIO_HOST_USB_DEFAULT = "172.22.11.2"
 private const val USE_DEFAULT_HOST_PLACEHOLDER = "<<<Use Default Host>>>"
 
+@Suppress("EnumEntryName")
+enum class RoboRioAddressType
+{
+    /** The DNS (aka LAN) address for the roboRIO. For example, for team 1234  it would be `roborio-1234-FRC.lan`. */
+    DNS,
+    /** mDNS, or multicast Domain Name System, address for the roboRIO. For example, for team 1234 it would be `roborio-1234-FRC.local`. */
+    mDNS,
+    /** The FieldLocal address for the roboRIO. For example, for team 1234  it would be `roborio-1234-FRC.frc-field.local`. */
+    FieldLocal,
+    /** The "TE.AM IP Notation" IP address for the roboRIO. For example, for team 1234 it would be `10.12.34.2` */
+    IP,
+    /** The USB address for the roboRIO, which is always `172.22.11.2`. */
+    USB;
+}
 
 /**
  * The project level settings for the RoboRio.
@@ -66,6 +80,29 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
 
         @JvmStatic
         fun clone(original: FrcRoboRioSettings): FrcRoboRioSettings = original.copy()
+
+        fun createRoboRioAddressDefault(teamNumber: Int, addressType: RoboRioAddressType): String
+        {
+            return when(addressType)
+            {
+                RoboRioAddressType.DNS -> createRoboRioHostDefault_DNS(teamNumber)
+                RoboRioAddressType.FieldLocal -> createRoboRioHostDefault_FieldLocal(teamNumber)
+                RoboRioAddressType.IP -> createRoboRioHostDefault_IP(teamNumber)
+                RoboRioAddressType.mDNS -> createRoboRioHostDefault_mDNS(teamNumber)
+                RoboRioAddressType.USB -> createRoboRioHostDefault_USB()
+            }
+        }
+        
+        fun createRoboRioHostDefault_USB(): String = ROBORIO_HOST_USB_DEFAULT
+        fun createRoboRioHostDefault_mDNS(teamNumber: Int): String = String.format(ROBORIO_HOST_mDNS_TEMPLATE, teamNumber)
+        fun createRoboRioHostDefault_DNS(teamNumber: Int): String = String.format(ROBORIO_HOST_DNS_TEMPLATE, teamNumber)
+        fun createRoboRioHostDefault_FieldLocal(teamNumber: Int): String = String.format(ROBORIO_HOST_FIELD_LOCAL_TEMPLATE, teamNumber)
+        fun createRoboRioHostDefault_IP(teamNumber: Int): String
+        {
+            val high = teamNumber / 100
+            val low = teamNumber % 100
+            return String.format(ROBORIO_HOST_IP_TEMPLATE, high, low)
+        }
     }
 
     private var project: Project? = null
@@ -127,7 +164,6 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
     @com.intellij.util.xmlb.annotations.Transient
     fun getRoboRioHostDefault_mDNS(roboRioTeamNumber: Int = teamNumber()): String = createRoboRioHostDefault_mDNS(roboRioTeamNumber)
 
-    private fun createRoboRioHostDefault_mDNS(teamNumber: Int): String = String.format(ROBORIO_HOST_mDNS_TEMPLATE, teamNumber)
 
     @com.intellij.util.xmlb.annotations.Transient
     fun isRoboRioHostTheDefault_mDNS(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawMDns
@@ -165,7 +201,6 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
     @com.intellij.util.xmlb.annotations.Transient
     fun getRoboRioHostDefault_DNS(roboRioTeamNumber: Int = teamNumber()): String = createRoboRioHostDefault_DNS(roboRioTeamNumber)
 
-    private fun createRoboRioHostDefault_DNS(teamNumber: Int): String = String.format(ROBORIO_HOST_DNS_TEMPLATE, teamNumber)
 
     @com.intellij.util.xmlb.annotations.Transient
     fun isRoboRioHostTheDefault_DNS(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawDns
@@ -203,8 +238,6 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
     @JvmOverloads
     @com.intellij.util.xmlb.annotations.Transient
     fun getRoboRioHostDefault_FieldLocal(roboRioTeamNumber: Int = teamNumber()): String = createRoboRioHostDefault_FieldLocal(roboRioTeamNumber)
-
-    private fun createRoboRioHostDefault_FieldLocal(teamNumber: Int): String = String.format(ROBORIO_HOST_FIELD_LOCAL_TEMPLATE, teamNumber)
 
     @com.intellij.util.xmlb.annotations.Transient
     fun isRoboRioHostTheDefault_FieldLocal(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawFieldLocal
@@ -248,13 +281,6 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
     @JvmOverloads
     @com.intellij.util.xmlb.annotations.Transient
     fun getRoboRioHostDefault_IP(roboRioTeamNumber: Int = teamNumber()): String = createRoboRioHostDefault_IP(roboRioTeamNumber)
-
-    private fun createRoboRioHostDefault_IP(teamNumber: Int): String
-    {
-        val high = teamNumber / 100
-        val low = teamNumber % 100
-        return String.format(ROBORIO_HOST_IP_TEMPLATE, high, low)
-    }
 
     @com.intellij.util.xmlb.annotations.Transient
     fun isRoboRioHostTheDefault_IP(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawIp

@@ -24,7 +24,7 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.util.messages.Topic
-import net.javaru.iip.frc.wpilib.getConfiguredTeamNumber
+import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFile
 import net.javaru.iip.frc.wpilib.wpiLibPreferencesFileName
 import java.util.*
 
@@ -42,8 +42,6 @@ class FrcProjectTeamNumberService private constructor(val project:Project)
 {
     private val LOG = Logger.getInstance(FrcProjectTeamNumberService::class.java)
     
-    
-    
     var teamNumber = UN_CONFIGURED_TEAM_NUMBER // default value, but then is set in the init block
         private set
                 
@@ -51,7 +49,7 @@ class FrcProjectTeamNumberService private constructor(val project:Project)
     init
     {
         LOG.debug("[FRC] Initializing FrcProjectTeamNumberService for project $project")
-        teamNumber = getConfiguredTeamNumber(project)
+        teamNumber = project.getTeamNumberConfiguredInWpiLibPreferencesFile()
         
         // Examples: com/intellij/openapi/externalSystem/service/project/manage/SourceFolderManagerImpl.kt:115
         //           schemeManager/SchemeManagerFactoryImpl.kt:133  along with  com.intellij.configurationStore.schemeManager.SchemeFileTracker
@@ -66,7 +64,7 @@ class FrcProjectTeamNumberService private constructor(val project:Project)
                     if (file != null && ProjectFileIndex.getInstance(project).isInContent(file) && file.name == wpiLibPreferencesFileName)
                     {
                         val previousTeamNumber = teamNumber
-                        teamNumber = getConfiguredTeamNumber(project)
+                        teamNumber = project.getTeamNumberConfiguredInWpiLibPreferencesFile()
                         // teamNumberChangeDispatcher.multicaster.onTeamNumberChange(previousTeamNumber, teamNumber)
                         project.messageBus.syncPublisher(PROJECT_TEAM_NUMBER_CHANGES).onTeamNumberChange(project, previousTeamNumber, teamNumber)
                     }
@@ -107,3 +105,9 @@ interface FrcProjectTeamNumberChangeListener: EventListener
 {
     fun onTeamNumberChange(project: Project, previousTeamNumber: Int, newTeamNumber: Int)
 }
+
+/**
+ * Returns the team number for a project as configured in the "wpilib_preferences.json" file, or the
+ * application settings in the event the preferences file is not available, or properly configured.
+ */
+fun Project.getProjectTeamNumber():Int = FrcProjectTeamNumberService.getInstance(this).teamNumber

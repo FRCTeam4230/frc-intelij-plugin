@@ -30,10 +30,12 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.model.project.ProjectId
 import com.intellij.openapi.module.JavaModuleType
+import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.module.StdModuleTypes
 import com.intellij.openapi.options.ConfigurationException
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkTypeId
 import com.intellij.openapi.projectRoots.impl.JavaSdkImpl
@@ -53,7 +55,11 @@ import net.javaru.iip.frc.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION
 import net.javaru.iip.frc.freemarker.FM_TEMPLATE_EXT_WITH_DOT
 import net.javaru.iip.frc.freemarker.freemarkerConfiguration
+import net.javaru.iip.frc.i18n.FrcBundle.message
+import net.javaru.iip.frc.run.createDebuggingRunConfiguration
+import net.javaru.iip.frc.run.createGradleRunConfiguration
 import net.javaru.iip.frc.settings.FrcApplicationSettings
+import net.javaru.iip.frc.settings.RoboRioAddressType
 import net.javaru.iip.frc.util.getPluginResource
 import net.javaru.iip.frc.util.getPluginResourceAsStream
 import net.javaru.iip.frc.util.isValidJavaVersion
@@ -186,7 +192,6 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         else
         {
             LOG.info("[FRC] Programmatic Gradle Import of new FRC Project is NOT enabled in Application Settings. A gradle import will not occur.")
-
         }
     }
 
@@ -340,8 +345,32 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         LOG.trace("[FRC] FrcModuleBuilder.setupRootModel() completed")
     }
 
-   
     
+    
+    override fun commitModule(project: Project, model: ModifiableModuleModel?): Module?
+    {
+        val module = super.commitModule(project, model)
+        if (module != null)
+        {
+            // We need to wait until the project is initialized because we need to get access to the gradle based "projectName.main" module when creating the debug configuration 
+            StartupManager.getInstance(project).runWhenProjectIsInitialized() { createRunConfigurations(project) }
+        }
+        return module
+    }
+
+    private fun createRunConfigurations(project: Project)
+    {
+        val debugModeArgument = "-PdebugMode=true"
+        createGradleRunConfiguration(project, message("frc.wizard.run.configuration.buildAndDeploy.name"), listOf("deploy"), setAsSelected = true)
+        createGradleRunConfiguration(project, message("frc.wizard.run.configuration.buildAndDeployForDebug.name"), listOf("deploy"), arguments = debugModeArgument)
+        createGradleRunConfiguration(project, message("frc.wizard.run.configuration.build.name"), listOf("build"))
+        createGradleRunConfiguration(project, message("frc.wizard.run.configuration.cleanBuildAndDeploy.name"), listOf("clean", "deploy"))
+        createGradleRunConfiguration(project, message("frc.wizard.run.configuration.cleanBuildAndDeployForDebug.name"), listOf("clean", "deploy"), arguments = debugModeArgument)
+        createGradleRunConfiguration(project, message("frc.wizard.run.configuration.cleanBuild.name"), listOf("clean", "build"))
+        createDebuggingRunConfiguration(project, dataModel.teamNumber, RoboRioAddressType.IP)
+        createDebuggingRunConfiguration(project, dataModel.teamNumber, RoboRioAddressType.USB)
+    }
+
     private fun copyAllResourcesToModuleRoot(modelContentRootDir: VirtualFile, resourceDirBase: Path, keepFilter: (VirtualFile) -> Boolean = { true })
     {
         val pluginResourceDirUrl = getPluginResource(resourceDirBase)
@@ -688,7 +717,6 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     }
 
     
-
     fun addSdkChangedListener(runnable: Runnable?)
     {
         if (runnable != null)

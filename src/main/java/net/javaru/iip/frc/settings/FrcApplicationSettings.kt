@@ -30,6 +30,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 const val DEFAULT_RIO_LOG_UDP_PORT: Int = 6666
+const val DEFAULT_DEBUG_PORT: Int = 8349
 
 const val WPILIB_BASE_DIR_ENV_VAR: String = "wpilib.base.dir"
 /**
@@ -68,7 +69,8 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                    *            ➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
                                    */
                                   var rioRestartRegexString: String = "(?ium).*Launching.*FRCUserProgram\\.jar.*", /* TODO Need to update for Gradle based deploy*/
-                                  var enableGradleImportUponNewProjectCreation: Boolean = true
+                                  var enableGradleImportUponNewProjectCreation: Boolean = true,
+                                  var debuggingPort: Int = DEFAULT_DEBUG_PORT
                                  ) : PersistentStateComponent<FrcApplicationSettings>
 {
     companion object Settings

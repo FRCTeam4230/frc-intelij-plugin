@@ -152,8 +152,8 @@ enum class FrcWizard2019ExampleTemplateDefinition(
     HIDRumble("HID Rumble", "Demonstrates how to make human interface devices rumble."),
     MotorController("Motor Controller", "Demonstrates controlling a single motor with a joystick."),
     MotorControlWithEncoder("Motor Control with Encoder", "Demonstrates controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder."),
-    GearsBot("GearsBot", "A fully functional example CommandBased program for WPIs GearsBot robot, ported to the CommandBased library. This code can run on your computer if it supports simulation."),
-    PacGoat("PacGoat", "A fully functional example CommandBased program for FRC Team 190's 2014 robot. This code can run on your computer if it supports simulation."),
+    GearsBot("GearsBot", "A fully functional example Command Based program for WPIs GearsBot robot, ported to the Command Based library. This code can run on your computer if it supports simulation."),
+    PacGoat("PacGoat", "A fully functional example Command Based program for FRC Team 190's 2014 robot. This code can run on your computer if it supports simulation."),
     SimpleVision("Simple Vision", "Demonstrates the use of the CameraServer class to stream from a USB Webcam without processing the images."),
     IntermediateVision("Intermediate Vision", "Demonstrates the use of the NIVision class to capture image from a Webcam, process them, and then send them to the dashboard."),
     AxisCameraSample("Axis Camera Sample", "An example program that acquires images from an Axis network camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display. This demonstrates the use of the AxisCamera class."),
@@ -182,8 +182,11 @@ enum class FrcWizard2020ProjectTemplateDefinition(
         override val commandVersion: Int = 1
                                                  ) : FrcWizardTemplateDefinition
 {
-    CommandBased("Command Based Robot", "A robot project that allows robots to be implemented using the version 2 command based model to allow complex functionality to be developed from simpler functionality. This is the updated for 2020 Command Based Robot, using components from the <tt>edu.wpi.first.wpilibj<strong>2</strong></tt> package from the <tt>wpilibNewCommands-java-2020-x.x.jar</tt>", commandVersion = 2),
-    CommandBasedOld("Old Command Based Robot", "A robot project that allows robots to be implemented using the version 1 command based model to allow complex functionality to be developed from simpler functionality. This is the original Command Based Robot introduced in 2012, using components from the <tt>edu.wpi.first.wpilibj</tt> package from the <tt>wpilibOldCommands-java-2020-x.x.jar</tt>", commandVersion = 1),
+    // Old Command Based docs: https://docs.wpilib.org/en/latest/docs/software/old-commandbased/index.html
+    // New Command Based docs: https://docs.wpilib.org/en/latest/docs/software/commandbased/index.html
+    //                         
+    CommandBasedOld("Command Based (v1) Robot", "A robot project for coding robots using using version 1 of the Command Based framework/API introduced in 2012. Command Based robots allow complex functionality to be developed from simpler functionality/components. This is the original Command Based Robot introduced in 2012, using classes from the <tt>edu.wpi.first.wpilibj</tt> package from the <tt>wpilibOldCommands-java-2020-x.x.jar</tt>", commandVersion = 1),
+    CommandBased("Command Based (v2) Robot", "A robot project for coding robots using version 2 of the Command Based framework/API introduced in 2020. Command Based robots allow complex functionality to be developed from simpler functionality/components. This is the updated for 2020 Command Based Robot, using classes from the <tt>edu.wpi.first.wpilibj<strong>2</strong></tt> package from the <tt>wpilibNewCommands-java-2020-x.x.jar</tt> See <em>Command-Based Programming</em> in the WPI Lib Docs for more information and details on the changes.", commandVersion = 2),
     Timed("Timed Robot", "A robot project that allows robots to be implemented in an iterative manner synced to a timer."),
     TimedSkeleton("Timed Skeleton (Advanced)", "A skeleton (stub) Timed Robot project for advanced programmers."),
     RobotBaseSkeleton("RobotBase Skeleton (Advanced)", "A skeleton (stub) for RobotBase, intended for <strong>highly advanced/experienced</strong> programmers, that provides more complete control over program flow.")
@@ -229,9 +232,9 @@ enum class FrcWizard2020ExampleTemplateDefinition(
     HIDRumble("HID Rumble", "Demonstrates how to make human interface devices rumble."),
     MotorController("Motor Controller", "Demonstrates controlling a single motor with a joystick."),
     MotorControlWithEncoder("Motor Control with Encoder", "Demonstrates controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder."),
-    GearsBot1("GearsBot v1", "A fully functional example version 1 CommandBased program for WPIs GearsBot robot. Uses version 1 of the CommandBased framework/API introduced in 2012. This code can run on your computer if it supports simulation.", commandVersion = 1),
-    GearsBot2("GearsBot v2", "A fully functional example version 2 CommandBased program for WPIs GearsBot robot. Uses version 2 of the CommandBased framework/API introduced in 2020. This code can run on your computer if it supports simulation.", commandVersion = 2),
-    PacGoat("PacGoat", "A fully functional example CommandBased (version 1) program for FRC Team 190's 2014 robot. Uses version 1 of the CommandBased framework/API introduced in 2012. This code can run on your computer if it supports simulation.", commandVersion = 1),
+    GearsBot1("GearsBot v1", "A fully functional example version 1 Command Based program for WPIs GearsBot robot. Uses version 1 of the Command Based framework/API introduced in 2012. This code can run on your computer if it supports simulation.", commandVersion = 1),
+    GearsBot2("GearsBot v2", "A fully functional example version 2 Command Based program for WPIs GearsBot robot. Uses version 2 of the Command Based framework/API introduced in 2020. This code can run on your computer if it supports simulation.", commandVersion = 2),
+    PacGoat("PacGoat", "A fully functional example Command Based (version 1) program for FRC Team 190's 2014 robot. Uses version 1 of the Command Based framework/API introduced in 2012. This code can run on your computer if it supports simulation.", commandVersion = 1),
     SimpleVision("Simple Vision", "Demonstrates the use of the CameraServer class to stream from a USB Webcam without processing the images."),
     IntermediateVision("Intermediate Vision", "Demonstrates the use of the NIVision class to capture image from a Webcam, process them, and then send them to the dashboard."),
     AxisCameraSample("Axis Camera Sample", "An example program that acquires images from an Axis network camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display. This demonstrates the use of the AxisCamera class."),

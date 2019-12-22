@@ -93,7 +93,6 @@ fun createGradleRunConfiguration(project: Project,
     {
         logger.warn("[FRC] Could not create '$runConfigName' Run Configuration for project '${project.name}' due to an exception: $e", e)
     }
-    
 }
 
 
@@ -107,8 +106,6 @@ fun createDebuggingRunConfiguration(project: Project, teamNumber: Int = project.
         if (project.basePath != null && mainModule != null)
         {
             val runManager = RunManager.getInstance(project)
-            
-            
             
             val baseName = "Debug Robot via ${addressType.name}"
             val name = determineNextName(runManager, baseName, RemoteConfigurationType::class.java)

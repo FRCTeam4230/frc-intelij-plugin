@@ -41,7 +41,7 @@ public final class Constants
         public static final boolean LEFT_ENCODER_REVERSED = false;
         public static final boolean RIGHT_ENCODER_REVERSED = true;
 
-        public static final double TRACK_WIDTH_METERS = 0.6;
+        public static final double TRACK_WIDTH_METERS = 0.69;
         public static final DifferentialDriveKinematics DRIVE_KINEMATICS =
                 new DifferentialDriveKinematics(TRACK_WIDTH_METERS);
 
@@ -56,14 +56,14 @@ public final class Constants
         // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
         // These characterization values MUST be determined either experimentally or theoretically
         // for *your* robot's drive.
-        // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
+        // The Robot Characterization Toolsuite provides a convenient tool for obtaining these
         // values for your robot.
-        public static final double S_VOLTS = 1;
-        public static final double V_VOLT_SECONDS_PER_METER = 0.8;
-        public static final double A_VOLT_SECONDS_SQUARED_PER_METER = 0.15;
+        public static final double S_VOLTS = 0.22;
+        public static final double V_VOLT_SECONDS_PER_METER = 1.98;
+        public static final double A_VOLT_SECONDS_SQUARED_PER_METER = 0.2;
 
         // Example value only - as above, this must be tuned for your drive!
-        public static final double P_DRIVE_VEL = 0.5;
+        public static final double P_DRIVE_VEL = 8.5;
     }
 
     public static final class OIConstants

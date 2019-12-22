@@ -23,6 +23,9 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
+import com.intellij.openapi.roots.ProjectRootManager
 import org.jetbrains.plugins.gradle.settings.GradleSettings
 
 
@@ -99,3 +102,11 @@ fun Project?.getModules(): Array<Module>
 fun Project?.getMainModule(): Module? = this.getModules().firstOrNull { module -> module.name.endsWith(".main") }
 /** Returns the 'test' Gradle module, i.e. `projectName.test` , or null if it cannot be found. */
 fun Project?.getTestModule(): Module? = this.getModules().firstOrNull { module -> module.name.endsWith(".test") }
+
+fun Project.getProjectJdk(): ProjectJdkImpl?
+{
+    val sdk = getProjectSdk()
+    return if (sdk == null) null else sdk as ProjectJdkImpl
+}
+fun Project.getProjectSdk(): Sdk? = ProjectRootManager.getInstance(this).projectSdk
+fun Project.getProjectSdkHomePath(): String? = ProjectRootManager.getInstance(this).projectSdk?.homePath

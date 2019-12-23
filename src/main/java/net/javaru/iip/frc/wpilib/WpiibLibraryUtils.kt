@@ -36,7 +36,7 @@ fun getCommandBasedLibraryStatus(project: Project?): CommandLibraryVersioning
     val v1Present = FindClassUtils.isLibraryPresent(project, WpiLibConstants.COMMAND_BASED_V1_FQN)
     val v2Present = FindClassUtils.isLibraryPresent(project, WpiLibConstants.COMMAND_BASED_V2_FQN)
     if (v1Present && !v2Present) return CommandLibraryVersioning.Version1
-    if (v2Present && !v2Present) return CommandLibraryVersioning.Version2
+    if (v2Present && !v1Present) return CommandLibraryVersioning.Version2
     if (v1Present && v2Present) return CommandLibraryVersioning.Both
     return CommandLibraryVersioning.Neither
 }

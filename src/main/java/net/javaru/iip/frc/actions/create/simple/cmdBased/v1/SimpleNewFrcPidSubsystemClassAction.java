@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.basic;
+package net.javaru.iip.frc.actions.create.simple.cmdBased.v1;
 
 import javax.swing.*;
 
@@ -30,15 +30,15 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
-public class NewFrcBasicCommandGroupClassAction extends AbstractNewFrcBasicClassAction
+public class SimpleNewFrcPidSubsystemClassAction extends AbstractSimpleNewFrcCmdBasedVersion1ClassAction
 {
-    private static final Icon ICON = FrcIcons.Components.COMMAND_GROUP;
+    private static final Icon ICON = FrcIcons.Components.PID_SUBSYSTEM;
 
 
-    protected NewFrcBasicCommandGroupClassAction()
+    protected SimpleNewFrcPidSubsystemClassAction()
     {
-        super(message("frc.new.class.commandGroup.action.name"),
-              message("frc.new.class.commandGroup.action.description"),
+        super(message("frc.new.class.pidSubsystem.action.name"),
+              message("frc.new.class.pidSubsystem.action.description"),
               ICON);
     }
 
@@ -46,15 +46,15 @@ public class NewFrcBasicCommandGroupClassAction extends AbstractNewFrcBasicClass
     @Override
     protected void buildDialog(Project project, PsiDirectory directory, Builder builder)
     {
-        builder.setTitle(message("frc.new.class.commandGroup.action.name"))
-               .addKind(message("frc.new.class.commandGroup.action.name"), ICON, FrcFileTemplateGroupDescriptorFactory.COMMAND_GROUP.getFileName());
+        builder.setTitle(message("frc.new.class.pidSubsystem.action.name"))
+               .addKind(message("frc.new.class.pidSubsystem.action.name"), ICON, FrcFileTemplateGroupDescriptorFactory.PID_SUBSYSTEM.getFileName());
     }
 
 
     @Override
     protected String getActionName(PsiDirectory directory, @NotNull String newName, String templateName)
     {
-        return message("frc.new.class.commandGroup.action.details", directory, newName);
+        return message("frc.new.class.pidSubsystem.action.details", directory, newName);
     }
 
 
@@ -62,7 +62,7 @@ public class NewFrcBasicCommandGroupClassAction extends AbstractNewFrcBasicClass
     @Override
     protected String getErrorTitle()
     {
-        return message("frc.new.class.commandGroup.action.error");
+        return message("frc.new.class.pidSubsystem.action.error");
     }
     
 }

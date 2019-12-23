@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ public class WpiLibConstants
      *     +- SampleRobot
      *     +- IterativeRobotBase (abstract)
      *        +- IterativeRobot
-     *        +- TimesRobot
+     *        +- TimedRobot
      * </pre>
      * 
      */
@@ -41,6 +41,9 @@ public class WpiLibConstants
     public static final String ITERATIVE_ROBOT_BASE_FQN =   "edu.wpi.first.wpilibj.IterativeRobotBase";
     public static final String ITERATIVE_ROBOT_FQN =        "edu.wpi.first.wpilibj.IterativeRobot";
     public static final String TIMED_ROBOT_FQN =            "edu.wpi.first.wpilibj.TimedRobot";
+    
+    public static final String COMMAND_BASED_V1_FQN =       "edu.wpi.first.wpilibj.command.Command"; // An Abstract Class
+    public static final String COMMAND_BASED_V2_FQN =       "edu.wpi.first.wpilibj2.command.Command";// An Interface
     
     public static final String VERSION_CLASS_FQN = "edu.wpi.first.wpilibj.util.WPILibVersion";
     public static final String VERSION_FIELD_NAME = "Version";

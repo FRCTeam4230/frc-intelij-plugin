@@ -14,14 +14,17 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.basic;
+package net.javaru.iip.frc.actions.create.simple;
 
 import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.ide.actions.JavaCreateTemplateInPackageAction;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.DumbAware;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaDirectoryService;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
@@ -35,31 +38,31 @@ import net.javaru.iip.frc.FrcIcons;
 /**
  * Base class for creating a new Class that uses the default dialog(s) for getting necessary information for creation of the class.
  */
-public abstract class AbstractNewFrcBasicClassAction extends JavaCreateTemplateInPackageAction<PsiClass> implements DumbAware
+public abstract class AbstractSimpleNewFrcClassAction extends JavaCreateTemplateInPackageAction<PsiClass> implements DumbAware
 {
     protected static final Icon DEFAULT_ICON = FrcIcons.FRC.FIRST_ICON_MEDIUM_16;
 
 
     @SuppressWarnings("unused")
-    protected AbstractNewFrcBasicClassAction(String text)
+    protected AbstractSimpleNewFrcClassAction(String text)
     {
         this(text, DEFAULT_ICON);
     }
 
 
-    protected AbstractNewFrcBasicClassAction(String text, Icon icon)
+    protected AbstractSimpleNewFrcClassAction(String text, Icon icon)
     {
         this(text, text, icon, true);
     }
 
 
-    protected AbstractNewFrcBasicClassAction(String text, String description, Icon icon)
+    protected AbstractSimpleNewFrcClassAction(String text, String description, Icon icon)
     {
         this(text, description, icon, true);
     }
 
 
-    protected AbstractNewFrcBasicClassAction(String text, String description, Icon icon, boolean inSourceOnly)
+    protected AbstractSimpleNewFrcClassAction(String text, String description, Icon icon, boolean inSourceOnly)
     {
         super(text, description, icon, inSourceOnly);
     }
@@ -77,8 +80,29 @@ public abstract class AbstractNewFrcBasicClassAction extends JavaCreateTemplateI
     {
         return JavaDirectoryService.getInstance().createClass(dir, className, templateName, askForUndefinedVariables());
     }
-
-
+    
+    
+    @Override
+    protected boolean isAvailable(DataContext dataContext)
+    {
+        final Project project = CommonDataKeys.PROJECT.getData(dataContext);
+        return super.isAvailable(dataContext) && project != null && shouldBeEnabledAdditionalCriteria(project);
+    }
+    
+    
+    /**
+     * Provides additional criteria when determining if the action should be enabled (in the menu).
+     * Verification that the module is an FRC module is already done and does NOT need to occur in
+     * implementations of this method.
+     *
+     * @return whether the action should be enabled.
+     */
+    protected boolean shouldBeEnabledAdditionalCriteria(@NotNull Project project)
+    {
+        return true;
+    }
+    
+    
     @Override
     public boolean startInWriteAction()
     {
@@ -90,7 +114,7 @@ public abstract class AbstractNewFrcBasicClassAction extends JavaCreateTemplateI
         //          at com.intellij.psi.impl.file.JavaDirectoryServiceImpl.createClassFromTemplate(JavaDirectoryServiceImpl.java:129)
         //          at com.intellij.psi.impl.file.JavaDirectoryServiceImpl.createClass(JavaDirectoryServiceImpl.java:84)
         //          at com.intellij.psi.impl.file.JavaDirectoryServiceImpl.createClass(JavaDirectoryServiceImpl.java:76)
-        //          at net.javaru.iip.frc.actions.create.basic.AbstractNewFrcBasicClassAction.doCreate(AbstractNewFrcBasicClassAction.java:74)
+        //          at net.javaru.iip.frc.actions.create.simple.AbstractSimpleNewFrcClassAction.doCreate(AbstractSimpleNewFrcClassAction.java:74)
         // In JavaDirectoryServiceImpl.java:129 it checks:
         //      LOG.assertTrue(!ApplicationManager.getApplication().isWriteAccessAllowed());
         // this was added on 2016-12-19 via the commit https://github.com/JetBrains/intellij-community/commit/ff87813

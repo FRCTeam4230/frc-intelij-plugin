@@ -411,16 +411,16 @@
                icon="/icons/first/FIRST_icon_16x16.png">
             <separator />
             <action id="frc.action.new.basic.command" 
-                    class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicCommandClassAction" />
+                    class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcCommandClassAction" />
             <action id="frc.action.new.basic.commandGroup"
-                    class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicCommandGroupClassAction" />
+                    class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcCommandGroupClassAction" />
             <action id="frc.action.new.basic.subsystem" 
-                    class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicSubsystemClassAction" />
+                    class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcSubsystemClassAction" />
             <action id="frc.action.new.basic.pidSubsystem"
-                    class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicPidSubsystemClassAction" />
+                    class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcPidSubsystemClassAction" />
             <!--suppress PluginXmlCapitalization -->
             <action id="frc.action.new.basic.trigger"
-                    class="net.javaru.iip.frc.actions.create.basic.NewFrcBasicTriggerClassAction" />
+                    class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcTriggerClassAction" />
 
             <!--<action id="frc.action.new.build.file" class="net.javaru.iip.frc.actions.create.build.NewFrcAntBuildFileAction" text="FRC New Ant Build File" />-->
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewJavaSpecialFile" />

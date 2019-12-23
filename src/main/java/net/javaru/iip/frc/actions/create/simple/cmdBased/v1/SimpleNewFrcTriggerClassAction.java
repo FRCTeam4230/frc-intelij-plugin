@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.basic;
+package net.javaru.iip.frc.actions.create.simple.cmdBased.v1;
 
 import javax.swing.*;
 
@@ -30,15 +30,15 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
-public class NewFrcBasicCommandClassAction extends AbstractNewFrcBasicClassAction
+public class SimpleNewFrcTriggerClassAction extends AbstractSimpleNewFrcCmdBasedVersion1ClassAction
 {
-    private static final Icon ICON = FrcIcons.Components.COMMAND;
+    private static final Icon ICON = FrcIcons.Components.BUTTON;
 
 
-    protected NewFrcBasicCommandClassAction()
+    protected SimpleNewFrcTriggerClassAction()
     {
-        super(message("frc.new.class.command.action.name"),
-              message("frc.new.class.command.action.description"),
+        super(message("frc.new.class.trigger.action.name"),
+              message("frc.new.class.trigger.action.description"),
               ICON);
     }
 
@@ -46,15 +46,15 @@ public class NewFrcBasicCommandClassAction extends AbstractNewFrcBasicClassActio
     @Override
     protected void buildDialog(Project project, PsiDirectory directory, Builder builder)
     {
-        builder.setTitle(message("frc.new.class.command.action.name"))
-               .addKind(message("frc.new.class.command.action.name"), ICON, FrcFileTemplateGroupDescriptorFactory.COMMAND.getFileName());
+        builder.setTitle(message("frc.new.class.trigger.action.name"))
+               .addKind(message("frc.new.class.trigger.action.name"), ICON, FrcFileTemplateGroupDescriptorFactory.TRIGGER.getFileName());
     }
 
 
     @Override
     protected String getActionName(PsiDirectory directory, @NotNull String newName, String templateName)
     {
-        return message("frc.new.class.command.action.details", directory, newName);
+        return message("frc.new.class.trigger.action.details", directory, newName);
     }
 
 
@@ -62,7 +62,7 @@ public class NewFrcBasicCommandClassAction extends AbstractNewFrcBasicClassActio
     @Override
     protected String getErrorTitle()
     {
-        return message("frc.new.class.command.action.error");
+        return message("frc.new.class.trigger.action.error");
     }
 
 }

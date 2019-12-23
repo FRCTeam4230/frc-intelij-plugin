@@ -32,6 +32,9 @@ import net.javaru.iip.frc.FrcIcons;
 
 
 
+/**
+ * Base class for creating a new Class that uses the default dialog(s) for getting necessary information for creation of the class.
+ */
 public abstract class AbstractNewFrcBasicClassAction extends JavaCreateTemplateInPackageAction<PsiClass> implements DumbAware
 {
     protected static final Icon DEFAULT_ICON = FrcIcons.FRC.FIRST_ICON_MEDIUM_16;
@@ -94,6 +97,8 @@ public abstract class AbstractNewFrcBasicClassAction extends JavaCreateTemplateI
         // So likely first appeared in v2017.1, or a late version of 2016.3.x
         // Based on this forum thread: https://intellij-support.jetbrains.com/hc/en-us/community/posts/115000431244-assertion-fail-in-LOG-assertTrue-ApplicationManager-getApplication-isWriteAccessAllowed-
         // We are overriding this method to return false. Although this seems counter to what the above fix was trying to solve.
+        // I believe it is due to the Javadoc comment which states to return false if presenting a modal dialog box, and then the
+        // action itself is responsible for starting write action when needed
         return false;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package net.javaru.iip.frc.actions.create.basic;
 
 import javax.swing.*;
 
+import org.jetbrains.annotations.NotNull;
 import com.intellij.ide.actions.CreateFileFromTemplateDialog.Builder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
@@ -51,12 +52,13 @@ public class NewFrcBasicTriggerClassAction extends AbstractNewFrcBasicClassActio
 
 
     @Override
-    protected String getActionName(PsiDirectory directory, String newName, String templateName)
+    protected String getActionName(PsiDirectory directory, @NotNull String newName, String templateName)
     {
         return message("frc.new.class.trigger.action.details", directory, newName);
     }
 
 
+    @NotNull
     @Override
     protected String getErrorTitle()
     {

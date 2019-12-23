@@ -131,18 +131,18 @@ fun createDebuggingRunConfiguration(project: Project, teamNumber: Int = project.
 }
 
 
-internal fun determineNextName(project: Project, baseName:String, type: Class<out ConfigurationType>): String = determineNextName(RunManager.getInstance(project), baseName, type)
+fun determineNextName(project: Project, baseName:String, type: Class<out ConfigurationType>): String = determineNextName(RunManager.getInstance(project), baseName, type)
 
-internal fun determineNextName(runManager: RunManager, baseName:String, type: Class<out ConfigurationType>): String = determineNextName(baseName, runManager.getConfigurationSettingsList(type))
+fun determineNextName(runManager: RunManager, baseName:String, type: Class<out ConfigurationType>): String = determineNextName(baseName, runManager.getConfigurationSettingsList(type))
 
-internal fun determineNextName(baseName:String, configurationSettingsList: List<RunnerAndConfigurationSettings>): String
+fun determineNextName(baseName:String, configurationSettingsList: List<RunnerAndConfigurationSettings>): String
 {
     val names = configurationSettingsList.map { it.name }
 
     return determineNextName(names, baseName)
 }
 
-internal fun determineNextName(names: List<String>, baseName: String): String
+fun determineNextName(names: List<String>, baseName: String): String
 {
     val nameRegex = """${baseName}( \(([\d]*)\))?""".toRegex()
     val filteredList = names.filter { it.matches(nameRegex) }

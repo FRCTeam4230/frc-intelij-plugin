@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -45,6 +46,8 @@ public abstract class NewFrcClassDialog extends DialogWrapper
     @NotNull
     private final Project myProject;
     @NotNull
+    private final Module myModule;
+    @NotNull
     private final ClassCreator myClassCreator;
     @NotNull
     private final PsiDirectory myDirectory;
@@ -52,14 +55,17 @@ public abstract class NewFrcClassDialog extends DialogWrapper
     
     /**
      * <strong style="font-color: red;">Implmenting classes must call <tt>init()</tt> at the end of their constructors.</strong>
-     * @param project the project
+     * @param module the module
      * @param classCreator the ClassCreator to use
      * @param directory The PsiDirectory the class the action was called on.
      */
-    protected NewFrcClassDialog(@NotNull Project project, @NotNull ClassCreator classCreator, @NotNull PsiDirectory directory)
+    protected NewFrcClassDialog(@NotNull Module module,
+                                @NotNull ClassCreator classCreator,
+                                @NotNull PsiDirectory directory)
     {
-        super(project);
-        this.myProject = project;
+        super(module.getProject());
+        this.myModule = module;
+        this.myProject = module.getProject();
         this.myClassCreator = classCreator;
         this.myDirectory = directory;
     }

@@ -27,6 +27,7 @@ import com.intellij.ide.actions.ElementCreator;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.text.StringUtil;
@@ -47,14 +48,17 @@ public abstract class ClassCreator
     
     @NotNull
     private final Project myProject;
+    @NotNull
+    private final Module myModule;
 
     private PsiClass[] createdClasses = null;
 
     
 
-    protected ClassCreator(@NotNull Project project)
+    protected ClassCreator(@NotNull Module module)
     {
-        this.myProject = project;
+        this.myModule = module;
+        this.myProject = module.getProject();
     }
     
     

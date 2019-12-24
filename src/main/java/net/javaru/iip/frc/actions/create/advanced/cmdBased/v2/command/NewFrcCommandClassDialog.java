@@ -22,7 +22,7 @@ import javax.swing.text.JTextComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
@@ -34,6 +34,7 @@ import net.javaru.iip.frc.util.UiUtilsKt;
 
 
 
+
 public class NewFrcCommandClassDialog extends NewFrcClassDialog
 {
     private static final Logger LOG = Logger.getInstance(NewFrcCommandClassDialog.class);
@@ -41,13 +42,14 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     private JBLabel myCommandNameLabel;
     private JBTextField myCommandNameTextField;
     private JCheckBox myAutoAppendCommandCheckBox;
+    private JPanel mySubsystemsPanel;
     
     
-    public NewFrcCommandClassDialog(@NotNull Project project,
+    public NewFrcCommandClassDialog(@NotNull Module module,
                                     @NotNull ClassCreator classCreator,
                                     @NotNull PsiDirectory directory)
     {
-        super(project, classCreator, directory);
+        super(module, classCreator, directory);
         initUiComponents();
         init(); //from DialogWrapper SHOULD BE LAST STATEMENT IN CONSTRUCTOR 
     }

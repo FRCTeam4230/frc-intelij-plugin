@@ -53,9 +53,9 @@ public abstract class AbstractAdvancedNewFrcClassAction extends CreateInDirector
     }
     
     
-    protected abstract ClassCreator constructClassCreatorInstance(@NotNull Project project);
+    protected abstract ClassCreator constructClassCreatorInstance(@NotNull Module module);
     
-    protected abstract NewFrcClassDialog constructNewClassDialogInstance(@NotNull Project project,
+    protected abstract NewFrcClassDialog constructNewClassDialogInstance(@NotNull Module module,
                                                                          @NotNull ClassCreator classCreator,
                                                                          @NotNull PsiDirectory directory);
     
@@ -74,16 +74,17 @@ public abstract class AbstractAdvancedNewFrcClassAction extends CreateInDirector
     {
         IdeView view = e.getData(LangDataKeys.IDE_VIEW);
         Project project = e.getProject();
-        if (view == null || project == null)
+        Module module = e.getData(LangDataKeys.MODULE);
+        if (view == null || project == null || module == null)
         {
             return;
         }
         PsiDirectory dir = view.getOrChooseDirectory();
         if (dir == null) return;
         
-        ClassCreator classCreator = constructClassCreatorInstance(project);
+        ClassCreator classCreator = constructClassCreatorInstance(module);
         
-        PsiClass[] createdClasses = invokeDialog(project, classCreator, dir);
+        PsiClass[] createdClasses = invokeDialog(project, module, classCreator, dir);
         if (createdClasses == null)
         {
             return;
@@ -97,9 +98,9 @@ public abstract class AbstractAdvancedNewFrcClassAction extends CreateInDirector
     
     
     @Nullable
-    private PsiClass[] invokeDialog(@NotNull Project project, ClassCreator classCreator, PsiDirectory dir)
+    private PsiClass[] invokeDialog(@NotNull Project project, @NotNull Module module, ClassCreator classCreator, PsiDirectory dir)
     {
-        DialogWrapper dialog = constructNewClassDialogInstance(project, classCreator, dir);
+        DialogWrapper dialog = constructNewClassDialogInstance(module, classCreator, dir);
         dialog.show();
         // When the user clicks OK, dialog.doOKAction() is called which in turn calls ClassCreator.createClass() which creates the class(es) 
         return classCreator.getCreatedClasses();

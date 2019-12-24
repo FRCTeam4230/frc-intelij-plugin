@@ -20,7 +20,7 @@ import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiDirectory;
 
 import net.javaru.iip.frc.FrcIcons;
@@ -47,17 +47,17 @@ public class NewFrcCommand2ClassAction extends AbstractAdvancedNewFrcCmdBaseV2Ac
     
     
     @Override
-    protected NewFrcClassDialog constructNewClassDialogInstance(@NotNull Project project,
+    protected NewFrcClassDialog constructNewClassDialogInstance(@NotNull Module module,
                                                                 @NotNull ClassCreator classCreator,
                                                                 @NotNull PsiDirectory directory)
     {
-        return new NewFrcCommandClassDialog(project, classCreator, directory);
+        return new NewFrcCommandClassDialog(module, classCreator, directory);
     }
     
     
     @Override
-    protected ClassCreator constructClassCreatorInstance(@NotNull Project project)
+    protected ClassCreator constructClassCreatorInstance(@NotNull Module module)
     {
-        return new FrcCommand2ClassCreator(project);
+        return new FrcCommand2ClassCreator(module);
     }
 }

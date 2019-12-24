@@ -18,7 +18,7 @@ package net.javaru.iip.frc.actions.create.advanced.cmdBased.v2.command;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.Module;
 
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 
@@ -29,9 +29,9 @@ class FrcCommand2ClassCreator extends ClassCreator
     private static final Logger LOG = Logger.getInstance(FrcCommand2ClassCreator.class);
     
     
-    public FrcCommand2ClassCreator(@NotNull Project project)
+    public FrcCommand2ClassCreator(@NotNull Module module)
     {
-        super(project);
+        super(module);
     }
     
     @NotNull

@@ -43,5 +43,5 @@ fun getCommandBasedLibraryStatus(project: Project?): CommandLibraryVersioning
 
 fun isVersion1CommandBaseLibAttached(module: Module?): Boolean = isVersion1CommandBaseLibAttached(module?.project)
 fun isVersion1CommandBaseLibAttached(project: Project?): Boolean = getCommandBasedLibraryStatus(project).isVersion1Present()
-fun isVersion2CommandBaseLibAttached(module: Module?): Boolean = isVersion1CommandBaseLibAttached(module?.project)
+fun isVersion2CommandBaseLibAttached(module: Module?): Boolean = isVersion2CommandBaseLibAttached(module?.project)
 fun isVersion2CommandBaseLibAttached(project: Project?): Boolean = getCommandBasedLibraryStatus(project).isVersion2Present()

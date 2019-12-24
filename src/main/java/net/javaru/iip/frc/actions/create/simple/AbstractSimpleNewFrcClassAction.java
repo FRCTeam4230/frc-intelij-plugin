@@ -24,6 +24,7 @@ import com.intellij.ide.actions.JavaCreateTemplateInPackageAction;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.DumbAware;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaDirectoryService;
 import com.intellij.psi.PsiClass;
@@ -32,6 +33,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.IncorrectOperationException;
 
 import net.javaru.iip.frc.FrcIcons;
+
+import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
@@ -86,14 +89,37 @@ public abstract class AbstractSimpleNewFrcClassAction extends JavaCreateTemplate
     protected boolean isAvailable(DataContext dataContext)
     {
         final Project project = CommonDataKeys.PROJECT.getData(dataContext);
-        return super.isAvailable(dataContext) && project != null && shouldBeEnabledAdditionalCriteria(project);
+        return super.isAvailable(dataContext) && project != null && notInDumbMode(project) && shouldBeEnabledAdditionalCriteria(project);
     }
     
+    
+    /**
+     * Indicates if the {@link #isAvailable(DataContext)} checks needs to check that the IDE is nor in dumb mode (i,e. that
+     * indexes are being updated) because the availability check, usually done by {@link #shouldBeEnabledAdditionalCriteria(Project)},
+     * runs checks, such as what libraries are attached, during its operation. Default it {@code true}.
+     * @return if the {@link #isAvailable(DataContext)} checks needs to check that the IDE is nor in dumb mode 
+     */
+    protected boolean needsIndexesToCheckEnabling()
+    {
+        return true;
+    }
+    
+    protected boolean notInDumbMode(@NotNull Project project)
+    {
+        if (needsIndexesToCheckEnabling() && DumbService.isDumb(project))
+        {
+            DumbService.getInstance(project).showDumbModeNotification(message("frc.new.class.adv.general.inDumbMode"));
+            return false;
+        }
+        return true;
+    }
     
     /**
      * Provides additional criteria when determining if the action should be enabled (in the menu).
      * Verification that the module is an FRC module is already done and does NOT need to occur in
      * implementations of this method.
+     * 
+     * Also see {@link #needsIndexesToCheckEnabling()}
      *
      * @return whether the action should be enabled.
      */

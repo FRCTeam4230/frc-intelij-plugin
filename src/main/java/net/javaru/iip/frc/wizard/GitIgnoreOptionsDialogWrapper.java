@@ -25,7 +25,6 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 
 import kotlin.Unit;
-import net.javaru.iip.frc.util.FrcExtsKt;
 import net.javaru.iip.frc.util.UiUtilsKt;
 
 

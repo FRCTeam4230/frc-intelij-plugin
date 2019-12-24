@@ -69,3 +69,23 @@ inline fun <T, R : Any, C : MutableCollection<in R>> Iterable<T>.mapExceptionFre
     }
     return destination
 }
+
+/**
+ * Converts a collection to a comma delimited string.
+ * @param withSpaces if true (the default), a space will appear after each comma: `one, two, three, four`; if false, no spaces will be present: `one,two,three,four`
+ */
+@JvmOverloads
+fun Collection<*>.toCommaDelimitedString(withSpaces: Boolean = true): String
+{
+    val result = this.toTypedArray().contentToString().removePrefix("[").removeSuffix("]")
+    return if (withSpaces) result else result.replace(" ", "")
+}
+
+/**
+ * Converts a comma delimited String to a Mutable List of Strings, properly trimming the values. 
+ */
+fun String.commaDelimitedToList(): MutableList<String>
+{
+    val list = this.split(',').map { it.trim() }.toMutableList()
+    return if (list.size == 1 && list[0].isBlank()) mutableListOf() else list
+}

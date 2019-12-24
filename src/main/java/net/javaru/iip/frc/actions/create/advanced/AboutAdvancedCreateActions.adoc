@@ -3,3 +3,13 @@
 
 
 The "advanced" creat actions show a custom dialog box, and can do more advanced data verification & processing. 
+
+
+The flow:
+
+* AbstractAdvancedNewFrcClassAction
+** actionPerformed() 
+*** invokeDialog()
+**** NewFrcComponentDialog.show()
+**** NewFrcComponentDialog.doOKAction()
+***** ComponentCreator.create()

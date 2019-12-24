@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
     public static final FileTemplateDescriptor SUBSYSTEM = new FileTemplateDescriptor("FRCSubsystem.java", FrcIcons.Components.SUBSYSTEM);
     public static final FileTemplateDescriptor PID_SUBSYSTEM = new FileTemplateDescriptor("FRCPIDSubsystem.java", FrcIcons.Components.PID_SUBSYSTEM);
     public static final FileTemplateDescriptor TRIGGER = new FileTemplateDescriptor("FRCTrigger.java", FrcIcons.Components.BUTTON);
+    
+    public static final FileTemplateDescriptor COMMAND2 = new FileTemplateDescriptor("FRCCommand2.java", FrcIcons.Components.COMMAND);
 
     private static final FileTemplateGroupDescriptor FILE_TEMPLATE_GROUP_DESCRIPTOR =
         new FileTemplateGroupDescriptor("FRC", FrcIcons.FRC.FIRST_ICON_MEDIUM_16,

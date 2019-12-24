@@ -14,33 +14,27 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.advanced.cmdBased.v2;
-
-import javax.swing.*;
+package net.javaru.iip.frc.actions.create.advanced.cmdBased.v2.command;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 
-import net.javaru.iip.frc.actions.create.advanced.AbstractAdvancedNewFrcClassAction;
-import net.javaru.iip.frc.wpilib.WpiibLibraryUtilsKt;
-
+import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 
 
-public abstract class AbstractAdvancedNewFrcCmdBaseV2Action extends AbstractAdvancedNewFrcClassAction
+
+class FrcCommand2ClassCreator extends ClassCreator
 {
-    private static final Logger LOG = Logger.getInstance(AbstractAdvancedNewFrcCmdBaseV2Action.class);
+    private static final Logger LOG = Logger.getInstance(FrcCommand2ClassCreator.class);
     
     
-    protected AbstractAdvancedNewFrcCmdBaseV2Action(String text, String description, Icon icon)
+    public FrcCommand2ClassCreator(@NotNull Project project)
     {
-        super(text, description, icon);
+        super(project);
     }
     
-    
+    @NotNull
     @Override
-    protected boolean shouldBeEnabledAdditionalCriteria(@NotNull Module module)
-    {
-        return WpiibLibraryUtilsKt.isVersion2CommandBaseLibAttached(module);
-    }
+    protected String getClassTemplateName() { return "FRCCommand2.java"; }
 }

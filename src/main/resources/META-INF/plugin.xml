@@ -422,6 +422,9 @@
             <action id="frc.action.new.basic.trigger"
                     class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcTriggerClassAction" />
 
+            <action id="frc.action.new.basic.command2"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.v2.command.NewFrcCommand2ClassAction" />
+
             <!--<action id="frc.action.new.build.file" class="net.javaru.iip.frc.actions.create.build.NewFrcAntBuildFileAction" text="FRC New Ant Build File" />-->
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewJavaSpecialFile" />
         </group>

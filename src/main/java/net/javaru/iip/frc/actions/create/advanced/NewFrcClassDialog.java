@@ -44,13 +44,13 @@ public abstract class NewFrcClassDialog extends DialogWrapper
     private static final Logger LOG = Logger.getInstance(NewFrcClassDialog.class);
     
     @NotNull
-    private final Project myProject;
+    protected final Project myProject;
     @NotNull
-    private final Module myModule;
+    protected final Module myModule;
     @NotNull
-    private final ClassCreator myClassCreator;
+    protected final ClassCreator myClassCreator;
     @NotNull
-    private final PsiDirectory myDirectory;
+    protected final PsiDirectory myDirectory;
     
     
     /**

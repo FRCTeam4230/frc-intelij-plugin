@@ -17,13 +17,16 @@
 package net.javaru.iip.frc.actions.create.advanced.cmdBased.v2.command;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.text.JTextComponent;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.BiMap;
@@ -44,6 +47,7 @@ import kotlin.Unit;
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 import net.javaru.iip.frc.actions.create.advanced.NewFrcClassDialog;
 import net.javaru.iip.frc.util.FindClassUtils;
+import net.javaru.iip.frc.util.FrcCollectionExtsKt;
 import net.javaru.iip.frc.util.UiUtilsKt;
 
 import static com.intellij.uiDesigner.core.GridConstraints.*;
@@ -52,6 +56,10 @@ import static com.intellij.uiDesigner.core.GridConstraints.*;
 
 public class NewFrcCommandClassDialog extends NewFrcClassDialog
 {
+    public static final String SUBSYSTEMS_FQN_COMMA_DELIMITED_LIST = "requiredSubsystemsFqnCommaDelimitedString";
+    public static final String SUBSYSTEMS_SIMPLE_NAME_COMMA_DELIMITED_LIST = "requiredSubsystemsNamesCommaDelimitedString";
+    public static final String SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST = "requiredSubsystemsVarsCommaDelimitedString";
+    
     private static final Logger LOG = Logger.getInstance(NewFrcCommandClassDialog.class);
     private JPanel myTopPanel;
     private JBLabel myCommandNameLabel;
@@ -59,7 +67,6 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     private JCheckBox myAutoAppendCommandCheckBox;
     private JPanel mySubsystemsPanel;
     
-    private Map<String, PsiClass> mySubsystemsActionCommandsMap;
     private BiMap<PsiClass, JBCheckBox>  mySubsystemsClassesBiMap;
     
     public NewFrcCommandClassDialog(@NotNull Module module,
@@ -98,7 +105,6 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
         // boolean isAbstract1 = psiClass.hasModifier(JvmModifier.ABSTRACT); // As of 2019-12-24 this is marked as experimental
         // boolean isAbstract2 = psiClass.hasModifierProperty(PsiModifier.ABSTRACT);
     
-        final ImmutableMap.Builder<String, PsiClass> actionCommandsMapBuilder = ImmutableMap.builder();
         final ImmutableBiMap.Builder<PsiClass, JBCheckBox> subSystemsMapBuilder = ImmutableBiMap.builder();
     
       ;
@@ -127,17 +133,54 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
             int row = 0;
             for (PsiClass subsystem : subsystems)
             {
+                
                 gc.setRow(++row);
                 JBCheckBox checkBox = new JBCheckBox(subsystem.getName());
                 checkBox.setActionCommand(subsystem.getQualifiedName());
                 mySubsystemsPanel.add(checkBox, gc);
+                subSystemsMapBuilder.put(subsystem, checkBox);
             }
         }
-        this.mySubsystemsActionCommandsMap = actionCommandsMapBuilder.build();
         this.mySubsystemsClassesBiMap = subSystemsMapBuilder.build();
     }
     
     
+    @Override
+    protected Map<String, String> getAdditionalProperties()
+    {
+        ImmutableMap.Builder<String, String> props = ImmutableMap.builder();
+        addSubSystemProperties(props);
+        return props.build();
+    }
+    
+    protected void addSubSystemProperties(ImmutableMap.Builder<String, String> props)
+    {
+        final List<PsiClass> subsystems = getSelectedSubsystems();
+        final String subSystemsFQN = FrcCollectionExtsKt.toCommaDelimitedString(subsystems, false, PsiClass::getQualifiedName);
+        props.put(SUBSYSTEMS_FQN_COMMA_DELIMITED_LIST, subSystemsFQN);
+        
+        final String subSystemsSimpleNames = FrcCollectionExtsKt.toCommaDelimitedString(subsystems, false, PsiClass::getName);
+        props.put(SUBSYSTEMS_SIMPLE_NAME_COMMA_DELIMITED_LIST, subSystemsSimpleNames);
+        
+        final String subSystemsVarNames = FrcCollectionExtsKt.toCommaDelimitedString(subsystems, false, psiClass -> 
+                StringUtils.uncapitalize(psiClass.getName()));
+        props.put(SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST, subSystemsVarNames);
+    }
+    
+    
+    protected List<PsiClass> getSelectedSubsystems()
+    {
+        final List<PsiClass> subsystems = new ArrayList<>();
+        for (Entry<PsiClass, JBCheckBox> entry : mySubsystemsClassesBiMap.entrySet())
+        {
+            if (entry.getValue().isSelected())
+            {
+                subsystems.add(entry.getKey());
+            }
+        }
+        subsystems.sort(Comparator.comparing(NavigationItem::getName));
+        return subsystems;
+    }
     
     protected String getSubsystemBaseClassFQN()
     {

@@ -17,7 +17,6 @@
 package net.javaru.iip.frc.actions.create.advanced;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
@@ -118,7 +117,13 @@ public abstract class NewFrcClassDialog extends DialogWrapper
 
     protected abstract JTextComponent getNewClassNameField();
     
-    //protected abstract Icon
+    /**
+     * Implementations should return a map of additional properties to pass into the Velocity Template. If none,
+     * return an empty Map.
+     * 
+     * @return a map of additional properties to pass into the Velocity Template
+     */
+    protected abstract Map<String, String> getAdditionalProperties();
     
     
     /**
@@ -151,9 +156,7 @@ public abstract class NewFrcClassDialog extends DialogWrapper
             return;
         }
     
-        //TODO - need to get the actual additional properties we need.
-        Map<String, String> additionalProperties = new HashMap<>();
-        additionalProperties.put("tempSubSystemName", "ExampleSubsystem");
+        Map<String, String> additionalProperties = getAdditionalProperties();
         
         if (myClassCreator.createClass(getNewClassName().trim(),
                                        myDirectory,
@@ -161,7 +164,6 @@ public abstract class NewFrcClassDialog extends DialogWrapper
         {
             close(OK_EXIT_CODE);
         }
-        // TODO Finish Me
     }
     
     

@@ -71,13 +71,17 @@ inline fun <T, R : Any, C : MutableCollection<in R>> Iterable<T>.mapExceptionFre
 }
 
 /**
- * Converts a collection to a comma delimited string.
- * @param withSpaces if true (the default), a space will appear after each comma: `one, two, three, four`; if false, no spaces will be present: `one,two,three,four`
+ * Converts a collection to a comma delimited string. Null values are not allowed.
+ * 
+ * @param withSpaces if true (the default), a space will appear after each comma: `one, two, three, four`; 
+ *                   if false, no spaces will be present: `one,two,three,four`.
+ * @param toStringFunction the function/lambda to use to convert collection elements to a String value. By default, the 
+ *                         element's `toString()` method is used
  */
 @JvmOverloads
-fun Collection<*>.toCommaDelimitedString(withSpaces: Boolean = true): String
+fun <T: Any> Collection<T>.toCommaDelimitedString(withSpaces: Boolean = true, toStringFunction: (T) -> String = {it.toString()}): String
 {
-    val result = this.toTypedArray().contentToString().removePrefix("[").removeSuffix("]")
+    val result = this.map { toStringFunction.invoke(it) }.toTypedArray().contentToString().removePrefix("[").removeSuffix("]")
     return if (withSpaces) result else result.replace(" ", "")
 }
 

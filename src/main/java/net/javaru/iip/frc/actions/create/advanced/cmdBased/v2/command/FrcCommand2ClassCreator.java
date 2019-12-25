@@ -21,6 +21,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
+import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory;
 
 
 
@@ -36,5 +37,5 @@ class FrcCommand2ClassCreator extends ClassCreator
     
     @NotNull
     @Override
-    protected String getClassTemplateName() { return "FRCCommand2.java"; }
+    protected String getClassTemplateName() { return FrcFileTemplateGroupDescriptorFactory.COMMAND2.getFileName(); }
 }

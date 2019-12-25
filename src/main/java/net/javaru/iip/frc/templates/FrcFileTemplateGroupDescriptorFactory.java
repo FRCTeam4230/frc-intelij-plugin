@@ -32,7 +32,7 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
     public static final FileTemplateDescriptor PID_SUBSYSTEM = new FileTemplateDescriptor("FRCPIDSubsystem.java", FrcIcons.Components.PID_SUBSYSTEM);
     public static final FileTemplateDescriptor TRIGGER = new FileTemplateDescriptor("FRCTrigger.java", FrcIcons.Components.BUTTON);
     
-    public static final FileTemplateDescriptor COMMAND2 = new FileTemplateDescriptor("FRCCommand2.java", FrcIcons.Components.COMMAND);
+    public static final FileTemplateDescriptor COMMAND2 = new FileTemplateDescriptor("FRC Command v2.java", FrcIcons.Components.COMMAND);
 
     private static final FileTemplateGroupDescriptor FILE_TEMPLATE_GROUP_DESCRIPTOR =
         new FileTemplateGroupDescriptor("FRC", FrcIcons.FRC.FIRST_ICON_MEDIUM_16,
@@ -40,7 +40,8 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
                                         COMMAND_GROUP,
                                         SUBSYSTEM,
                                         PID_SUBSYSTEM,
-                                        TRIGGER
+                                        TRIGGER,
+                                        COMMAND2
         );
 
 

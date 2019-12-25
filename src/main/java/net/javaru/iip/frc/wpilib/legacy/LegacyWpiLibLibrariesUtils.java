@@ -54,7 +54,7 @@ import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.impl.compiled.ClassFileDecompiler;
 
 import net.javaru.iip.frc.i18n.FrcBundle;
-import net.javaru.iip.frc.util.FindClassUtils;
+import net.javaru.iip.frc.util.FindClassUtilsKt;
 import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.wpilib.WpiLibConstants;
 import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloader;
@@ -62,7 +62,7 @@ import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionExtKt;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
 
-import static net.javaru.iip.frc.util.FindClassUtils.isLibraryPresent;
+import static net.javaru.iip.frc.util.FindClassUtilsKt.isLibraryPresent;
 
 
 
@@ -92,7 +92,7 @@ public class LegacyWpiLibLibrariesUtils
         //noinspection SimplifiableIfStatement
         if (project.isInitialized())
         {
-            return FindClassUtils.isLibraryPresent(project, WpiLibConstants.ROBOT_BASE_FQN) ||
+            return isLibraryPresent(project, WpiLibConstants.ROBOT_BASE_FQN) ||
                    isLibraryPresent(project, WpiLibConstants.ITERATIVE_ROBOT_FQN) ||
                    isLibraryPresent(project, WpiLibConstants.VERSION_CLASS_FQN);
         }
@@ -456,7 +456,7 @@ public class LegacyWpiLibLibrariesUtils
         }
 
         
-        final PsiClass[] verClass = FindClassUtils.findClass(project, WpiLibConstants.VERSION_CLASS_FQN);
+        final PsiClass[] verClass = FindClassUtilsKt.findClass(project, WpiLibConstants.VERSION_CLASS_FQN);
         
         if (verClass.length == 0)
         {
@@ -475,7 +475,7 @@ public class LegacyWpiLibLibrariesUtils
                 if (initializer instanceof PsiLiteralExpression)
                 {
                     Object value = ((PsiLiteralExpression) initializer).getValue();
-                    if (value != null && value instanceof String)
+                    if (value instanceof String)
                     {
                         version = value.toString();
                         break;

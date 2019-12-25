@@ -46,7 +46,7 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import kotlin.Unit;
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 import net.javaru.iip.frc.actions.create.advanced.NewFrcClassDialog;
-import net.javaru.iip.frc.util.FindClassUtils;
+import net.javaru.iip.frc.util.FindClassUtilsKt;
 import net.javaru.iip.frc.util.FrcCollectionExtsKt;
 import net.javaru.iip.frc.util.UiUtilsKt;
 
@@ -94,11 +94,11 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     
     protected void initSubsystemSelectionPanel()
     {
-        final List<PsiClass> subsystems = FindClassUtils.findImplementationsInModule(getSubsystemBaseClassFQN(),
-                                                                                     myModule,
-                                                                                     false,
-                                                                                     false,
-                                                                                     null);
+        final List<PsiClass> subsystems = FindClassUtilsKt.findImplementationsInModule(getSubsystemBaseClassFQN(),
+                                                                                       myModule,
+                                                                                       false,
+                                                                                       false,
+                                                                                       null);
         LOG.debug("[FRC] Found the following Subsystem subclasses: " + subsystems);
         
         // TODO: add option to filter out abstract 

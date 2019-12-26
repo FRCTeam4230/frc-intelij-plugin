@@ -40,12 +40,8 @@ public class ArmSubsystem extends ProfiledPIDSubsystem
      */
     public ArmSubsystem()
     {
-        super(new ProfiledPIDController(
-                P,
-                0,
-                0,
-                new TrapezoidProfile.Constraints(MAX_VELOCITY_RAD_PER_SECOND,
-                        MAX_ACCELERATION_RAD_PER_SEC_SQUARED)));
+        super(new ProfiledPIDController(P, 0, 0,
+                                        new TrapezoidProfile.Constraints(MAX_VELOCITY_RAD_PER_SECOND, MAX_ACCELERATION_RAD_PER_SEC_SQUARED)), 0);
         encoder.setDistancePerPulse(ENCODER_DISTANCE_PER_PULSE);
         // Start arm at rest in neutral position
         setGoal(ARM_OFFSET_RADS);

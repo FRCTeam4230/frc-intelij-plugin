@@ -26,7 +26,7 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import com.intellij.util.ui.JBUI;
 
-import net.javaru.iip.frc.util.FrcUiUtils;
+import net.javaru.iip.frc.util.FrcUiUtilsKt;
 
 
 
@@ -71,7 +71,7 @@ public class FrcLegacyModuleWizardPanel extends JPanel
         int currentRow = 0;
         for (LegacyRobotType legacyRobotType : legacyRobotTypes)
         {
-            JRadioButton button = new JRadioButton(FrcUiUtils.boldLabelText(legacyRobotType.getLabelName()));
+            JRadioButton button = new JRadioButton(FrcUiUtilsKt.boldLabelText(legacyRobotType.getLabelName()));
             button.setActionCommand(legacyRobotType.name());
             robotTypeButtonGroup.add(button);
             if (legacyRobotType == legacyRobotTypes[0]) {button.setSelected(true);}

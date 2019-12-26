@@ -26,7 +26,7 @@ import com.intellij.ui.components.JBTextField;
 
 import kotlin.Unit;
 import net.javaru.iip.frc.util.FrcCollectionExtsKt;
-import net.javaru.iip.frc.util.UiUtilsKt;
+import net.javaru.iip.frc.util.FrcUiUtilsKt;
 
 
 
@@ -113,7 +113,7 @@ public class GitIgnoreOptionsDialogWrapper extends DialogWrapper
         winCheckBox.addActionListener(e -> configuration.setWindows(winCheckBox.isSelected()));
         cppCheckBox.addActionListener(e -> configuration.setCpp(cppCheckBox.isSelected()));
     
-        UiUtilsKt.addTextChangedListener(additionalGitignoreTemplatesTextField, text -> {
+        FrcUiUtilsKt.addTextChangedListener(additionalGitignoreTemplatesTextField, text -> {
             configuration.setAdditionalGitignoreTemplates(FrcCollectionExtsKt.commaDelimitedToList(additionalGitignoreTemplatesTextField.getText()));
             return Unit.INSTANCE; });
     

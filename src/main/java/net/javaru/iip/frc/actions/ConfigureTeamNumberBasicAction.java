@@ -41,7 +41,7 @@ import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.settings.FrcTeamNumberKt;
-import net.javaru.iip.frc.util.UiUtilsKt;
+import net.javaru.iip.frc.util.FrcUiUtilsKt;
 import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibPaths;
 import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloader;
 
@@ -76,7 +76,7 @@ public class ConfigureTeamNumberBasicAction extends AnAction
         final FrcApplicationSettings settings = FrcApplicationSettings.getInstance();
         
         @Nullable
-        final Component parentComponent = UiUtilsKt.findIdeFrameOrAlternateParentComponent(project);
+        final Component parentComponent = FrcUiUtilsKt.findIdeFrameOrAlternateParentComponent(project);
         final String message = FrcBundle.message("frc.ui.dialogs.enterTeamNumberPrompt");
         final String title = FrcPluginGlobals.FRC_PLUGIN_NAME;
         final Icon icon = FRC.FIRST_ICON_DIALOG_WINDOW;

@@ -1,5 +1,5 @@
 #set($requiredSubsystemsFqnArray=$requiredSubsystemsFqnCommaDelimitedString.split(","))
-##The split method on an empty string will result in an array of one emoty string token, so we need to handle that
+##The split method when called on an empty string will result in an array of one empty string token, so we need to handle that
 #if($requiredSubsystemsFqnArray.size() == 1 && $requiredSubsystemsFqnArray[0] == "")
     #set($requiredSubsystemsFqnArray = [])
 #end
@@ -18,11 +18,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 #foreach($fqn in $requiredSubsystemsFqnArray)
 import $fqn;            
 #end
-
-
-
-
-// VERSION 9
 
 
 #parse("File Header.java")

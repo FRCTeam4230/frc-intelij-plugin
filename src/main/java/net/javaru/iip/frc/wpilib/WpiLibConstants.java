@@ -45,6 +45,21 @@ public class WpiLibConstants
     public static final String COMMAND_BASED_V1_FQN =       "edu.wpi.first.wpilibj.command.Command"; // An Abstract Class
     public static final String COMMAND_BASED_V2_FQN =       "edu.wpi.first.wpilibj2.command.Command";// An Interface
     
+    
+    
+    public static final String SUBSYSTEM_V1_BASE_FQN =      "edu.wpi.first.wpilibj.command.Subsystem";
+    public static final String SUBSYSTEM_V2_INTERFACE_FQN = "edu.wpi.first.wpilibj2.command.Subsystem";
+    public static final String SUBSYSTEM_V2_BASE_FQN =      "edu.wpi.first.wpilibj2.command.SubsystemBase";
+    public static final String SUBSYSTEM_V1_TOP_FQN =       SUBSYSTEM_V1_BASE_FQN;
+    public static final String SUBSYSTEM_V2_TOP_FQN =       SUBSYSTEM_V2_INTERFACE_FQN;
+    
+   
+    public static final String COMMAND_V1_BASE_FQN =      "edu.wpi.first.wpilibj.command.Command";
+    public static final String COMMAND_V2_INTERFACE_FQN = "edu.wpi.first.wpilibj2.command.Command";
+    public static final String COMMAND_V2_BASE_FQN =      "edu.wpi.first.wpilibj2.command.CommandBase";
+    public static final String COMMAND_V1_TOP_FQN =       COMMAND_V1_BASE_FQN;
+    public static final String COMMAND_V2_TOP_FQN =       COMMAND_V2_INTERFACE_FQN;
+    
     public static final String VERSION_CLASS_FQN = "edu.wpi.first.wpilibj.util.WPILibVersion";
     public static final String VERSION_FIELD_NAME = "Version";
 

@@ -22,6 +22,7 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiModifier
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.PsiElementProcessor
 import com.intellij.psi.search.PsiElementProcessorAdapter
@@ -247,3 +248,11 @@ private fun calculateModuleSearchScope(module: Module,
         GlobalSearchScope.moduleScope(module)
     }
 }
+
+fun PsiClass.isAbstract(): Boolean
+{
+    // boolean isAbstract1 = psiClass.hasModifier(JvmModifier.ABSTRACT); // As of 2019-12-26 this is marked as experimental
+    return this.hasModifierProperty(PsiModifier.ABSTRACT);
+}
+
+fun PsiClass.isInterfaceOrAbstract(): Boolean = this.isInterface || this.isAbstract()

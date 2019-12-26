@@ -17,21 +17,31 @@
 
 package net.javaru.iip.frc.util
 
+import com.intellij.navigation.NavigationItem
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.wm.ex.WindowManagerEx
+import com.intellij.psi.PsiClass
+import com.intellij.ui.components.JBCheckBox
+import com.intellij.ui.components.JBLabel
+import com.intellij.ui.components.JBScrollPane
+import com.intellij.uiDesigner.core.GridConstraints
+import com.intellij.uiDesigner.core.GridLayoutManager
 import org.intellij.lang.annotations.Language
 import java.awt.Component
 import java.awt.Container
+import java.awt.Dimension
 import java.util.*
 import javax.swing.AbstractButton
 import javax.swing.ButtonModel
 import javax.swing.DefaultButtonModel
 import javax.swing.JComponent
 import javax.swing.JLabel
+import javax.swing.JPanel
 import javax.swing.JTabbedPane
 import javax.swing.JTextField
+import javax.swing.ScrollPaneConstants
 import javax.swing.colorchooser.AbstractColorChooserPanel
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
@@ -106,19 +116,19 @@ fun JTextComponent.addTextChangedListener(action: (e: DocumentEvent?, text: Stri
 }
 
 /**
- * Finds the `IdeFrame` for the supplied project (which may be null when no project is 
+ * Finds the `IdeFrame` for the supplied project (which may be null when no project is
  * opened). In the event that cannot be found, it attempts to find the most recently
  * focused component for the project is found. In the event that cannot be found, it
- * attempts to find the most recently focused window. In the event that cannot be 
- * found, `null` is returned. Primarily meant for use when needing a parent component 
+ * attempts to find the most recently focused window. In the event that cannot be
+ * found, `null` is returned. Primarily meant for use when needing a parent component
  * for use when opening a dialog window.
- * 
+ *
  * @receiver project – may be null when no project is opened.
  */
 fun Project?.findIdeFrameOrAlternateParentComponent(): Component?
 {
     val windowManager = WindowManagerEx.getInstanceEx()
-    
+
     var parentComponent: Component? = null
     val ideFrame = windowManager.findFrameFor(this)
     if (ideFrame != null)
@@ -129,17 +139,17 @@ fun Project?.findIdeFrameOrAlternateParentComponent(): Component?
     {
         parentComponent = windowManager.getFocusedComponent(this)
     }
-    
+
     if (parentComponent == null)
     {
         parentComponent = windowManager.mostRecentFocusedWindow
     }
-    
+
     return parentComponent
 }
 
 /**
- * Recursively finds all used/assigned  Mnemonics for a component, returning them as a Set. 
+ * Recursively finds all used/assigned  Mnemonics for a component, returning them as a Set.
  */
 @JvmOverloads
 fun findAllUsedMnemonics(component: Component?, convertAllToUpperCase: Boolean = true): MutableSet<Char>
@@ -151,7 +161,7 @@ fun findAllUsedMnemonics(component: Component?, convertAllToUpperCase: Boolean =
 
 /**
  * Recursively finds all used/assigned  Mnemonics for a component, adding them to the supplied set.
- * 
+ *
  * @param convertAllToUpperCase if *all* values in the set (including any present when passed in) should be converted to uppercase
  */
 @JvmOverloads
@@ -195,18 +205,17 @@ fun findAllUsedMnemonics(component: Component?, mnemonics: MutableSet<Char>, con
 }
 
 
-fun <T> calculateMnemonics(topComponent: JComponent?, elements: Collection<T>, getNameFunction: (T) -> String?): Map<T, Char> 
-        = calculateMnemonics(elements, findAllUsedMnemonics(topComponent), getNameFunction)
+fun <T> calculateMnemonics(topComponent: JComponent?, elements: Collection<T>, getNameFunction: (T) -> String?): Map<T, Char> = calculateMnemonics(elements, findAllUsedMnemonics(topComponent), getNameFunction)
 
 fun <T> calculateMnemonics(elements: Collection<T>, unavailableMnemonics: Set<Char>, getNameFunction: (T) -> String?): MutableMap<T, Char>
 {
-    val usedMnemonics = unavailableMnemonics.map{ it.toUpperCase() }.toMutableSet()
+    val usedMnemonics = unavailableMnemonics.map { it.toUpperCase() }.toMutableSet()
 
     val mnemonicsMap: MutableMap<T, Char> = HashMap()
-    
+
     try
     {
-    
+
         // First pass, see if first letter is available
         elements.forEach { element ->
             val name = getNameFunction.invoke(element)
@@ -217,7 +226,7 @@ fun <T> calculateMnemonics(elements: Collection<T>, unavailableMnemonics: Set<Ch
                 mnemonicsMap[element] = first
             }
         }
-    
+
         if (mnemonicsMap.size != elements.size)
         {
             // Second pass, see if a camel case letter if available
@@ -242,7 +251,7 @@ fun <T> calculateMnemonics(elements: Collection<T>, unavailableMnemonics: Set<Ch
                 }
             }
         }
-    
+
         if (mnemonicsMap.size != elements.size)
         {
             // Third pass, just find an available letter, but we look for one in the shortest names 
@@ -272,4 +281,111 @@ fun <T> calculateMnemonics(elements: Collection<T>, unavailableMnemonics: Set<Ch
     }
     return mnemonicsMap
 }
+
+@JvmOverloads
+fun initClassSelectionPanel(topComponent: JComponent?,
+                            panel: JPanel,
+                            labelText: String,
+                            classes: List<PsiClass>,
+                            maxItemCols: Int = 4,
+                            maxItemRows: Int = 6,
+                            textCreator: (PsiClass) -> String? = { psiClass -> psiClass.name })
+        : Map<PsiClass, JBCheckBox>
+{
+    val mutableMap = mutableMapOf<PsiClass, JBCheckBox>()
     
+    if (classes.isNotEmpty())
+    {
+        val classesCount = classes.size
+        
+        var colCount = classesCount / maxItemRows
+        if (classesCount %  maxItemRows != 0) colCount++
+        if (colCount > maxItemCols)
+        {
+            colCount = maxItemCols
+        }
+        
+        var rowCount = classesCount  / colCount
+        if (classesCount % colCount != 0) rowCount++
+        
+        // if rowCount > maxItemRows, we want to wrap in a scroll pane 
+        val thePanel = if (rowCount > maxItemRows) 
+        {
+            val innerPanel = JPanel(GridLayoutManager(rowCount, colCount))
+            val scrollPane = JBScrollPane(innerPanel)
+            scrollPane.horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
+            scrollPane.verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
+            val height = maxItemRows * 30 // a good approximation for now
+            panel.add(scrollPane, GridConstraints(0, 0, 1, 1,
+                                                  GridConstraints.ANCHOR_WEST,
+                                                  GridConstraints.FILL_NONE,
+                                                  GridConstraints.SIZEPOLICY_CAN_GROW or GridConstraints.SIZEPOLICY_CAN_SHRINK,
+                                                  GridConstraints.SIZEPOLICY_FIXED,
+                                                  Dimension(-1, 100),
+                                                  Dimension(-1, height),
+                                                  Dimension(-1, height),
+                                                  0))
+            innerPanel
+        }
+        else 
+        {
+            panel
+        }
+        
+        
+        //Add a row for the label
+        rowCount++
+        
+        val manager = GridLayoutManager(rowCount, colCount)
+        thePanel.layout = manager
+        val gc = GridConstraints(0, 0, 1, 1,
+                                 GridConstraints.ANCHOR_WEST,
+                                 GridConstraints.FILL_NONE,
+                                 GridConstraints.SIZEPOLICY_CAN_GROW or GridConstraints.SIZEPOLICY_CAN_SHRINK,
+                                 GridConstraints.SIZEPOLICY_FIXED,
+                                 Dimension(-1, -1),
+                                 Dimension(-1, -1),
+                                 Dimension(-1, -1),
+                                 1)
+        gc.colSpan = colCount
+        val label = JBLabel(labelText)
+        thePanel.add(label, gc)
+        gc.colSpan = 1
+        val sortedList = classes.sortedWith(Comparator.comparing { psiClass: PsiClass -> psiClass.name ?: "" })
+        val mnemonics = calculateMnemonics(topComponent, sortedList) { obj: NavigationItem -> obj.name }
+        gc.indent = 3
+        
+        var row = 0
+        for (psiClass in sortedList)
+        {
+            val text = textCreator.invoke(psiClass)
+            if (text != null)
+            {
+                row++
+                if (row >= rowCount)
+                {
+                    row = 1
+                    gc.column = gc.column + 1
+                }
+                gc.row = row
+                
+                val checkBox = JBCheckBox(text)
+                try
+                {
+                    val mnemonic = mnemonics.get(psiClass)
+                    if (mnemonic != null)
+                    {
+                        checkBox.setMnemonic(mnemonic)
+                    }
+                }
+                catch (e: Exception)
+                {
+                    LOG.info("[FRC] An exception occurred when assigning a Mnemonic: $e", e)
+                }
+                thePanel.add(checkBox, gc)
+                mutableMap.put(psiClass, checkBox)
+            }
+        }
+    }
+    return mutableMap.toMap()
+}

@@ -48,7 +48,7 @@ import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 import net.javaru.iip.frc.actions.create.advanced.NewFrcClassDialog;
 import net.javaru.iip.frc.util.FindClassUtilsKt;
 import net.javaru.iip.frc.util.FrcCollectionExtsKt;
-import net.javaru.iip.frc.util.UiUtilsKt;
+import net.javaru.iip.frc.util.FrcUiUtilsKt;
 
 import static com.intellij.uiDesigner.core.GridConstraints.*;
 
@@ -74,6 +74,7 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
                                     @NotNull PsiDirectory directory)
     {
         super(module, classCreator, directory);
+        setTitle(getTitle());
         initUiComponents();
         init(); //from DialogWrapper SHOULD BE LAST STATEMENT IN CONSTRUCTOR 
     }
@@ -83,7 +84,7 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     {
         myAutoAppendCommandCheckBox.setSelected(true);
     
-        UiUtilsKt.addTextChangedListener(myCommandNameTextField, (documentEvent, text) -> {
+        FrcUiUtilsKt.addTextChangedListener(myCommandNameTextField, (documentEvent, text) -> {
             myAutoAppendCommandCheckBox.setEnabled(!myCommandNameTextField.getText().endsWith("Command") && 
                                                    !myCommandNameTextField.getText().endsWith("Cmd"));
             return Unit.INSTANCE;
@@ -129,14 +130,26 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
             mySubsystemsPanel.add(label, gc);
     
             subsystems.sort(Comparator.comparing(NavigationItem::getName));
+            final Map<PsiClass, Character> mnemonics = FrcUiUtilsKt.calculateMnemonics(myTopPanel, subsystems, NavigationItem::getName);
+    
             gc.setIndent(3);
             int row = 0;
             for (PsiClass subsystem : subsystems)
             {
-                
                 gc.setRow(++row);
-                JBCheckBox checkBox = new JBCheckBox(subsystem.getName());
-                checkBox.setActionCommand(subsystem.getQualifiedName());
+                final JBCheckBox checkBox = new JBCheckBox(subsystem.getName());
+                try
+                {
+                    final Character mnemonic = mnemonics.get(subsystem);
+                    if (mnemonic != null)
+                    {
+                        checkBox.setMnemonic(mnemonic);
+                    }
+                }
+                catch (Exception e)
+                {
+                    LOG.info("[FRC] An exception occurred when assigning a Mnemonic: " + e.toString(), e);
+                }
                 mySubsystemsPanel.add(checkBox, gc);
                 subSystemsMapBuilder.put(subsystem, checkBox);
             }

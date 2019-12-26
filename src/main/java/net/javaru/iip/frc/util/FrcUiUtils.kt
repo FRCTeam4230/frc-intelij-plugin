@@ -17,15 +17,29 @@
 
 package net.javaru.iip.frc.util
 
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.wm.ex.WindowManagerEx
 import org.intellij.lang.annotations.Language
 import java.awt.Component
+import java.awt.Container
+import java.util.*
+import javax.swing.AbstractButton
+import javax.swing.ButtonModel
+import javax.swing.DefaultButtonModel
+import javax.swing.JComponent
+import javax.swing.JLabel
+import javax.swing.JTabbedPane
 import javax.swing.JTextField
+import javax.swing.colorchooser.AbstractColorChooserPanel
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.text.JTextComponent
+
+private object FrcUiUtils
+
+private val LOG = Logger.getInstance(FrcUiUtils::class.java)
 
 /**
  * Returns the provided text inside HTML tags centering the text for use on a Swing label.
@@ -123,3 +137,139 @@ fun Project?.findIdeFrameOrAlternateParentComponent(): Component?
     
     return parentComponent
 }
+
+/**
+ * Recursively finds all used/assigned  Mnemonics for a component, returning them as a Set. 
+ */
+@JvmOverloads
+fun findAllUsedMnemonics(component: Component?, convertAllToUpperCase: Boolean = true): MutableSet<Char>
+{
+    val mnemonics: MutableSet<Char> = HashSet()
+    findAllUsedMnemonics(component, mnemonics, convertAllToUpperCase)
+    return mnemonics
+}
+
+/**
+ * Recursively finds all used/assigned  Mnemonics for a component, adding them to the supplied set.
+ * 
+ * @param convertAllToUpperCase if *all* values in the set (including any present when passed in) should be converted to uppercase
+ */
+@JvmOverloads
+fun findAllUsedMnemonics(component: Component?, mnemonics: MutableSet<Char>, convertAllToUpperCase: Boolean = true)
+{
+    try
+    {
+        if (component == null) return
+        if (component is AbstractButton) mnemonics.add(component.mnemonic.toChar())
+        if (component is ButtonModel) mnemonics.add(component.mnemonic.toChar())
+        if (component is AbstractColorChooserPanel) mnemonics.add(component.mnemonic.toChar())
+        if (component is DefaultButtonModel) mnemonics.add(component.mnemonic.toChar())
+        if (component is JLabel) mnemonics.add(component.displayedMnemonic.toChar())
+        if (component is JTabbedPane)
+        {
+            for (i in 0..component.tabCount)
+            {
+                mnemonics.add(component.getMnemonicAt(i).toChar())
+            }
+        }
+
+        if (component is Container)
+        {
+            for (childComponent in component.components)
+            {
+                findAllUsedMnemonics(childComponent, mnemonics)
+            }
+        }
+
+        if (convertAllToUpperCase)
+        {
+            val upperCase = mnemonics.map { it.toUpperCase() }
+            mnemonics.clear()
+            mnemonics.addAll(upperCase)
+        }
+    }
+    catch (e: Exception)
+    {
+        LOG.info("[FRC] An exception occurred when finding all used Mnemonics: $e", e)
+    }
+}
+
+
+fun <T> calculateMnemonics(topComponent: JComponent?, elements: Collection<T>, getNameFunction: (T) -> String?): Map<T, Char> 
+        = calculateMnemonics(elements, findAllUsedMnemonics(topComponent), getNameFunction)
+
+fun <T> calculateMnemonics(elements: Collection<T>, unavailableMnemonics: Set<Char>, getNameFunction: (T) -> String?): MutableMap<T, Char>
+{
+    val usedMnemonics = unavailableMnemonics.map{ it.toUpperCase() }.toMutableSet()
+
+    val mnemonicsMap: MutableMap<T, Char> = HashMap()
+    
+    try
+    {
+    
+        // First pass, see if first letter is available
+        elements.forEach { element ->
+            val name = getNameFunction.invoke(element)
+            val first = name?.first()
+            if (first != null && !usedMnemonics.contains(first.toUpperCase()))
+            {
+                usedMnemonics.add(first.toUpperCase())
+                mnemonicsMap[element] = first
+            }
+        }
+    
+        if (mnemonicsMap.size != elements.size)
+        {
+            // Second pass, see if a camel case letter if available
+            elements.forEach { element ->
+                if (!mnemonicsMap.containsKey(element))
+                {
+                    val name = getNameFunction.invoke(element)
+                    if (name != null && name.length >= 2)
+                    {
+                        val chars = name.toCharArray()
+                        // first look for camel casing
+                        camel@ for (char in chars)
+                        {
+                            if (char.isUpperCase() && !usedMnemonics.contains(char.toUpperCase()))
+                            {
+                                usedMnemonics.add(char.toUpperCase())
+                                mnemonicsMap[element] = char
+                                break@camel
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    
+        if (mnemonicsMap.size != elements.size)
+        {
+            // Third pass, just find an available letter, but we look for one in the shortest names 
+            elements.filter { !mnemonicsMap.containsKey(it) && getNameFunction(it)?.length ?: 0 >= 2 }.sortedByDescending { getNameFunction(it)?.length ?: 0 }
+                .forEach {
+                    val name = getNameFunction.invoke(it)
+                    if (name != null && name.length >= 2)
+                    {
+                        val chars = name.toCharArray()
+                        // first look for camel casing
+                        forChars@ for (char in chars)
+                        {
+                            if (!usedMnemonics.contains(char.toUpperCase()))
+                            {
+                                usedMnemonics.add(char.toUpperCase())
+                                mnemonicsMap[it] = char
+                                break@forChars
+                            }
+                        }
+                    }
+                }
+        }
+    }
+    catch (e: Exception)
+    {
+        LOG.info("[FRC] An exception occurred when calculating Mnemonics: $e", e)
+    }
+    return mnemonicsMap
+}
+    

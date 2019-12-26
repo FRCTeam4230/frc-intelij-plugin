@@ -22,8 +22,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import javax.swing.*;
-import javax.swing.border.EtchedBorder;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.diagnostic.Logger;
@@ -49,8 +50,11 @@ import net.javaru.iip.frc.actions.create.advanced.NewFrcClassDialog;
 import net.javaru.iip.frc.util.FindClassUtilsKt;
 import net.javaru.iip.frc.util.FrcCollectionExtsKt;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
+import net.javaru.iip.frc.wpilib.WpiLibConstants;
 
 import static com.intellij.uiDesigner.core.GridConstraints.*;
+import static net.javaru.iip.frc.i18n.FrcBundle.message;
+import static net.javaru.iip.frc.wpilib.WpiLibConstants.COMMAND_V2_INTERFACE_FQN;
 
 
 
@@ -67,7 +71,7 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     private JCheckBox myAutoAppendCommandCheckBox;
     private JPanel mySubsystemsPanel;
     
-    private BiMap<PsiClass, JBCheckBox>  mySubsystemsClassesBiMap;
+    private Map<PsiClass, JBCheckBox> mySubsystemsClassesMap;
     
     public NewFrcCommandClassDialog(@NotNull Module module,
                                     @NotNull ClassCreator classCreator,
@@ -90,71 +94,83 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
             return Unit.INSTANCE;
         });
     
+        initSuperClassPanel();
         initSubsystemSelectionPanel();
     }
     
     protected void initSubsystemSelectionPanel()
     {
-        final List<PsiClass> subsystems = FindClassUtilsKt.findImplementationsInModule(getSubsystemBaseClassFQN(),
+        final String labelText = message("frc.new.class.adv.command.dialog.subsystems.label");
+        final List<PsiClass> subsystems = FindClassUtilsKt.findImplementationsInModule(getSubsystemTopClassFQN(),
                                                                                        myModule,
                                                                                        false,
                                                                                        false,
                                                                                        null);
-        LOG.debug("[FRC] Found the following Subsystem subclasses: " + subsystems);
         
         // TODO: add option to filter out abstract 
-        // boolean isAbstract1 = psiClass.hasModifier(JvmModifier.ABSTRACT); // As of 2019-12-24 this is marked as experimental
-        // boolean isAbstract2 = psiClass.hasModifierProperty(PsiModifier.ABSTRACT);
+        // See our FindClassUtils (to be renamed FrcClassUtils) isAbstract() extension
+        this.mySubsystemsClassesMap = FrcUiUtilsKt.initClassSelectionPanel(myTopPanel, mySubsystemsPanel, labelText, subsystems);
+    }
     
-        final ImmutableBiMap.Builder<PsiClass, JBCheckBox> subSystemsMapBuilder = ImmutableBiMap.builder();
     
-      ;
-        if (!subsystems.isEmpty())
+    protected static BiMap<PsiClass, JBCheckBox> initClassSelectionPanel(JComponent topComponent, JPanel panel, String labelText, List<PsiClass> classes)
+    {
+        final ImmutableBiMap.Builder<PsiClass, JBCheckBox> mapBuilder = ImmutableBiMap.builder();
+        if (!classes.isEmpty())
         {
-            final GridLayoutManager manager = new GridLayoutManager(subsystems.size() + 1, 1);
-            mySubsystemsPanel.setLayout(manager);
+            final int classesCount = classes.size();
+            int rowCount = classesCount + 1;
+            int colCount = 1;
             
-            mySubsystemsPanel.setBorder(new EtchedBorder());
-            
+            if (classesCount > 12)
+            {
+                colCount = 3;
+                rowCount = (classesCount / 3) + 1;
+                if (classesCount % 3 != 0)
+                {
+                    rowCount++;
+                }
+            }
+            else if (classesCount > 6)
+            {
+                colCount = 2;
+                rowCount = (classesCount / 2) + 1;
+                if (classesCount % 2 != 0)
+                {
+                    rowCount++;
+                }
+            }
+        
+            final GridLayoutManager manager = new GridLayoutManager(rowCount, colCount);
+            panel.setLayout(manager);
+        
             final GridConstraints gc = new GridConstraints(0, 0, 1, 1,
-                                                     ANCHOR_WEST,
-                                                     FILL_NONE,
-                                                     (SIZEPOLICY_CAN_GROW | SIZEPOLICY_CAN_SHRINK),
-                                                     SIZEPOLICY_FIXED,
-                                                     new Dimension(-1, -1),
-                                                     new Dimension(-1, -1),
-                                                     new Dimension(-1, -1),
-                                                     1);
+                                                           ANCHOR_WEST,
+                                                           FILL_NONE,
+                                                           (SIZEPOLICY_CAN_GROW | SIZEPOLICY_CAN_SHRINK),
+                                                           SIZEPOLICY_FIXED,
+                                                           new Dimension(-1, -1),
+                                                           new Dimension(-1, -1),
+                                                           new Dimension(-1, -1),
+                                                           1);
+            gc.setColSpan(colCount);
+            JBLabel label = new JBLabel(labelText);
+            panel.add(label, gc);
+            gc.setColSpan(1);
             
-            JBLabel label = new JBLabel("Select required subsystem(s):");
-            mySubsystemsPanel.add(label, gc);
-    
-            subsystems.sort(Comparator.comparing(NavigationItem::getName));
-            final Map<PsiClass, Character> mnemonics = FrcUiUtilsKt.calculateMnemonics(myTopPanel, subsystems, NavigationItem::getName);
+            classes.sort(Comparator.comparing(NavigationItem::getName));
+            final Map<PsiClass, Character> mnemonics = FrcUiUtilsKt.calculateMnemonics(topComponent, classes, NavigationItem::getName);
     
             gc.setIndent(3);
             int row = 0;
-            for (PsiClass subsystem : subsystems)
+            for (PsiClass psiClass : classes)
             {
                 gc.setRow(++row);
-                final JBCheckBox checkBox = new JBCheckBox(subsystem.getName());
-                try
-                {
-                    final Character mnemonic = mnemonics.get(subsystem);
-                    if (mnemonic != null)
-                    {
-                        checkBox.setMnemonic(mnemonic);
-                    }
-                }
-                catch (Exception e)
-                {
-                    LOG.info("[FRC] An exception occurred when assigning a Mnemonic: " + e.toString(), e);
-                }
-                mySubsystemsPanel.add(checkBox, gc);
-                subSystemsMapBuilder.put(subsystem, checkBox);
+                final JBCheckBox checkBox = new JBCheckBox(psiClass.getName());
             }
         }
-        this.mySubsystemsClassesBiMap = subSystemsMapBuilder.build();
+    
+        return mapBuilder.build();
     }
     
     
@@ -184,7 +200,7 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     protected List<PsiClass> getSelectedSubsystems()
     {
         final List<PsiClass> subsystems = new ArrayList<>();
-        for (Entry<PsiClass, JBCheckBox> entry : mySubsystemsClassesBiMap.entrySet())
+        for (Entry<PsiClass, JBCheckBox> entry : mySubsystemsClassesMap.entrySet())
         {
             if (entry.getValue().isSelected())
             {
@@ -195,9 +211,26 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
         return subsystems;
     }
     
-    protected String getSubsystemBaseClassFQN()
+    protected String getSubsystemTopClassFQN()
     {
-        return "edu.wpi.first.wpilibj2.command.Subsystem";
+        return WpiLibConstants.SUBSYSTEM_V2_TOP_FQN;
+    }
+    
+    protected List<PsiClass> getCommandTopClasses()
+    {
+        final ImmutableList.Builder<PsiClass> classes = ImmutableList.builder();
+        classes.add(FindClassUtilsKt.findClass(myModule, COMMAND_V2_INTERFACE_FQN));
+        classes.add(FindClassUtilsKt.findClass(myModule, WpiLibConstants.COMMAND_V2_BASE_FQN));
+    
+        final List<PsiClass> projectImpls = FindClassUtilsKt.findImplementationsInModule(COMMAND_V2_INTERFACE_FQN,
+                                                                                       myModule,
+                                                                                       false,
+                                                                                       false,
+                                                                                       null);
+        final List<PsiClass> list = projectImpls.stream().filter(FindClassUtilsKt::isInterfaceOrAbstract).collect(Collectors.toList());
+        classes.addAll(list);
+    
+        return classes.build();
     }
     
     @NotNull

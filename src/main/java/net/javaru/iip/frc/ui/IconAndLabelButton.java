@@ -18,17 +18,25 @@ package net.javaru.iip.frc.ui;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.*;
 
 import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.diagnostic.Logger;
 
 
 
 public class IconAndLabelButton extends JPanel
 {
+    private static final Logger LOG = Logger.getInstance(IconAndLabelButton.class);
+    
     private static final long serialVersionUID = -392212524102824537L;
     private final AbstractButton button;
     private final JLabel label;
+    private final JComponent spacer;
     
     
     public IconAndLabelButton(AbstractButton button, Icon icon, String text)
@@ -36,11 +44,25 @@ public class IconAndLabelButton extends JPanel
         this.button = button;
         this.label = new JLabel();
         this.label.setLabelFor(this.button);
+        this.spacer = createSpacer();
         setIcon(icon);
         setText(text);
         setLayout(new GridBagLayout());
         add(button);
+        add(spacer); // without the spacer, the label is too tight next to the radioButton or checkBox
         add(getLabel());
+        this.button.addFocusListener(new OurMnemonicSelectionListener());
+        this.label.addMouseListener(new OurLabelClickListener());
+    }
+    
+    private static JComponent createSpacer()
+    {
+        JLabel spacer = new JLabel("");
+        final Dimension size = new Dimension(5, -1);
+        spacer.setMinimumSize(size);
+        spacer.setMaximumSize(size);
+        spacer.setPreferredSize(size);
+        return spacer;
     }
     
     
@@ -131,4 +153,33 @@ public class IconAndLabelButton extends JPanel
         return getLabel().getIcon();
     }
     
+    
+    private void toggleButton()
+    {
+        button.setSelected(!button.isSelected());
+    }
+    
+    
+    class OurMnemonicSelectionListener implements FocusListener
+    {
+    
+        @Override
+        public void focusGained(FocusEvent e)
+        {
+            toggleButton();
+    
+        }
+    
+        @Override
+        public void focusLost(FocusEvent e) {}
+    }
+    
+    class OurLabelClickListener extends MouseAdapter
+    {
+        @Override
+        public void mouseClicked(MouseEvent e)
+        {
+            toggleButton();
+        }
+    }
 }

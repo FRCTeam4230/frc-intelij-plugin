@@ -133,7 +133,7 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
                                                                                      mySubsystemsPanel, 
                                                                                      labelText, 
                                                                                      subsystems,
-                                                                                     false);
+                                                                                     true);
     }
     
     

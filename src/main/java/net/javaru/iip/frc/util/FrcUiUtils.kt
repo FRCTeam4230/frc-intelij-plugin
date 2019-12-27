@@ -17,6 +17,7 @@
 
 package net.javaru.iip.frc.util
 
+import com.intellij.icons.AllIcons
 import com.intellij.navigation.NavigationItem
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
@@ -25,15 +26,18 @@ import com.intellij.openapi.wm.ex.WindowManagerEx
 import com.intellij.psi.PsiClass
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
+import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.uiDesigner.core.GridConstraints
 import com.intellij.uiDesigner.core.GridLayoutManager
+import net.javaru.iip.frc.ui.IconAndLabelButton
 import org.intellij.lang.annotations.Language
 import java.awt.Component
 import java.awt.Container
 import java.awt.Dimension
 import java.util.*
 import javax.swing.AbstractButton
+import javax.swing.ButtonGroup
 import javax.swing.ButtonModel
 import javax.swing.DefaultButtonModel
 import javax.swing.JComponent
@@ -283,33 +287,86 @@ fun <T> calculateMnemonics(elements: Collection<T>, unavailableMnemonics: Set<Ch
 }
 
 @JvmOverloads
-fun initClassSelectionPanel(topComponent: JComponent?,
-                            panel: JPanel,
-                            labelText: String,
-                            classes: List<PsiClass>,
-                            maxItemCols: Int = 4,
-                            maxItemRows: Int = 6,
-                            textCreator: (PsiClass) -> String? = { psiClass -> psiClass.name })
+fun initClassSelectionPanelCheckBoxes(topComponent: JComponent,
+                                      panel: JPanel,
+                                      labelText: String,
+                                      classes: List<PsiClass>,
+                                      includeIcons: Boolean,
+                                      maxItemCols: Int = 4,
+                                      maxItemRows: Int = 6,
+                                      textCreator: (PsiClass) -> String? = { psiClass -> psiClass.name })
         : Map<PsiClass, JBCheckBox>
 {
-    val mutableMap = mutableMapOf<PsiClass, JBCheckBox>()
-    
+    return initClassSelectionPanel(topComponent,
+                                   panel,
+                                   labelText,
+                                   classes,
+                                   includeIcons,
+                                   maxItemCols,
+                                   maxItemRows,
+                                   ::JBCheckBox,
+                                   null,
+                                   textCreator
+                                  )
+
+}
+
+@JvmOverloads
+fun initClassSelectionPanelRadioButtons(topComponent: JComponent,
+                                        panel: JPanel,
+                                        labelText: String,
+                                        buttonGroup: ButtonGroup,
+                                        classes: List<PsiClass>,
+                                        includeIcons: Boolean,
+                                        maxItemCols: Int = 4,
+                                        maxItemRows: Int = 6,
+                                        textCreator: (PsiClass) -> String? = { psiClass -> psiClass.name })
+        : Map<PsiClass, JBRadioButton>
+{
+    return initClassSelectionPanel(topComponent,
+                                   panel,
+                                   labelText,
+                                   classes,
+                                   includeIcons,
+                                   maxItemCols,
+                                   maxItemRows,
+                                   ::JBRadioButton,
+                                   buttonGroup,
+                                   textCreator
+                                  )
+}
+
+@JvmOverloads
+fun <T : AbstractButton> initClassSelectionPanel(topComponent: JComponent,
+                                                 panel: JPanel,
+                                                 labelText: String,
+                                                 classes: List<PsiClass>,
+                                                 includeIcons: Boolean,
+                                                 maxItemCols: Int,
+                                                 maxItemRows: Int,
+                                                 buttonConstructor: () -> T,
+                                                 buttonGroup: ButtonGroup?,
+                                                 textCreator: (PsiClass) -> String? = { psiClass -> psiClass.name })
+        : Map<PsiClass, T>
+{
+    val mutableMap = mutableMapOf<PsiClass, T>()
+
     if (classes.isNotEmpty())
     {
         val classesCount = classes.size
-        
+
         var colCount = classesCount / maxItemRows
-        if (classesCount %  maxItemRows != 0) colCount++
+        if (classesCount % maxItemRows != 0) colCount++
         if (colCount > maxItemCols)
         {
             colCount = maxItemCols
         }
-        
-        var rowCount = classesCount  / colCount
+
+        var rowCount = classesCount / colCount
         if (classesCount % colCount != 0) rowCount++
         
         // if rowCount > maxItemRows, we want to wrap in a scroll pane 
-        val thePanel = if (rowCount > maxItemRows) 
+        val thePanel = if (rowCount > maxItemRows)
         {
             val innerPanel = JPanel(GridLayoutManager(rowCount, colCount))
             val scrollPane = JBScrollPane(innerPanel)
@@ -327,7 +384,7 @@ fun initClassSelectionPanel(topComponent: JComponent?,
                                                   0))
             innerPanel
         }
-        else 
+        else
         {
             panel
         }
@@ -335,7 +392,7 @@ fun initClassSelectionPanel(topComponent: JComponent?,
         
         //Add a row for the label
         rowCount++
-        
+
         val manager = GridLayoutManager(rowCount, colCount)
         thePanel.layout = manager
         val gc = GridConstraints(0, 0, 1, 1,
@@ -347,16 +404,16 @@ fun initClassSelectionPanel(topComponent: JComponent?,
                                  Dimension(-1, -1),
                                  Dimension(-1, -1),
                                  1)
+        gc.isUseParentLayout = false
         gc.colSpan = colCount
         val label = JBLabel(labelText)
         thePanel.add(label, gc)
         gc.colSpan = 1
-        val sortedList = classes.sortedWith(Comparator.comparing { psiClass: PsiClass -> psiClass.name ?: "" })
-        val mnemonics = calculateMnemonics(topComponent, sortedList) { obj: NavigationItem -> obj.name }
         gc.indent = 3
+        val mnemonics = calculateMnemonics(topComponent, classes) { obj: NavigationItem -> obj.name }
         
         var row = 0
-        for (psiClass in sortedList)
+        for (psiClass in classes)
         {
             val text = textCreator.invoke(psiClass)
             if (text != null)
@@ -368,22 +425,43 @@ fun initClassSelectionPanel(topComponent: JComponent?,
                     gc.column = gc.column + 1
                 }
                 gc.row = row
+
+                val optionButton: T = buttonConstructor.invoke()
                 
-                val checkBox = JBCheckBox(text)
-                try
+                optionButton.actionCommand = psiClass.qualifiedName
+                optionButton.toolTipText = psiClass.qualifiedName
+                buttonGroup?.add(optionButton)
+                val mnemonic = mnemonics[psiClass]
+                
+                
+                if (includeIcons)
                 {
-                    val mnemonic = mnemonics.get(psiClass)
+                    val icon =
+                            when
+                            {
+                                psiClass.isInterface  -> AllIcons.Nodes.Interface
+                                psiClass.isAbstract() -> AllIcons.Nodes.AbstractClass
+                                else                  -> AllIcons.Nodes.Class
+                            }
+                    val xButton = IconAndLabelButton(optionButton, icon, text)
+                    xButton.toolTipText = psiClass.qualifiedName
                     if (mnemonic != null)
                     {
-                        checkBox.setMnemonic(mnemonic)
+                        xButton.setMnemonic(mnemonic)
+                    }
+                    thePanel.add(xButton, gc)
+                }
+                else
+                {
+                    thePanel.add(optionButton, gc)
+                    optionButton.text = text
+                    
+                    if (mnemonic != null)
+                    {
+                        optionButton.setMnemonic(mnemonic)
                     }
                 }
-                catch (e: Exception)
-                {
-                    LOG.info("[FRC] An exception occurred when assigning a Mnemonic: $e", e)
-                }
-                thePanel.add(checkBox, gc)
-                mutableMap.put(psiClass, checkBox)
+                mutableMap.put(psiClass, optionButton)
             }
         }
     }

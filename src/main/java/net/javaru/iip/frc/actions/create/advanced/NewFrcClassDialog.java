@@ -19,6 +19,8 @@ package net.javaru.iip.frc.actions.create.advanced;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
@@ -31,8 +33,12 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiNameHelper;
+
+import net.javaru.iip.frc.util.FindClassUtilsKt;
+import net.javaru.iip.frc.util.PsiClassNameComparator;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
@@ -51,6 +57,9 @@ public abstract class NewFrcClassDialog extends DialogWrapper
     @NotNull
     protected final PsiDirectory myDirectory;
     
+    @NotNull
+    protected final NewFrcClassDataProvider myDataProvider;
+    
     
     /**
      * <strong style="font-color: red;">Implmenting classes must call <tt>init()</tt> at the end of their constructors.</strong>
@@ -60,13 +69,15 @@ public abstract class NewFrcClassDialog extends DialogWrapper
      */
     protected NewFrcClassDialog(@NotNull Module module,
                                 @NotNull ClassCreator classCreator,
-                                @NotNull PsiDirectory directory)
+                                @NotNull PsiDirectory directory,
+                                @NotNull NewFrcClassDataProvider dataProvider)
     {
         super(module.getProject());
         this.myModule = module;
         this.myProject = module.getProject();
         this.myClassCreator = classCreator;
         this.myDirectory = directory;
+        this.myDataProvider = dataProvider;
     }
 
 
@@ -78,11 +89,14 @@ public abstract class NewFrcClassDialog extends DialogWrapper
 
         boolean nameIsValid = isProposedClassNameValid();
         @Nullable
-        String createClassErrorMessage = ClassCreator.checkCanCreateClass(myDirectory, getNewClassNameField().getText(), getClassTypeSimpleName());
+        String createClassErrorMessage = ClassCreator.checkCanCreateClass(myDirectory, 
+                                                                          getNewClassNameField().getText(), 
+                                                                          myDataProvider.getClassTypeSimpleName());
         
         if (!nameIsValid)
         {
-            results.add(new ValidationInfo(message("frc.new.class.adv.validation.invalidName", getClassTypeSimpleName()), getNewClassNameField()));
+            results.add(new ValidationInfo(message("frc.new.class.adv.validation.invalidName", myDataProvider.getClassTypeSimpleName()), 
+                                           getNewClassNameField()));
         }
        
         if (createClassErrorMessage != null)
@@ -90,8 +104,6 @@ public abstract class NewFrcClassDialog extends DialogWrapper
             results.add(new ValidationInfo(createClassErrorMessage, getNewClassNameField()));
         }
     
-        
-
         results.addAll(doAdditionalValidation());
         // Everything is valid
         return results.build();
@@ -107,14 +119,8 @@ public abstract class NewFrcClassDialog extends DialogWrapper
         return Collections.emptyList();
     }
     
-    /**
-     * Returns the simple name of the class type being created for use in Dialogs and error messages. For example: 'Command", 'Subsystem', etc.
-     * @return the simple name of the class type being created for use in Dialogs and error messages. For example: 'Command", 'Subsystem', etc.
-     */
+    
     @NotNull
-    protected abstract String getClassTypeSimpleName();
-
-
     protected abstract JTextComponent getNewClassNameField();
     
     /**
@@ -178,8 +184,110 @@ public abstract class NewFrcClassDialog extends DialogWrapper
     @Override
     public String getTitle()
     {
-        return message("frc.new.class.adv.general.dialog.title", getClassTypeSimpleName());
+        return message("frc.new.class.adv.general.dialog.title", myDataProvider.getClassTypeSimpleName());
     }
     
     
+    protected List<PsiClass> getExtendableClasses()
+    {
+        final ImmutableList.Builder<PsiClass> classes = ImmutableList.builder();
+        
+        final String typicalBaseClassFqName = myDataProvider.getTypicalBaseClassFqName();
+        final String topLevelClassFqName = myDataProvider.getTopLevelClassFqName();
+        
+        
+        final PsiClass[] foundBaseClasses = FindClassUtilsKt.findClass(myProject, typicalBaseClassFqName);
+        classes.add(foundBaseClasses);
+        
+        final PsiClass[] topLevelClasses;
+        
+        if (!topLevelClassFqName.equals(typicalBaseClassFqName))
+        {
+            topLevelClasses = FindClassUtilsKt.findClass(myProject, topLevelClassFqName);
+            classes.add(topLevelClasses);
+        }
+        else
+        {
+            topLevelClasses = foundBaseClasses;
+        }
+        
+        
+        // We should only find the one interface, but the easiest way to handle is to iterate over them.
+        for (PsiClass foundInterface : topLevelClasses)
+        {
+            List<PsiClass> projectImpls = findProjectBaseImpls(foundInterface);
+            classes.addAll(projectImpls);
+        }
+        
+        return classes.build();
+    }
+    
+    
+    /**
+     * Returns an immutable List of all 'base' implementations of the provided top level class, This
+     * includes all interfaces and abstract classes that implement or extend the provided top level
+     * class, as well as any classes that have a "Base Class" name, as returned by 
+     * {@link #isBaseClass(PsiClass)}.
+     * 
+     * @param topLevelClassFqName the top level interface or (abstract) class name to find an implementation for.
+     */
+    @NotNull
+    protected List<PsiClass> findProjectBaseImpls(String topLevelClassFqName)
+    {
+        final List<PsiClass> implementations = FindClassUtilsKt.findImplementationsInModule(topLevelClassFqName,
+                                                                                            myModule,
+                                                                                            false,
+                                                                                            false,
+                                                                                            null);
+        return doFindProjectBaseImplsProcessing(implementations);
+    }
+    
+    /**
+     * Returns an immutable List of all 'base' implementations of the provided top level class, This
+     * includes all interfaces and abstract classes that implement or extend the provided top level
+     * class, as well as any classes that have a "Base Class" name, as returned by 
+     * {@link #isBaseClass(PsiClass)}.
+     * 
+     * @param topLevelClass the top level interface or (abstract) class name to find an implementation for.
+     */
+    @NotNull
+    protected List<PsiClass> findProjectBaseImpls(PsiClass topLevelClass)
+    {
+        final List<PsiClass> implementations = FindClassUtilsKt.findImplementationsInModule(topLevelClass,
+                                                                                                    myModule,
+                                                                                                    false,
+                                                                                                    false,
+                                                                                                    null);
+        return doFindProjectBaseImplsProcessing(implementations);                       
+    }
+    
+    
+    @NotNull
+    protected List<PsiClass> doFindProjectBaseImplsProcessing(List<PsiClass> foundImplementations)
+    {
+        return foundImplementations.stream()
+                                   .filter(this::isBaseClass)
+                                   .sorted(PsiClassNameComparator.INSTANCE)
+                                   .collect(Collectors.toList());
+    }
+    
+    /**
+     * Determines if a PsiClass is a 'Base Class', returning true if the PsiClass is an interface, is abstract, or
+     * has a 'Base Name' ending such as 'CommandBase' or 'BaseCommand' in the case of a Command. Just having 'Base'
+     * in the name however does not make it a 'Base Class'. 
+     */
+    protected boolean isBaseClass(PsiClass psiClass)
+    {
+        @Nullable
+        final String name = psiClass.getName();
+        
+        boolean isBaseClass = false;
+        if (name != null)
+        {
+            final Set<String> baseNames = myDataProvider.getClassTypeBaseNames();
+            isBaseClass = baseNames.stream().anyMatch(name::endsWith);
+        }
+        
+        return isBaseClass || FindClassUtilsKt.isInterfaceOrAbstract(psiClass);
+    }
 }

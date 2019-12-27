@@ -256,3 +256,26 @@ fun PsiClass.isAbstract(): Boolean
 }
 
 fun PsiClass.isInterfaceOrAbstract(): Boolean = this.isInterface || this.isAbstract()
+
+fun MutableList<PsiClass>.sortByName()
+{
+    this.sortWith(PsiClassNameComparator)
+    
+}
+
+fun Collection<PsiClass>.sortedByName(): List<PsiClass>
+{
+    val mutableList = this.toMutableList()
+    mutableList.sortByName()
+    return mutableList
+}
+
+object PsiClassNameComparator: Comparator<PsiClass>
+{
+    override fun compare(o1: PsiClass?, o2: PsiClass?): Int
+    {
+        val name1 = if (o1?.name == null) "" else o1.name!!
+        val name2 = if (o2?.name == null) "" else o2.name!!
+        return name1.compareTo(name2)
+    }
+}

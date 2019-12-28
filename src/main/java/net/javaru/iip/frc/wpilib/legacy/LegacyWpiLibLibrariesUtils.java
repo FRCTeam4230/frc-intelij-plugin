@@ -54,7 +54,7 @@ import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.impl.compiled.ClassFileDecompiler;
 
 import net.javaru.iip.frc.i18n.FrcBundle;
-import net.javaru.iip.frc.util.FindClassUtilsKt;
+import net.javaru.iip.frc.util.FrcClassUtilsKt;
 import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.wpilib.WpiLibConstants;
 import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloader;
@@ -62,7 +62,7 @@ import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionExtKt;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl;
 
-import static net.javaru.iip.frc.util.FindClassUtilsKt.isLibraryPresent;
+import static net.javaru.iip.frc.util.FrcClassUtilsKt.isLibraryPresent;
 
 
 
@@ -456,7 +456,7 @@ public class LegacyWpiLibLibrariesUtils
         }
 
         
-        final PsiClass[] verClass = FindClassUtilsKt.findClass(project, WpiLibConstants.VERSION_CLASS_FQN);
+        final PsiClass[] verClass = FrcClassUtilsKt.findClass(project, WpiLibConstants.VERSION_CLASS_FQN);
         
         if (verClass.length == 0)
         {

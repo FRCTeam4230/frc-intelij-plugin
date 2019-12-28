@@ -40,7 +40,7 @@ import com.intellij.ui.components.JBTextField;
 import kotlin.Unit;
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 import net.javaru.iip.frc.actions.create.advanced.NewFrcClassDialog;
-import net.javaru.iip.frc.util.FindClassUtilsKt;
+import net.javaru.iip.frc.util.FrcClassUtilsKt;
 import net.javaru.iip.frc.util.FrcCollectionExtsKt;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
 import net.javaru.iip.frc.util.PsiClassNameComparator;
@@ -121,14 +121,14 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     protected void initSubsystemSelectionPanel()
     {
         final String labelText = message("frc.new.class.adv.command.dialog.subsystems.label");
-        List<PsiClass> subsystems = FindClassUtilsKt.findImplementationsInModule(getSubsystemTopClassFQN(),
-                                                                                       myModule,
-                                                                                       false,
-                                                                                       false,
-                                                                                       null);
-        subsystems = FindClassUtilsKt.sortedByName(subsystems);
+        List<PsiClass> subsystems = FrcClassUtilsKt.findImplementationsInModule(getSubsystemTopClassFQN(),
+                                                                                myModule,
+                                                                                false,
+                                                                                false,
+                                                                                null);
+        subsystems = FrcClassUtilsKt.sortedByName(subsystems);
         // TODO: add option to filter out abstract 
-        // See our FindClassUtils (to be renamed FrcClassUtils) isAbstract() extension
+        // See our FrcClassUtilsKt.isAbstract() extension
         this.mySubsystemsClassesMap = FrcUiUtilsKt.initClassSelectionPanelCheckBoxes(myTopPanel, 
                                                                                      mySubsystemsPanel, 
                                                                                      labelText, 

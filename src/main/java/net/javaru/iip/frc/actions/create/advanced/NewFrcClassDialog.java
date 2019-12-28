@@ -37,7 +37,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiNameHelper;
 
-import net.javaru.iip.frc.util.FindClassUtilsKt;
+import net.javaru.iip.frc.util.FrcClassUtilsKt;
 import net.javaru.iip.frc.util.PsiClassNameComparator;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
@@ -196,14 +196,14 @@ public abstract class NewFrcClassDialog extends DialogWrapper
         final String topLevelClassFqName = myDataProvider.getTopLevelClassFqName();
         
         
-        final PsiClass[] foundBaseClasses = FindClassUtilsKt.findClass(myProject, typicalBaseClassFqName);
+        final PsiClass[] foundBaseClasses = FrcClassUtilsKt.findClass(myProject, typicalBaseClassFqName);
         classes.add(foundBaseClasses);
         
         final PsiClass[] topLevelClasses;
         
         if (!topLevelClassFqName.equals(typicalBaseClassFqName))
         {
-            topLevelClasses = FindClassUtilsKt.findClass(myProject, topLevelClassFqName);
+            topLevelClasses = FrcClassUtilsKt.findClass(myProject, topLevelClassFqName);
             classes.add(topLevelClasses);
         }
         else
@@ -234,11 +234,11 @@ public abstract class NewFrcClassDialog extends DialogWrapper
     @NotNull
     protected List<PsiClass> findProjectBaseImpls(String topLevelClassFqName)
     {
-        final List<PsiClass> implementations = FindClassUtilsKt.findImplementationsInModule(topLevelClassFqName,
-                                                                                            myModule,
-                                                                                            false,
-                                                                                            false,
-                                                                                            null);
+        final List<PsiClass> implementations = FrcClassUtilsKt.findImplementationsInModule(topLevelClassFqName,
+                                                                                           myModule,
+                                                                                           false,
+                                                                                           false,
+                                                                                           null);
         return doFindProjectBaseImplsProcessing(implementations);
     }
     
@@ -253,11 +253,11 @@ public abstract class NewFrcClassDialog extends DialogWrapper
     @NotNull
     protected List<PsiClass> findProjectBaseImpls(PsiClass topLevelClass)
     {
-        final List<PsiClass> implementations = FindClassUtilsKt.findImplementationsInModule(topLevelClass,
-                                                                                                    myModule,
-                                                                                                    false,
-                                                                                                    false,
-                                                                                                    null);
+        final List<PsiClass> implementations = FrcClassUtilsKt.findImplementationsInModule(topLevelClass,
+                                                                                           myModule,
+                                                                                           false,
+                                                                                           false,
+                                                                                           null);
         return doFindProjectBaseImplsProcessing(implementations);                       
     }
     
@@ -288,6 +288,6 @@ public abstract class NewFrcClassDialog extends DialogWrapper
             isBaseClass = baseNames.stream().anyMatch(name::endsWith);
         }
         
-        return (isBaseClass || FindClassUtilsKt.isInterfaceOrAbstract(psiClass)) && FindClassUtilsKt.isOpen(psiClass);
+        return (isBaseClass || FrcClassUtilsKt.isInterfaceOrAbstract(psiClass)) && FrcClassUtilsKt.isOpen(psiClass);
     }
 }

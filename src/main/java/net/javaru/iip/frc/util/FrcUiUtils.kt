@@ -349,6 +349,9 @@ fun <T : AbstractButton> initClassSelectionPanel(topComponent: JComponent,
                                                  textCreator: (PsiClass) -> String? = { psiClass -> psiClass.name })
         : Map<PsiClass, T>
 {
+    // TODO add a context Help icon -- use com.intellij.ui.ContextHelpLabel, which displays an AllIcons.General.ContextHelp icon -- next 
+    //      to the label to explain how items are selected have an optional/nullable FrcMessageKey passed in for the message to 
+    //      displayed when it's hovered over.
     val mutableMap = mutableMapOf<PsiClass, T>()
 
     if (classes.isNotEmpty())

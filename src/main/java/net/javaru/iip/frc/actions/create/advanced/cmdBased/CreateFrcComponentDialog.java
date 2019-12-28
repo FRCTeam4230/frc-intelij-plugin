@@ -45,6 +45,7 @@ import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.components.JBTextField;
 
 import kotlin.Unit;
+import kotlin.collections.CollectionsKt;
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider;
 import net.javaru.iip.frc.util.FrcClassUtilsKt;
@@ -146,26 +147,41 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     
         initSuperClassPanel();
         initOptionsPanel(myTopPanel, myOptionsPanel);
+        
+        if (myOptionsPanel.getComponents().length == 0)
+        {
+            myTopPanel.remove(myOptionsPanel);
+        }
     }
+    
     
     protected void initSuperClassPanel()
     {
         final String labelText = message("frc.new.class.adv.general.dialog.componentBase.label");
         final List<PsiClass> classes = getExtendableClasses();
-        this.myTopLevelComponentClassesMap = FrcUiUtilsKt.initClassSelectionPanelRadioButtons(myTopPanel,
-                                                                                              mySuperClassPanel,
-                                                                                              labelText,
-                                                                                              mySuperButtonGroup,
-                                                                                              classes,
-                                                                                              true);
-    
-        final Set<Entry<PsiClass, JBRadioButton>> entries = this.myTopLevelComponentClassesMap.entrySet();
-        for (Entry<PsiClass, JBRadioButton> entry : entries)
+        
+        myTopLevelComponentClassesMap = FrcUiUtilsKt.initClassSelectionPanelRadioButtons(myTopPanel,
+                                                                                         mySuperClassPanel,
+                                                                                         labelText,
+                                                                                         mySuperButtonGroup,
+                                                                                         classes,
+                                                                                         true);
+        
+        if (myTopLevelComponentClassesMap.size() == 1)
         {
-            // TODO: modify to use last selected value
-            if (myDataProvider.getTypicalBaseClassFqName().equals(entry.getKey().getQualifiedName()))
+            CollectionsKt.first(myTopLevelComponentClassesMap.values()).setSelected(true);
+            myTopPanel.remove(mySuperClassPanel);
+        }
+        else
+        {
+            final Set<Entry<PsiClass, JBRadioButton>> entries = myTopLevelComponentClassesMap.entrySet();
+            for (Entry<PsiClass, JBRadioButton> entry : entries)
             {
-                entry.getValue().setSelected(true);
+                // TODO: modify to use last selected value
+                if (myDataProvider.getTypicalBaseClassFqName().equals(entry.getKey().getQualifiedName()))
+                {
+                    entry.getValue().setSelected(true);
+                }
             }
         }
     }
@@ -173,7 +189,8 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     
     /**
      * Initializes the lower options panel for component specific UI options. 
-     * @param topPanel the main parent panel. <strong>Implementations should avoid modifying this panel</strong> It is provided for determining used mneumonics
+     * @param topPanel the main parent panel. <strong>Implementations should avoid modifying this panel</strong> It is 
+     *                 provided primarily for determining used mnemonics
      * @param optionsPanel the options panel to be initialized.
      */
     protected void initOptionsPanel(JPanel topPanel, JPanel optionsPanel)

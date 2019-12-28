@@ -59,7 +59,7 @@ public abstract class AbstractAdvancedNewFrcClassAction extends CreateInDirector
     protected abstract CreateFrcComponentDialog constructCreateFrcComponentDialogInstance(@NotNull Module module,
                                                                                           @NotNull ClassCreator classCreator,
                                                                                           @NotNull PsiDirectory directory);
-    
+    protected abstract CreateFrcComponentDataProvider getDataProvider();
     
     
     @Override

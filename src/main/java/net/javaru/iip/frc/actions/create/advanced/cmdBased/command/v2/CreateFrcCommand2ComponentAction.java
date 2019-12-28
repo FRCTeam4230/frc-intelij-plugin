@@ -25,6 +25,7 @@ import com.intellij.psi.PsiDirectory;
 
 import net.javaru.iip.frc.FrcIcons;
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
+import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider;
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.command.CreateCommandComponentDialog;
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.CreateFrcComponentDialog;
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractAdvancedNewFrcCmdBaseV2Action;
@@ -39,6 +40,9 @@ public class CreateFrcCommand2ComponentAction extends AbstractAdvancedNewFrcCmdB
     
     private static final Icon ICON = FrcIcons.Components.COMMAND;
     
+    @NotNull
+    private CreateFrcCommandV2DataProvider dataProvider = CreateFrcCommandV2DataProvider.INSTANCE;
+    
     public CreateFrcCommand2ComponentAction()
     {
         super(message("frc.new.class.command.action.name"),
@@ -52,13 +56,20 @@ public class CreateFrcCommand2ComponentAction extends AbstractAdvancedNewFrcCmdB
                                                                                  @NotNull ClassCreator classCreator,
                                                                                  @NotNull PsiDirectory directory)
     {
-        return new CreateCommandComponentDialog(module, classCreator, directory, CreateFrcCommandV2DataProvider.INSTANCE);
+        return new CreateCommandComponentDialog(module, classCreator, directory, dataProvider);
     }
     
     
     @Override
     protected ClassCreator constructClassCreatorInstance(@NotNull Module module)
     {
-        return new FrcCommand2ComponentCreator(module);
+        return new ClassCreator(module, dataProvider);
+    }
+    
+    
+    @Override
+    protected CreateFrcComponentDataProvider getDataProvider()
+    {
+        return dataProvider;
     }
 }

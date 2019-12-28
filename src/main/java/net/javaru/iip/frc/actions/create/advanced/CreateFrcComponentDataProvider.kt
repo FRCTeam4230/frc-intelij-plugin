@@ -64,10 +64,12 @@ abstract class CreateFrcComponentDataProvider
         return@lazy ImmutableSet.copyOf(names)
     }
 
-    /** Returns the highest level interface of class that defines the FRC component. */
+    /** Returns the highest level interface or class that defines the FRC component. */
     abstract val topLevelClassFqName: String
     
     /** Returns the typical base class or interface that is extended or implemented by users when creating this FRC component. 
      * This may or may not be the same value as the [topLevelClassFqName]. */
     abstract val typicalBaseClassFqName: String
+    
+    abstract val fileTemplateName: String
 }

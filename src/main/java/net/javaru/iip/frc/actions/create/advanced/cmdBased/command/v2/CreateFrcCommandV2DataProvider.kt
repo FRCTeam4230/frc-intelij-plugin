@@ -18,6 +18,7 @@ package net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2
 
 import com.google.common.collect.ImmutableList
 import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider
+import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory
 import net.javaru.iip.frc.wpilib.WpiLibConstants
 
 
@@ -27,4 +28,5 @@ object CreateFrcCommandV2DataProvider : CreateFrcComponentDataProvider()
     override val classTypeSimpleNames: List<String> by lazy { ImmutableList.of("Command", "Cmd") }
     override val topLevelClassFqName: String = WpiLibConstants.COMMAND_V2_INTERFACE_FQN
     override val typicalBaseClassFqName: String = WpiLibConstants.COMMAND_V2_BASE_FQN
+    override val fileTemplateName: String =  FrcFileTemplateGroupDescriptorFactory.COMMAND2.fileName
 }

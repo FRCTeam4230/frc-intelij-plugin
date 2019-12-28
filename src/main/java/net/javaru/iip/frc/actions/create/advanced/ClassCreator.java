@@ -41,30 +41,28 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
-public abstract class ClassCreator
+public class ClassCreator
 {
     private static final Logger LOG = Logger.getInstance(ClassCreator.class);
     
     
     @NotNull
     private final Project myProject;
+    @SuppressWarnings("FieldCanBeLocal")
     @NotNull
     private final Module myModule;
+    @NotNull
+    private final CreateFrcComponentDataProvider dataProvider;
 
     private PsiClass[] createdClasses = null;
 
-    
 
-    protected ClassCreator(@NotNull Module module)
+    public ClassCreator(@NotNull Module module, @NotNull CreateFrcComponentDataProvider dataProvider)
     {
         this.myModule = module;
         this.myProject = module.getProject();
+        this.dataProvider = dataProvider;
     }
-    
-    
-    @NotNull
-    protected abstract String getClassTemplateName();
-    
     
     PsiClass[] getCreatedClasses()
     {
@@ -78,7 +76,7 @@ public abstract class ClassCreator
     {
         return doCreateClass(() -> {
             final PsiClass psiClass = createSingleClass(name,
-                                                        getClassTemplateName(),
+                                                        dataProvider.getFileTemplateName(),
                                                         directory,
                                                         additionalProperties);
             createdClasses = new PsiClass[] {psiClass};

@@ -137,9 +137,10 @@ public abstract class NewFrcClassDialog extends DialogWrapper
      *                          `frc.robot.commands.claw` since the user is asking for the the `claw` subpackage
      *                          to be used.
      * 
+     * @param newClassName      the name of the new component class
      * @return a map of additional properties to pass into the Velocity Template
      */
-    protected abstract Map<String, String> getAdditionalProperties(@NotNull String targetPackageName);
+    protected abstract Map<String, String> getAdditionalProperties(@NotNull String targetPackageName, @NotNull  String newClassName);
     
     
     /**
@@ -189,7 +190,7 @@ public abstract class NewFrcClassDialog extends DialogWrapper
             }
         }
     
-        Map<String, String> additionalProperties = getAdditionalProperties(pkgName.toString());
+        Map<String, String> additionalProperties = getAdditionalProperties(pkgName.toString(), newClassName);
         
         if (myClassCreator.createClass(newClassName,
                                        myDirectory,
@@ -307,14 +308,21 @@ public abstract class NewFrcClassDialog extends DialogWrapper
     {
         @Nullable
         final String name = psiClass.getName();
-        
+    
+        boolean isBaseClass = isBaseClassName(name);
+    
+        return (isBaseClass || FrcClassUtilsKt.isInterfaceOrAbstract(psiClass)) && FrcClassUtilsKt.isOpen(psiClass);
+    }
+    
+    
+    protected boolean isBaseClassName(String name)
+    {
         boolean isBaseClass = false;
         if (name != null)
         {
             final Set<String> baseNames = myDataProvider.getClassTypeBaseNames();
             isBaseClass = baseNames.stream().anyMatch(name::endsWith);
         }
-        
-        return (isBaseClass || FrcClassUtilsKt.isInterfaceOrAbstract(psiClass)) && FrcClassUtilsKt.isOpen(psiClass);
+        return isBaseClass;
     }
 }

@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
@@ -60,6 +61,7 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     public static final String BASE_CLASS_EXTENDS_CLAUSE = "baseClassExtendsClause";
     public static final String NEEDS_GET_REQUIREMENTS = "needsGetRequirementsImpl";
     public static final String INCLUDE_JAVADOC_FOR_OVERRIDES = "includeJavaDocsForOverrides";
+    public static final String MAKE_ABSTRACT = "makeAbstract";
     
     private static final Logger LOG = Logger.getInstance(NewFrcCommandClassDialog.class);
     private JPanel myTopPanel;
@@ -146,12 +148,12 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     
     
     @Override
-    protected Map<String, String> getAdditionalProperties(@NotNull String targetPackageName)
+    protected Map<String, String> getAdditionalProperties(@NotNull String targetPackageName, @NotNull String newClassName)
     {
         ImmutableMap.Builder<String, String> props = ImmutableMap.builder();
         addGeneralProperties(props);
         addSubSystemProperties(props);
-        addBaseClassProperties(props, targetPackageName);
+        addBaseClassProperties(props, targetPackageName, newClassName);
         return props.build();
     }
     
@@ -174,7 +176,7 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
         props.put(SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST, subSystemsVarNames);
     }
     
-    protected void addBaseClassProperties(@NotNull ImmutableMap.Builder<String, String> props, @NotNull String targetPackageName)
+    protected void addBaseClassProperties(@NotNull Builder<String, String> props, @NotNull String targetPackageName, @NotNull String newClassName)
     {
         PsiClass base = null;
         for (Entry<PsiClass, JBRadioButton> entry : myTopLevelCommandClassesMap.entrySet())
@@ -209,6 +211,7 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
         final String baseName = base.getName() != null ? base.getName() : myDataProvider.getTypicalBaseClassFqName().substring(myDataProvider.getTypicalBaseClassFqName().lastIndexOf('.') + 1);
         final String extendsClause = base.isInterface() ? "implements " + baseName : "extends " + baseName;
         props.put(BASE_CLASS_EXTENDS_CLAUSE, extendsClause);
+        props.put(MAKE_ABSTRACT, Boolean.toString(newClassName.contains("Abstract")));
         // TODO it'd be nice to make this more sophisticated (to handle the event of a custom interface that has the getRequirements as a default
         props.put(NEEDS_GET_REQUIREMENTS, Boolean.toString(base.isInterface()));
     }
@@ -249,9 +252,10 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     @Override
     protected String getNewClassName()
     {
-        return myAutoAppendCommandCheckBox.isEnabled() && myAutoAppendCommandCheckBox.isSelected() 
-               ? myCommandNameTextField.getText().trim() + "Command" 
-               : myCommandNameTextField.getText().trim();
+        final String name = getNewClassNameField().getText().trim();
+        return myAutoAppendCommandCheckBox.isEnabled() && myAutoAppendCommandCheckBox.isSelected() && !isBaseClassName(name)
+               ? name + "Command" 
+               : name;
     }
 }    
 

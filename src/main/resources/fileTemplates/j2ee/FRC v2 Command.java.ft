@@ -34,7 +34,7 @@ import java.util.Set;
 #end
 
 #parse("File Header.java")
-public class ${NAME} ${baseClassExtendsClause} 
+public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtendsClause} 
 {
 #foreach($subSystemName in $requiredSubsystemsNamesArray)
     private final $subSystemName $requiredSubsystemsVarsArray[$foreach.index];
@@ -121,8 +121,8 @@ private final Set<Subsystem> subsystems;
     {
         
     }
-    
 #if ($needsGetRequirementsImpl == "true")
+
 #if($includeJavaDocsForOverrides == "true")
     /**
      * <p>

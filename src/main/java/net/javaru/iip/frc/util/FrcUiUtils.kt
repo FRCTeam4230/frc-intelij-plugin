@@ -17,6 +17,7 @@
 
 package net.javaru.iip.frc.util
 
+import com.google.common.collect.ImmutableMap
 import com.intellij.icons.AllIcons
 import com.intellij.navigation.NavigationItem
 import com.intellij.openapi.diagnostic.Logger
@@ -352,7 +353,7 @@ fun <T : AbstractButton> initClassSelectionPanel(topComponent: JComponent,
     // TODO add a context Help icon -- use com.intellij.ui.ContextHelpLabel, which displays an AllIcons.General.ContextHelp icon -- next 
     //      to the label to explain how items are selected have an optional/nullable FrcMessageKey passed in for the message to 
     //      displayed when it's hovered over.
-    val mutableMap = mutableMapOf<PsiClass, T>()
+    val mapBuilder = ImmutableMap.builder<PsiClass, T>()
 
     if (classes.isNotEmpty())
     {
@@ -459,9 +460,9 @@ fun <T : AbstractButton> initClassSelectionPanel(topComponent: JComponent,
                         optionButton.setMnemonic(mnemonic)
                     }
                 }
-                mutableMap.put(psiClass, optionButton)
+                mapBuilder.put(psiClass, optionButton)
             }
         }
     }
-    return mutableMap.toMap()
+    return mapBuilder.build()
 }

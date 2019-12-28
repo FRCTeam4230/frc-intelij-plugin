@@ -92,7 +92,7 @@ public abstract class ClassCreator
     /**
      * Executes the creation process in a WriteActionCommand. The supplied action should set the createdClasses field.
      * 
-     * @return whether the class was created (which indicates whether the create class dialog can be closed).
+     * @return whether the class was created (which indicates whether the CreateFrcComponentDialog can be closed).
      */
     protected boolean doCreateClass(Callable<Boolean> action)
     {

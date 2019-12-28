@@ -10,6 +10,6 @@ The flow:
 * AbstractAdvancedNewFrcClassAction
 ** actionPerformed() 
 *** invokeDialog()
-**** NewFrcComponentDialog.show()
-**** NewFrcComponentDialog.doOKAction()
-***** ComponentCreator.create()
+**** CreateFrcComponentDialog.show()
+**** CreateFrcComponentDialog.doOKAction()
+***** ClassCreator.create()

@@ -51,7 +51,7 @@ private final Set<Subsystem> subsystems;
          this.$subSystemVar = $subSystemVar;
     #end
     #if ($needsGetRequirementsImpl == "true")
-        this.subsystems =Set.of(#foreach($subSystemVar in $requiredSubsystemsVarsArray)$subSystemVar#if($foreach.hasNext), #end#end);
+        this.subsystems = Set.of(#foreach($subSystemVar in $requiredSubsystemsVarsArray)$subSystemVar#if($foreach.hasNext), #end#end);
     #else    
         #if (!$requiredSubsystemsVarsArray.isEmpty())
         addRequirements(#foreach($subSystemVar in $requiredSubsystemsVarsArray)$subSystemVar#if($foreach.hasNext), #end#end);

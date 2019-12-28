@@ -78,7 +78,7 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
                                     @NotNull ClassCreator classCreator,
                                     @NotNull PsiDirectory directory)
     {
-        super(module, classCreator, directory, NewFrcCommandClassDataProvider.INSTANCE);
+        super(module, classCreator, directory, NewFrcCommandClassV2DataProvider.INSTANCE);
         setTitle(getTitle());
         initUiComponents();
         init(); //from DialogWrapper SHOULD BE LAST STATEMENT IN CONSTRUCTOR 

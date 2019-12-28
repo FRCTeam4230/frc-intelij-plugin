@@ -20,7 +20,7 @@ import net.javaru.iip.frc.actions.create.advanced.NewFrcClassDataProvider
 import net.javaru.iip.frc.wpilib.WpiLibConstants
 
 
-object NewFrcCommandClassDataProvider : NewFrcClassDataProvider()
+object NewFrcCommandClassV2DataProvider : NewFrcClassDataProvider()
 {
     override val classTypeSimpleName: String = "Command"
     override val classTypeSimpleNames: List<String> by lazy { listOf("Command", "Cmd") }

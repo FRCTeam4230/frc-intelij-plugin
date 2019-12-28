@@ -25,32 +25,31 @@ import java.awt.event.MouseEvent;
 import javax.swing.*;
 
 import org.jetbrains.annotations.Nullable;
-import com.intellij.openapi.diagnostic.Logger;
 
 
 
 public class IconAndLabelButton extends JPanel
 {
-    private static final Logger LOG = Logger.getInstance(IconAndLabelButton.class);
+    //private static final Logger LOG = Logger.getInstance(IconAndLabelButton.class);
     
     private static final long serialVersionUID = -392212524102824537L;
     private final AbstractButton button;
     private final JLabel label;
-    private final JComponent spacer;
-    
+    private boolean buttonHasMouseHover = false;
     
     public IconAndLabelButton(AbstractButton button, Icon icon, String text)
     {
         this.button = button;
         this.label = new JLabel();
         this.label.setLabelFor(this.button);
-        this.spacer = createSpacer();
+        final JComponent spacer = createSpacer();
         setIcon(icon);
         setText(text);
         setLayout(new GridBagLayout());
         add(button);
         add(spacer); // without the spacer, the label is too tight next to the radioButton or checkBox
         add(getLabel());
+        this.button.addMouseListener(new OurButtonMouseStatusListener());
         this.button.addFocusListener(new OurMnemonicSelectionListener());
         this.label.addMouseListener(new OurLabelClickListener());
     }
@@ -162,16 +161,31 @@ public class IconAndLabelButton extends JPanel
     
     class OurMnemonicSelectionListener implements FocusListener
     {
-    
         @Override
         public void focusGained(FocusEvent e)
         {
-            toggleButton();
+            if (!buttonHasMouseHover) toggleButton();
     
         }
     
         @Override
         public void focusLost(FocusEvent e) {}
+    }
+    
+    class OurButtonMouseStatusListener extends MouseAdapter
+    {
+        @Override
+        public void mouseEntered(MouseEvent e)
+        {
+            buttonHasMouseHover = true;
+        }
+    
+    
+        @Override
+        public void mouseExited(MouseEvent e)
+        {
+            buttonHasMouseHover = false;
+        }
     }
     
     class OurLabelClickListener extends MouseAdapter

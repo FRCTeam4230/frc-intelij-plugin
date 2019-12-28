@@ -67,7 +67,7 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     private JPanel myTopPanel;
     private JBLabel myCommandNameLabel;
     private JBTextField myCommandNameTextField;
-    private JCheckBox myAutoAppendCommandCheckBox;
+    private JCheckBox myAutoAppendComponentTypeCheckBox;
     private JPanel mySubsystemsPanel;
     private JPanel mySuperClassPanel;
     private JCheckBox myIncludeJavaDocCheckBox;
@@ -90,19 +90,18 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     protected void initUiComponents()
     {
         //TODO init to last used
-        myAutoAppendCommandCheckBox.setSelected(true);
+        myAutoAppendComponentTypeCheckBox.setSelected(true);
+        myAutoAppendComponentTypeCheckBox.setText(message("frc.new.class.adv.general.dialog.autoAppend.text", myDataProvider.getClassTypeSimpleName()));
+        
         myIncludeJavaDocCheckBox.setSelected(true);
     
         FrcUiUtilsKt.addTextChangedListener(myCommandNameTextField, (documentEvent, text) -> {
-            myAutoAppendCommandCheckBox.setEnabled(!myCommandNameTextField.getText().endsWith("Command") && 
-                                                   !myCommandNameTextField.getText().endsWith("Cmd") &&
-                                                   !myCommandNameTextField.getText().endsWith("CommandBase") &&
-                                                   !myCommandNameTextField.getText().endsWith("CmdBase"));
+            myAutoAppendComponentTypeCheckBox.setEnabled(nameCanBeAutoAppended(myCommandNameTextField.getText().trim()));
             return Unit.INSTANCE;
         });
     
         initSuperClassPanel();
-        initSubsystemSelectionPanel();
+        initOptionsPanel();
     }
     
     protected void initSuperClassPanel()
@@ -127,6 +126,10 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
         }
     }
     
+    protected void initOptionsPanel()
+    {
+        initSubsystemSelectionPanel();
+    }
     
     protected void initSubsystemSelectionPanel()
     {
@@ -253,8 +256,8 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     protected String getNewClassName()
     {
         final String name = getNewClassNameField().getText().trim();
-        return myAutoAppendCommandCheckBox.isEnabled() && myAutoAppendCommandCheckBox.isSelected() && !isBaseClassName(name)
-               ? name + "Command" 
+        return myAutoAppendComponentTypeCheckBox.isEnabled() && myAutoAppendComponentTypeCheckBox.isSelected() && !isBaseClassName(name)
+               ? name + myDataProvider.getClassTypeSimpleName() 
                : name;
     }
 }    

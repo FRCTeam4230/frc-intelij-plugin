@@ -130,11 +130,11 @@ public abstract class NewFrcClassDialog extends DialogWrapper
      * return an empty Map.
      * 
      * @param targetPackageName the fully qualified target Package of the new class. While never null, there is a
-     *                          slight chance of it being an empty string. This value may not match the the value 
+     *                          slight chance of it being an empty string. This value may not match the value 
      *                          of the {@link #myDirectory} as that represents the directory the action was initiated 
      *                          on. For example, if the action is activated on the `frc.robot.commands` package, 
-     *                          but the user enters a class name of `claw.OpenClaw`, the this parameter will be
-     *                          `frc.robot.commands.claw` since the user is asking for the the `claw` subpackage
+     *                          but the user enters a class name of `claw.OpenClaw`, this parameter will be
+     *                          `frc.robot.commands.claw` since the user is asking for the `claw` subpackage
      *                          to be used.
      * 
      * @param newClassName      the name of the new component class
@@ -315,14 +315,31 @@ public abstract class NewFrcClassDialog extends DialogWrapper
     }
     
     
-    protected boolean isBaseClassName(String name)
+    protected boolean isBaseClassName(@Nullable String name)
     {
         boolean isBaseClass = false;
         if (name != null)
         {
-            final Set<String> baseNames = myDataProvider.getClassTypeBaseNames();
-            isBaseClass = baseNames.stream().anyMatch(name::endsWith);
+            final Set<String> baseSuffixes = myDataProvider.getClassTypeBaseNameSuffixes();
+            isBaseClass = baseSuffixes.stream().anyMatch(name::endsWith);
         }
         return isBaseClass;
+    }
+    
+    
+    /**
+     * Returns if the provided name if valid to have the component type auto appended to it. 
+     * For example 'OpenClaw' or 'DriveTrain' would return `true`, but 'OpenClawCommand' or 
+     * 'DriveTrainSubsystem' would return `false`.
+     */
+    protected boolean nameCanBeAutoAppended(String name)
+    {
+        boolean needsAutoAppending = true;
+        if (name != null)
+        {
+            final Set<String> commonSuffixes = myDataProvider.getComponentTypeCommonSuffixes();
+            needsAutoAppending = commonSuffixes.stream().noneMatch(name::endsWith);
+        }
+        return needsAutoAppending;
     }
 }

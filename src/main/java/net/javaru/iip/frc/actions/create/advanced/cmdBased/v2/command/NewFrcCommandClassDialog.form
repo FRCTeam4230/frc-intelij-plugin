@@ -28,12 +28,12 @@
         </constraints>
         <properties/>
       </component>
-      <component id="2159a" class="javax.swing.JCheckBox" binding="myAutoAppendCommandCheckBox">
+      <component id="2159a" class="javax.swing.JCheckBox" binding="myAutoAppendComponentTypeCheckBox">
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text resource-bundle="i18n/FrcBundle" key="frc.new.class.adv.command.dialog.autoAppend.text"/>
+          <text resource-bundle="i18n/FrcBundle" key="frc.new.class.adv.general.dialog.autoAppend.text"/>
         </properties>
       </component>
       <grid id="92193" binding="mySubsystemsPanel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">

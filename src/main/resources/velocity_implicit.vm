@@ -1,0 +1,11 @@
+#* @implicitly included *#
+#* @vtlvariable name="NAME" type="java.lang.String" *#
+#* @vtlvariable name="PACKAGE_NAME" type="java.lang.String" *#
+#* @vtlvariable name="baseClassExtendsClause" type="java.lang.String" *#
+#* @vtlvariable name="baseClassFqName" type="java.lang.String" *#
+#* @vtlvariable name="baseClassNeedsImporting" type="java.lang.String" *#
+#* @vtlvariable name="includeJavaDocsForOverrides" type="java.lang.String" *#
+#* @vtlvariable name="needsGetRequirementsImpl" type="java.lang.String" *#
+#* @vtlvariable name="requiredSubsystemsFqnCommaDelimitedString" type="java.lang.String" *#
+#* @vtlvariable name="requiredSubsystemsNamesCommaDelimitedString" type="java.lang.String" *#
+#* @vtlvariable name="requiredSubsystemsVarsCommaDelimitedString" type="java.lang.String" *#

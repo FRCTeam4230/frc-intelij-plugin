@@ -1,5 +1,7 @@
+#* A hack so we can have a hash characterin JavaDocs for {@link} entries *#
+#set( $H = '#' )
 #set($requiredSubsystemsFqnArray=$requiredSubsystemsFqnCommaDelimitedString.split(","))
-##The split method when called on an empty string will result in an array of one empty string token, so we need to handle that
+#* The split method when called on an empty string will result in an array of one empty string token, so we need to handle that *#
 #if($requiredSubsystemsFqnArray.size() == 1 && $requiredSubsystemsFqnArray[0] == "")
     #set($requiredSubsystemsFqnArray = [])
 #end
@@ -11,8 +13,10 @@
 #if($requiredSubsystemsVarsArray.size() == 1 && $requiredSubsystemsVarsArray[0] == "")
     #set($requiredSubsystemsVarsArray = [])
 #end
-#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")
+#if(${PACKAGE_NAME})
+#if (${PACKAGE_NAME} != "")
 package ${PACKAGE_NAME};
+#end
 #end
 
 #if($baseClassNeedsImporting == "true")
@@ -55,30 +59,34 @@ private final Set<Subsystem> subsystems;
     #end    
     }
 
-
-    #[[/**
+#if($includeJavaDocsForOverrides == "true")
+    /**
     * The initial subroutine of a command.  Called once when the command is initially scheduled.
-    */]]#
+    */
+#end    
     @Override
     public void initialize()
     {
         
     }
-        
-    #[[/**
+
+#if($includeJavaDocsForOverrides == "true")
+    /**
      * The main body of a command.  Called repeatedly while the command is scheduled.
-     * (That is, it is called repeatedly until {@link #isFinished()}) returns true.)
-     */]]#
+     * (That is, it is called repeatedly until {@link ${H}isFinished()}) returns true.)
+     */
+#end
     @Override
     public void execute()
     {
         
     }
-
-    #[[/**
+    
+#if($includeJavaDocsForOverrides == "true")
+    /**
      * <p>
      * Returns whether this command has finished. Once a command finishes -- indicated by
-     * this method returning true -- the scheduler will call its {@link #end(boolean)} method.
+     * this method returning true -- the scheduler will call its {@link ${H}end(boolean)} method.
      * </p><p>
      * Returning false will result in the command never ending automatically. It may still be
      * cancelled manually or interrupted by another command. Hard coding this command to always
@@ -89,7 +97,8 @@ private final Set<Subsystem> subsystems;
      *
      * @return whether this command has finished.
      *
-     */]]#
+     */
+#end
     @Override
     public boolean isFinished()
     {
@@ -97,14 +106,16 @@ private final Set<Subsystem> subsystems;
         return false;
     }
 
-    #[[/**
+#if($includeJavaDocsForOverrides == "true")    
+    /**
      * The action to take when the command ends. Called when either the command 
-     * finishes normally -- that is it is called when {@link #isFinished()} returns 
+     * finishes normally -- that is it is called when {@link ${H}isFinished()} returns 
      * true -- or when  it is interrupted/canceled. This is where you may want to 
      * wrap up loose ends, like shutting off a motor that was being used in the command.
      * 
      * @param interrupted whether the command was interrupted/canceled
-     */]]#
+     */
+#end
     @Override
     public void end(boolean interrupted)
     {
@@ -112,6 +123,7 @@ private final Set<Subsystem> subsystems;
     }
     
 #if ($needsGetRequirementsImpl == "true")
+#if($includeJavaDocsForOverrides == "true")
     /**
      * <p>
      * Specifies the set of subsystems used by this command.  Two commands cannot use the same
@@ -125,6 +137,7 @@ private final Set<Subsystem> subsystems;
      * 
      * @return the set of subsystems that are required
      */
+#end
     @Override
     public Set<Subsystem> getRequirements()
     {

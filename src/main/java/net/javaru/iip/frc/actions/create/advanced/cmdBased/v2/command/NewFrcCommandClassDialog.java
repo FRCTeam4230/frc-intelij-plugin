@@ -59,6 +59,7 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     public static final String BASE_CLASS_NEEDS_IMPORTING = "baseClassNeedsImporting";
     public static final String BASE_CLASS_EXTENDS_CLAUSE = "baseClassExtendsClause";
     public static final String NEEDS_GET_REQUIREMENTS = "needsGetRequirementsImpl";
+    public static final String INCLUDE_JAVADOC_FOR_OVERRIDES = "includeJavaDocsForOverrides";
     
     private static final Logger LOG = Logger.getInstance(NewFrcCommandClassDialog.class);
     private JPanel myTopPanel;
@@ -67,6 +68,7 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     private JCheckBox myAutoAppendCommandCheckBox;
     private JPanel mySubsystemsPanel;
     private JPanel mySuperClassPanel;
+    private JCheckBox myIncludeJavaDocCheckBox;
     
     private Map<PsiClass, JBCheckBox> mySubsystemsClassesMap;
     private Map<PsiClass, JBRadioButton> myTopLevelCommandClassesMap;
@@ -85,7 +87,9 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     
     protected void initUiComponents()
     {
+        //TODO init to last used
         myAutoAppendCommandCheckBox.setSelected(true);
+        myIncludeJavaDocCheckBox.setSelected(true);
     
         FrcUiUtilsKt.addTextChangedListener(myCommandNameTextField, (documentEvent, text) -> {
             myAutoAppendCommandCheckBox.setEnabled(!myCommandNameTextField.getText().endsWith("Command") && 
@@ -145,9 +149,15 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     protected Map<String, String> getAdditionalProperties(@NotNull String targetPackageName)
     {
         ImmutableMap.Builder<String, String> props = ImmutableMap.builder();
+        addGeneralProperties(props);
         addSubSystemProperties(props);
         addBaseClassProperties(props, targetPackageName);
         return props.build();
+    }
+    
+    protected void addGeneralProperties(@NotNull ImmutableMap.Builder<String, String> props)
+    {
+        props.put(INCLUDE_JAVADOC_FOR_OVERRIDES, Boolean.toString(myIncludeJavaDocCheckBox.isSelected()));
     }
     
     protected void addSubSystemProperties(@NotNull ImmutableMap.Builder<String, String> props)

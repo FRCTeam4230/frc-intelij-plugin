@@ -19,7 +19,7 @@ package net.javaru.iip.frc.actions.create.advanced
 import com.google.common.collect.ImmutableSet
 
 
-abstract class NewFrcClassDataProvider
+abstract class CreateFrcComponentDataProvider
 {
     /**
      * The **primary* simple name of the class type being created for use in Dialogs, error messages, and 

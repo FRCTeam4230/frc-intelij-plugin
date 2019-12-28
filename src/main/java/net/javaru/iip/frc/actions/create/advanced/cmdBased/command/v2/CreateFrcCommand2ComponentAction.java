@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.advanced.cmdBased.v2.command;
+package net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2;
 
 import javax.swing.*;
 
@@ -25,20 +25,21 @@ import com.intellij.psi.PsiDirectory;
 
 import net.javaru.iip.frc.FrcIcons;
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
-import net.javaru.iip.frc.actions.create.advanced.NewFrcClassDialog;
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.v2.AbstractAdvancedNewFrcCmdBaseV2Action;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.command.CreateCommandComponentDialog;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.CreateFrcComponentDialog;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractAdvancedNewFrcCmdBaseV2Action;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
-public class NewFrcCommand2ClassAction extends AbstractAdvancedNewFrcCmdBaseV2Action
+public class CreateFrcCommand2ComponentAction extends AbstractAdvancedNewFrcCmdBaseV2Action
 {
-    private static final Logger LOG = Logger.getInstance(NewFrcCommand2ClassAction.class);
+    private static final Logger LOG = Logger.getInstance(CreateFrcCommand2ComponentAction.class);
     
     private static final Icon ICON = FrcIcons.Components.COMMAND;
     
-    public NewFrcCommand2ClassAction()
+    public CreateFrcCommand2ComponentAction()
     {
         super(message("frc.new.class.command.action.name"),
               message("frc.new.class.command.action.description"),
@@ -47,17 +48,17 @@ public class NewFrcCommand2ClassAction extends AbstractAdvancedNewFrcCmdBaseV2Ac
     
     
     @Override
-    protected NewFrcClassDialog constructNewClassDialogInstance(@NotNull Module module,
-                                                                @NotNull ClassCreator classCreator,
-                                                                @NotNull PsiDirectory directory)
+    protected CreateFrcComponentDialog constructCreateFrcComponentDialogInstance(@NotNull Module module,
+                                                                                 @NotNull ClassCreator classCreator,
+                                                                                 @NotNull PsiDirectory directory)
     {
-        return new NewFrcCommandClassDialog(module, classCreator, directory);
+        return new CreateCommandComponentDialog(module, classCreator, directory, CreateFrcCommandV2DataProvider.INSTANCE);
     }
     
     
     @Override
     protected ClassCreator constructClassCreatorInstance(@NotNull Module module)
     {
-        return new FrcCommand2ClassCreator(module);
+        return new FrcCommand2ComponentCreator(module);
     }
 }

@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.advanced.cmdBased.v2;
+package net.javaru.iip.frc.actions.create.advanced.cmdBased;
 
 import javax.swing.*;
 

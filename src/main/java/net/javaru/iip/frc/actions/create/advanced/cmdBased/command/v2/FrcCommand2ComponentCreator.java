@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.advanced.cmdBased.v2.command;
+package net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
@@ -25,12 +25,12 @@ import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory;
 
 
 
-class FrcCommand2ClassCreator extends ClassCreator
+class FrcCommand2ComponentCreator extends ClassCreator
 {
-    private static final Logger LOG = Logger.getInstance(FrcCommand2ClassCreator.class);
+    private static final Logger LOG = Logger.getInstance(FrcCommand2ComponentCreator.class);
     
     
-    public FrcCommand2ClassCreator(@NotNull Module module)
+    public FrcCommand2ComponentCreator(@NotNull Module module)
     {
         super(module);
     }

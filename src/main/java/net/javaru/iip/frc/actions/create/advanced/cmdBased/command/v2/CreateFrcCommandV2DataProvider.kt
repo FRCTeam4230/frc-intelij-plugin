@@ -14,14 +14,14 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.advanced.cmdBased.v2.command
+package net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2
 
 import com.google.common.collect.ImmutableList
-import net.javaru.iip.frc.actions.create.advanced.NewFrcClassDataProvider
+import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider
 import net.javaru.iip.frc.wpilib.WpiLibConstants
 
 
-object NewFrcCommandClassV2DataProvider : NewFrcClassDataProvider()
+object CreateFrcCommandV2DataProvider : CreateFrcComponentDataProvider()
 {
     override val classTypeSimpleName: String = "Command"
     override val classTypeSimpleNames: List<String> by lazy { ImmutableList.of("Command", "Cmd") }

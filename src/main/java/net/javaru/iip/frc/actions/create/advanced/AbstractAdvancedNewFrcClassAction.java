@@ -32,6 +32,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.CreateFrcComponentDialog;
 import net.javaru.iip.frc.facet.FrcFacetKt;
 
 
@@ -55,9 +56,9 @@ public abstract class AbstractAdvancedNewFrcClassAction extends CreateInDirector
     
     protected abstract ClassCreator constructClassCreatorInstance(@NotNull Module module);
     
-    protected abstract NewFrcClassDialog constructNewClassDialogInstance(@NotNull Module module,
-                                                                         @NotNull ClassCreator classCreator,
-                                                                         @NotNull PsiDirectory directory);
+    protected abstract CreateFrcComponentDialog constructCreateFrcComponentDialogInstance(@NotNull Module module,
+                                                                                          @NotNull ClassCreator classCreator,
+                                                                                          @NotNull PsiDirectory directory);
     
     
     
@@ -100,9 +101,9 @@ public abstract class AbstractAdvancedNewFrcClassAction extends CreateInDirector
     @Nullable
     private PsiClass[] invokeDialog(@NotNull Project project, @NotNull Module module, ClassCreator classCreator, PsiDirectory dir)
     {
-        DialogWrapper dialog = constructNewClassDialogInstance(module, classCreator, dir);
+        DialogWrapper dialog = constructCreateFrcComponentDialogInstance(module, classCreator, dir);
         dialog.show();
-        // When the user clicks OK, dialog.doOKAction() is called which in turn calls ClassCreator.createClass() which creates the class(es) 
+        // When the user clicks OK, dialog.doOKAction() is called, which in turn calls ClassCreator.createClass() which creates the class(es) 
         return classCreator.getCreatedClasses();
     }
     

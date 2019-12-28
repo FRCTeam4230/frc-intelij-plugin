@@ -55,6 +55,9 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     public static final String SUBSYSTEMS_FQN_COMMA_DELIMITED_LIST = "requiredSubsystemsFqnCommaDelimitedString";
     public static final String SUBSYSTEMS_SIMPLE_NAME_COMMA_DELIMITED_LIST = "requiredSubsystemsNamesCommaDelimitedString";
     public static final String SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST = "requiredSubsystemsVarsCommaDelimitedString";
+    public static final String BASE_CLASS_FQ_NAME = "baseClassFqName";
+    public static final String BASE_CLASS_EXTENDS_CLAUSE = "baseClassExtendsClause";
+    public static final String NEEDS_GET_REQUIREMENTS = "needsGetRequirementsImpl";
     
     private static final Logger LOG = Logger.getInstance(NewFrcCommandClassDialog.class);
     private JPanel myTopPanel;
@@ -142,10 +145,11 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     {
         ImmutableMap.Builder<String, String> props = ImmutableMap.builder();
         addSubSystemProperties(props);
+        addBaseClassProperties(props);
         return props.build();
     }
     
-    protected void addSubSystemProperties(ImmutableMap.Builder<String, String> props)
+    protected void addSubSystemProperties(@NotNull ImmutableMap.Builder<String, String> props)
     {
         final List<PsiClass> subsystems = getSelectedSubsystems();
         final String subSystemsFQN = FrcCollectionExtsKt.toCommaDelimitedString(subsystems, false, PsiClass::getQualifiedName);
@@ -159,6 +163,42 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
         props.put(SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST, subSystemsVarNames);
     }
     
+    protected void addBaseClassProperties(@NotNull ImmutableMap.Builder<String, String> props)
+    {
+        PsiClass base = null;
+        for (Entry<PsiClass, JBRadioButton> entry : myTopLevelCommandClassesMap.entrySet())
+        {
+            if (entry.getValue().isSelected())
+            {
+                base = entry.getKey();
+                break;
+            }
+        }
+        if (base == null)
+        {
+            // should not happen, but just in case
+            LOG.warn("[FRC] No selected Option found for the Base Class. Will attempt to default to the Typical Base Class.");
+            final PsiClass[] classes = FrcClassUtilsKt.findClass(myProject, myDataProvider.getTypicalBaseClassFqName());
+            if (classes.length > 0)
+            {
+                base = classes[0];
+            }
+        }
+        
+        if (base == null)
+        {
+            LOG.warn("[FRC] Could not find the Typical Base Class. Cannot configure base class properties for the template. Template creation will result in invalid class.");
+            return;
+        }
+        
+        final String baseFqName = base.getQualifiedName() != null ? base.getQualifiedName() : myDataProvider.getTypicalBaseClassFqName();
+        props.put(BASE_CLASS_FQ_NAME, baseFqName);
+        final String baseName = base.getName() != null ? base.getName() : myDataProvider.getTypicalBaseClassFqName().substring(myDataProvider.getTypicalBaseClassFqName().lastIndexOf('.') + 1);
+        final String extendsClause = base.isInterface() ? "implements " + baseName : "extends " + baseName;
+        props.put(BASE_CLASS_EXTENDS_CLAUSE, extendsClause);
+        // TODO it'd be nice to make this more sophisticated (to handle the event of a custom interface that has the getRequirements as a default
+        props.put(NEEDS_GET_REQUIREMENTS, Boolean.toString(base.isInterface()));
+    }
     
     protected List<PsiClass> getSelectedSubsystems()
     {

@@ -11,22 +11,31 @@
 #if($requiredSubsystemsVarsArray.size() == 1 && $requiredSubsystemsVarsArray[0] == "")
     #set($requiredSubsystemsVarsArray = [])
 #end
-#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")
+package ${PACKAGE_NAME};
 #end
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import ${baseClassFqName};
+#if ($needsGetRequirementsImpl == "true")
+import edu.wpi.first.wpilibj2.command.Subsystem;
+#end
 #foreach($fqn in $requiredSubsystemsFqnArray)
 import $fqn;            
 #end
 
+#if ($needsGetRequirementsImpl == "true")
+import java.util.Set;
+#end
 
 #parse("File Header.java")
-public class ${NAME} extends CommandBase 
+public class ${NAME} ${baseClassExtendsClause} 
 {
 #foreach($subSystemName in $requiredSubsystemsNamesArray)
     private final $subSystemName $requiredSubsystemsVarsArray[$foreach.index];
 #end
-    
+#if ($needsGetRequirementsImpl == "true")
+private final Set<Subsystem> subsystems;
+#end    
     /**
      * Creates a new instance of this ${NAME}.
      */
@@ -35,8 +44,12 @@ public class ${NAME} extends CommandBase
     #foreach($subSystemVar in $requiredSubsystemsVarsArray)
          this.$subSystemVar = $subSystemVar;
     #end
-    #if (!$requiredSubsystemsVarsArray.isEmpty())
-         addRequirements(#foreach($subSystemVar in $requiredSubsystemsVarsArray)$subSystemVar#if($foreach.hasNext), #end#end);
+    #if ($needsGetRequirementsImpl == "true")
+        this.subsystems =Set.of(#foreach($subSystemVar in $requiredSubsystemsVarsArray)$subSystemVar#if($foreach.hasNext), #end#end);
+    #else    
+        #if (!$requiredSubsystemsVarsArray.isEmpty())
+        addRequirements(#foreach($subSystemVar in $requiredSubsystemsVarsArray)$subSystemVar#if($foreach.hasNext), #end#end);
+        #end
     #end    
     }
 
@@ -60,7 +73,6 @@ public class ${NAME} extends CommandBase
         
     }
 
-
     #[[/**
      * <p>
      * Returns whether this command has finished. Once a command finishes -- indicated by
@@ -68,7 +80,7 @@ public class ${NAME} extends CommandBase
      * </p><p>
      * Returning false will result in the command never ending automatically. It may still be
      * cancelled manually or interrupted by another command. Hard coding this command to always
-     * return true will result in the * command executing once and finishing immediately. It is 
+     * return true will result in the command executing once and finishing immediately. It is 
      * recommended to use * {@link edu.wpi.first.wpilibj2.command.InstantCommand InstantCommand} 
      * for such an operation.
      * </p>
@@ -83,7 +95,6 @@ public class ${NAME} extends CommandBase
         return false;
     }
 
-
     #[[/**
      * The action to take when the command ends. Called when either the command 
      * finishes normally -- that is it is called when {@link #isFinished()} returns 
@@ -97,5 +108,25 @@ public class ${NAME} extends CommandBase
     {
         
     }
-
+    
+#if ($needsGetRequirementsImpl == "true")
+    /**
+     * <p>
+     * Specifies the set of subsystems used by this command.  Two commands cannot use the same
+     * subsystem at the same time.  If the command is scheduled as interruptible and another
+     * command is scheduled that shares a requirement, the command will be interrupted.  Else,
+     * the command will not be scheduled. If no subsystems are required, return an empty set.
+     * </p><p>
+     * Note: it is recommended that user implementations contain the requirements as a field,
+     * and return that field here, rather than allocating a new set every time this is called.
+     * </p>
+     * 
+     * @return the set of subsystems that are required
+     */
+    @Override
+    public Set<Subsystem> getRequirements()
+    {
+        return this.subsystems;
+    }
+#end
 }

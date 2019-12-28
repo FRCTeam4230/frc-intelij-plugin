@@ -288,6 +288,6 @@ public abstract class NewFrcClassDialog extends DialogWrapper
             isBaseClass = baseNames.stream().anyMatch(name::endsWith);
         }
         
-        return isBaseClass || FindClassUtilsKt.isInterfaceOrAbstract(psiClass);
+        return (isBaseClass || FindClassUtilsKt.isInterfaceOrAbstract(psiClass)) && FindClassUtilsKt.isOpen(psiClass);
     }
 }

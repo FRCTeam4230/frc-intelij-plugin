@@ -257,6 +257,9 @@ fun PsiClass.isAbstract(): Boolean
 
 fun PsiClass.isInterfaceOrAbstract(): Boolean = this.isInterface || this.isAbstract()
 
+fun PsiClass.isFinal(): Boolean =  this.hasModifierProperty(PsiModifier.FINAL)
+fun PsiClass.isOpen(): Boolean =  !this.isFinal()
+
 fun MutableList<PsiClass>.sortByName()
 {
     this.sortWith(PsiClassNameComparator)

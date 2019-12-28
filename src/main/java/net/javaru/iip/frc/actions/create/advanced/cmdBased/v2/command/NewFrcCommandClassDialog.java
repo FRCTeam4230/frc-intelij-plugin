@@ -56,6 +56,7 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     public static final String SUBSYSTEMS_SIMPLE_NAME_COMMA_DELIMITED_LIST = "requiredSubsystemsNamesCommaDelimitedString";
     public static final String SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST = "requiredSubsystemsVarsCommaDelimitedString";
     public static final String BASE_CLASS_FQ_NAME = "baseClassFqName";
+    public static final String BASE_CLASS_NEEDS_IMPORTING = "baseClassNeedsImporting";
     public static final String BASE_CLASS_EXTENDS_CLAUSE = "baseClassExtendsClause";
     public static final String NEEDS_GET_REQUIREMENTS = "needsGetRequirementsImpl";
     
@@ -141,11 +142,11 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
     
     
     @Override
-    protected Map<String, String> getAdditionalProperties()
+    protected Map<String, String> getAdditionalProperties(@NotNull String targetPackageName)
     {
         ImmutableMap.Builder<String, String> props = ImmutableMap.builder();
         addSubSystemProperties(props);
-        addBaseClassProperties(props);
+        addBaseClassProperties(props, targetPackageName);
         return props.build();
     }
     
@@ -163,7 +164,7 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
         props.put(SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST, subSystemsVarNames);
     }
     
-    protected void addBaseClassProperties(@NotNull ImmutableMap.Builder<String, String> props)
+    protected void addBaseClassProperties(@NotNull ImmutableMap.Builder<String, String> props, @NotNull String targetPackageName)
     {
         PsiClass base = null;
         for (Entry<PsiClass, JBRadioButton> entry : myTopLevelCommandClassesMap.entrySet())
@@ -193,6 +194,8 @@ public class NewFrcCommandClassDialog extends NewFrcClassDialog
         
         final String baseFqName = base.getQualifiedName() != null ? base.getQualifiedName() : myDataProvider.getTypicalBaseClassFqName();
         props.put(BASE_CLASS_FQ_NAME, baseFqName);
+        final boolean baseClassNeedsImporting = !baseFqName.contains(".") || !baseFqName.substring(0, baseFqName.lastIndexOf('.')).equals(targetPackageName);
+        props.put(BASE_CLASS_NEEDS_IMPORTING, Boolean.toString(baseClassNeedsImporting));
         final String baseName = base.getName() != null ? base.getName() : myDataProvider.getTypicalBaseClassFqName().substring(myDataProvider.getTypicalBaseClassFqName().lastIndexOf('.') + 1);
         final String extendsClause = base.isInterface() ? "implements " + baseName : "extends " + baseName;
         props.put(BASE_CLASS_EXTENDS_CLAUSE, extendsClause);

@@ -33,9 +33,11 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.psi.JavaDirectoryService;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiNameHelper;
+import com.intellij.psi.PsiPackage;
 
 import net.javaru.iip.frc.util.FrcClassUtilsKt;
 import net.javaru.iip.frc.util.PsiClassNameComparator;
@@ -127,9 +129,17 @@ public abstract class NewFrcClassDialog extends DialogWrapper
      * Implementations should return a map of additional properties to pass into the Velocity Template. If none,
      * return an empty Map.
      * 
+     * @param targetPackageName the fully qualified target Package of the new class. While never null, there is a
+     *                          slight chance of it being an empty string. This value may not match the the value 
+     *                          of the {@link #myDirectory} as that represents the directory the action was initiated 
+     *                          on. For example, if the action is activated on the `frc.robot.commands` package, 
+     *                          but the user enters a class name of `claw.OpenClaw`, the this parameter will be
+     *                          `frc.robot.commands.claw` since the user is asking for the the `claw` subpackage
+     *                          to be used.
+     * 
      * @return a map of additional properties to pass into the Velocity Template
      */
-    protected abstract Map<String, String> getAdditionalProperties();
+    protected abstract Map<String, String> getAdditionalProperties(@NotNull String targetPackageName);
     
     
     /**
@@ -161,10 +171,27 @@ public abstract class NewFrcClassDialog extends DialogWrapper
         {
             return;
         }
-    
-        Map<String, String> additionalProperties = getAdditionalProperties();
         
-        if (myClassCreator.createClass(getNewClassName().trim(),
+        final String newClassName = getNewClassName().trim();
+        final StringBuilder pkgName = new StringBuilder();
+        
+        final PsiPackage pkg = JavaDirectoryService.getInstance().getPackageInSources(myDirectory);
+        if (pkg != null)
+        {
+            pkgName.append(pkg.getQualifiedName());
+            if (newClassName.contains("."))
+            {
+                String[] names = newClassName.split("\\.");
+                for (int i = 0; i < names.length - 1; i++)
+                {
+                    pkgName.append(".").append(names[i]); 
+                }
+            }
+        }
+    
+        Map<String, String> additionalProperties = getAdditionalProperties(pkgName.toString());
+        
+        if (myClassCreator.createClass(newClassName,
                                        myDirectory,
                                        additionalProperties))
         {

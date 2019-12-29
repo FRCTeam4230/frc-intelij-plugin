@@ -418,17 +418,18 @@
                     class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcSubsystemClassAction" />
             <action id="frc.action.new.basic.pidSubsystem"
                     class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcPidSubsystemClassAction" />
-            <!--suppress PluginXmlCapitalization -->
-            <action id="frc.action.new.basic.trigger"
-                    class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcTriggerClassAction" />
 
             <action id="frc.action.new.basic.command2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.CreateFrcCommand2ComponentAction" />
             <action id="frc.action.new.basic.subsystem2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2.CreateFrcSubsystem2ComponentAction" />
 
+
+            <action id="frc.action.new.basic.trigger"
+                    class="net.javaru.iip.frc.actions.create.simple.SimpleNewFrcTriggerClassAction" />
+            
             <!--<action id="frc.action.new.build.file" class="net.javaru.iip.frc.actions.create.build.NewFrcAntBuildFileAction" text="FRC New Ant Build File" />-->
-            <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewJavaSpecialFile" />
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile" />
         </group>
 
         <action id="frc.configureTeamNumberBasicAction"

@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.simple.cmdBased.v1;
+package net.javaru.iip.frc.actions.create.simple;
 
 import javax.swing.*;
 
@@ -30,7 +30,7 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
-public class SimpleNewFrcTriggerClassAction extends AbstractSimpleNewFrcCmdBasedVersion1ClassAction
+public class SimpleNewFrcTriggerClassAction extends AbstractSimpleNewFrcClassAction
 {
     private static final Icon ICON = FrcIcons.Components.BUTTON;
 

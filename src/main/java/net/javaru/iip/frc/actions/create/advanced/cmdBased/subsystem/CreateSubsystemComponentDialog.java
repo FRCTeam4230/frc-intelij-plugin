@@ -16,23 +16,35 @@
 
 package net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem;
 
+import javax.swing.*;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.ui.ContextHelpLabel;
+import com.intellij.ui.components.JBCheckBox;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider;
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.CreateFrcComponentDialog;
 import net.javaru.iip.frc.util.FrcClassUtilsKt;
+import net.javaru.iip.frc.util.FrcUiUtilsKt;
+
+import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
 public class CreateSubsystemComponentDialog extends CreateFrcComponentDialog
 {
     private static final String INCLUDE_ADD_CHILD_MESSAGE = "includeChildMessage";
+    private static final String MAKE_SINGLETON = "makeSingleton";
+    
+    private JBCheckBox makeSingletonCheckbox;
     
     public CreateSubsystemComponentDialog(@NotNull Module module,
                                           @NotNull ClassCreator classCreator,
@@ -55,11 +67,34 @@ public class CreateSubsystemComponentDialog extends CreateFrcComponentDialog
             boolean includeChildMessage =  subsystemBaseClass != null && (baseClass.equals(subsystemBaseClass) ||  baseClass.isInheritor(subsystemBaseClass, true));
             props.put(INCLUDE_ADD_CHILD_MESSAGE, Boolean.toString(includeChildMessage));
         }
+        boolean makeSingleton = (makeSingletonCheckbox != null && makeSingletonCheckbox.isSelected());
+        props.put(MAKE_SINGLETON, Boolean.toString(makeSingleton));
     }
     
     @Override
     protected boolean showTheIncludeJavaDocCheckbox()
     {
         return false;
+    }
+    
+    
+    @Override
+    protected void initMinorOptionsPanel(JPanel topPanel, JPanel optionsPanel)
+    {
+        final GridLayoutManager layoutManager = new GridLayoutManager(1, 3);
+        final GridConstraints gc = createStandardGridConstraints();
+        gc.setIndent(2);
+        makeSingletonCheckbox = new JBCheckBox(message("frc.new.class.adv.subsystem.dialog.makeSingleton.checkbox.text"));
+        makeSingletonCheckbox.setSelected(true); //TODO: init to previous choice
+        optionsPanel.setLayout(layoutManager);
+        optionsPanel.add(makeSingletonCheckbox, gc);
+    
+        final ContextHelpLabel helpLabel = ContextHelpLabel.create(message("frc.new.class.adv.subsystem.dialog.makeSingleton.help.title"), 
+                                                                   message("frc.new.class.adv.subsystem.dialog.makeSingleton.help.text"));
+        gc.setIndent(0);
+        gc.setColumn(1);
+        gc.setHSizePolicy(GridConstraints.SIZEPOLICY_FIXED);
+        optionsPanel.add(helpLabel, gc);
+        FrcUiUtilsKt.addHorizontalSpacer(optionsPanel, 0, 2);
     }
 }

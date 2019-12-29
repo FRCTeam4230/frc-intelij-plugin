@@ -32,6 +32,7 @@ import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.uiDesigner.core.GridConstraints
 import com.intellij.uiDesigner.core.GridLayoutManager
+import com.intellij.uiDesigner.core.Spacer
 import net.javaru.iip.frc.i18n.FrcBundle.message
 import net.javaru.iip.frc.ui.IconAndLabelButton
 import org.intellij.lang.annotations.Language
@@ -95,6 +96,57 @@ fun boldLabelText(text: String): String
     return "<html><div style='font-weight: bold;'>$text</div></html>"
 }
 
+@JvmOverloads
+fun JComponent.addHorizontalSpacer(row: Int, col: Int, rowSpan: Int = 1, colSpan: Int = 1, useParentLayout: Boolean = false)
+{
+    /*
+      <hspacer id="9135a">
+        <constraints>
+          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </hspacer>    
+    */
+    val spacer = Spacer();
+    val dimension = Dimension(-1, -1)
+    val gc = GridConstraints(row, col, rowSpan, colSpan,
+                             GridConstraints.ANCHOR_CENTER,         /*Anchor want 0*/
+                             GridConstraints.ALIGN_CENTER,          /*Fill want 1*/
+                             GridConstraints.SIZEPOLICY_CAN_GROW or GridConstraints.SIZEPOLICY_WANT_GROW,       /*HSizePolicy want 6*/
+                             GridConstraints.SIZEPOLICY_CAN_SHRINK,  /*VSizePolicy want 1*/
+                             dimension, /*MinSize*/
+                             dimension, /*PreferredSize*/
+                             dimension, /*MaxSize*/
+                             0, 
+                             useParentLayout)
+
+   this.add(spacer, gc); 
+}
+
+@JvmOverloads
+fun JComponent.addVerticalSpacer(row: Int, col: Int, rowSpan: Int = 1, colSpan: Int = 1, useParentLayout: Boolean = false)
+{
+    /*
+       <vspacer id="892f3">
+            <constraints>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </vspacer> 
+    */
+    val spacer = Spacer();
+    val dimension = Dimension(-1, -1)
+    val gc = GridConstraints(row, col, rowSpan, colSpan,
+                             GridConstraints.ANCHOR_CENTER,         /*Anchor want 0*/
+                             GridConstraints.ALIGN_RIGHT,           /*Fill want 2*/
+                             GridConstraints.SIZEPOLICY_CAN_SHRINK, /*HSizePolicy want 1*/
+                             GridConstraints.SIZEPOLICY_CAN_GROW or GridConstraints.SIZEPOLICY_WANT_GROW,  /*VSizePolicy want 6*/
+                             dimension, /*MinSize*/
+                             dimension, /*PreferredSize*/
+                             dimension, /*MaxSize*/
+                             0, 
+                             useParentLayout)
+
+   this.add(spacer, gc); 
+}
 
 /**
  * Sets the text of the supplied field to the supplied value iff the text field is blank.

@@ -12,8 +12,12 @@ import ${baseClassFqName};
 #parse("File Header.java")
 public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtendsClause}
 {
+#if($makeSingleton == "true")
+    private final static ${NAME} INSTANCE = new ${NAME}();  
+#end
+    
     /** Creates a new instance of this ${NAME}. */
-    public ${NAME}()
+    #if($makeSingleton == "true")private #else public #end${NAME}()
     {
         // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command) 
         //       in the constructor or the robot coordination class, such as RobotContainer.
@@ -22,6 +26,10 @@ public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtends
         //       such as SpeedControllers, Encoders, DigitalInputs, etc.
         #end
     }
+#if($makeSingleton == "true")
+    
+    public static ${NAME} getInstance() { return INSTANCE; }
+#end
     
 }
 

@@ -63,7 +63,7 @@ public class CreateCommandComponentDialog extends CreateFrcComponentDialog
     
     
     @Override
-    protected void initOptionsPanel(JPanel topPanel, JPanel optionsPanel)
+    protected void initMajorOptionsPanel(JPanel topPanel, JPanel optionsPanel)
     {
         // Display subsystems
         final String labelText = message("frc.new.class.adv.command.dialog.subsystems.label");

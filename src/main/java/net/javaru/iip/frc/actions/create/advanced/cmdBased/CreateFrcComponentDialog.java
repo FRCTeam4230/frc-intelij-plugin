@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.actions.create.advanced.cmdBased;
 
+import java.awt.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ import com.intellij.psi.PsiPackage;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.components.JBTextField;
+import com.intellij.uiDesigner.core.GridConstraints;
 
 import kotlin.Unit;
 import kotlin.collections.CollectionsKt;
@@ -83,9 +85,10 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     private JBLabel myComponentNameLabel;
     private JBTextField myComponentNameTextField;
     private JCheckBox myAutoAppendComponentTypeCheckBox;
-    private JPanel myOptionsPanel;
+    private JPanel myMajorOptionsPanel;
     private JPanel mySuperClassPanel;
     private JCheckBox myIncludeJavaDocCheckBox;
+    private JPanel myMinorOptionsPanel;
     
     
     private Map<PsiClass, JBRadioButton> myTopLevelComponentClassesMap;
@@ -120,7 +123,7 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     /**
      * Hook Method that is called after the {@link #initUI()} method to allow subclasses to initialize any additional 
      * UI components or do other work that depends on the UI having been initialized first. This is called prior to the
-     * {@link DialogWrapper#init()} method. Keep in mind that the {@code initUI} method calls the {@link #initOptionsPanel}
+     * {@link DialogWrapper#init()} method. Keep in mind that the {@code initUI} method calls the {@link #initMajorOptionsPanel}
      * for the initialization that panel
      */
     protected void postInitUI() { /* no op */ }
@@ -154,11 +157,17 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
         {
             myTopPanel.remove(mySuperClassPanel);
         }
-        initOptionsPanel(myTopPanel, myOptionsPanel);
-        
-        if (myOptionsPanel.getComponents().length == 0)
+       
+        initMinorOptionsPanel(myTopPanel, myMinorOptionsPanel);
+        if (myMinorOptionsPanel.getComponents().length == 0)
         {
-            myTopPanel.remove(myOptionsPanel);
+            myTopPanel.remove(myMinorOptionsPanel);
+        }
+        
+        initMajorOptionsPanel(myTopPanel, myMajorOptionsPanel);
+        if (myMajorOptionsPanel.getComponents().length == 0)
+        {
+            myTopPanel.remove(myMajorOptionsPanel);
         }
     }
     
@@ -200,16 +209,43 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     
     
     /**
-     * Initializes the lower options panel for component specific UI options. 
-     * @param topPanel the main parent panel. <strong>Implementations should avoid modifying this panel</strong> It is 
-     *                 provided primarily for determining used mnemonics
+     * Initializes the middle minor options panel for component specific UI options. Note that check boxes are indented by 2.
+     *
+     * @param topPanel     the main parent panel. <strong>Implementations should avoid modifying this panel</strong> It is
+     *                     provided primarily for determining used mnemonics
      * @param optionsPanel the options panel to be initialized.
      */
-    protected void initOptionsPanel(JPanel topPanel, JPanel optionsPanel)
+    protected void initMinorOptionsPanel(JPanel topPanel, JPanel optionsPanel)
     {
         /* no op by default */
     }
     
+    /**
+     * Initializes the lower major options panel for component specific UI options. 
+     * @param topPanel the main parent panel. <strong>Implementations should avoid modifying this panel</strong> It is 
+     *                 provided primarily for determining used mnemonics
+     * @param optionsPanel the options panel to be initialized.
+     */
+    protected void initMajorOptionsPanel(JPanel topPanel, JPanel optionsPanel)
+    {
+        /* no op by default */
+    }
+    
+    
+    protected GridConstraints createStandardGridConstraints()
+    {
+        final Dimension dimension = new Dimension(-1, -1);
+        return new GridConstraints(0, 0, 1, 1,
+                                   GridConstraints.ANCHOR_WEST,
+                                   GridConstraints.FILL_NONE,
+                                   GridConstraints.SIZEPOLICY_CAN_GROW | GridConstraints.SIZEPOLICY_CAN_SHRINK,
+                                   GridConstraints.SIZEPOLICY_FIXED,
+                                   dimension,
+                                   dimension,
+                                   dimension,
+                                   0);
+        
+    }
     
     @Override
     protected void doOKAction()

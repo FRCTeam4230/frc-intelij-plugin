@@ -7,6 +7,7 @@
 #* @vtlvariable name="includeChildMessage" type="java.lang.String" *#
 #* @vtlvariable name="includeJavaDocsForOverrides" type="java.lang.String" *#
 #* @vtlvariable name="makeAbstract" type="java.lang.String" *#
+#* @vtlvariable name="makeSingleton" type="java.lang.String" *#
 #* @vtlvariable name="needsGetRequirementsImpl" type="java.lang.String" *#
 #* @vtlvariable name="requiredSubsystemsFqnCommaDelimitedString" type="java.lang.String" *#
 #* @vtlvariable name="requiredSubsystemsNamesCommaDelimitedString" type="java.lang.String" *#

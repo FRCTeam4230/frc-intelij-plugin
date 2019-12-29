@@ -26,25 +26,29 @@ import net.javaru.iip.frc.FrcIcons;
 
 public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupDescriptorFactory
 {
+    // COMMAND BASED FRAMEWORK v1
     public static final FileTemplateDescriptor COMMAND = new FileTemplateDescriptor("FRCCommand.java", FrcIcons.Components.COMMAND);
     public static final FileTemplateDescriptor COMMAND_GROUP = new FileTemplateDescriptor("FRCCommandGroup.java", FrcIcons.Components.COMMAND_GROUP);
     public static final FileTemplateDescriptor SUBSYSTEM = new FileTemplateDescriptor("FRCSubsystem.java", FrcIcons.Components.SUBSYSTEM);
     public static final FileTemplateDescriptor PID_SUBSYSTEM = new FileTemplateDescriptor("FRCPIDSubsystem.java", FrcIcons.Components.PID_SUBSYSTEM);
-    public static final FileTemplateDescriptor TRIGGER = new FileTemplateDescriptor("FRCTrigger.java", FrcIcons.Components.BUTTON);
     
+    // COMMAND BASED FRAMEWORK v2
     public static final FileTemplateDescriptor COMMAND2 = new FileTemplateDescriptor("FRC v2 Command.java", FrcIcons.Components.COMMAND);
     public static final FileTemplateDescriptor SUBSYSTEM2 = new FileTemplateDescriptor("FRC v2 Subsystem.java", FrcIcons.Components.SUBSYSTEM);
-
+    
+    // GENERAL FRC/WPI
+    public static final FileTemplateDescriptor TRIGGER = new FileTemplateDescriptor("FRC Trigger.java", FrcIcons.Components.BUTTON);
+    
     private static final FileTemplateGroupDescriptor FILE_TEMPLATE_GROUP_DESCRIPTOR =
         new FileTemplateGroupDescriptor("FRC", FrcIcons.FRC.FIRST_ICON_MEDIUM_16,
                                         COMMAND,
                                         COMMAND_GROUP,
                                         SUBSYSTEM,
                                         PID_SUBSYSTEM,
-                                        TRIGGER,
-                                        COMMAND2, 
-                                        SUBSYSTEM2
-        );
+                                        COMMAND2,
+                                        SUBSYSTEM2,
+                                        TRIGGER
+                                        );
 
 
     @Override

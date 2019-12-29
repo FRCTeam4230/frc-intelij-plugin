@@ -16,8 +16,6 @@
 
 package net.javaru.iip.frc.actions.create.advanced;
 
-import javax.swing.*;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.ide.IdeView;
@@ -45,21 +43,35 @@ public abstract class AbstractAdvancedNewFrcClassAction extends CreateInDirector
 {
     private static final Logger LOG = Logger.getInstance(AbstractAdvancedNewFrcClassAction.class);
     
+    @NotNull
+    protected final CreateFrcComponentDataProvider dataProvider;
     
-    protected AbstractAdvancedNewFrcClassAction(String text,
-                                             String description,
-                                             Icon icon)
+    protected AbstractAdvancedNewFrcClassAction(@NotNull String text,
+                                                @NotNull String description,
+                                                @NotNull CreateFrcComponentDataProvider dataProvider)
     {
-        super(text, description, icon);
+        super(text, description, dataProvider.getIcon());
+        this.dataProvider = dataProvider;
     }
     
     
-    protected abstract ClassCreator constructClassCreatorInstance(@NotNull Module module);
+    
     
     protected abstract CreateFrcComponentDialog constructCreateFrcComponentDialogInstance(@NotNull Module module,
-                                                                                          @NotNull ClassCreator classCreator,
+                                                                                          @NotNull ClassCreator classCreator, 
                                                                                           @NotNull PsiDirectory directory);
-    protected abstract CreateFrcComponentDataProvider getDataProvider();
+    
+    
+    protected ClassCreator constructClassCreatorInstance(@NotNull Module module)
+    {
+        return new ClassCreator(module, dataProvider);
+    }
+    
+    @NotNull
+    protected CreateFrcComponentDataProvider getDataProvider()
+    {
+        return dataProvider;
+    }
     
     
     @Override

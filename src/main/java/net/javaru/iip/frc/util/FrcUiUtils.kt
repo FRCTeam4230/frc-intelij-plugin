@@ -22,6 +22,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.navigation.NavigationItem
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.wm.ex.WindowManagerEx
 import com.intellij.psi.PsiClass
@@ -31,6 +32,7 @@ import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.uiDesigner.core.GridConstraints
 import com.intellij.uiDesigner.core.GridLayoutManager
+import net.javaru.iip.frc.i18n.FrcBundle.message
 import net.javaru.iip.frc.ui.IconAndLabelButton
 import org.intellij.lang.annotations.Language
 import java.awt.Component
@@ -55,6 +57,22 @@ import javax.swing.text.JTextComponent
 private object FrcUiUtils
 
 private val LOG = Logger.getInstance(FrcUiUtils::class.java)
+
+@JvmOverloads
+fun displayExceptionDialog(t: Throwable, project: Project?, title: String = "An error has occurred")
+{
+    @Language("HTML")
+    val message = message("frc.generic.exception.message", t)
+    Messages.showErrorDialog(project, message, title)
+}
+
+@JvmOverloads
+fun displayExceptionDialog(t: Throwable, component: Component, title: String = "An error has occurred")
+{
+    @Language("HTML")
+    val message = message("frc.generic.exception.message", t)
+    Messages.showErrorDialog(component, message, title)
+}
 
 /**
  * Returns the provided text inside HTML tags centering the text for use on a Swing label.
@@ -299,16 +317,16 @@ fun initClassSelectionPanelCheckBoxes(topComponent: JComponent,
         : Map<PsiClass, JBCheckBox>
 {
     return initClassSelectionPanel(topComponent,
-                                   panel,
-                                   labelText,
-                                   classes,
-                                   includeIcons,
-                                   maxItemCols,
-                                   maxItemRows,
-                                   ::JBCheckBox,
-                                   null,
-                                   textCreator
-                                  )
+                                                                              panel,
+                                                                              labelText,
+                                                                              classes,
+                                                                              includeIcons,
+                                                                              maxItemCols,
+                                                                              maxItemRows,
+                                                                              ::JBCheckBox,
+                                                                              null,
+                                                                              textCreator
+                                                                             )
 
 }
 
@@ -325,16 +343,16 @@ fun initClassSelectionPanelRadioButtons(topComponent: JComponent,
         : Map<PsiClass, JBRadioButton>
 {
     return initClassSelectionPanel(topComponent,
-                                   panel,
-                                   labelText,
-                                   classes,
-                                   includeIcons,
-                                   maxItemCols,
-                                   maxItemRows,
-                                   ::JBRadioButton,
-                                   buttonGroup,
-                                   textCreator
-                                  )
+                                                                              panel,
+                                                                              labelText,
+                                                                              classes,
+                                                                              includeIcons,
+                                                                              maxItemCols,
+                                                                              maxItemRows,
+                                                                              ::JBRadioButton,
+                                                                              buttonGroup,
+                                                                              textCreator
+                                                                             )
 }
 
 @JvmOverloads

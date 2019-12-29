@@ -24,9 +24,9 @@ import javax.swing.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
@@ -50,12 +50,9 @@ public class CreateCommandComponentDialog extends CreateFrcComponentDialog
     private static final String SUBSYSTEMS_SIMPLE_NAME_COMMA_DELIMITED_LIST = "requiredSubsystemsNamesCommaDelimitedString";
     private static final String SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST = "requiredSubsystemsVarsCommaDelimitedString";
     
-    private static final Logger LOG = Logger.getInstance(CreateCommandComponentDialog.class);
     private Map<PsiClass, JBCheckBox> mySubsystemsClassesMap;
     
-    /**
-     * <strong style="font-color: red;">Implmenting classes must call <tt>init()</tt> at the end of their constructors.</strong>
-     */
+    
     public CreateCommandComponentDialog(@NotNull Module module,
                                         @NotNull ClassCreator classCreator,
                                         @NotNull PsiDirectory directory,
@@ -87,7 +84,10 @@ public class CreateCommandComponentDialog extends CreateFrcComponentDialog
     
     
     @Override
-    protected void addComponentSpecificProperties(@NotNull Builder<String, String> props, @NotNull String targetPackageName, @NotNull String newClassName)
+    protected void addComponentSpecificProperties(@NotNull Builder<String, String> props,
+                                                  @Nullable PsiClass baseClass,
+                                                  @NotNull String targetPackageName,
+                                                  @NotNull String newClassName)
     {
         addSubSystemProperties(props);
     }

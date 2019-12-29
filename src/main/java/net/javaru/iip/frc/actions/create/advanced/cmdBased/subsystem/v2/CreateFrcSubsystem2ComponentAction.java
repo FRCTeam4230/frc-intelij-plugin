@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2;
+package net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.module.Module;
@@ -23,19 +23,19 @@ import com.intellij.psi.PsiDirectory;
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractAdvancedNewFrcCmdBaseV2Action;
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.CreateFrcComponentDialog;
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.command.CreateCommandComponentDialog;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.CreateSubsystemComponentDialog;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
-public class CreateFrcCommand2ComponentAction extends AbstractAdvancedNewFrcCmdBaseV2Action
+public class CreateFrcSubsystem2ComponentAction extends AbstractAdvancedNewFrcCmdBaseV2Action
 {
-    public CreateFrcCommand2ComponentAction()
+    public CreateFrcSubsystem2ComponentAction()
     {
-        super(message("frc.new.class.command.action.name"),
-              message("frc.new.class.command.action.description"),
-              CreateFrcCommandV2DataProvider.INSTANCE);
+        super(message("frc.new.class.subsystem.action.name"),
+              message("frc.new.class.subsystem.action.description"),
+              CreateFrcSubsystemV2DataProvider.INSTANCE);
     }
     
     
@@ -44,6 +44,6 @@ public class CreateFrcCommand2ComponentAction extends AbstractAdvancedNewFrcCmdB
                                                                                  @NotNull ClassCreator classCreator,
                                                                                  @NotNull PsiDirectory directory)
     {
-        return new CreateCommandComponentDialog(module, classCreator, directory, dataProvider);
+        return new CreateSubsystemComponentDialog(module, classCreator, directory, dataProvider);
     }
 }

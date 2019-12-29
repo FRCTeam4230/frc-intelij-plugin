@@ -16,13 +16,12 @@
 
 package net.javaru.iip.frc.actions.create.advanced.cmdBased;
 
-import javax.swing.*;
-
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 
 import net.javaru.iip.frc.actions.create.advanced.AbstractAdvancedNewFrcClassAction;
+import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider;
 import net.javaru.iip.frc.wpilib.WpiibLibraryUtilsKt;
 
 
@@ -32,9 +31,9 @@ public abstract class AbstractAdvancedNewFrcCmdBaseV2Action extends AbstractAdva
     private static final Logger LOG = Logger.getInstance(AbstractAdvancedNewFrcCmdBaseV2Action.class);
     
     
-    protected AbstractAdvancedNewFrcCmdBaseV2Action(String text, String description, Icon icon)
+    protected AbstractAdvancedNewFrcCmdBaseV2Action(String text, String description, CreateFrcComponentDataProvider dataProvider)
     {
-        super(text, description, icon);
+        super(text, description, dataProvider);
     }
     
     

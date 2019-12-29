@@ -4,6 +4,7 @@
 #* @vtlvariable name="baseClassExtendsClause" type="java.lang.String" *#
 #* @vtlvariable name="baseClassFqName" type="java.lang.String" *#
 #* @vtlvariable name="baseClassNeedsImporting" type="java.lang.String" *#
+#* @vtlvariable name="includeChildMessage" type="java.lang.String" *#
 #* @vtlvariable name="includeJavaDocsForOverrides" type="java.lang.String" *#
 #* @vtlvariable name="makeAbstract" type="java.lang.String" *#
 #* @vtlvariable name="needsGetRequirementsImpl" type="java.lang.String" *#

@@ -49,6 +49,12 @@ fun findClass(project: Project?, fqn: String?): Array<PsiClass?>
     return facade.findClasses(fqn, scope)
 }
 
+fun findClassAssumeOneIfAny(project: Project?, fqn: String?): PsiClass?
+{
+    val classes = findClass(project, fqn)
+    return takeFirstPsiClass(classes, fqn)
+}
+
 @Contract("null, _ -> !null; !null, null -> !null")
 fun findClass(module: Module?, fqn: String?): Array<PsiClass?>
 {
@@ -59,6 +65,28 @@ fun findClass(module: Module?, fqn: String?): Array<PsiClass?>
     val scope = GlobalSearchScope.moduleScope(module)
     val facade = JavaPsiFacade.getInstance(module.project)
     return facade.findClasses(fqn, scope)
+}
+
+fun findClassAssumeOneIfAny(module: Module?, fqn: String?): PsiClass?
+{
+    val classes = findClass(module, fqn)
+    return takeFirstPsiClass(classes, fqn)
+}
+
+private fun takeFirstPsiClass(classes: Array<PsiClass?>, fqn: String?): PsiClass?
+{
+    return if (classes.isEmpty())
+    {
+        null
+    }
+    else
+    {
+        if (classes.size > 1)
+        {
+            LOG.warn("[FRC] Multiple classes found for '$fqn' when it was assumed only a single instance would be found. Found instances: $classes")
+        }
+        classes[0]
+    }
 }
 
 @Suppress("unused")

@@ -92,13 +92,6 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     private ButtonGroup mySuperButtonGroup = new ButtonGroup();
     
     
-    /**
-     * <strong style="font-color: red;">Implmenting classes must call <tt>init()</tt> at the end of their constructors.</strong>
-     *
-     * @param module       the module
-     * @param classCreator the ClassCreator to use
-     * @param directory    The PsiDirectory the class the action was called on.
-     */
     protected CreateFrcComponentDialog(@NotNull Module module,
                                     @NotNull ClassCreator classCreator,
                                     @NotNull PsiDirectory directory,
@@ -138,14 +131,29 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
         myAutoAppendComponentTypeCheckBox.setSelected(true);
         myAutoAppendComponentTypeCheckBox.setText(message("frc.new.class.adv.general.dialog.autoAppend.text", myDataProvider.getClassTypeSimpleName()));
         
-        myIncludeJavaDocCheckBox.setSelected(true);
+        if (showTheIncludeJavaDocCheckbox())
+        {
+            myIncludeJavaDocCheckBox.setSelected(true);
+        }
+        else
+        {
+            myTopPanel.remove(myIncludeJavaDocCheckBox);
+        }
+        
     
         FrcUiUtilsKt.addTextChangedListener(myComponentNameTextField, (documentEvent, text) -> {
             myAutoAppendComponentTypeCheckBox.setEnabled(nameCanBeAutoAppended(myComponentNameTextField.getText().trim()));
             return Unit.INSTANCE;
         });
     
-        initSuperClassPanel();
+        if (myDataProvider.getBaseType().hasBaseClass())
+        {
+            initSuperClassPanel();
+        }
+        else
+        {
+            myTopPanel.remove(mySuperClassPanel);
+        }
         initOptionsPanel(myTopPanel, myOptionsPanel);
         
         if (myOptionsPanel.getComponents().length == 0)
@@ -154,6 +162,10 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
         }
     }
     
+    protected boolean showTheIncludeJavaDocCheckbox()
+    {
+        return true;
+    }
     
     protected void initSuperClassPanel()
     {
@@ -203,36 +215,45 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     protected void doOKAction()
     {
         LOG.trace("[FRC] doOKAction called");
-        
-        if (!getOKAction().isEnabled())
+    
+        try
         {
-            return;
-        }
-        
-        final String newClassName = getNewClassName().trim();
-        final StringBuilder pkgName = new StringBuilder();
-        
-        final PsiPackage pkg = JavaDirectoryService.getInstance().getPackageInSources(myDirectory);
-        if (pkg != null)
-        {
-            pkgName.append(pkg.getQualifiedName());
-            if (newClassName.contains("."))
+            if (!getOKAction().isEnabled())
             {
-                String[] names = newClassName.split("\\.");
-                for (int i = 0; i < names.length - 1; i++)
+                return;
+            }
+        
+            final String newClassName = getNewClassName().trim();
+            final StringBuilder pkgName = new StringBuilder();
+        
+            final PsiPackage pkg = JavaDirectoryService.getInstance().getPackageInSources(myDirectory);
+            if (pkg != null)
+            {
+                pkgName.append(pkg.getQualifiedName());
+                if (newClassName.contains("."))
                 {
-                    pkgName.append(".").append(names[i]);
+                    String[] names = newClassName.split("\\.");
+                    for (int i = 0; i < names.length - 1; i++)
+                    {
+                        pkgName.append(".").append(names[i]);
+                    }
                 }
             }
+        
+            Map<String, String> additionalProperties = getAdditionalProperties(pkgName.toString(), newClassName);
+        
+            if (myClassCreator.createClass(newClassName,
+                                           myDirectory,
+                                           additionalProperties))
+            {
+                close(OK_EXIT_CODE);
+            }
         }
-        
-        Map<String, String> additionalProperties = getAdditionalProperties(pkgName.toString(), newClassName);
-        
-        if (myClassCreator.createClass(newClassName,
-                                       myDirectory,
-                                       additionalProperties))
+        catch (Exception e)
         {
-            close(OK_EXIT_CODE);
+            LOG.warn("[FRC] An exception occurred when creating a new class from a file template. Please consider reporting at https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues  Cause: " + e.toString(), e);
+            FrcUiUtilsKt.displayExceptionDialog(e, myTopPanel);
+            close(CANCEL_EXIT_CODE);
         }
     }
     
@@ -270,7 +291,14 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     {
         ImmutableMap.Builder<String, String> props = ImmutableMap.builder();
         addGeneralProperties(props);
-        addBaseClassProperties(props, targetPackageName, newClassName);
+        
+        PsiClass baseClass = null;
+        if (myDataProvider.getBaseType().hasBaseClass())
+        {
+            baseClass = addBaseClassProperties(props, targetPackageName, newClassName);
+        }
+        
+        addComponentSpecificProperties(props, baseClass, targetPackageName, newClassName);
         return props.build();
     }
     
@@ -280,7 +308,8 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     }
     
     
-    protected void addBaseClassProperties(@NotNull Builder<String, String> props, @NotNull String targetPackageName, @NotNull String newClassName)
+    @NotNull
+    protected PsiClass addBaseClassProperties(@NotNull Builder<String, String> props, @NotNull String targetPackageName, @NotNull String newClassName)
     {
         PsiClass base = null;
         for (Entry<PsiClass, JBRadioButton> entry : myTopLevelComponentClassesMap.entrySet())
@@ -304,8 +333,8 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
         
         if (base == null)
         {
-            LOG.warn("[FRC] Could not find the Typical Base Class. Cannot configure base class properties for the template. Template creation will result in invalid class.");
-            return;
+            LOG.warn("[FRC] Could not find the Typical Base Class. Cannot configure base class properties for the template.");
+            throw new IllegalStateException("Could not find base class/interface");
         }
         
         final String baseFqName = base.getQualifiedName() != null ? base.getQualifiedName() : myDataProvider.getTypicalBaseClassFqName();
@@ -318,10 +347,21 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
         props.put(MAKE_ABSTRACT, Boolean.toString(newClassName.contains("Abstract")));
         // TODO it'd be nice to make this more sophisticated (to handle the event of a custom interface that has the getRequirements as a default
         props.put(NEEDS_GET_REQUIREMENTS, Boolean.toString(base.isInterface()));
+        return base;
     }
     
     
-    protected abstract void addComponentSpecificProperties(@NotNull Builder<String, String> props, @NotNull String targetPackageName, @NotNull String newClassName);
+    /**
+     * @param props the map builder to add the properties to
+     * @param baseClass the baseClass being extended/implemented; may be nullif the template does not use a base class 
+     *                  (i.e. it does not extend a class or implement an interface)
+     * @param targetPackageName the FQ package the class will be created in 
+     * @param newClassName the name of the class to be created
+     */
+    protected abstract void addComponentSpecificProperties(@NotNull Builder<String, String> props,
+                                                           @Nullable PsiClass baseClass, 
+                                                           @NotNull String targetPackageName,
+                                                           @NotNull String newClassName);
     
     
     protected String getSubsystemTopClassFQN()

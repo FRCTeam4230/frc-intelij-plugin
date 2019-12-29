@@ -89,7 +89,7 @@ public abstract class AbstractSimpleNewFrcClassAction extends JavaCreateTemplate
     protected boolean isAvailable(DataContext dataContext)
     {
         final Project project = CommonDataKeys.PROJECT.getData(dataContext);
-        return super.isAvailable(dataContext) && project != null && notInDumbMode(project) && shouldBeEnabledAdditionalCriteria(project);
+        return super.isAvailable(dataContext) && project != null && notInDumbMode(project) && shouldBeEnabledAdditionalCriteria(project, dataContext);
     }
     
     
@@ -114,16 +114,19 @@ public abstract class AbstractSimpleNewFrcClassAction extends JavaCreateTemplate
         return true;
     }
     
+    
     /**
      * Provides additional criteria when determining if the action should be enabled (in the menu).
      * Verification that the module is an FRC module is already done and does NOT need to occur in
      * implementations of this method.
-     * 
-     * Also see {@link #needsIndexesToCheckEnabling()}
+     *
+     * @param project      the project that the action was activated for (remember the project is available via the module.getProject() method)
+     * @param dataContext the context, which allows retrieval of information about the state of IDEA related to the action
+     *                    invocation (active editor, selection and so on).
      *
      * @return whether the action should be enabled.
      */
-    protected boolean shouldBeEnabledAdditionalCriteria(@NotNull Project project)
+    protected boolean shouldBeEnabledAdditionalCriteria(@NotNull Project project, @NotNull DataContext dataContext)
     {
         return true;
     }

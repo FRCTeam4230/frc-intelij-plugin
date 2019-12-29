@@ -19,6 +19,7 @@ package net.javaru.iip.frc.actions.create.simple.cmdBased.v1;
 import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 
@@ -58,7 +59,7 @@ public abstract class AbstractSimpleNewFrcCmdBasedVersion1ClassAction extends Ab
     
     
     @Override
-    protected boolean shouldBeEnabledAdditionalCriteria(@NotNull Project project)
+    protected boolean shouldBeEnabledAdditionalCriteria(@NotNull Project project, @NotNull DataContext dataContext)
     {
         return WpiibLibraryUtilsKt.isVersion1CommandBaseLibAttached(project);
     }

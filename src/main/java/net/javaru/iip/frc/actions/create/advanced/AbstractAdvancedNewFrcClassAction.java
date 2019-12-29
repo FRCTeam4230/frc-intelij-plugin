@@ -22,6 +22,7 @@ import com.intellij.ide.IdeView;
 import com.intellij.ide.actions.CreateInDirectoryActionBase;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.WriteActionAware;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -77,17 +78,21 @@ public abstract class AbstractAdvancedNewFrcClassAction extends CreateInDirector
     @Override
     public void update(AnActionEvent e)
     {
-        Module module = e.getData(LangDataKeys.MODULE);
-        e.getPresentation().setEnabled(FrcFacetKt.isFrcFacetedModule(module) && shouldBeEnabledAdditionalCriteria(module));
+        final Module module = e.getData(LangDataKeys.MODULE);
+        final Presentation presentation = e.getPresentation();
+        
+        // Note, on the Presentation, there is a "setEnabled() and a "setEnabledAndVisible() method. 
+        // If you set just the first, the action shows in the menu, but dithered our.
+        presentation.setEnabledAndVisible(FrcFacetKt.isFrcFacetedModule(module) && shouldBeEnabledAdditionalCriteria(module));
     }
     
     
     @Override
     public final void actionPerformed(@NotNull AnActionEvent e)
     {
-        IdeView view = e.getData(LangDataKeys.IDE_VIEW);
-        Project project = e.getProject();
-        Module module = e.getData(LangDataKeys.MODULE);
+        final IdeView view = e.getData(LangDataKeys.IDE_VIEW);
+        final Project project = e.getProject();
+        final Module module = e.getData(LangDataKeys.MODULE);
         if (view == null || project == null || module == null)
         {
             return;
@@ -97,7 +102,7 @@ public abstract class AbstractAdvancedNewFrcClassAction extends CreateInDirector
         
         ClassCreator classCreator = constructClassCreatorInstance(module);
         
-        PsiClass[] createdClasses = invokeDialog(project, module, classCreator, dir);
+        PsiClass[] createdClasses = invokeDialog(module, classCreator, dir);
         if (createdClasses == null)
         {
             return;
@@ -111,7 +116,7 @@ public abstract class AbstractAdvancedNewFrcClassAction extends CreateInDirector
     
     
     @Nullable
-    private PsiClass[] invokeDialog(@NotNull Project project, @NotNull Module module, ClassCreator classCreator, PsiDirectory dir)
+    private PsiClass[] invokeDialog(@NotNull Module module, ClassCreator classCreator, PsiDirectory dir)
     {
         DialogWrapper dialog = constructCreateFrcComponentDialogInstance(module, classCreator, dir);
         dialog.show();
@@ -124,7 +129,9 @@ public abstract class AbstractAdvancedNewFrcClassAction extends CreateInDirector
      * Provides additional criteria when determining if the action should be enabled (in the menu).
      * Verification that the module is an FRC module is already done and does NOT need to occur in
      * implementations of this method.
-     *
+     * 
+     * @param module the module that the action was activated for (remember the project is available via the module.getProject() method)
+     *               
      * @return whether the action should be enabled.
      */
     protected boolean shouldBeEnabledAdditionalCriteria(@NotNull Module module)

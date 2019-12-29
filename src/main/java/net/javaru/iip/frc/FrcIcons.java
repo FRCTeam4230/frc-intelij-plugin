@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -100,10 +100,10 @@ public final class FrcIcons
         /** A 16x16 Icon for Command Group classes. */
         public static final Icon COMMAND_GROUP = loadIcon("/icons/components/Command-Group-16.png"); // 16x16
 
-        /** A 16x16 Icon for Trigger (i.e. Button) classes. */
+        /** A 16x16 Icon for Trigger (i.e. a simple Button) classes. */
         public static final Icon BUTTON_WPI = loadIcon("/icons/wpi/Button.png"); // 16x16
 
-        /** A 16x16 Icon for Trigger (i.e. Button) classes. */
+        /** A 16x16 Icon for Trigger (i.e. a simple Button) classes. */
         public static final Icon BUTTON = loadIcon("/icons/components/Button-16.png"); // 16x16
 
         /** A 16x16 Icon for Subsystem classes. */

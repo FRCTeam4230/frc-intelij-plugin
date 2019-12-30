@@ -16,7 +16,8 @@ public #if($makeAbstract == "true")abstract#end class ${NAME}  ${baseClassExtend
 {
 #if($makeSingleton == "true")
     
-    // Any variables/fields used in the constructor must appear before the "INSTANCE" variable so that they are initialized before the constructor is called.
+    // Any variables/fields used in the constructor must appear before the "INSTANCE" variable
+    // so that they are initialized before the constructor is called.
     
     /** 
      * The Singleton instance of this ${NAME}. External classes should

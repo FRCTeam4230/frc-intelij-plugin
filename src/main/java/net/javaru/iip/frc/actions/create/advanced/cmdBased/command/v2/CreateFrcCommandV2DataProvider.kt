@@ -27,8 +27,8 @@ import net.javaru.iip.frc.wpilib.WpiLibConstants
 object CreateFrcCommandV2DataProvider : CreateFrcComponentDataProvider()
 {
     override val componentVersion: Int = 2
-    override val classTypeSimpleName: String = "Command"
-    override val classTypeSimpleNames: List<String> by lazy { ImmutableList.of("Command", "Cmd") }
+    override val componentTypeSimpleName: String = "Command"
+    override val componentTypeSimpleNames: List<String> by lazy { ImmutableList.of("Command", "Cmd") }
     override val baseType: BaseType = BaseType.InterfaceAndBaseClass
     override val topLevelClassFqName: String = WpiLibConstants.COMMAND_V2_INTERFACE_FQN
     override val typicalBaseClassFqName: String = WpiLibConstants.COMMAND_V2_BASE_FQN

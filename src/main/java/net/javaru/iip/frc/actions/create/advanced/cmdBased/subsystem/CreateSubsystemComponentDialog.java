@@ -44,6 +44,7 @@ public class CreateSubsystemComponentDialog extends CreateFrcComponentDialog
 {
     private static final String INCLUDE_ADD_CHILD_MESSAGE = "includeChildMessage";
     protected static final String MAKE_SINGLETON = "makeSingleton";
+    protected static final String STATE_KEY_SUBSYSTEMS_MAKE_SINGLETON = "subsystems-makeSingleton";
     
     protected JBCheckBox makeSingletonCheckbox;
     
@@ -86,7 +87,7 @@ public class CreateSubsystemComponentDialog extends CreateFrcComponentDialog
         final GridConstraints gc = createStandardGridConstraints();
         gc.setIndent(2);
         makeSingletonCheckbox = new JBCheckBox(message("frc.new.class.adv.subsystem.dialog.makeSingleton.checkbox.text"));
-        makeSingletonCheckbox.setSelected(true); //TODO: init to previous choice
+        makeSingletonCheckbox.setSelected(sharedState.getBooleanOption(STATE_KEY_SUBSYSTEMS_MAKE_SINGLETON, true));
         optionsPanel.setLayout(layoutManager);
         optionsPanel.add(makeSingletonCheckbox, gc);
     
@@ -104,5 +105,13 @@ public class CreateSubsystemComponentDialog extends CreateFrcComponentDialog
             makeSingletonCheckbox.setEnabled(name != null && !name.toLowerCase().contains("abstract"));
             return Unit.INSTANCE;
         });
+    }
+    
+    
+    @Override
+    protected void saveState()
+    {
+        super.saveState();
+        sharedState.updateBooleanOption(STATE_KEY_SUBSYSTEMS_MAKE_SINGLETON, makeSingletonCheckbox);
     }
 }

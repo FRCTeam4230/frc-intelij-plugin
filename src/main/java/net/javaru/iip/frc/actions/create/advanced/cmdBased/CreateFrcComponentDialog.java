@@ -49,6 +49,7 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import kotlin.Unit;
 import kotlin.collections.CollectionsKt;
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
+import net.javaru.iip.frc.actions.create.advanced.ComponentCreationSharedState;
 import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider;
 import net.javaru.iip.frc.util.FrcClassUtilsKt;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
@@ -61,7 +62,6 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 public abstract class CreateFrcComponentDialog extends DialogWrapper
 {
-
     private static final String BASE_CLASS_FQ_NAME = "baseClassFqName";
     private static final String BASE_CLASS_NEEDS_IMPORTING = "baseClassNeedsImporting";
     private static final String BASE_CLASS_EXTENDS_CLAUSE = "baseClassExtendsClause";
@@ -79,6 +79,8 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     protected final PsiDirectory myDirectory;
     @NotNull
     protected final CreateFrcComponentDataProvider myDataProvider;
+    
+    protected final ComponentCreationSharedState sharedState = ComponentCreationSharedState.getInstance();
     
     private static final Logger LOG = Logger.getInstance(CreateFrcComponentDialog.class);
     private JPanel myTopPanel;
@@ -130,16 +132,17 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     
     protected void initUI()
     {
-        //TODO init to last used
-        myAutoAppendComponentTypeCheckBox.setSelected(true);
-        myAutoAppendComponentTypeCheckBox.setText(message("frc.new.class.adv.general.dialog.autoAppend.text", myDataProvider.getClassTypeSimpleName()));
+        final String suffix = myDataProvider.getAutoAppendSuffix();
+        myAutoAppendComponentTypeCheckBox.setText(message("frc.new.class.adv.general.dialog.autoAppend.text", suffix));
+        myAutoAppendComponentTypeCheckBox.setSelected(sharedState.getShouldAutoAppend(suffix));
         
         if (showTheIncludeJavaDocCheckbox())
         {
-            myIncludeJavaDocCheckBox.setSelected(true);
+            myIncludeJavaDocCheckBox.setSelected(sharedState.getIncludeJavaDoc());
         }
         else
         {
+            myIncludeJavaDocCheckBox.setEnabled(false);
             myTopPanel.remove(myIncludeJavaDocCheckBox);
         }
         
@@ -278,6 +281,8 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
         
             Map<String, String> additionalProperties = getAdditionalProperties(pkgName.toString(), newClassName);
         
+            saveState();
+            
             if (myClassCreator.createClass(newClassName,
                                            myDirectory,
                                            additionalProperties))
@@ -293,6 +298,11 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
         }
     }
     
+    protected void saveState()
+    {
+        sharedState.setIncludeJavaDoc(myIncludeJavaDocCheckBox.isEnabled() && myIncludeJavaDocCheckBox.isSelected());
+        sharedState.updateShouldAutoAppend(myDataProvider.getAutoAppendSuffix(), myAutoAppendComponentTypeCheckBox);
+    }
     
     @Nullable
     @Override
@@ -305,7 +315,7 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     @Override
     public String getTitle()
     {
-        return message("frc.new.class.adv.general.dialog.title", myDataProvider.getClassTypeSimpleName());
+        return message("frc.new.class.adv.general.dialog.title", myDataProvider.getComponentTypeSimpleName());
     }
     
     /**
@@ -420,11 +430,11 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
         @Nullable
         String createClassErrorMessage = ClassCreator.checkCanCreateClass(myDirectory,
                                                                           getNewClassNameField().getText(),
-                                                                          myDataProvider.getClassTypeSimpleName());
+                                                                          myDataProvider.getComponentTypeSimpleName());
         
         if (!nameIsValid)
         {
-            results.add(new ValidationInfo(message("frc.new.class.adv.validation.invalidName", myDataProvider.getClassTypeSimpleName()),
+            results.add(new ValidationInfo(message("frc.new.class.adv.validation.invalidName", myDataProvider.getComponentTypeSimpleName()),
                                            getNewClassNameField()));
         }
         
@@ -478,7 +488,7 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     {
         final String name = getNewClassNameField().getText().trim();
         return myAutoAppendComponentTypeCheckBox.isEnabled() && myAutoAppendComponentTypeCheckBox.isSelected() && !isBaseClassName(name)
-               ? name + myDataProvider.getClassTypeSimpleName() 
+               ? name + myDataProvider.getComponentTypeSimpleName() 
                : name;
     }
     

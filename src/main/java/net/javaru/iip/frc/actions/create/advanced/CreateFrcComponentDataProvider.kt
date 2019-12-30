@@ -30,14 +30,16 @@ abstract class CreateFrcComponentDataProvider
      * The **primary* simple name of the class type being created for use in Dialogs, error messages, and 
      * possibly for class discovery. For example: `Command`, `Subsystem`, etc. Must not be null or a blank string.
      */
-    abstract val classTypeSimpleName:String
+    abstract val componentTypeSimpleName:String
 
     /**
      * Aan immutable list of possible class names and abbreviations fo use in class discovery. For example
      * for the Command component, this might be `['Command', 'Cmd']`. At a minimum, it should return a list
-     * of just the value returned by [classTypeSimpleName]. Lazy initialization is strongly encouraged.
+     * of just the value returned by [componentTypeSimpleName]. Lazy initialization is strongly encouraged.
      */
-    abstract val classTypeSimpleNames: List<String>
+    abstract val componentTypeSimpleNames: List<String>
+    
+    open val autoAppendSuffix: String by lazy { componentTypeSimpleName }
 
     /**
      * Indicates the base type of the template, indicating if it can extend a base class, implement an interface, both, or neither.
@@ -67,7 +69,7 @@ abstract class CreateFrcComponentDataProvider
      */
     open val classTypeBaseNameSuffixes: Set<String> by lazy {
         val names = ImmutableSet.builder<String>()
-        classTypeSimpleNames.forEach {
+        componentTypeSimpleNames.forEach {
             names.add("${it}Base") // e.g. CommandBase & CmdBase
             names.add("Base${it}") // e.g. BaseCommand & BaseCmd
         }
@@ -83,7 +85,7 @@ abstract class CreateFrcComponentDataProvider
      */
     open val componentTypeCommonSuffixes: Set<String> by lazy {
         val names = mutableSetOf<String>()
-        names.addAll(classTypeSimpleNames)
+        names.addAll(componentTypeSimpleNames)
         names.addAll(classTypeBaseNameSuffixes)
         names.remove("Base")
         return@lazy ImmutableSet.copyOf(names)

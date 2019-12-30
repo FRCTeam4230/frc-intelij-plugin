@@ -27,8 +27,8 @@ import net.javaru.iip.frc.wpilib.WpiLibConstants
 object CreateFrcTrapezoidProfileSubsystemV2DataProvider : CreateFrcComponentDataProvider()
 {
     override val componentVersion: Int = 2
-    override val classTypeSimpleName: String = "TrapezoidProfileSubsystem"
-    override val classTypeSimpleNames: List<String> by lazy { 
+    override val componentTypeSimpleName: String = "TrapezoidProfileSubsystem"
+    override val componentTypeSimpleNames: List<String> by lazy { 
         ImmutableList.of("Subsystem", "System", "SubSystem", "ProfileSubsystem", "ProfileSubSystem") }
     override val baseType: BaseType = BaseType.InterfaceAndBaseClass
     override val topLevelClassFqName: String = WpiLibConstants.TRAPEZOID_PROFILED_SUBSYSTEM_BASE_V2_FQN

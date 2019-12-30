@@ -27,8 +27,8 @@ import net.javaru.iip.frc.wpilib.WpiLibConstants
 object CreateFrcProfiledPidSubsystemV2DataProvider : CreateFrcComponentDataProvider()
 {
     override val componentVersion: Int = 2
-    override val classTypeSimpleName: String = "ProfiledPIDSubsystem"
-    override val classTypeSimpleNames: List<String> by lazy {
+    override val componentTypeSimpleName: String = "ProfiledPIDSubsystem"
+    override val componentTypeSimpleNames: List<String> by lazy {
         ImmutableList
             .of("Subsystem", "System", "SubSystem", "PIDSubsystem", "PidSubsystem", "PIDSubSystem", "PidSubSystem")
     }

@@ -222,6 +222,7 @@
         <applicationService id="FRC.FrcNotificationsSettings"   serviceImplementation="net.javaru.iip.frc.settings.FrcNotificationsSettings" />
         <applicationService id="FRC.RioLogUdpSocketManagerApplicationService" serviceImplementation="net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService" />
         <applicationService id="FRC.GradleRioMavenMetadataState" serviceImplementation="net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState" />
+        <applicationService id="FRC.ComponentCreationSharedState" serviceImplementation="net.javaru.iip.frc.actions.create.advanced.ComponentCreationSharedState" />
         
         <applicationConfigurable id="preferences.language.FRC" 
                                  instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable" 

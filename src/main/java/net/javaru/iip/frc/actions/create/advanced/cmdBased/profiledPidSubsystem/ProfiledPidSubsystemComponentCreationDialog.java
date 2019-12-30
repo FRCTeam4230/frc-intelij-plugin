@@ -14,24 +14,24 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.advanced.cmdBased.trapezoidProfileSubsystem;
+package net.javaru.iip.frc.actions.create.advanced.cmdBased.profiledPidSubsystem;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiDirectory;
 
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
-import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider;
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.CreateSubsystemComponentDialog;
+import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.SubsystemComponentCreationDialog;
 
 
 
-public class CreateTrapezoidProfileSubsystemComponentDialog extends CreateSubsystemComponentDialog
+public class ProfiledPidSubsystemComponentCreationDialog extends SubsystemComponentCreationDialog
 {
-    public CreateTrapezoidProfileSubsystemComponentDialog(@NotNull Module module,
-                                                          @NotNull ClassCreator classCreator,
-                                                          @NotNull PsiDirectory directory,
-                                                          @NotNull CreateFrcComponentDataProvider dataProvider)
+    public ProfiledPidSubsystemComponentCreationDialog(@NotNull Module module,
+                                                       @NotNull ClassCreator classCreator,
+                                                       @NotNull PsiDirectory directory,
+                                                       @NotNull FrcComponentCreationDataProvider dataProvider)
     {
         super(module, classCreator, directory, dataProvider);
     }

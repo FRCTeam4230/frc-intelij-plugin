@@ -21,29 +21,29 @@ import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiDirectory;
 
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractAdvancedNewFrcCmdBaseV2Action;
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.CreateFrcComponentDialog;
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.command.CreateCommandComponentDialog;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractCmdBaseV2ComponentCreationAction;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.command.CommandComponentCreationDialog;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
-public class CreateFrcCommand2ComponentAction extends AbstractAdvancedNewFrcCmdBaseV2Action
+public class Command2ComponentCreationAction extends AbstractCmdBaseV2ComponentCreationAction
 {
-    public CreateFrcCommand2ComponentAction()
+    public Command2ComponentCreationAction()
     {
         super(message("frc.new.class.command.action.name"),
               message("frc.new.class.command.action.description"),
-              CreateFrcCommandV2DataProvider.INSTANCE);
+              Command2ComponentCreationDataProvider.INSTANCE);
     }
     
     
     @Override
-    protected CreateFrcComponentDialog constructCreateFrcComponentDialogInstance(@NotNull Module module,
-                                                                                 @NotNull ClassCreator classCreator,
-                                                                                 @NotNull PsiDirectory directory)
+    protected FrcComponentCreationDialog constructCreateFrcComponentDialogInstance(@NotNull Module module,
+                                                                                   @NotNull ClassCreator classCreator,
+                                                                                   @NotNull PsiDirectory directory)
     {
-        return new CreateCommandComponentDialog(module, classCreator, directory, dataProvider);
+        return new CommandComponentCreationDialog(module, classCreator, directory, dataProvider);
     }
 }

@@ -14,25 +14,24 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2
+package net.javaru.iip.frc.actions.create.advanced.cmdBased.trapezoidProfileSubsystem.v2
 
 import com.google.common.collect.ImmutableList
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor
 import net.javaru.iip.frc.actions.create.advanced.BaseType
-import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider
+import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider
 import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory
 import net.javaru.iip.frc.wpilib.WpiLibConstants
 
 
-
-
-object CreateFrcSubsystemV2DataProvider : CreateFrcComponentDataProvider()
+object TrapezoidProfileSubsystem2ComponentCreationDataProvider : FrcComponentCreationDataProvider()
 {
     override val componentVersion: Int = 2
-    override val componentTypeSimpleName: String = "Subsystem"
-    override val componentTypeSimpleNames: List<String> by lazy { ImmutableList.of("Subsystem", "System", "SubSystem") }
+    override val componentTypeSimpleName: String = "TrapezoidProfileSubsystem"
+    override val componentTypeSimpleNames: List<String> by lazy { 
+        ImmutableList.of("Subsystem", "System", "SubSystem", "ProfileSubsystem", "ProfileSubSystem") }
     override val baseType: BaseType = BaseType.InterfaceAndBaseClass
-    override val topLevelClassFqName: String = WpiLibConstants.SUBSYSTEM_V2_INTERFACE_FQN
-    override val typicalBaseClassFqName: String = WpiLibConstants.SUBSYSTEM_V2_BASE_FQN
-    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.SUBSYSTEM2
+    override val topLevelClassFqName: String = WpiLibConstants.TRAPEZOID_PROFILED_SUBSYSTEM_BASE_V2_FQN
+    override val typicalBaseClassFqName: String = WpiLibConstants.TRAPEZOID_PROFILED_SUBSYSTEM_BASE_V2_FQN
+    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.TRAPEZOID_PROFILED_SUBSYSTEM2
 }

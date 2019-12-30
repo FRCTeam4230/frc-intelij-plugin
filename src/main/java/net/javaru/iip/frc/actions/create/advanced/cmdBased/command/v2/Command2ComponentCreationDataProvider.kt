@@ -14,23 +14,23 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v2
+package net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2
 
 import com.google.common.collect.ImmutableList
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor
 import net.javaru.iip.frc.actions.create.advanced.BaseType
-import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider
+import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider
 import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory
 import net.javaru.iip.frc.wpilib.WpiLibConstants
 
 
-object CreateFrcPidSubsystemV2DataProvider : CreateFrcComponentDataProvider()
+object Command2ComponentCreationDataProvider : FrcComponentCreationDataProvider()
 {
     override val componentVersion: Int = 2
-    override val componentTypeSimpleName: String = "PIDSubsystem"
-    override val componentTypeSimpleNames: List<String> by lazy { ImmutableList.of("Subsystem", "System", "SubSystem", "PIDSubsystem", "PidSubsystem", "PIDSubSystem", "PidSubSystem") }
-    override val baseType: BaseType = BaseType.BaseClassOnly
-    override val topLevelClassFqName: String = WpiLibConstants.PID_SUBSYSTEM_BASE_V2_FQN
-    override val typicalBaseClassFqName: String = WpiLibConstants.PID_SUBSYSTEM_BASE_V2_FQN
-    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.PID_SUBSYSTEM2
+    override val componentTypeSimpleName: String = "Command"
+    override val componentTypeSimpleNames: List<String> by lazy { ImmutableList.of("Command", "Cmd") }
+    override val baseType: BaseType = BaseType.InterfaceAndBaseClass
+    override val topLevelClassFqName: String = WpiLibConstants.COMMAND_V2_INTERFACE_FQN
+    override val typicalBaseClassFqName: String = WpiLibConstants.COMMAND_V2_BASE_FQN
+    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.COMMAND2
 }

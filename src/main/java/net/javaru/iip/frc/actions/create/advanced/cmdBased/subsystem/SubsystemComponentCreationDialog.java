@@ -31,8 +31,8 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 
 import kotlin.Unit;
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
-import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider;
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.CreateFrcComponentDialog;
+import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog;
 import net.javaru.iip.frc.util.FrcClassUtilsKt;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
 
@@ -40,7 +40,7 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
-public class CreateSubsystemComponentDialog extends CreateFrcComponentDialog
+public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
 {
     private static final String INCLUDE_ADD_CHILD_MESSAGE = "includeChildMessage";
     protected static final String MAKE_SINGLETON = "makeSingleton";
@@ -48,10 +48,10 @@ public class CreateSubsystemComponentDialog extends CreateFrcComponentDialog
     
     protected JBCheckBox makeSingletonCheckbox;
     
-    public CreateSubsystemComponentDialog(@NotNull Module module,
-                                          @NotNull ClassCreator classCreator,
-                                          @NotNull PsiDirectory directory,
-                                          @NotNull CreateFrcComponentDataProvider dataProvider)
+    public SubsystemComponentCreationDialog(@NotNull Module module,
+                                            @NotNull ClassCreator classCreator,
+                                            @NotNull PsiDirectory directory,
+                                            @NotNull FrcComponentCreationDataProvider dataProvider)
     {
         super(module, classCreator, directory, dataProvider);
     }

@@ -21,29 +21,29 @@ import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiDirectory;
 
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractAdvancedNewFrcCmdBaseV2Action;
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.CreateFrcComponentDialog;
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.CreatePidSubsystemComponentDialog;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractCmdBaseV2ComponentCreationAction;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.PidSubsystemComponentCreationDialog;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
-public class CreateFrcPidSubsystem2ComponentAction extends AbstractAdvancedNewFrcCmdBaseV2Action
+public class PidSubsystem2ComponentCreationAction extends AbstractCmdBaseV2ComponentCreationAction
 {
-    public CreateFrcPidSubsystem2ComponentAction()
+    public PidSubsystem2ComponentCreationAction()
     {
         super(message("frc.new.class.pidSubsystem.action.name"),
               message("frc.new.class.pidSubsystem.action.description"),
-              CreateFrcPidSubsystemV2DataProvider.INSTANCE);
+              PidSubsystem2ComponentCreationDataProvider.INSTANCE);
     }
     
     
     @Override
-    protected CreateFrcComponentDialog constructCreateFrcComponentDialogInstance(@NotNull Module module,
-                                                                                 @NotNull ClassCreator classCreator,
-                                                                                 @NotNull PsiDirectory directory)
+    protected FrcComponentCreationDialog constructCreateFrcComponentDialogInstance(@NotNull Module module,
+                                                                                   @NotNull ClassCreator classCreator,
+                                                                                   @NotNull PsiDirectory directory)
     {
-        return new CreatePidSubsystemComponentDialog(module, classCreator, directory, dataProvider);
+        return new PidSubsystemComponentCreationDialog(module, classCreator, directory, dataProvider);
     }
 }

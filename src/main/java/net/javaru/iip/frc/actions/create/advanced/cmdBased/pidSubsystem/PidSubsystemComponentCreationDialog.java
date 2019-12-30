@@ -21,17 +21,17 @@ import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiDirectory;
 
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
-import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider;
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.CreateSubsystemComponentDialog;
+import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.SubsystemComponentCreationDialog;
 
 
 
-public class CreatePidSubsystemComponentDialog extends CreateSubsystemComponentDialog
+public class PidSubsystemComponentCreationDialog extends SubsystemComponentCreationDialog
 {
-    public CreatePidSubsystemComponentDialog(@NotNull Module module,
-                                             @NotNull ClassCreator classCreator,
-                                             @NotNull PsiDirectory directory,
-                                             @NotNull CreateFrcComponentDataProvider dataProvider)
+    public PidSubsystemComponentCreationDialog(@NotNull Module module,
+                                               @NotNull ClassCreator classCreator,
+                                               @NotNull PsiDirectory directory,
+                                               @NotNull FrcComponentCreationDataProvider dataProvider)
     {
         super(module, classCreator, directory, dataProvider);
     }

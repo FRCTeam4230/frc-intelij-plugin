@@ -50,7 +50,7 @@ import kotlin.Unit;
 import kotlin.collections.CollectionsKt;
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 import net.javaru.iip.frc.actions.create.advanced.ComponentCreationSharedState;
-import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider;
+import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider;
 import net.javaru.iip.frc.util.FrcClassUtilsKt;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
 import net.javaru.iip.frc.util.PsiClassNameComparator;
@@ -60,7 +60,7 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
-public abstract class CreateFrcComponentDialog extends DialogWrapper
+public abstract class FrcComponentCreationDialog extends DialogWrapper
 {
     private static final String BASE_CLASS_FQ_NAME = "baseClassFqName";
     private static final String BASE_CLASS_NEEDS_IMPORTING = "baseClassNeedsImporting";
@@ -78,11 +78,11 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     @NotNull
     protected final PsiDirectory myDirectory;
     @NotNull
-    protected final CreateFrcComponentDataProvider myDataProvider;
+    protected final FrcComponentCreationDataProvider myDataProvider;
     
     protected final ComponentCreationSharedState sharedState = ComponentCreationSharedState.getInstance();
     
-    private static final Logger LOG = Logger.getInstance(CreateFrcComponentDialog.class);
+    private static final Logger LOG = Logger.getInstance(FrcComponentCreationDialog.class);
     private JPanel myTopPanel;
     private JBLabel myComponentNameLabel;
     protected JBTextField myComponentNameTextField;
@@ -97,10 +97,10 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     private ButtonGroup mySuperButtonGroup = new ButtonGroup();
     
     
-    protected CreateFrcComponentDialog(@NotNull Module module,
-                                    @NotNull ClassCreator classCreator,
-                                    @NotNull PsiDirectory directory,
-                                    @NotNull CreateFrcComponentDataProvider dataProvider)
+    protected FrcComponentCreationDialog(@NotNull Module module,
+                                         @NotNull ClassCreator classCreator,
+                                         @NotNull PsiDirectory directory,
+                                         @NotNull FrcComponentCreationDataProvider dataProvider)
     {
         super(module.getProject());
         this.myModule = module;

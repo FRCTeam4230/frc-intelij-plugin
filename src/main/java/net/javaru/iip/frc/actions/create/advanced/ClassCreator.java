@@ -52,12 +52,12 @@ public class ClassCreator
     @NotNull
     private final Module myModule;
     @NotNull
-    private final CreateFrcComponentDataProvider dataProvider;
+    private final FrcComponentCreationDataProvider dataProvider;
 
     private PsiClass[] createdClasses = null;
 
 
-    public ClassCreator(@NotNull Module module, @NotNull CreateFrcComponentDataProvider dataProvider)
+    public ClassCreator(@NotNull Module module, @NotNull FrcComponentCreationDataProvider dataProvider)
     {
         this.myModule = module;
         this.myProject = module.getProject();
@@ -90,7 +90,7 @@ public class ClassCreator
     /**
      * Executes the creation process in a WriteActionCommand. The supplied action should set the createdClasses field.
      * 
-     * @return whether the class was created (which indicates whether the CreateFrcComponentDialog can be closed).
+     * @return whether the class was created (which indicates whether the FrcComponentCreationDialog can be closed).
      */
     protected boolean doCreateClass(Callable<Boolean> action)
     {

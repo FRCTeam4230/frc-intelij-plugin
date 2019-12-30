@@ -31,7 +31,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.CreateFrcComponentDialog;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog;
 import net.javaru.iip.frc.facet.FrcFacetKt;
 
 
@@ -40,16 +40,16 @@ import net.javaru.iip.frc.facet.FrcFacetKt;
 /**
  * Base class for creating a new Class with a custom dialog for getting necessary information for creation of the class.
  */
-public abstract class AbstractAdvancedNewFrcClassAction extends CreateInDirectoryActionBase implements WriteActionAware
+public abstract class AbstractFrcComponentCreationAction extends CreateInDirectoryActionBase implements WriteActionAware
 {
-    private static final Logger LOG = Logger.getInstance(AbstractAdvancedNewFrcClassAction.class);
+    private static final Logger LOG = Logger.getInstance(AbstractFrcComponentCreationAction.class);
     
     @NotNull
-    protected final CreateFrcComponentDataProvider dataProvider;
+    protected final FrcComponentCreationDataProvider dataProvider;
     
-    protected AbstractAdvancedNewFrcClassAction(@NotNull String text,
-                                                @NotNull String description,
-                                                @NotNull CreateFrcComponentDataProvider dataProvider)
+    protected AbstractFrcComponentCreationAction(@NotNull String text,
+                                                 @NotNull String description,
+                                                 @NotNull FrcComponentCreationDataProvider dataProvider)
     {
         super(text, description, dataProvider.getIcon());
         this.dataProvider = dataProvider;
@@ -58,9 +58,9 @@ public abstract class AbstractAdvancedNewFrcClassAction extends CreateInDirector
     
     
     
-    protected abstract CreateFrcComponentDialog constructCreateFrcComponentDialogInstance(@NotNull Module module,
-                                                                                          @NotNull ClassCreator classCreator, 
-                                                                                          @NotNull PsiDirectory directory);
+    protected abstract FrcComponentCreationDialog constructCreateFrcComponentDialogInstance(@NotNull Module module,
+                                                                                            @NotNull ClassCreator classCreator,
+                                                                                            @NotNull PsiDirectory directory);
     
     
     protected ClassCreator constructClassCreatorInstance(@NotNull Module module)
@@ -69,7 +69,7 @@ public abstract class AbstractAdvancedNewFrcClassAction extends CreateInDirector
     }
     
     @NotNull
-    protected CreateFrcComponentDataProvider getDataProvider()
+    protected FrcComponentCreationDataProvider getDataProvider()
     {
         return dataProvider;
     }

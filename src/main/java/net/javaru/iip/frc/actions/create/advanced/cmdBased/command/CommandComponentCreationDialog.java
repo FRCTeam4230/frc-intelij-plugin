@@ -33,8 +33,8 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.ui.components.JBCheckBox;
 
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
-import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider;
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.CreateFrcComponentDialog;
+import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog;
 import net.javaru.iip.frc.util.FrcClassUtilsKt;
 import net.javaru.iip.frc.util.FrcCollectionExtsKt;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
@@ -44,7 +44,7 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
-public class CreateCommandComponentDialog extends CreateFrcComponentDialog
+public class CommandComponentCreationDialog extends FrcComponentCreationDialog
 {
     private static final String SUBSYSTEMS_FQN_COMMA_DELIMITED_LIST = "requiredSubsystemsFqnCommaDelimitedString";
     private static final String SUBSYSTEMS_SIMPLE_NAME_COMMA_DELIMITED_LIST = "requiredSubsystemsNamesCommaDelimitedString";
@@ -53,10 +53,10 @@ public class CreateCommandComponentDialog extends CreateFrcComponentDialog
     private Map<PsiClass, JBCheckBox> mySubsystemsClassesMap;
     
     
-    public CreateCommandComponentDialog(@NotNull Module module,
-                                        @NotNull ClassCreator classCreator,
-                                        @NotNull PsiDirectory directory,
-                                        @NotNull CreateFrcComponentDataProvider dataProvider)
+    public CommandComponentCreationDialog(@NotNull Module module,
+                                          @NotNull ClassCreator classCreator,
+                                          @NotNull PsiDirectory directory,
+                                          @NotNull FrcComponentCreationDataProvider dataProvider)
     {
         super(module, classCreator, directory, dataProvider);
     }

@@ -20,18 +20,18 @@ import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 
-import net.javaru.iip.frc.actions.create.advanced.AbstractAdvancedNewFrcClassAction;
-import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider;
+import net.javaru.iip.frc.actions.create.advanced.AbstractFrcComponentCreationAction;
+import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider;
 import net.javaru.iip.frc.wpilib.WpiibLibraryUtilsKt;
 
 
 
-public abstract class AbstractAdvancedNewFrcCmdBaseV2Action extends AbstractAdvancedNewFrcClassAction
+public abstract class AbstractCmdBaseV2ComponentCreationAction extends AbstractFrcComponentCreationAction
 {
-    private static final Logger LOG = Logger.getInstance(AbstractAdvancedNewFrcCmdBaseV2Action.class);
+    private static final Logger LOG = Logger.getInstance(AbstractCmdBaseV2ComponentCreationAction.class);
     
     
-    protected AbstractAdvancedNewFrcCmdBaseV2Action(String text, String description, CreateFrcComponentDataProvider dataProvider)
+    protected AbstractCmdBaseV2ComponentCreationAction(String text, String description, FrcComponentCreationDataProvider dataProvider)
     {
         super(text, description, dataProvider);
     }

@@ -22,7 +22,7 @@ import com.intellij.ide.fileTemplates.FileTemplateDescriptor
 import javax.swing.Icon
 
 
-abstract class CreateFrcComponentDataProvider
+abstract class FrcComponentCreationDataProvider
 {
     abstract val componentVersion: Int
   

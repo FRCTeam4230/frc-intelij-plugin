@@ -19,12 +19,12 @@ package net.javaru.iip.frc.actions.create.advanced.cmdBased.profiledPidSubsystem
 import com.google.common.collect.ImmutableList
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor
 import net.javaru.iip.frc.actions.create.advanced.BaseType
-import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider
+import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider
 import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory
 import net.javaru.iip.frc.wpilib.WpiLibConstants
 
 
-object CreateFrcProfiledPidSubsystemV2DataProvider : CreateFrcComponentDataProvider()
+object ProfiledPidSubsystem2ComponentCreationDataProvider : FrcComponentCreationDataProvider()
 {
     override val componentVersion: Int = 2
     override val componentTypeSimpleName: String = "ProfiledPIDSubsystem"

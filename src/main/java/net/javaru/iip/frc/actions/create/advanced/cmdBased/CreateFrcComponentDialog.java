@@ -83,8 +83,8 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
     private static final Logger LOG = Logger.getInstance(CreateFrcComponentDialog.class);
     private JPanel myTopPanel;
     private JBLabel myComponentNameLabel;
-    private JBTextField myComponentNameTextField;
-    private JCheckBox myAutoAppendComponentTypeCheckBox;
+    protected JBTextField myComponentNameTextField;
+    protected JCheckBox myAutoAppendComponentTypeCheckBox;
     private JPanel myMajorOptionsPanel;
     private JPanel mySuperClassPanel;
     private JCheckBox myIncludeJavaDocCheckBox;

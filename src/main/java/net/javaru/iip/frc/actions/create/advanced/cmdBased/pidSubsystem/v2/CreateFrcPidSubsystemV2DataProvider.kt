@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2
+package net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v2
 
 import com.google.common.collect.ImmutableList
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor
@@ -24,15 +24,13 @@ import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory
 import net.javaru.iip.frc.wpilib.WpiLibConstants
 
 
-
-
-object CreateFrcSubsystemV2DataProvider : CreateFrcComponentDataProvider()
+object CreateFrcPidSubsystemV2DataProvider : CreateFrcComponentDataProvider()
 {
     override val componentVersion: Int = 2
-    override val classTypeSimpleName: String = "Subsystem"
-    override val classTypeSimpleNames: List<String> by lazy { ImmutableList.of("Subsystem", "System", "SubSystem") }
-    override val baseType: BaseType = BaseType.InterfaceAndBaseClass
-    override val topLevelClassFqName: String = WpiLibConstants.SUBSYSTEM_V2_INTERFACE_FQN
-    override val typicalBaseClassFqName: String = WpiLibConstants.SUBSYSTEM_V2_BASE_FQN
-    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.SUBSYSTEM2
+    override val classTypeSimpleName: String = "PIDSubsystem"
+    override val classTypeSimpleNames: List<String> by lazy { ImmutableList.of("Subsystem", "System", "SubSystem", "PIDSubsystem", "PidSubsystem", "PIDSubSystem", "PidSubSystem") }
+    override val baseType: BaseType = BaseType.BaseClassOnly
+    override val topLevelClassFqName: String = WpiLibConstants.PID_SUBSYSTEM_BASE_V2_FQN
+    override val typicalBaseClassFqName: String = WpiLibConstants.PID_SUBSYSTEM_BASE_V2_FQN
+    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.PID_SUBSYSTEM2
 }

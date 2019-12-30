@@ -1,0 +1,83 @@
+#set( $H = '#' )
+#if(${PACKAGE_NAME})
+#if (${PACKAGE_NAME} != "")
+package ${PACKAGE_NAME};
+#end
+#end
+
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
+
+
+#parse("File Header.java")
+public #if($makeAbstract == "true")abstract#end class ${NAME} extends PIDSubsystem
+{
+#if($makeSingleton == "true")
+    /** 
+     * The Singleton instance of this ${NAME}. External classes should
+     * use the {@link ${H}getInstance()} method to get the instance.
+     */
+    private final static ${NAME} INSTANCE = new ${NAME}();
+
+#end
+    // TODO: Determine real PID values needed and configure them here
+    private static final double P = 0.0;
+    private static final double I = 0.0;
+    private static final double D = 0.0;
+
+    /**
+     * Creates a new instance of this ${NAME}.
+    #if($makeSingleton == "true")
+     * This constructor is private since this class is a Singleton. External classes 
+     * should use the {@link ${H}getInstance()} method to get the instance. 
+    #end
+     */
+    #if($makeSingleton == "true")private #elseif($makeAbstract == "true")protected #else public #end${NAME}()
+    {
+        super(new PIDController(P ,I, D));
+        // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command) 
+        //       in the constructor or in the robot coordination class, such as RobotContainer.
+        //       Also, you can call addChild(name, sendableChild) to associate sendables with the subsystem
+        //       such as SpeedControllers, Encoders, DigitalInputs, etc.
+    }
+#if($makeSingleton == "true")
+    
+    /**
+     * Returns the Singleton instance of this ${NAME}. This static method 
+     * should be used -- {@code ${NAME}.getInstance();} -- by external
+     * classes, rather than the constructor to get the instance of this class.
+     */
+    public static ${NAME} getInstance() { return INSTANCE; }
+#end
+
+#if($includeJavaDocsForOverrides == "true")
+  /**
+   * Returns the measurement of the process variable used by the PIDController.
+   * This method is automatically called by the subsystem.
+   *
+   * @return the measurement of the process variable
+   */
+#end
+    @Override
+    public double getMeasurement()
+    {
+        // TODO: Return the measurement from the PID sensor, such as an encoder or potentiometer. 
+        //       This method is automatically called by the subsystem.
+        return 0.0;
+    }
+
+#if($includeJavaDocsForOverrides == "true")
+    /**
+     * Uses the output from the PIDController.
+     * This method is automatically called by the subsystem
+     *
+     * @param output the output of the PIDController
+     * @param setpoint the setpoint of the PIDController (for feedforward)
+     */
+#end
+    @Override
+    protected void useOutput(double output, double setpoint)
+    {
+        // TODO: Use the output, for example to set the sped on a motor.
+    }    
+}

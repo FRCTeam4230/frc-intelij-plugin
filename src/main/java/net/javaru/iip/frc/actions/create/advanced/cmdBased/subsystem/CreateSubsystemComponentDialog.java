@@ -29,6 +29,7 @@ import com.intellij.ui.components.JBCheckBox;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 
+import kotlin.Unit;
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 import net.javaru.iip.frc.actions.create.advanced.CreateFrcComponentDataProvider;
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.CreateFrcComponentDialog;
@@ -42,9 +43,9 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 public class CreateSubsystemComponentDialog extends CreateFrcComponentDialog
 {
     private static final String INCLUDE_ADD_CHILD_MESSAGE = "includeChildMessage";
-    private static final String MAKE_SINGLETON = "makeSingleton";
+    protected static final String MAKE_SINGLETON = "makeSingleton";
     
-    private JBCheckBox makeSingletonCheckbox;
+    protected JBCheckBox makeSingletonCheckbox;
     
     public CreateSubsystemComponentDialog(@NotNull Module module,
                                           @NotNull ClassCreator classCreator,
@@ -67,7 +68,7 @@ public class CreateSubsystemComponentDialog extends CreateFrcComponentDialog
             boolean includeChildMessage =  subsystemBaseClass != null && (baseClass.equals(subsystemBaseClass) ||  baseClass.isInheritor(subsystemBaseClass, true));
             props.put(INCLUDE_ADD_CHILD_MESSAGE, Boolean.toString(includeChildMessage));
         }
-        boolean makeSingleton = (makeSingletonCheckbox != null && makeSingletonCheckbox.isSelected());
+        boolean makeSingleton = (makeSingletonCheckbox != null && makeSingletonCheckbox.isEnabled() && makeSingletonCheckbox.isSelected());
         props.put(MAKE_SINGLETON, Boolean.toString(makeSingleton));
     }
     
@@ -96,5 +97,12 @@ public class CreateSubsystemComponentDialog extends CreateFrcComponentDialog
         gc.setHSizePolicy(GridConstraints.SIZEPOLICY_FIXED);
         optionsPanel.add(helpLabel, gc);
         FrcUiUtilsKt.addHorizontalSpacer(optionsPanel, 0, 2);
+        
+        // Disable the make Singleton option is the name contains "abstract"
+        FrcUiUtilsKt.addTextChangedListener(myComponentNameTextField, (documentEvent, text) -> {
+            final String name = myComponentNameTextField.getText();
+            makeSingletonCheckbox.setEnabled(name != null && !name.toLowerCase().contains("abstract"));
+            return Unit.INSTANCE;
+        });
     }
 }

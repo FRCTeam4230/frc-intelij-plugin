@@ -1,3 +1,4 @@
+#set( $H = '#' )
 #if(${PACKAGE_NAME})
 #if (${PACKAGE_NAME} != "")
 package ${PACKAGE_NAME};
@@ -13,14 +14,24 @@ import ${baseClassFqName};
 public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtendsClause}
 {
 #if($makeSingleton == "true")
-    private final static ${NAME} INSTANCE = new ${NAME}();  
+    /** 
+     * The Singleton instance of this ${NAME}. External classes should
+     * use the {@link ${H}getInstance()} method to get the instance.
+     */
+    private final static ${NAME} INSTANCE = new ${NAME}();
 #end
     
-    /** Creates a new instance of this ${NAME}. */
-    #if($makeSingleton == "true")private #else public #end${NAME}()
+    /**
+     * Creates a new instance of this ${NAME}.
+    #if($makeSingleton == "true")
+     * This constructor is private since this class is a Singleton. External classes 
+     * should use the {@link ${H}getInstance()} method to get the instance. 
+    #end
+     */
+    #if($makeSingleton == "true")private #elseif($makeAbstract == "true")protected #else public #end${NAME}()
     {
-        // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command) 
-        //       in the constructor or the robot coordination class, such as RobotContainer.
+        // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command)
+        //       in the constructor or in the robot coordination class, such as RobotContainer.
         #if($includeChildMessage == "true")
         //       Also, you can call addChild(name, sendableChild) to associate sendables with the subsystem
         //       such as SpeedControllers, Encoders, DigitalInputs, etc.
@@ -28,6 +39,11 @@ public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtends
     }
 #if($makeSingleton == "true")
     
+    /**
+     * Returns the Singleton instance of this ${NAME}. This static method 
+     * should be used -- {@code ${NAME}.getInstance();} -- by external
+     * classes, rather than the constructor to get the instance of this class.
+     */
     public static ${NAME} getInstance() { return INSTANCE; }
 #end
     

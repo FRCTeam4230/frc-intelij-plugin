@@ -423,6 +423,8 @@
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.CreateFrcCommand2ComponentAction" />
             <action id="frc.action.new.subsystem2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2.CreateFrcSubsystem2ComponentAction" />
+            <action id="frc.action.new.trapezoidProfileSubsystem2"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.trapezoidProfileSubsystem.v2.CreateFrcTrapezoidProfileSubsystem2ComponentAction" />
             <action id="frc.action.new.pidSubsystem2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v2.CreateFrcPidSubsystem2ComponentAction" />
             <action id="frc.action.new.profiledPidSubsystem2"

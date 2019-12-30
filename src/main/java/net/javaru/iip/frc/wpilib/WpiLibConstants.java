@@ -51,6 +51,7 @@ public class WpiLibConstants
     public static final String PID_SUBSYSTEM_BASE_V1_FQN =       "edu.wpi.first.wpilibj.command.PIDSubsystem";
     public static final String PID_SUBSYSTEM_BASE_V2_FQN =       "edu.wpi.first.wpilibj2.command.PIDSubsystem";
     public static final String PROFILED_PID_SUBSYSTEM_BASE_V2_FQN = "edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem";
+    public static final String TRAPEZOID_PROFILED_SUBSYSTEM_BASE_V2_FQN = "edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem";
     
     public static final String COMMAND_V1_BASE_FQN =      "edu.wpi.first.wpilibj.command.Command";
     public static final String COMMAND_V2_INTERFACE_FQN = "edu.wpi.first.wpilibj2.command.Command";

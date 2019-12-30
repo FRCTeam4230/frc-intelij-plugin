@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem;
+package net.javaru.iip.frc.actions.create.advanced.cmdBased.trapezoidProfileSubsystem;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.module.Module;
@@ -26,12 +26,12 @@ import net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.CreateSubsy
 
 
 
-public class CreatePidSubsystemComponentDialog extends CreateSubsystemComponentDialog
+public class CreateTrapezoidProfileSubsystemComponentDialog extends CreateSubsystemComponentDialog
 {
-    public CreatePidSubsystemComponentDialog(@NotNull Module module,
-                                             @NotNull ClassCreator classCreator,
-                                             @NotNull PsiDirectory directory,
-                                             @NotNull CreateFrcComponentDataProvider dataProvider)
+    public CreateTrapezoidProfileSubsystemComponentDialog(@NotNull Module module,
+                                                          @NotNull ClassCreator classCreator,
+                                                          @NotNull PsiDirectory directory,
+                                                          @NotNull CreateFrcComponentDataProvider dataProvider)
     {
         super(module, classCreator, directory, dataProvider);
     }

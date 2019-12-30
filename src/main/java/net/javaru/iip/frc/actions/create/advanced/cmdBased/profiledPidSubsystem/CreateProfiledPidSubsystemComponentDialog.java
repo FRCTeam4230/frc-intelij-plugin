@@ -17,7 +17,6 @@
 package net.javaru.iip.frc.actions.create.advanced.cmdBased.profiledPidSubsystem;
 
 import org.jetbrains.annotations.NotNull;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiDirectory;
 
@@ -29,9 +28,6 @@ import net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.CreateSubsy
 
 public class CreateProfiledPidSubsystemComponentDialog extends CreateSubsystemComponentDialog
 {
-    private static final Logger LOG = Logger.getInstance(CreateProfiledPidSubsystemComponentDialog.class);
-    
-    
     public CreateProfiledPidSubsystemComponentDialog(@NotNull Module module,
                                                      @NotNull ClassCreator classCreator,
                                                      @NotNull PsiDirectory directory,

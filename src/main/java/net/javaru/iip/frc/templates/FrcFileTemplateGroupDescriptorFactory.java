@@ -35,6 +35,7 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
     // COMMAND BASED FRAMEWORK v2
     public static final FileTemplateDescriptor COMMAND2 = new FileTemplateDescriptor("FRC v2 Command.java", FrcIcons.Components.COMMAND);
     public static final FileTemplateDescriptor SUBSYSTEM2 = new FileTemplateDescriptor("FRC v2 Subsystem.java", FrcIcons.Components.SUBSYSTEM);
+    public static final FileTemplateDescriptor TRAPEZOID_PROFILED_SUBSYSTEM2 = new FileTemplateDescriptor("FRC v2 Trapezoid Profile Subsystem.java", FrcIcons.Components.SUBSYSTEM);
     public static final FileTemplateDescriptor PID_SUBSYSTEM2 = new FileTemplateDescriptor("FRC v2 PIDSubsystem.java", FrcIcons.Components.PID_SUBSYSTEM);
     public static final FileTemplateDescriptor PROFILED_PID_SUBSYSTEM2 = new FileTemplateDescriptor("FRC v2 ProfiledPIDSubsystem.java", FrcIcons.Components.PID_SUBSYSTEM);
     
@@ -49,6 +50,7 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
                                         PID_SUBSYSTEM,
                                         COMMAND2,
                                         SUBSYSTEM2,
+                                        TRAPEZOID_PROFILED_SUBSYSTEM2,
                                         PID_SUBSYSTEM2,
                                         PROFILED_PID_SUBSYSTEM2,
                                         TRIGGER

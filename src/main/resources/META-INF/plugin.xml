@@ -419,12 +419,14 @@
             <action id="frc.action.new.basic.pidSubsystem"
                     class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcPidSubsystemClassAction" />
 
-            <action id="frc.action.new.basic.command2"
+            <action id="frc.action.new.command2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.CreateFrcCommand2ComponentAction" />
-            <action id="frc.action.new.basic.subsystem2"
+            <action id="frc.action.new.subsystem2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2.CreateFrcSubsystem2ComponentAction" />
-            <action id="frc.action.new.basic.pidSubsystem2"
+            <action id="frc.action.new.pidSubsystem2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v2.CreateFrcPidSubsystem2ComponentAction" />
+            <action id="frc.action.new.profiledPidSubsystem2"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.profiledPidSubsystem.v2.CreateFrcProfiledPidSubsystem2ComponentAction" />
 
 
             <action id="frc.action.new.basic.trigger"

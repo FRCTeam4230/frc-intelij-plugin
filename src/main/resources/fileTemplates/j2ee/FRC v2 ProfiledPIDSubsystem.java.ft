@@ -5,16 +5,20 @@ package ${PACKAGE_NAME};
 #end
 #end
 
-import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 #if($baseClassNeedsImporting == "true")
 import ${baseClassFqName};
 #end
 
 
 #parse("File Header.java")
-public #if($makeAbstract == "true")abstract#end class ${NAME}  ${baseClassExtendsClause}
+public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtendsClause}
 {
 #if($makeSingleton == "true")
+    
+    // Any variables/fields used in the constructor must appear before the "INSTANCE" variable so that they are initialized before the constructor is called.
+    
     /** 
      * The Singleton instance of this ${NAME}. External classes should
      * use the {@link ${H}getInstance()} method to get the instance.
@@ -33,7 +37,8 @@ public #if($makeAbstract == "true")abstract#end class ${NAME}  ${baseClassExtend
     #if($makeSingleton == "true")private #elseif($makeAbstract == "true")protected #else public #end${NAME}()
     {
         // TODO: Determine real PID values needed and configure them here
-        super(new PIDController(0.0, 0.0, 0.0));
+        //       as well as the TrapezoidProfile 'maxVelocity' & 'maxAcceleration' constraints
+        super(new ProfiledPIDController(0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0)));
         
         // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command) 
         //       in the constructor or in the robot coordination class, such as RobotContainer.
@@ -52,7 +57,7 @@ public #if($makeAbstract == "true")abstract#end class ${NAME}  ${baseClassExtend
 
 #if($includeJavaDocsForOverrides == "true")
   /**
-   * Returns the measurement of the process variable used by the PIDController.
+   * Returns the measurement of the process variable used by the ProfiledPIDController.
    * This method is automatically called by the subsystem.
    *
    * @return the measurement of the process variable
@@ -68,15 +73,15 @@ public #if($makeAbstract == "true")abstract#end class ${NAME}  ${baseClassExtend
 
 #if($includeJavaDocsForOverrides == "true")
     /**
-     * Uses the output from the PIDController.
-     * This method is automatically called by the subsystem
+     * Uses the output from the ProfiledPIDController.
+     * This method is automatically called by the subsystem.
      *
-     * @param output the output of the PIDController
-     * @param setpoint the setpoint of the PIDController (for feedforward)
+     * @param output the output of the ProfiledPIDController
+     * @param setpoint the setpoint of the ProfiledPIDController (for feedforward)
      */
 #end
     @Override
-    protected void useOutput(double output, double setpoint)
+    protected void useOutput(double output,TrapezoidProfile.State setpoint)
     {
         // TODO: Use the output, for example to set the sped on a motor.
     }    

@@ -36,6 +36,7 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
     public static final FileTemplateDescriptor COMMAND2 = new FileTemplateDescriptor("FRC v2 Command.java", FrcIcons.Components.COMMAND);
     public static final FileTemplateDescriptor SUBSYSTEM2 = new FileTemplateDescriptor("FRC v2 Subsystem.java", FrcIcons.Components.SUBSYSTEM);
     public static final FileTemplateDescriptor PID_SUBSYSTEM2 = new FileTemplateDescriptor("FRC v2 PIDSubsystem.java", FrcIcons.Components.PID_SUBSYSTEM);
+    public static final FileTemplateDescriptor PROFILED_PID_SUBSYSTEM2 = new FileTemplateDescriptor("FRC v2 ProfiledPIDSubsystem.java", FrcIcons.Components.PID_SUBSYSTEM);
     
     // GENERAL FRC/WPI
     public static final FileTemplateDescriptor TRIGGER = new FileTemplateDescriptor("FRC Trigger.java", FrcIcons.Components.BUTTON);
@@ -49,6 +50,7 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
                                         COMMAND2,
                                         SUBSYSTEM2,
                                         PID_SUBSYSTEM2,
+                                        PROFILED_PID_SUBSYSTEM2,
                                         TRIGGER
                                         );
 

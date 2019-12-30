@@ -30,6 +30,7 @@ object TrapezoidProfileSubsystem2ComponentCreationDataProvider : FrcComponentCre
     override val componentTypeSimpleName: String = "TrapezoidProfileSubsystem"
     override val componentTypeSimpleNames: List<String> by lazy { 
         ImmutableList.of("Subsystem", "System", "SubSystem", "ProfileSubsystem", "ProfileSubSystem") }
+    override val autoAppendSuffix: String = "Subsystem" 
     override val baseType: BaseType = BaseType.InterfaceAndBaseClass
     override val topLevelClassFqName: String = WpiLibConstants.TRAPEZOID_PROFILED_SUBSYSTEM_BASE_V2_FQN
     override val typicalBaseClassFqName: String = WpiLibConstants.TRAPEZOID_PROFILED_SUBSYSTEM_BASE_V2_FQN

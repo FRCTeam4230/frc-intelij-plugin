@@ -32,6 +32,7 @@ object ProfiledPidSubsystem2ComponentCreationDataProvider : FrcComponentCreation
         ImmutableList
             .of("Subsystem", "System", "SubSystem", "PIDSubsystem", "PidSubsystem", "PIDSubSystem", "PidSubSystem")
     }
+    override val autoAppendSuffix: String = "PIDSubsystem"
     override val baseType: BaseType = BaseType.BaseClassOnly
     override val topLevelClassFqName: String = WpiLibConstants.PROFILED_PID_SUBSYSTEM_BASE_V2_FQN
     override val typicalBaseClassFqName: String = WpiLibConstants.PROFILED_PID_SUBSYSTEM_BASE_V2_FQN

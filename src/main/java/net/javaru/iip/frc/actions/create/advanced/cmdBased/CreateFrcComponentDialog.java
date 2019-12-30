@@ -505,8 +505,14 @@ public abstract class CreateFrcComponentDialog extends DialogWrapper
         {
             topLevelClasses = foundBaseClasses;
         }
-        
-        
+    
+        final List<String> additionalBaseClassesNames = myDataProvider.getAdditionalBaseClassFqNames();
+        for (String additionalBaseClassesName : additionalBaseClassesNames)
+        {
+            classes.add(FrcClassUtilsKt.findClass(myProject, additionalBaseClassesName));
+        }
+    
+    
         // We should only find the one interface, but the easiest way to handle is to iterate over them.
         for (PsiClass foundInterface : topLevelClasses)
         {

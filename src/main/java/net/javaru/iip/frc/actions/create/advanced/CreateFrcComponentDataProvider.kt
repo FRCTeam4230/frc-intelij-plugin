@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.actions.create.advanced
 
+import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor
 import javax.swing.Icon
@@ -54,6 +55,9 @@ abstract class CreateFrcComponentDataProvider
     /** Returns the typical base class or interface that is extended or implemented by users when creating this FRC component.
      * This may or may not be the same value as the [topLevelClassFqName]. */
     abstract val typicalBaseClassFqName: String
+    
+    /** Returns a (potentially empty) list of additional base classes. */
+    open val additionalBaseClassFqNames: List<String> by lazy { ImmutableList.of<String>() }
     
     /**
      * An immutable Set of base name suffixes for the component. A class ending in one of these

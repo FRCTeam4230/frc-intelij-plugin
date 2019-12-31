@@ -14,7 +14,7 @@
         </constraints>
         <properties>
           <labelFor value="d91ab"/>
-          <text resource-bundle="i18n/FrcBundle" key="frc.new.class.adv.command.dialog.commandName.label"/>
+          <text resource-bundle="i18n/FrcBundle" key="frc.new.class.adv.general.dialog.className.label.simple"/>
         </properties>
       </component>
       <vspacer id="99511">

@@ -1,7 +1,6 @@
 #* @implicitly included *#
 #* @vtlvariable name="NAME" type="java.lang.String" *#
 #* @vtlvariable name="PACKAGE_NAME" type="java.lang.String" *#
-#* @vtlvariable name="additionalConstructorJavadoc" type="java.lang.String" *#
 #* @vtlvariable name="baseClassExtendsClause" type="java.lang.String" *#
 #* @vtlvariable name="baseClassFqName" type="java.lang.String" *#
 #* @vtlvariable name="baseClassNeedsImporting" type="java.lang.String" *#

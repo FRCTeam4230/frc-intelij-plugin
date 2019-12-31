@@ -35,6 +35,7 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
     // COMMAND BASED FRAMEWORK v1
     public static final FileTemplateDescriptor COMMAND1 = new FileTemplateDescriptor("FRC v1 Command.java", FrcIcons.Components.COMMAND);
     public static final FileTemplateDescriptor COMMAND_GROUP1 = new FileTemplateDescriptor("FRC v1 CommandGroup.java", FrcIcons.Components.COMMAND_GROUP);
+    public static final FileTemplateDescriptor SUBSYSTEM1 = new FileTemplateDescriptor("FRC v1 Subsystem.java", FrcIcons.Components.SUBSYSTEM);
     
     
     // COMMAND BASED FRAMEWORK v2
@@ -49,9 +50,9 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
     
     private static final FileTemplateGroupDescriptor FILE_TEMPLATE_GROUP_DESCRIPTOR =
         new FileTemplateGroupDescriptor("FRC", FrcIcons.FRC.FIRST_ICON_MEDIUM_16,
-                                        COMMAND,
-                                        COMMAND_GROUP,
-                                        SUBSYSTEM,
+                                        COMMAND1,
+                                        COMMAND_GROUP1,
+                                        SUBSYSTEM1,
                                         PID_SUBSYSTEM,
                                         COMMAND2,
                                         SUBSYSTEM2,

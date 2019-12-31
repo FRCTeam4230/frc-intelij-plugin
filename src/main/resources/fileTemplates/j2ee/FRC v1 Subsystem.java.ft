@@ -1,0 +1,30 @@
+#set( $H = '#' )
+#if(${PACKAGE_NAME})
+#if (${PACKAGE_NAME} != "")
+package ${PACKAGE_NAME};
+#end
+#end
+
+
+#if($baseClassNeedsImporting == "true")
+import ${baseClassFqName};
+#end
+
+#parse("File Header.java")
+public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtendsClause}
+{
+#parse("FRC_singletonInstanceVariable.java")
+    #parse("FRC_constructorSignature.java")()
+    {
+
+    }
+    #parse("FRC_getInstance.java")
+    
+    @Override
+    protected void initDefaultCommand()
+    {
+        // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command)
+        //       e.g. setDefaultCommand(new MyCommand());
+    }
+}
+

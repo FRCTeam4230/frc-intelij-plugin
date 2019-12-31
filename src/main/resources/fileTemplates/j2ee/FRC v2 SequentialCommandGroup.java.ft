@@ -15,8 +15,14 @@ public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtends
 {
     #parse("FRC_constructorSignature.java")()
     {
-        // TODO: Add your commands in the super() call, e.g.
-        //       super(new FooCommand(), new BarCommand());
+        // TODO: Add your sequential commands in the super() call, e.g.
+        //           super(new FooCommand(), new BarCommand());
+        //       or use the addCommands() method. For example:
+        //           addCommands(
+        //                     new OpenClawCommand(Claw.getInstance()),
+        //                     parallel(
+        //                             new SetWristSetpointCommand(0, Wrist.getInstance()),
+        //                             new SetElevatorSetpointCommand(0, Elevator.getInstance())));
         super();
     }
 }

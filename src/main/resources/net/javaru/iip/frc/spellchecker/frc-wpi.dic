@@ -23,6 +23,7 @@ hids
 imgcodecs
 imgproc
 intellisense
+interruptible
 joystick
 joysticks
 kauai
@@ -56,6 +57,7 @@ robo
 roborio
 screenstepslive
 sendable
+sendables
 setpoint
 setpoints
 shuffleboard

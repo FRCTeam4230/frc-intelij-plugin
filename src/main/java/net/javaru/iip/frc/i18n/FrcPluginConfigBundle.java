@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2019 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.PropertyKey;
 import com.intellij.BundleBase;
 
-import net.javaru.iip.frc.util.FrcUiUtils;
+import net.javaru.iip.frc.util.FrcUiUtilsKt;
 
 
 
@@ -98,7 +98,7 @@ public class FrcPluginConfigBundle
      */
     public static String messageLabelCentered(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params)
     {
-        return FrcUiUtils.centerLabelText(message(key, params));
+        return FrcUiUtilsKt.centerLabelText(message(key, params));
     }
 
 

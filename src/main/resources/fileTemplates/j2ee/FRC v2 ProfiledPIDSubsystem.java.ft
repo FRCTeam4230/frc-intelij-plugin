@@ -1,0 +1,62 @@
+#set( $H = '#' )
+#if(${PACKAGE_NAME})
+#if (${PACKAGE_NAME} != "")
+package ${PACKAGE_NAME};
+#end
+#end
+
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+#if($baseClassNeedsImporting == "true")
+import ${baseClassFqName};
+#end
+
+
+#parse("File Header.java")
+public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtendsClause}
+{
+#parse("FRC_singletonInstanceVariable.java")
+    #parse("FRC_constructorSignature.java")()
+    {
+        // TODO: Determine real PID values needed and configure them here
+        //       as well as the TrapezoidProfile 'maxVelocity' & 'maxAcceleration' constraints
+        super(new ProfiledPIDController(0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0)));
+        
+        // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command) 
+        //       in the constructor or in the robot coordination class, such as RobotContainer.
+        //       Also, you can call addChild(name, sendableChild) to associate sendables with the subsystem
+        //       such as SpeedControllers, Encoders, DigitalInputs, etc.
+    }
+#parse("FRC_getInstance.java")
+
+#if($includeJavaDocsForOverrides == "true")
+  /**
+   * Returns the measurement of the process variable used by the ProfiledPIDController.
+   * This method is automatically called by the subsystem.
+   *
+   * @return the measurement of the process variable
+   */
+#end
+    @Override
+    public double getMeasurement()
+    {
+        // TODO: Return the measurement from the PID sensor, such as an encoder, gyro, potentiometer, etc. 
+        //       This method is automatically called by the subsystem.
+        return 0.0;
+    }
+
+#if($includeJavaDocsForOverrides == "true")
+    /**
+     * Uses the output from the ProfiledPIDController.
+     * This method is automatically called by the subsystem.
+     *
+     * @param output the output of the ProfiledPIDController
+     * @param setpoint the setpoint of the ProfiledPIDController (for feedforward)
+     */
+#end
+    @Override
+    protected void useOutput(double output,TrapezoidProfile.State setpoint)
+    {
+        // TODO: Use the output, for example to set the sped on a motor.
+    }    
+}

@@ -50,7 +50,7 @@ import net.javaru.iip.frc.settings.TeamNumberFormChangeListener;
 import net.javaru.iip.frc.settings.TeamNumberKeyChangeListener;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
 import net.javaru.iip.frc.util.FrcPsiNameHelper;
-import net.javaru.iip.frc.util.UiUtilsKt;
+import net.javaru.iip.frc.util.FrcUiUtilsKt;
 import net.javaru.iip.frc.wizard.FrcProjectWizardData.JUnitOption;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
@@ -114,9 +114,9 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         initTeamNumberField();
         final FrcProjectWizardData dataModel = myBuilder.getDataModel();
         
-        UiUtilsKt.setTextIfEmpty(basePackageTextField, dataModel.getBasePackage());
+        FrcUiUtilsKt.setTextIfEmpty(basePackageTextField, dataModel.getBasePackage());
         basePackageWarningLabel.setVisible(false);
-        UiUtilsKt.addTextChangedListener(basePackageTextField, text -> { basePackageWarningLabel.setVisible(StringUtils.isBlank(text));
+        FrcUiUtilsKt.addTextChangedListener(basePackageTextField, text -> { basePackageWarningLabel.setVisible(StringUtils.isBlank(text));
             return Unit.INSTANCE;
         });
         basePackageDefaultButton.addActionListener(e -> basePackageTextField.setText(FrcProjectWizardDataKt.DEFAULT_BASE_PACKAGE));
@@ -188,7 +188,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     private void initTeamNumberField()
     {
         // We may need to update this when the team number changed from an application setting to a project setting
-        UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getDataModel().getTeamNumber()));
+        FrcUiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getDataModel().getTeamNumber()));
         updateTeamNumberWarningVisibility(FrcTeamNumberKt.isValidTeamNumber(teamNumberTextField.getText()));
         // The TeamNumberKeyChangeListener calls the 'onTeamNumberFormChange' method upon changes to the team number text field
         teamNumberTextField.addKeyListener(new TeamNumberKeyChangeListener(teamNumberTextField, this));
@@ -381,7 +381,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
 //        ProjectData parentProject = myParentProjectForm.getParentProject();
 //        ProjectId projectId = myBuilder.getProjectId();
         
-        UiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getDataModel().getTeamNumber()));
+        FrcUiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getDataModel().getTeamNumber()));
         
         updateComponents();
         LOG.trace("[FRC] Exiting FrcProjectSettingsWizardStep.updateStep()");

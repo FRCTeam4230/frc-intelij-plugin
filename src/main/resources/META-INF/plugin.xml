@@ -222,6 +222,7 @@
         <applicationService id="FRC.FrcNotificationsSettings"   serviceImplementation="net.javaru.iip.frc.settings.FrcNotificationsSettings" />
         <applicationService id="FRC.RioLogUdpSocketManagerApplicationService" serviceImplementation="net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService" />
         <applicationService id="FRC.GradleRioMavenMetadataState" serviceImplementation="net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState" />
+        <applicationService id="FRC.ComponentCreationSharedState" serviceImplementation="net.javaru.iip.frc.actions.create.advanced.ComponentCreationSharedState" />
         
         <applicationConfigurable id="preferences.language.FRC" 
                                  instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable" 
@@ -410,20 +411,34 @@
                popup="true"
                icon="/icons/first/FIRST_icon_16x16.png">
             <separator />
-            <action id="frc.action.new.basic.command" 
-                    class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcCommandClassAction" />
-            <action id="frc.action.new.basic.commandGroup"
-                    class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcCommandGroupClassAction" />
-            <action id="frc.action.new.basic.subsystem" 
-                    class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcSubsystemClassAction" />
-            <action id="frc.action.new.basic.pidSubsystem"
-                    class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcPidSubsystemClassAction" />
-            <!--suppress PluginXmlCapitalization -->
-            <action id="frc.action.new.basic.trigger"
-                    class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcTriggerClassAction" />
+            <action id="frc.action.new.command1"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v1.Command1ComponentCreationAction" />
+            <action id="frc.action.new.commandGroup1"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v1.CommandGroup1ComponentCreationAction" />
+            <action id="frc.action.new.subsystem1" 
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v1.Subsystem1ComponentCreationAction" />
+            <action id="frc.action.new.pidSubsystem1"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v1.PidSubsystem1ComponentCreationAction" />
 
+            <action id="frc.action.new.command2"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.Command2ComponentCreationAction" />
+            <action id="frc.action.new.commandGroup2"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v2.CommandGroup2ComponentCreationAction" />
+            <action id="frc.action.new.subsystem2"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2.Subsystem2ComponentCreationAction" />
+            <action id="frc.action.new.trapezoidProfileSubsystem2"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.trapezoidProfileSubsystem.v2.TrapezoidProfileSubsystem2ComponentCreationAction" />
+            <action id="frc.action.new.pidSubsystem2"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v2.PidSubsystem2ComponentCreationAction" />
+            <action id="frc.action.new.profiledPidSubsystem2"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.profiledPidSubsystem.v2.ProfiledPidSubsystem2ComponentCreationAction" />
+
+
+            <action id="frc.action.new.basic.trigger"
+                    class="net.javaru.iip.frc.actions.create.simple.SimpleNewFrcTriggerClassAction" />
+            
             <!--<action id="frc.action.new.build.file" class="net.javaru.iip.frc.actions.create.build.NewFrcAntBuildFileAction" text="FRC New Ant Build File" />-->
-            <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewJavaSpecialFile" />
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile" />
         </group>
 
         <action id="frc.configureTeamNumberBasicAction"

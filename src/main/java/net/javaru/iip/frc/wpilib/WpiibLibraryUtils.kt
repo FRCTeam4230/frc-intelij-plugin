@@ -14,11 +14,13 @@
  *     limitations under the License.
  */
 
+@file:Suppress("unused")
+
 package net.javaru.iip.frc.wpilib
 
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
-import net.javaru.iip.frc.util.FindClassUtils
+import net.javaru.iip.frc.util.isLibraryPresent
 
 
 enum class CommandLibraryVersioning 
@@ -33,8 +35,8 @@ fun getCommandBasedLibraryStatus(module: Module?): CommandLibraryVersioning = ge
 
 fun getCommandBasedLibraryStatus(project: Project?): CommandLibraryVersioning
 {
-    val v1Present = FindClassUtils.isLibraryPresent(project, WpiLibConstants.COMMAND_BASED_V1_FQN)
-    val v2Present = FindClassUtils.isLibraryPresent(project, WpiLibConstants.COMMAND_BASED_V2_FQN)
+    val v1Present = isLibraryPresent(project, WpiLibConstants.COMMAND_BASED_VERSION_CHECK_V1_FQN)
+    val v2Present = isLibraryPresent(project, WpiLibConstants.COMMAND_BASED_VERSION_CHECK_V2_FQN)
     if (v1Present && !v2Present) return CommandLibraryVersioning.Version1
     if (v2Present && !v1Present) return CommandLibraryVersioning.Version2
     if (v1Present && v2Present) return CommandLibraryVersioning.Both

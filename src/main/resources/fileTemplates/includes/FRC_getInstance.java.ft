@@ -1,0 +1,9 @@
+#if($makeSingleton == "true")
+
+/**
+ * Returns the Singleton instance of this ${NAME}. This static method 
+ * should be used -- {@code ${NAME}.getInstance();} -- by external
+ * classes, rather than the constructor to get the instance of this class.
+ */
+public static ${NAME} getInstance() { return INSTANCE; }
+#end

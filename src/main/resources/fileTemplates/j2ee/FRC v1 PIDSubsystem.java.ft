@@ -1,0 +1,68 @@
+#set( $H = '#' )
+#if(${PACKAGE_NAME})
+#if (${PACKAGE_NAME} != "")
+package ${PACKAGE_NAME};
+#end
+#end
+
+#if($baseClassNeedsImporting == "true")
+import ${baseClassFqName};
+#end
+
+
+#parse("File Header.java")
+public #if($makeAbstract == "true")abstract#end class ${NAME}  ${baseClassExtendsClause}
+{
+#parse("FRC_singletonInstanceVariable.java")
+    #parse("FRC_constructorSignature.java")()
+    {
+        // TODO: Determine real PID values needed and configure them here
+        super(0.0, 0.0, 0.0);
+    }
+#parse("FRC_getInstance.java")
+
+#if($includeJavaDocsForOverrides == "true")
+    /**
+     * Initialize the default command for a subsystem By default subsystems have no default command,
+     * but if they do, the default command is set with this method. It is called on all Subsystems by
+     * CommandBase in the robot's program after all the Subsystems are created.
+     */
+#end
+    @Override
+    protected void initDefaultCommand()
+    {
+        // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command)
+        //       e.g. setDefaultCommand(new MyCommand());
+    }
+    
+#if($includeJavaDocsForOverrides == "true")
+  /**
+   * Returns the input for the pid loop.
+   * This method is automatically called by the subsystem.
+   *
+   * @return the measurement of the process variable
+   */
+#end
+    @Override
+    protected double returnPIDInput()
+    {
+        // TODO: Return the measurement from the PID sensor, such as an encoder, gyro, potentiometer, etc. 
+        //       This method is automatically called by the subsystem.
+        return 0.0;
+    }
+
+#if($includeJavaDocsForOverrides == "true")
+    /**
+     * Uses the value that the pid loop calculated. The calculated value is the "output" parameter.
+     * This method is a good time to set motor values, maybe something along the lines of
+     * <code>driveline.tankDrive(output, -output)</code>.
+     *
+     * @param output the value the pid loop calculated
+     */
+#end
+    @Override
+    protected void usePIDOutput(double output)
+    {
+        // TODO: Use the output, for example to set the sped on a motor.
+    }    
+}

@@ -1,0 +1,138 @@
+## A hack, so we can have a hash characterin JavaDocs for {@link} entries
+#set( $H = '#' )
+#set($requiredSubsystemsFqnArray=$requiredSubsystemsFqnCommaDelimitedString.split(","))
+## The split method when called on an empty string will result in an array of one empty string token, so we need to handle that *#
+#if($requiredSubsystemsFqnArray.size() == 1 && $requiredSubsystemsFqnArray[0] == "")
+    #set($requiredSubsystemsFqnArray = [])
+#end
+#set($requiredSubsystemsNamesArray=$requiredSubsystemsNamesCommaDelimitedString.split(","))
+#if($requiredSubsystemsNamesArray.size() == 1 && $requiredSubsystemsNamesArray[0] == "")
+    #set($requiredSubsystemsNamesArray = [])
+#end
+#set($requiredSubsystemsVarsArray=$requiredSubsystemsVarsCommaDelimitedString.split(","))
+#if($requiredSubsystemsVarsArray.size() == 1 && $requiredSubsystemsVarsArray[0] == "")
+    #set($requiredSubsystemsVarsArray = [])
+#end
+#if(${PACKAGE_NAME})
+#if (${PACKAGE_NAME} != "")
+package ${PACKAGE_NAME};
+#end
+#end
+
+#if($baseClassNeedsImporting == "true")
+import ${baseClassFqName};
+#end
+#foreach($fqn in $requiredSubsystemsFqnArray)
+import $fqn;
+#end
+
+#parse("File Header.java")
+public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtendsClause}
+{
+#foreach($subSystemName in $requiredSubsystemsNamesArray)
+    private final $subSystemName $requiredSubsystemsVarsArray[$foreach.index];
+#end
+
+    #if($makeAbstract == "true")protected #else public #end${NAME}(#foreach($subSystemName in $requiredSubsystemsNamesArray) $subSystemName $requiredSubsystemsVarsArray[$foreach.index]#if($foreach.hasNext), #end#end)
+    {
+    #foreach($subSystemVar in $requiredSubsystemsVarsArray)
+         this.$subSystemVar = $subSystemVar;
+    #end
+    #if ($requiredSubsystemsVarsArray.isEmpty())
+        // If any subsystems are needed, you will need to pass them into the requires() method
+    #else
+        #foreach($subSystemVar in $requiredSubsystemsVarsArray)
+        requires($subSystemVar);
+        #end    
+    #end
+    }
+
+#if($includeJavaDocsForOverrides == "true")
+    /**
+    * The 'initialize' method is called one time just prior to the first time
+    * this Command is run after being started.
+    */
+#end
+    @Override
+    protected void initialize()
+    {
+        
+    }
+
+#if($includeJavaDocsForOverrides == "true")
+    /**
+     * The 'execute' method is the main body of a command.  Is called repeatedly when 
+     * this * Command is scheduled to run. It is called repeatedly until either the 
+     * command finishes -- i.e. {@link ${H}isFinished()}) returns true -- or it is
+     * canceled.
+     */
+#end
+    @Override
+    protected void execute()
+    {
+        
+    }
+    
+#if($includeJavaDocsForOverrides == "true")
+    /**
+     * <p>
+     * Returns whether this command is finished. If it is, then the command will be removed and 
+     * {@link ${H}end}()} will be called.
+     * </p><p>
+     * It may be useful for a team to reference the {@link ${H}isTimedOut}()}
+     * method for time-sensitive commands.
+     * </p><p>
+     * Returning false will result in the command never ending automatically. It may still be
+     * cancelled manually or interrupted by another command. Returning true will result in the
+     * command executing once and finishing immediately. It is recommended to use 
+     * {@link edu.wpi.first.wpilibj.command.InstantCommand} (added in 2017) for this.
+     * </p>
+     *
+     * @return whether this command is finished.
+     *
+     * @see Command${H}isTimedOut}() isTimedOut()
+     */
+#end
+    @Override
+    protected boolean isFinished()
+    {
+        // TODO: Make this return true when this Command no longer needs to run execute()
+        return false;
+    }
+
+#if($includeJavaDocsForOverrides == "true")
+    /**
+     * Called once when the command ended peacefully; that is it is called once 
+     * after {@link ${H}isFinished}()} returns true. This is where you may want to 
+     * wrap up loose ends, like shutting off a motor that was being used in the 
+     * command.
+     */
+#end
+    @Override
+    protected void end()
+    {
+        
+    }
+
+#if($includeJavaDocsForOverrides == "true")
+    /**
+     * <p>
+     * Called when the command ends because somebody called {@link #cancel()} or
+     * another command shared the same requirements as this one, and booted it out. For example,
+     * it is called when another command that requires one or more of the same
+     * subsystems is scheduled to run.
+     * </p><p>
+     * This is where you may want to wrap up loose ends, like shutting off a motor
+     * used in the command.
+     * </p><p>
+     * Generally, it is useful to simply call the {@link ${H}end}()} method within this
+     * method, as done here.
+     * </p>
+     */
+#end
+    @Override
+    protected void interrupted()
+    {
+        
+    }
+}

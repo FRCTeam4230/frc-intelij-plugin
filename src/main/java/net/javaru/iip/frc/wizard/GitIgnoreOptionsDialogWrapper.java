@@ -25,8 +25,8 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 
 import kotlin.Unit;
-import net.javaru.iip.frc.util.FrcExtsKt;
-import net.javaru.iip.frc.util.UiUtilsKt;
+import net.javaru.iip.frc.util.FrcCollectionExtsKt;
+import net.javaru.iip.frc.util.FrcUiUtilsKt;
 
 
 
@@ -113,8 +113,8 @@ public class GitIgnoreOptionsDialogWrapper extends DialogWrapper
         winCheckBox.addActionListener(e -> configuration.setWindows(winCheckBox.isSelected()));
         cppCheckBox.addActionListener(e -> configuration.setCpp(cppCheckBox.isSelected()));
     
-        UiUtilsKt.addTextChangedListener(additionalGitignoreTemplatesTextField, text -> {
-            configuration.setAdditionalGitignoreTemplates(FrcExtsKt.commaDelimitedToList(additionalGitignoreTemplatesTextField.getText()));
+        FrcUiUtilsKt.addTextChangedListener(additionalGitignoreTemplatesTextField, text -> {
+            configuration.setAdditionalGitignoreTemplates(FrcCollectionExtsKt.commaDelimitedToList(additionalGitignoreTemplatesTextField.getText()));
             return Unit.INSTANCE; });
     
         generateFromSiteCheckBox.setSelected(configuration.getGenerateFromSite());
@@ -205,7 +205,7 @@ public class GitIgnoreOptionsDialogWrapper extends DialogWrapper
         winCheckBox.setSelected(configuration.getWindows());
         cppCheckBox.setSelected(configuration.getCpp());
         generateFromSiteCheckBox.setSelected(configuration.getGenerateFromSite());
-        additionalGitignoreTemplatesTextField.setText(FrcExtsKt.toCommaDelimitedString(configuration.getAdditionalGitignoreTemplates()));
+        additionalGitignoreTemplatesTextField.setText(FrcCollectionExtsKt.toCommaDelimitedString(configuration.getAdditionalGitignoreTemplates()));
     }
     
  

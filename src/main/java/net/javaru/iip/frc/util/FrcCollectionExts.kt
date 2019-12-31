@@ -69,3 +69,27 @@ inline fun <T, R : Any, C : MutableCollection<in R>> Iterable<T>.mapExceptionFre
     }
     return destination
 }
+
+/**
+ * Converts a collection to a comma delimited string. Null values are not allowed.
+ * 
+ * @param withSpaces if true (the default), a space will appear after each comma: `one, two, three, four`; 
+ *                   if false, no spaces will be present: `one,two,three,four`.
+ * @param toStringFunction the function/lambda to use to convert collection elements to a String value. By default, the 
+ *                         element's `toString()` method is used
+ */
+@JvmOverloads
+fun <T: Any> Collection<T>.toCommaDelimitedString(withSpaces: Boolean = true, toStringFunction: (T) -> String = {it.toString()}): String
+{
+    val result = this.map { toStringFunction.invoke(it) }.toTypedArray().contentToString().removePrefix("[").removeSuffix("]")
+    return if (withSpaces) result else result.replace(" ", "")
+}
+
+/**
+ * Converts a comma delimited String to a Mutable List of Strings, properly trimming the values. 
+ */
+fun String.commaDelimitedToList(): MutableList<String>
+{
+    val list = this.split(',').map { it.trim() }.toMutableList()
+    return if (list.size == 1 && list[0].isBlank()) mutableListOf() else list
+}

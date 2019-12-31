@@ -1,0 +1,27 @@
+#set( $H = '#' )
+#set( $isParallelDeadline = $baseClassFqName.endsWith("ParallelDeadlineGroup"))
+#if(${PACKAGE_NAME})
+#if (${PACKAGE_NAME} != "")
+package ${PACKAGE_NAME};
+#end
+#end
+
+
+#if($baseClassNeedsImporting == "true")
+import ${baseClassFqName};
+#end
+
+#parse("File Header.java")
+public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtendsClause}
+{
+    #parse("FRC_constructorSignature.java")()
+    {
+        // TODO: Add your sequential commands in the super() call, e.g.
+        //           super(new FooCommand(), new BarCommand());
+        #if (${isParallelDeadline})
+        //       Add the deadline command first. i.e. the command that upon 
+        //       ending will interrupt all other commands that are still running
+        #end
+        super();
+    }
+}

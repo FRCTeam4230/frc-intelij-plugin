@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.PropertyKey;
 import com.intellij.BundleBase;
 
-import net.javaru.iip.frc.util.FrcUiUtils;
+import net.javaru.iip.frc.util.FrcUiUtilsKt;
 
 
 
@@ -117,6 +117,6 @@ public class FrcBundle
     @NotNull
     public static String messageLabelCentered(@NotNull @PropertyKey(resourceBundle = BUNDLE_NAME) String key, @NotNull Object... params)
     {
-        return FrcUiUtils.centerLabelText(message(key, params));
+        return FrcUiUtilsKt.centerLabelText(message(key, params));
     }
 }

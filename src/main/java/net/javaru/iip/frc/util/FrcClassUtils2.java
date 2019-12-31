@@ -49,7 +49,9 @@ import one.util.streamex.StreamEx;
 
 
 
-// Extracted from  com.siyeh.ig.psiutils.ClassUtils in the InspectionGadgets/InspectionGadgetsAnalysis module of IntelliJ IDEA
+// primary work methods extracted from  com.siyeh.ig.psiutils.ClassUtils in the InspectionGadgets/InspectionGadgetsAnalysis module of IntelliJ IDEA
+// but since many were private, we needed to move them here. 
+// (There are more in that other class)
 public class FrcClassUtils2
 {
     @SuppressWarnings("unused")

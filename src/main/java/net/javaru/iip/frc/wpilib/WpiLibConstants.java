@@ -58,6 +58,7 @@ public class WpiLibConstants
     public static final String COMMAND_V2_BASE_FQN =      "edu.wpi.first.wpilibj2.command.CommandBase";
 
     public static final String COMMAND_GROUP_V1_BASE_FQN = "edu.wpi.first.wpilibj.command.CommandGroup";
+    public static final String SEQUENTIAL_COMMAND_GROUP_V2_BASE_FQN = "edu.wpi.first.wpilibj2.command.SequentialCommandGroup";
     
     public static final String COMMAND_BASED_VERSION_CHECK_V1_FQN = COMMAND_V1_BASE_FQN;      // An Abstract Class
     public static final String COMMAND_BASED_VERSION_CHECK_V2_FQN = COMMAND_V2_INTERFACE_FQN; // An Interface

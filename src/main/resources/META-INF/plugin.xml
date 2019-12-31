@@ -23,7 +23,7 @@
     <!-- Unique identifier of the plugin. Cannot be changed between the plugin versions. If not specified, assumed to be equal to <name>. -->
     <id>net.javaru.idea.frc</id>
     <name>FRC</name>
-    <version>0.9.0.000-SNAPSHOT</version>
+    <version>1.0.000</version>
 
     <!-- The vendor of the plugin.
        The optional "url" attribute specifies the URL of the vendor homepage.
@@ -38,126 +38,38 @@
 
     <description><![CDATA[
         <p>
-            <!-- The first sentence gets used as a summary on the plugins repository. -->
-            <em><a href='http://www.firstinspires.org/'>FIRST</a> Robotics Competition</em>  
-            (<a href='http://www.firstinspires.org/robotics/frc'>FRC</a>) development support for IntelliJ IDEA. 
+            <!-- The first sentence gets used as a summary at the JetBrains Plugins Repository. -->
+            <em><a href='http://www.firstinspires.org/'>FIRST</a> Robotics Competition</em>
+            (<a href='http://www.firstinspires.org/robotics/frc'>FRC</a>) development support for
+            IntelliJ IDEA, including new project wizards, new class templates, robust RioLog console,
+            and more. Works will all v2019.2 or later editions (Community, Education, and Ultimate) 
+            of IntelliJ IDEA. Enjoy using your favorite IDE when coding your team's robot in Java,
+            Kotlin, or other JVM language.
         </p>
-        <p> </p>
+        <p><br></p>
         <p>
-            This plugin will work with either the free open-sourced <em>Community Edition</em> or the 
-            licensed <em>Ultimate Edition</em> of IntelliJ IDEA. As of v0.8, <strong>this plugin requires 
-            IntelliJ IDEA v2019.2 or later.</strong> Moving forward, I will be limiting support to only
-            the latest IntelliJ IDEA release or two.
+            <strong>Please report issues or make feature requests via the project's</strong>
+            <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>Issue Tracker</a>.
         </p>
-        <p> </p>
-        <p>
-            <strong>Please report issues or make feature requests at:</strong> 
-            <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues</a><br>
-            Usage documentation is available at the project's <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/wikis">wiki</a>
-        </p>
-        <p> </p>
-        <p>
-            This plugin provides most of the functionality in the 'official' WPI VScode plugin, plus some additional functionality. 
-            More features are planned for future versions, with a 1.0 release coming soon. Please 
-            report issues or make feature requests via the above link.
-        </p>
-        
     ]]></description>
 
     <change-notes><![CDATA[
-      <strong>NEXT VERSION</strong> <br>
-      &nbsp;&nbsp;&bull; Deprecated the custom FrcModuleType used by the custom FRC Project Wizard and instead have the wizard create JavaModuleType projects.
-      This change will have very minimal impact to users, but improves some functionality. See  <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/41">Enhancement #41</a>
-      for additional details.<br>
-      <br>
-      <strong>v0.8.1</strong> <br>
-      &nbsp;&nbsp;&bull; Fixed <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/40">Issue #40</a>, a potential NPE when clicking on the 
-      "Configure FRC Team Number" action on the IntelliJ IDEA Welcome Screen<br>
-      <br>
-      <strong>v0.8</strong> <br>
-      &nbsp;&nbsp;&bull; Implemented <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/28">Feature #28</a>, adding a robust new FRC Robot Project
-      Wizard.<br>
-      &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/21">Issue #21</a>, improving the plugin's comparability with
-      year 2019+ GradleRIO based projects. <br>
-      &nbsp;&nbsp;&bull; Added several words to the FRC spellcheck dictionary.<br>
-      &nbsp;&nbsp;&bull; Dropping support for IntelliJ IDEA v2017.3 through and including 2019.1. Starting with this plugin version, 
-      <strong>only IntelliJ IDEA v2019.2 and later are now supported.</strong>Please see
-      <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/21#note_242234956">this comment</a> in Issue #21 for details.<br>
-      &nbsp;&nbsp;&bull; Miscellaneous changes and improvements<br>
-      <strong>Known Issue:</strong> The RIOLog Net Console still uses an application wide team number setting. If you create a project with an alternate team
-      number, the RIOLog Net Console
-      will <em>not</em> connect to the roboRIO using that alternate team number. As a workaround, you must modify the team number in the Application settings,
-      which affects all open projects. See
-      <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/37">Issue #37</a> to track progress on fixing this.<br>
-      <br>
-      <strong>v0.7.5</strong> <br>
-      &nbsp;&nbsp;&bull; Partial, and slightly glitchy, support for year 2019+ GradleRIO projects for IntelliJ IDEA v2017.3 through v2019.1.
-      For full Gradle RIO support, upgrade to IntelliJ IDEA v2019.2.x and v0.8 of this FRC Plugin.
-      Please see <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/21#note_242234956">this comment</a> in Issue #21 for details.<br>
-      &nbsp;&nbsp;&bull; This is the last release for IntelliJ IDEA versions older than v2019.2. Please upgrade to v2019.2.<br>
-      <br>
-      <strong>v0.7.1</strong> <br>
-      &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/19">Issue #19</a>, a NPE that sometimes occurred when
-      initializing the FRC framework<br>
-      <br>
-      <strong>v0.7</strong> <br>
-      &nbsp;&nbsp;&bull; Added RIOLog monitoring for WPILib's new (for 2018) TCP implementation (<a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/7">Issue #7</a>)<br>
-      &nbsp;&nbsp;&bull; No longer open the SSH Tailing alternative RIOLog monitoring by default. It is available via the menu: Tools | FRC | RIOLog Monitoring | SSH Tailing</a>)<br>
-      &nbsp;&nbsp;&bull; Resolved an issue where the team number was sometimes not correctly set in the wpilib.properties (<a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/13">Issue #13</a>)<br>
-      &nbsp;&nbsp;&bull; Miscellaneous changes and improvements<br>
-      <br>
-      <strong>v0.6.1</strong> <br>
-      &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/8">Issue #8</a>, &quot;Cannot deploy code to roboRIO&quot; 
-      that was caused by a change in the way the 2018 WPILib deploys code to the roboRIO<br>
-      <br>
-      <strong>v0.6</strong> <br>
-      &nbsp;&nbsp;&bull; <strong>IntelliJ IDEA v2017.3 or later now required</strong><br>
-      &nbsp;&nbsp;&bull; Added FRC project templates to IntelliJ IDEA's New Project wizard<br>
-      &nbsp;&nbsp;&bull; Updates for 2018 WPILib compatibility<br>
-      &nbsp;&nbsp;&bull; Improved &quot;version aware&quot; WPILib update process in the tool menu<br>
-      &nbsp;&nbsp;&bull; Improvements to the <em>SSH Tailing of roboRIO Log File</em> feature<br>
-      &nbsp;&nbsp;&bull; Added some words/terms to built-in spell check dictionary<br>
-      &nbsp;&nbsp;&bull; Miscellaneous changes and improvements<br>
-      <br>
-      <strong>v0.5</strong> <br>
-      &nbsp;&nbsp;&bull; Resolved <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/3">Issue #3</a> that was causing changes to plugin settings 
-      to not be persisted between IDE runs when using IntelliJ IDEA v2017.1<br>
-      &nbsp;&nbsp;&bull; Fixed a high CPU utilization issue with the experimental SSH tailing feature. It still may need some more tweaking to reduced CPU usage 
-      for when the roboRIO is not connected and the SSH tail is testing to see if the roboRIO is connected again.<br>
-      &nbsp;&nbsp;&bull; Resolved two issues related to lifecycle / &quot;initialization sequencing&quot; that caused some exceptions -- 
-      &quot;Runner FrcRioLog is not registered&quot; or an &quot;IndexNotReadyException&quot; -- when opening a new FRC project.<br>
-      &nbsp;&nbsp;&bull; Added some <em>initial</em> documentation on the project's 
-      <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/wikis">wiki</a><br>
-      &nbsp;&nbsp;&bull; Added some words/terms to built-in spell check dictionary<br>
-      <br>
-      <strong>v0.4</strong> <br>
-      &nbsp;&nbsp;&bull; Add tailing of roboRIO log via SSH over Wi-Fi (Experimental Feature). Like Net Console log monitoring, it supports the 
-      use of the <a href='https://plugins.jetbrains.com/idea/plugin/7125-grep-console'>Grep Console plugin</a> to provide syntax highlighting and line folding<br>
-      &nbsp;&nbsp;&bull; Resolved issue with RioLog console not auto clearing (on roboRIO restart) when selected due to a character encoding difference on some developers' systems<br>
-      &nbsp;&nbsp;&bull; Added some words/terms to built-in spell check dictionary<br>
-      <br>
-      <strong>v0.3.1</strong> <br>
-      &nbsp;&nbsp;&bull; Fixed an issue where the WpiLib was not downloaded to the properly nested directory. The 'current' sub-directory was missing in the full path.<br>
-      <br>
-      <strong>v0.3</strong> <br>
-      &nbsp;&nbsp;&bull; Added auto checks at project startup that WPILib and User Lib are attached as Libraries<br>
-      &nbsp;&nbsp;&bull; Auto prompt at startup if Team Number is not configured<br>
-      &nbsp;&nbsp;&bull; Added notification about known issue of RioLog socket binding issue if two FRC projects are open at the same time<br>
-      &nbsp;&nbsp;&bull; Updated built-in spell check dictionary with additional FRC domain specific terms/words<br>
-      &nbsp;&nbsp;&bull; Some code cleanup and minor improvements<br>
-      <br>
-      <strong>v0.2</strong> <br>
-      &nbsp;&nbsp;&bull; Downloading of the WPILib libraries (Tools > Frc > Downloading Latest WPILib)<br>
-      &nbsp;&nbsp;&bull; Easy attachment of the WPILib libraries as dependencies (Tools > Frc > Attach WPILib JARs as Dependency)<br>
-      &nbsp;&nbsp;&bull; Easy attachment of the User Lib directory as dependencies (Tools > Frc > Attach User Lib Directory as Dependency)<br>
-      &nbsp;&nbsp;&bull; Some code cleanup and minor improvements<br>
-      <br>
-      <strong>v0.1</strong> <br>
-      &nbsp;&nbsp;&bull; Initial beta release of plugin <br>
-      &nbsp;&nbsp;&bull; FRC Facet <br>
-      &nbsp;&nbsp;&bull; RioLog monitoring <br>
-      &nbsp;&nbsp;&bull; Basic FRC templates <br>
-      &nbsp;&nbsp;&bull; Auto discovery of FRC projects to auto add FRC Facet <br>
+        <strong>v1.0</strong> <br>
+        &nbsp;&nbsp;&bull; Dropping the zero based versioning and migrating to a 1.0 version after 14 such releases over the course of 4 years.<br>
+        &nbsp;&nbsp;&bull; Improvements to the new FRC Robot Project Wizard<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&bull; Wizard automatically creates Gradle build and deploy Run Configurations, as well as debugger attachment Configurations.<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&bull; Added 2020 project and example templates.<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&bull; The wizard checks for the latest WPI Lib version so new projects always can use the latest version.<br>
+        &nbsp;&nbsp;&bull; RioLog Console reads team number from project level rather than application level.<br>
+        &nbsp;&nbsp;&bull; Added JSON Schema Validation for the wpilib_preferences.json file. This prevents errors and provides auto completion.<br>
+        &nbsp;&nbsp;&bull; Major rewrite of the FRC class creation template framework to make them more robust and convenient.<br>
+        &nbsp;&nbsp;&bull; Additional words added to the FRC spellcheck dictionary.<br>
+        &nbsp;&nbsp;&bull; Miscellaneous changes and improvements<br>
+        &nbsp;&nbsp;&bull; Deprecated the custom FrcModuleType used by the custom FRC Project Wizard and instead have the wizard create JavaModuleType projects.
+        This change will have very minimal impact to users, but improves some functionality. See <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/41">Enhancement #41</a>
+        for additional details.<br>
+        &nbsp;&nbsp;&bull; Good luck to all FRC teams in the 2020 <em>INFINITE RECHARGE<sup>SM</sup></em> game and competition.<br>
+        <br>
     ]]>
     </change-notes>
 

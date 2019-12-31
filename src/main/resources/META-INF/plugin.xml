@@ -411,8 +411,8 @@
                popup="true"
                icon="/icons/first/FIRST_icon_16x16.png">
             <separator />
-            <action id="frc.action.new.basic.command" 
-                    class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcCommandClassAction" />
+            <action id="frc.action.new.command1"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v1.Command1ComponentCreationAction" />
             <action id="frc.action.new.basic.commandGroup"
                     class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcCommandGroupClassAction" />
             <action id="frc.action.new.basic.subsystem" 

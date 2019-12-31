@@ -54,7 +54,6 @@ import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvid
 import net.javaru.iip.frc.util.FrcClassUtilsKt;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
 import net.javaru.iip.frc.util.PsiClassNameComparator;
-import net.javaru.iip.frc.wpilib.WpiLibConstants;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
@@ -409,11 +408,6 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
                                                            @NotNull String targetPackageName,
                                                            @NotNull String newClassName);
     
-    
-    protected String getSubsystemTopClassFQN()
-    {
-        return WpiLibConstants.SUBSYSTEM_V2_TOP_FQN;
-    }
     
     
     @NotNull

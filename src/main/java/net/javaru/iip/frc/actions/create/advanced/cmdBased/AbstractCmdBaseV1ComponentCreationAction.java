@@ -25,9 +25,9 @@ import net.javaru.iip.frc.wpilib.WpiibLibraryUtilsKt;
 
 
 
-public abstract class AbstractCmdBaseV2ComponentCreationAction extends AbstractFrcComponentCreationAction
+public abstract class AbstractCmdBaseV1ComponentCreationAction extends AbstractFrcComponentCreationAction
 {
-    protected AbstractCmdBaseV2ComponentCreationAction(String text, String description, FrcComponentCreationDataProvider dataProvider)
+    protected AbstractCmdBaseV1ComponentCreationAction(String text, String description, FrcComponentCreationDataProvider dataProvider)
     {
         super(text, description, dataProvider);
     }
@@ -36,6 +36,6 @@ public abstract class AbstractCmdBaseV2ComponentCreationAction extends AbstractF
     @Override
     protected boolean shouldBeEnabledAdditionalCriteria(@NotNull Module module)
     {
-        return WpiibLibraryUtilsKt.isVersion2CommandBaseLibAttached(module);
+        return WpiibLibraryUtilsKt.isVersion1CommandBaseLibAttached(module);
     }
 }

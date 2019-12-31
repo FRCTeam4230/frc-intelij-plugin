@@ -39,6 +39,7 @@ import net.javaru.iip.frc.util.FrcClassUtilsKt;
 import net.javaru.iip.frc.util.FrcCollectionExtsKt;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
 import net.javaru.iip.frc.util.PsiClassNameComparator;
+import net.javaru.iip.frc.wpilib.WpiLibConstants;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
@@ -80,6 +81,19 @@ public class CommandComponentCreationDialog extends FrcComponentCreationDialog
                                                                                      labelText,
                                                                                      subsystems,
                                                                                      true);
+    }
+    
+    
+    protected String getSubsystemTopClassFQN()
+    {
+        if (myDataProvider instanceof CommandCreationDataProvider)
+        {
+            return ((CommandCreationDataProvider) myDataProvider).getSubsystemTopFqName();
+        }
+        else
+        {
+            return WpiLibConstants.SUBSYSTEM_V2_TOP_FQN;
+        }
     }
     
     

@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2
+package net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v1
 
 import com.google.common.collect.ImmutableList
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor
@@ -24,14 +24,14 @@ import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory
 import net.javaru.iip.frc.wpilib.WpiLibConstants
 
 
-object Command2ComponentCreationDataProvider : CommandCreationDataProvider()
+object Command1ComponentCreationDataProvider : CommandCreationDataProvider()
 {
-    override val componentVersion: Int = 2
+    override val componentVersion: Int = 1
     override val componentTypeSimpleName: String = "Command"
     override val componentTypeSimpleNames: List<String> by lazy { ImmutableList.of("Command", "Cmd") }
     override val baseType: BaseType = BaseType.InterfaceAndBaseClass
-    override val topLevelClassFqName: String = WpiLibConstants.COMMAND_V2_INTERFACE_FQN
-    override val typicalBaseClassFqName: String = WpiLibConstants.COMMAND_V2_BASE_FQN
-    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.COMMAND2
-    override val subsystemTopFqName: String = WpiLibConstants.SUBSYSTEM_V2_TOP_FQN
+    override val topLevelClassFqName: String = WpiLibConstants.COMMAND_V1_BASE_FQN
+    override val typicalBaseClassFqName: String = WpiLibConstants.COMMAND_V1_BASE_FQN
+    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.COMMAND1
+    override val subsystemTopFqName: String = WpiLibConstants.SUBSYSTEM_V1_TOP_FQN
 }

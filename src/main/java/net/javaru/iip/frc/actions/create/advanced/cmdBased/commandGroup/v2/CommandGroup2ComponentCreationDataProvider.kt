@@ -24,7 +24,7 @@ import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory
 import net.javaru.iip.frc.wpilib.WpiLibConstants
 
 
-object SequentialCommandGroup2ComponentCreationDataProvider : CommandCreationDataProvider()
+object CommandGroup2ComponentCreationDataProvider : CommandCreationDataProvider()
 {
     override val componentVersion: Int = 2
     override val componentTypeSimpleName: String = "CommandGroup"
@@ -32,7 +32,12 @@ object SequentialCommandGroup2ComponentCreationDataProvider : CommandCreationDat
     override val baseType: BaseType = BaseType.InterfaceAndBaseClass
     override val topLevelClassFqName: String = WpiLibConstants.SEQUENTIAL_COMMAND_GROUP_V2_BASE_FQN
     override val typicalBaseClassFqName: String = WpiLibConstants.SEQUENTIAL_COMMAND_GROUP_V2_BASE_FQN
-    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.SEQUENTIAL_COMMAND_GROUP2
+    override val additionalBaseClassFqNames: List<String> by lazy { ImmutableList.of<String>(
+            "edu.wpi.first.wpilibj2.command.ParallelCommandGroup",
+            "edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup",
+            "edu.wpi.first.wpilibj2.command.ParallelRaceGroup"
+                                                                                            ) }
+    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.COMMAND_GROUP2
     override val subsystemTopFqName: String = ""
     override val includeSubsystemChooser: Boolean = false
 

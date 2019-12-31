@@ -422,6 +422,8 @@
 
             <action id="frc.action.new.command2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.Command2ComponentCreationAction" />
+            <action id="frc.action.new.commandGroup2"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v2.CommandGroup2ComponentCreationAction" />
             <action id="frc.action.new.subsystem2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2.Subsystem2ComponentCreationAction" />
             <action id="frc.action.new.trapezoidProfileSubsystem2"
@@ -437,15 +439,6 @@
             
             <!--<action id="frc.action.new.build.file" class="net.javaru.iip.frc.actions.create.build.NewFrcAntBuildFileAction" text="FRC New Ant Build File" />-->
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile" />
-        </group>
-        
-        <group id="frc.v2CommandGroupActionsGroup"
-                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v2.CommandGroupComponentCreationActionGroup"
-                popup="true"
-                icon="/icons/components/Command-Group-16.png">
-            <action id="frc.action.new.sequentialCommandGroup2"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v2.SequentialCommandGroup2ComponentCreationAction" />
-            <add-to-group group-id="frc.NewFileTemplates" anchor="after" relative-to-action="frc.action.new.command2" />
         </group>
 
         <action id="frc.configureTeamNumberBasicAction"

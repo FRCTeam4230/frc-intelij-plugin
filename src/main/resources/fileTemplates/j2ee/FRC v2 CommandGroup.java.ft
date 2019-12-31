@@ -1,4 +1,5 @@
 #set( $H = '#' )
+#set( $isParallelDeadline = $baseClassFqName.endsWith("ParallelDeadlineGroup"))
 #if(${PACKAGE_NAME})
 #if (${PACKAGE_NAME} != "")
 package ${PACKAGE_NAME};
@@ -17,12 +18,10 @@ public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtends
     {
         // TODO: Add your sequential commands in the super() call, e.g.
         //           super(new FooCommand(), new BarCommand());
-        //       or use the addCommands() method. For example:
-        //           addCommands(
-        //                     new OpenClawCommand(Claw.getInstance()),
-        //                     parallel(
-        //                             new SetWristSetpointCommand(0, Wrist.getInstance()),
-        //                             new SetElevatorSetpointCommand(0, Elevator.getInstance())));
+        #if (${isParallelDeadline})
+        //       Add the deadline command first. i.e. the command that upon 
+        //       ending will interrupt all other commands that are still running
+        #end
         super();
     }
 }

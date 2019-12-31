@@ -29,13 +29,13 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
-public class SequentialCommandGroup2ComponentCreationAction extends AbstractCmdBaseV2ComponentCreationAction
+public class CommandGroup2ComponentCreationAction extends AbstractCmdBaseV2ComponentCreationAction
 {
-    public SequentialCommandGroup2ComponentCreationAction()
+    public CommandGroup2ComponentCreationAction()
     {
-        super(message("frc.new.class.sequentialCommandGroup.action.name"),
-              message("frc.new.class.sequentialCommandGroup.action.description"),
-              SequentialCommandGroup2ComponentCreationDataProvider.INSTANCE);
+        super(message("frc.new.class.commandGroup.action.name"),
+              message("frc.new.class.commandGroup.action.description"),
+              CommandGroup2ComponentCreationDataProvider.INSTANCE);
     }
     
     

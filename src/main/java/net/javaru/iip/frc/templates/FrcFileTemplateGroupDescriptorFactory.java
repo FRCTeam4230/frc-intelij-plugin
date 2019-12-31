@@ -26,12 +26,6 @@ import net.javaru.iip.frc.FrcIcons;
 
 public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupDescriptorFactory
 {
-    // COMMAND BASED FRAMEWORK v1 - BASIC IMPLS
-    public static final FileTemplateDescriptor COMMAND = new FileTemplateDescriptor("FRCCommand.java", FrcIcons.Components.COMMAND);
-    public static final FileTemplateDescriptor COMMAND_GROUP = new FileTemplateDescriptor("FRCCommandGroup.java", FrcIcons.Components.COMMAND_GROUP);
-    public static final FileTemplateDescriptor SUBSYSTEM = new FileTemplateDescriptor("FRCSubsystem.java", FrcIcons.Components.SUBSYSTEM);
-    public static final FileTemplateDescriptor PID_SUBSYSTEM = new FileTemplateDescriptor("FRCPIDSubsystem.java", FrcIcons.Components.PID_SUBSYSTEM);
-    
     // COMMAND BASED FRAMEWORK v1
     public static final FileTemplateDescriptor COMMAND1 = new FileTemplateDescriptor("FRC v1 Command.java", FrcIcons.Components.COMMAND);
     public static final FileTemplateDescriptor COMMAND_GROUP1 = new FileTemplateDescriptor("FRC v1 CommandGroup.java", FrcIcons.Components.COMMAND_GROUP);
@@ -54,7 +48,7 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
                                         COMMAND1,
                                         COMMAND_GROUP1,
                                         SUBSYSTEM1,
-                                        PID_SUBSYSTEM,
+                                        PID_SUBSYSTEM1,
                                         COMMAND2,
                                         SUBSYSTEM2,
                                         TRAPEZOID_PROFILED_SUBSYSTEM2,

@@ -175,7 +175,7 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
     
     protected boolean showTheIncludeJavaDocCheckbox()
     {
-        return true;
+        return myDataProvider.getShowJavaDocForOverridesOption();
     }
     
     protected void initSuperClassPanel()

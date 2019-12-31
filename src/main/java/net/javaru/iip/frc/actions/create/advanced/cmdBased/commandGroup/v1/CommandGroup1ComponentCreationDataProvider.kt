@@ -14,27 +14,27 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2
+package net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v1
 
 import com.google.common.collect.ImmutableList
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor
 import net.javaru.iip.frc.actions.create.advanced.BaseType
-import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.command.CommandCreationDataProvider
 import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory
 import net.javaru.iip.frc.wpilib.WpiLibConstants
 
 
-
-
-object Subsystem2ComponentCreationDataProvider : FrcComponentCreationDataProvider()
+object CommandGroup1ComponentCreationDataProvider : CommandCreationDataProvider()
 {
-    override val componentVersion: Int = 2
-    override val componentTypeSimpleName: String = "Subsystem"
-    override val componentTypeSimpleNames: List<String> by lazy { ImmutableList.of("Subsystem", "System", "SubSystem") }
+    override val componentVersion: Int = 1
+    override val componentTypeSimpleName: String = "CommandGroup"
+    override val componentTypeSimpleNames: List<String> by lazy { ImmutableList.of("Command", "Cmd, CommandGroup", "CmdGroup", "CommandGrp", "CmdGrp") }
     override val baseType: BaseType = BaseType.InterfaceAndBaseClass
-    override val topLevelClassFqName: String = WpiLibConstants.SUBSYSTEM_V2_INTERFACE_FQN
-    override val typicalBaseClassFqName: String = WpiLibConstants.SUBSYSTEM_V2_BASE_FQN
-    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.SUBSYSTEM2
-    
+    override val topLevelClassFqName: String = WpiLibConstants.COMMAND_GROUP_V1_BASE_FQN
+    override val typicalBaseClassFqName: String = WpiLibConstants.COMMAND_GROUP_V1_BASE_FQN
+    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.COMMAND_GROUP1
+    override val subsystemTopFqName: String = ""
+    override val includeSubsystemChooser: Boolean = false
+
     override val showJavaDocForOverridesOption: Boolean = false
 }

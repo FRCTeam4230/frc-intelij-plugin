@@ -91,6 +91,8 @@ abstract class FrcComponentCreationDataProvider
         return@lazy ImmutableSet.copyOf(names)
     }
 
+    open val showJavaDocForOverridesOption: Boolean by lazy { true }
+    
     abstract val fileTemplateDescriptor: FileTemplateDescriptor
     
     open val icon: Icon by lazy { fileTemplateDescriptor.icon }

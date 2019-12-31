@@ -66,21 +66,24 @@ public class CommandComponentCreationDialog extends FrcComponentCreationDialog
     @Override
     protected void initMajorOptionsPanel(JPanel topPanel, JPanel optionsPanel)
     {
-        // Display subsystems
-        final String labelText = message("frc.new.class.adv.command.dialog.subsystems.label");
-        List<PsiClass> subsystems = FrcClassUtilsKt.findImplementationsInModule(getSubsystemTopClassFQN(),
-                                                                                myModule,
-                                                                                false,
-                                                                                false,
-                                                                                null);
-        subsystems = FrcClassUtilsKt.sortedByName(subsystems);
-        // TODO: add option to filter out abstract 
-        // See our FrcClassUtilsKt.isAbstract() extension
-        this.mySubsystemsClassesMap = FrcUiUtilsKt.initClassSelectionPanelCheckBoxes(topPanel,
-                                                                                     optionsPanel,
-                                                                                     labelText,
-                                                                                     subsystems,
-                                                                                     true);
+        if (includeSubsystemSelection())
+        {
+            // Display subsystems
+            final String labelText = message("frc.new.class.adv.command.dialog.subsystems.label");
+            List<PsiClass> subsystems = FrcClassUtilsKt.findImplementationsInModule(getSubsystemTopClassFQN(),
+                                                                                    myModule,
+                                                                                    false,
+                                                                                    false,
+                                                                                    null);
+            subsystems = FrcClassUtilsKt.sortedByName(subsystems);
+            // TODO: add option to filter out abstract 
+            // See our FrcClassUtilsKt.isAbstract() extension
+            this.mySubsystemsClassesMap = FrcUiUtilsKt.initClassSelectionPanelCheckBoxes(topPanel,
+                                                                                         optionsPanel,
+                                                                                         labelText,
+                                                                                         subsystems,
+                                                                                         true);
+        }
     }
     
     
@@ -96,6 +99,17 @@ public class CommandComponentCreationDialog extends FrcComponentCreationDialog
         }
     }
     
+    protected boolean includeSubsystemSelection()
+    {
+        if (myDataProvider instanceof CommandCreationDataProvider)
+        {
+            return ((CommandCreationDataProvider) myDataProvider).getIncludeSubsystemChooser();
+        }
+        else
+        {
+            return true;
+        }
+    }
     
     @Override
     protected void addComponentSpecificProperties(@NotNull Builder<String, String> props,
@@ -125,14 +139,17 @@ public class CommandComponentCreationDialog extends FrcComponentCreationDialog
     protected List<PsiClass> getSelectedSubsystems()
     {
         final List<PsiClass> subsystems = new ArrayList<>();
-        for (Entry<PsiClass, JBCheckBox> entry : mySubsystemsClassesMap.entrySet())
+        if (includeSubsystemSelection())
         {
-            if (entry.getValue().isSelected())
+            for (Entry<PsiClass, JBCheckBox> entry : mySubsystemsClassesMap.entrySet())
             {
-                subsystems.add(entry.getKey());
+                if (entry.getValue().isSelected())
+                {
+                    subsystems.add(entry.getKey());
+                }
             }
+            subsystems.sort(PsiClassNameComparator.INSTANCE);
         }
-        subsystems.sort(PsiClassNameComparator.INSTANCE);
         return subsystems;
     }
 }

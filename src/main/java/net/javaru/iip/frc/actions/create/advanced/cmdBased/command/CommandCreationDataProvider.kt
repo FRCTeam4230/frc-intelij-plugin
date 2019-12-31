@@ -22,4 +22,5 @@ import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvid
 abstract class CommandCreationDataProvider: FrcComponentCreationDataProvider()
 {
     abstract val subsystemTopFqName: String
+    open val includeSubsystemChooser: Boolean by lazy { true }
 }

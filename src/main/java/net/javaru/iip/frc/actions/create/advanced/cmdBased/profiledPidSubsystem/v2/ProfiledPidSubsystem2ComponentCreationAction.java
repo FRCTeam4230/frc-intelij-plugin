@@ -23,7 +23,7 @@ import com.intellij.psi.PsiDirectory;
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractCmdBaseV2ComponentCreationAction;
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog;
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.profiledPidSubsystem.ProfiledPidSubsystemComponentCreationDialog;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.SubsystemComponentCreationDialog;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
@@ -44,6 +44,6 @@ public class ProfiledPidSubsystem2ComponentCreationAction extends AbstractCmdBas
                                                                                    @NotNull ClassCreator classCreator,
                                                                                    @NotNull PsiDirectory directory)
     {
-        return new ProfiledPidSubsystemComponentCreationDialog(module, classCreator, directory, dataProvider);
+        return new SubsystemComponentCreationDialog(module, classCreator, directory, dataProvider);
     }
 }

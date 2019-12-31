@@ -413,8 +413,8 @@
             <separator />
             <action id="frc.action.new.command1"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v1.Command1ComponentCreationAction" />
-            <action id="frc.action.new.basic.commandGroup"
-                    class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcCommandGroupClassAction" />
+            <action id="frc.action.new.commandGroup1"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v1.CommandGroup1ComponentCreationAction" />
             <action id="frc.action.new.basic.subsystem" 
                     class="net.javaru.iip.frc.actions.create.simple.cmdBased.v1.SimpleNewFrcSubsystemClassAction" />
             <action id="frc.action.new.basic.pidSubsystem"

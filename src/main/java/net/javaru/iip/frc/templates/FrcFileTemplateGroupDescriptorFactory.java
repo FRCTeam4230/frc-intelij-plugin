@@ -34,6 +34,7 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
     
     // COMMAND BASED FRAMEWORK v1
     public static final FileTemplateDescriptor COMMAND1 = new FileTemplateDescriptor("FRC v1 Command.java", FrcIcons.Components.COMMAND);
+    public static final FileTemplateDescriptor COMMAND_GROUP1 = new FileTemplateDescriptor("FRC v1 CommandGroup.java", FrcIcons.Components.COMMAND_GROUP);
     
     
     // COMMAND BASED FRAMEWORK v2

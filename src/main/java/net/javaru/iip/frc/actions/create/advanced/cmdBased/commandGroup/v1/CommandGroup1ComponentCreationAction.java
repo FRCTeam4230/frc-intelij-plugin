@@ -14,28 +14,29 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.advanced.cmdBased.trapezoidProfileSubsystem.v2;
+package net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v1;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiDirectory;
 
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractCmdBaseV2ComponentCreationAction;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractCmdBaseV1ComponentCreationAction;
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog;
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.SubsystemComponentCreationDialog;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.command.CommandComponentCreationDialog;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
-public class TrapezoidProfileSubsystem2ComponentCreationAction extends AbstractCmdBaseV2ComponentCreationAction
+public class CommandGroup1ComponentCreationAction extends AbstractCmdBaseV1ComponentCreationAction
 {
-    public TrapezoidProfileSubsystem2ComponentCreationAction()
+    
+    public CommandGroup1ComponentCreationAction()
     {
-        super(message("frc.new.class.trapezoidProfiledSubsystem.action.name"),
-              message("frc.new.class.trapezoidProfiledSubsystem.action.description"),
-              TrapezoidProfileSubsystem2ComponentCreationDataProvider.INSTANCE);
+        super(message("frc.new.class.commandGroup.action.name"),
+              message("frc.new.class.commandGroup.action.description"),
+              CommandGroup1ComponentCreationDataProvider.INSTANCE);
     }
     
     
@@ -44,6 +45,6 @@ public class TrapezoidProfileSubsystem2ComponentCreationAction extends AbstractC
                                                                                    @NotNull ClassCreator classCreator,
                                                                                    @NotNull PsiDirectory directory)
     {
-        return new SubsystemComponentCreationDialog(module, classCreator, directory, dataProvider);
+        return new CommandComponentCreationDialog(module, classCreator, directory, dataProvider);
     }
 }

@@ -73,12 +73,6 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
         props.put(MAKE_SINGLETON, Boolean.toString(makeSingleton));
     }
     
-    @Override
-    protected boolean showTheIncludeJavaDocCheckbox()
-    {
-        return false;
-    }
-    
     
     @Override
     protected void initMinorOptionsPanel(JPanel topPanel, JPanel optionsPanel)

@@ -40,7 +40,7 @@ public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtends
     @Override
     public double getMeasurement()
     {
-        // TODO: Return the measurement from the PID sensor, such as an encoder or potentiometer. 
+        // TODO: Return the measurement from the PID sensor, such as an encoder, gyro, potentiometer, etc. 
         //       This method is automatically called by the subsystem.
         return 0.0;
     }

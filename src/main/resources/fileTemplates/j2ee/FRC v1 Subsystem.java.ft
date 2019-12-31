@@ -20,6 +20,13 @@ public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtends
     }
     #parse("FRC_getInstance.java")
     
+#if($includeJavaDocsForOverrides == "true")
+    /**
+     * Initialize the default command for a subsystem By default subsystems have no default command,
+     * but if they do, the default command is set with this method. It is called on all Subsystems by
+     * CommandBase in the robot's program after all the Subsystems are created.
+     */
+#end
     @Override
     protected void initDefaultCommand()
     {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -86,7 +86,10 @@ val allFrcFacetsForAllOpenProjects: ImmutableList<FrcFacet>
 
         for (openProject in openProjects)
         {
-            listBuilder.addAll(openProject.getAllFrcFacetsForProject())
+            if (!openProject.isDisposed)
+            {
+                listBuilder.addAll(openProject.getAllFrcFacetsForProject())
+            }
         }
         return listBuilder.build()
     }
@@ -99,8 +102,11 @@ fun Project?.getAllFrcFacetsForProject(): ImmutableList<FrcFacet>
     val modules = ModuleManager.getInstance(this).modules
     for (module in modules)
     {
-        val frcFacets = FacetManager.getInstance(module).getFacetsByType(FACET_TYPE_ID)
-        listBuilder.addAll(frcFacets)
+        if (!module.isDisposed)
+        {
+            val frcFacets = FacetManager.getInstance(module).getFacetsByType(FACET_TYPE_ID)
+            listBuilder.addAll(frcFacets)
+        }
     }
     return listBuilder.build()
 }
@@ -110,7 +116,7 @@ fun Facet<*>?.isFrcFacet(): Boolean = this is FrcFacet
 @Contract("null -> false")
 fun Module?.isFrcFacetedModule(): Boolean
 {
-    if (this == null)
+    if (this == null || !this.isDisposed)
     {
         return false
     }
@@ -121,7 +127,7 @@ fun Module?.isFrcFacetedModule(): Boolean
 @Contract("null -> false")
 fun Project?.isFrcFacetedProject(): Boolean
 {
-    if (this != null)
+    if (this != null && !this.isDisposed)
     {
         val modules = ModuleManager.getInstance(this).modules
         for (module in modules)

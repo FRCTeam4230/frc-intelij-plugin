@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL;
 
 /*
+    TODO: Issue #55: Migrate Plugin Components to Services, Extensions or Listeners as Components will become deprecated in the IntelliJ Plugin API
+
     TODO: Issue #26:  Migrate this ApplicationComponent to a "true" ApplicationService (or possibly remove it completely)
     
     The FrcApplicationComponent interface was originally extending ApplicationComponent

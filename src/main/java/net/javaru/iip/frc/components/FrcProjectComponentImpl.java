@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -58,8 +58,8 @@ import static net.javaru.iip.frc.components.FrcProjectComponentImpl.Notification
 
 
 // TODO: Issue #45: This projectComponent has a lot of technical debt, and frankly has become an ugly mess. Let's clean it up. We can migrate to Kotlin at the same time.
-//       Issue #46: A lot of the notification work can be moved to a dedicated notification class/package.
-
+// TODO: Issue #46: A lot of the notification work can be moved to a dedicated notification class/package.
+// TODO: Issue #55: Migrate Plugin Components to Services, Extensions or Listeners as Components will become deprecated in the IntelliJ Plugin API
 public class FrcProjectComponentImpl implements FrcProjectComponent
 {
     private static final Logger LOG = Logger.getInstance(FrcProjectComponentImpl.class);

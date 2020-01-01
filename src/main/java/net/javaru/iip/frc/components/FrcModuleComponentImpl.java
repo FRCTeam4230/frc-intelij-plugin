@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.riolog.RioLogProjectService;
 
 
+// TODO: Issue #55: Migrate Plugin Components to Services, Extensions or Listeners as Components will become deprecated in the IntelliJ Plugin API
 
 public class FrcModuleComponentImpl implements FrcModuleComponent
 {

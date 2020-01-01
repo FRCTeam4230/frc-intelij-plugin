@@ -116,7 +116,7 @@ fun Facet<*>?.isFrcFacet(): Boolean = this is FrcFacet
 @Contract("null -> false")
 fun Module?.isFrcFacetedModule(): Boolean
 {
-    if (this == null || !this.isDisposed)
+    if (this == null || this.isDisposed)
     {
         return false
     }

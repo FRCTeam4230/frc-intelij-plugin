@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import java.nio.file.Paths
 import java.util.*
 
 /**
- * The `projectYear` used in the `wpilib_preferences.json` file. Typically it is just the year such as `2020`, but it may be an alternate
+ * The `projectYear` used in the `wpilib_preferences.json` file. Typically, it is just the year such as `2020`, but it may be an alternate
  * value during the beta releases, such as `Beta2020` or `Beta2020-2`. There doesn't appear to be any pattern to it as in the WPI repo, it
  * is a hard coded value in [https://github.com/wpilibsuite/vscode-wpilib/blob/master/vscode-wpilib/resources/gradle/java/.wpilib/wpilib_preferences.json]
  * and the change from `Beta2020` to `Beta2020-2` did not correlate to a WpiLib version/release.
@@ -48,7 +48,7 @@ fun WpiLibVersion.projectYearFor(): String = if (this.isNewerThan(minVersion(202
 /**
  * Returns the standard path for the wpilib installation, **but does not check if it exists**.
  */
-fun getWpiLibRoot(year: Int): Path
+fun getWpiLibRootPath(year: Int): Path
 {
     //        From https://docs.wpilib.org/en/latest/docs/getting-started/getting-started-frc-control-system/wpilib-setup.html
     //        The installation directory has changed for 2020. In 2019 the software was installed to  ~\frcYYYY where ~ is C:\Users\Public on Windows and YYYY is the FRC year. 
@@ -76,7 +76,7 @@ fun getWpiLibRoot(year: Int): Path
 /**
  * Returns the standard path for the wpilib JDK installation, **but does not check if it exists**.
  */
-fun getWpiLibJdkHome(year: Int): Path = getWpiLibRoot(year).resolve("jdk")
+fun getWpiLibJdkHomePath(year: Int): Path = getWpiLibRootPath(year).resolve("jdk")
 
 /**
  * Returns the standard path for the Java `RELEASE` file for the wpilib JDK installation, **but does not check if it exists**.
@@ -115,7 +115,7 @@ fun getWpiLibJdkHome(year: Int): Path = getWpiLibRoot(year).resolve("jdk")
  * SOURCE=""
  * ```
  */
-fun getWpiLibJdkReleaseFile(year: Int): Path = getWpiLibJdkHome(year).resolve("RELEASE")
+fun getWpiLibJdkReleaseFile(year: Int): Path = getWpiLibJdkHomePath(year).resolve("RELEASE")
 
 /**
  * Returns the value of the `JAVA_VERSION` property of the JDK `RELEASE` file, or null if the file 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -369,10 +369,13 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
     public void ensureContentIsPinned()
     {
-        final ToolWindow toolWindow = ToolWindowManager.getInstance(myProject)
-                                                       .getToolWindow(getToolWindowId());
-        final ContentManager contentManager = toolWindow.getContentManager();
-        ensureContentIsPinned(contentManager);
+        if (myProject != null && !myProject.isDisposed())
+        {
+            final ToolWindow toolWindow = ToolWindowManager.getInstance(myProject)
+                                                           .getToolWindow(getToolWindowId());
+            final ContentManager contentManager = toolWindow.getContentManager();
+            ensureContentIsPinned(contentManager);
+        }
     }
 
 
@@ -399,20 +402,27 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         public void run()
         {
             LOG.debug("[FRC] ActivateRioLogConsoleRunnable is executing for " + toString());
-            final ToolWindow toolWindow = ToolWindowManager.getInstance(myProject)
-                                                           .getToolWindow(getToolWindowId());
-            toolWindow.activate(null);
-            final ContentManager contentManager = toolWindow.getContentManager();
-            final Content content = contentManager.findContent(getTabTitle());
-            if (content != null)
+            if (!myProject.isDisposed())
             {
-                LOG.debug("[FRC] requesting focus for " + content.getDescription());
-                contentManager.setSelectedContent(content, true);
-                ensureContentIsPinned(content);
+                final ToolWindow toolWindow = ToolWindowManager.getInstance(myProject)
+                                                               .getToolWindow(getToolWindowId());
+                toolWindow.activate(null);
+                final ContentManager contentManager = toolWindow.getContentManager();
+                final Content content = contentManager.findContent(getTabTitle());
+                if (content != null)
+                {
+                    LOG.debug("[FRC] requesting focus for " + content.getDescription());
+                    contentManager.setSelectedContent(content, true);
+                    ensureContentIsPinned(content);
+                }
+                else
+                {
+                    LOG.debug("[FRC] content was null and cannot be activated/given-focus for " + toString());
+                }
             }
-            else
+            else 
             {
-                LOG.debug("[FRC] content was null and cannot be activated/given-focus for " + toString());
+                LOG.debug("[FRC] Project '" + myProject + "' is disposed. Will NOT activate RioLog Console.");
             }
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -164,9 +164,10 @@ fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
         LOG.info("[FRC] IndexNotReadyException when searching for $wpiLibPreferencesFileName files for module $module")
         // TODO: make index not ready notification?
     }
-    catch (e: Exception)
+    catch (t: Throwable)
     {
-        LOG.warn("[FRC] An exception occurred when finding $wpiLibPreferencesFileName files for module ${module}. Cause Summary: $e", e)
+        // Issue #60: a Throwable can be thrown by during an indexing event
+        LOG.warn("[FRC] An exception occurred when finding $wpiLibPreferencesFileName files for module ${module}. Cause Summary: $t", t)
     }
     
     return foundFiles

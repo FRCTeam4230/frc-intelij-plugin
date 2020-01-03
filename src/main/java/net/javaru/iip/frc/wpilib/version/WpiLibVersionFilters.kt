@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package net.javaru.iip.frc.wpilib.version
 
-import net.javaru.iip.frc.util.getAdjustedBuildYear
-import net.javaru.iip.frc.util.getCurrentBuildYear
 import org.apache.commons.lang3.BooleanUtils
 import java.util.stream.Stream
 
@@ -59,48 +57,40 @@ fun Stream<WpiLibVersion>.filterOutVersions(filter: WpiLibVersionFilter): Stream
 }
 
 /**
- * For the given year, filters out all but the latest version for that year.
- * If [excludePreReleases] is set to true, pre-releases (betas, release candidates, etc) are 
+ * For the given year, filters out ALL but the latest version for that year, in essence returning
+ * a list of a sinfge element, or an empty list if no versions for the year are present in the initial 
+ * list (or no non-pre-release versions)
+ * If [excludePreReleases] is set to true, pre-releases (betas, release candidates, etc) are
  * excluded so that the latest "full" release is returned.
  */
 @JvmOverloads
-fun Iterable<WpiLibVersion>.filterOutAllButLatestForYear(year: Int, excludePreReleases:Boolean  = true): List<WpiLibVersion>
+fun Iterable<WpiLibVersion>.filterOutAllButLatestForYear(year: Int, excludePreReleases: Boolean = true): List<WpiLibVersion>
 {
-    // find the latest for the year
-    var listForYear = this.filterVersions(YearFilter(year))
-    if (excludePreReleases)
-    {
-        listForYear = listForYear.filterVersions(IsReleaseFilter)
-    }
-    if (listForYear.isEmpty()) return this.toList() // No versions for the specified year
-
-    val yearMutableList = listForYear.toMutableList()
-    yearMutableList.sortDescending()
-    val latestVersionForYear = yearMutableList[0]
-    
-    return this.filter { 
-        if (it.major != year) true
-        else it == latestVersionForYear 
-    }
+    val latest = this.filterToLatestForYear(year, excludePreReleases)
+    return if (latest != null) listOf(latest) else listOf()
 }
 
+@JvmOverloads
+fun Iterable<WpiLibVersion>.filterToLatestForYear(year: Int, excludePreReleases: Boolean = true): WpiLibVersion? =  this.filterVersions(YearFilter(year, excludePreReleases)).max()
+
+
 /**
- * Filter the Iterable to include: only releases.  and the latest version if it is a release candidate. It also filters 
- * out the transitional `2018.06.21` version. Finally, it sorts the list in descending order' so the latest version is 
- * first. 
- * 
+ * Filter the Iterable to include: only releases.  and the latest version if it is a release candidate. It also filters
+ * out the transitional `2018.06.21` version. Finally, it sorts the list in descending order' so the latest version is
+ * first.
+ *
  * For now we will not show betas because there may be peculiarities with betas. For example, during the beta program of 2020,
  * the `projectYear` in the wpilib_preferences.json file was "Beta2020-2" and not 2020. But I could find no mapping of
  * the WpiLib Version to this value. It was basically a hard coded value in the code checking for it.
- * 
+ *
  */
 fun Iterable<WpiLibVersion>.filterToDefaultListing(): List<WpiLibVersion>
 {
     val versionList = this.toList().sortedDescending()
     val filter = if (BooleanUtils.toBoolean(System.getProperty(SHOW_BETAS_SYS_PROP_KEY, "false"))) IsReleaseOrRcOrBetaFilter else IsReleaseFilter
     val filteredList = versionList.filterVersions(filter).filterOutVersions(Is2018TransitionalRelease)
-    
-    
+
+
     return if (versionList.isNotEmpty() && !filteredList.contains(versionList[0]) && versionList[0].isReleaseCandidate())
     {
         // the latest version is not included, and is a release candidate and we want to show it.
@@ -179,28 +169,28 @@ interface WpiLibVersionFilter
 }
 
 
-object Is2018TransitionalRelease: WpiLibVersionFilter
+object Is2018TransitionalRelease : WpiLibVersionFilter
 {
     override fun predicate(): (WpiLibVersion) -> Boolean = { wpiLibVersion -> wpiLibVersion == ver2018_06_21 }
 }
 
-object IsReleaseFilter: WpiLibVersionFilter
+object IsReleaseFilter : WpiLibVersionFilter
 {
     override fun predicate(): (WpiLibVersion) -> Boolean = { wpiLibVersion -> wpiLibVersion.isRelease() }
 }
 
 
-object IsReleaseCandidateFilter: WpiLibVersionFilter
+object IsReleaseCandidateFilter : WpiLibVersionFilter
 {
     override fun predicate(): (WpiLibVersion) -> Boolean = { wpiLibVersion -> wpiLibVersion.isReleaseCandidate() }
 }
 
-object IsBetaFilter: WpiLibVersionFilter
+object IsBetaFilter : WpiLibVersionFilter
 {
     override fun predicate(): (WpiLibVersion) -> Boolean = { wpiLibVersion -> wpiLibVersion.isBeta() }
 }
 
-object IsPreReleasePreviewFilter: WpiLibVersionFilter
+object IsPreReleasePreviewFilter : WpiLibVersionFilter
 {
     override fun predicate(): (WpiLibVersion) -> Boolean = { wpiLibVersion -> wpiLibVersion.isPreReleasePreview() }
 }
@@ -210,16 +200,22 @@ object IsReleaseOrRcOrBetaFilter : WpiLibVersionFilter
     override fun predicate(): (WpiLibVersion) -> Boolean = { wpiLibVersion -> wpiLibVersion.isRelease() || wpiLibVersion.isReleaseCandidate() || wpiLibVersion.isBeta() }
 }
 
-object IsNotPreReleasePreviewFilter: WpiLibVersionFilter
+object IsNotPreReleasePreviewFilter : WpiLibVersionFilter
 {
     override fun predicate(): (WpiLibVersion) -> Boolean = { wpiLibVersion -> !wpiLibVersion.isPreReleasePreview() }
 }
 
-open class YearFilter(private val year:Int): WpiLibVersionFilter
+/**
+ * Filters a list so that it contains just the values for a particular year. By default, it will filter out pre-releases. Note that NO
+ * sorting takes place. the items are returned in the same order as they were in the original list.
+ */
+open class YearFilter @JvmOverloads constructor(private val year: Int, private val excludePreReleases: Boolean = true) : WpiLibVersionFilter
 {
-    override fun predicate(): (WpiLibVersion) -> Boolean = { wpiLibVersion -> wpiLibVersion.major == year }
+    override fun predicate(): (WpiLibVersion) -> Boolean =
+            if (excludePreReleases)
+                { wpiLibVersion -> wpiLibVersion.frcYear == year && wpiLibVersion.isRelease() }
+            else 
+                { wpiLibVersion -> wpiLibVersion.frcYear == year }
 }
 
-object CurrentBuildYearFilter: YearFilter(getCurrentBuildYear())
 
-object NearBuildYearFilter: YearFilter(getAdjustedBuildYear())

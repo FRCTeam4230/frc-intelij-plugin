@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2015-2019 the original author or authors
+  ~ Copyright 2015-2020 the original author or authors
   ~
   ~     Licensed under the Apache License, Version 2.0 (the "License");
   ~     you may not use this file except in compliance with the License.
@@ -79,6 +79,7 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.plugins.gradle</depends>
+    <depends>org.intellij.groovy</depends>
     <!--<depends>AntSupport</depends>-->
 
     <!-- Optional dependency on another plugin.
@@ -164,6 +165,10 @@
 
         <projectService id="FRC.SshRioLogConsoleProjectService"
                         serviceImplementation="net.javaru.iip.frc.riolog.ssh.SshRioLogMonitorProjectService" />
+        
+        
+        <projectService id="FRC.WpiLibUpdateCheckingService" serviceImplementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionService" />
+        <postStartupActivity implementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionStartupActivity" />
 
         <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
 

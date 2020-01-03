@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -52,6 +52,10 @@ interface WpiLibVersion : Comparable<WpiLibVersion>
     val preReleaseModifierSubVersion: String
     
     val preReleasePreviewVersion: Int?
+
+    /** The project year, such as `2019` or `2020` */
+    val frcYear:Int
+            get() = major
     
     /** Indicates the version is a (full) release and not a pre-release (such as RC, Beta, or Alpha). */
     fun isRelease(): Boolean = preReleaseModifier == null
@@ -98,9 +102,9 @@ interface WpiLibVersion : Comparable<WpiLibVersion>
     
     override fun compareTo(other: WpiLibVersion): Int
     {
-
         return CompareToBuilder()
                 .append(this.generation, other.generation)
+                // For now, since it is the same as the major, we leave out frcYear
                 .append(this.major, other.major)
                 .append(this.minor, other.minor)
                 .append(this.patch, other.patch)

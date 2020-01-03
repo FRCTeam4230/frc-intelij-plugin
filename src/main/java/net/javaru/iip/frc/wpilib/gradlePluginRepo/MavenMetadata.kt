@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -354,17 +354,32 @@ fun fetchGradleRioMavenMetadata(): WpiLibMavenMetadata?
 {
     return try
     {
-        LOG.debug("[FRC] Checking Gradle Repo for GradleRio MavenMetadata update")
-        val mavenMetadataDocument = FrcHttpClient.fetchXmlResourceAsDocument(wpiLibGradlePluginMavenMetadataURI)
-        val mavenMetadata = parseMavenMetadata(mavenMetadataDocument)
+
+        val mavenMetadata = fetchLatestMavenMetadata(wpiLibGradlePluginMavenMetadataURI)
         if (mavenMetadata == null) null else WpiLibMavenMetadata(mavenMetadata)
     }
     catch (e: Exception)
     {
-        LOG.warn("[FRC] Could not complete a check for a new version of WPI Lib from the Gradle Repo due to an exception: $e", e)
+        LOG.warn("[FRC] Could not convert mavenMetadata to WpiLibMavenMetadata due to an exception: $e", e)
         null
     }
 }
+
+fun fetchLatestMavenMetadata(metadataURI: URI): MavenMetadata?
+{
+    return try
+    {
+        LOG.debug("[FRC] Checking for MavenMetadata update from: $metadataURI")
+        val mavenMetadataDocument = FrcHttpClient.fetchXmlResourceAsDocument(metadataURI)
+        parseMavenMetadata(mavenMetadataDocument)
+    }
+    catch (e: Exception)
+    {
+        LOG.warn("[FRC] Could not complete a check for maven metadata update from $metadataURI due to an exception: $e", e)
+        null
+    }
+}
+
 
 @Language("JSON")
 val defaultMavenMetadataJson = """{"groupId":"edu.wpi.first.GradleRIO","artifactId":"edu.wpi.first.GradleRIO.gradle.plugin","version":"2020.1.1-beta-3a","latest":"2020.1.1-beta-3a","release":"2020.1.1-beta-3a","versions":["2018.06.21","2019.0.0-alpha-1","2019.0.0-alpha-2","2019.0.0-alpha-3","2019.0.0-beta0-pre1","2019.0.0-beta0-pre3","2019.0.0-beta0-pre4","2019.0.0-beta0-pre5","2019.0.0-beta0-pre6","2019.1.1-beta-1","2019.1.1-beta-2a","2019.1.1-beta-3","2019.1.1-beta-3a","2019.1.1-beta-3-p-2","2019.1.1-beta-3-pre3","2019.1.1-beta-3-pre4","2019.1.1-beta-3-pre5","2019.1.1-beta-3-pre6","2019.1.1-beta-3-pre7","2019.1.1-beta-3-pre8","2019.1.1-beta-3-pre9","2019.1.1-beta-4","2019.1.1-beta-4a","2019.1.1-beta-4b","2019.1.1-beta-4c","2019.1.1-beta-4-pre1","2019.1.1-beta-4-pre2","2019.1.1-beta-4-pre4","2019.1.1-rc-1","2019.1.1","2019.2.1","2019.3.1","2019.3.2","2019.4.1","2020.1.1-beta-1","2020.1.1-beta-2","2020.1.1-beta-3","2020.1.1-beta-3a"],"lastUpdated":"20191123193733"}"""

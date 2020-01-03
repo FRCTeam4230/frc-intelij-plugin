@@ -16,9 +16,14 @@
 
 package net.javaru.iip.frc.wpilib
 
+import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiLiteralExpression
 import com.intellij.util.io.isFile
 import com.intellij.util.lang.JavaVersion
+import net.javaru.iip.frc.util.findClass
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
+import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl
 import net.javaru.iip.frc.wpilib.version.firstRelease
 import net.javaru.iip.frc.wpilib.version.minVersion
 import java.nio.file.Files
@@ -27,12 +32,12 @@ import java.nio.file.Paths
 import java.util.*
 
 /**
- * The `projectYear` used in the `wpilib_preferences.json` file. Typically, it is just the year such as `2020`, but it may be an alternate
- * value during the beta releases, such as `Beta2020` or `Beta2020-2`. There doesn't appear to be any pattern to it as in the WPI repo, it
+ * Determines the `projectYear` String used in the `wpilib_preferences.json` file. Typically, it is just the year such as `2020`, but it may be an alternate
+ * value during the pre-releases, such as `Beta2020` or `Beta2020-2`. There doesn't appear to be any pattern to it as in the WPI repo, it
  * is a hard coded value in [https://github.com/wpilibsuite/vscode-wpilib/blob/master/vscode-wpilib/resources/gradle/java/.wpilib/wpilib_preferences.json]
  * and the change from `Beta2020` to `Beta2020-2` did not correlate to a WpiLib version/release.
  */
-fun WpiLibVersion.projectYearFor(): String = if (this.isNewerThan(minVersion(2020)) && this.isOlderThan(firstRelease(2020)) && this.isBetaOrBetaPreview()) "Beta2020-2" else major.toString()
+fun determineProjectYearStringForVersion(version: WpiLibVersion): String = if (version.isNewerThan(minVersion(2020)) && version.isOlderThan(firstRelease(2020)) && version.isBetaOrBetaPreview()) "Beta2020-2" else version.frcYear.toString()
 
 
 //        JAVA_VERSION key in 
@@ -69,7 +74,7 @@ fun getWpiLibRootPath(year: Int): Path
     }
     else
     {
-        publicRoot.resolve("wpilib").resolve ("$year")
+        publicRoot.resolve("wpilib").resolve("$year")
     }
 }
 
@@ -81,7 +86,7 @@ fun getWpiLibJdkHomePath(year: Int): Path = getWpiLibRootPath(year).resolve("jdk
 /**
  * Returns the standard path for the Java `RELEASE` file for the wpilib JDK installation, **but does not check if it exists**.
  * Some example content:
- * 
+ *
  * **Oracle JDK 11 AND OpenJDK 11**
  * ```
  * IMPLEMENTOR="Oracle Corporation"
@@ -93,7 +98,7 @@ fun getWpiLibJdkHomePath(year: Int): Path = getWpiLibRootPath(year).resolve("jdk
  * OS_NAME="Windows"
  * SOURCE=".:8513ac27b651"
  * ```
- * 
+ *
  * **Amazon Corretto 8**
  * ```
  * JAVA_VERSION="1.8.0_222"
@@ -102,7 +107,7 @@ fun getWpiLibJdkHomePath(year: Int): Path = getWpiLibRootPath(year).resolve("jdk
  * OS_ARCH="amd64"
  * SOURCE=""
  * ```
- * 
+ *
  * **Amazon Corretto 11**
  * ```
  * IMPLEMENTOR="Amazon.com Inc."
@@ -118,7 +123,7 @@ fun getWpiLibJdkHomePath(year: Int): Path = getWpiLibRootPath(year).resolve("jdk
 fun getWpiLibJdkReleaseFile(year: Int): Path = getWpiLibJdkHomePath(year).resolve("RELEASE")
 
 /**
- * Returns the value of the `JAVA_VERSION` property of the JDK `RELEASE` file, or null if the file 
+ * Returns the value of the `JAVA_VERSION` property of the JDK `RELEASE` file, or null if the file
  * does not exist, or does nto contain the `JAVA_VERSION property.
  * Example values:
  *  - 11.0.2
@@ -145,3 +150,65 @@ fun getWpiLibJdkReleaseJavaVersionString(year: Int): String?
 
 fun getWpiLibJdkReleaseJavaVersion(year: Int): JavaVersion? = JavaVersion.tryParse(getWpiLibJdkReleaseJavaVersionString(year))
 fun getWpiLibJdkReleaseJavaFeatureVersion(year: Int): Int? = JavaVersion.tryParse(getWpiLibJdkReleaseJavaVersionString(year))?.feature
+
+
+/**
+ * Gets the WPI Lib Version for the attached WPI Lib JAR **within a smart read action**, returning null if it cannot be determined (for example if the
+ * WpiLib is not attached as a dependency/library).
+ */
+fun Project.getAttachedWpiLibVersionInSmartReadAction(): WpiLibVersion?
+{
+    var version: WpiLibVersion? = null
+    DumbService.getInstance(this).runReadActionInSmartMode() {
+        version = getAttachedWpiLibVersion()
+    }
+    return version
+}
+
+/**
+ * Gets the WPI Lib Version for the attached WPI Lib JAR, returning null if it cannot be determined (for example if the
+ * WpiLib is not attached as a dependency/library). **This action should be run in a `runReadActionInSmartMode` wrapping.**
+ * @see [getAttachedWpiLibVersionInSmartReadAction]
+ */
+fun Project.getAttachedWpiLibVersion(): WpiLibVersion?
+{
+    val versionString = this.getAttachedWpiLibVersionString()
+    return WpiLibVersionImpl.parseSafely(versionString)
+}
+
+/**
+ * Gets the WPI Lib Version String for the attached WPI Lib JAR **within a smart read action**, returning null if it cannot be determined (for example if the
+ * WpiLib is not attached as a dependency/library).
+ * @see [getAttachedWpiLibVersionInSmartReadAction]
+ */
+fun Project.getAttachedWpiLibVersionStringInSmartReadAction(): String?
+{
+    var version: String? = null
+    DumbService.getInstance(this).runReadActionInSmartMode() {
+        version = this.getAttachedWpiLibVersionString()
+    }
+    return version
+}
+
+/**
+ * Gets the WPI Lib Version String for the attached WPI Lib JAR returning null if it cannot be determined (for example if the
+ * WpiLib is not attached as a dependency/library). **This action should be run in a `runReadActionInSmartMode` wrapping.**
+ * @see [getAttachedWpiLibVersionStringInSmartReadAction]
+ */
+fun Project.getAttachedWpiLibVersionString(): String?
+{
+    val verClasses = findClass(this, WpiLibConstants.VERSION_CLASS_FQN)
+    for (psiClass in verClasses)
+    {
+        val initializer = psiClass?.findFieldByName("Version", false)?.initializer
+        if (initializer is PsiLiteralExpression)
+        {
+            val value = initializer.value
+            if (value is String)
+            {
+                return value
+            }
+        }
+    }
+    return null
+}

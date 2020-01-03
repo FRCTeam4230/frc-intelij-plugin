@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -19,12 +19,15 @@ package net.javaru.iip.frc.util
 import com.intellij.application.options.CodeStyle
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.impl.LoadTextUtil
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtilRt
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiManager
 import org.jdom2.filter.Filters
 import org.jdom2.input.SAXBuilder
 import org.jdom2.xpath.XPathFactory
@@ -88,6 +91,13 @@ fun VirtualFile.lineSeparator(): String
     }
     return lineSeparator!!
 }
+
+fun VirtualFile?.findPsiFile(project: Project): PsiFile? = if (this == null) null else PsiManager.getInstance(project).findFile(this)
+
+@JvmOverloads
+fun File?.findVirtualFile(refreshIfNeeded: Boolean = true): VirtualFile? = if (this == null) null else VfsUtil.findFileByIoFile(this, refreshIfNeeded)
+
+fun Path?.findVirtualFile(refreshIfNeeded: Boolean = true): VirtualFile? = if (this == null) null else VfsUtil.findFile(this, refreshIfNeeded)
 
 /**
  * @param parent the parent directory to create the file (or sub directories and file) in

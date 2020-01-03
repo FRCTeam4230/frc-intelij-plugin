@@ -49,8 +49,6 @@ import net.javaru.iip.frc.settings.FrcProjectTeamNumberService;
 import net.javaru.iip.frc.util.FrcProjectExtsKt;
 import net.javaru.iip.frc.util.UriUtilsKt;
 import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibLibrariesUtils;
-import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibVersionStatus;
-import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT;
 import static net.javaru.iip.frc.actions.tools.legacy.DownloadLegacyWpiLibAction.NOTIFICATIONS_SUBTITLE;
@@ -293,52 +291,8 @@ public class FrcProjectComponentImpl implements FrcProjectComponent
             notificationMap.put(ConfigureTeamNumberQuery, notification);
         }
     }
-
-    // TODO: Rework for Gradle RIO Version
-    public static Notification queueNewerWpiLibVersionIsAvailable(@NotNull Project project,
-                                                                  @NotNull LegacyWpiLibVersionStatus versionStatus)
-    {
-        return queueNewerWpiLibVersionIsAvailable(project, versionStatus.getAttachedVersion(), versionStatus.getAvailableVersion());    
-    }
     
     
-    // TODO: Rework for Gradle RIO Version
-    public static Notification queueNewerWpiLibVersionIsAvailable(@NotNull Project project,
-                                                                  @Nullable WpiLibVersion attachedVersion,
-                                                                  @Nullable WpiLibVersion availableVersion)
-    {
-
-        StringBuilder content = new StringBuilder("A newer version of the WPILib is available for download.<br>");
-        if (attachedVersion != null && availableVersion != null)
-        {
-            content.append("Current Version: ")
-                   .append(attachedVersion.getVersionString())
-                   .append(" Available Version: ")
-                   .append(availableVersion.getVersionString())
-                   .append("<br>");
-        }
-        content.append("Would you like to download the new version? <a href='download'>Yes</a>  <a href='doNotDownload'>No</a>");
-        final Notification notification = FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP()
-                                                                    .createNotification(FrcNotifications.Title,
-                                                                                        "New WPI Lib Available",
-                                                                                        content.toString(),
-                                                                                        NotificationType.INFORMATION,
-                                                                                        (theNotification, event) ->
-                                {
-                                    theNotification.expire();
-                                    if ("download".equals(event.getDescription()))
-                                    {
-                                        DownloadLegacyWpiLibAction.downloadLatestInBackground(
-                                            project,
-                                            true,
-                                            true);
-                                    }
-                                }
-            );
-        Notifications.Bus.notify(notification, project);
-        getNotificationMapForProject(project).put(DownloadNewWpiLibVersionQuery, notification);
-        return notification;
-    }
     
     private static void queueDownloadAndAttachWpilibNotification(@NotNull Project project)
     {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package net.javaru.iip.frc.wizard
 
 import net.javaru.iip.frc.settings.FrcApplicationSettings
+import net.javaru.iip.frc.wpilib.determineProjectYearStringForVersion
 import net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState
-import net.javaru.iip.frc.wpilib.projectYearFor
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -50,11 +50,11 @@ class FrcProjectWizardData(
      * and the change from `Beta2020` to `Beta2020-2` did not correlate to a WpiLib version/release.
      */
     val projectYear: String
-        get() = wpilibVersion.projectYearFor()
+        get() = determineProjectYearStringForVersion(wpilibVersion)
                 
     /** The project year, such as `2019` or `2020`, as a String. */
     val frcYear: String
-        get() = wpilibVersion.major.toString()
+        get() = wpilibVersion.frcYear.toString()
     
     val teamNumberString: String
         get() = teamNumber.toString()
@@ -74,7 +74,7 @@ class FrcProjectWizardData(
 
     val gradleDistributionUrl: String
         get() {
-            return when (wpilibVersion.major)
+            return when (wpilibVersion.frcYear)
             {
                 2019 -> """https\://services.gradle.org/distributions/gradle-5.0-bin.zip"""
                 2020 -> """https\://services.gradle.org/distributions/gradle-6.0.1-bin.zip"""

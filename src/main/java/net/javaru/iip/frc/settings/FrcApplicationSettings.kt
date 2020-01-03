@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -70,7 +70,8 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                    */
                                   var rioRestartRegexString: String = "(?ium).*Launching.*FRCUserProgram\\.jar.*", /* TODO Need to update for Gradle based deploy*/
                                   var enableGradleImportUponNewProjectCreation: Boolean = true,
-                                  var debuggingPort: Int = DEFAULT_DEBUG_PORT
+                                  var debuggingPort: Int = DEFAULT_DEBUG_PORT,
+                                  var checkWpiLibStatusOnProjectStartup: Boolean = true
                                  ) : PersistentStateComponent<FrcApplicationSettings>
 {
     companion object Settings

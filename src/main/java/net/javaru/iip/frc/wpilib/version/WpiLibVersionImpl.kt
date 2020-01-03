@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -51,10 +51,23 @@ class WpiLibVersionImpl private constructor(override val versionString: String,
     companion object
     {
 
-        private val pre2017Pattern = """([\d]{1,2})\.([\d]{1,2})\.([\d]{1,2})\.([\d]{12})""".toRegex().toPattern()
-        private val post2017Pattern = """(?<major>[\d]{4})\.(?<minor>[\d]{1,2})(\.(?<patch>[\d]{1,2})(?<preAll>[-.](?<preName>alpha|beta|rc)([-.]?(?<preVersion>[\d]{1,2}))?)?(?<preSubVersion>[a-z])?(?<previewAll>[-.](pre|p-)[-]?(?<previewVer>[\d]*))?)?""".toRegex(RegexOption.IGNORE_CASE).toPattern()
+        internal val pre2017Pattern = """([\d]{1,2})\.([\d]{1,2})\.([\d]{1,2})\.([\d]{12})""".toRegex().toPattern()
+        internal val post2017Pattern = """(?<major>[\d]{4})\.(?<minor>[\d]{1,2})(\.(?<patch>[\d]{1,2})(?<preAll>[-.](?<preName>alpha|beta|rc)([-.]?(?<preVersion>[\d]{1,2}))?)?(?<preSubVersion>[a-z])?(?<previewAll>[-.](pre|p-)[-]?(?<previewVer>[\d]*))?)?""".toRegex(RegexOption.IGNORE_CASE).toPattern()
 
-
+        /** Safely parses the provided version String, returning null if the supplied string is null or if it cannot be parsed (logging the problem).  */
+        fun parseSafely(version: String?): WpiLibVersion?
+        {
+            if (version == null) return null
+            return try{
+                parse(version)
+            }
+            catch (e:Exception)
+            {
+                LOG.warn(""""[FRC] Could not parse the string "$version" to a WpiLibVersion. Cause: $e""")
+                null
+            }
+        }
+        
         @Throws(IllegalArgumentException::class)
         fun parse(version: String): WpiLibVersion
         {

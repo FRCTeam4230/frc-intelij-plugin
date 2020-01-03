@@ -188,10 +188,46 @@ fun Project.getTeamNumberConfiguredInWpiLibPreferencesFile(): Int
     }
 }
 
-
-fun getConfiguredProjectYear(project: Project): String?
+/**
+ * Returns the project year, **which may not be just the year** but may also have character text, e.g. "Beta2020-2".
+ */
+fun Project.getConfiguredProjectYear(): String?
 {
     return runReadAction {
-        findLikelyWpiLibPreferencesPsiFileAsJsonFile(project)?.getStringPropertyValue(projectYearPropertyName)
+        findLikelyWpiLibPreferencesPsiFileAsJsonFile(this)?.getStringPropertyValue(projectYearPropertyName)
     }
+}
+
+// Y2.1K failure pending ;)
+private val yearRegex = """20\d\d""".toRegex()
+
+/**
+ * Returns just the year, as an Int, for the configured project year. Thus if the project year is configured as "Beta2020-2", this will return the Int `2020`.
+ */
+fun Project.getConfiguredProjectYearJustYear(): Int?
+{
+    val configuredProjectYear = this.getConfiguredProjectYear()
+    return extractProjectYear(configuredProjectYear)
+}
+
+/**
+ * Extracts the year, as an Int, from the provided String. Thus if the provided project year is "Beta2020-2", this will return the Int `2020`.
+ * @see [getConfiguredProjectYearJustYear] to get the year as an Int from the `wpilib_preferences.json` file
+ */
+fun extractProjectYear(projectYearString: String?): Int?
+{
+    try
+    {
+        if (projectYearString != null)
+        {
+            val result = yearRegex.find(projectYearString)
+            return result?.value?.toInt()
+        }
+    }
+    catch (e: Exception)
+    {
+        LOG.warn("[FRC] Could not extract integer year from $wpiLibPreferencesFileName file. Cause: $e")
+    }
+
+    return null
 }

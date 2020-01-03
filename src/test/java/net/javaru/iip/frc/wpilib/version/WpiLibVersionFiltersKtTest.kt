@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -48,8 +48,8 @@ internal class WpiLibVersionFiltersKtTest
     {
         val expected = GRV.betas.filter { it.versionString.startsWith("2019") }
         assertAll(
-                { assertEquals(expected, GRV.versions.filterVersions(IsBetaFilter.and(YearFilter(2019))), "failed for ThisFilter.and(ThatFilter)") },
-                { assertEquals(expected, GRV.versions.filterVersions(WpiLibVersionFilter.and(IsBetaFilter, YearFilter(2019))), "failed for WpiLibVersionFilter.and(filter1, filter2)") }
+                { assertEquals(expected, GRV.versions.filterVersions(IsBetaFilter.and(YearFilter(2019, false))), "failed for ThisFilter.and(ThatFilter)") },
+                { assertEquals(expected, GRV.versions.filterVersions(WpiLibVersionFilter.and(IsBetaFilter, YearFilter(2019, false))), "failed for WpiLibVersionFilter.and(filter1, filter2)") }
                  )
     }
     
@@ -58,8 +58,8 @@ internal class WpiLibVersionFiltersKtTest
     {
         val expected = GRV.betas.filter { !it.versionString.startsWith("2019") }
         assertAll(
-                { assertEquals(expected, GRV.versions.filterVersions(IsBetaFilter.andNot(YearFilter(2019))), "failed for ThisFilter.and(ThatFilter)") },
-                { assertEquals(expected, GRV.versions.filterVersions(WpiLibVersionFilter.and(IsBetaFilter, WpiLibVersionFilter.not(YearFilter(2019)))), "failed for WpiLibVersionFilter.and(filter1, not(filter2))") }
+                { assertEquals(expected, GRV.versions.filterVersions(IsBetaFilter.andNot(YearFilter(2019, false))), "failed for ThisFilter.and(ThatFilter)") },
+                { assertEquals(expected, GRV.versions.filterVersions(WpiLibVersionFilter.and(IsBetaFilter, WpiLibVersionFilter.not(YearFilter(2019, false)))), "failed for WpiLibVersionFilter.and(filter1, not(filter2))") }
                  )
     }
     
@@ -76,8 +76,13 @@ internal class WpiLibVersionFiltersKtTest
     @Test
     fun yearFilterTest()
     {
-        val expected = GRV.versions.filter { it.versionString.startsWith("2020") }
-        assertEquals(expected, GRV.versions.filterVersions(YearFilter(2020)))
+        val expected = 
+        assertAll(
+                { assertEquals(listOf(GRV.v2020_1_1, GRV.v2020_1_2), GRV.versions.filterVersions(YearFilter(2020, true))) },
+                { assertEquals(GRV.versions.filter { it.versionString.startsWith("2020") }, GRV.versions.filterVersions(YearFilter(2020, false))) },
+                { assertEquals(GRV.versions.filter { it.versionString.startsWith("2019") }, GRV.versions.filterVersions(YearFilter(2019, false))) }
+                 )
+        
     }
 
     @Test
@@ -85,11 +90,10 @@ internal class WpiLibVersionFiltersKtTest
     
     @Test
     fun filterOutTransitionalVersions() = assertEquals(listOf(GRV.v2018_06_21), GRV.versions.filterVersions(Is2018TransitionalRelease))
-    
+
     @Test
     fun filterOutAllButLatestForYear()
     {
-
         val inputFull = listOf(
             GRV.v2018_06_21,
             GRV.v2019_0_0_alpha_1,
@@ -137,7 +141,6 @@ internal class WpiLibVersionFiltersKtTest
             GRV.v2019_4_1_rc1,
             GRV.v2019_4_1_rc2,
             GRV.v2019_4_1_rc3,
-            GRV.v2019_4_1,
             GRV.v2020_1_1_beta_1,
             GRV.v2020_1_1_beta_2,
             GRV.v2020_1_1_beta_3,
@@ -145,80 +148,14 @@ internal class WpiLibVersionFiltersKtTest
             GRV.v2020_1_1,
             GRV.v2020_1_2_rc_1_pre1,
             GRV.v2020_1_2_rc_1,
-            GRV.v2020_1_2)
+            GRV.v2020_1_2).shuffled()
 
-        val expectedLatestFor2020 = listOf(
-            GRV.v2018_06_21,
-            GRV.v2019_0_0_alpha_1,
-            GRV.v2019_0_0_alpha_2_pre1,
-            GRV.v2019_0_0_alpha_2,
-            GRV.v2019_0_0_alpha_3,
-            GRV.v2019_0_0_beta0_pre1,
-            GRV.v2019_0_0_beta0_pre3,
-            GRV.v2019_0_0_beta0_pre4,
-            GRV.v2019_0_0_beta0_pre5,
-            GRV.v2019_0_0_beta0_pre6,
-            GRV.v2019_0_1,
-            GRV.v2019_1_1_beta_1,
-            GRV.v2019_1_1_beta_2a,
-            GRV.v2019_1_1_beta_3_pre1,
-            GRV.v2019_1_1_beta_3_p_2,
-            GRV.v2019_1_1_beta_3_pre3,
-            GRV.v2019_1_1_beta_3_pre4,
-            GRV.v2019_1_1_beta_3_pre5,
-            GRV.v2019_1_1_beta_3_pre6,
-            GRV.v2019_1_1_beta_3_pre7,
-            GRV.v2019_1_1_beta_3_pre8,
-            GRV.v2019_1_1_beta_3_pre9,
-            GRV.v2019_1_1_beta_3_pre10,
-            GRV.v2019_1_1_beta_3,
-            GRV.v2019_1_1_beta_3a,
-            GRV.v2019_1_1_beta_4_pre1,
-            GRV.v2019_1_1_beta_4_pre2,
-            GRV.v2019_1_1_beta_4_pre4,
-            GRV.v2019_1_1_beta_4,
-            GRV.v2019_1_1_beta_4a,
-            GRV.v2019_1_1_beta_4b,
-            GRV.v2019_1_1_beta_4c,
-            GRV.v2019_1_1_beta_5,
-            GRV.v2019_1_1_beta_99,
-            GRV.v2019_1_1_rc_1,
-            GRV.v2019_1_1,
-            GRV.v2019_1_2,
-            GRV.v2019_2_1,
-            GRV.v2019_3_1_rc,
-            GRV.v2019_3_1,
-            GRV.v2019_3_2_rc,
-            GRV.v2019_3_2_rc2,
-            GRV.v2019_3_2,
-            GRV.v2019_4_1_rc1,
-            GRV.v2019_4_1_rc2,
-            GRV.v2019_4_1_rc3,
-            GRV.v2019_4_1,
-            GRV.v2020_1_2)
-
-        val expectedLatestFor2019 = listOf(
-                GRV.v2018_06_21,
-                GRV.v2019_4_1,
-                GRV.v2020_1_1_beta_1,
-                GRV.v2020_1_1_beta_2,
-                GRV.v2020_1_1_beta_3,
-                GRV.v2020_1_1_beta_3a,
-                GRV.v2020_1_1,
-                GRV.v2020_1_2_rc_1_pre1,
-                GRV.v2020_1_2_rc_1,
-                GRV.v2020_1_2)
         
-        val expectedChained = listOf(
-                GRV.v2018_06_21,
-                GRV.v2019_4_1,
-                GRV.v2020_1_2
-                             )
         assertAll(
-                { assertEquals(expectedLatestFor2020, inputFull.filterOutAllButLatestForYear(2020), "Failed for 2020") },
-                { assertEquals(expectedLatestFor2019, inputFull.filterOutAllButLatestForYear(2019), "Failed for 2019") },
-                { assertEquals(inputFull, inputFull.filterOutAllButLatestForYear(2018), "Failed for 2018") },
-                { assertEquals(expectedChained, inputFull.filterOutAllButLatestForYear(2018).filterOutAllButLatestForYear(2019).filterOutAllButLatestForYear(2020), "Failed for chained years") }
+                { assertEquals(listOf(GRV.v2020_1_2), inputFull.filterOutAllButLatestForYear(2020), "Failed for 2020") },
+                { assertEquals(listOf(GRV.v2019_3_2), inputFull.filterOutAllButLatestForYear(2019, true), "Failed for 2019 & 'true'") },
+                { assertEquals(listOf(GRV.v2019_4_1_rc3), inputFull.filterOutAllButLatestForYear(2019, false), "Failed for 2019 & 'false'") },
+                { assertEquals(listOf(GRV.v2018_06_21), inputFull.filterOutAllButLatestForYear(2018), "Failed for 2018") }
                  )
     }
     

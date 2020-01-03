@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ interface FrcWizardTemplateDefinition
 }
 
 
-fun projectTemplateDefinitionsFor(version: WpiLibVersion): Array<FrcWizardTemplateDefinition> = projectTemplateDefinitionsFor(version.major)
+fun projectTemplateDefinitionsFor(version: WpiLibVersion): Array<FrcWizardTemplateDefinition> = projectTemplateDefinitionsFor(version.frcYear)
 @Suppress("UNCHECKED_CAST")
 fun projectTemplateDefinitionsFor(year: Int): Array<FrcWizardTemplateDefinition>
 {
@@ -86,7 +86,7 @@ fun projectTemplateDefinitionsFor(year: Int): Array<FrcWizardTemplateDefinition>
         else -> FrcWizard2020ProjectTemplateDefinition.values() as Array<FrcWizardTemplateDefinition>
     }
 }
-fun exampleTemplateDefinitionsFor(version: WpiLibVersion): Array<FrcWizardTemplateDefinition> = exampleTemplateDefinitionsFor(version.major)
+fun exampleTemplateDefinitionsFor(version: WpiLibVersion): Array<FrcWizardTemplateDefinition> = exampleTemplateDefinitionsFor(version.frcYear)
 @Suppress("UNCHECKED_CAST")
 fun exampleTemplateDefinitionsFor(year:Int): Array<FrcWizardTemplateDefinition>
 {

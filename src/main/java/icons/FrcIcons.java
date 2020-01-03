@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc;
+package icons;
 
 import javax.swing.*;
 
@@ -104,13 +104,13 @@ public final class FrcIcons
         public static final Icon BUTTON_WPI = loadIcon("/icons/wpi/Button.png"); // 16x16
 
         /** A 16x16 Icon for Trigger (i.e. a simple Button) classes. */
-        public static final Icon BUTTON = loadIcon("/icons/components/Button-16.png"); // 16x16
+        public static final Icon BUTTON = loadIcon("/icons/components/Button-Joystick-16.png"); // 16x16
 
         /** A 16x16 Icon for Subsystem classes. */
         public static final Icon SUBSYSTEM_WPI = loadIcon("/icons/wpi/Subsystem.png"); // 16x16
 
         /** A 16x16 Icon for Subsystem classes. */
-        public static final Icon SUBSYSTEM = loadIcon("/icons/components/Subsystem.png"); // 16x16
+        public static final Icon SUBSYSTEM = loadIcon("/icons/components/Subsystem-16.png"); // 16x16
 
         /** A 16x16 Icon for PID Subsystem classes. */
         public static final Icon PID_SUBSYSTEM_WPI = loadIcon("/icons/wpi/PIDSubsystem.png"); // 16x16
@@ -122,8 +122,8 @@ public final class FrcIcons
     
     public static class WpiLib
     {
-        /** A SVG file of the new (2019+) WpiLib 'official' icon.  */
-        public static final Icon WPI_LIB_SVG = loadIcon("/icons/wpi/wpilib.svg");
+        /** An SVG file of the new (2019+) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB = loadIcon("/icons/wpi/wpilib.svg");
         
         /** A WpiLib ico Icon file with 16x16 through 256x256 icons of the new (2019+) WpiLib 'official' icon.  */
         public static final Icon WPI_LIB_ICO_16_THRU_256 = loadIcon("/icons/wpi/wpilib-256.ico");

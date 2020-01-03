@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.InputValidator;
 import com.intellij.openapi.ui.Messages;
 
-import net.javaru.iip.frc.FrcIcons.FRC;
+import icons.FrcIcons.FRC;
 import net.javaru.iip.frc.FrcPluginGlobals;
 import net.javaru.iip.frc.components.FrcProjectComponentImpl;
 import net.javaru.iip.frc.i18n.FrcBundle;

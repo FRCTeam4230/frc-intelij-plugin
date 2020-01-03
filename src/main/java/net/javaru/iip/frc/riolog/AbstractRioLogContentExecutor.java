@@ -71,7 +71,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 
-import net.javaru.iip.frc.FrcIcons;
+import icons.FrcIcons;
 import net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 

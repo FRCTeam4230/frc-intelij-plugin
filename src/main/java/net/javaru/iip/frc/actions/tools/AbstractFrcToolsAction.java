@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package net.javaru.iip.frc.actions.tools;
 
 import javax.swing.*;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -57,6 +58,17 @@ public abstract class AbstractFrcToolsAction extends AnAction
         final Project project = e.getData(CommonDataKeys.PROJECT);
         e.getPresentation().setVisible(project != null &&
                                        !project.isDisposed() &&
-                                       FrcFacetKt.isFrcFacetedProject(project));
+                                       FrcFacetKt.isFrcFacetedProject(project) &&
+                                       additionalIsVisibleChecks(project, e));
+    }
+    
+    
+    /**
+     * Overrode to impose additional visibility checks. Return `true` to make the action visible.
+     */
+    @SuppressWarnings("unused")
+    protected boolean additionalIsVisibleChecks(@NotNull Project project, @NotNull AnActionEvent e)
+    {
+        return true;
     }
 }

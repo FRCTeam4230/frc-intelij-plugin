@@ -289,6 +289,8 @@
                class="net.javaru.iip.frc.actions.tools.FrcToolsActionGroup"
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
+
+            <action id="frc.tools.CheckForWpiLibUpdateAction" class="net.javaru.iip.frc.actions.tools.CheckForWpiLibUpdateAction" icon="FrcIcons.WpiLib.WPI_LIB_16" />
             
             <!-- LEGACY ACTIONS -->
             <action id="frc.tools.AttachWpilibAction"

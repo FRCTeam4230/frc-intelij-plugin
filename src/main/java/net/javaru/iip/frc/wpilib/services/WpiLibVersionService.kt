@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.wpilib.services
 
-import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
@@ -28,6 +27,7 @@ import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.i18n.FrcBundle.message
 import net.javaru.iip.frc.notify.FrcNotifications
 import net.javaru.iip.frc.notify.FrcNotifications.Companion.FRC_ACTIONABLE_NOTIFICATION_GROUP
+import net.javaru.iip.frc.notify.FrcNotifications.Companion.FRC_GENERAL_NOTIFICATION_GROUP
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.wpilib.getAttachedWpiLibVersion
 import net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState
@@ -61,24 +61,37 @@ class WpiLibVersionService private constructor(private val project: Project)
         fun getInstance(project: Project) = project.service<WpiLibVersionService>()
     }
 
-    fun checkWpiLibStatusAndAlertIfNeeded()
+    fun checkWpiLibStatusAndAlertIfNeeded(notifyIfNoUpdateAvailable: Boolean = false)
     {
         val versionStatus = getWpiLibVersionStatus()
-        if (versionStatus?.updateAvailableForCurrentYear() == true)
+        
+        if (versionStatus != null)
         {
-            queueNewerWpiLibVersionIsAvailableNotification(versionStatus)
+            if (versionStatus.updateAvailableForCurrentYear())
+            {
+                notifyNewerWpiLibVersionIsAvailable(versionStatus)
+            }
+            else
+            {
+                noUpdateAvailable()
+            }
         }
+        else
+        {
+            notifyUnableToCheckVersionStatus()
+        }
+        
     }
     
-    fun queueNewerWpiLibVersionIsAvailableNotification(versionStatus: WpiLibVersionStatus): Notification?
+    private fun notifyNewerWpiLibVersionIsAvailable(versionStatus: WpiLibVersionStatus)
     {
-        return if (versionStatus.updateAvailableForCurrentYear())
+        if (versionStatus.updateAvailableForCurrentYear())
         {
             val availVerString = versionStatus.latestAvailableForSameYear.versionString
             val currVerString = versionStatus.attachedVersion.versionString
             
-            val subtitle = message("frc.notification.wpiLibUpdateAvailable.subtitle", availVerString)
-            val content = message("frc.notification.wpiLibUpdateAvailable.content", availVerString, currVerString)
+            val subtitle = message("frc.notification.wpiLibVersionStatus.updateAvailable.subtitle", availVerString)
+            val content = message("frc.notification.wpiLibVersionStatus.updateAvailable.content", availVerString, currVerString)
             
             // TODO need to implement update capability - and then move this to I18N into the above resource bundle string and update the below event handler
             //content.append("Would you like to update the Gradle build script to use the new version? <a href='makeUpdate'>Yes</a>  <a href='doNotUpdate'>No</a>")
@@ -97,15 +110,34 @@ class WpiLibVersionService private constructor(private val project: Project)
 //                    }
 //                }
             notification.notify(project)
-            notification
             
-        }
-        else
-        {
-            null
         }
     }
 
+    private fun notifyUnableToCheckVersionStatus()
+    {
+        val content = message("frc.notification.wpiLibVersionStatus.unableToCheck.content")
+        val notification = FRC_GENERAL_NOTIFICATION_GROUP
+            .createNotification(FrcNotifications.Title,
+                                null,
+                                content,
+                                NotificationType.INFORMATION)
+
+        notification.notify(project)
+    }
+    
+    private fun noUpdateAvailable()
+    {
+        val content = message("frc.notification.wpiLibVersionStatus.haveTheLatest.content")
+        val notification = FRC_GENERAL_NOTIFICATION_GROUP
+            .createNotification(FrcNotifications.Title,
+                                null,
+                                content,
+                                NotificationType.INFORMATION)
+
+        notification.notify(project)
+    }
+    
     
     // TODO - we only want to check if we have not done so recently
     fun getWpiLibVersionStatus(): WpiLibVersionStatus?

@@ -28,6 +28,8 @@ import org.apache.commons.lang3.StringUtils
 import java.nio.file.InvalidPathException
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.time.Duration
+import java.time.temporal.TemporalAmount
 
 const val DEFAULT_RIO_LOG_UDP_PORT: Int = 6666
 const val DEFAULT_DEBUG_PORT: Int = 8349
@@ -71,7 +73,9 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                   var rioRestartRegexString: String = "(?ium).*Launching.*FRCUserProgram\\.jar.*", /* TODO Need to update for Gradle based deploy*/
                                   var enableGradleImportUponNewProjectCreation: Boolean = true,
                                   var debuggingPort: Int = DEFAULT_DEBUG_PORT,
-                                  var checkWpiLibStatusOnProjectStartup: Boolean = true
+                                  var checkWpiLibStatusOnProjectStartup: Boolean = true,
+                                  var checkWpiLibStatusPeriodically: Boolean = true,
+                                  var checkWpiLibStatusInterval: TemporalAmount = Duration.ofHours(4)
                                  ) : PersistentStateComponent<FrcApplicationSettings>
 {
     companion object Settings

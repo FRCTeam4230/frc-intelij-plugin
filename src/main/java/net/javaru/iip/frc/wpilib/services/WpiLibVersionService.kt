@@ -16,7 +16,13 @@
 
 package net.javaru.iip.frc.wpilib.services
 
+import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.components.PersistentStateComponent
+import com.intellij.openapi.components.State
+import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.StoragePathMacros
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.DumbService
@@ -29,10 +35,17 @@ import net.javaru.iip.frc.notify.FrcNotifications
 import net.javaru.iip.frc.notify.FrcNotifications.Companion.FRC_ACTIONABLE_NOTIFICATION_GROUP
 import net.javaru.iip.frc.notify.FrcNotifications.Companion.FRC_GENERAL_NOTIFICATION_GROUP
 import net.javaru.iip.frc.settings.FrcApplicationSettings
+import net.javaru.iip.frc.util.asDate
+import net.javaru.iip.frc.util.lastCheckedDateTimeFormatter
 import net.javaru.iip.frc.wpilib.getAttachedWpiLibVersion
 import net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
+import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl
 import net.javaru.iip.frc.wpilib.version.filterToLatestForYear
+import java.time.Duration
+import java.time.LocalDateTime
+import java.util.*
+
 
 // GitConflictsToolWindowManager is a good example of using the StartupActivity
 // AcceptedLanguageLevelsSettings sows a class tha is both a StartupActivity and an application Service
@@ -42,18 +55,29 @@ class WpiLibVersionStartupActivity : StartupActivity
 {
     override fun runActivity(project: Project)
     {
-        if (FrcApplicationSettings.getInstance().checkWpiLibStatusOnProjectStartup && project.isFrcFacetedProject())
+        if (project.isFrcFacetedProject())
         {
             StartupManager.getInstance(project).runWhenProjectIsInitialized() {
-                WpiLibVersionService.getInstance(project).checkWpiLibStatusAndAlertIfNeeded()
+                val versionService = WpiLibVersionService.getInstance(project)
+                if (FrcApplicationSettings.getInstance().checkWpiLibStatusOnProjectStartup)
+                    versionService.checkWpiLibStatusAndAlertIfNeeded()
+                else
+                    versionService.scheduleStatusCheck()
             }
         }
     }
 }
-
-class WpiLibVersionService private constructor(private val project: Project)
+@State(name = "WpiLibVersionService", storages =[Storage(StoragePathMacros.WORKSPACE_FILE)])
+class WpiLibVersionService private constructor(private val project: Project) : PersistentStateComponent<WpiLibVersionServiceState>,
+                                                                               Disposable
 {
     private val LOG = Logger.getInstance(WpiLibVersionService::class.java)
+    
+    private var myState: WpiLibVersionServiceState = WpiLibVersionServiceState()
+    
+    private val timer = Timer("WpiLibVersionService Check for Update Timer")
+    private var timerTask: TimerTask? = null
+    
     
     companion object
     {
@@ -61,31 +85,73 @@ class WpiLibVersionService private constructor(private val project: Project)
         fun getInstance(project: Project) = project.service<WpiLibVersionService>()
     }
 
-    fun checkWpiLibStatusAndAlertIfNeeded(notifyIfNoUpdateAvailable: Boolean = false)
+    /**
+     * Checks if there is a newer version of the WPI Lib available as compared to the one configured for the project, notifying the user
+     * is an update is available.
+     * 
+     * @param notifyIfNoUpdateAvailable whether to notify the user if an update is NOT available. Primarily meant for when the user
+     *                                  initiates the check via an action. Default is false
+     * @param maxTimeSinceLastCheck the maximum time since the last check for an update to allow. If the time since the last
+     *                              check is less than this value, no check is performed. The default is 10 seconds, primarily 
+     *                              to prevent any accidental double checks during project startup or such. 
+     *                              Use `Duration.ofDays()`, `Duration.ofMinutes()`, etc. to create a value.
+     */
+    @JvmOverloads
+    fun checkWpiLibStatusAndAlertIfNeeded(notifyIfNoUpdateAvailable: Boolean = false,
+                                          maxTimeSinceLastCheck: Duration = Duration.ofSeconds(10))
     {
+        if (myState.durationSinceLastCheck < maxTimeSinceLastCheck) return
+        
         val versionStatus = getWpiLibVersionStatus()
+        var updateAvailableNotification: Notification? = null
         
         if (versionStatus != null)
         {
-            if (versionStatus.updateAvailableForCurrentYear())
+            if (versionStatus.updateAvailableForAttachedYear())
             {
-                notifyNewerWpiLibVersionIsAvailable(versionStatus)
+                updateAvailableNotification = notifyNewerWpiLibVersionIsAvailable(versionStatus)
             }
-            else
+            else if(notifyIfNoUpdateAvailable)
             {
-                noUpdateAvailable()
+                notifyNoUpdateAvailable(versionStatus.attachedVersion.frcYear)
             }
         }
-        else
+        else if (notifyIfNoUpdateAvailable)
         {
             notifyUnableToCheckVersionStatus()
         }
-        
+        // If we've notified an update is available, we do no want to schedule the next check until the user acknowledges the previous check
+        if (updateAvailableNotification != null) updateAvailableNotification.whenExpired(::scheduleStatusCheck) else scheduleStatusCheck()
     }
     
-    private fun notifyNewerWpiLibVersionIsAvailable(versionStatus: WpiLibVersionStatus)
+    
+    
+    fun scheduleStatusCheck()
     {
-        if (versionStatus.updateAvailableForCurrentYear())
+        // NOTE: we don't use timer.scheduleAtFixedRate() because we do not want the next one to be scheduled 
+        //       until the user acknowledges the notification of the last one to prevent multiple notifications
+        
+        // Cancel any current timer tasks
+        cancelTimer()
+        val applicationSettings = FrcApplicationSettings.getInstance()
+        if (applicationSettings.checkWpiLibStatusPeriodically)
+        {
+            val last = myState.lastCheckedDateTime
+            var next = last.plus(applicationSettings.checkWpiLibStatusInterval)
+            val now = LocalDateTime.now()
+            if (next.isBefore(now.plus(Duration.ofMinutes(15)))) // we have a small buffer to prevent strange behavior
+            {
+                next = now.plus(applicationSettings.checkWpiLibStatusInterval)
+            }
+            timerTask = CheckStatusTimerTask(project)
+            timer.schedule(timerTask, next.asDate())
+            LOG.info("[FRC] next check for WPI Lib update scheduled for $next")
+        }
+    }
+    
+    private fun notifyNewerWpiLibVersionIsAvailable(versionStatus: WpiLibVersionStatus): Notification?
+    {
+        if (versionStatus.updateAvailableForAttachedYear())
         {
             val availVerString = versionStatus.latestAvailableForSameYear.versionString
             val currVerString = versionStatus.attachedVersion.versionString
@@ -110,8 +176,13 @@ class WpiLibVersionService private constructor(private val project: Project)
 //                    }
 //                }
             notification.notify(project)
-            
+            return notification
         }
+        else
+        {
+            return null
+        }
+            
     }
 
     private fun notifyUnableToCheckVersionStatus()
@@ -126,9 +197,10 @@ class WpiLibVersionService private constructor(private val project: Project)
         notification.notify(project)
     }
     
-    private fun noUpdateAvailable()
+    private fun notifyNoUpdateAvailable(year: Int)
     {
-        val content = message("frc.notification.wpiLibVersionStatus.haveTheLatest.content")
+        // we call toString on the year otherwise the resource bundle formats it wiath a comma: 2,019
+        val content = message("frc.notification.wpiLibVersionStatus.haveTheLatest.content", year.toString())
         val notification = FRC_GENERAL_NOTIFICATION_GROUP
             .createNotification(FrcNotifications.Title,
                                 null,
@@ -139,8 +211,7 @@ class WpiLibVersionService private constructor(private val project: Project)
     }
     
     
-    // TODO - we only want to check if we have not done so recently
-    fun getWpiLibVersionStatus(): WpiLibVersionStatus?
+    private fun getWpiLibVersionStatus(): WpiLibVersionStatus?
     {
         var versionStatus: WpiLibVersionStatus? = null
         DumbService.getInstance(project).runReadActionInSmartMode() {
@@ -166,8 +237,31 @@ class WpiLibVersionService private constructor(private val project: Project)
                 }
             }
         }
-        
+        myState.updateLastCheckedTime()
         return versionStatus
+    }
+
+    override fun getState(): WpiLibVersionServiceState = myState
+
+    override fun loadState(state: WpiLibVersionServiceState)
+    {
+       myState = state
+    }
+
+    override fun dispose()
+    {
+        cancelTimer()
+    }
+
+    private fun cancelTimer()
+    {
+        timerTask?.cancel()
+        timer.purge()
+    }
+
+    class CheckStatusTimerTask(private val project: Project) : TimerTask()
+    {
+        override fun run() = project.service<WpiLibVersionService>().checkWpiLibStatusAndAlertIfNeeded()
     }
 }
 
@@ -176,5 +270,28 @@ data class WpiLibVersionStatus(val attachedVersion: WpiLibVersion,
                                val latestAvailableForSameYear: WpiLibVersion,
                                val latestAvailableVersion: WpiLibVersion?)
 {
-    fun updateAvailableForCurrentYear(): Boolean = latestAvailableForSameYear.isNewerThan(attachedVersion)
+    fun updateAvailableForAttachedYear(): Boolean = latestAvailableForSameYear.isNewerThan(attachedVersion)
+
+    @Suppress("unused")
+    constructor(attachedVersion: String, latestAvailableForSameYear: String, latestAvailableVersion: String) :
+            this(WpiLibVersionImpl.parse(attachedVersion),
+                 WpiLibVersionImpl.parse(latestAvailableForSameYear),
+                 WpiLibVersionImpl.parse(latestAvailableVersion))
 }
+
+data class WpiLibVersionServiceState(var lastChecked: String = "20180101000000")
+{
+    val lastCheckedDateTime: LocalDateTime
+        get() = LocalDateTime.parse(lastChecked, lastCheckedDateTimeFormatter)
+
+    val durationSinceLastCheck: Duration
+        get() = Duration.between(lastCheckedDateTime, LocalDateTime.now())
+    
+    @JvmOverloads
+    fun updateLastCheckedTime(checkTime: LocalDateTime = LocalDateTime.now())
+    {
+        lastChecked = lastCheckedDateTimeFormatter.format(checkTime)
+    }
+    
+}
+

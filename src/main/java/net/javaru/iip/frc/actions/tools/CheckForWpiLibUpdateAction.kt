@@ -20,6 +20,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
 import net.javaru.iip.frc.util.isGradleProject
 import net.javaru.iip.frc.wpilib.services.WpiLibVersionService
+import java.time.Duration
 
 
 class CheckForWpiLibUpdateAction: AbstractFrcToolsAction()
@@ -27,8 +28,7 @@ class CheckForWpiLibUpdateAction: AbstractFrcToolsAction()
     override fun actionPerformed(e: AnActionEvent)
     {
         val project = e.project ?: return
-        WpiLibVersionService.getInstance(project).checkWpiLibStatusAndAlertIfNeeded(true)
-        
+        WpiLibVersionService.getInstance(project).checkWpiLibStatusAndAlertIfNeeded(true, Duration.ofSeconds(0))
     }
 
     override fun additionalIsVisibleChecks(project: Project, e: AnActionEvent): Boolean = project.isGradleProject()

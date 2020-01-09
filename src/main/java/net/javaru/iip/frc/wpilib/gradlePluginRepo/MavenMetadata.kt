@@ -25,6 +25,8 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.xmlb.XmlSerializerUtil
 import net.javaru.iip.frc.net.FrcHttpClient
+import net.javaru.iip.frc.util.lastCheckedDateTimeFormatter
+import net.javaru.iip.frc.util.lastCheckedDateTimeZonedFormatter
 import net.javaru.iip.frc.util.mapExceptionFreeAndNotNull
 import net.javaru.iip.frc.util.mapper
 import net.javaru.iip.frc.util.prettyPrintWriter
@@ -40,14 +42,10 @@ import java.net.URI
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 
 
 val LOG = Logger.getInstance(MavenMetadata::class.java)
 
-val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
-val dateTimeZonedFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss z")
 val wpiLibGradlePluginMavenMetadataURI = URI("https://plugins.gradle.org/m2/edu/wpi/first/GradleRIO/edu.wpi.first.GradleRIO.gradle.plugin/maven-metadata.xml")
 
 // NOTE: This class is registered as an <applicationService> in the plugin.xml
@@ -67,7 +65,7 @@ data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: 
         PersistentStateComponent<GradleRioMavenMetadataState>
 {
     val lastCheckedDateTime: LocalDateTime
-        get() = LocalDateTime.parse(lastChecked, dateTimeFormatter)
+        get() = LocalDateTime.parse(lastChecked, lastCheckedDateTimeFormatter)
     
     val durationSinceLastCheck: Duration
         get() = Duration.between(lastCheckedDateTime, LocalDateTime.now())
@@ -110,7 +108,7 @@ data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: 
     @JvmOverloads
     fun updateLastCheckedTime(checkTime: LocalDateTime = LocalDateTime.now())
     {
-        lastChecked = dateTimeFormatter.format(checkTime)
+        lastChecked = lastCheckedDateTimeFormatter.format(checkTime)
     }
 
     companion object
@@ -134,17 +132,13 @@ data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: 
         fun getInstance(maxAge: Duration): GradleRioMavenMetadataState
         {
             val state = ServiceManager.getService(GradleRioMavenMetadataState::class.java)
-             state.lastCheckedDateTime
-            val minutesBetween = ChronoUnit.MINUTES.between(state.lastCheckedDateTime, LocalDateTime.now())
-            val durationSinceLastUpdate = Duration.ofMinutes(minutesBetween)
-
-            return if (durationSinceLastUpdate >= maxAge)
+            return if (state.durationSinceLastCheck >= maxAge)
             {
                 getInstance(true)
             }
             else
             {
-                state;
+                state
             }
         }
         
@@ -266,7 +260,7 @@ data class WpiLibMavenMetadata(val mavenMetadata: MavenMetadata)
     val versionAsWpiLibVersion by lazy { WpiLibVersionImpl.parse(mavenMetadata.version) }
     val latestAsWpiLibVersion by lazy { WpiLibVersionImpl.parse(mavenMetadata.latest) } 
     val releaseAsWpiLibVersion by lazy { WpiLibVersionImpl.parse(mavenMetadata.release) }
-    val lastUpdatedAsDateTime: ZonedDateTime by lazy {ZonedDateTime.parse("${mavenMetadata.lastUpdated} UTC", dateTimeZonedFormatter) }
+    val lastUpdatedAsDateTime: ZonedDateTime by lazy {ZonedDateTime.parse("${mavenMetadata.lastUpdated} UTC", lastCheckedDateTimeZonedFormatter) }
 }
 
 fun parseMavenMetadata(@Language("XML") mavenMetadata: String): MavenMetadata?

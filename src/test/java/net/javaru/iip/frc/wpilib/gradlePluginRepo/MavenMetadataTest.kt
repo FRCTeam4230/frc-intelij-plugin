@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.wpilib.gradlePluginRepo
 
+import net.javaru.iip.frc.util.lastCheckedDateTimeFormatter
 import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2018_06_21
 import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_0_0_alpha_1
 import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2020_1_1_beta_3a
@@ -47,7 +48,7 @@ internal class MavenMetadataTest
                 { assertEquals(v2018_06_21, actual.wpiLibVersions[0], "Wrong first version value") },
                 { assertEquals(v2019_0_0_alpha_1, actual.wpiLibVersions[1], "Wrong second version value") },
                 { assertEquals(v2020_1_1_beta_3a, actual.wpiLibVersions.last(), "Wrong last version value") },
-                { assertEquals("20191123193733", dateTimeFormatter.format(actual.lastUpdatedAsDateTime), "Wrong lastUpdatedAsDateTime") }
+                { assertEquals("20191123193733", lastCheckedDateTimeFormatter.format(actual.lastUpdatedAsDateTime), "Wrong lastUpdatedAsDateTime") }
                  )
     }
     

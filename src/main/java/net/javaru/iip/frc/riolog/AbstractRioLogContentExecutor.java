@@ -22,7 +22,6 @@ import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.intellij.codeEditor.printing.PrintAction;
 import com.intellij.compiler.server.BuildManager;
 import com.intellij.execution.ExecutionBundle;
 import com.intellij.execution.ExecutionManager;
@@ -259,7 +258,11 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         // We need to grab some actions that are created in the ConsoleView itself.
         // This is a bit hackish but works. 
 
-        AnAction softWrapAction = null, scrollToEndAction = null, printAction = null, grepConsoleAction = null;
+        AnAction softWrapAction = null;
+        AnAction scrollToEndAction = null;
+        AnAction grepConsoleAction = null;
+//        AnAction printAction = null;
+        
         for (AnAction action : myConsoleView.createConsoleActions())
         {
             final Class<? extends AnAction> actionClass = action.getClass();
@@ -273,9 +276,10 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                                         actionClass.getEnclosingClass(),
                                         actionClass.getDeclaringClass()));
             }
+    
+            //We use the string equals (rather than instanceof) for this action to prevent an import error if the Grep Console Plugin is not available
             if (actionClass.getName().equals("krasa.grepconsole.action.OpenConsoleSettingsAction"))
             {
-                //We use the string equals for this action to prevent an import error if the Grp Console Pulg-in is not avaiable
                 grepConsoleAction = action;
             }
             else if (action instanceof ToggleUseSoftWrapsToolbarAction)
@@ -286,10 +290,10 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             {
                 scrollToEndAction = action;
             }
-            else if (action instanceof PrintAction)
-            {
-                printAction = action;
-            }
+//            else if (action instanceof PrintAction)
+//            {
+//                printAction = action;
+//            }
         }
 
         // See com.intellij.execution.impl.ConsoleViewImpl.createConsoleActions for example 
@@ -304,6 +308,23 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             actions.add(grepConsoleAction);
         }
 
+        if (softWrapAction != null)
+        {
+            actions.add(softWrapAction);
+        }
+        if (scrollToEndAction != null)
+        {
+            actions.add(scrollToEndAction);
+        }
+//        if (printAction != null)
+//        {
+//            actions.add(printAction);
+//        }
+
+        actions.add(new RioLogClearAllAction());
+        actions.add(new RioLogToggleAutoClearAction());
+    
+        actions.add(new Separator());
         if (myConsoleView instanceof OccurenceNavigator)
         {
             final CommonActionsManager commonActionsManager = CommonActionsManager.getInstance();
@@ -315,23 +336,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             nextAction.getTemplatePresentation().setText(occurenceNavigator.getNextOccurenceActionName());
             actions.add(nextAction);
         }
-
-        if (softWrapAction != null)
-        {
-            actions.add(softWrapAction);
-        }
-        if (scrollToEndAction != null)
-        {
-            actions.add(scrollToEndAction);
-        }
-        if (printAction != null)
-        {
-            actions.add(printAction);
-        }
-
-        actions.add(new RioLogClearAllAction());
-        actions.add(new Separator());
-        actions.add(new RioLogToggleAutoClearAction());
+    
+    
         // We no longer provide a close button. As long as a FRC Facet is present, we want a RioLog console. 
         // The 'work' of the close action was moved to myCloseRunnable and closing is managed by the RioLogProjectService
         // Leaving this line of code here commented out in case in the future we need to remember how we did include a close button.

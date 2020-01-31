@@ -42,20 +42,29 @@
             <em><a href='http://www.firstinspires.org/'>FIRST</a> Robotics Competition</em>
             (<a href='http://www.firstinspires.org/robotics/frc'>FRC</a>) development support for
             IntelliJ IDEA, including new project wizards, new class templates, robust RioLog console,
-            and more. Works will all v2019.2 or later editions (Community, Education, and Ultimate) 
+            and more. Works with all v2019.2 or later editions (Community, Education, and Ultimate) 
             of IntelliJ IDEA. Enjoy using your favorite IDE when coding your team's robot in Java,
-            Kotlin, or other JVM language.
+            and/or Kotlin.
         </p>
         <p><br></p>
         <p>
             <strong>Please report issues or make feature requests via the project's</strong>
-            <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>Issue Tracker</a>.
-        </p>
+            <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>Issue Tracker</a>.<br>
+            This is an unofficial plugin written by an FRC team mentor. Please do <em>not</em> 
+            contact <em>FIRST</em> or the WPI Lib developers for support. Thanks.
+        </p>        
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v1.1</strong> <br>
+        &nbsp;&nbsp;&bull; Fixed the auto clear feature in the rioLog console tool window. It was keying on an old startup message.<br>
+        &nbsp;&nbsp;&bull; Removed the print action from the rioLog console.<br>
+        &nbsp;&nbsp;&bull; Rearranged the order of the action buttons on the rioLog console so that the more frequently used actions are
+                           on the top to improve usability when the tool window height is reduced.<br>
+        <br>
+        
         <strong>v1.0</strong> <br>
-        &nbsp;&nbsp;&bull; Dropping the zero based versioning and migrating to a 1.0 version after 14 such releases over the course of 4 years.<br>
+        &nbsp;&nbsp;&bull; Dropping the zero based versioning and migrating to a 1.0 version after 14 such releases over the course of three years.<br>
         &nbsp;&nbsp;&bull; Improvements to the new FRC Robot Project Wizard<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&bull; Wizard automatically creates Gradle build and deploy Run Configurations, as well as debugger attachment Configurations.<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&bull; Added 2020 project and example templates.<br>
@@ -68,8 +77,11 @@
         &nbsp;&nbsp;&bull; Deprecated the custom FrcModuleType used by the custom FRC Project Wizard and instead have the wizard create JavaModuleType projects.
         This change will have very minimal impact to users, but improves some functionality. See <a href="https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/41">Enhancement #41</a>
         for additional details.<br>
-        &nbsp;&nbsp;&bull; Good luck to all FRC teams in the 2020 <em>INFINITE RECHARGE<sup>SM</sup></em> game and competition.<br>
+        &nbsp;&nbsp;&bull; Good luck to all FRC teams in the 2020 <em>INFINITE RECHARGE</em> game.<br>
         <br>
+        
+        <strong>v0.1 - v0.8.1</strong> <br>
+        &nbsp;&nbsp;&bull; Fourteen releases over three years containing numerous features, enhancements, and fixes.
     ]]>
     </change-notes>
 

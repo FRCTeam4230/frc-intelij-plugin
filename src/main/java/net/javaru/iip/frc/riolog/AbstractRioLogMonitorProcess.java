@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.output.NullOutputStream;
 import org.jetbrains.annotations.NotNull;
@@ -66,6 +67,9 @@ public abstract class AbstractRioLogMonitorProcess extends Process
     public static final String SIMULATED_LOG_SERVICE_USE_CONFIGURED_PORT_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".use.configured.port";
     public static final int SIMULATED_LOG_SERVICE_PORT_DEFAULT = 4248; //arbitrarily chosen port not listed at https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
 
+    //TODO: need to handle a change to the base pattern when we make it configurable
+    public static Pattern restartRegex = Pattern.compile(FrcApplicationSettings.getInstance().getRioRestartRegexString());
+    
     private final Semaphore myWaitSemaphore;
 
 
@@ -358,6 +362,16 @@ public abstract class AbstractRioLogMonitorProcess extends Process
             }
 
             consoleWriter.print(received);
+            
+            if (received.contains("Listening for transport dt_socket at address:"))
+            {
+                if (addLineBreak())
+                {
+                    consoleWriter.println();
+                }
+                consoleWriter.println("=== The robot is waiting for the debugger to be attached. ===");
+            }
+            
             if (addLineBreak())
             {
                 consoleWriter.println();
@@ -427,14 +441,16 @@ public abstract class AbstractRioLogMonitorProcess extends Process
 
         protected boolean isRestartNotification(String text)
         {
+            // TODO: It'd be nice if the line is the debugger attachement, it clears for it, but NOT for the next line which is the "Robot program starting" to prevent a flash like effect
             if (getSettings().getUseRegexForRestartCheck())
             {
-                //TODO: Make configurable in settings
-                return RioLogGlobals.RIO_RESTART_REGEX_DEFAULT.matcher(text).find();
+                return restartRegex.matcher(text).find();
             }
             else
             {
-                return text.contains("Launching") && text.contains("-jar") && text.contains("FRCUserProgram.jar");
+                return text.contains("*** Robot program starting *** ") || 
+                       text.contains("Listening for transport dt_socket at address:"); // ||
+                       // (text.contains("Launching") && text.contains("-jar") && text.contains("FRCUserProgram.jar"));
             }
         }
 

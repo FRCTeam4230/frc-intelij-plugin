@@ -69,8 +69,12 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                    *        closing/right-pointing guillemet flush right as shown here:
                                    *        
                                    *            ➔ Launching «'/usr/local/frc/JRE/bin/java' '-jar' '/home/lvuser/FRCUserProgram.jar'»
+                                   *        Gradle:
+                                   *            ********** Robot program starting **********
+                                   *        Debugger:
+                                   *            Listening for transport dt_socket at address: 8349
                                    */
-                                  var rioRestartRegexString: String = "(?ium).*Launching.*FRCUserProgram\\.jar.*", /* TODO Need to update for Gradle based deploy*/
+                                  var rioRestartRegexString: String = """(?ium).*\* Robot program starting \*.*|.*Listening for transport dt_socket at address: [\d,]{1,6}.*|.*Launching.*FRCUserProgram\.jar.*"""",
                                   var enableGradleImportUponNewProjectCreation: Boolean = true,
                                   var debuggingPort: Int = DEFAULT_DEBUG_PORT,
                                   var checkWpiLibStatusOnProjectStartup: Boolean = true,

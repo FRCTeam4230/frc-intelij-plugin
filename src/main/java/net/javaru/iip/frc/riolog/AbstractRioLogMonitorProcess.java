@@ -360,8 +360,6 @@ public abstract class AbstractRioLogMonitorProcess extends Process
                 rollFileWriter();
                 logStartingMonitoring();
             }
-
-            consoleWriter.print(received);
             
             if (received.contains("Listening for transport dt_socket at address:"))
             {
@@ -369,8 +367,10 @@ public abstract class AbstractRioLogMonitorProcess extends Process
                 {
                     consoleWriter.println();
                 }
-                consoleWriter.println("=== The robot is waiting for the debugger to be attached. ===");
+                consoleWriter.println("The robot is waiting for the debugger to be attached.");
             }
+    
+            consoleWriter.print(received);
             
             if (addLineBreak())
             {
@@ -448,7 +448,7 @@ public abstract class AbstractRioLogMonitorProcess extends Process
             }
             else
             {
-                return text.contains("*** Robot program starting *** ") || 
+                return text.contains("*** Robot program starting ***") || 
                        text.contains("Listening for transport dt_socket at address:"); // ||
                        // (text.contains("Launching") && text.contains("-jar") && text.contains("FRCUserProgram.jar"));
             }

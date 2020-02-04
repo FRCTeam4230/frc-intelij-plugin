@@ -57,8 +57,11 @@
 
     <change-notes><![CDATA[
         <strong>v1.1</strong> <br>
-        &nbsp;&nbsp;&bull; Fixed the auto clear feature in the rioLog console tool window. It was keying on an old startup message.<br>
-        &nbsp;&nbsp;&bull; Removed the print action from the rioLog console.<br>
+        &nbsp;&nbsp;&bull; Added periodic background check for a new WPI Lib version. When a new version is available, the user is notified. 
+                           A future version will offer the option to automatically edit the gradle build file with the new version as well as 
+                           allow for configuring the "check for new version" internal.<br>
+        &nbsp;&nbsp;&bull; Fixed the auto clear feature in the rioLog console tool window. It was keying on an old startup message and thus not working.<br>
+        &nbsp;&nbsp;&bull; Removed the print action from the rioLog console. It was likely never used and was using real estate and adding clutter.<br>
         &nbsp;&nbsp;&bull; Rearranged the order of the action buttons on the rioLog console so that the more frequently used actions are
                            on the top to improve usability when the tool window height is reduced.<br>
         <br>

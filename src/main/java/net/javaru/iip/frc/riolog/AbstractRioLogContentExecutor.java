@@ -303,11 +303,6 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         actions.add(new RioLogPauseOutputAction(myConsoleView, myProcessHandler));
         actions.add(new Separator());
 
-        if (grepConsoleAction != null)
-        {
-            actions.add(grepConsoleAction);
-        }
-
         if (softWrapAction != null)
         {
             actions.add(softWrapAction);
@@ -335,6 +330,12 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             final AnAction nextAction = commonActionsManager.createNextOccurenceAction(occurenceNavigator);
             nextAction.getTemplatePresentation().setText(occurenceNavigator.getNextOccurenceActionName());
             actions.add(nextAction);
+        }
+    
+        if (grepConsoleAction != null)
+        {
+            actions.add(new Separator());
+            actions.add(grepConsoleAction);
         }
     
     

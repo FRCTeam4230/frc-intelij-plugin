@@ -76,7 +76,6 @@ internal class WpiLibVersionFiltersKtTest
     @Test
     fun yearFilterTest()
     {
-        val expected = 
         assertAll(
                 { assertEquals(listOf(GRV.v2020_1_1, GRV.v2020_1_2), GRV.versions.filterVersions(YearFilter(2020, true))) },
                 { assertEquals(GRV.versions.filter { it.versionString.startsWith("2020") }, GRV.versions.filterVersions(YearFilter(2020, false))) },

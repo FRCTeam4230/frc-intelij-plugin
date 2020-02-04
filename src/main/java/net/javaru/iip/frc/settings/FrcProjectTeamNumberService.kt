@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -19,13 +19,8 @@ package net.javaru.iip.frc.settings
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ProjectFileIndex
-import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.openapi.vfs.newvfs.BulkFileListener
-import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.util.messages.Topic
 import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFile
-import net.javaru.iip.frc.wpilib.wpiLibPreferencesFileName
 import java.util.*
 
 /**
@@ -56,21 +51,22 @@ class FrcProjectTeamNumberService private constructor(val project:Project)
         // As noted in https://www.jetbrains.org/intellij/sdk/docs/basics/virtual_file_system.html#virtual-file-system-events
         //      "VFS listeners are application level and will receive events for changes happening in all the projects opened by the user. 
         //       You may need to filter out events that aren't relevant to your task (e.g., via ProjectFileIndex#isInContent())."
-        project.messageBus.connect().subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener{
-            override fun after(events: List<VFileEvent>)
-            {
-                events.forEach { event: VFileEvent ->
-                    val file = event.file
-                    if (file != null && ProjectFileIndex.getInstance(project).isInContent(file) && file.name == wpiLibPreferencesFileName)
-                    {
-                        val previousTeamNumber = teamNumber
-                        teamNumber = project.getTeamNumberConfiguredInWpiLibPreferencesFile()
-                        // teamNumberChangeDispatcher.multicaster.onTeamNumberChange(previousTeamNumber, teamNumber)
-                        project.messageBus.syncPublisher(PROJECT_TEAM_NUMBER_CHANGES).onTeamNumberChange(project, previousTeamNumber, teamNumber)
-                    }
-                }
-            }
-        })
+        // TODO: Commenting this out as a temp fix for issue #60, but need to resolve (keep in mind the line number in the stacktrace in the issue are off by 1 with this comment present
+//        project.messageBus.connect().subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener{
+//            override fun after(events: List<VFileEvent>)
+//            {
+//                events.forEach { event: VFileEvent ->
+//                    val file = event.file
+//                    if (file != null && ProjectFileIndex.getInstance(project).isInContent(file) && file.name == wpiLibPreferencesFileName)
+//                    {
+//                        val previousTeamNumber = teamNumber
+//                        teamNumber = project.getTeamNumberConfiguredInWpiLibPreferencesFile()
+//                        // teamNumberChangeDispatcher.multicaster.onTeamNumberChange(previousTeamNumber, teamNumber)
+//                        project.messageBus.syncPublisher(PROJECT_TEAM_NUMBER_CHANGES).onTeamNumberChange(project, previousTeamNumber, teamNumber)
+//                    }
+//                }
+//            }
+//        })
     }
     
     companion object

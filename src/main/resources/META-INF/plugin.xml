@@ -91,7 +91,7 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.plugins.gradle</depends>
-    <depends>org.intellij.groovy</depends>
+    <!--<depends>org.intellij.groovy</depends>-->
     <!--<depends>AntSupport</depends>-->
 
     <!-- Optional dependency on another plugin.

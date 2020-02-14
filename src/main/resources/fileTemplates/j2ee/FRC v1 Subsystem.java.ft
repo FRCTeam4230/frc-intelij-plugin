@@ -13,12 +13,12 @@ import ${baseClassFqName};
 #parse("File Header.java")
 public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtendsClause}
 {
-#parse("FRC_singletonInstanceVariable.java")
+#parse("FRC_singleton_instanceVariable.java")
     #parse("FRC_constructorSignature.java")()
     {
 
     }
-    #parse("FRC_getInstance.java")
+    #parse("FRC_singleton_getInstance.java")
     
 #if($includeJavaDocsForOverrides == "true")
     /**

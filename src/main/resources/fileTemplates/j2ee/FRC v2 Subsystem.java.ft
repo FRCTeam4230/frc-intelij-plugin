@@ -13,7 +13,7 @@ import ${baseClassFqName};
 #parse("File Header.java")
 public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtendsClause}
 {
-#parse("FRC_singletonInstanceVariable.java")
+#parse("FRC_singleton_instanceVariable.java")
     #parse("FRC_constructorSignature.java")()
     {
         // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command)
@@ -23,7 +23,7 @@ public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtends
         //       such as SpeedControllers, Encoders, DigitalInputs, etc.
         #end
     }
-#parse("FRC_getInstance.java")
+#parse("FRC_singleton_getInstance.java")
     
 }
 

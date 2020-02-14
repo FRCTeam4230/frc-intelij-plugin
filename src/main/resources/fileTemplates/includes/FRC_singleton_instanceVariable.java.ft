@@ -7,10 +7,12 @@
     // before the constructor is called when the "INSTANCE" variable initializes.
     
 #end
+#if($singletonIncludeJavadoc == "true") 
 /**
  * The Singleton instance of this ${NAME}. External classes should
  * use the {@link ${H}getInstance()} method to get the instance.
  */
+#end
 #if($singletonInitMethodology == "EAGER")
 private final static ${NAME} INSTANCE = new ${NAME}();
 #else

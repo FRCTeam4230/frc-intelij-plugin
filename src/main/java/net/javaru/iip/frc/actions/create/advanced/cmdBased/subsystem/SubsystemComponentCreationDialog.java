@@ -48,12 +48,17 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
     protected static final String STATE_KEY_SUBSYSTEMS_MAKE_SINGLETON = "subsystems-makeSingleton";
     protected static final String SINGLETON_INIT_METHODOLOGY = "singletonInitMethodology";
     protected static final String STATE_KEY_SUBSYSTEMS_SINGLETON_INIT_METHODOLOGY = "subsystems-singletonInitMethodology";
+    protected static final String SINGLETON_INCLUDE_JAVADOC = "singletonIncludeJavadoc";
+    protected static final String STATE_KEY_SUBSYSTEMS_SINGLETON_INCLUDE_JAVADOC = "subsystems-singletonIncludeJavadoc";
+    
     
     protected JBCheckBox makeSingletonCheckbox;
     protected JBRadioButton eagerSingletonRadioButton;
     protected JBRadioButton lazySingletonRadioButton;
     protected JBRadioButton threadSafeSingletonRadioButton;
     protected ButtonGroup singletonButtonGroup;
+    
+    protected JBCheckBox includeSingletonJavadocCheckbox;
     
     private enum  SingletonMethodology { EAGER, LAZY, THREAD_SAFE}
     
@@ -84,6 +89,9 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
         
         final String singletonMethodology = makeSingleton ? singletonButtonGroup.getSelection().getActionCommand() : "NONE";
         props.put(SINGLETON_INIT_METHODOLOGY, singletonMethodology);
+        
+        boolean includeJavadoc = (makeSingleton && includeSingletonJavadocCheckbox != null && includeSingletonJavadocCheckbox.isEnabled() && includeSingletonJavadocCheckbox.isSelected());
+        props.put(SINGLETON_INCLUDE_JAVADOC, Boolean.toString(includeJavadoc));
     }
     
     
@@ -92,6 +100,9 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
     {
         makeSingletonCheckbox = new JBCheckBox(message("frc.new.class.adv.subsystem.dialog.makeSingleton.checkbox.text"));
         makeSingletonCheckbox.setSelected(sharedState.getBooleanOption(STATE_KEY_SUBSYSTEMS_MAKE_SINGLETON, true));
+    
+        includeSingletonJavadocCheckbox = new JBCheckBox(message("frc.new.class.adv.subsystem.dialog.includeSingletonJavadoc.checkbox.text"));
+        includeSingletonJavadocCheckbox.setSelected(sharedState.getBooleanOption(STATE_KEY_SUBSYSTEMS_SINGLETON_INCLUDE_JAVADOC, true));
     
         SingletonMethodology selectedMethodology;
     
@@ -130,6 +141,7 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
         FrcUiUtilsKt.addTextChangedListener(myComponentNameTextField, (documentEvent, text) -> {
             final String name = myComponentNameTextField.getText();
             makeSingletonCheckbox.setEnabled(name != null && !name.toLowerCase().contains("abstract"));
+            includeSingletonJavadocCheckbox.setEnabled(makeSingletonCheckbox.isEnabled());
             final boolean optionsEnabled = makeSingletonCheckbox.isEnabled() && makeSingletonCheckbox.isSelected();
             threadSafeSingletonRadioButton.setEnabled(optionsEnabled);
             lazySingletonRadioButton.setEnabled(optionsEnabled);
@@ -140,13 +152,14 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
         //Enable//disable the methodology buttons based on the make singleton checkbox selection
         makeSingletonCheckbox.addActionListener(e -> {
             final boolean optionsEnabled = makeSingletonCheckbox.isEnabled() && makeSingletonCheckbox.isSelected();
+            includeSingletonJavadocCheckbox.setEnabled(optionsEnabled);
             threadSafeSingletonRadioButton.setEnabled(optionsEnabled);
             lazySingletonRadioButton.setEnabled(optionsEnabled);
             eagerSingletonRadioButton.setEnabled(optionsEnabled);
         });
         
         // Do layout
-        final GridLayoutManager layoutManager = new GridLayoutManager(4, 3);
+        final GridLayoutManager layoutManager = new GridLayoutManager(5, 3);
         final GridConstraints gc = createStandardGridConstraints();
         gc.setIndent(2);
         
@@ -172,6 +185,8 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
         optionsPanel.add(lazySingletonRadioButton, gc);
         gc.setRow(3);
         optionsPanel.add(eagerSingletonRadioButton, gc);
+        gc.setRow(4);
+        optionsPanel.add(includeSingletonJavadocCheckbox, gc);
     }
     
     
@@ -195,6 +210,7 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
     {
         super.saveState();
         sharedState.updateBooleanOption(STATE_KEY_SUBSYSTEMS_MAKE_SINGLETON, makeSingletonCheckbox);
+        sharedState.updateBooleanOption(STATE_KEY_SUBSYSTEMS_SINGLETON_INCLUDE_JAVADOC, includeSingletonJavadocCheckbox);
         sharedState.updateStringOption(STATE_KEY_SUBSYSTEMS_SINGLETON_INIT_METHODOLOGY, singletonButtonGroup);
     }
 }

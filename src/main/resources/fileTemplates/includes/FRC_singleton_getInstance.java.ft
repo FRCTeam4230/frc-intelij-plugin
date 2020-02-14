@@ -1,11 +1,12 @@
 #if($makeSingleton == "true")
 
+#if($singletonIncludeJavadoc == "true")
 /**
  * Returns the Singleton instance of this ${NAME}. This static method 
  * should be used by external classes, rather than the constructor 
  * to get the instance of this class. For example: {@code ${NAME}.getInstance();}
  */
-@SuppressWarnings({"WeakerAccess", "unused"})
+#end
 public static ${NAME} getInstance()
 {    
 #if($singletonInitMethodology == "EAGER")

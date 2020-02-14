@@ -1,5 +1,5 @@
 #set( $H = '#' )
-#if($makeSingleton == "true")
+#if($makeSingleton == "true" && $singletonIncludeJavadoc == "true")
     /**
      * Creates a new instance of this ${NAME}.
      * This constructor is private since this class is a Singleton. External classes 

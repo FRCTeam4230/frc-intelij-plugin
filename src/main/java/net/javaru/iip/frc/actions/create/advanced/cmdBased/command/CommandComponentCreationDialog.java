@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import javax.swing.*;
 
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
+import com.intellij.lang.jvm.JvmModifier;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
@@ -75,8 +77,10 @@ public class CommandComponentCreationDialog extends FrcComponentCreationDialog
                                                                                     false,
                                                                                     false,
                                                                                     null);
+            // TODO: add option to show abstract subsystem classes... although I can't think of a use case for making an abstract subsystem a required subsystem of a command 
+            subsystems = subsystems.stream().filter(psiClass -> !psiClass.hasModifier(JvmModifier.ABSTRACT)).collect(Collectors.toList());
             subsystems = FrcClassUtilsKt.sortedByName(subsystems);
-            // TODO: add option to filter out abstract 
+            
             // See our FrcClassUtilsKt.isAbstract() extension
             this.mySubsystemsClassesMap = FrcUiUtilsKt.initClassSelectionPanelCheckBoxes(topPanel,
                                                                                          optionsPanel,

@@ -14,7 +14,8 @@ import ${baseClassFqName};
 #parse("File Header.java")
 public #if($makeAbstract == "true")abstract#end class ${NAME}  ${baseClassExtendsClause}
 {
-#parse("FRC_singleton_instanceVariable.java")
+    #parse("FRC_singleton_instanceVariable.java")
+    #parse("FRC_singleton_getInstance.java")
     #parse("FRC_constructorSignature.java")()
     {
         // TODO: Determine real PID values needed and configure them here
@@ -25,7 +26,6 @@ public #if($makeAbstract == "true")abstract#end class ${NAME}  ${baseClassExtend
         //       Also, you can call addChild(name, sendableChild) to associate sendables with the subsystem
         //       such as SpeedControllers, Encoders, DigitalInputs, etc.
     }
-#parse("FRC_singleton_getInstance.java")
 
 #if($includeJavaDocsForOverrides == "true")
   /**
@@ -55,6 +55,6 @@ public #if($makeAbstract == "true")abstract#end class ${NAME}  ${baseClassExtend
     @Override
     protected void useOutput(double output, double setpoint)
     {
-        // TODO: Use the output, for example to set the sped on a motor.
+        // TODO: Use the output, for example to set the speed on a motor.
     }    
 }

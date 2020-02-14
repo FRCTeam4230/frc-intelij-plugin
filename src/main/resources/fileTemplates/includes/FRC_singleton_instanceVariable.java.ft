@@ -1,13 +1,19 @@
 #set( $H = '#' )
 #if($makeSingleton == "true")
-
-// Any variables/fields used in the constructor must appear before the "INSTANCE" variable
-// so that they are initialized before the constructor is called.
-
+#if($singletonInitMethodology == "EAGER")
+    
+    // With eager singleton initialization, any static variables/fields used in the 
+    // constructor must appear before the "INSTANCE" variable so that they are initialized 
+    // before the constructor is called when the "INSTANCE" variable initializes.
+    
+#end
 /**
  * The Singleton instance of this ${NAME}. External classes should
  * use the {@link ${H}getInstance()} method to get the instance.
  */
-private final static ${NAME} INSTANCE=new ${NAME}();
-
+#if($singletonInitMethodology == "EAGER")
+private final static ${NAME} INSTANCE = new ${NAME}();
+#else
+private static ${NAME} INSTANCE;     
+#end
 #end

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.ui.ContextHelpLabel;
 import com.intellij.ui.components.JBCheckBox;
+import com.intellij.ui.components.JBRadioButton;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 
@@ -45,8 +46,16 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
     private static final String INCLUDE_ADD_CHILD_MESSAGE = "includeChildMessage";
     protected static final String MAKE_SINGLETON = "makeSingleton";
     protected static final String STATE_KEY_SUBSYSTEMS_MAKE_SINGLETON = "subsystems-makeSingleton";
+    protected static final String SINGLETON_INIT_METHODOLOGY = "singletonInitMethodology";
+    protected static final String STATE_KEY_SUBSYSTEMS_SINGLETON_INIT_METHODOLOGY = "subsystems-singletonInitMethodology";
     
     protected JBCheckBox makeSingletonCheckbox;
+    protected JBRadioButton eagerSingletonRadioButton;
+    protected JBRadioButton lazySingletonRadioButton;
+    protected JBRadioButton threadSafeSingletonRadioButton;
+    protected ButtonGroup singletonButtonGroup;
+    
+    private enum  SingletonMethodology { EAGER, LAZY, THREAD_SAFE}
     
     public SubsystemComponentCreationDialog(@NotNull Module module,
                                             @NotNull ClassCreator classCreator,
@@ -69,19 +78,78 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
             boolean includeChildMessage =  subsystemBaseClass != null && (baseClass.equals(subsystemBaseClass) ||  baseClass.isInheritor(subsystemBaseClass, true));
             props.put(INCLUDE_ADD_CHILD_MESSAGE, Boolean.toString(includeChildMessage));
         }
+        
         boolean makeSingleton = (makeSingletonCheckbox != null && makeSingletonCheckbox.isEnabled() && makeSingletonCheckbox.isSelected());
         props.put(MAKE_SINGLETON, Boolean.toString(makeSingleton));
+        
+        final String singletonMethodology = makeSingleton ? singletonButtonGroup.getSelection().getActionCommand() : "NONE";
+        props.put(SINGLETON_INIT_METHODOLOGY, singletonMethodology);
     }
     
     
     @Override
     protected void initMinorOptionsPanel(JPanel topPanel, JPanel optionsPanel)
     {
-        final GridLayoutManager layoutManager = new GridLayoutManager(1, 3);
-        final GridConstraints gc = createStandardGridConstraints();
-        gc.setIndent(2);
         makeSingletonCheckbox = new JBCheckBox(message("frc.new.class.adv.subsystem.dialog.makeSingleton.checkbox.text"));
         makeSingletonCheckbox.setSelected(sharedState.getBooleanOption(STATE_KEY_SUBSYSTEMS_MAKE_SINGLETON, true));
+    
+        SingletonMethodology selectedMethodology;
+    
+        try
+        {
+            selectedMethodology = SingletonMethodology.valueOf(sharedState.getStringOption(STATE_KEY_SUBSYSTEMS_SINGLETON_INIT_METHODOLOGY,
+                                                                                           SingletonMethodology.THREAD_SAFE.name()));
+        }
+        catch (Exception ignore)
+        {
+            selectedMethodology = SingletonMethodology.THREAD_SAFE;
+        }
+    
+        singletonButtonGroup = new ButtonGroup();
+        final boolean buttonsEnabled = makeSingletonCheckbox.isEnabled() && makeSingletonCheckbox.isSelected();
+    
+        threadSafeSingletonRadioButton =
+                initSingletonMethodologyButton(message("frc.new.class.adv.subsystem.dialog.makeSingleton.threadSafeOption"),
+                                               SingletonMethodology.THREAD_SAFE,
+                                               selectedMethodology, 
+                                               buttonsEnabled);
+    
+        lazySingletonRadioButton =
+                initSingletonMethodologyButton(message("frc.new.class.adv.subsystem.dialog.makeSingleton.lazyOption"),
+                                               SingletonMethodology.LAZY,
+                                               selectedMethodology, 
+                                               buttonsEnabled);
+    
+        eagerSingletonRadioButton =
+                initSingletonMethodologyButton(message("frc.new.class.adv.subsystem.dialog.makeSingleton.eagerOption"),
+                                               SingletonMethodology.EAGER,
+                                               selectedMethodology, 
+                                               buttonsEnabled);
+    
+        // Disable the make Singleton option is the name contains "abstract"
+        FrcUiUtilsKt.addTextChangedListener(myComponentNameTextField, (documentEvent, text) -> {
+            final String name = myComponentNameTextField.getText();
+            makeSingletonCheckbox.setEnabled(name != null && !name.toLowerCase().contains("abstract"));
+            final boolean optionsEnabled = makeSingletonCheckbox.isEnabled() && makeSingletonCheckbox.isSelected();
+            threadSafeSingletonRadioButton.setEnabled(optionsEnabled);
+            lazySingletonRadioButton.setEnabled(optionsEnabled);
+            eagerSingletonRadioButton.setEnabled(optionsEnabled);
+            return Unit.INSTANCE;
+        });
+        
+        //Enable//disable the methodology buttons based on the make singleton checkbox selection
+        makeSingletonCheckbox.addActionListener(e -> {
+            final boolean optionsEnabled = makeSingletonCheckbox.isEnabled() && makeSingletonCheckbox.isSelected();
+            threadSafeSingletonRadioButton.setEnabled(optionsEnabled);
+            lazySingletonRadioButton.setEnabled(optionsEnabled);
+            eagerSingletonRadioButton.setEnabled(optionsEnabled);
+        });
+        
+        // Do layout
+        final GridLayoutManager layoutManager = new GridLayoutManager(4, 3);
+        final GridConstraints gc = createStandardGridConstraints();
+        gc.setIndent(2);
+        
         optionsPanel.setLayout(layoutManager);
         optionsPanel.add(makeSingletonCheckbox, gc);
     
@@ -92,13 +160,33 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
         gc.setHSizePolicy(GridConstraints.SIZEPOLICY_FIXED);
         optionsPanel.add(helpLabel, gc);
         FrcUiUtilsKt.addHorizontalSpacer(optionsPanel, 0, 2);
+    
         
-        // Disable the make Singleton option is the name contains "abstract"
-        FrcUiUtilsKt.addTextChangedListener(myComponentNameTextField, (documentEvent, text) -> {
-            final String name = myComponentNameTextField.getText();
-            makeSingletonCheckbox.setEnabled(name != null && !name.toLowerCase().contains("abstract"));
-            return Unit.INSTANCE;
-        });
+        gc.setIndent(4);
+        gc.setColumn(0);
+        gc.setColSpan(3);
+    
+        gc.setRow(1);
+        optionsPanel.add(threadSafeSingletonRadioButton, gc);
+        gc.setRow(2);
+        optionsPanel.add(lazySingletonRadioButton, gc);
+        gc.setRow(3);
+        optionsPanel.add(eagerSingletonRadioButton, gc);
+    }
+    
+    
+    private JBRadioButton initSingletonMethodologyButton(@NotNull String buttonText,
+                                                         @NotNull SingletonMethodology methodology,
+                                                         @NotNull SingletonMethodology selectedMethodology, 
+                                                         boolean makeEnabled)
+    {
+        JBRadioButton button = new JBRadioButton();
+        button.setText(buttonText);
+        singletonButtonGroup.add(button);
+        button.setActionCommand(methodology.name());
+        button.setSelected(methodology.equals(selectedMethodology));
+        button.setEnabled(makeEnabled);
+        return button;
     }
     
     
@@ -107,5 +195,6 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
     {
         super.saveState();
         sharedState.updateBooleanOption(STATE_KEY_SUBSYSTEMS_MAKE_SINGLETON, makeSingletonCheckbox);
+        sharedState.updateStringOption(STATE_KEY_SUBSYSTEMS_SINGLETON_INIT_METHODOLOGY, singletonButtonGroup);
     }
 }

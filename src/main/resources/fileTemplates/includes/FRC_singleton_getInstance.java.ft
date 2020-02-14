@@ -2,8 +2,36 @@
 
 /**
  * Returns the Singleton instance of this ${NAME}. This static method 
- * should be used -- {@code ${NAME}.getInstance();} -- by external
- * classes, rather than the constructor to get the instance of this class.
+ * should be used by external classes, rather than the constructor 
+ * to get the instance of this class. For example: {@code ${NAME}.getInstance();}
  */
-public static ${NAME} getInstance() { return INSTANCE; }
+@SuppressWarnings({"WeakerAccess", "unused"})
+public static ${NAME} getInstance()
+{    
+#if($singletonInitMethodology == "EAGER")
+    return INSTANCE;
+#elseif($singletonInitMethodology == "THREAD_SAFE")
+    // Fast (non-synchronized) check to reduce overhead of acquiring a lock when it's not needed
+    if (INSTANCE == null)
+    {
+        // Lock to make thread safe 
+        synchronized (${NAME}.class)
+        {
+            // check nullness again as multiple threads can reach above null check
+            if(INSTANCE==null)
+            {
+                INSTANCE = new ${NAME}();
+            }
+        }
+    }    
+    return INSTANCE; 
+#else ## LAZY
+    if (INSTANCE == null)
+    {
+        INSTANCE = new ${NAME}();
+    }
+    return INSTANCE;
+#end
+}
+
 #end

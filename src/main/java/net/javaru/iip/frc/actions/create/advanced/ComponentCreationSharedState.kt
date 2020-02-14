@@ -24,12 +24,15 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.OptionTag
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog
 import javax.swing.AbstractButton
+import javax.swing.ButtonGroup
+import javax.swing.ButtonModel
 
 @State(name = "ComponentCreationSharedState", storages = [(Storage("frc.xml"))])
 data class ComponentCreationSharedState(
         var includeJavaDoc: Boolean = true,
         @OptionTag private var autoAppend: MutableMap<String, Boolean> = mutableMapOf(),
         @OptionTag private var booleanOptions: MutableMap<String, Boolean> = mutableMapOf(),
+        @OptionTag private var stringOptions: MutableMap<String, String> = mutableMapOf(),
         @OptionTag private var baseComponent: MutableMap<String, String> = mutableMapOf()
                                        ) : PersistentStateComponent<ComponentCreationSharedState>
 {
@@ -47,12 +50,42 @@ data class ComponentCreationSharedState(
     @JvmOverloads
     fun getBooleanOption(key:String, defaultValue: Boolean = true): Boolean = booleanOptions.getOrDefault(key, defaultValue)
 
-    /** Updates the shouldAutoAppendValue to the buttons selection iff the button is not null && enabled. */
+  
+    fun updateBooleanOption(key: String, value: Boolean)
+    {
+        booleanOptions[key] = value
+    }
+    
     fun updateBooleanOption(key: String, button: AbstractButton?)
     {
         if (button?.isEnabled == true)
         {
             booleanOptions[key] = button.isSelected
+        }
+    }
+    
+    fun getStringOption(key:String, defaultValue: String): String = stringOptions.getOrDefault(key, defaultValue)
+
+    
+    fun updateStringOption(key: String, value: String)
+    {
+        stringOptions[key] = value
+    }
+    
+    /** Updates a String option to the button group's selected model's action command. */
+    fun updateStringOption(key: String, buttonGroup: ButtonGroup?)
+    {
+        if (buttonGroup != null)
+        {
+            updateStringOption(key, buttonGroup.selection)
+        }
+    }
+    /** Updates a String option to provided model's action command. */
+    fun updateStringOption(key: String, buttonModel: ButtonModel?)
+    {
+        if (buttonModel?.actionCommand != null)
+        {
+            stringOptions[key] = buttonModel.actionCommand
         }
     }
     

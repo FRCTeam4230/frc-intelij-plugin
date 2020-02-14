@@ -12,3 +12,4 @@
 #* @vtlvariable name="requiredSubsystemsFqnCommaDelimitedString" type="java.lang.String" *#
 #* @vtlvariable name="requiredSubsystemsNamesCommaDelimitedString" type="java.lang.String" *#
 #* @vtlvariable name="requiredSubsystemsVarsCommaDelimitedString" type="java.lang.String" *#
+#* @vtlvariable name="singletonInitMethodology" type="java.lang.String" *#

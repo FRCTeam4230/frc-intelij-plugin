@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -71,6 +71,9 @@ public class TcpRioLogRunWindowContentExecutor extends AbstractRioLogContentExec
         return new AnnouncementRioLogMonitorProcess(myProject, this::invokeClearAll,
                                                     this::invokeStop,
                                                     new StringBuffer("\n")
-                                                        .append(FrcBundle.message("frc.riolog.first.start.message.tcp")));
+                                                            .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line1"))
+                                                            .append("\n")
+                                                            .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line2"))
+                                                            .append("\n"));
     }
 }

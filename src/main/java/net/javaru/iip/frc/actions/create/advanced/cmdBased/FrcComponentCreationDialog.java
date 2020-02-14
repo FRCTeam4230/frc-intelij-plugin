@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -198,12 +198,42 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
         else
         {
             final Set<Entry<PsiClass, JBRadioButton>> entries = myTopLevelComponentClassesMap.entrySet();
+            final String selectedComponent = sharedState.getBaseComponentSelection(getClass(), myDataProvider);
+            
+            boolean madeSelection = false;
             for (Entry<PsiClass, JBRadioButton> entry : entries)
             {
-                // TODO: modify to use last selected value
-                if (myDataProvider.getTypicalBaseClassFqName().equals(entry.getKey().getQualifiedName()))
+                //if (myDataProvider.getTypicalBaseClassFqName().equals(entry.getKey().getQualifiedName()))
+                if (selectedComponent.equals(entry.getKey().getQualifiedName()))
                 {
                     entry.getValue().setSelected(true);
+                    madeSelection = true;
+                    break;
+                    
+                }
+            }
+            
+            if (!madeSelection) 
+            {
+                // Likely a case of the previously selected option no longer being a valid class (due to rename or deletion)
+                for (Entry<PsiClass, JBRadioButton> entry : entries)
+                {
+                    if (myDataProvider.getTypicalBaseClassFqName().equals(entry.getKey().getQualifiedName()))
+                    {
+                        entry.getValue().setSelected(true);
+                        madeSelection = true;
+                        break;
+                    }
+                }
+            }
+            
+            
+            if (!madeSelection && entries.size() >= 1)
+            {
+                final Entry<PsiClass, JBRadioButton> first = CollectionsKt.firstOrNull(entries);
+                if (first != null)
+                {
+                    first.getValue().setSelected(true);
                 }
             }
         }
@@ -383,6 +413,7 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
         }
         
         final String baseFqName = base.getQualifiedName() != null ? base.getQualifiedName() : myDataProvider.getTypicalBaseClassFqName();
+        sharedState.updateBaseComponentSelection(getClass(),myDataProvider, baseFqName);
         props.put(BASE_CLASS_FQ_NAME, baseFqName);
         final boolean baseClassNeedsImporting = !baseFqName.contains(".") || !baseFqName.substring(0, baseFqName.lastIndexOf('.')).equals(targetPackageName);
         props.put(BASE_CLASS_NEEDS_IMPORTING, Boolean.toString(baseClassNeedsImporting));

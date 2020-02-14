@@ -78,7 +78,10 @@ public class CommandComponentCreationDialog extends FrcComponentCreationDialog
                                                                                     false,
                                                                                     null);
             // TODO: add option to show abstract subsystem classes... although I can't think of a use case for making an abstract subsystem a required subsystem of a command 
-            subsystems = subsystems.stream().filter(psiClass -> !psiClass.hasModifier(JvmModifier.ABSTRACT)).collect(Collectors.toList());
+            
+            //  hasModifier(JvmModifier.ABSTRACT)  is an experimental API. So for now we use the (older) hasModifierProperty(PsiModifier.ABSTRACT)
+            //subsystems = subsystems.stream().filter(psiClass -> !psiClass.hasModifier(JvmModifier.ABSTRACT)).collect(Collectors.toList());
+            subsystems = subsystems.stream().filter(psiClass -> !psiClass.hasModifierProperty(PsiModifier.ABSTRACT)).collect(Collectors.toList());
             subsystems = FrcClassUtilsKt.sortedByName(subsystems);
             
             // See our FrcClassUtilsKt.isAbstract() extension

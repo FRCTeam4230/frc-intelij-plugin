@@ -1,4 +1,4 @@
-## A hack, so we can have a hash characterin JavaDocs for {@link} entries
+## A hack, so we can have a hash character in JavaDocs for {@link} entries
 #set( $H = '#' )
 #set($requiredSubsystemsFqnArray=$requiredSubsystemsFqnCommaDelimitedString.split(","))
 ## The split method when called on an empty string will result in an array of one empty string token, so we need to handle that *#

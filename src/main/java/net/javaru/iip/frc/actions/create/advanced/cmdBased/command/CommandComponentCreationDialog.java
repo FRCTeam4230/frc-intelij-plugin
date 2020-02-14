@@ -28,15 +28,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
-import com.intellij.lang.jvm.JvmModifier;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiField;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifier;
 import com.intellij.ui.components.JBCheckBox;
 
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider;
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog;
+import net.javaru.iip.frc.util.FrcClassUtils2;
 import net.javaru.iip.frc.util.FrcClassUtilsKt;
 import net.javaru.iip.frc.util.FrcCollectionExtsKt;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
@@ -52,6 +55,7 @@ public class CommandComponentCreationDialog extends FrcComponentCreationDialog
     private static final String SUBSYSTEMS_FQN_COMMA_DELIMITED_LIST = "requiredSubsystemsFqnCommaDelimitedString";
     private static final String SUBSYSTEMS_SIMPLE_NAME_COMMA_DELIMITED_LIST = "requiredSubsystemsNamesCommaDelimitedString";
     private static final String SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST = "requiredSubsystemsVarsCommaDelimitedString";
+    private static final String SUBSYSTEMS_SINGLETON_CALLS_COMMA_DELIMITED_LIST = "requiredSubsystemsSingletonCallsCommaDelimitedString";
     
     private Map<PsiClass, JBCheckBox> mySubsystemsClassesMap;
     
@@ -140,6 +144,47 @@ public class CommandComponentCreationDialog extends FrcComponentCreationDialog
         final String subSystemsVarNames = FrcCollectionExtsKt.toCommaDelimitedString(subsystems, false, psiClass ->
                 StringUtils.uncapitalize(psiClass.getName()));
         props.put(SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST, subSystemsVarNames);
+    
+        final List<String> singletonCalls = createSingletonCalls(subsystems);
+        final String singletonCallsString = FrcCollectionExtsKt.toCommaDelimitedString(singletonCalls, false, String::toString, "<NULL>");
+        props.put(SUBSYSTEMS_SINGLETON_CALLS_COMMA_DELIMITED_LIST, singletonCallsString);
+    }
+    
+    @NotNull
+    protected List<String> createSingletonCalls(@NotNull List<PsiClass> classes)
+    {
+        final List<String> calls = new ArrayList<>(classes.size());
+        for (PsiClass psiClass : classes)
+        {
+            final String singletonCall = createSingletonCall(psiClass);
+            calls.add(singletonCall);
+        }
+        return calls;
+    }
+    
+    
+    @Nullable
+    private static String createSingletonCall(PsiClass psiClass)
+    {
+        String result = null;
+        if (FrcClassUtils2.isSingleton(psiClass))
+        {
+            // favor using the getter if it is present
+            final PsiMethod singletonMethod = FrcClassUtils2.getSingletonMethod(psiClass);
+            if (singletonMethod != null)
+            {
+                result = psiClass.getName() + "." + singletonMethod.getName() + "()";
+            }
+            else
+            {
+                final PsiField singletonField = FrcClassUtils2.getSingletonField(psiClass);
+                if (singletonField != null && singletonField.hasModifierProperty(PsiModifier.PUBLIC))
+                {
+                    result = psiClass.getName() + "." + singletonField.getName();
+                }
+            }
+        }
+        return result;
     }
     
     

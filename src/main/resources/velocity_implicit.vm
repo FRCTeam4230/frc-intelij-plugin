@@ -11,6 +11,7 @@
 #* @vtlvariable name="needsGetRequirementsImpl" type="java.lang.String" *#
 #* @vtlvariable name="requiredSubsystemsFqnCommaDelimitedString" type="java.lang.String" *#
 #* @vtlvariable name="requiredSubsystemsNamesCommaDelimitedString" type="java.lang.String" *#
+#* @vtlvariable name="requiredSubsystemsSingletonCallsCommaDelimitedString" type="java.lang.String" *#
 #* @vtlvariable name="requiredSubsystemsVarsCommaDelimitedString" type="java.lang.String" *#
 #* @vtlvariable name="singletonIncludeJavadoc" type="java.lang.String" *#
 #* @vtlvariable name="singletonInitMethodology" type="java.lang.String" *#

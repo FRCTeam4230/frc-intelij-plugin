@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -77,11 +77,17 @@ inline fun <T, R : Any, C : MutableCollection<in R>> Iterable<T>.mapExceptionFre
  *                   if false, no spaces will be present: `one,two,three,four`.
  * @param toStringFunction the function/lambda to use to convert collection elements to a String value. By default, the 
  *                         element's `toString()` method is used
+ * @param nullReplacement The string to replace null values with; default is an empty string (i.e. "")                        
  */
 @JvmOverloads
-fun <T: Any> Collection<T>.toCommaDelimitedString(withSpaces: Boolean = true, toStringFunction: (T) -> String = {it.toString()}): String
+fun <T: Any?> Collection<T>.toCommaDelimitedString(withSpaces: Boolean = true, toStringFunction: (T) -> String = {it.toString()}, nullReplacement:String = ""): String
 {
-    val result = this.map { toStringFunction.invoke(it) }.toTypedArray().contentToString().removePrefix("[").removeSuffix("]")
+    val result = this.map { 
+        if (it == null) 
+            nullReplacement
+        else
+            toStringFunction.invoke(it) 
+    }.toTypedArray().contentToString().removePrefix("[").removeSuffix("]")
     return if (withSpaces) result else result.replace(" ", "")
 }
 

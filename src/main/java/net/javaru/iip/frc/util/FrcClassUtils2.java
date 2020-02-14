@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ public class FrcClassUtils2
         final List<PsiMethod> methods = Arrays.stream(aClass.getMethods())
                                            .filter(m -> !m.isConstructor() &&
                                                         m.hasModifierProperty(PsiModifier.PUBLIC) &&
-                                                        !m.hasModifierProperty(PsiModifier.STATIC) &&
+                                                        m.hasModifierProperty(PsiModifier.STATIC) &&
                                                         !m.hasParameters() &&
                                                         Objects.equals(aClass, PsiUtil.resolveClassInClassTypeOnly(m.getReturnType()))
                                                         

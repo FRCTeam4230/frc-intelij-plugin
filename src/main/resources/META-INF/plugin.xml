@@ -23,7 +23,7 @@
     <!-- Unique identifier of the plugin. Cannot be changed between the plugin versions. If not specified, assumed to be equal to <name>. -->
     <id>net.javaru.idea.frc</id>
     <name>FRC</name>
-    <version>1.1</version>
+    <version>1.2</version>
 
     <!-- The vendor of the plugin.
        The optional "url" attribute specifies the URL of the vendor homepage.
@@ -43,7 +43,7 @@
             (<a href='http://www.firstinspires.org/robotics/frc'>FRC</a>) development support for
             IntelliJ IDEA, including new project wizards, new class templates, robust RioLog console,
             and more. Works with all v2019.2 or later editions (Community, Education, and Ultimate) 
-            of IntelliJ IDEA. Enjoy using your favorite IDE when coding your team's robot in Java,
+            of IntelliJ IDEA. Enjoy using your favorite IDE when coding your team's robot in Java
             and/or Kotlin.
         </p>
         <p><br></p>
@@ -51,13 +51,33 @@
             <strong>Please report issues or make feature requests via the project's</strong>
             <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>Issue Tracker</a>.<br>
             This is an unofficial plugin written by an FRC team mentor. Please do <em>not</em> 
-            contact <em>FIRST</em> or the WPI Lib developers for support. Thanks.
+            contact <em>FIRST</em> or the WPI Lib developers for support. Use the above link. Thanks.
         </p>        
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v1.2</strong> <br>
+        &nbsp;&nbsp;&bull; Enhanced the Subsystem "Create as Singleton" option to offer different Singleton initialization 
+                           methodologies (based on the methodologies presented in the <em>Geeks for Geeks</em> 
+                           <a href="https://www.geeksforgeeks.org/singleton-design-pattern">Singleton Design Pattern</a> article).<br>
+        &nbsp;&nbsp;&bull; Added functionality to Command class creation so that Subsystems that are Singletons are not added 
+                           as parameters to the Command's constructor, but rather are initialized in their field declaration
+                           via a call to their singleton getter method (or field if applicable).<br>
+        &nbsp;&nbsp;&bull; Enhanced the Command class creation dialog so that abstract subsystem classess are not listed in
+                           the "required subsystems" selection pane. Since an abstract subsystem cannot be instantiated, it
+                           make no sense to present them as an option in the list.<br>
+        &nbsp;&nbsp;&bull; Enhanced the component creation dialogs so that the last selected base component is remembered 
+                           and pre-selected on the next use.<br>
+        &nbsp;&nbsp;&bull; Implemented <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/63'>Feature #63</a>: 
+                           Auto reimport gradle project when changes are made to vendordeps so that changes are made to the project 
+                           classpath. (<a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/61'>Feature #61</a>, UI for 
+                           adding and managing vendordeps is still pending.)<br>
+        &nbsp;&nbsp;&bull; Some miscellaneous internal improvements.<br>
+        <br>
+        
         <strong>v1.1</strong> <br>
-        &nbsp;&nbsp;&bull; Added an action to check for the availability of a WPI Lib update.<br>
+        &nbsp;&nbsp;&bull; Added an action (<em>Tools > FRC > Check for WPI Lib Update</em>) to check for the availability of a WPI Lib update. The action runs 
+                           automatically when an FRC project is opened, and then periodically in the background while the FRC project is open.<br>
         &nbsp;&nbsp;&bull; Fixed the auto clear feature in the rioLog console tool window. It was keying on an old startup message and thus not working.<br>
         &nbsp;&nbsp;&bull; Removed the print action from the rioLog console. It was likely never used and was using real estate and adding clutter.<br>
         &nbsp;&nbsp;&bull; Rearranged the order of the action buttons on the rioLog console so that the more frequently used actions are

@@ -166,6 +166,8 @@
         <projectService id="FRC.FrcProjectSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcProjectGeneralSettings" />
         <projectService id="FRC.FrcRoboRioSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcRoboRioSettings" />
         <projectService id="FRC.FrcSshSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcSshSettings" />
+        <projectService id ="FRC.VendordepsFileListener" serviceImplementation="net.javaru.iip.frc.services.VendordepsFileListener" />
+        <postStartupActivity implementation="net.javaru.iip.frc.services.VendordepsFileListenerStartupActivity" />
         
         <projectService id="FRC.RioLogConsoleProjectService"
                         serviceImplementation="net.javaru.iip.frc.riolog.RioLogProjectService" />

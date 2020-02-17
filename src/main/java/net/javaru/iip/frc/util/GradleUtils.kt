@@ -16,10 +16,16 @@
 
 package net.javaru.iip.frc.util
 
+import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
+import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode
+import com.intellij.openapi.externalSystem.service.project.ExternalProjectRefreshCallback
+import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
+import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataCache
+import org.jetbrains.plugins.gradle.util.GradleConstants
 
 // NOTE: AddGradleDslPluginActionHandler has example of modifying the gradle build file (for a groovy build file)
 
@@ -32,3 +38,24 @@ fun Project.getGradleBuildVirtualFile(): VirtualFile?
 }
 
 fun Project.getGradleBuildPsiFile(): PsiFile? = this.getGradleBuildVirtualFile()?.findPsiFile(this)
+
+
+fun Project.importGradleProject()
+{
+    // TODO: When a change is made to only support IDEA v2910.3 or greater, we can use the linkAndRefreshGradleProject from it. Note that it is marked experimental in the EAP version
+    // /* v2019.3 */ org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject(this.basePath!!, this)
+    /* v2019.2 */ org.jetbrains.plugins.gradle.service.project.open.importProject(this.basePath!!, this)
+}
+
+fun Module.importGradleProject() = this.project.importGradleProject()
+
+@JvmOverloads
+fun Project.reimportGradleProject(callback: ExternalProjectRefreshCallback? = null)
+{
+    // derived from looking at RefreshAllExternalProjectsAction, specifically when it calls ExternalSystemUtil.refreshProjects
+    ExternalSystemUtil.refreshProjects(ImportSpecBuilder(this, GradleConstants.SYSTEM_ID)
+                                           .forceWhenUptodate(true)
+                                           .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
+                                           .callback(callback)
+                                      )
+}

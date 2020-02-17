@@ -62,6 +62,7 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.settings.RoboRioAddressType
 import net.javaru.iip.frc.util.getPluginResource
 import net.javaru.iip.frc.util.getPluginResourceAsStream
+import net.javaru.iip.frc.util.importNewGradleProject
 import net.javaru.iip.frc.util.isValidJavaVersion
 import net.javaru.iip.frc.util.isValidJdk
 import net.javaru.iip.frc.util.reader
@@ -219,9 +220,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                             gradleNotifications.forEach { it.expire() }
                             // We only import if we found the notification. If we import and the user then clicks on the import action on the notification, the IDE throws an error
                             ApplicationManager.getApplication().runWriteAction() {
-                                // TODO: When a change is made to only support IDEA v2910.3 or greater, we can use the linkAndRefreshGradleProject from it. Note that it is marked experimental in the EAP version
-                                // /* v2019.3 */ org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject(module.project.basePath!!, module.project)
-                                /* v2019.2 */ org.jetbrains.plugins.gradle.service.project.open.importProject(module.project.basePath!!, module.project)
+                                module.importNewGradleProject() // this is a function in this plugin's GradleUtils that wraps the API function 
                             }
                         }
                     }

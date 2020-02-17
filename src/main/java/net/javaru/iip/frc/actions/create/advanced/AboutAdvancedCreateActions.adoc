@@ -1,15 +1,101 @@
 
 
-
-
-The "advanced" creat actions show a custom dialog box, and can do more advanced data verification & processing. 
-
+The "advanced" create actions show a custom dialog box, and can do more advanced data verification & processing.
 
 The flow:
 
 * AbstractAdvancedNewFrcClassAction
-** actionPerformed() 
+** actionPerformed()
 *** invokeDialog()
 **** CreateFrcComponentDialog.show()
 **** CreateFrcComponentDialog.doOKAction()
 ***** ClassCreator.create()
+
+== Defining a template
+
+. The actual file template -- such as `Foo.java.ft` -- gets placed in the `src/main/resources/j2ee` directory
+**  The `j2ee` name and location is defined in the IntelliJ IDEA Plugin API and cannot be changed, overridden, or configured at all. It's a legacy requirement from the very early days of IntelliJ IDEA's development.
+**  A corresponding `Foo.java.html` file should be defined as it defines the help information shown below the template in the settings dialog
+. A (single) `FileTemplateGroupDescriptorFactory` implementation -- such as the `FrcFileTemplateGroupDescriptorFactory` -- is created and defined in the `plugin.xml` file as:
+
+[source,xml]
+----
+<extensions defaultExtensionNs="com.intellij">
+    <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
+</extensions>
+----
+
+[start=3]
+. A `FileTemplateDescriptor` instance variable gets defined for each template, and then added to a `FileTemplateGroupDescriptor`, which is returned via the `getFileTemplatesDescriptor` method.
+For example:
+
+[source,java]
+----
+public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupDescriptorFactory
+{
+
+    public static final FileTemplateDescriptor COMMAND = 
+        new FileTemplateDescriptor("FRC Command.java", FrcIcons.Components.COMMAND);
+    public static final FileTemplateDescriptor COMMAND_GROUP = 
+        new FileTemplateDescriptor("FRC CommandGroup.java", FrcIcons.Components.COMMAND_GROUP);
+   
+    private static final FileTemplateGroupDescriptor FILE_TEMPLATE_GROUP_DESCRIPTOR =
+        new FileTemplateGroupDescriptor("FRC", FrcIcons.FRC.FIRST_ICON_MEDIUM_16,
+                                        COMMAND,
+                                        COMMAND_GROUP);
+
+    @Override
+    public FileTemplateGroupDescriptor getFileTemplatesDescriptor()
+    {
+        return FILE_TEMPLATE_GROUP_DESCRIPTOR;
+    }
+}
+----
+
+[start=4]
+. Create a Data provider by extending the `FrcComponentCreationDataProvider` abstract class or one of its children such as `Command1ComponentCreationDataProvider` or `Command2ComponentCreationDataProvider`
+**  The `fileTemplateDescriptor` value references the `FileTemplateDescriptor` field you created in the above inside the `FileTemplateGroupDescriptorFactory`. Thus, this is where the template to use dor the action is defined.
+. A Creation Action is defined by extending `AbstractFrcComponentCreationAction` or one of its children such as `AbstractCmdBaseV1ComponentCreationAction` or `AbstractCmdBaseV2ComponentCreationAction`
+**  Implement the constructor, using the Data Provider created above, and the `constructCreateFrcComponentDialogInstance` method.
+. Add the Action to an Actions Group in the `plugin.xml`. For example:
+
+[source,xml]
+----
+<actions>
+<group id="frc.team9999.NewFileTemplates"
+           text="FRC"
+           class="net.javaru.iip.frc.actions.create.FrcCreateComponentsActionGroup"
+           popup="true"
+           icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
+        <separator />
+        <action id="frc.action.new.command1"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v1.Command1ComponentCreationAction" />
+    <!-- Add after the primary FRC templates -->
+    <add-to-group group-id="NewGroup" anchor="before" relative-to-action="frc.NewFileTemplates" />
+</actions>
+----
+
+.Reducing Velocity Template Warnings
+[TIP]
+You can reduce a number of the _unresolvable variable_ warnings in the template files by creating a `velocity_implicit.vm` file in the `src/main/resources` directory. In this file, you can provide implicit definitions of variables that are defined in the code, but used in the template. Below is a sample that covers most of the variables.
+----
+#* @implicitly included *#
+#* @vtlvariable name="NAME" type="java.lang.String" *#
+#* @vtlvariable name="PACKAGE_NAME" type="java.lang.String" *#
+#* @vtlvariable name="baseClassExtendsClause" type="java.lang.String" *#
+#* @vtlvariable name="baseClassFqName" type="java.lang.String" *#
+#* @vtlvariable name="baseClassNeedsImporting" type="java.lang.String" *#
+#* @vtlvariable name="includeChildMessage" type="java.lang.String" *#
+#* @vtlvariable name="includeJavaDocsForOverrides" type="java.lang.String" *#
+#* @vtlvariable name="makeAbstract" type="java.lang.String" *#
+#* @vtlvariable name="makeSingleton" type="java.lang.String" *#
+#* @vtlvariable name="needsGetRequirementsImpl" type="java.lang.String" *#
+#* @vtlvariable name="requiredSubsystemsFqnCommaDelimitedString" type="java.lang.String" *#
+#* @vtlvariable name="requiredSubsystemsNamesCommaDelimitedString" type="java.lang.String" *#
+#* @vtlvariable name="requiredSubsystemsSingletonCallsCommaDelimitedString" type="java.lang.String" *#
+#* @vtlvariable name="requiredSubsystemsVarsCommaDelimitedString" type="java.lang.String" *#
+#* @vtlvariable name="singletonIncludeJavadoc" type="java.lang.String" *#
+#* @vtlvariable name="singletonInitMethodology" type="java.lang.String" *#
+----
+
+

@@ -61,8 +61,6 @@ public class FrcApplicationComponentImpl implements FrcApplicationComponent
 {
     private static final Logger LOG = Logger.getInstance(FrcApplicationComponentImpl.class);
 
-    private static final FrcApplicationComponent defaultInstance = new FrcApplicationComponentImpl();
-
 
     /** Do not call constructor directly. Use the static {@link #getInstance()} method. */
     public FrcApplicationComponentImpl()
@@ -74,8 +72,8 @@ public class FrcApplicationComponentImpl implements FrcApplicationComponent
     @NotNull
     public static FrcApplicationComponent getInstance()
     {
-        final FrcApplicationComponent component = ApplicationManager.getApplication().getComponent(FrcApplicationComponent.class, defaultInstance);
-        return component != null ? component : defaultInstance;
+        final FrcApplicationComponent component = ApplicationManager.getApplication().getComponent(FrcApplicationComponent.class);
+        return component != null ? component : new FrcApplicationComponentImpl();
     }
     
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -40,15 +40,12 @@ public class FrcApplicationSettingsConfigurable implements SearchableConfigurabl
 
     private FrcApplicationSettingsForm myForm;
 
-    private static FrcApplicationSettingsConfigurable defaultInstance = new FrcApplicationSettingsConfigurable();
-    
 
     @NotNull
     public static FrcApplicationSettingsConfigurable getInstance()
     {
-        final FrcApplicationSettingsConfigurable instance = ApplicationManager.getApplication().getComponent(FrcApplicationSettingsConfigurable.class,
-                                                                                                             defaultInstance);
-        return instance != null ? instance : defaultInstance;
+        final FrcApplicationSettingsConfigurable instance = ApplicationManager.getApplication().getComponent(FrcApplicationSettingsConfigurable.class);
+        return instance != null ? instance : new FrcApplicationSettingsConfigurable();
     }
     
     @Nls

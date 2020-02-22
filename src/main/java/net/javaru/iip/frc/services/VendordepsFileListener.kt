@@ -64,7 +64,7 @@ class VendordepsFileListener private constructor(val project: Project)
                        {
                            override fun after(events: List<VFileEvent>)
                            {
-                               LOG.trace("[FRC] VendordepsFileListener.AFTER called with ${events.size} events")
+                               //LOG.trace("[FRC] VendordepsFileListener.AFTER called with ${events.size} events")
                                for (event in events)
                                {
                                    val file = event.file
@@ -83,7 +83,7 @@ class VendordepsFileListener private constructor(val project: Project)
 
                            override fun before(events: MutableList<out VFileEvent>)
                            {
-                               LOG.trace("[FRC] VendordepsFileListener.BEFORE called with ${events.size} events")
+                               //LOG.trace("[FRC] VendordepsFileListener.BEFORE called with ${events.size} events")
                                for (event in events)
                                { 
                                    val file = event.file

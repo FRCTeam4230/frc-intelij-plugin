@@ -310,8 +310,3 @@ object PsiClassNameComparator: Comparator<PsiClass>
         return name1.compareTo(name2)
     }
 }
-
-fun findSingletonGetInstanceMethod(clz: PsiClass)
-{
-    val singletonMethod = FrcClassUtils2.getSingletonMethod(clz)
-}

@@ -50,7 +50,7 @@ import java.util.*
 // GitConflictsToolWindowManager is a good example of using the StartupActivity
 // AcceptedLanguageLevelsSettings sows a class tha is both a StartupActivity and an application Service
 
-// For IJ v2019.3+ we can/should use StartupActivity.Background (and change the plugin.xml element to <backgroundPostStartupActivity>)
+// NOTE: We CANNOT use StartupActivity.Background for this as per the docs, it "should not be used for any work that requires access to indices", which this does
 class WpiLibVersionStartupActivity : StartupActivity
 {
     override fun runActivity(project: Project)

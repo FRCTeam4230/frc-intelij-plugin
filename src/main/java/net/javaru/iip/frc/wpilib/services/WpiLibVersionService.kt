@@ -100,7 +100,13 @@ class WpiLibVersionService private constructor(private val project: Project) : P
     fun checkWpiLibStatusAndAlertIfNeeded(notifyIfNoUpdateAvailable: Boolean = false,
                                           maxTimeSinceLastCheck: Duration = Duration.ofSeconds(10))
     {
-        if (myState.durationSinceLastCheck < maxTimeSinceLastCheck) return
+        LOG.debug("[FRC] Preparing to check WPI Lib for update. notifyIfNoUpdateAvailable = $notifyIfNoUpdateAvailable  maxTimeSinceLastCheck = $maxTimeSinceLastCheck")
+        val durationSinceLastCheck = myState.durationSinceLastCheck
+        if (durationSinceLastCheck < maxTimeSinceLastCheck) 
+        {
+            LOG.debug("[FRC] time since last check of $durationSinceLastCheck is less than maxTimeSinceLastCheck or $maxTimeSinceLastCheck. No update check will be performed.")
+            return
+        }
         
         val versionStatus = getWpiLibVersionStatus()
         var updateAvailableNotification: Notification? = null
@@ -109,16 +115,23 @@ class WpiLibVersionService private constructor(private val project: Project) : P
         {
             if (versionStatus.updateAvailableForAttachedYear())
             {
+                LOG.debug("[FRC] notifying WPI Lib update is available. WpiLibVersionStatus: $versionStatus")
                 updateAvailableNotification = notifyNewerWpiLibVersionIsAvailable(versionStatus)
             }
             else if(notifyIfNoUpdateAvailable)
             {
+                LOG.debug("[FRC] notifying WPILib update NOT available. WpiLibVersionStatus: $versionStatus")
                 notifyNoUpdateAvailable(versionStatus.attachedVersion.frcYear)
             }
         }
         else if (notifyIfNoUpdateAvailable)
         {
+            LOG.debug("[FRC] notifying WPILib update NOT available due to null WpiLibVersionStatus")
             notifyUnableToCheckVersionStatus()
+        }
+        else
+        {
+            LOG.debug("[FRC] WpiLibVersionStatus was null, indicating it couold not be determined.")
         }
         // If we've notified an update is available, we do no want to schedule the next check until the user acknowledges the previous check
         if (updateAvailableNotification != null) updateAvailableNotification.whenExpired(::scheduleStatusCheck) else scheduleStatusCheck()
@@ -213,10 +226,12 @@ class WpiLibVersionService private constructor(private val project: Project) : P
     
     private fun getWpiLibVersionStatus(): WpiLibVersionStatus?
     {
+        LOG.debug("[FRC] getWpiLibVersionStatus() called. Will perform work in runReadActionInSmartMode")
         var versionStatus: WpiLibVersionStatus? = null
         DumbService.getInstance(project).runReadActionInSmartMode() {
             if (!project.isDisposed && project.isFrcFacetedProject())
             {
+                LOG.debug("[FRC] getWpiLibVersionStatus() : runReadActionInSmartMode has started.")
                 val state = GradleRioMavenMetadataState.getInstance(true)
                 val latestAvailableVersion = state.wpiLibMavenMetadata.latestAsWpiLibVersion
 
@@ -233,11 +248,13 @@ class WpiLibVersionService private constructor(private val project: Project) : P
                     if (latestAvailableForSameYear != null)
                     {
                         versionStatus = WpiLibVersionStatus(attachedVersion, latestAvailableForSameYear, latestAvailableVersion)
+                        LOG.debug("[FRC] WpiLibVersionStatus readActionInSmartMode determined to be: $versionStatus")
                     }
                 }
             }
         }
         myState.updateLastCheckedTime()
+        LOG.debug("[FRC] getWpiLibVersionStatus() returning WpiLibVersionStatus of:  $versionStatus")
         return versionStatus
     }
 

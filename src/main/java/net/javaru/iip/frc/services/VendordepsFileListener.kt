@@ -142,7 +142,7 @@ class VendordepsFileListenerStartupActivity : StartupActivity
 
 class GradleReimportTask(private val project: Project): TimerTask()
 {
-    var importHasStarted = false;
+    var importHasStarted = false
     private val LOG = Logger.getInstance(GradleReimportTask::class.java)
     
     override fun run()

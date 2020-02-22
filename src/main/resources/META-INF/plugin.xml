@@ -65,13 +65,14 @@
                            via a call to their singleton getter method (or field if applicable).<br>
         &nbsp;&nbsp;&bull; Enhanced the Command class creation dialog so that abstract subsystem classes are not listed in
                            the "required subsystems" selection pane. Since an abstract subsystem cannot be instantiated, it
-                           make no sense to present them as an option in the list.<br>
+                           made no sense to present them as an option in the list.<br>
         &nbsp;&nbsp;&bull; Enhanced the component creation dialogs so that the last selected base component is remembered 
                            and pre-selected on the next use.<br>
         &nbsp;&nbsp;&bull; Implemented <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/63'>Feature #63</a>: 
-                           Auto reimport gradle project when changes are made to vendordeps so that changes are made to the project 
-                           classpath. (<a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/61'>Feature #61</a>, UI for 
-                           adding and managing vendordeps is still pending.)<br>
+                           Auto reimport gradle project when changes are made to <em>vendordeps</em> directory so that changes are 
+                           picked up and the project classpath is updated appropriately. 
+                           (<a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/61'>Feature #61</a>, UI for 
+                           adding and managing <em>vendordeps</em>, is still pending.)<br>
         &nbsp;&nbsp;&bull; Some miscellaneous internal improvements.<br>
         <br>
         

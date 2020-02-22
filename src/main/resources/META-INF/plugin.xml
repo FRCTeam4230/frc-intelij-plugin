@@ -63,7 +63,7 @@
         &nbsp;&nbsp;&bull; Added functionality to Command class creation so that Subsystems that are Singletons are not added 
                            as parameters to the Command's constructor, but rather are initialized in their field declaration
                            via a call to their singleton getter method (or field if applicable).<br>
-        &nbsp;&nbsp;&bull; Enhanced the Command class creation dialog so that abstract subsystem classess are not listed in
+        &nbsp;&nbsp;&bull; Enhanced the Command class creation dialog so that abstract subsystem classes are not listed in
                            the "required subsystems" selection pane. Since an abstract subsystem cannot be instantiated, it
                            make no sense to present them as an option in the list.<br>
         &nbsp;&nbsp;&bull; Enhanced the component creation dialogs so that the last selected base component is remembered 

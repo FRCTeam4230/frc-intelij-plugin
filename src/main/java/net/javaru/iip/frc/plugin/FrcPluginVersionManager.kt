@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -16,13 +16,16 @@
 
 package net.javaru.iip.frc.plugin
 
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 
-
+private val LOG = Logger.getInstance(FrcPluginVersionManager::class.java)
 object FrcPluginVersionManager
 {
+    
     fun checkPluginUpdateStatus(project: Project?)
     {
+        LOG.debug("[FRC] checking plugin status. project? = $project")
         // TODO This is a temp hard coded hack to get a notification out now. This needs to be improved.
         //      Want some functionality that automatic informs people when there is a new update that requires a newer version of IntelliJ IDEA.
 

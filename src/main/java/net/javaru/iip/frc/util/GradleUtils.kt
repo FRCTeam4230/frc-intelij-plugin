@@ -68,8 +68,8 @@ fun Project.importNewGradleProject()
     // Version 2019.3 has the new API function:          org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject(this.basePath!!, this)
     //
     // Eventually, once we stop supporting v2019.2, we can just call the linkAndRefreshGradleProject directly
-    /* 2019.2  */  org.jetbrains.plugins.gradle.service.project.open.importProject(this.basePath!!, this)
-    /* 2019.3+ */  //org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject(this.basePath!!, this)
+    /* 2019.2  */  //org.jetbrains.plugins.gradle.service.project.open.importProject(this.basePath!!, this)
+    /* 2019.3+ */  org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject(this.basePath!!, this)
     
 }
 

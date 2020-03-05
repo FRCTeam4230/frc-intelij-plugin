@@ -127,7 +127,7 @@ class VendordepsFileListener private constructor(val project: Project)
 }
 
 // For IJ v2019.3+ we can/should use StartupActivity.Background (and change the plugin.xml element to <backgroundPostStartupActivity>)
-class VendordepsFileListenerStartupActivity : StartupActivity
+class VendordepsFileListenerStartupActivity : StartupActivity.Background
 {
     override fun runActivity(project: Project)
     {

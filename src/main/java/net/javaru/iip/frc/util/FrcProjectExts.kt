@@ -19,6 +19,7 @@ package net.javaru.iip.frc.util
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
+import com.intellij.openapi.progress.PerformInBackgroundOption
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -60,30 +61,25 @@ fun Project?.isGradleProject(): Boolean
     }
 }
 
+/**
+ * Convenience function for running a progress in the background. Per the [SDK Guide](https://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/general_threading_rules.html)
+ * callers should be prepared to catch and rethrow a `ProcessCanceledException`. "**This exception should never be logged**, it 
+ * should be rethrown, and it’ll be handled in the infrastructure that started the process." 
+ */
 fun Project.runBackgroundTask(
         name: String,
         indeterminate: Boolean = true,
         cancellable: Boolean = false,
-        background: Boolean = false,
+        background: PerformInBackgroundOption = PerformInBackgroundOption.ALWAYS_BACKGROUND,
         callback: (indicator: ProgressIndicator) -> Unit
                           )
 {
-    ProgressManager.getInstance().run(object : Task.Backgroundable(this, name, cancellable, { background })
+    ProgressManager.getInstance().run(object : Task.Backgroundable(this, name, cancellable, background)
                                       {
-                                          override fun shouldStartInBackground() = background
-
                                           override fun run(indicator: ProgressIndicator)
                                           {
-                                              try
-                                              {
-                                                  if (indeterminate) indicator.isIndeterminate = true
-                                                  callback(indicator)
-                                              }
-                                              catch (e: Throwable)
-                                              {
-                                                  e.printStackTrace()
-                                                  throw e
-                                              }
+                                              if (indeterminate) indicator.isIndeterminate = true
+                                              callback(indicator)
                                           }
                                       })
 }

@@ -56,6 +56,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v1.2.1</strong> <br>
+        &nbsp;&nbsp;&bull; Fixes <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/6u'>issue #6u</a> in which a plugin 
+                           'State Error' exception may have occurred on IDE startup.
+        
         <strong>v1.2</strong> <br>
         &nbsp;&nbsp;&bull; Enhanced the Subsystem "Create as Singleton" option to offer different Singleton initialization 
                            methodologies (based on the methodologies presented in the <em>Geeks for Geeks</em> 

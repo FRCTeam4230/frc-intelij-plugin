@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -47,7 +47,6 @@ enum class FrcNotificationType(val group: NotificationGroup, val notificationTyp
 /**
  * Also see [net.javaru.iip.frc.components.FrcProjectComponentImpl] for some notification methods.
  */
-// NOTE: This class is registered in the plugin.xml as an ApplicationService
 class FrcNotifications private constructor()
 {
 
@@ -186,6 +185,7 @@ class FrcNotifications private constructor()
         /**
          * @sample notifyExampleUsage
          */
+        @JvmOverloads
         fun notify(type: FrcNotificationType, content: String, subTitle: String? = null, project: Project? = null, listener: NotificationListener? = null): Notification
         {
             val notification = Notification(type.group.displayId,

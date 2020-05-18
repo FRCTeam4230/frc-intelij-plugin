@@ -244,9 +244,6 @@
             <interface-class>net.javaru.iip.frc.components.FrcApplicationComponent</interface-class>
             <implementation-class>net.javaru.iip.frc.components.FrcApplicationComponentImpl</implementation-class>
         </component>
-        <component>
-            <implementation-class>net.javaru.iip.frc.notify.FrcNotifications</implementation-class>
-        </component>
     </application-components>
 
     <project-components>
@@ -369,9 +366,12 @@
             
             <action id="FRC.tools.internal.CauseAnException"
                     class="net.javaru.iip.frc.actions.tools.internal.CauseAnExceptionAction" />
-            
             <action id="FRC.tools.internal.LogAnErrorAction"
                     class="net.javaru.iip.frc.actions.tools.internal.LogAnErrorAction" />
+            <action id="FRC.tools.internal.TriggerNotificationOfTypeActionableAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationOfTypeActionableAction" />
+            <action id="FRC.tools.internal.TriggerNotificationOfTypeGeneralAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationOfTypeGeneralAction" />
             
             <add-to-group  group-id="ToolsMenu" relative-to-action="FRC.FrcToolsActionsGroup" anchor="after" />
         </group>

@@ -23,7 +23,7 @@
     <!-- Unique identifier of the plugin. Cannot be changed between the plugin versions. If not specified, assumed to be equal to <name>. -->
     <id>net.javaru.idea.frc</id>
     <name>FRC</name>
-    <version>1.2-2020.1-eap.1</version>
+    <version>1.2.1-2020.1</version>
 
     <!-- The vendor of the plugin.
        The optional "url" attribute specifies the URL of the vendor homepage.
@@ -34,7 +34,7 @@
     
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <!-- Minimum ('since-build') and maximum ('until-build') build of IDEA compatible with the plugin -->
-    <idea-version since-build="201.5985" until-build="201.*"/>
+    <idea-version since-build="201.6668" until-build="201.*"/>
 
     <description><![CDATA[
         <p>

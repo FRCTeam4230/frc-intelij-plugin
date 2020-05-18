@@ -57,7 +57,7 @@
 
     <change-notes><![CDATA[
         <strong>v1.2.1</strong> <br>
-        &nbsp;&nbsp;&bull; Fixed <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/6u'>issue #6u</a> in which a plugin 
+        &nbsp;&nbsp;&bull; Fixed <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/64'>issue #64</a> in which a plugin 
                            'State Error' exception may have occurred on IDE startup.
         
         <strong>v1.2</strong> <br>

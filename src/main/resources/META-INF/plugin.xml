@@ -362,6 +362,20 @@
             <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="first" />
         </group>
         
+        <group id="FRC.FrcInternalActionsGroup"
+               class="net.javaru.iip.frc.actions.tools.internal.FrcInternalActionsGroup"
+               popup="true"
+               icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
+            
+            <action id="FRC.tools.internal.CauseAnException"
+                    class="net.javaru.iip.frc.actions.tools.internal.CauseAnExceptionAction" />
+            
+            <action id="FRC.tools.internal.LogAnErrorAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.LogAnErrorAction" />
+            
+            <add-to-group  group-id="ToolsMenu" relative-to-action="FRC.FrcToolsActionsGroup" anchor="after" />
+        </group>
+        
         <group id="frc.NewFileTemplates"
                text="FRC"
                class="net.javaru.iip.frc.actions.create.FrcCreateComponentsActionGroup"

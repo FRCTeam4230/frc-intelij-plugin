@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -14,28 +14,27 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.tools.pluginTesting;
+package net.javaru.iip.frc.actions.tools.internal;
 
+import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
-
-import net.javaru.iip.frc.actions.tools.AbstractFrcToolsAction;
 
 
 
 /**
  * An action that will purposefully cause an exception for testing purposes. 
  */
-public class CauseAnExceptionAction extends AbstractFrcToolsAction
+public class LogAnErrorAction extends AbstractFrcInternalAction
 {
-    private static final Logger LOG = Logger.getInstance(CauseAnExceptionAction.class);
+    private static final Logger LOG = Logger.getInstance(LogAnErrorAction.class);
 
 
     @Override
-    public void actionPerformed(AnActionEvent actionEvent)
+    public void actionPerformed(@NotNull AnActionEvent actionEvent)
     {
-        LOG.info("[FRC] Throwing simulated exception for testing exception handling");
-        throw new RuntimeException("Sample exception for testing exception handling");
+        LOG.info("[FRC] logging a simulated error message for testing exception handling");
+        LOG.error("[FRC] Sample error logging for testing exception handling", new RuntimeException("Sample exception for testing exception handling"));
     }
 
 }

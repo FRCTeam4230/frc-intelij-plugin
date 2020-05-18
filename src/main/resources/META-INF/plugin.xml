@@ -56,6 +56,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v1.2.1</strong> <br>
+        &nbsp;&nbsp;&bull; Fixes <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/6u'>issue #6u</a> in which a plugin 
+                           'State Error' exception may have occurred on IDE startup.
+        
         <strong>v1.2</strong> <br>
         &nbsp;&nbsp;&bull; <strong>Initial EAP release of the plugin for Intellij IDEA 2020.1 EAP releases.</strong> 
                            Please <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>report</a> any issues.<br>

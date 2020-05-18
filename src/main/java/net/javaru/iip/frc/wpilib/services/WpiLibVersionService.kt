@@ -104,6 +104,7 @@ class WpiLibVersionService private constructor(private val project: Project) : P
         val durationSinceLastCheck = myState.durationSinceLastCheck
         if (durationSinceLastCheck < maxTimeSinceLastCheck) 
         {
+            // TODO: Do we need to call scheduleStatusCheck here?
             LOG.debug("[FRC] time since last check of $durationSinceLastCheck is less than maxTimeSinceLastCheck or $maxTimeSinceLastCheck. No update check will be performed.")
             return
         }

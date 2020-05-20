@@ -21,8 +21,14 @@ import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
 
+val baseVersion = "v1.3.0"
+val releaseType = "release"
+val ideaMajorVersion: String by project
+val subVersion = "1"
+
 group = "net.javaru.iip.frc"
-version = "1.2"
+// ex: "v1.3.0-release-IJ2019.2-1"
+version = "$baseVersion-$releaseType-IJ$ideaMajorVersion-$subVersion"
 
 //buildscript {
 //    build.loadExtraPropertiesOf(project)

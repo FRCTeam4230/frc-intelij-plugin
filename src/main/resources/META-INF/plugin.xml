@@ -14,8 +14,8 @@
   ~     limitations under the License.
   -->
 
-
-<!-- Documentation: http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_configuration_file.html -->
+ 
+<!-- Documentation: https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_configuration_file.html -->
 
 <!-- url="" specifies the URL of the plugin homepage (displayed in the Welcome Screen and in "Plugins" settings dialog) -->
 <idea-plugin url="https://gitlab.com/Javaru/frc-intellij-idea-plugin/wikis">
@@ -23,13 +23,11 @@
     <!-- Unique identifier of the plugin. Cannot be changed between the plugin versions. If not specified, assumed to be equal to <name>. -->
     <id>net.javaru.idea.frc</id>
     <name>FRC</name>
-    <version>1.2</version>
+    <version>replacedAtBuildTime</version>
 
     <!-- The vendor of the plugin.
        The optional "url" attribute specifies the URL of the vendor homepage.
-       The optional "email" attribute specifies the e-mail address of the vendor.
-       The optional "logo" attribute [DEPRECATED] specifies the path within the plugin JAR 
-       to a 16x16 icon to be displayed next to the plugin name in the welcome screen.    -->
+       The optional "email" attribute specifies the e-mail address of the vendor. -->
     <vendor url="https://gitlab.com/Javaru/frc-intellij-idea-plugin" >Javaru</vendor>
     
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
@@ -56,7 +54,7 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <strong>v1.3.0-release-IJyyyy.n-1</strong> <br>
+        <strong>v1.3.0</strong> <br>
         &nbsp;&nbsp;&bull; Some internal refactorings in prep for upcoming enhancements<br>
         &nbsp;&nbsp;&bull; Changing the versioning scheme used to resolve a version number sorting issue by IntelliJ IDEA 
                            (which caused the 1.2.1-2020.1 version to not get auto updated as it was seen as an older version 

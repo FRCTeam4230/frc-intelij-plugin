@@ -16,19 +16,19 @@
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.gradle.ext.ProjectSettings
+import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
 
-val baseVersion = "v1.3.0"
-val releaseType = "release"
+val frcPluginBaseVersion: String by project
+val frcPluginBuildType: String by project
 val ideaMajorVersion: String by project
-val subVersion = "1"
 
 group = "net.javaru.iip.frc"
-// ex: "v1.3.0-release-IJ2019.2-1"
-version = "$baseVersion-$releaseType-IJ$ideaMajorVersion-$subVersion"
+// ex: "v1.3.0-release-IJ2019.2"
+version = "$frcPluginBaseVersion-$frcPluginBuildType-IJ$ideaMajorVersion"
 
 //buildscript {
 //    build.loadExtraPropertiesOf(project)
@@ -39,11 +39,14 @@ val kotlinVersion = plugins.getPlugin(KotlinPluginWrapper::class.java).kotlinPlu
 
 val ideaVersion: String by project
 val isEAP: String by project
-val useSameSinceUntilBuild: String by project
-val downloadIdeaSources: String by project
+val ideaSameSinceUntilBuild: String by project
+val ideaDownloadSources: String by project
 val publishRepoUsername: String by project
 val publishRepoPassword: String by project
 val publishRepoChannel: String by project
+val ideaUpdateSinceUntilBuild: String by project
+val ideaSinceBuild: String by project
+val ideaUntilBuild: String by project
 
 
 plugins {
@@ -102,6 +105,11 @@ tasks.named<Test>("test") {
     }
 }
 
+
+val patchPluginXml: PatchPluginXmlTask by tasks
+val publishPlugin: PublishTask by tasks
+val runIde: RunIdeTask by tasks
+
 // The Gradle plugin for writing intellij plugins
 intellij {
     pluginName = "FRC"
@@ -110,45 +118,49 @@ intellij {
     // Bundled plugin dependencies - comma separated list
     setPlugins("java", "gradle"/*, "Groovy"*/)  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/ 
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
-    updateSinceUntilBuild = false
-    sameSinceUntilBuild = isEAP.toBoolean() || useSameSinceUntilBuild.toBoolean()
-    downloadSources = downloadIdeaSources.toBoolean()
-}
+    
+    updateSinceUntilBuild = ideaUpdateSinceUntilBuild.toBoolean()
+    sameSinceUntilBuild = isEAP.toBoolean() || ideaSameSinceUntilBuild.toBoolean()
+    downloadSources = ideaDownloadSources.toBoolean()
+    
+    patchPluginXml {
+        version(version)
+        sinceBuild(ideaSinceBuild)
+        untilBuild(ideaUntilBuild)
+    } 
+    
+    runIde {
+        runIde.systemProperties = mapOf(
+                //"key" to "value",
+                //systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, ".sandbox", "log.xml")),
+                systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, "idea-sandbox-log4j-config.xml")),
+                systemPropertyGetOrDefault("frc.show.betas.in.new.project.wizard", "true"),
+                systemPropertyGetOrDefault("frc.is.internal", "true")
+                // Legacy Ant based robot project system properties
+                //systemPropertyGetOrDefault("frc.simulated.log.service.enabled", "false"),
+                //systemPropertyGetOrDefault("frc.simulated.log.service.use.configured.port", "false"),
+                //systemPropertyGetOrDefault("frc.use.wpilib.beta.site", "false"),
+                //systemPropertyGetOrDefault("frc.alt.wpilib.base.dir", ""),
+                //systemPropertyGetOrDefault("wpilib.base.dir", "")
+                                       )
+    } 
+    
+    publishPlugin {
+        // See http://www.jetbrains.org/intellij/sdk/docs/tutorials/build_system/deployment.html
+        // See https://github.com/minecraft-dev/MinecraftDev/blob/dev/build.gradle.kts
+        if (properties["publish"] != null)
+        {
+            project.version = "${project.version}" //-${properties["buildNumber"]}"
 
-
-val publishPlugin: PublishTask by tasks
-val runIde: RunIdeTask by tasks
-
-runIde {
-    runIde.systemProperties = mapOf(
-            //"key" to "value",
-            //systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, ".sandbox", "log.xml")),
-            systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, "idea-sandbox-log4j-config.xml")),
-            systemPropertyGetOrDefault("frc.show.betas.in.new.project.wizard", "true"),
-            systemPropertyGetOrDefault("frc.is.internal", "true")
-            // Legacy Ant based robot project system properties
-            //systemPropertyGetOrDefault("frc.simulated.log.service.enabled", "false"),
-            //systemPropertyGetOrDefault("frc.simulated.log.service.use.configured.port", "false"),
-            //systemPropertyGetOrDefault("frc.use.wpilib.beta.site", "false"),
-            //systemPropertyGetOrDefault("frc.alt.wpilib.base.dir", ""),
-            //systemPropertyGetOrDefault("wpilib.base.dir", "")
-                                   )
-}
-
-publishPlugin {
-    // See http://www.jetbrains.org/intellij/sdk/docs/tutorials/build_system/deployment.html
-    // See https://github.com/minecraft-dev/MinecraftDev/blob/dev/build.gradle.kts
-    if (properties["publish"] != null)
-    {
-        project.version = "${project.version}" //-${properties["buildNumber"]}"
-
-        username(publishRepoUsername)
-        password(publishRepoPassword)
-        channels(publishRepoChannel)
+            username(publishRepoUsername)
+            password(publishRepoPassword)
+            channels(publishRepoChannel)
+        }
     }
 }
 
-// Configure some IDEA Project settings
+
+// Configure some IDEA Project settings (i.e. for Intellij IDEA used to code the plugin)
 idea {
     // https://github.com/JetBrains/gradle-idea-ext-plugin
     // Note: The DSL apparently changed in v0.4 since if I upgrade to it or later, the following breaks. 

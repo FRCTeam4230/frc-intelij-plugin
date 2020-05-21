@@ -55,15 +55,10 @@
 
     <change-notes><![CDATA[
         <strong>v1.3.0</strong> <br>
-        &nbsp;&nbsp;&bull; Some internal refactorings in prep for upcoming enhancements<br>
-        &nbsp;&nbsp;&bull; The versioning scheme used for the plugin is changing in order to resolve a version number 
-                           sorting issue by IntelliJ IDEA. The new scheme follows a similar convention used by JetBrains
-                           with some of its plugins and will be <tt>{major}.{minor}.{patch}-{releaseType}-IJ{ideaMajorVersion}</tt>.
-                           The primary plugin version is represented by the initial thee digits and release type.
-                           For example: 1.3.0-release-IJ2020.1 and 1.3.0-release-IJ2019.3 are both "v1.3.0-release" of 
-                           the FRC plugin, but represent different builds for the different versions of IntelliJ IDEA, 
-                           accommodating any Plugin API differences between versions. Also, moving forward, the patch level 
-                           will always be indicated. So rather than using v1.3, it will be 1.3.0.<br>
+        &nbsp;&nbsp;&bull; This is a re-release of v1.2.1 but as v1.3.0. Due to the lack of a patch level indicator in the 
+                           v1.2 release, the IntelliJ IDEA plugin frameworks was not seeing v1.2.1-2020.1 as being newer than
+                           v1.2-2020.1 and therefore not auto updating to it. Moving forward, all releases will have a patch level
+                           configured to prevent this issue.<br>
         <br>
         <strong>v1.2.1</strong> <br>
         &nbsp;&nbsp;&bull; Fixed <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/64'>issue #64</a> in which a plugin 

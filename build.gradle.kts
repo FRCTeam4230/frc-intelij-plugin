@@ -23,12 +23,12 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
 
 val frcPluginBaseVersion: String by project
-val frcPluginBuildType: String by project
 val ideaMajorVersion: String by project
+val frcPluginEapDesignator: String by project
 
 group = "net.javaru.iip.frc"
-// ex: "v1.3.0-release-IJ2019.2"
-version = "$frcPluginBaseVersion-$frcPluginBuildType-IJ$ideaMajorVersion"
+// ex: v1.3.0-2019.2,  1.3.1-2020.1-eap.1
+version = "$frcPluginBaseVersion-$ideaMajorVersion$frcPluginEapDesignator"
 
 //buildscript {
 //    build.loadExtraPropertiesOf(project)

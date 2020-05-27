@@ -14,8 +14,8 @@
   ~     limitations under the License.
   -->
 
-
-<!-- Documentation: http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_configuration_file.html -->
+ 
+<!-- Documentation: https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_configuration_file.html -->
 
 <!-- url="" specifies the URL of the plugin homepage (displayed in the Welcome Screen and in "Plugins" settings dialog) -->
 <idea-plugin url="https://gitlab.com/Javaru/frc-intellij-idea-plugin/wikis">
@@ -23,18 +23,16 @@
     <!-- Unique identifier of the plugin. Cannot be changed between the plugin versions. If not specified, assumed to be equal to <name>. -->
     <id>net.javaru.idea.frc</id>
     <name>FRC</name>
-    <version>1.2.1-2020.1</version>
+    <version>replacedAtBuildTime</version>
 
     <!-- The vendor of the plugin.
        The optional "url" attribute specifies the URL of the vendor homepage.
-       The optional "email" attribute specifies the e-mail address of the vendor.
-       The optional "logo" attribute [DEPRECATED] specifies the path within the plugin JAR 
-       to a 16x16 icon to be displayed next to the plugin name in the welcome screen.    -->
+       The optional "email" attribute specifies the e-mail address of the vendor. -->
     <vendor url="https://gitlab.com/Javaru/frc-intellij-idea-plugin" >Javaru</vendor>
     
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <!-- Minimum ('since-build') and maximum ('until-build') build of IDEA compatible with the plugin -->
-    <idea-version since-build="201.6668" until-build="201.*"/>
+    <idea-version since-build="*.*" until-build="*.*"/> 
 
     <description><![CDATA[
         <p>
@@ -56,13 +54,17 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v1.3.0</strong> <br>
+        &nbsp;&nbsp;&bull; This is a re-release of v1.2.1 but as v1.3.0. Due to the lack of a patch level indicator in the 
+                           v1.2 release, the IntelliJ IDEA plugin frameworks was not seeing v1.2.1-2020.1 as being newer than
+                           v1.2-2020.1 and therefore not auto updating to it. Moving forward, all releases will have a patch level
+                           configured to prevent this issue.<br>
+        <br>
         <strong>v1.2.1</strong> <br>
         &nbsp;&nbsp;&bull; Fixed <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/64'>issue #64</a> in which a plugin 
-                           'State Error' exception may have occurred on IDE startup.
-        
+                           'State Error' exception may have occurred on IDE startup.<br>
+        <br>
         <strong>v1.2</strong> <br>
-        &nbsp;&nbsp;&bull; <strong>Initial EAP release of the plugin for Intellij IDEA 2020.1 EAP releases.</strong> 
-                           Please <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>report</a> any issues.<br>
         &nbsp;&nbsp;&bull; Enhanced the Subsystem "Create as Singleton" option to offer different Singleton initialization 
                            methodologies (based on the methodologies presented in the <em>Geeks for Geeks</em> 
                            <a href="https://www.geeksforgeeks.org/singleton-design-pattern">Singleton Design Pattern</a> article).<br>

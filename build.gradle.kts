@@ -238,16 +238,16 @@ repositories {
 
 
 dependencies {
-    val junit5Version = "5.5.2"
-    val http4kVersion = "3.194.0"
+    val junit5Version = "5.6.2"
+    val http4kVersion = "3.248.0"
     val jacksonVersion = "2.10.1"
 
     compile(kotlin("stdlib", kotlinVersion))
     compile(kotlin("reflect", kotlinVersion))
     testImplementation(kotlin("test", kotlinVersion))
     compile("org.jdom:jdom2:2.0.6")
-    compile("commons-io:commons-io:2.6")
-    compile("org.apache.commons:commons-lang3:3.7")
+    compile("commons-io:commons-io:2.7")
+    compile("org.apache.commons:commons-lang3:3.10")
     compile("com.jcraft:jsch:0.1.54")
     // Klaxon is a library to parse JSON in Kotlin.  https://github.com/cbeust/klaxon   Available in jcenter bintray: https://jcenter.bintray.com/com/beust/klaxon/   Help available in the #klaxon channel of the Kotlin Slack Workspace
     compile("com.beust:klaxon:5.0.9")
@@ -261,7 +261,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatypes-collections:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava:$jacksonVersion")
-    implementation("org.freemarker:freemarker:2.3.29")
+    implementation("org.freemarker:freemarker:2.3.30")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junit5Version")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junit5Version")

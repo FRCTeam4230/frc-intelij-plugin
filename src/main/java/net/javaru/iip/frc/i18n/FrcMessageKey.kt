@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -13,42 +13,41 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  */
+package net.javaru.iip.frc.i18n
 
-package net.javaru.iip.frc.i18n;
+import org.jetbrains.annotations.PropertyKey
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.PropertyKey;
-
-
-
-public class FrcMessageKey
+class FrcMessageKey private constructor(@field:PropertyKey(resourceBundle = FrcBundle.BUNDLE_NAME) @param:PropertyKey(resourceBundle = FrcBundle.BUNDLE_NAME) val key: String,
+                                        val params: Array<out Any>)
 {
-    @NotNull
-    @PropertyKey(resourceBundle = FrcBundle.BUNDLE_NAME)
-    private final String key;
-    private static final String[] EMPTY_PARAMS = new String[0];
-    
-    
-    @NotNull
-    private final Object[] params;
-    
-    public static FrcMessageKey of(@NotNull @PropertyKey(resourceBundle = FrcBundle.BUNDLE_NAME) String key, @Nullable Object... params)
+    companion object
     {
-        return new FrcMessageKey(key, params);
+        @JvmStatic
+        fun of(@PropertyKey(resourceBundle = FrcBundle.BUNDLE_NAME) key: String, vararg params: Any): FrcMessageKey
+        {
+            return FrcMessageKey(key, params)
+        }
     }
-    
-    private FrcMessageKey(@NotNull @PropertyKey(resourceBundle = FrcBundle.BUNDLE_NAME) String key, @Nullable Object... params)
+
+    override fun toString(): String = "FrcMessageKey(key='$key', params=${params.contentToString()})"
+
+    override fun equals(other: Any?): Boolean
     {
-        this.key = key;
-        this.params = params == null ? EMPTY_PARAMS : params;
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as FrcMessageKey
+
+        if (key != other.key) return false
+        if (!params.contentEquals(other.params)) return false
+
+        return true
     }
-    
-    
-    @NotNull
-    public String getKey() { return key; }
-    
-    
-    @NotNull
-    public Object[] getParams() { return params; }
+
+    override fun hashCode(): Int
+    {
+        var result = key.hashCode()
+        result = 31 * result + params.contentHashCode()
+        return result
+    }
 }

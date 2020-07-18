@@ -52,7 +52,7 @@ val ideaUntilBuild: String by project
 plugins {
     base
     java
-    kotlin("jvm") version "1.3.72"  // It's best to keep the major.minor version consistent with (initial) version of the Kotlin plugin bundled with the targeted version of IntelliJ IDEA, or the lowest version of the targeted versions of IDEA. For 2019.2 that's v1.3.41
+    kotlin("jvm") version "1.3.72"
     id("org.jetbrains.intellij") version "0.4.21" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.

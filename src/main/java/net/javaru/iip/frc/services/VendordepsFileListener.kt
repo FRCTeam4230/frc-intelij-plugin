@@ -188,8 +188,8 @@ class GradleReimportTask(private val project: Project): TimerTask()
                                                   }
 //                                                                         else if (recursiveCount == 4)
 //                                                                         {
-//                                                                             FrcNotifications
-//                                                                                 .notify(FrcNotificationType.ACTIONABLE_WARN,
+//                                                                             FrcNotifications2
+//                                                                                 .notify(FrcNotificationType2.ACTIONABLE_WARN,
 //                                                                                         message("frc.notification.vendordeps.reimport.retry"),
 //                                                                                         subtitle,
 //                                                                                         project)
@@ -197,11 +197,10 @@ class GradleReimportTask(private val project: Project): TimerTask()
                                               }
                                               else
                                               {
-                                                  FrcNotifications
-                                                      .notify(FrcNotificationType.ACTIONABLE_ERROR,
-                                                              message("frc.notification.vendordeps.reimport.failure", errorMessage),
-                                                              subtitle,
-                                                              project)
+                                                  FrcNotifications.notify(FrcNotificationType.ACTIONABLE_ERROR,
+                                                                          message("frc.notification.vendordeps.reimport.failure", errorMessage),
+                                                                          subtitle,
+                                                                          project)
                                               }
 
                                           }

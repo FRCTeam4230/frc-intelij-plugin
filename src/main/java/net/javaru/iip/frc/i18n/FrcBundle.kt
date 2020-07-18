@@ -52,6 +52,13 @@ object FrcBundle
     @JvmStatic
     fun message(messageKey: FrcMessageKey): String = message(messageKey.key, *messageKey.params)
 
+    /**
+     * Returns the message for the provided `FrcMessageKey`, which wil be null if the provided key is null.
+     */
+    @Contract("null->null, !null->!null")
+    @JvmStatic
+    fun messageNullable(messageKey: FrcMessageKey?): String? = if (messageKey == null) null else message(messageKey)
+
     @JvmStatic
     @Contract("_,!null,_ -> !null")
     fun messageOrDefault(@PropertyKey(resourceBundle = BUNDLE_NAME) key: String,

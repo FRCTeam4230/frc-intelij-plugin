@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -24,9 +24,6 @@ import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.facet.FacetManager;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.diagnostic.Logger;
@@ -40,6 +37,7 @@ import com.intellij.openapi.ui.Messages;
 import net.javaru.iip.frc.actions.tools.AbstractFrcToolsAction;
 import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.facet.FrcFacetKt;
+import net.javaru.iip.frc.notify.FrcNotificationType;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.util.FrcFileUtils;
 import net.javaru.iip.frc.util.FrcProjectExtsKt;
@@ -97,14 +95,10 @@ public class AttachLegacyWpilibAction extends AbstractFrcToolsAction
                         //TODO: need to see if it is present as a Project library, and if so, attach that
                         if (LegacyWpiLibLibrariesUtils.isLegacyWpilibAttachedViaReadAction(module))
                         {
-                            Notifications.Bus.notify(new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
-                                                                      FrcNotifications.Companion.getIconInfo(),
-                                                                      FrcNotifications.Title,
-                                                                      "WPILib",
-                                                                      "WPILib is already attached as a library",
-                                                                      NotificationType.WARNING,
-                                                                      null
-                            ), project);
+                            FrcNotifications.notify(FrcNotificationType.GENERAL_WARN,
+                                                    "WPILib is already attached as a library",
+                                                    "WPILib",
+                                                    project);
                             return;
                         }
 
@@ -149,7 +143,7 @@ public class AttachLegacyWpilibAction extends AbstractFrcToolsAction
                         LibraryUtilsKt.attachDirectoryBasedLibrary(libDef);
                         if (notifyOnCompletion)
                         {
-                            queueSuccessfulNotification(project);
+                            makeSuccessfulNotification(project);
                         }
                     }
                 }
@@ -160,56 +154,34 @@ public class AttachLegacyWpilibAction extends AbstractFrcToolsAction
             }
             catch (Exception e)
             {
-                queueFailureNotification(project, e);
+                makeFailureNotification(project, e);
             }
         }
     }
-
-
-    private static void queueFailureNotification(@Nullable Project project, @Nullable Exception e)
+    
+    
+    private static void makeFailureNotification(@Nullable Project project, @Nullable Exception e)
     {
-        Notifications.Bus.notify(createFailureNotification(e), project);
-    }
-
-
-    @NotNull
-    private static Notification createFailureNotification(@Nullable Exception e)
-    {
-
-
+        
+        
         if (e != null)
         {
             LOG.info("[FRC] Failed to attach WPILib Cause: " + e.toString(), e);
         }
-
+        
         String cause = e != null ? " Cause: " + e.toString() : "";
-        return new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
-                                FrcNotifications.Companion.getIconWarn(),
-                                FrcNotifications.Title,
+        FrcNotifications.notify(FrcNotificationType.GENERAL_WARN,
+                                 "Could not attach WPILib JARs as a library." + cause,
                                 "WPILib",
-                                "Could not attach WPILib JARs as a library." + cause,
-                                NotificationType.WARNING,
-                                null
-        );
+                                project);
     }
-
-
-    private static void queueSuccessfulNotification(@Nullable Project project)
+    
+    
+    private static void makeSuccessfulNotification(@Nullable Project project)
     {
-        Notifications.Bus.notify(createSuccessNotification(), project);
-    }
-
-
-    @NotNull
-    private static Notification createSuccessNotification()
-    {
-        return new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
-                                FrcNotifications.Companion.getIconInfo(),
-                                FrcNotifications.Title,
-                                "WPILib",
+        FrcNotifications.notify(FrcNotificationType.GENERAL_INFO,
                                 "WPILib JARs have been attached as a library.",
-                                NotificationType.INFORMATION,
-                                null
-        );
+                                "WPILib",
+                                project);
     }
 }

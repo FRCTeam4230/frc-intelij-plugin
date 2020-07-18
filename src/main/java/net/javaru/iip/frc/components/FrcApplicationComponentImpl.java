@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 
-import net.javaru.iip.frc.notify.FrcNotifications;
+import net.javaru.iip.frc.notify.FrcTeamNumberNotificationsKt;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL;
@@ -89,7 +89,7 @@ public class FrcApplicationComponentImpl implements FrcApplicationComponent
         
         if (!settings.isTeamNumberConfigured() && settings.getPrc() <= TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL)
         {
-            FrcNotifications.Companion.notifyAboutTeamNumberNeedingToBeConfigured(null, true, false);
+            FrcTeamNumberNotificationsKt.notifyAboutTeamNumberNeedingToBeConfigured(null, true, false);
         }
     }
     

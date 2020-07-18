@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -87,33 +87,33 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
 
     private class UdpRioLogMonitoringRunnable extends AbstractRioLogMonitoringRunnable
     {
-
-
+    
+    
         protected UdpRioLogMonitoringRunnable()
         {
             this(getSettings().getRioLogUdpPort());
         }
-
-
+    
+    
         public UdpRioLogMonitoringRunnable(int port)
         {
             super(port);
         }
-
-
+    
+    
         @Override
         public void run()
         {
             logStartingMonitoring();
-
+    
             isRunning = true;
             byte[] buffer = new byte[MAX_PACKET_SIZE];
             try (DatagramSocket socket = createSocket())
             {
                 socket.setSoTimeout((int) TimeUnit.SECONDS.toMillis(1)); // check every x seconds for shutdown
-
+    
                 DatagramPacket incomingPacket;
-
+    
                 while (enabled)
                 {
                     incomingPacket = new DatagramPacket(buffer, buffer.length);
@@ -148,15 +148,17 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
             }
             catch (BindException e)
             {
-                final String msg = "Could not bind to the RioLog port. This can occur if the port is already bound to in another " 
+                final String msg = "Could not bind to the RioLog port. This can occur if the port is already bound to in another "
                                    + "instance of IntelliJ IDEA with an FRC project open, or by another tool, such as Eclipse. "
                                    + "You will need to stop the RioLog monitoring in the other tool and then then reattempt to start monitoring.";
                 LOG.warn(msg + " Cause Summary: " + e.toString(), e);
                 consoleWriter.println();
                 consoleWriter.println("==Could not bind to the RioLog UDP port.==");
-                consoleWriter.println("This can occur if the port is already bound to in another instance of IntelliJ IDEA with an FRC project open, or by another tool, such as Eclipse.");
+                consoleWriter.println(
+                        "This can occur if the port is already bound to in another instance of IntelliJ IDEA with an FRC project open, or by another tool, such as Eclipse.");
                 consoleWriter.println("You will need to stop the monitoring in the other tool and then reattempt to start monitoring.");
-                consoleWriter.println("Since this UDP based RIOLog monitoring is no longer used (since 2018), and this is considered legacy feature, there is no plan to resolve this minor shortcoming of only having a single monitor running at a time.");
+                consoleWriter.println(
+                        "Since this UDP based RIOLog monitoring is no longer used (since 2018), and this is considered legacy feature, there is no plan to resolve this minor shortcoming of only having a single monitor running at a time.");
                 consoleWriter.println();
                 consoleWriter.flush();
                 // publishBindWarning(msg);
@@ -170,11 +172,11 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
             //This sets isRunning to false after the while(enabled) loop exits so the destroy method knows its ok to exit
             isRunning = false;
         }
-
-
+    
+    
         @Override
         @NotNull
-        protected String getStartingMonitoringMessage() 
+        protected String getStartingMonitoringMessage()
         {
             StringBuilder sb = new StringBuilder();
             sb.append(get2018ChangeMessage());
@@ -186,8 +188,8 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
             sb.append("==");
             return sb.toString();
         }
-
-
+    
+    
         protected DatagramSocket createSocket() throws IOException
         {
             if (getPort() == null)
@@ -210,8 +212,8 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
             socket.setBroadcast(true);
             return socket;
         }
-
-
+    
+    
         protected void cleanUpSocket(DatagramSocket socket) throws IOException
         {
             //no op - here mostly for the testing version of this class
@@ -220,27 +222,22 @@ public class UdpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
 
 //        protected void publishBindWarning(String msg)
 //        {
-//            final Notification notification = new Notification(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP.getDisplayId(),
-//                                                               FrcNotifications.IconWarn,
-//                                                               FrcNotifications.Title,
-//                                                               "RIOLog Monitor",
-//                                                               msg,
-//                                                               NotificationType.WARNING,
-//                                                               (theNotification, event) ->
-//                                                               {
-//                                                                   if ("configure".equals(event.getDescription()))
-//                                                                   {
-//                                                                       final Configurable configurable = FrcApplicationSettingsConfigurable.getInstance();
-//                                                                       IdeFrame ideFrame = WindowManagerEx.getInstanceEx().findFrameFor(null);
-//                                                                       ShowSettingsUtil.getInstance().editConfigurable((JFrame) ideFrame, configurable);
-//                                                                   }
-//                                                                   theNotification.expire();
-//                                                               }
-//            );
-//            Notifications.Bus.notify(notification, null);
+//            FrcNotifications2.notify(FrcNotificationType2.ACTIONABLE_WARN,
+//                                     msg,
+//                                     "RIOLog Monitor",
+//                                     null,
+//                                     (notification, event) -> {
+//                                         if ("configure".equals(event.getDescription()))
+//                                         {
+//                                             final Configurable configurable = FrcApplicationSettingsConfigurable.getInstance();
+//                                             IdeFrame ideFrame = WindowManagerEx.getInstanceEx().findFrameFor(null);
+//                                             ShowSettingsUtil.getInstance().editConfigurable((JFrame) ideFrame, configurable);
+//                                         }
+//                                         notification.expire();
+//                                     });
 //        }
+//    }
     }
-
 
     @NotNull
     public static String get2018ChangeMessage()

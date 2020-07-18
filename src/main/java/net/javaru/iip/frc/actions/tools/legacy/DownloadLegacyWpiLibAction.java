@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -19,14 +19,13 @@ package net.javaru.iip.frc.actions.tools.legacy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task.Backgroundable;
 import com.intellij.openapi.project.Project;
 
+import net.javaru.iip.frc.notify.FrcNotificationType;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.util.IndexUtils;
 import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibLibrariesUtils;
@@ -122,22 +121,19 @@ public class DownloadLegacyWpiLibAction extends AbstractFrcToolsLegacyAction
                     else
                     {
                         notification = notifyOnCompletion ?
-                                       new Notification(FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP().getDisplayId(),
-                                                        FrcNotifications.Companion.getIconInfo(),
-                                                        FrcNotifications.Title,
-                                                        NOTIFICATIONS_SUBTITLE + " Completed Successfully",
-                                                        "One or more WPILib JARs are not attached. <a href='attach'>Attach as library</a>",
-                                                        NotificationType.INFORMATION,
-                                                        (theNotification, event) ->
-                                                        {
-                                                            if ("attach".equals(event.getDescription()))
-                                                            {
-                                                                Logger.getInstance(DownloadLegacyWpiLibAction.class).debug("[FRC] Attaching WPILib library");
-                                                                AttachLegacyWpilibAction.attachWpiLib(project, true, true);
-                                                            }
-                                                            theNotification.expire();
-                                                        }
-                                       )
+                                       FrcNotifications.createNotification(FrcNotificationType.ACTIONABLE_INFO,
+                                                                           "One or more WPILib JARs are not attached. <a href='attach'>Attach as library</a>",
+                                                                            NOTIFICATIONS_SUBTITLE + " Completed Successfully",
+                                                                           (theNotification, event) ->
+                                                                            {
+                                                                                if ("attach".equals(event.getDescription()))
+                                                                                {
+                                                                                    Logger.getInstance(DownloadLegacyWpiLibAction.class)
+                                                                                          .debug("[FRC] Attaching WPILib library");
+                                                                                    AttachLegacyWpilibAction.attachWpiLib(project, true, true);
+                                                                                }
+                                                                                theNotification.expire();
+                                                                            })
                                        : null;
                     }
                 }
@@ -150,7 +146,7 @@ public class DownloadLegacyWpiLibAction extends AbstractFrcToolsLegacyAction
                 
                 if (notification != null)
                 {
-                    Notifications.Bus.notify(notification, myProject);
+                    notification.notify(myProject);
                 }
                 
                 if (onSuccessAction != null)
@@ -180,14 +176,10 @@ public class DownloadLegacyWpiLibAction extends AbstractFrcToolsLegacyAction
 
                 if (notifyOnFailure)
                 {
-                    Notifications.Bus.notify(new Notification(FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP().getDisplayId(),
-                                                              FrcNotifications.Companion.getIconWarn(),
-                                                              FrcNotifications.Title,
-                                                              NOTIFICATIONS_SUBTITLE + " Failed",
-                                                              content,
-                                                              NotificationType.WARNING,
-                                                              null
-                    ), project);
+                    FrcNotifications.notify(FrcNotificationType.ACTIONABLE_WARN,
+                                            content,
+                                             NOTIFICATIONS_SUBTITLE + " Failed",
+                                            project);
                 }
                 
                 if (onFailAction != null)
@@ -201,17 +193,13 @@ public class DownloadLegacyWpiLibAction extends AbstractFrcToolsLegacyAction
 
         }.queue();
     }
-
-
+    
+    
     private static Notification createNoActionSuccessNotification()
     {
-        return new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
-                                FrcNotifications.Companion.getIconInfo(),
-                                FrcNotifications.Title,
-                                NOTIFICATIONS_SUBTITLE,
-                                "Download completed successfully.",
-                                NotificationType.INFORMATION,
-                                null
-        );
+        return FrcNotifications.createNotification(FrcNotificationType.GENERAL_INFO,
+                                                   "Download completed successfully.",
+                                                   NOTIFICATIONS_SUBTITLE);
+        
     }
 }

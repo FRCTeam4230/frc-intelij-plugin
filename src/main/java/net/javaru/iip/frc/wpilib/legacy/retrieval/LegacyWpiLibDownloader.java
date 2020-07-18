@@ -50,7 +50,7 @@ import com.intellij.openapi.ui.Messages;
 import icons.FrcIcons.FRC;
 import net.javaru.iip.frc.components.FrcProjectComponentImpl;
 import net.javaru.iip.frc.net.FrcHttpClient;
-import net.javaru.iip.frc.notify.FrcNotifications;
+import net.javaru.iip.frc.notify.FrcTeamNumberNotificationsKt;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.UnzipUtils;
 import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibPaths;
@@ -297,7 +297,7 @@ public class LegacyWpiLibDownloader
             {
                 if (FrcProjectComponentImpl.isFrcFacetedProject(project))
                 {
-                    FrcNotifications.Companion.notifyAboutTeamNumberNeedingToBeConfigured(project, true, true);
+                    FrcTeamNumberNotificationsKt.notifyAboutTeamNumberNeedingToBeConfigured(project, true, true);
                 }
             }
         }

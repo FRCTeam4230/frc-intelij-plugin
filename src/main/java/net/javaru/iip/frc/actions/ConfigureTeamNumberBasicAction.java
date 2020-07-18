@@ -23,8 +23,6 @@ import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -38,7 +36,9 @@ import icons.FrcIcons.FRC;
 import net.javaru.iip.frc.FrcPluginGlobals;
 import net.javaru.iip.frc.components.FrcProjectComponentImpl;
 import net.javaru.iip.frc.i18n.FrcBundle;
+import net.javaru.iip.frc.notify.FrcNotificationType;
 import net.javaru.iip.frc.notify.FrcNotifications;
+import net.javaru.iip.frc.notify.FrcTeamNumberNotificationsKt;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.settings.FrcTeamNumberKt;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
@@ -107,7 +107,7 @@ public class ConfigureTeamNumberBasicAction extends AnAction
         {
             settings.setTeamNumber(Integer.parseInt(teamNumString));
             performTeamNumberChangeUpdates();
-            FrcNotifications.Companion.expireConfigureTeamNumberNotification(project);
+            FrcTeamNumberNotificationsKt.expireConfigureTeamNumberNotification(project);
         }
     }
 
@@ -138,20 +138,18 @@ public class ConfigureTeamNumberBasicAction extends AnAction
             catch (IOException e)
             {
                 final Notification notification =
-                    FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP()
-                                              .createNotification("FRC",
-                                            "Team Number Update Failure",
-                                                                  "The '" + LegacyWpiLibPaths.getWpilibPropertiesFile() + "' file could not be updated with "
-                                                                  + "the change to the team number. You will need to manually update the 'team-number' "
-                                                                  + "property in the file in order for your robot deploys to work. Update Failure Cause: "
-                                                                  + e.toString(),
-                                            NotificationType.ERROR);
+                        FrcNotifications.createNotification(FrcNotificationType.ACTIONABLE_ERROR,
+                                                             "The '" + LegacyWpiLibPaths.getWpilibPropertiesFile() + "' file could not be updated with "
+                                                             + "the change to the team number. You will need to manually update the 'team-number' "
+                                                             + "property in the file in order for your robot deploys to work. Update Failure Cause: "
+                                                             + e.toString(),
+                                                            "Team Number Update Failure");
                 final Project[] projects = ProjectManager.getInstance().getOpenProjects();
                 for (Project project : projects)
                 {
                     if (FrcProjectComponentImpl.isFrcFacetedProject(project))
                     {
-                        Notifications.Bus.notify(notification, project);
+                        notification.notify(project);
                     }
                 }
             }

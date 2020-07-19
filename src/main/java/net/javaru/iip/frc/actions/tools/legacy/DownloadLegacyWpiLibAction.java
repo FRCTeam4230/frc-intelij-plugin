@@ -27,12 +27,11 @@ import com.intellij.openapi.project.Project;
 
 import net.javaru.iip.frc.notify.FrcNotificationType;
 import net.javaru.iip.frc.notify.FrcNotifications;
+import net.javaru.iip.frc.services.FrcLegacyProjectUtilsKt;
 import net.javaru.iip.frc.util.IndexUtils;
 import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibLibrariesUtils;
 import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloadFailedException;
 import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloader;
-
-import static net.javaru.iip.frc.components.FrcProjectComponentImpl.cancelLegacyWpiLibIsDownloadingNotifications;
 
 
 
@@ -142,7 +141,7 @@ public class DownloadLegacyWpiLibAction extends AbstractFrcToolsLegacyAction
                     notification = createNoActionSuccessNotification();
                 }
 
-                cancelLegacyWpiLibIsDownloadingNotifications(myProject);
+                FrcLegacyProjectUtilsKt.cancelLegacyWpiLibIsDownloadingNotifications(myProject);
                 
                 if (notification != null)
                 {

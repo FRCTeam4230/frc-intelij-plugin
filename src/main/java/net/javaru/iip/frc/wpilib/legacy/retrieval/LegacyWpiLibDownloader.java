@@ -48,7 +48,7 @@ import com.intellij.openapi.ui.InputValidator;
 import com.intellij.openapi.ui.Messages;
 
 import icons.FrcIcons.FRC;
-import net.javaru.iip.frc.components.FrcProjectComponentImpl;
+import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.net.FrcHttpClient;
 import net.javaru.iip.frc.notify.FrcTeamNumberNotificationsKt;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
@@ -295,7 +295,7 @@ public class LegacyWpiLibDownloader
             final Project[] projects = ProjectManager.getInstance().getOpenProjects();
             for (Project project : projects)
             {
-                if (FrcProjectComponentImpl.isFrcFacetedProject(project))
+                if (FrcFacetKt.isFrcFacetedProject(project))
                 {
                     FrcTeamNumberNotificationsKt.notifyAboutTeamNumberNeedingToBeConfigured(project, true, true);
                 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -58,24 +58,23 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
         Use cases we want to be sure the RioLog Console status is updated, and where they are handled:
         
         1) Project Open
-            Handled via: This classes implementation of ProjectComponent.projectOpened()
+            Handled via: This classes implementation of FrcOpenRioLogStartupActivity.runActivity()
         2) Facet Added to Project
-            Handled via: FrcFacetManagerListener.facetAdded() (inner class in FrcProjectComponent)
+            Handled via: FrcProjectLifecycleService.facetAdded() (via its extending of FacetManagerAdapter, an impl of FacetManagerListener)
         3) Facet Removed from Project
             a) was only facet and  we want to close the console
             b) there are other FRC facets still configured on the project
-            Handled via: FrcFacetManagerListener.facetRemoved() (inner class in FrcProjectComponent)
-        4) New module created and facet was Added - likely dup of #2, but we want t test it
-            Handled via: FrcModuleComponent.moduleAdded()
+            Handled via: FrcProjectLifecycleService.facetRemoved() (via its extending of FacetManagerAdapter, an impl of FacetManagerListener)
+        4) New module created and facet was Added - likely dup of #2, but we want to test it
+            Handled via: FrcOpenRioLogStartupActivity.moduleAdded()
         5) Module imported (with FRC facet)
-            Handled via: FrcModuleComponent.moduleAdded()
+            Handled via: FrcOpenRioLogStartupActivity.moduleAdded()
         6) Module Removed from project
             a) was only module with an FRC facet and  we want to close the console
             b) there are other modules with FRC facets still configured on the project
-            Handled via: FrcModuleComponent.disposeComponent()
+            Handled via: FrcOpenRioLogStartupActivity.disposeComponent()
         7) Change to the target window in the FrcSettings
             Handled via: FrcApplicationComponent's impl of UnnamedConfigurable.apply()
-        
      */
 
 

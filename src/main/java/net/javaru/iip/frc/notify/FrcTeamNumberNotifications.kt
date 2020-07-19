@@ -19,22 +19,22 @@ package net.javaru.iip.frc.notify
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
+import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.actions.ConfigureTeamNumberBasicAction
+import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.settings.FrcApplicationSettings
-import java.util.HashMap
 
 
-private const val Title = "FRC"
+private val LOG = Logger.getInstance(FrcNotifications::class.java)
 
-private val configureTeamNumberNotifications = HashMap<String, Notification>()
+private  val notificationKey = FrcNotificationsTracker.NotificationKey.ConfigureTeamNumberQuery
 
 fun notifyAboutTeamNumberNeedingToBeConfigured(project: Project?, useSticky: Boolean, asWarning: Boolean): Notification
 {
-
-    // See com/intellij/ide/plugins/PluginManager.java:177 for an example
-
-    var notification: Notification? = configureTeamNumberNotifications[createProjectKey(project)]
+    //val notificationMapForProject = FrcProjectNotificationsTracker.getNotificationMapForProject(project)
+    var notification: Notification? = FrcNotificationsTracker.getNotification(project, notificationKey)
 
     // We want to replace an existing info notification with a warning one if a warning one has been requested
     if (notification != null && asWarning && notification.type != NotificationType.WARNING)
@@ -48,13 +48,31 @@ fun notifyAboutTeamNumberNeedingToBeConfigured(project: Project?, useSticky: Boo
         notification = createConfigureTeamNotification(project, useSticky, asWarning)
         // This makes the notification title & subtitle appear in bold in the Event Log window
         notification.isImportant = true
-        if (project != null)
-        {
-            configureTeamNumberNotifications[createProjectKey(project)] = notification
-        }
+        FrcNotificationsTracker.putNotification(project, notificationKey, notification)
         Notifications.Bus.notify(notification, project)
     }
     return notification
+}
+
+fun notifyToConfigureTeamNumIfNecessary(project: Project, knownFacetedProject: Boolean)
+{
+    val settings = FrcApplicationSettings.getInstance()
+
+    val shouldNotify =
+            !settings.isTeamNumberConfigured()
+            &&
+            ((knownFacetedProject || project.isFrcFacetedProject()) || settings.prc <= FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT)
+            &&
+            FrcNotificationsTracker.getNotification(project, notificationKey) == null
+
+    if (shouldNotify)
+    {
+        LOG.debug("[FRC] Publishing 'configure team number' notification for Project '$project'")
+        // Expire any application level notification to prevent duplicate notification in the event log
+        FrcNotificationsTracker.expireAppNotification(notificationKey)
+        val notification = notifyAboutTeamNumberNeedingToBeConfigured(project, true, false)
+        FrcNotificationsTracker.putNotification(project, notificationKey, notification)
+    }
 }
 
 private fun createConfigureTeamNotification(project: Project?, useSticky: Boolean, asWarning: Boolean): Notification
@@ -68,7 +86,7 @@ private fun createConfigureTeamNotification(project: Project?, useSticky: Boolea
     val notificationGroup = if (useSticky) FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP else FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP
     return Notification(notificationGroup.displayId,
                         icon,
-                        Title,
+                        FrcNotifications.Title,
                         subtitle,
                         content,
                         notificationType
@@ -86,41 +104,9 @@ private fun createConfigureTeamNotification(project: Project?, useSticky: Boolea
             theNotification.expire()
         }
     }
-
-    // THIS IS AN ALTERNATIVE WAY TO CREATE A NOTIFICATION FROM THE NotificationGroup CLASS
-    //        return notificationGroup.createNotification(Title,
-    //                                                    "Configuration Needed",
-    //                                                    "Please <a href='configure'>configure</a> your FRC Team Number.",
-    //                                                    NotificationType.INFORMATION,
-    //                                                    (theNotification, event) ->
-    //                                                    {
-    //                                                        if ("configure".equals(event.getDescription()))
-    //                                                        {
-    ////                                                                       final Configurable configurable = FrcApplicationSettingsConfigurable.getInstance();
-    ////                                                                       IdeFrame ideFrame = WindowManagerEx.getInstanceEx().findFrameFor(project);
-    ////                                                                       ShowSettingsUtil.getInstance().editConfigurable((JFrame) ideFrame, configurable);
-    //                                                            ConfigureTeamNumberBasicAction.openConfigureTeamNumberDialog(project);
-    //                                                        }
-    //
-    //                                                        if (FrcFacetSettings.getInstance().isTeamNumberConfigured())
-    //                                                        {
-    //                                                            theNotification.expire();
-    //                                                        }
-    //                                                    }
-    //        );
 }
-
 
 fun expireConfigureTeamNumberNotification(project: Project?)
 {
-    val notification = configureTeamNumberNotifications[createProjectKey(project)]
-    notification?.expire()
-}
-
-private fun createProjectKey(project: Project?): String
-{
-    return if (project != null)
-        "${project.name}--${project.basePath}"
-    else
-        "null-project"
+    FrcNotificationsTracker.expireNotification(project, FrcNotificationsTracker.NotificationKey.ConfigureTeamNumberQuery)
 }

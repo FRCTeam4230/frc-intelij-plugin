@@ -34,7 +34,7 @@ import com.intellij.openapi.ui.Messages;
 
 import icons.FrcIcons.FRC;
 import net.javaru.iip.frc.FrcPluginGlobals;
-import net.javaru.iip.frc.components.FrcProjectComponentImpl;
+import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.notify.FrcNotificationType;
 import net.javaru.iip.frc.notify.FrcNotifications;
@@ -147,7 +147,7 @@ public class ConfigureTeamNumberBasicAction extends AnAction
                 final Project[] projects = ProjectManager.getInstance().getOpenProjects();
                 for (Project project : projects)
                 {
-                    if (FrcProjectComponentImpl.isFrcFacetedProject(project))
+                    if (FrcFacetKt.isFrcFacetedProject(project))
                     {
                         notification.notify(project);
                     }

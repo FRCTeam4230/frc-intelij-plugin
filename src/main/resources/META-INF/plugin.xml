@@ -188,8 +188,10 @@
                              instance="net.javaru.iip.frc.settings.FrcProjectSettingsConfigurable"
                              groupId="language"
                              parentId="preferences.language.FRC" />-->
-        
 
+
+        <projectService id="FRC.FrcProjectLifecycleService" serviceImplementation="net.javaru.iip.frc.services.FrcProjectLifecycleService"  />
+        <postStartupActivity id="FRC.FrcProjectLifecycleServiceStartupActivity" implementation="net.javaru.iip.frc.services.FrcProjectLifecycleServiceStartupActivity"  />
         <projectService id="FRC.TcpRioSocketConnectorProjectService" serviceImplementation="net.javaru.iip.frc.riolog.tcp.TcpRioSocketConnectorProjectService" />
         <projectService id="FRC.FrcProjectTeamNumberService" serviceImplementation="net.javaru.iip.frc.settings.FrcProjectTeamNumberService" />
         <projectService id="FRC.FrcProjectSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcProjectGeneralSettings" />
@@ -254,27 +256,7 @@
         </component>
     </application-components>
 
-    <project-components>
-        <!-- Add your project components here -->
-        <!-- If the "workspace" attributed in the <component><option> element is set "true", the component saves its  
-             state to the .iws file instead of the .ipr file. Note that the <option> element is used only if the component
-             implements the JDOMExternalizable interface. Otherwise, the use of the <option> element takes no effect.  -->
-        <!-- If the <loadForDefaultProject> element is present, the project component is instantiated also for the default project. 
-             (Thus allowing default settings_ -->
-        <component>
-            <interface-class>net.javaru.iip.frc.components.FrcProjectComponent</interface-class>
-            <implementation-class>net.javaru.iip.frc.components.FrcProjectComponentImpl</implementation-class>
-            <loadForDefaultProject/>
-        </component>
-    </project-components>
 
-    <module-components>
-        <!-- Add your module components here -->
-        <component>
-            <interface-class>net.javaru.iip.frc.components.FrcModuleComponent</interface-class>
-            <implementation-class>net.javaru.iip.frc.components.FrcModuleComponentImpl</implementation-class>
-        </component>
-    </module-components>
     
     <actions>
         <!--   Ref:  http://www.jetbrains.org/intellij/sdk/docs/basics/action_system.html  -->

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 
-import net.javaru.iip.frc.components.FrcProjectComponentImpl;
+import net.javaru.iip.frc.facet.FrcFacetKt;
+import net.javaru.iip.frc.services.FrcProjectLifecycleService;
 
 
 
@@ -89,7 +90,7 @@ public class FrcToolWindowFactory implements ToolWindowFactory,
         // TODO: Need to either rename the displayName, or pass in null
         final Content content = contentManager.getFactory().createContent(frcToolWindowPanel, "Options Panel", false);
         contentManager.addContent(content);
-        Disposer.register(project, frcToolWindowPanel);
+        Disposer.register(FrcProjectLifecycleService.getInstance(project), frcToolWindowPanel);
     }
 
 
@@ -98,7 +99,7 @@ public class FrcToolWindowFactory implements ToolWindowFactory,
     {
         // Because we've defined an <facet.toolWindow> with a list of valid facets, this should only be called for an FRC Faceted project,
         // but we do a sanity check anyways. In the future, we may have additional information to check.
-        final boolean shouldBeAvailable = FrcProjectComponentImpl.isFrcFacetedProject(project);
+        final boolean shouldBeAvailable = FrcFacetKt.isFrcFacetedProject(project);
         LOG.debug("[FRC] FrcToolWindowFactory.shouldBeAvailable() returning '" + shouldBeAvailable + "' for Project '" + project.getName() + "'");
         return shouldBeAvailable;
     }

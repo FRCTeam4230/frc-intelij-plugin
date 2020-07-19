@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.facet.FacetManager;
 import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -34,6 +33,7 @@ import com.intellij.openapi.roots.libraries.Library;
 import net.javaru.iip.frc.actions.tools.AbstractFrcToolsAction;
 import net.javaru.iip.frc.facet.FrcFacet;
 import net.javaru.iip.frc.facet.FrcFacetKt;
+import net.javaru.iip.frc.notify.FrcNotificationType;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.util.FrcProjectExtsKt;
 import net.javaru.iip.frc.util.IndexUtils;
@@ -90,15 +90,10 @@ public class AttachLegacyUserLibDirAction extends AbstractFrcToolsAction
                     final Library existing = LegacyWpiLibLibrariesUtils.findExistingUserLibDirLibrary(module);
                     if (existing != null)
                     {
-                        Notifications.Bus.notify(new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
-                                                                  FrcNotifications.Companion.getIconInfo(),
-                                                                  FrcNotifications.Title,
-                                                                  "User Lib Already Attached",
-                                                                  "The FRC 'user/java/lib' directory is already attached via library '" + existing.getName() 
-                                                                  + "'. Indexes are being refreshed." ,
-                                                                  NotificationType.INFORMATION,
-                                                                  null
-                        ), project);
+                        FrcNotifications.notify(FrcNotificationType.GENERAL_INFO,
+                                                 "The FRC 'user/java/lib' directory is already attached via library '" + existing.getName() + "'. Indexes are being refreshed.",
+                                                "User Lib Already Attached",
+                                                project);
                     }
                     else
                     {
@@ -140,14 +135,9 @@ public class AttachLegacyUserLibDirAction extends AbstractFrcToolsAction
         }
 
         String cause = e != null ? "Cause: " + e.toString() : "";
-        return new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
-                                FrcNotifications.Companion.getIconWarn(),
-                                FrcNotifications.Title,
-                                "WPILib",
-                                "Could not attach 'user/java/lib' dir as a library." + cause,
-                                NotificationType.WARNING,
-                                null
-        );
+        return FrcNotifications.createNotification(FrcNotificationType.GENERAL_WARN,
+                                                    "Could not attach 'user/java/lib' dir as a library." + cause,
+                                                   "WPILib");
     }
 
 
@@ -160,13 +150,8 @@ public class AttachLegacyUserLibDirAction extends AbstractFrcToolsAction
     @NotNull
     private static Notification createSuccessNotification()
     {
-        return new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
-                                FrcNotifications.Companion.getIconInfo(),
-                                FrcNotifications.Title,
-                                "WPILib",
-                                "The 'user/java/lib' has been attached as a library. Indexes are being refreshed.",
-                                NotificationType.INFORMATION,
-                                null
-        );
+        return FrcNotifications.createNotification(FrcNotificationType.GENERAL_INFO,
+                                                   "The 'user/java/lib' has been attached as a library. Indexes are being refreshed.",
+                                                   "WPILib");
     }
 }

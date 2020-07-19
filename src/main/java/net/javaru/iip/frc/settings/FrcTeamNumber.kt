@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package net.javaru.iip.frc.settings
 
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.text.StringUtil
+import org.apache.commons.lang3.RegExUtils
 import org.apache.commons.lang3.StringUtils
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
@@ -121,7 +122,8 @@ class TeamNumberKeyChangeListener(private val teamNumberTextField: JTextField,
                                        private vararg val formChangeListeners: TeamNumberFormChangeListener ) : KeyListener
 {
     private var previousText: String
-    
+
+    private val spaceRegex = """\s""".toRegex().toPattern()
     
     init
     {
@@ -150,7 +152,7 @@ class TeamNumberKeyChangeListener(private val teamNumberTextField: JTextField,
      */
     override fun keyReleased(e: KeyEvent)
     {
-        val updatedText = StringUtils.replaceAll(teamNumberTextField.text.trim { it <= ' ' }, "\\s", "")
+        val updatedText = RegExUtils.replaceAll(teamNumberTextField.text.trim { it <= ' ' }, spaceRegex, "")
             .trim { it <= ' ' }
         teamNumberTextField.text = updatedText // set to the trimmed value - this mostly handles values pasted in with spaces
         if (StringUtils.isBlank(updatedText))

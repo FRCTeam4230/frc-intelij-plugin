@@ -17,7 +17,6 @@
 package net.javaru.iip.frc.wpilib.services
 
 import com.intellij.notification.Notification
-import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
@@ -31,9 +30,8 @@ import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.startup.StartupManager
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.i18n.FrcBundle.message
+import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications
-import net.javaru.iip.frc.notify.FrcNotifications.Companion.FRC_ACTIONABLE_NOTIFICATION_GROUP
-import net.javaru.iip.frc.notify.FrcNotifications.Companion.FRC_GENERAL_NOTIFICATION_GROUP
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.util.asDate
 import net.javaru.iip.frc.util.lastCheckedDateTimeFormatter
@@ -175,22 +173,16 @@ class WpiLibVersionService private constructor(private val project: Project) : P
             
             // TODO need to implement update capability - and then move this to I18N into the above resource bundle string and update the below event handler
             //content.append("Would you like to update the Gradle build script to use the new version? <a href='makeUpdate'>Yes</a>  <a href='doNotUpdate'>No</a>")
-
-            val notification = FRC_ACTIONABLE_NOTIFICATION_GROUP
-                .createNotification(FrcNotifications.Title,
-                                    subtitle,
-                                    content,
-                                    NotificationType.INFORMATION
-                                   ) 
-//                { theNotification: Notification, event: HyperlinkEvent ->
-//                    theNotification.expire()
-//                    if ("makeUpdate" == event.description)
-//                    {
-//                        TODO("Call Update Gradle Function once written")
-//                    }
-//                }
-            notification.notify(project)
-            return notification
+            return FrcNotifications.notify(FrcNotificationType.ACTIONABLE_INFO,
+                                           content, subtitle,
+                                           project /*,
+                                           NotificationListener { notification, event ->
+                                               notification.expire()
+                                               if ("makeUpdate" == event.description)
+                                               {
+                                                   TODO("Call Update Gradle Function once written")
+                                               }
+                                           }*/);
         }
         else
         {
@@ -202,26 +194,14 @@ class WpiLibVersionService private constructor(private val project: Project) : P
     private fun notifyUnableToCheckVersionStatus()
     {
         val content = message("frc.notification.wpiLibVersionStatus.unableToCheck.content")
-        val notification = FRC_GENERAL_NOTIFICATION_GROUP
-            .createNotification(FrcNotifications.Title,
-                                null,
-                                content,
-                                NotificationType.INFORMATION)
-
-        notification.notify(project)
+        FrcNotifications.notify(FrcNotificationType.ACTIONABLE_INFO, content, project = project)
     }
     
     private fun notifyNoUpdateAvailable(year: Int)
     {
-        // we call toString on the year otherwise the resource bundle formats it wiath a comma: 2,019
+        // we call toString on the year otherwise the resource bundle formats it with a comma: 2,019
         val content = message("frc.notification.wpiLibVersionStatus.haveTheLatest.content", year.toString())
-        val notification = FRC_GENERAL_NOTIFICATION_GROUP
-            .createNotification(FrcNotifications.Title,
-                                null,
-                                content,
-                                NotificationType.INFORMATION)
-
-        notification.notify(project)
+        FrcNotifications.notify(FrcNotificationType.GENERAL_INFO, content, project = project)
     }
     
     

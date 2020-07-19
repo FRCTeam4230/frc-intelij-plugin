@@ -40,10 +40,10 @@ public class TriggerNotificationOfTypeActionableAction extends AbstractFrcIntern
     {
         LOG.info("[FRC] Making a sample FRC Notification");
         final Project project = actionEvent.getData(CommonDataKeys.PROJECT);
-        FrcNotifications.Companion.notify(FrcNotificationType.ACTIONABLE_INFO, 
-                                          "This is a test FRC Actionable notification",
-                                          "My Sub-title",
-                                          project);
+        FrcNotifications.notify(FrcNotificationType.ACTIONABLE_INFO,
+                                "This is a test FRC Actionable notification",
+                                "My Sub-title",
+                                project);
     }
 
 }

@@ -32,19 +32,18 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.output.NullOutputStream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.concurrency.Semaphore;
 
+import net.javaru.iip.frc.notify.FrcNotificationType;
 import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 
@@ -66,7 +65,8 @@ public abstract class AbstractRioLogMonitorProcess extends Process
     public static final String SIMULATED_LOG_SERVICE_PORT_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".port";
     public static final String SIMULATED_LOG_SERVICE_USE_CONFIGURED_PORT_PROP_KEY = SIMULATED_LOG_SERVICE_PROP_KEY_BASE + ".use.configured.port";
     public static final int SIMULATED_LOG_SERVICE_PORT_DEFAULT = 4248; //arbitrarily chosen port not listed at https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
-
+    private static final Pattern TIME_REGEX = Pattern.compile("\\$\\{time}", Pattern.LITERAL);
+    
     //TODO: need to handle a change to the base pattern when we make it configurable
     public static Pattern restartRegex = Pattern.compile(FrcApplicationSettings.getInstance().getRioRestartRegexString());
     
@@ -149,14 +149,10 @@ public abstract class AbstractRioLogMonitorProcess extends Process
             enabled = false;
             myWaitSemaphore.up();
             LOG.warn("[FRC] Could not initialize riolog monitor. Cause Summary: " + e.toString(), e);
-            Notifications.Bus.notify(new Notification(FrcNotifications.Companion.getFRC_ACTIONABLE_NOTIFICATION_GROUP().getDisplayId(),
-                                                      FrcNotifications.Companion.getIconError(),
-                                                      FrcNotifications.Title,
-                                                      "RioLog Initialization Failure",
-                                                      "Could not initialize the RioLog socket monitor. See idea.log for more details.",
-                                                      NotificationType.ERROR,
-                                                      null
-            ));
+            FrcNotifications.notify(FrcNotificationType.ACTIONABLE_ERROR,
+                                    "Could not initialize the RioLog socket monitor. See idea.log for more details.",
+                                    "RioLog Initialization Failure",
+                                    project);
         }
 
 
@@ -207,16 +203,12 @@ public abstract class AbstractRioLogMonitorProcess extends Process
         catch (Exception e)
         {
             LOG.info("[FRC] Could not create PrintWriter for writing RiLog to file. Cause Summary: " + e.toString(), e);
-            Notifications.Bus.notify(new Notification(FrcNotifications.Companion.getFRC_GENERAL_NOTIFICATION_GROUP().getDisplayId(),
-                                                      FrcNotifications.Companion.getIconWarn(),
-                                                      FrcNotifications.Title,
-                                                      "RioLog File Logging",
-                                                      "Could not create writer to log RioLog to file. Cause:" + e.toString(),
-                                                      NotificationType.WARNING,
-                                                      null
-            ));
+            FrcNotifications.notify(FrcNotificationType.GENERAL_WARN,
+                                     "Could not create writer to log RioLog to file. Cause:" + e.toString(),
+                                    "RioLog File Logging",
+                                    project);
 
-            return new PrintWriter(new NullOutputStream());
+            return new PrintWriter(NullOutputStream.NULL_OUTPUT_STREAM);
         }
     }
 
@@ -225,7 +217,7 @@ public abstract class AbstractRioLogMonitorProcess extends Process
     {
         final Path directory = Paths.get(getSettings().getLogNetConsoleToFilePath());
         final String baseName = getSettings().getLogNetConsoleToFileBaseName();
-        final String name = baseName.replace("${time}", dateFormat.format(new Date()));
+        final String name = TIME_REGEX.matcher(baseName).replaceAll(Matcher.quoteReplacement(dateFormat.format(new Date())));
         return directory.resolve(name);
     }
 

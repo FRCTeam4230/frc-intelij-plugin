@@ -251,7 +251,7 @@ fun findImplementationsForScope(psiClass: PsiClass,
                             }
                             true
                         }))
-                }, FrcBundle.message("frc.util.findImplementations.progress.title", psiClass.name), true, psiClass.project, parentComponent)
+                }, FrcBundle.message("frc.util.findImplementations.progress.title", psiClass.name ?: psiClass), true, psiClass.project, parentComponent)
     return inheritors
 }
 

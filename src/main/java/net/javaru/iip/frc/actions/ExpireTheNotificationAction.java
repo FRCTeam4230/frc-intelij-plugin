@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.diagnostic.Logger;
 
-import net.javaru.iip.frc.notify.FrcNotifications;
+import net.javaru.iip.frc.notify.FrcTeamNumberNotificationsKt;
 
 
 
@@ -33,7 +33,7 @@ public class ExpireTheNotificationAction extends AnAction
     @Override
     public void actionPerformed(AnActionEvent e)
     {
-        FrcNotifications.Companion.expireConfigureTeamNumberNotification(e.getData(CommonDataKeys.PROJECT));
+        FrcTeamNumberNotificationsKt.expireConfigureTeamNumberNotification(e.getData(CommonDataKeys.PROJECT));
     }
 
 

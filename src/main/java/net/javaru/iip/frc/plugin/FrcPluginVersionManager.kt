@@ -64,10 +64,10 @@ object FrcPluginVersionManager
 //                else
 //                    ""
 //                
-//                val notifyType = if (newVersionAvailable) FrcNotificationType.ACTIONABLE_WARN else FrcNotificationType.ACTIONABLE_INFO
+//                val notifyType = if (newVersionAvailable) FrcNotificationType2.ACTIONABLE_WARN else FrcNotificationType2.ACTIONABLE_INFO
 //                
 //                
-//                FrcNotifications.notify(notifyType,
+//                FrcNotifications2.notify(notifyType,
 //                                        "$firstSentence " +
 //                                        "This is due to some significant changes to the IntelliJ IDEA plugin API being leveraged. " +
 //                                        "Please upgrade to the latest version of IntelliJ IDEA at your convenience.$suffix Thanks.",

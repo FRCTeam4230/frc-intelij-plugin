@@ -20,15 +20,12 @@ import org.apache.commons.lang3.BooleanUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 
 
 
 public class FrcInternalActionsGroup extends DefaultActionGroup
 {
-    private static final Logger LOG = Logger.getInstance(FrcInternalActionsGroup.class);
-    
     static final boolean IS_IN_FRC_INTERNAL_MODE = BooleanUtils.toBoolean(System.getProperty("frc.is.internal", "false"));
     
     @Override
@@ -40,5 +37,4 @@ public class FrcInternalActionsGroup extends DefaultActionGroup
                                        IS_IN_FRC_INTERNAL_MODE);
         
     }
-    
 }

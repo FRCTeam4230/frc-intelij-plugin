@@ -23,11 +23,19 @@ import com.intellij.notification.NotificationGroup
 import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.notification.NotificationsConfiguration
+import com.intellij.notification.impl.NotificationsManagerImpl
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.popup.Balloon
+import com.intellij.openapi.wm.WindowManager
+import com.intellij.ui.BalloonLayoutData
+import com.intellij.ui.awt.RelativePoint
 import net.javaru.iip.frc.i18n.FrcBundle.message
 import net.javaru.iip.frc.i18n.FrcBundle.messageNullable
 import net.javaru.iip.frc.i18n.FrcMessageKey
+import net.javaru.iip.frc.util.getParentDisposable
+import org.intellij.lang.annotations.Language
+import java.awt.Point
 import javax.swing.Icon
 import javax.swing.event.HyperlinkEvent
 
@@ -79,6 +87,7 @@ enum class FrcNotificationType(val group: NotificationGroup, val notificationTyp
 
 }
 
+@Suppress("unused")
 object FrcNotifications
 {
     private val LOG = Logger.getInstance(FrcNotifications::class.java)
@@ -94,8 +103,12 @@ object FrcNotifications
     val FRC_ACTIONABLE_NOTIFICATION_GROUP = NotificationGroup(message("frc.notifications.group.name.actionable"),
                                                               NotificationDisplayType.STICKY_BALLOON,
                                                               true)
+
+    @JvmStatic
     val IconInfo: Icon = AllIcons.General.BalloonInformation
+    @JvmStatic
     val IconWarn: Icon = AllIcons.General.BalloonWarning
+    @JvmStatic
     val IconError: Icon = AllIcons.General.BalloonError
 
 
@@ -116,9 +129,9 @@ object FrcNotifications
      * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
      * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
      * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
-     * 
+     *
      * This version of the `notify` function takes Strings and an (optional) `NotificationListener` instance.
-     * 
+     *
      * @sample notificationExamples
      */
     @JvmStatic
@@ -307,6 +320,219 @@ object FrcNotifications
     }
 
 
+    /**
+     * Creates and shows a Balloon  notification. It is recommended for the content to be HTML. The notification is returned in
+     * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
+     * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
+     * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
+     *
+     * This version of the `notifyBalloon` function takes Strings and an (optional) `NotificationListener` instance.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun notifyBalloon(type: FrcNotificationType,
+                      @Language("HTML") content: String,
+                      subTitle: String? = null,
+                      project: Project? = null,
+                      listener: NotificationListener? = null): Notification
+    {
+        val notification = createNotification(type, content, subTitle, listener)
+        showBalloon(notification, project)
+        return notification
+    }
+
+    /**
+     * Creates and shows a Balloon  notification. It is recommended for the content to be HTML. The notification is returned in
+     * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
+     * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
+     * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
+     *
+     * This version of the `notifyBalloon` function takes Strings and an (optional) `NotificationListener` instance.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun notifyBalloon(type: FrcNotificationType,
+                      @Language("HTML") content: String,
+                      subTitle: String? = null,
+                      project: Project? = null,
+                      listener: (notification: Notification, event: HyperlinkEvent) -> Unit): Notification
+    {
+        val notification = createNotification(type, content, subTitle, listener)
+        showBalloon(notification, project)
+        return notification
+    }
+
+    /**
+     * Creates and shows a Balloon  notification. It is recommended for the content to be HTML. The notification is returned in
+     * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
+     * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
+     * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
+     *
+     * This version of the `notifyBalloon` function takes FrcMessageKeys and an (optional) `NotificationListener` instance.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun notifyBalloon(type: FrcNotificationType,
+                      contentKey: FrcMessageKey,
+                      subTitleKey: FrcMessageKey? = null,
+                      project: Project? = null,
+                      listener: NotificationListener? = null): Notification
+    {
+        val notification = createNotification(type, contentKey, subTitleKey, listener)
+        showBalloon(notification, project)
+        return notification
+    }
+
+    /**
+     * Creates and shows a Balloon  notification. It is recommended for the content to be HTML. The notification is returned in
+     * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
+     * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
+     * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
+     *
+     * This version of the `notifyBalloon` function takes FrcMessageKeys and an (optional) `NotificationListener` lambda.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun notifyBalloon(type: FrcNotificationType,
+                      contentKey: FrcMessageKey,
+                      subTitleKey: FrcMessageKey? = null,
+                      project: Project? = null,
+                      listener: (notification: Notification, event: HyperlinkEvent) -> Unit): Notification
+    {
+        val notification = createNotification(type, contentKey, subTitleKey, listener)
+        showBalloon(notification, project)
+        return notification
+    }
+
+
+    /**
+     * Creates and shows an Information Balloon notification. It is recommended for the content to be HTML. The notification is returned in
+     * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
+     * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
+     * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
+     *
+     * This version of the `notifyBalloon` function takes Strings and an (optional) `NotificationListener` instance.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun notifyInfoBalloon(@Language("HTML") content: String,
+                      subTitle: String? = null,
+                      project: Project? = null,
+                      listener: NotificationListener? = null): Notification
+    {
+        val notification = createNotification(FrcNotificationType.ACTIONABLE_INFO, content, subTitle, listener)
+        showBalloon(notification, project)
+        return notification
+    }
+
+    /**
+     * Creates and shows an Information Balloon notification. It is recommended for the content to be HTML. The notification is returned in
+     * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
+     * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
+     * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
+     *
+     * This version of the `notifyBalloon` function takes Strings and an (optional) `NotificationListener` instance.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun notifyInfoBalloon(@Language("HTML") content: String,
+                      subTitle: String? = null,
+                      project: Project? = null,
+                      listener: (notification: Notification, event: HyperlinkEvent) -> Unit): Notification
+    {
+        val notification = createNotification(FrcNotificationType.ACTIONABLE_INFO, content, subTitle, listener)
+        showBalloon(notification, project)
+        return notification
+    }
+
+    /**
+     * Creates and shows an Information Balloon notification. It is recommended for the content to be HTML. The notification is returned in
+     * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
+     * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
+     * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
+     *
+     * This version of the `notifyBalloon` function takes FrcMessageKeys and an (optional) `NotificationListener` instance.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun notifyInfoBalloon(contentKey: FrcMessageKey,
+                      subTitleKey: FrcMessageKey? = null,
+                      project: Project? = null,
+                      listener: NotificationListener? = null): Notification
+    {
+        val notification = createNotification(FrcNotificationType.ACTIONABLE_INFO, contentKey, subTitleKey, listener)
+        showBalloon(notification, project)
+        return notification
+    }
+
+    /**
+     * Creates and shows an Information Balloon notification. It is recommended for the content to be HTML. The notification is returned in
+     * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
+     * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
+     * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
+     *
+     * This version of the `notifyBalloon` function takes FrcMessageKeys and an (optional) `NotificationListener` lambda.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun notifyInfoBalloon(contentKey: FrcMessageKey,
+                      subTitleKey: FrcMessageKey? = null,
+                      project: Project? = null,
+                      listener: (notification: Notification, event: HyperlinkEvent) -> Unit): Notification
+    {
+        val notification = createNotification(FrcNotificationType.ACTIONABLE_INFO, contentKey, subTitleKey, listener)
+        showBalloon(notification, project)
+        return notification
+    }
+
+
+    @JvmStatic
+    @JvmOverloads
+    fun showBalloon(notification: Notification, project: Project?, hideOnClickOutside: Boolean = false)
+    {
+        val frame = WindowManager.getInstance().getIdeFrame(project)
+        if (frame == null)
+        {
+            notification.notify(project)
+        }
+        else
+        {
+            val bounds = frame.component.bounds
+            val target = RelativePoint(frame.component, Point(bounds.x + bounds.width, 20))
+
+            try
+            {
+                val balloon = NotificationsManagerImpl.createBalloon(frame,
+                                                                     notification,
+                                                                     true,
+                                                                     hideOnClickOutside,
+                                                                     BalloonLayoutData.fullContent(),
+                                                                     project.getParentDisposable())
+                balloon.show(target, Balloon.Position.atLeft)
+            }
+            catch (t: Throwable)
+            {
+                LOG.warn("[FRC] Could not display balloon. Cause details: $t", t)
+                notification.notify(project)
+            }
+        }
+    }
 
 
     @Suppress("ObjectLiteralToLambda", "ControlFlowWithEmptyBody")

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.settings
 
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
@@ -30,7 +31,8 @@ data class FrcNotificationsSettings(var appLevelConfigureTeamNumNotifyCount: Int
 {
     companion object Settings
     {
-        fun INSTANCE(): FrcNotificationsSettings
+        @JvmStatic
+        fun getInstance(): FrcNotificationsSettings
         {
             return ServiceManager.getService(FrcNotificationsSettings::class.java)
         }
@@ -41,19 +43,17 @@ data class FrcNotificationsSettings(var appLevelConfigureTeamNumNotifyCount: Int
         }
     }
 
-
     private val LOG = Logger.getInstance(FrcNotificationsSettings::class.java)
 
     override fun getState(): FrcNotificationsSettings
     {
-        LOG.trace("[FRC] FrcNotificationsSettings.getState() called. Returning current state of: " + toString())
+        LOG.trace("[FRC] FrcNotificationsSettings.getState() called. Returning current state of: ${toString()}")
         return this
     }
 
     override fun loadState(state: FrcNotificationsSettings)
     {
-        LOG.trace("[FRC] FrcNotificationsSettings.loadState() called with state object of: " + state)
+        LOG.trace("[FRC] FrcNotificationsSettings.loadState() called with state object of: $state")
         XmlSerializerUtil.copyBean<FrcNotificationsSettings>(state, this)
     }
-
 }

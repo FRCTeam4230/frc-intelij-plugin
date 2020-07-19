@@ -17,10 +17,14 @@
 package net.javaru.iip.frc.util
 
 import com.intellij.ide.plugins.cl.PluginClassLoader
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.project.Project
 import icons.FrcIcons
+import net.javaru.iip.frc.services.FrcApplicationDisposableService
+import net.javaru.iip.frc.services.FrcProjectLifecycleService
 import org.apache.commons.io.FilenameUtils
 import java.io.InputStream
 import java.net.URL
@@ -77,5 +81,12 @@ fun getPluginResourceAsStream(path: String): InputStream?
         null
     }
 }
+
+fun Project?.getParentDisposable(): Disposable
+{
+    return if (this != null) FrcProjectLifecycleService.getInstance(this) else getApplicationParentDisposable()
+}
+
+fun getApplicationParentDisposable(): Disposable = FrcApplicationDisposableService.getInstance()
 
 

@@ -173,6 +173,7 @@
         
         <spellchecker.bundledDictionaryProvider implementation="net.javaru.iip.frc.spellchecker.FrcBundledDictionaryProvider" />
 
+        <applicationService id="FRC.FrcApplicationDisposableService" serviceImplementation="net.javaru.iip.frc.services.FrcApplicationDisposableService" />
         <applicationService id="FRC.FrcApplicationSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcApplicationSettings" />
         <applicationService id="FRC.FrcNotificationsSettings"   serviceImplementation="net.javaru.iip.frc.settings.FrcNotificationsSettings" />
         <applicationService id="FRC.RioLogUdpSocketManagerApplicationService" serviceImplementation="net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService" />
@@ -312,7 +313,7 @@
                class="net.javaru.iip.frc.actions.tools.FrcToolsActionGroup"
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
-
+            <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after" />
             <action id="frc.tools.CheckForWpiLibUpdateAction" class="net.javaru.iip.frc.actions.tools.CheckForWpiLibUpdateAction" icon="FrcIcons.WpiLib.WPI_LIB_16" />
             
             <!-- LEGACY ACTIONS -->
@@ -329,41 +330,47 @@
             <action id="frc.tools.DownloadWpiLibAction"
                     class="net.javaru.iip.frc.actions.tools.legacy.DownloadLegacyWpiLibAction"
                     icon="AllIcons.Actions.Download" />
-            
-            <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after" />
         </group>
 
         <group id="FRC.FrcRioLogActionsGroup"
                class="net.javaru.iip.frc.actions.tools.riolog.FrcRioLogActionGroup"
                popup="true"
                icon="FrcIcons.RioLog.RIOLOG">
-
+            <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="first" />
             <action id="frc.tools.ShowTcp"
                     class="net.javaru.iip.frc.actions.tools.ShowRioLogTcpConsoleAction" />
-            
             <action id="frc.tools.ShowSsh"
                     class="net.javaru.iip.frc.actions.tools.ShowRioLogSshConsoleAction" />
-
             <action id="frc.tools.ShowUdp"
                     class="net.javaru.iip.frc.actions.tools.ShowRioLogUdpConsoleAction" />
-            <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="first" />
         </group>
         
         <group id="FRC.FrcInternalActionsGroup"
                class="net.javaru.iip.frc.actions.tools.internal.FrcInternalActionsGroup"
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
-            
+            <add-to-group group-id="ToolsMenu" relative-to-action="FRC.FrcToolsActionsGroup" anchor="after" />
             <action id="FRC.tools.internal.CauseAnException"
                     class="net.javaru.iip.frc.actions.tools.internal.CauseAnExceptionAction" />
             <action id="FRC.tools.internal.LogAnErrorAction"
                     class="net.javaru.iip.frc.actions.tools.internal.LogAnErrorAction" />
+        </group>
+
+        <group id="FRC.FrcInternalNotificationsActionsGroup"
+                class="net.javaru.iip.frc.actions.tools.internal.FrcInternalNotificationsActionsGroup"
+                popup="true"
+                icon="AllIcons.General.Balloon">
+            <add-to-group group-id="FRC.FrcInternalActionsGroup" anchor="last" />
             <action id="FRC.tools.internal.TriggerNotificationOfTypeActionableAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationOfTypeActionableAction" />
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationActionableInfoAction" />
             <action id="FRC.tools.internal.TriggerNotificationOfTypeGeneralAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationOfTypeGeneralAction" />
-            
-            <add-to-group  group-id="ToolsMenu" relative-to-action="FRC.FrcToolsActionsGroup" anchor="after" />
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationGeneralInfoAction" />
+            <action id="FRC.tools.internal.TriggerNotificationActionableErrorAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationActionableErrorAction" />
+            <action id="FRC.tools.internal.TriggerNotificationActionableErrorImportantAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationActionableErrorImportantAction" />
+            <action id="FRC.tools.internal.TriggerNotificationBalloonAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationBalloonAction" />
         </group>
         
         <group id="frc.NewFileTemplates"
@@ -371,6 +378,7 @@
                class="net.javaru.iip.frc.actions.create.FrcCreateComponentsActionGroup"
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile" />
             <separator />
             <action id="frc.action.new.command1"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v1.Command1ComponentCreationAction" />
@@ -380,7 +388,6 @@
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v1.Subsystem1ComponentCreationAction" />
             <action id="frc.action.new.pidSubsystem1"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v1.PidSubsystem1ComponentCreationAction" />
-
             <action id="frc.action.new.command2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.Command2ComponentCreationAction" />
             <action id="frc.action.new.commandGroup2"
@@ -393,13 +400,10 @@
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v2.PidSubsystem2ComponentCreationAction" />
             <action id="frc.action.new.profiledPidSubsystem2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.profiledPidSubsystem.v2.ProfiledPidSubsystem2ComponentCreationAction" />
-
-
             <action id="frc.action.new.basic.trigger"
                     class="net.javaru.iip.frc.actions.create.simple.SimpleNewFrcTriggerClassAction" />
             
             <!--<action id="frc.action.new.build.file" class="net.javaru.iip.frc.actions.create.build.NewFrcAntBuildFileAction" text="FRC New Ant Build File" />-->
-            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile" />
         </group>
 
         <action id="frc.configureTeamNumberBasicAction"

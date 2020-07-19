@@ -17,8 +17,7 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-== Level 1 Header
-
+== About
 
 An IntelliJ IDEA plugin for FIRST Robotics Competition (FRC) robot development in Java. This plugin works with either the free open-sourced Community Edition or Education Edition, or the licensed Ultimate Edition of IntelliJ IDEA.
 
@@ -27,11 +26,11 @@ An IntelliJ IDEA plugin for FIRST Robotics Competition (FRC) robot development i
 *IntelliJ IDEA v2019.3 or later is required.* The FRC plugin typically supports the last three major versions of IntelliJ IDEA. While I wish I could support more versions, doing so adds considerable time to the development of the plugin as I have to maintain separate branches for each major version as the Intellij IDEA Plugin API evolves. I would much rather put that time into adding new features. Given that this plugin works fully with the free IntelliJ IDEA Community edition, I do not think asking users to use a major version released within the past year is overly burdensome. Thank you for your understanding.
 
 
-=== Known Issues
+== Known Issues
 
 Please report any issues via the https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues[Project's Issue Tracker]. Please note, that I use GitLab to host the project, but you can https://gitlab.com/users/sign_in[log into] GiLab using your GitHub, Bitbucket, Twitter, or Google credentials if desired.
 
-==== Documentation needs updating
+=== Documentation needs updating
 
 The documentation at this project's wiki is very outdated. It has not been updated since the plugin was transition from Ant based projects to the Gradle based projects. I will do my best to get it updated. But for the most part, the plugin's use is fairly intuitive.
 

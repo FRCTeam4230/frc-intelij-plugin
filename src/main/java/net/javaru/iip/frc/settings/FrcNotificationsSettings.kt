@@ -6,7 +6,7 @@
  *     You may obtain a copy of the License at
  *
  *       http://www.apache.org/licenses/LICENSE-2.0
- *     
+ *
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.settings
 
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
@@ -24,8 +23,7 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.xmlb.XmlSerializerUtil
 
-// NOTE: This class is registered as an <applicationService> in the plugin.xml
-@State(name = "FrcPluginNotifications", storages = arrayOf(Storage("frc.xml")))
+@State(name = "FrcPluginNotifications", storages = [Storage("frc.xml")])
 data class FrcNotificationsSettings(var appLevelConfigureTeamNumNotifyCount: Int = 0
                                  ) : PersistentStateComponent<FrcNotificationsSettings>
 {

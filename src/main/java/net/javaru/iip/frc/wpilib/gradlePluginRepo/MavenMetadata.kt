@@ -48,38 +48,37 @@ val LOG = Logger.getInstance(MavenMetadata::class.java)
 
 val wpiLibGradlePluginMavenMetadataURI = URI("https://plugins.gradle.org/m2/edu/wpi/first/GradleRIO/edu.wpi.first.GradleRIO.gradle.plugin/maven-metadata.xml")
 
-// NOTE: This class is registered as an <applicationService> in the plugin.xml
-@Suppress("MemberVisibilityCanBePrivate", "unused")
-@State(name = "GradleRioMavenMetadata", storages = [(Storage("frc.xml"))])
 /**
  * A `PersistentStateComponent` that stores the last retrieved `maven-metadata.xml` information for the GradleRIO plugin.
  * It stores a `MavenMetadata` instance as JSON (since  the persistent API does not store complex objects without additional
- * development work). It then stores the [lastChecked] time. The `lastChecked` time should not be confused with the 
- * `lastUpdated` property of the `MavenMetadata` instance. The `MavenMetadata`'s `lastUpdated` property is contained within 
+ * development work). It then stores the [lastChecked] time. The `lastChecked` time should not be confused with the
+ * `lastUpdated` property of the `MavenMetadata` instance. The `MavenMetadata`'s `lastUpdated` property is contained within
  * the `maven-metadata.xml` and represents the last time the Gradle Repo was updated with a new instance of the artifact.
- * The `lastChecked` time of this State class is the last time we have checked the Gradle Repo to see if the 
+ * The `lastChecked` time of this State class is the last time we have checked the Gradle Repo to see if the
  * `maven-metadata.xml` file has been modified (and thus presumably the latest version of the GradleRIO plugin).
  */
-data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: String = defaultMavenMetadataJson, 
+@Suppress("MemberVisibilityCanBePrivate", "unused")
+@State(name = "GradleRioMavenMetadata", storages = [(Storage("frc.xml"))])
+data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: String = defaultMavenMetadataJson,
                                        var lastChecked: String = "20191123193733") :
         PersistentStateComponent<GradleRioMavenMetadataState>
 {
     val lastCheckedDateTime: LocalDateTime
         get() = LocalDateTime.parse(lastChecked, lastCheckedDateTimeFormatter)
-    
+
     val durationSinceLastCheck: Duration
         get() = Duration.between(lastCheckedDateTime, LocalDateTime.now())
-    
+
     val daysSinceLastCheck: Long
         get() = durationSinceLastCheck.toDays()
-    
+
     val hoursSinceLastCheck: Long
         get() = durationSinceLastCheck.toHours()
-    
+
     @Suppress("RemoveExplicitTypeArguments")
     val wpiLibMavenMetadata: WpiLibMavenMetadata
         get() = WpiLibMavenMetadata(MavenMetadata.fromJson(mavenMetadataJson))
-    
+
     fun setMavenMetadata(metadata: MavenMetadata)
     {
         mavenMetadataJson = metadata.toJson(false)
@@ -104,7 +103,7 @@ data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: 
      * @see com.intellij.util.xmlb.XmlSerializerUtil.copyBean
      */
     override fun loadState(state: GradleRioMavenMetadataState) = XmlSerializerUtil.copyBean(state, this)
-    
+
     @JvmOverloads
     fun updateLastCheckedTime(checkTime: LocalDateTime = LocalDateTime.now())
     {
@@ -125,7 +124,7 @@ data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: 
         }
 
         /**
-         * @param maxAge the maximum age of the last update before an update from the Gradle repo needs to be made. 
+         * @param maxAge the maximum age of the last update before an update from the Gradle repo needs to be made.
          *               Use `Duration.ofDays()`, `Duration.ofMinutes()`, etc. to create.
          */
         @JvmStatic
@@ -141,7 +140,7 @@ data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: 
                 state
             }
         }
-        
+
 
         @JvmStatic
         fun clone(original: GradleRioMavenMetadataState): GradleRioMavenMetadataState
@@ -233,23 +232,23 @@ data class MavenMetadata(val groupId: String,
                          )
 {
     @Language("JSON")
-    fun toJson(prettyPrint: Boolean): String 
+    fun toJson(prettyPrint: Boolean): String
     {
         val writer: ObjectWriter = if (prettyPrint) prettyPrintWriter else mapper.writer()
         return writer.writeValueAsString(this)
     }
-    
+
     companion object
     {
         @JvmStatic
         fun fromJson(@Language("JSON") json: String): MavenMetadata = mapper.readValue<MavenMetadata>(json)
     }
-    
+
 }
 
-/** 
- * A data class to represent a `maven-metadata.xml` file for a WpiLib artifact such as the GradleRIO plugin. 
- * It wraps a [mavenMetadata] instance, providing convenience methods to get various properties as `WpiLibVersion` 
+/**
+ * A data class to represent a `maven-metadata.xml` file for a WpiLib artifact such as the GradleRIO plugin.
+ * It wraps a [mavenMetadata] instance, providing convenience methods to get various properties as `WpiLibVersion`
  * instances rather than Strings, as well as some date and time values as DateTime instances.
  */
 data class WpiLibMavenMetadata(val mavenMetadata: MavenMetadata)
@@ -258,7 +257,7 @@ data class WpiLibMavenMetadata(val mavenMetadata: MavenMetadata)
     /** returns a descending list of the versions, such that the newest version is first */
     val wpiLibVersionsDescending by lazy { wpiLibVersions.reversed() }
     val versionAsWpiLibVersion by lazy { WpiLibVersionImpl.parse(mavenMetadata.version) }
-    val latestAsWpiLibVersion by lazy { WpiLibVersionImpl.parse(mavenMetadata.latest) } 
+    val latestAsWpiLibVersion by lazy { WpiLibVersionImpl.parse(mavenMetadata.latest) }
     val releaseAsWpiLibVersion by lazy { WpiLibVersionImpl.parse(mavenMetadata.release) }
     val lastUpdatedAsDateTime: ZonedDateTime by lazy {ZonedDateTime.parse("${mavenMetadata.lastUpdated} UTC", lastCheckedDateTimeZonedFormatter) }
 }
@@ -275,18 +274,18 @@ fun parseMavenMetadata(@Language("XML") mavenMetadata: String): MavenMetadata?
         LOG.warn("[FRC] Could not convert the mavenMetadata XML to a Document object. Cause Details: $e", e)
         null
     }
-    
+
     return if (document == null) null else parseMavenMetadata(document)
 }
 
 fun parseMavenMetadata(document: Document?): MavenMetadata?
 {
-    if (document == null) 
+    if (document == null)
     {
         LOG.warn("[FRC] Could not parse the mavenMetadata Document to a MavenMetadata object as a null document was received.")
         return null
     }
-    
+
     return try
     {
         val xPathFactory = XPathFactory.instance()
@@ -381,7 +380,7 @@ val defaultMavenMetadataJson = """{"groupId":"edu.wpi.first.GradleRIO","artifact
 
 @Suppress("unused")
 @Language("JSON")
-val defaultMavenMetadataJsonPretty = 
+val defaultMavenMetadataJsonPretty =
         """
             {
               "groupId" : "edu.wpi.first.GradleRIO",

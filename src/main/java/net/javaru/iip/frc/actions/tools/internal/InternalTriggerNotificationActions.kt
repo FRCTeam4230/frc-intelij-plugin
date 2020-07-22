@@ -6,7 +6,7 @@
  *     You may obtain a copy of the License at
  *
  *       http://www.apache.org/licenses/LICENSE-2.0
- *     
+ *
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,9 @@ import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications.createNotification
 import net.javaru.iip.frc.notify.FrcNotifications.notify
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloon
+import org.apache.commons.lang3.RandomUtils
 import org.intellij.lang.annotations.Language
+import kotlin.random.Random
 
 
 class FrcInternalNotificationsActionsGroup : FrcInternalActionsGroup()
@@ -95,14 +97,16 @@ class TriggerNotificationBalloonAction : AbstractTriggerNotificationAction()
 {
     override fun doNotification(project: Project?)
     {
+
         @Suppress("HtmlRequiredLangAttribute")
         @Language("HTML")
         val content = """
                           |<html>
-                          |This is a test FRC <span style="color:red">balloon</span> notification<br/>
-                          |Line 2<br/>
-                          |Line 3<br/>
-                          |Line 4<br/>
+                          |This is a test <span style="color:red">balloon</span> notification<br/>
+                          |Line #2<br/>
+                          |${randomNumberOfLines()}
+                          |A random Number: ${RandomUtils.nextInt(1, 5000)} <br/>
+                          |
                           |<br/>
                           |<h1>Header 1</h1>
                           |<br/>
@@ -112,12 +116,14 @@ class TriggerNotificationBalloonAction : AbstractTriggerNotificationAction()
                           |<br/>
                           |<h4>Header 4</h4>
                           |<br/>
-                          |The toughest fun you will ever have!<br/>
+                          |<strong>Strong (i.e. bold) Text</strong>
                           |<br/>
-                          |A long line to test text wrapping. A long line to test text wrapping. 
-                          |A long line to test text wrapping. A long line to test text wrapping. 
-                          |A long line to test text wrapping. A long line to test text wrapping. 
-                          |A long line to test text wrapping. A long line to test text wrapping. 
+                          |<em>Italics / Emphasis Text</em><br/>
+                          |<br/>
+                          |A long line to test text wrapping. A long line to test text wrapping.
+                          |A long line to test text wrapping. A long line to test text wrapping.
+                          |A long line to test text wrapping. A long line to test text wrapping.
+                          |A long line to test text wrapping. A long line to test text wrapping.
                           |A long line to test text wrapping. A long line to test text wrapping. <br/>
                           |</html>
                       """.trimMargin()
@@ -126,6 +132,38 @@ class TriggerNotificationBalloonAction : AbstractTriggerNotificationAction()
                       content,
                       "Some Sub-title")
     }
+
+    fun randomNumberOfLines():String
+    {
+        val sb = StringBuilder()
+        for (i in 3..(RandomUtils.nextInt(4, 11)))
+        {
+            sb.append("Line #").append(i).append("<br/>")
+        }
+        return sb.toString()
+    }
+}
+
+
+class TriggerSmallNotificationBalloonAction : AbstractTriggerNotificationAction()
+{
+    override fun doNotification(project: Project?)
+    {
+        val random = Random(1234)
+
+        @Suppress("HtmlRequiredLangAttribute")
+        @Language("HTML")
+        val content = """
+                          |<html>
+                          |A <em>short/small</em> test <span style="color:green">balloon</span> notification. (${RandomUtils.nextInt(1, 5000)})<br/>
+                          |</html>
+                      """.trimMargin()
+
+        notifyBalloon(FrcNotificationType.ACTIONABLE_INFO,
+                      content,
+                      "Some Sub-title")
+    }
+
 }
 
 

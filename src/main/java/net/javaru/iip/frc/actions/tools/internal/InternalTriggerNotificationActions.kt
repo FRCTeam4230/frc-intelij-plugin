@@ -109,13 +109,13 @@ class TriggerNotificationBalloonAction : AbstractTriggerNotificationAction()
                           |
                           |<br/>
                           |<h1>Header 1</h1>
-                          |<br/>
+                          |Section 1 Text. Blah blah blah.<br/>
                           |<h2>Header 2</h2>
-                          |<br/>
+                          |Section 2 Text. Blah blah blah.<br/>
                           |<h3>Header 3</h3>
-                          |<br/>
+                          |Section 3 Text. Blah blah blah.<br/>
                           |<h4>Header 4</h4>
-                          |<br/>
+                          |Section 4 Text. Blah blah blah.<br/>
                           |<strong>Strong (i.e. bold) Text</strong>
                           |<br/>
                           |<em>Italics / Emphasis Text</em><br/>
@@ -149,8 +149,6 @@ class TriggerSmallNotificationBalloonAction : AbstractTriggerNotificationAction(
 {
     override fun doNotification(project: Project?)
     {
-        val random = Random(1234)
-
         @Suppress("HtmlRequiredLangAttribute")
         @Language("HTML")
         val content = """
@@ -163,7 +161,6 @@ class TriggerSmallNotificationBalloonAction : AbstractTriggerNotificationAction(
                       content,
                       "Some Sub-title")
     }
-
 }
 
 

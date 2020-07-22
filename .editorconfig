@@ -7,6 +7,8 @@ root = true
 
 [*]
 charset = utf-8
+[*.properties]
+charset = latin1
 
 [*.{groovy, java, kt, kts, xml, xsd}]
 indent_style = space

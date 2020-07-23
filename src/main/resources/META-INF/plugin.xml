@@ -369,10 +369,14 @@
                     class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationActionableErrorAction" />
             <action id="FRC.tools.internal.TriggerNotificationActionableErrorImportantAction"
                     class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationActionableErrorImportantAction" />
+            <action id="FRC.tools.internal.TriggerNotificationThatUsesNotificationActionsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationThatUsesNotificationActionsAction" />
             <action id="FRC.tools.internal.TriggerNotificationBalloonAction"
                     class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationBalloonAction" />
             <action id="FRC.tools.internal.TriggerSmallNotificationBalloonAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerSmallNotificationBalloonAction" />
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationSmallBalloonAction" />
+            <action id="FRC.tools.internal.TriggerNotificationBalloonWithActionsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationBalloonWithActionsAction" />
         </group>
 
         <group id="frc.NewFileTemplates"

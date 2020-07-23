@@ -18,18 +18,22 @@ package net.javaru.iip.frc.notify
 
 import com.intellij.icons.AllIcons
 import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationDisplayType
 import com.intellij.notification.NotificationGroup
 import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.notification.NotificationsConfiguration
 import com.intellij.notification.impl.NotificationsManagerImpl
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.ui.BalloonLayoutData
 import com.intellij.ui.awt.RelativePoint
+import icons.FrcIcons
 import net.javaru.iip.frc.i18n.FrcBundle.message
 import net.javaru.iip.frc.i18n.FrcBundle.messageNullable
 import net.javaru.iip.frc.i18n.FrcMessageKey
@@ -59,6 +63,7 @@ enum class FrcNotificationType(val group: NotificationGroup, val notificationTyp
     GENERAL_WARN(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP, NotificationType.WARNING, FrcNotifications.IconWarn),
     GENERAL_ERROR(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP, NotificationType.ERROR, FrcNotifications.IconError),
     ACTIONABLE_INFO(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP, NotificationType.INFORMATION, FrcNotifications.IconInfo),
+    ACTIONABLE_INFO_WITH_FRC_ICON(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP, NotificationType.INFORMATION, FrcIcons.FRC.FIRST_ICON_MEDIUM_16),
     ACTIONABLE_WARN(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP, NotificationType.WARNING, FrcNotifications.IconWarn),
     ACTIONABLE_ERROR(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP, NotificationType.ERROR, FrcNotifications.IconError);
 
@@ -632,5 +637,44 @@ object FrcNotifications
             logger.debug("When expired action code would go here")
         }
             .notify(project)
+
+        // You can also add NotificationAction (abstract class) actions. These appear below the notifications as a series of links
+        val myNotification = createNotification(FrcNotificationType.ACTIONABLE_INFO, content = "Some message")
+
+        val myActionA = object : NotificationAction("Link Text") {
+            override fun actionPerformed(e: AnActionEvent, notification: Notification)
+            {
+                notification.expire();
+                // Do work here
+            }
+        }
+        val myActionB = object : NotificationAction("Don't show again") {
+            override fun actionPerformed(e: AnActionEvent, notification: Notification)
+            {
+                notification.expire();
+                // Update setting so this message is not shown again
+            }
+        }
+
+        myNotification.addAction(myActionA)
+        myNotification.addAction(myActionB)
+        myNotification.notify(project);
+
+
+        // We can also add Actions in a fluent/builder way
+        createNotification(FrcNotificationType.ACTIONABLE_INFO, content = "Some message")
+            .addAction(object : NotificationAction("Link Text") {
+                override fun actionPerformed(e: AnActionEvent, notification: Notification)
+                {
+                    notification.expire();
+                    // Do work here
+                }
+            }).addAction(object : NotificationAction("Don't show again") {
+                override fun actionPerformed(e: AnActionEvent, notification: Notification)
+                {
+                    notification.expire();
+                    // Update setting so this message is not shown again
+                }
+            }).notify(project)
     }
 }

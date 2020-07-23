@@ -106,8 +106,6 @@ class TriggerNotificationBalloonAction : AbstractTriggerNotificationAction()
                           |Line #2<br/>
                           |${randomNumberOfLines()}
                           |A random Number: ${RandomUtils.nextInt(1, 5000)} <br/>
-                          |
-                          |<br/>
                           |<h1>Header 1</h1>
                           |Section 1 Text. Blah blah blah.<br/>
                           |<h2>Header 2</h2>
@@ -119,7 +117,17 @@ class TriggerNotificationBalloonAction : AbstractTriggerNotificationAction()
                           |<strong>Strong (i.e. bold) Text</strong>
                           |<br/>
                           |<em>Italics / Emphasis Text</em><br/>
-                          |<br/>
+                          |<span style='font-size: xx-small'>XX-Small font size.</span><br/>
+                          |<span style='font-size: x-small'>X-Small font size.</span><br/>
+                          |<span style='font-size: small'>Small font size.</span><br/>
+                          |<span style='font-size: smaller'>Smaller font size.</span><br/>
+                          |Standard font size (unmodified)<br/>
+                          |<span style='font-size: medium'>Medium font size.</span><br/>
+                          |<span style='font-size: larger'>Larger font size.</span><br/>
+                          |<span style='font-size: large'>Large font size.</span><br/>
+                          |<span style='font-size: x-large'>X-Large font size.</span><br/>
+                          |<span style='font-size: xx-large'>XX-Large font size.</span><br/>
+                          |<br/><br/>
                           |A long line to test text wrapping. A long line to test text wrapping.
                           |A long line to test text wrapping. A long line to test text wrapping.
                           |A long line to test text wrapping. A long line to test text wrapping.

@@ -6,7 +6,7 @@
   ~     You may obtain a copy of the License at
   ~
   ~       http://www.apache.org/licenses/LICENSE-2.0
-  ~     
+  ~
   ~     Unless required by applicable law or agreed to in writing, software
   ~     distributed under the License is distributed on an "AS IS" BASIS,
   ~     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,12 +14,12 @@
   ~     limitations under the License.
   -->
 
- 
+
 <!-- Documentation: https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_configuration_file.html -->
 
 <!-- url="" specifies the URL of the plugin homepage (displayed in the Welcome Screen and in "Plugins" settings dialog) -->
 <idea-plugin url="https://gitlab.com/Javaru/frc-intellij-idea-plugin/wikis">
-    
+
     <!-- Unique identifier of the plugin. Cannot be changed between the plugin versions. If not specified, assumed to be equal to <name>. -->
     <id>net.javaru.idea.frc</id>
     <name>FRC</name>
@@ -29,10 +29,10 @@
        The optional "url" attribute specifies the URL of the vendor homepage.
        The optional "email" attribute specifies the e-mail address of the vendor. -->
     <vendor url="https://gitlab.com/Javaru/frc-intellij-idea-plugin" >Javaru</vendor>
-    
+
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <!-- Minimum ('since-build') and maximum ('until-build') build of IDEA compatible with the plugin -->
-    <idea-version since-build="*.*" until-build="*.*"/> 
+    <idea-version since-build="*.*" until-build="*.*"/>
 
     <description><![CDATA[
         <p>
@@ -40,7 +40,7 @@
             <em><a href='http://www.firstinspires.org/'>FIRST</a> Robotics Competition</em>
             (<a href='http://www.firstinspires.org/robotics/frc'>FRC</a>) development support for
             IntelliJ IDEA, including new project wizards, new class templates, robust RioLog console,
-            and more. Works with all v2019.2 or later editions (Community, Education, and Ultimate) 
+            and more. Works with all v2019.2 or later editions (Community, Education, and Ultimate)
             of IntelliJ IDEA. Enjoy using your favorite IDE when coding your team's robot in Java
             and/or Kotlin.
         </p>
@@ -48,51 +48,51 @@
         <p>
             <strong>Please report issues or make feature requests via the project's</strong>
             <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues'>Issue Tracker</a>.<br>
-            This is an unofficial plugin written by an FRC team mentor. Please do <em>not</em> 
+            This is an unofficial plugin written by an FRC team mentor. Please do <em>not</em>
             contact <em>FIRST</em> or the WPI Lib developers for support. Use the above link. Thanks.
-        </p>        
+        </p>
     ]]></description>
 
     <change-notes><![CDATA[
         <strong>v1.3.0</strong> <br>
-        &nbsp;&nbsp;&bull; This is a re-release of v1.2.1 but as v1.3.0. Due to the lack of a patch level indicator in the 
+        &nbsp;&nbsp;&bull; This is a re-release of v1.2.1 but as v1.3.0. Due to the lack of a patch level indicator in the
                            v1.2 release, the IntelliJ IDEA plugin frameworks was not seeing v1.2.1-2020.1 as being newer than
                            v1.2-2020.1 and therefore not auto updating to it. Moving forward, all releases will have a patch level
                            configured to prevent this issue.<br>
         <br>
         <strong>v1.2.1</strong> <br>
-        &nbsp;&nbsp;&bull; Fixed <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/64'>issue #64</a> in which a plugin 
+        &nbsp;&nbsp;&bull; Fixed <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/64'>issue #64</a> in which a plugin
                            'State Error' exception may have occurred on IDE startup.<br>
         <br>
         <strong>v1.2</strong> <br>
-        &nbsp;&nbsp;&bull; Enhanced the Subsystem "Create as Singleton" option to offer different Singleton initialization 
-                           methodologies (based on the methodologies presented in the <em>Geeks for Geeks</em> 
+        &nbsp;&nbsp;&bull; Enhanced the Subsystem "Create as Singleton" option to offer different Singleton initialization
+                           methodologies (based on the methodologies presented in the <em>Geeks for Geeks</em>
                            <a href="https://www.geeksforgeeks.org/singleton-design-pattern">Singleton Design Pattern</a> article).<br>
-        &nbsp;&nbsp;&bull; Added functionality to Command class creation so that Subsystems that are Singletons are not added 
+        &nbsp;&nbsp;&bull; Added functionality to Command class creation so that Subsystems that are Singletons are not added
                            as parameters to the Command's constructor, but rather are initialized in their field declaration
                            via a call to their singleton getter method (or field if applicable).<br>
         &nbsp;&nbsp;&bull; Enhanced the Command class creation dialog so that abstract subsystem classes are not listed in
                            the "required subsystems" selection pane. Since an abstract subsystem cannot be instantiated, it
                            made no sense to present them as an option in the list.<br>
-        &nbsp;&nbsp;&bull; Enhanced the component creation dialogs so that the last selected base component is remembered 
+        &nbsp;&nbsp;&bull; Enhanced the component creation dialogs so that the last selected base component is remembered
                            and pre-selected on the next use.<br>
-        &nbsp;&nbsp;&bull; Implemented <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/63'>Feature #63</a>: 
-                           Auto reimport gradle project when changes are made to <em>vendordeps</em> directory so that changes are 
-                           picked up and the project classpath is updated appropriately. 
-                           (<a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/61'>Feature #61</a>, UI for 
+        &nbsp;&nbsp;&bull; Implemented <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/63'>Feature #63</a>:
+                           Auto reimport gradle project when changes are made to <em>vendordeps</em> directory so that changes are
+                           picked up and the project classpath is updated appropriately.
+                           (<a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/61'>Feature #61</a>, UI for
                            adding and managing <em>vendordeps</em>, is still pending.)<br>
         &nbsp;&nbsp;&bull; Some miscellaneous internal improvements.<br>
         <br>
-        
+
         <strong>v1.1</strong> <br>
-        &nbsp;&nbsp;&bull; Added an action (<em>Tools > FRC > Check for WPI Lib Update</em>) to check for the availability of a WPI Lib update. The action runs 
+        &nbsp;&nbsp;&bull; Added an action (<em>Tools > FRC > Check for WPI Lib Update</em>) to check for the availability of a WPI Lib update. The action runs
                            automatically when an FRC project is opened, and then periodically in the background while the FRC project is open.<br>
         &nbsp;&nbsp;&bull; Fixed the auto clear feature in the rioLog console tool window. It was keying on an old startup message and thus not working.<br>
         &nbsp;&nbsp;&bull; Removed the print action from the rioLog console. It was likely never used and was using real estate and adding clutter.<br>
         &nbsp;&nbsp;&bull; Rearranged the order of the action buttons on the rioLog console so that the more frequently used actions are
                            on the top to improve usability when the tool window height is reduced.<br>
         <br>
-        
+
         <strong>v1.0</strong> <br>
         &nbsp;&nbsp;&bull; Dropping the zero based versioning and migrating to a 1.0 version after 14 such releases over the course of three years.<br>
         &nbsp;&nbsp;&bull; Improvements to the new FRC Robot Project Wizard<br>
@@ -109,13 +109,13 @@
         for additional details.<br>
         &nbsp;&nbsp;&bull; Good luck to all FRC teams in the 2020 <em>INFINITE RECHARGE</em> game.<br>
         <br>
-        
+
         <strong>v0.1 - v0.8.1</strong> <br>
         &nbsp;&nbsp;&bull; Fourteen releases over three years containing numerous features, enhancements, and fixes.
     ]]>
     </change-notes>
 
-    
+
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html on how to target different products -->
     <!-- The unique identifiers of the plugins on which this plugin depends. -->
     <depends>com.intellij.modules.lang</depends>
@@ -125,14 +125,14 @@
     <!--<depends>AntSupport</depends>-->
 
     <!-- Optional dependency on another plugin.
-       If the plugin with the "MySecondPlugin" ID is installed, the contents of 
+       If the plugin with the "MySecondPlugin" ID is installed, the contents of
        mySecondPlugin.xml (the format of this file conforms to the format of plugin.xml) will be loaded.
     <depends optional="true" config-file="mySecondPlugin.xml">MySecondPlugin</depends>
     -->
 
 
-    <!-- Allows a plugin to integrate its help system (in JavaHelp format) with the IDEA help system. 
-         The "file" attribute specifies the name of the JAR file in the "help" subdirectory of the plugin 
+    <!-- Allows a plugin to integrate its help system (in JavaHelp format) with the IDEA help system.
+         The "file" attribute specifies the name of the JAR file in the "help" subdirectory of the plugin
          directory. The "path" attribute specifies the name of the helpset file within the JAR file.-->
     <!--<helpset file="myHelp.jar" path="/Help.hs" />-->
 
@@ -141,8 +141,8 @@
     <resource-bundle>i18n.FrcPluginConfigBundle</resource-bundle>
 
 
-    
-    <!-- Extension points defined by the plugin. Extension points are registered by a plugin so that other plugins can 
+
+    <!-- Extension points defined by the plugin. Extension points are registered by a plugin so that other plugins can
          provide this plugin with certain data. The "beanClass" attribute specifies the class the implementations of
          which can be used for the extension point. -->
     <!-- Ref: http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_extensions_and_extension_points.html -->
@@ -150,15 +150,15 @@
         <!--<extensionPoint name="fooExtensionPoint" beanClass="com.foo.impl.FooExtensionBean" />-->
     </extensionPoints>
 
-    
-    
-    
+
+
+
     <!-- Extensions which the plugin adds to extension points defined by the IDEA core or by other plugins.
-         The "defaultExtensionNs " attribute must be set to the ID of the plugin defining the extension point, or to 
+         The "defaultExtensionNs " attribute must be set to the ID of the plugin defining the extension point, or to
          "com.intellij" if the extension point is defined by the IDEA core. The name of the tag within the <extensions>
          tag matches the name of the extension point, and the "implementation" class specifies the name of the class
          added to the extension point. -->
-    <!-- **REFERENCES** 
+    <!-- **REFERENCES**
              General Info:              http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_extensions_and_extension_points.html
              Detailed attribute info:   https://sites.google.com/site/malenkov/java/150403
              To get a list of extension points available in the IntelliJ Platform core, consult the <extensionPoints> section of the following XML configuration files:
@@ -170,19 +170,20 @@
         <facetType id="FRC_FACET" implementation="net.javaru.iip.frc.facet.FrcFacetType" />
 
         <executor id="FrcRioLogToolWindowExecutor" implementation="net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor" />
-        
+
         <spellchecker.bundledDictionaryProvider implementation="net.javaru.iip.frc.spellchecker.FrcBundledDictionaryProvider" />
 
+        <applicationService id="FRC.FrcApplicationDisposableService" serviceImplementation="net.javaru.iip.frc.services.FrcApplicationDisposableService" />
         <applicationService id="FRC.FrcApplicationSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcApplicationSettings" />
         <applicationService id="FRC.FrcNotificationsSettings"   serviceImplementation="net.javaru.iip.frc.settings.FrcNotificationsSettings" />
         <applicationService id="FRC.RioLogUdpSocketManagerApplicationService" serviceImplementation="net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService" />
         <applicationService id="FRC.GradleRioMavenMetadataState" serviceImplementation="net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState" />
         <applicationService id="FRC.ComponentCreationSharedState" serviceImplementation="net.javaru.iip.frc.actions.create.advanced.ComponentCreationSharedState" />
-        
-        <applicationConfigurable id="preferences.language.FRC" 
-                                 instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable" 
+
+        <applicationConfigurable id="preferences.language.FRC"
+                                 instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable"
                                  groupId="language" />
-        
+
         <!-- Commenting out for now. Rethinking that these should be at the module/facet level rather than project level. -->
         <!--<projectConfigurable id="preferences.language.FRC.project"
                              instance="net.javaru.iip.frc.settings.FrcProjectSettingsConfigurable"
@@ -211,8 +212,8 @@
 
         <projectService id="FRC.SshRioLogConsoleProjectService"
                         serviceImplementation="net.javaru.iip.frc.riolog.ssh.SshRioLogMonitorProjectService" />
-        
-        
+
+
         <projectService id="FRC.WpiLibUpdateCheckingService" serviceImplementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionService" />
         <postStartupActivity implementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionStartupActivity" />
 
@@ -226,7 +227,7 @@
         <!--<projectTemplate projectType="FRC_Legacy_Module" templatePath="projectTemplates/legacy/robots/FRC_Timed_Robot.zip" />-->
         <!--<projectTemplate projectType="FRC_Legacy_Module" templatePath="projectTemplates/legacy/robots/FRC_Sample_Robot.zip" />-->
 
-        <!-- 
+        <!--
             While  the custom FrcModuleType is deprecated, we need to leave it in to prevent errors when projects that were created using it are opened.
             It's use was limited to a few weeks in Nov 2019 in v0.8.0 & v0.8.1, and was removed in the next release later in November.
             Still, let's keep it around until at least May 2023 (i.e. 3 build seasons) to prevent issues.
@@ -238,7 +239,7 @@
         <moduleBuilder id="FrcModuleBuilder" builderClass="net.javaru.iip.frc.wizard.FrcModuleBuilder" order="last" />
 
         <externalProjectDataService id="FrcDependencyDataService" implementation="net.javaru.iip.frc.facet.importer.FrcDependencyDataService" />
-        
+
         <framework.detector implementation="net.javaru.iip.frc.facet.framework.detector.RobotSubclassFrcFrameworkDetector" />
     </extensions>
 
@@ -246,8 +247,8 @@
         <ProviderFactory implementation="net.javaru.iip.frc.wpilib.jsonSchema.WpiLibJsonSchemaProviderFactory" />
     </extensions>
 
-    
-    
+
+
     <application-components>
         <!-- Add your application components here -->
         <component>
@@ -257,7 +258,7 @@
     </application-components>
 
 
-    
+
     <actions>
         <!--   Ref:  http://www.jetbrains.org/intellij/sdk/docs/basics/action_system.html  -->
         <!--
@@ -304,7 +305,7 @@
 
             The <reference> element allows to add an existing action to the group. The mandatory "ref" attribute specifies the ID of the action to add.
         -->
-        
+
         <!-- (most) text & description attributes are defined in the resource-bundle (defined above)-->
         <!-- You MUST manually update the corresponding resource bundle keys if you change an ID -->
         <group id="FRC.FrcToolsActionsGroup"
@@ -312,9 +313,9 @@
                class="net.javaru.iip.frc.actions.tools.FrcToolsActionGroup"
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
-
+            <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after" />
             <action id="frc.tools.CheckForWpiLibUpdateAction" class="net.javaru.iip.frc.actions.tools.CheckForWpiLibUpdateAction" icon="FrcIcons.WpiLib.WPI_LIB_16" />
-            
+
             <!-- LEGACY ACTIONS -->
             <action id="frc.tools.AttachWpilibAction"
                     class="net.javaru.iip.frc.actions.tools.legacy.AttachLegacyWpilibAction"
@@ -329,58 +330,66 @@
             <action id="frc.tools.DownloadWpiLibAction"
                     class="net.javaru.iip.frc.actions.tools.legacy.DownloadLegacyWpiLibAction"
                     icon="AllIcons.Actions.Download" />
-            
-            <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after" />
         </group>
 
         <group id="FRC.FrcRioLogActionsGroup"
                class="net.javaru.iip.frc.actions.tools.riolog.FrcRioLogActionGroup"
                popup="true"
                icon="FrcIcons.RioLog.RIOLOG">
-
+            <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="first" />
             <action id="frc.tools.ShowTcp"
                     class="net.javaru.iip.frc.actions.tools.ShowRioLogTcpConsoleAction" />
-            
             <action id="frc.tools.ShowSsh"
                     class="net.javaru.iip.frc.actions.tools.ShowRioLogSshConsoleAction" />
-
             <action id="frc.tools.ShowUdp"
                     class="net.javaru.iip.frc.actions.tools.ShowRioLogUdpConsoleAction" />
-            <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="first" />
         </group>
-        
+
         <group id="FRC.FrcInternalActionsGroup"
                class="net.javaru.iip.frc.actions.tools.internal.FrcInternalActionsGroup"
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
-            
+            <add-to-group group-id="ToolsMenu" relative-to-action="FRC.FrcToolsActionsGroup" anchor="after" />
             <action id="FRC.tools.internal.CauseAnException"
                     class="net.javaru.iip.frc.actions.tools.internal.CauseAnExceptionAction" />
             <action id="FRC.tools.internal.LogAnErrorAction"
                     class="net.javaru.iip.frc.actions.tools.internal.LogAnErrorAction" />
-            <action id="FRC.tools.internal.TriggerNotificationOfTypeActionableAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationOfTypeActionableAction" />
-            <action id="FRC.tools.internal.TriggerNotificationOfTypeGeneralAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationOfTypeGeneralAction" />
-            
-            <add-to-group  group-id="ToolsMenu" relative-to-action="FRC.FrcToolsActionsGroup" anchor="after" />
         </group>
-        
+
+        <group id="FRC.FrcInternalNotificationsActionsGroup"
+                class="net.javaru.iip.frc.actions.tools.internal.FrcInternalNotificationsActionsGroup"
+                popup="true"
+                icon="AllIcons.General.Balloon">
+            <add-to-group group-id="FRC.FrcInternalActionsGroup" anchor="last" />
+            <action id="FRC.tools.internal.TriggerNotificationOfTypeActionableAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationActionableInfoAction" />
+            <action id="FRC.tools.internal.TriggerNotificationOfTypeGeneralAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationGeneralInfoAction" />
+            <action id="FRC.tools.internal.TriggerNotificationActionableErrorAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationActionableErrorAction" />
+            <action id="FRC.tools.internal.TriggerNotificationActionableErrorImportantAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationActionableErrorImportantAction" />
+            <action id="FRC.tools.internal.TriggerNotificationBalloonAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationBalloonAction" />
+            <action id="FRC.tools.internal.TriggerSmallNotificationBalloonAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerSmallNotificationBalloonAction" />
+        </group>
+
         <group id="frc.NewFileTemplates"
                text="FRC"
                class="net.javaru.iip.frc.actions.create.FrcCreateComponentsActionGroup"
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile" />
             <separator />
             <action id="frc.action.new.command1"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v1.Command1ComponentCreationAction" />
             <action id="frc.action.new.commandGroup1"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v1.CommandGroup1ComponentCreationAction" />
-            <action id="frc.action.new.subsystem1" 
+            <action id="frc.action.new.subsystem1"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v1.Subsystem1ComponentCreationAction" />
             <action id="frc.action.new.pidSubsystem1"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v1.PidSubsystem1ComponentCreationAction" />
-
             <action id="frc.action.new.command2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.Command2ComponentCreationAction" />
             <action id="frc.action.new.commandGroup2"
@@ -393,13 +402,10 @@
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v2.PidSubsystem2ComponentCreationAction" />
             <action id="frc.action.new.profiledPidSubsystem2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.profiledPidSubsystem.v2.ProfiledPidSubsystem2ComponentCreationAction" />
-
-
             <action id="frc.action.new.basic.trigger"
                     class="net.javaru.iip.frc.actions.create.simple.SimpleNewFrcTriggerClassAction" />
-            
+
             <!--<action id="frc.action.new.build.file" class="net.javaru.iip.frc.actions.create.build.NewFrcAntBuildFileAction" text="FRC New Ant Build File" />-->
-            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile" />
         </group>
 
         <action id="frc.configureTeamNumberBasicAction"
@@ -407,14 +413,14 @@
                 icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
             <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after" />
             <add-to-group group-id="WelcomeScreen.Configure" />
-        </action> 
-        
+        </action>
+
         <action id="frc.configureTeamNumberStatusAwareAction"
                 class="net.javaru.iip.frc.actions.ConfigureTeamNumberStatusAwareAction"
                 icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
             <add-to-group group-id="WelcomeScreen.QuickStart" />
         </action>
-        
+
     </actions>
 
 </idea-plugin>

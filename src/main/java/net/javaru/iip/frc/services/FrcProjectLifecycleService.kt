@@ -74,6 +74,8 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
         // Projects should be fully initialized at this point (per JavaDoc in StartupActivity)
         if (project.isOpen && project.isFrcFacetedProject() && !project.isDisposed)
         {
+            // FYI: The FrcPluginVersionManagerStartupActivity also does some notification work
+
             checkLegacyIssue8Refresh(project)
             //RioLogProjectService.getInstance(project).activateTcp()
             RioLogProjectService.getInstance(project).update()
@@ -84,9 +86,6 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
             notifyToConfigureTeamNumIfNecessary(project, true)
 
             checkProjectFrcStatus(project, knownFacetedProject = true, checkTeamNumConfigStatus = false)
-
-            //TODO the checkPluginUpdateStatus function needs to be rewritten, It currently is an empty function.
-            FrcPluginVersionManager.checkPluginUpdateStatus(project)
         }
     }
 

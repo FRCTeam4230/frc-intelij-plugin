@@ -15,6 +15,8 @@
  */
 package net.javaru.iip.frc.actions.tools.internal
 
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.diagnostic.Logger
@@ -90,6 +92,29 @@ class TriggerNotificationActionableErrorImportantAction : AbstractTriggerNotific
                                               "My Sub-title")
         notification.isImportant = true
         notification.notify(project)
+    }
+}
+
+class TriggerNotificationThatUsesNotificationActionsAction : AbstractTriggerNotificationAction()
+{
+    override fun doNotification(project: Project?)
+    {
+        createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                          """Select an Option Please.""".trimIndent())
+            .addAction(object: NotificationAction("Option A") {
+                override fun actionPerformed(e: AnActionEvent, notification: Notification)
+                {
+                    val projectFromNotification = e.getData(CommonDataKeys.PROJECT)
+                    notify(FrcNotificationType.ACTIONABLE_INFO, "You selected option A from project ${projectFromNotification?.name}")
+                }
+            })
+            .addAction(object: NotificationAction("Option B") {
+                override fun actionPerformed(e: AnActionEvent, notification: Notification)
+                {
+                    val projectFromNotification = e.getData(CommonDataKeys.PROJECT)
+                    notify(FrcNotificationType.ACTIONABLE_INFO, "You selected option B from project ${projectFromNotification?.name}")
+                }
+            }).notify(project)
     }
 }
 

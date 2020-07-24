@@ -25,7 +25,6 @@ import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.notification.NotificationsConfiguration
 import com.intellij.notification.impl.NotificationsManagerImpl
-import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
@@ -53,8 +52,11 @@ import javax.swing.event.HyperlinkEvent
                 NotificationActions add links below the content/message (i.e. links are not inline)
                 Use Notification.addAction(AnAction) to add actions
             Use NotificationListener.URL_OPENING_LISTENER to open external links in browser
+                However, this expires the notification. If that is not desired, use our own
+                URL_OPENING_LISTENER_NO_EXPIRE
  */
 
+val URL_OPENING_LISTENER_NO_EXPIRE = NotificationListener.UrlOpeningListener(false)
 
 @Suppress("unused")
 enum class FrcNotificationType(val group: NotificationGroup, val notificationType: NotificationType, val icon: Icon)
@@ -90,6 +92,12 @@ enum class FrcNotificationType(val group: NotificationGroup, val notificationTyp
                            listener: (notification: Notification, event: HyperlinkEvent) -> Unit): Notification = FrcNotifications.createNotification(this, content, subTitle, listener)
 
 
+}
+
+fun Notification.notifyViaBalloonForFrc(project: Project?, hideOnClickOutside: Boolean = false): Notification
+{
+    FrcNotifications.showBalloon(this, project, hideOnClickOutside)
+    return this
 }
 
 @Suppress("unused")
@@ -644,21 +652,21 @@ object FrcNotifications
         val myActionA = object : NotificationAction("Link Text") {
             override fun actionPerformed(e: AnActionEvent, notification: Notification)
             {
-                notification.expire();
+                notification.expire()
                 // Do work here
             }
         }
         val myActionB = object : NotificationAction("Don't show again") {
             override fun actionPerformed(e: AnActionEvent, notification: Notification)
             {
-                notification.expire();
+                notification.expire()
                 // Update setting so this message is not shown again
             }
         }
 
         myNotification.addAction(myActionA)
         myNotification.addAction(myActionB)
-        myNotification.notify(project);
+        myNotification.notify(project)
 
 
         // We can also add Actions in a fluent/builder way
@@ -666,13 +674,13 @@ object FrcNotifications
             .addAction(object : NotificationAction("Link Text") {
                 override fun actionPerformed(e: AnActionEvent, notification: Notification)
                 {
-                    notification.expire();
+                    notification.expire()
                     // Do work here
                 }
             }).addAction(object : NotificationAction("Don't show again") {
                 override fun actionPerformed(e: AnActionEvent, notification: Notification)
                 {
-                    notification.expire();
+                    notification.expire()
                     // Update setting so this message is not shown again
                 }
             }).notify(project)

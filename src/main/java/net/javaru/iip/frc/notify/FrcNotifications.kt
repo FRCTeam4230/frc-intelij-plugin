@@ -28,17 +28,22 @@ import com.intellij.notification.impl.NotificationsManagerImpl
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.popup.Balloon
+import com.intellij.openapi.ui.popup.JBPopupListener
+import com.intellij.openapi.ui.popup.LightweightWindowEvent
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.ui.BalloonLayoutData
 import com.intellij.ui.awt.RelativePoint
 import icons.FrcIcons
+import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.i18n.FrcBundle.message
 import net.javaru.iip.frc.i18n.FrcBundle.messageNullable
 import net.javaru.iip.frc.i18n.FrcMessageKey
 import net.javaru.iip.frc.util.getParentDisposable
 import org.intellij.lang.annotations.Language
 import java.awt.Point
+import java.util.*
 import javax.swing.Icon
 import javax.swing.event.HyperlinkEvent
 
@@ -94,11 +99,18 @@ enum class FrcNotificationType(val group: NotificationGroup, val notificationTyp
 
 }
 
-fun Notification.notifyViaBalloonForFrc(project: Project?, hideOnClickOutside: Boolean = false): Notification
+fun Notification.notifyViaBalloonForFrc(project: Project?, hideOnClickOutside: Boolean = false): BalloonResult
 {
-    FrcNotifications.showBalloon(this, project, hideOnClickOutside)
+    return BalloonResult(this, FrcNotifications.showBalloon(this, project, hideOnClickOutside))
+}
+
+fun Notification.notifyFluent(project: Project?): Notification
+{
+    this.notify(project)
     return this
 }
+
+data class BalloonResult(val notification: Notification, val balloon: Balloon?)
 
 @Suppress("unused")
 object FrcNotifications
@@ -119,8 +131,10 @@ object FrcNotifications
 
     @JvmStatic
     val IconInfo: Icon = AllIcons.General.BalloonInformation
+
     @JvmStatic
     val IconWarn: Icon = AllIcons.General.BalloonWarning
+
     @JvmStatic
     val IconError: Icon = AllIcons.General.BalloonError
 
@@ -136,6 +150,7 @@ object FrcNotifications
                                                                             true)
     }
 
+    // region == notify ==
 
     /**
      * Creates and shows -- i.e. calls `notification.notify(project)` -- a notification. The notification is returned in
@@ -228,6 +243,63 @@ object FrcNotifications
         notification.notify(project)
         return notification
     }
+
+    // endregion == notify ==
+
+
+    // region == notifyAllFrcProjects ==
+
+
+    /**
+     * Creates and shows -- i.e. calls `notification.notify(project)` -- a set of notifications, one for each open
+     * FRC project, and displays then. A `whenExpired` lambda is added to the notifications so that when one of them
+     * is expired, they are all expired. Use one of the `createNotification()` functions as the notification creation
+     * lambda. The UUID is used as a key in the [FrcSharedNotificationTracker]. The notifications are removed
+     * upon expiring.
+     */
+    fun notifyAllFrcProjects(uuidKey: UUID = UUID.randomUUID(), createNotificationFunction: () -> Notification): UUID
+    {
+        ProjectManager.getInstance().openProjects.filter {
+            it.isFrcFacetedProject()
+        }.forEach {
+            FrcSharedNotificationTracker.add(uuidKey, it,
+                                             createNotificationFunction.invoke()
+                                                 .whenExpired { FrcSharedNotificationTracker.expireAll(uuidKey) }
+                                                 .notifyFluent(it))
+        }
+        return uuidKey
+    }
+
+    /**
+     * Creates and shows -- i.e. calls `notification.notify(project)` -- a set of Balloon notifications, one for each open
+     * FRC project, and displays then. A `whenExpired` lambda is added to the notifications so that when one of them
+     * is expired, they are all expired. Use one of the `createNotification()` functions as the notification creation
+     * lambda. The UUID is used as a key in the [FrcSharedNotificationTracker]. The notifications are removed
+     * upon expiring.
+     */
+    fun notifyBalloonAllFrcProjects(uuidKey: UUID = UUID.randomUUID(), createNotificationFunction: () -> Notification): UUID
+    {
+        ProjectManager.getInstance().openProjects.filter {
+            it.isFrcFacetedProject()
+        }.forEach {
+            val balloonResult = createNotificationFunction.invoke()
+                .whenExpired { FrcSharedNotificationTracker.expireAll(uuidKey) }
+                .notifyViaBalloonForFrc(it)
+            FrcSharedNotificationTracker.add(uuidKey, it, balloonResult)
+            balloonResult.balloon?.addListener(object : JBPopupListener {
+                override fun onClosed(event: LightweightWindowEvent)
+                {
+                    FrcSharedNotificationTracker.expireAll(uuidKey)
+                }
+            })
+        }
+        return uuidKey
+    }
+
+    // endregion == notifyAllFrcProjects ==
+
+
+    // region == createNotification ==
 
     /**
      * Creates, but does *not* show a notification. The caller will be responsible for queuing up (i.e. showing) the notification
@@ -332,6 +404,9 @@ object FrcNotifications
 
     }
 
+    // endregion createNotification
+
+    // region == notifyBalloon ==
 
     /**
      * Creates and shows a Balloon  notification. It is recommended for the content to be HTML. The notification is returned in
@@ -372,11 +447,10 @@ object FrcNotifications
                       @Language("HTML") content: String,
                       subTitle: String? = null,
                       project: Project? = null,
-                      listener: (notification: Notification, event: HyperlinkEvent) -> Unit): Notification
+                      listener: (notification: Notification, event: HyperlinkEvent) -> Unit): BalloonResult
     {
         val notification = createNotification(type, content, subTitle, listener)
-        showBalloon(notification, project)
-        return notification
+        return BalloonResult(notification, showBalloon(notification, project))
     }
 
     /**
@@ -395,11 +469,10 @@ object FrcNotifications
                       contentKey: FrcMessageKey,
                       subTitleKey: FrcMessageKey? = null,
                       project: Project? = null,
-                      listener: NotificationListener? = null): Notification
+                      listener: NotificationListener? = null): BalloonResult
     {
         val notification = createNotification(type, contentKey, subTitleKey, listener)
-        showBalloon(notification, project)
-        return notification
+        return BalloonResult(notification, showBalloon(notification, project))
     }
 
     /**
@@ -418,13 +491,15 @@ object FrcNotifications
                       contentKey: FrcMessageKey,
                       subTitleKey: FrcMessageKey? = null,
                       project: Project? = null,
-                      listener: (notification: Notification, event: HyperlinkEvent) -> Unit): Notification
+                      listener: (notification: Notification, event: HyperlinkEvent) -> Unit): BalloonResult
     {
         val notification = createNotification(type, contentKey, subTitleKey, listener)
-        showBalloon(notification, project)
-        return notification
+        return BalloonResult(notification, showBalloon(notification, project))
     }
 
+    // endregion notifyBalloon
+
+    // region == notifyInfoBalloon ==
 
     /**
      * Creates and shows an Information Balloon notification. It is recommended for the content to be HTML. The notification is returned in
@@ -439,13 +514,12 @@ object FrcNotifications
     @JvmStatic
     @JvmOverloads
     fun notifyInfoBalloon(@Language("HTML") content: String,
-                      subTitle: String? = null,
-                      project: Project? = null,
-                      listener: NotificationListener? = null): Notification
+                          subTitle: String? = null,
+                          project: Project? = null,
+                          listener: NotificationListener? = null): BalloonResult
     {
         val notification = createNotification(FrcNotificationType.ACTIONABLE_INFO, content, subTitle, listener)
-        showBalloon(notification, project)
-        return notification
+        return BalloonResult(notification, showBalloon(notification, project))
     }
 
     /**
@@ -461,13 +535,12 @@ object FrcNotifications
     @JvmStatic
     @JvmOverloads
     fun notifyInfoBalloon(@Language("HTML") content: String,
-                      subTitle: String? = null,
-                      project: Project? = null,
-                      listener: (notification: Notification, event: HyperlinkEvent) -> Unit): Notification
+                          subTitle: String? = null,
+                          project: Project? = null,
+                          listener: (notification: Notification, event: HyperlinkEvent) -> Unit): BalloonResult
     {
         val notification = createNotification(FrcNotificationType.ACTIONABLE_INFO, content, subTitle, listener)
-        showBalloon(notification, project)
-        return notification
+        return BalloonResult(notification, showBalloon(notification, project))
     }
 
     /**
@@ -483,13 +556,12 @@ object FrcNotifications
     @JvmStatic
     @JvmOverloads
     fun notifyInfoBalloon(contentKey: FrcMessageKey,
-                      subTitleKey: FrcMessageKey? = null,
-                      project: Project? = null,
-                      listener: NotificationListener? = null): Notification
+                          subTitleKey: FrcMessageKey? = null,
+                          project: Project? = null,
+                          listener: NotificationListener? = null): BalloonResult
     {
         val notification = createNotification(FrcNotificationType.ACTIONABLE_INFO, contentKey, subTitleKey, listener)
-        showBalloon(notification, project)
-        return notification
+        return BalloonResult(notification, showBalloon(notification, project))
     }
 
     /**
@@ -505,24 +577,27 @@ object FrcNotifications
     @JvmStatic
     @JvmOverloads
     fun notifyInfoBalloon(contentKey: FrcMessageKey,
-                      subTitleKey: FrcMessageKey? = null,
-                      project: Project? = null,
-                      listener: (notification: Notification, event: HyperlinkEvent) -> Unit): Notification
+                          subTitleKey: FrcMessageKey? = null,
+                          project: Project? = null,
+                          listener: (notification: Notification, event: HyperlinkEvent) -> Unit): BalloonResult
     {
         val notification = createNotification(FrcNotificationType.ACTIONABLE_INFO, contentKey, subTitleKey, listener)
-        showBalloon(notification, project)
-        return notification
+        return BalloonResult(notification, showBalloon(notification, project))
     }
 
+    // endregion notifyInfoBalloon
+
+    // region == misc ==
 
     @JvmStatic
     @JvmOverloads
-    fun showBalloon(notification: Notification, project: Project?, hideOnClickOutside: Boolean = false)
+    fun showBalloon(notification: Notification, project: Project?, hideOnClickOutside: Boolean = false): Balloon?
     {
         val frame = WindowManager.getInstance().getIdeFrame(project)
-        if (frame == null)
+        return if (frame == null)
         {
             notification.notify(project)
+            null
         }
         else
         {
@@ -538,15 +613,18 @@ object FrcNotifications
                                                                      BalloonLayoutData.fullContent(),
                                                                      project.getParentDisposable())
                 balloon.show(target, Balloon.Position.atLeft)
+                balloon
             }
             catch (t: Throwable)
             {
                 LOG.warn("[FRC] Could not display balloon. Cause details: $t", t)
                 notification.notify(project)
+                null
             }
         }
     }
 
+    // endregion misc
 
     @Suppress("ObjectLiteralToLambda", "ControlFlowWithEmptyBody")
     private fun notificationExamples(project: Project, logger: Logger)
@@ -649,14 +727,16 @@ object FrcNotifications
         // You can also add NotificationAction (abstract class) actions. These appear below the notifications as a series of links
         val myNotification = createNotification(FrcNotificationType.ACTIONABLE_INFO, content = "Some message")
 
-        val myActionA = object : NotificationAction("Link Text") {
+        val myActionA = object : NotificationAction("Link Text")
+        {
             override fun actionPerformed(e: AnActionEvent, notification: Notification)
             {
                 notification.expire()
                 // Do work here
             }
         }
-        val myActionB = object : NotificationAction("Don't show again") {
+        val myActionB = object : NotificationAction("Don't show again")
+        {
             override fun actionPerformed(e: AnActionEvent, notification: Notification)
             {
                 notification.expire()
@@ -671,18 +751,20 @@ object FrcNotifications
 
         // We can also add Actions in a fluent/builder way
         createNotification(FrcNotificationType.ACTIONABLE_INFO, content = "Some message")
-            .addAction(object : NotificationAction("Link Text") {
-                override fun actionPerformed(e: AnActionEvent, notification: Notification)
-                {
-                    notification.expire()
-                    // Do work here
-                }
-            }).addAction(object : NotificationAction("Don't show again") {
-                override fun actionPerformed(e: AnActionEvent, notification: Notification)
-                {
-                    notification.expire()
-                    // Update setting so this message is not shown again
-                }
-            }).notify(project)
+            .addAction(object : NotificationAction("Link Text")
+                       {
+                           override fun actionPerformed(e: AnActionEvent, notification: Notification)
+                           {
+                               notification.expire()
+                               // Do work here
+                           }
+                       }).addAction(object : NotificationAction("Don't show again")
+                                    {
+                                        override fun actionPerformed(e: AnActionEvent, notification: Notification)
+                                        {
+                                            notification.expire()
+                                            // Update setting so this message is not shown again
+                                        }
+                                    }).notify(project)
     }
 }

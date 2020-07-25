@@ -377,6 +377,10 @@
                     class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationSmallBalloonAction" />
             <action id="FRC.tools.internal.TriggerNotificationBalloonWithActionsAction"
                     class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationBalloonWithActionsAction" />
+            <action id="FRC.tools.internal.TriggerNotificationSharedByFrcProjectsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationSharedByFrcProjectsAction" />
+            <action id="FRC.tools.internal.TriggerNotificationBalloonSharedByFrcProjectsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationBalloonSharedByFrcProjectsAction" />
         </group>
 
         <group id="frc.NewFileTemplates"

@@ -21,14 +21,18 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
+import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications.createNotification
 import net.javaru.iip.frc.notify.FrcNotifications.notify
+import net.javaru.iip.frc.notify.FrcNotifications.notifyAllFrcProjects
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloon
+import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllFrcProjects
 import net.javaru.iip.frc.notify.FrcNotifications.showBalloon
+import net.javaru.iip.frc.notify.notifyViaBalloonForFrc
 import org.apache.commons.lang3.RandomUtils
 import org.intellij.lang.annotations.Language
-import kotlin.random.Random
 
 
 class FrcInternalNotificationsActionsGroup : FrcInternalActionsGroup()
@@ -238,4 +242,29 @@ class TriggerNotificationBalloonWithActionsAction : AbstractTriggerNotificationA
 
 
 
+class TriggerNotificationSharedByFrcProjectsAction : AbstractTriggerNotificationAction()
+{
+    override fun doNotification(project: Project?)
+    {
+        val subTitle = "ID #${RandomUtils.nextInt(1, 5000)}"
+        notifyAllFrcProjects() { createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                                                    "This is a notification shared across all open FRC projects.",
+                                                    subTitle = subTitle)}
+    }
+}
+
+
+
+class TriggerNotificationBalloonSharedByFrcProjectsAction : AbstractTriggerNotificationAction()
+{
+    override fun doNotification(project: Project?)
+    {
+        val subTitle = "ID #${RandomUtils.nextInt(1, 5000)}"
+        notifyBalloonAllFrcProjects() {
+            createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                               "<html><h2>This is a notification shared across all open FRC projects.</h2></html>",
+                               subTitle = subTitle)
+        }
+    }
+}
 

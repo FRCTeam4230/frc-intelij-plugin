@@ -514,6 +514,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             {
                 try
                 {
+                    // TODO: replace use of Http4k classes with build in om.intellij.util.io.HttpRequests class See https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues/69
                     val url = "https://gitignore.io/api/${templates.toCommaDelimitedString(false)}"
                     val client = ApacheClient()
                     val request = Request(Method.GET, url)

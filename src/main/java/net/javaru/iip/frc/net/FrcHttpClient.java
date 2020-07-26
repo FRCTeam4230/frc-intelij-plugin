@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -46,6 +46,11 @@ import com.intellij.vcs.log.util.StopWatch;
 
 
 
+/**
+ * @deprecated We should use the built in {@link com.intellij.util.io.HttpRequests} calss as it honord the IDE's proxy settings. This
+ * is discussed in <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues/69'>Issue #69</a>
+ */
+@Deprecated
 public class FrcHttpClient
 {
     private static final Logger LOG = Logger.getInstance(FrcHttpClient.class);

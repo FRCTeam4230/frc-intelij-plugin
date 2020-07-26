@@ -16,9 +16,10 @@
 
 package net.javaru.iip.frc.wpilib
 
-import org.junit.jupiter.api.Assertions.*
+import net.javaru.iip.frc.assertPathsEqual
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
+import java.nio.file.Paths
 
 
 internal class WpiLibHelpersKtTest
@@ -28,11 +29,9 @@ internal class WpiLibHelpersKtTest
     @Test
     fun getWpiLibRootTest()
     {
-        assertAll(
-                { assertEquals("C:\\Users\\Public\\frc2019", getWpiLibRootPath(2019).toString()) },
-                { assertEquals("C:\\Users\\Public\\wpilib\\2020", getWpiLibRootPath(2020).toString()) },
-                { assertEquals("C:\\Users\\Public\\wpilib\\2021", getWpiLibRootPath(2021).toString()) }
-                 )
+        assertAll({ assertPathsEqual(Paths.get("C:\\Users\\Public\\frc2019"), getWpiLibRootPath(2019)) },
+                  { assertPathsEqual(Paths.get("C:\\Users\\Public\\wpilib\\2020"), getWpiLibRootPath(2020)) },
+                  { assertPathsEqual(Paths.get("C:\\Users\\Public\\wpilib\\2021"), getWpiLibRootPath(2021)) })
     }
 
 

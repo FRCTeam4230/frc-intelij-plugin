@@ -39,15 +39,25 @@ public class RunJavaCodeForTestingAndDebuggingFrcInternalAction extends Abstract
         final IdeView ideView = actionEvent.getData(LangDataKeys.IDE_VIEW);
         final Module module = actionEvent.getData(LangDataKeys.MODULE);
         final Project project = actionEvent.getProject();
-        
+    
         LOG.trace("[FRC] BREAKPOINT");
     
-        // Put code here, but do N0T commit it
+        try
+        {
+            LOG.trace("[FRC] BREAKPOINT");
         
-        
-        
-        
-        
+            // Put code here, but do N0T commit it
+    
+            
+            
+    
+            LOG.trace("[FRC] BREAKPOINT");
+        }
+        catch (Throwable t)
+        {
+            LOG.warn("[FRC] Exception: $t", t);
+        }
+    
         LOG.trace("[FRC] BREAKPOINT");
     }
 }

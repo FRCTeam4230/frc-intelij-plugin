@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.LangDataKeys
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
+import com.intellij.util.io.HttpRequests
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import javax.swing.Icon
 import org.apache.commons.lang3.BooleanUtils
@@ -126,10 +127,21 @@ class RunKotlinCodeForTestingAndDebuggingFrcInternalAction : AbstractFrcInternal
 
         LOG.trace("[FRC] BREAKPOINT")
 
-        // Put code here, but do N0T commit it
+        try
+        {
+            LOG.trace("[FRC] BREAKPOINT")
+
+            // Put code here, but do N0T commit it
 
 
 
+
+            LOG.trace("[FRC] BREAKPOINT")
+        }
+        catch (t: Throwable)
+        {
+            LOG.warn("[FRC] Exception: $t", t)
+        }
 
         LOG.trace("[FRC] BREAKPOINT")
     }

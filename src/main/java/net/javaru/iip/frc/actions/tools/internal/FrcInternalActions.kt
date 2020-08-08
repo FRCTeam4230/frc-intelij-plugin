@@ -17,12 +17,10 @@ package net.javaru.iip.frc.actions.tools.internal
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.LangDataKeys
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
-import com.intellij.util.io.HttpRequests
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import javax.swing.Icon
 import org.apache.commons.lang3.BooleanUtils

@@ -46,7 +46,7 @@ public class RunJavaCodeForTestingAndDebuggingFrcInternalAction extends Abstract
         {
             LOG.trace("[FRC] BREAKPOINT");
         
-            // Put code here, but do N0T commit it
+            // Put code here, but do N0T commit it - paying attention to import statements
     
             
             

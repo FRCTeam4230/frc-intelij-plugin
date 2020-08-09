@@ -232,21 +232,7 @@ data class MavenMetadata(val groupId: String,
                          val versions: List<String>,
                          val lastUpdated: String /* ex: 20191123193733 */
                          )
-{
-//    @Language("JSON")
-//    fun toJson(prettyPrint: Boolean): String
-//    {
-//        val writer: ObjectWriter = if (prettyPrint) prettyPrintWriter else mapper.writer()
-//        return writer.writeValueAsString(this)
-//    }
 
-    companion object
-    {
-        @JvmStatic
-        fun fromJson(@Language("JSON") json: String): MavenMetadata = mapper.readValue<MavenMetadata>(json)
-    }
-
-}
 
 /**
  * A data class to represent a `maven-metadata.xml` file for a WpiLib artifact such as the GradleRIO plugin.

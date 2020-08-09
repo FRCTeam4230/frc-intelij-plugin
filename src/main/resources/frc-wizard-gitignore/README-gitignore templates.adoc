@@ -19,7 +19,7 @@ bar.*
 # End of https://www.gitignore.io/api/foo
 ----
 
-Out `foo.txt` file would just contain:
+Our `foo.txt` file would just contain:
 
 [source,.gitignore]
 ----

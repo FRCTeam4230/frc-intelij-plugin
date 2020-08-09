@@ -514,13 +514,14 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             {
                 try
                 {
-                    // TODO: replace use of Http4k classes with build in om.intellij.util.io.HttpRequests class See https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues/69
+                    // TODO: replace use of Http4k classes with build in com.intellij.util.io.HttpRequests class See https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues/69
                     val url = "https://gitignore.io/api/${templates.toCommaDelimitedString(false)}"
                     val client = ApacheClient()
                     val request = Request(Method.GET, url)
                     val response = client(request)
                     if (response.status.code != 200)
                     {
+                        // TODO: we need to notify the user that the gitignore was not gnerated from the site and therefore may be out of date: https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues/72
                         LOG.warn("[FRC] Did not get a successful response when querying gitignore.io in order dynamically create .gitignore file. Response status was ${response.status.code} : ${response.status.description}  Request URI was >>${request.uri}<<")
                         createFromCache = true
                     }

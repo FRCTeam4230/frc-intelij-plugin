@@ -248,6 +248,7 @@ dependencies {
     implementation("org.jdom:jdom2:2.0.6")
     implementation("commons-io:commons-io:2.7")
     implementation("org.apache.commons:commons-lang3:3.10")
+    implementation("org.apache.commons:commons-text:1.9")
     implementation("com.jcraft:jsch:0.1.54")
     // Klaxon is a library to parse JSON in Kotlin.  https://github.com/cbeust/klaxon   Available in jcenter bintray: https://jcenter.bintray.com/com/beust/klaxon/   Help available in the #klaxon channel of the Kotlin Slack Workspace
     implementation("com.beust:klaxon:5.0.9")

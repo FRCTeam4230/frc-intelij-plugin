@@ -17,6 +17,7 @@
 package net.javaru.iip.frc.util
 
 import com.intellij.openapi.diagnostic.Logger
+import org.apache.commons.text.TextStringBuilder
 
 val COL_EXT_LOG = Logger.getInstance("#net.javaru.iip.frc.util.FrcCollectionExts")
 
@@ -98,4 +99,37 @@ fun String.commaDelimitedToList(): MutableList<String>
 {
     val list = this.split(',').map { it.trim() }.toMutableList()
     return if (list.size == 1 && list[0].isBlank()) mutableListOf() else list
+}
+
+/**
+ * Converts a collection (such as a List) of Strings to a single String object with each
+ * item in the collection separated by a new line. Unix newlines are used as the default.
+ */
+fun Collection<String>?.linesToText(eol: EOL = EOL.UNIX, addTrailingEol: Boolean = false): String
+{
+    if (this == null)
+    {
+        return ""
+    }
+
+    val sb = TextStringBuilder()
+    sb.newLineText = eol.eol
+    val iterator = this.iterator()
+    while (iterator.hasNext())
+    {
+        val line = iterator.next()
+        if (iterator.hasNext())
+        {
+            sb.appendln(line)
+        }
+        else
+        {
+            sb.append(line)
+        }
+    }
+    if (addTrailingEol)
+    {
+        sb.appendNewLine()
+    }
+    return sb.toString()
 }

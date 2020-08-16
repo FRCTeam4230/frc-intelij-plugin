@@ -138,7 +138,8 @@ class RunKotlinCodeForTestingAndDebuggingFrcInternalAction : AbstractFrcInternal
         }
         catch (t: Throwable)
         {
-            LOG.warn("[FRC] Exception: $t", t)
+            // We log as an error so we can more easily grab the stacktrace from the exception reporter
+            LOG.error("[FRC] Exception: $t", t)
         }
 
         LOG.trace("[FRC] BREAKPOINT")

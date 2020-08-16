@@ -21,8 +21,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectManager
-import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications.createNotification
 import net.javaru.iip.frc.notify.FrcNotifications.notify
@@ -30,7 +28,6 @@ import net.javaru.iip.frc.notify.FrcNotifications.notifyAllFrcProjects
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloon
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllFrcProjects
 import net.javaru.iip.frc.notify.FrcNotifications.showBalloon
-import net.javaru.iip.frc.notify.notifyViaBalloonForFrc
 import org.apache.commons.lang3.RandomUtils
 import org.intellij.lang.annotations.Language
 

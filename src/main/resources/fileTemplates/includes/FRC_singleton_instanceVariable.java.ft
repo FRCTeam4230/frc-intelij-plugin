@@ -9,12 +9,21 @@
 #end
 #if($singletonIncludeJavadoc == "true") 
 /**
- * The Singleton instance of this ${NAME}. External classes should
- * use the {@link ${H}getInstance()} method to get the instance.
+ * The Singleton instance of this ${NAME}. Code should use
+ * the {@link ${H}getInstance()} method to get the single instance (rather
+ * than trying to construct an instance of this class.)
+  #if($singletonInitMethodology == "THREAD_SAFE")
+ * <p>
+ * The INSTANCE field is volatile to ensure that multiple threads
+ * offer it correctly when it is being initialized by ensuring changes
+ * made in one thread are immediately reflected in other threads.
+  #end
  */
 #end
 #if($singletonInitMethodology == "EAGER")
 private final static ${NAME} INSTANCE = new ${NAME}();
+#elseif($singletonInitMethodology == "THREAD_SAFE")
+private volatile static ${NAME} INSTANCE;
 #else
 private static ${NAME} INSTANCE;     
 #end

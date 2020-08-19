@@ -257,10 +257,15 @@ object FrcNotifications
      * lambda. The UUID is used as a key in the [FrcSharedNotificationTracker]. The notifications are removed
      * upon expiring.
      */
-    fun notifyAllFrcProjects(uuidKey: UUID = UUID.randomUUID(), createNotificationFunction: () -> Notification): UUID
+    fun notifyAllOpenProjects(uuidKey: UUID = UUID.randomUUID(),
+                              notifyFrcProjectsOnly: Boolean = true,
+                              createNotificationFunction: () -> Notification): UUID
     {
         ProjectManager.getInstance().openProjects.filter {
-            it.isFrcFacetedProject()
+            if (notifyFrcProjectsOnly)
+                it.isFrcFacetedProject()
+            else
+                true
         }.forEach {
             FrcSharedNotificationTracker.add(uuidKey, it,
                                              createNotificationFunction.invoke()
@@ -277,10 +282,15 @@ object FrcNotifications
      * lambda. The UUID is used as a key in the [FrcSharedNotificationTracker]. The notifications are removed
      * upon expiring.
      */
-    fun notifyBalloonAllFrcProjects(uuidKey: UUID = UUID.randomUUID(), createNotificationFunction: () -> Notification): UUID
+    fun notifyBalloonAllOpenProjects(uuidKey: UUID = UUID.randomUUID(),
+                                     notifyFrcProjectsOnly: Boolean = true,
+                                     createNotificationFunction: () -> Notification): UUID
     {
         ProjectManager.getInstance().openProjects.filter {
-            it.isFrcFacetedProject()
+            if (notifyFrcProjectsOnly)
+                 it.isFrcFacetedProject()
+            else
+                true
         }.forEach {
             val balloonResult = createNotificationFunction.invoke()
                 .whenExpired { FrcSharedNotificationTracker.expireAll(uuidKey) }

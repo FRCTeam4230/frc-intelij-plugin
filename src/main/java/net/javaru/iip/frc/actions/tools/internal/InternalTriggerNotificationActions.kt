@@ -24,9 +24,9 @@ import com.intellij.openapi.project.Project
 import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications.createNotification
 import net.javaru.iip.frc.notify.FrcNotifications.notify
-import net.javaru.iip.frc.notify.FrcNotifications.notifyAllFrcProjects
+import net.javaru.iip.frc.notify.FrcNotifications.notifyAllOpenProjects
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloon
-import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllFrcProjects
+import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllOpenProjects
 import net.javaru.iip.frc.notify.FrcNotifications.showBalloon
 import org.apache.commons.lang3.RandomUtils
 import org.intellij.lang.annotations.Language
@@ -244,9 +244,21 @@ class TriggerNotificationSharedByFrcProjectsAction : AbstractTriggerNotification
     override fun doNotification(project: Project?)
     {
         val subTitle = "ID #${RandomUtils.nextInt(1, 5000)}"
-        notifyAllFrcProjects() { createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
-                                                    "This is a notification shared across all open FRC projects.",
-                                                    subTitle = subTitle)}
+        notifyAllOpenProjects() { createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                                                     "This is a notification shared across all open FRC projects.",
+                                                     subTitle = subTitle)}
+    }
+}
+
+
+class TriggerNotificationSharedByALLOpenProjectsAction : AbstractTriggerNotificationAction()
+{
+    override fun doNotification(project: Project?)
+    {
+        val subTitle = "ID #${RandomUtils.nextInt(1, 5000)}"
+        notifyAllOpenProjects(notifyFrcProjectsOnly = false) { createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                                                     "This is a notification shared across ALL open projects (FRC & Non-FRC).",
+                                                     subTitle = subTitle)}
     }
 }
 
@@ -257,9 +269,22 @@ class TriggerNotificationBalloonSharedByFrcProjectsAction : AbstractTriggerNotif
     override fun doNotification(project: Project?)
     {
         val subTitle = "ID #${RandomUtils.nextInt(1, 5000)}"
-        notifyBalloonAllFrcProjects() {
+        notifyBalloonAllOpenProjects(notifyFrcProjectsOnly = true) {
             createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
                                "<html><h2>This is a notification shared across all open FRC projects.</h2></html>",
+                               subTitle = subTitle)
+        }
+    }
+}
+
+class TriggerNotificationBalloonSharedByALLOpenProjectsAction : AbstractTriggerNotificationAction()
+{
+    override fun doNotification(project: Project?)
+    {
+        val subTitle = "ID #${RandomUtils.nextInt(1, 5000)}"
+        notifyBalloonAllOpenProjects(notifyFrcProjectsOnly = false) {
+            createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                               "<html><h2>This is a notification shared across ALL open projects (FRC & Non-FRC).</h2></html>",
                                subTitle = subTitle)
         }
     }

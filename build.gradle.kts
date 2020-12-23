@@ -53,13 +53,13 @@ plugins {
     base
     java
     kotlin("jvm") version "1.3.72"
-    id("org.jetbrains.intellij") version "0.4.26" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
+    id("org.jetbrains.intellij") version "0.6.5" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
     //    https://github.com/jetbrains/gradle-idea-ext-plugin
     //    https://plugins.gradle.org/plugin/org.jetbrains.gradle.plugin.idea-ext
-    //    v0.6.1+ requires IntelliJ IDEA 2019.2
-    id("org.jetbrains.gradle.plugin.idea-ext") version "0.7"
+    //    v0.10+ requires IDEA 2020.2+   v0.6.1+ requires IntelliJ IDEA 2019.2
+    id("org.jetbrains.gradle.plugin.idea-ext") version "0.10"
 }
 
 
@@ -231,8 +231,15 @@ idea {
 
 repositories {
     mavenCentral()
-    maven("https://dl.bintray.com/jetbrains/intellij-plugin-service")
+    maven("https://jetbrains.bintray.com/intellij-plugin-service") // new repo
+    maven("https://dl.bintray.com/jetbrains/intellij-plugin-service/") // older repo
     maven("https://plugins.gradle.org/m2/")
+    maven {
+        url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
     jcenter()
 }
 

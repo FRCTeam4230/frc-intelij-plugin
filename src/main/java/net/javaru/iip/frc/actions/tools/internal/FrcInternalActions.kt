@@ -19,9 +19,22 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.LangDataKeys
+import com.intellij.openapi.application.Application
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.Task
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
+import icons.FrcIcons.FRC
+import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.facet.isFrcFacetedProject
+import net.javaru.iip.frc.net.FrcPseudoRestService
+import net.javaru.iip.frc.notify.FrcNotificationType
+import net.javaru.iip.frc.notify.FrcNotifications
+import net.javaru.iip.frc.notify.FrcNotifications.createNotification
+import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllOpenProjects
+import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibLibrariesUtils
 import javax.swing.Icon
 import org.apache.commons.lang3.BooleanUtils
 
@@ -148,5 +161,72 @@ class RunKotlinCodeForTestingAndDebuggingFrcInternalAction : AbstractFrcInternal
     companion object
     {
         private val LOG = Logger.getInstance(CauseAnExceptionAction::class.java)
+    }
+}
+
+class FetchPredefinedRestResource: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        object : Task.Modal(actionEvent.project, "Checking REST Service", false)
+        {
+            override fun run(indicator: ProgressIndicator)
+            {
+                val resourcePath = "license.txt"
+                val resource = FrcPseudoRestService.getResource(resourcePath) ?: "Was Null (i.e. not found)"
+                notifyBalloonAllOpenProjects(notifyFrcProjectsOnly = true) {
+                    createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                                       "<html><h2>The following was retrieved from '$resourcePath'</h2><br/><pre>$resource</pre></html>")
+                }
+            }
+        }.queue()
+    }
+}
+
+class FetchSpecifiedRestResource: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        val project = actionEvent.project
+        if (project == null)
+        {
+            FrcNotifications.notifyAllOpenProjects(notifyFrcProjectsOnly = false) {
+                createNotification(
+                    FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                    "Project was null on the ActionEvent. Need a Project in order to fetch the resource on a read action thread",
+                    subTitle = "Fetch REST Service Failure"
+                                  )
+            }
+        }
+        else
+        {
+            DumbService.getInstance(project).runReadActionInSmartMode<Boolean> {
+                val defaultResourcePath = "dynamic-notifications/eol.json"
+                val message =
+                    """<html><b>Resource to fetch?<b><br>
+                    |Relative to the <tt>src/main/resources</tt> dir on the <tt>rest-v1/</tt> branch <b>without</b> leading slash.<br>
+                    |Examples:<br>
+                    |&nbsp;&nbsp;&nbsp;&nbsp;copyright.txt<br>
+                    |&nbsp;&nbsp;&nbsp;&nbsp;licenses/wpilib-license.txt<br>
+                    |&nbsp;&nbsp;&nbsp;&nbsp;dynamic-notifications/eol.json<br>
+                    |</html>""".trimMargin()
+                val resourcePath = Messages.showInputDialog(project, message, FrcPluginGlobals.FRC_PLUGIN_NAME, FRC.FIRST_ICON_DIALOG_WINDOW, defaultResourcePath, null) ?: defaultResourcePath
+                object : Task.Modal(project, "Checking REST Service", false)
+                {
+                    override fun run(indicator: ProgressIndicator)
+                    {
+
+                        val resource = FrcPseudoRestService.getResource(resourcePath) ?: "Was Null (i.e. not found)"
+                        notifyBalloonAllOpenProjects(notifyFrcProjectsOnly = true) {
+                            createNotification(
+                                FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                                "<html><h2>The following was retrieved from '$resourcePath'</h2><br/><pre>$resource</pre></html>"
+                                              )
+                        }
+                    }
+                }.queue()
+                true;
+            }
+        }
     }
 }

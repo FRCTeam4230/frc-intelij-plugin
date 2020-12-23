@@ -179,6 +179,9 @@
         <applicationService id="FRC.RioLogUdpSocketManagerApplicationService" serviceImplementation="net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService" />
         <applicationService id="FRC.GradleRioMavenMetadataState" serviceImplementation="net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState" />
         <applicationService id="FRC.ComponentCreationSharedState" serviceImplementation="net.javaru.iip.frc.actions.create.advanced.ComponentCreationSharedState" />
+        <applicationService id="FRC.FrcPluginVersionManagerState" serviceImplementation="net.javaru.iip.frc.plugin.FrcPluginVersionManagerState" />
+        <applicationService id="FRC.RestService" serviceImplementation="net.javaru.iip.frc.net.FrcPseudoRestService" />
+        <applicationService id="FRC.FrcPluginVersionManagerApplicationService" serviceImplementation="net.javaru.iip.frc.plugin.FrcPluginVersionManagerApplicationService" />
 
         <applicationConfigurable id="preferences.language.FRC"
                                  instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable"
@@ -199,23 +202,17 @@
         <projectService id="FRC.FrcRoboRioSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcRoboRioSettings" />
         <projectService id="FRC.FrcSshSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcSshSettings" />
         <projectService id ="FRC.VendordepsFileListener" serviceImplementation="net.javaru.iip.frc.services.VendordepsFileListener" />
-        <postStartupActivity implementation="net.javaru.iip.frc.services.VendordepsFileListenerStartupActivity" />
-
-        <projectService id="FRC.RioLogConsoleProjectService"
-                        serviceImplementation="net.javaru.iip.frc.riolog.RioLogProjectService" />
-
-        <projectService id="FRC.TcpRioLogConsoleProjectService"
-                        serviceImplementation="net.javaru.iip.frc.riolog.tcp.TcpRioLogMonitorProjectService" />
-
-        <projectService id="FRC.UdpRioLogConsoleProjectService"
-                        serviceImplementation="net.javaru.iip.frc.riolog.udp.UdpRioLogMonitorProjectService" />
-
-        <projectService id="FRC.SshRioLogConsoleProjectService"
-                        serviceImplementation="net.javaru.iip.frc.riolog.ssh.SshRioLogMonitorProjectService" />
-
-
+        <postStartupActivity id="FRC.VendordepsFileListenerStartupActivity" implementation="net.javaru.iip.frc.services.VendordepsFileListenerStartupActivity" />
+        <postStartupActivity id="FRC.FrcPluginVersionManagerStartupActivity" implementation="net.javaru.iip.frc.plugin.FrcPluginVersionManagerStartupActivity" />
         <projectService id="FRC.WpiLibUpdateCheckingService" serviceImplementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionService" />
         <postStartupActivity implementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionStartupActivity" />
+        <projectService id="FRC.RioLogConsoleProjectService" serviceImplementation="net.javaru.iip.frc.riolog.RioLogProjectService" />
+        <projectService id="FRC.TcpRioLogConsoleProjectService" serviceImplementation="net.javaru.iip.frc.riolog.tcp.TcpRioLogMonitorProjectService" />
+        <projectService id="FRC.UdpRioLogConsoleProjectService" serviceImplementation="net.javaru.iip.frc.riolog.udp.UdpRioLogMonitorProjectService" />
+        <projectService id="FRC.SshRioLogConsoleProjectService" serviceImplementation="net.javaru.iip.frc.riolog.ssh.SshRioLogMonitorProjectService" />
+
+
+
 
         <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
 
@@ -358,6 +355,10 @@
                     class="net.javaru.iip.frc.actions.tools.internal.CauseAnExceptionAction" />
             <action id="FRC.tools.internal.LogAnErrorAction"
                     class="net.javaru.iip.frc.actions.tools.internal.LogAnErrorAction" />
+            <action id="FRC.tools.internal.FetchPredefinedRestResource"
+                    class="net.javaru.iip.frc.actions.tools.internal.FetchPredefinedRestResource" />
+            <action id="FRC.tools.internal.FetchSpecifiedRestResource"
+                    class="net.javaru.iip.frc.actions.tools.internal.FetchSpecifiedRestResource" />
         </group>
 
         <group id="FRC.FrcInternalNotificationsActionsGroup"

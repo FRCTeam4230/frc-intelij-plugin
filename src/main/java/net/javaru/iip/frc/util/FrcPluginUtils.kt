@@ -82,6 +82,29 @@ fun getPluginResourceAsStream(path: String): InputStream?
     }
 }
 
+@WillNotThrowException
+fun getPluginResourceAsText(resourcePath: String): String?
+{
+    val inputStream = getPluginResourceAsStream(resourcePath)
+    return if (inputStream == null)
+    {
+        LOG.warn("[FRC] Could not find resource: $resourcePath")
+        null
+    }
+    else
+    {
+        try
+        {
+            inputStream.bufferedReader().use { it.readText() }
+        }
+        catch (t: Throwable)
+        {
+            LOG.warn("[FRC] An exception occurred when trying to read resource '$resourcePath'. Cause Summary: $t", t)
+            null
+        }
+    }
+}
+
 fun Project?.getParentDisposable(): Disposable
 {
     return if (this != null) FrcProjectLifecycleService.getInstance(this) else getApplicationParentDisposable()

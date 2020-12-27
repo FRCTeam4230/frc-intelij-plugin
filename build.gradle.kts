@@ -52,7 +52,7 @@ val ideaUntilBuild: String by project
 plugins {
     base
     java
-    kotlin("jvm") version "1.3.72"
+    kotlin("jvm") version "1.4.21"
     id("org.jetbrains.intellij") version "0.4.21" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
@@ -92,8 +92,11 @@ tasks {
 
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    // Java 11 required when supporting v2020.3 and later only; Java 8 is no longer bundled.
+    //      See  https://jetbrains.org/intellij/sdk/docs/reference_guide/api_changes/api_changes_list_2020.html#section
+    //           https://blog.jetbrains.com/platform/2020/09/intellij-project-migrates-to-java-11/
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 tasks.named<Test>("test") {

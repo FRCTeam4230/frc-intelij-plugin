@@ -145,7 +145,16 @@ fun findAnAnchorProject(): Project?
     }
     else
     {
-        getAllOpenProjects().findProjectWithFocus()
+        val openProjects = getAllOpenProjects()
+        if (openProjects.isNotEmpty())
+        {
+            openProjects.findProjectWithFocus() ?: openProjects[0]
+        }
+        else
+        {
+            null
+        }
+
     }
 }
 

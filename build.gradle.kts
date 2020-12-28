@@ -19,7 +19,7 @@ import org.jetbrains.gradle.ext.ProjectSettings
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.intellij.tasks.RunIdeTask
-import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
+//import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
 
 val frcPluginBaseVersion: String by project
@@ -35,7 +35,7 @@ version = "$frcPluginBaseVersion-$ideaMajorVersion$frcPluginEapDesignator"
 //}
 
 
-val kotlinVersion = plugins.getPlugin(KotlinPluginWrapper::class.java).kotlinPluginVersion
+//val kotlinVersion = plugins.getPlugin(KotlinPluginWrapper::class.java).kotlinPluginVersion
 
 val ideaVersion: String by project
 val isEAP: String by project
@@ -249,9 +249,9 @@ dependencies {
     val http4kVersion = "3.248.0"
     val jacksonVersion = "2.11.2"
 
-    implementation(kotlin("stdlib", kotlinVersion))
-    implementation(kotlin("reflect", kotlinVersion))
-    testImplementation(kotlin("test", kotlinVersion))
+    implementation(kotlin("stdlib"))
+    implementation(kotlin("reflect"))
+    testImplementation(kotlin("test"))
     implementation("org.jdom:jdom2:2.0.6")
     implementation("commons-io:commons-io:2.7")
     implementation("org.apache.commons:commons-lang3:3.11")

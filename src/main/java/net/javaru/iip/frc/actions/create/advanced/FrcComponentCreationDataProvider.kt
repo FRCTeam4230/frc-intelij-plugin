@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@ abstract class FrcComponentCreationDataProvider
     
     abstract val fileTemplateDescriptor: FileTemplateDescriptor
     
-    open val icon: Icon by lazy { fileTemplateDescriptor.icon }
+    open val icon: Icon? by lazy { fileTemplateDescriptor.icon }
     
     open val fileTemplateName: String by lazy { fileTemplateDescriptor.fileName } }
 

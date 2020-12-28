@@ -92,7 +92,6 @@ tasks {
 
 
 java {
-    //Once we only support 203 (2020.3) and later, change to Java 11. See https://blog.jetbrains.com/platform/2020/09/intellij-project-migrates-to-java-11/
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }

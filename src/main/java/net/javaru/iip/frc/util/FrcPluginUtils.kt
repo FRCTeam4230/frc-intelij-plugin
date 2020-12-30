@@ -118,59 +118,22 @@ fun Project?.getParentDisposable(): Disposable
 fun getApplicationParentDisposable(): Disposable = FrcApplicationDisposableService.getInstance()
 
 /**
- * Returns the full version, including the Idea Version, of the running FRC plugin. For example: `1.4.0-2020.3`
- * In the rare event the Plugin Version cannot be determined, `null` is returned.
- * @see getFrcPluginFullVersion
- * @see getFrcPluginCoreVersionString
- * @see getFrcPluginCoreVersion
+ * Returns the full Semantic Version, including the IntelliJ IDEA Version, of the running FRC plugin. For example: `1.4.0-2020.3`.
+ * If you need just the "base"/"core" version, for example 1.4.0, use the `normalVersion` property: `getFrcPlugVersion()?.normalVersion`
+ * In the rare event the Plugin Version cannot be determined, or an exception occur during parsing, `null` is returned.
  */
-fun getFrcPluginFullVersionString(): String?
+fun getFrcPlugVersion(): SemVer?
 {
     val pluginId = PluginId.getId(FRC_PLUGIN_ID_STRING)
     val pluginDescriptor = PluginManager.getPlugin(pluginId)
-    return pluginDescriptor?.version
-}
-
-/**
- * Returns the full version, including the Idea Version, of the running FRC plugin. For example: `1.4.0-2020.3`
- * In the rare event the Plugin Version cannot be determined, `null` is returned.
- * Note that the supported IDEA version is parsed as the 'preReleaseVersion` within the `SemVer`.
- * @see getFrcPluginFullVersionString
- * @see getFrcPluginCoreVersionString
- * @see getFrcPluginCoreVersion
- */
-fun getFrcPluginFullVersion(): SemVer? = getFrcPluginFullVersionString().toSemVer()
-
-/**
- * Returns the core version, *without* the Idea Version, of the running FRC plugin. For example: `1.4.0`
- * In the rare event the Plugin Version cannot be determined, `null` is returned.
- * @see getFrcPluginCoreVersion
- * @see getFrcPluginFullVersionString
- * @see getFrcPluginFullVersion
- */
-fun getFrcPluginCoreVersionString(): String?
-{
-    return getFrcPluginFullVersionString()?.substringBefore('-')
-}
-
-/**
- * Returns the core version, *without* the Idea Version, of the running FRC plugin. For example: `1.4.0`
- * In the rare event the Plugin Version cannot be determined, `null` is returned.
- * @see getFrcPluginCoreVersionString
- * @see getFrcPluginFullVersionString
- * @see getFrcPluginFullVersion
- */
-fun getFrcPluginCoreVersion(): SemVer? = getFrcPluginCoreVersionString().toSemVer()
-
-private fun String?.toSemVer(): SemVer?
-{
+    val version =  pluginDescriptor?.version
     // We're using SemVer from com.asarkar:jsemver but it should be noted IDEA has a built in SemVer in com.intellij.util.text - but it's less robust than the library one
     return try
     {
-        if (this == null) null else SemVer.parse(this)
+        if (version == null) null else SemVer.parse(version)
     } catch (e: Exception)
     {
-        LOG.warn("Could not parse '$this' to a Semantic Version. Cause Summary: $e", e)
+        LOG.warn("Could not parse '$version' to a Semantic Version. Cause Summary: $e", e)
         null
     }
 }

@@ -122,7 +122,7 @@ fun getApplicationParentDisposable(): Disposable = FrcApplicationDisposableServi
  * If you need just the "base"/"core" version, for example 1.4.0, use the `normalVersion` property: `getFrcPlugVersion()?.normalVersion`
  * In the rare event the Plugin Version cannot be determined, or an exception occur during parsing, `null` is returned.
  */
-fun getFrcPlugVersion(): SemVer?
+fun getFrcPluginVersion(): SemVer?
 {
     val pluginId = PluginId.getId(FRC_PLUGIN_ID_STRING)
     val pluginDescriptor = PluginManager.getPlugin(pluginId)

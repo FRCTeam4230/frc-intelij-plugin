@@ -16,13 +16,16 @@
 
 package net.javaru.iip.frc.util
 
+import com.intellij.ide.plugins.PluginManager
 import com.intellij.ide.plugins.cl.PluginClassLoader
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import icons.FrcIcons
+import net.javaru.iip.frc.FrcPluginGlobals.FRC_PLUGIN_ID_STRING
 import net.javaru.iip.frc.services.FrcApplicationDisposableService
 import net.javaru.iip.frc.services.FrcProjectLifecycleService
 import org.apache.commons.io.FilenameUtils
@@ -112,4 +115,9 @@ fun Project?.getParentDisposable(): Disposable
 
 fun getApplicationParentDisposable(): Disposable = FrcApplicationDisposableService.getInstance()
 
-
+fun getFrcPluginVersion(): String?
+{
+    val pluginId = PluginId.getId(FRC_PLUGIN_ID_STRING)
+    val pluginDescriptor = PluginManager.getPlugin(pluginId)
+    return pluginDescriptor?.version
+}

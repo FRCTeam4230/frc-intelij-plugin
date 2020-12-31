@@ -270,7 +270,7 @@ dependencies {
     implementation("org.http4k:http4k-client-apache-async:$http4kVersion")
     //compile("org.http4k:http4k-server-jetty:$http4kVersion")
 
-    implementation("com.asarkar:jsemver:0.6.2")
+    implementation("com.asarkar:jsemver:0.6.2")  // https://github.com/asarkar/jsemver  Requires one-off repo declaration of: maven("https://dl.bintray.com/asarkar/mvn")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatypes-collections:$jacksonVersion")

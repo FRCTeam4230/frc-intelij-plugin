@@ -133,7 +133,7 @@ fun getFrcPluginVersion(): SemVer?
         if (version == null) null else SemVer.parse(version)
     } catch (e: Exception)
     {
-        LOG.warn("Could not parse '$version' to a Semantic Version. Cause Summary: $e", e)
+        LOG.warn("[FRC] Could not parse '$version' to a Semantic Version. Cause Summary: $e", e)
         null
     }
 }

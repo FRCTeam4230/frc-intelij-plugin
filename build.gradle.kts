@@ -233,6 +233,7 @@ repositories {
     mavenCentral()
     maven("https://jetbrains.bintray.com/intellij-plugin-service") // new repo
     maven("https://dl.bintray.com/jetbrains/intellij-plugin-service/") // older repo
+    maven("https://dl.bintray.com/asarkar/mvn") //for jsemver
     maven("https://plugins.gradle.org/m2/")
     maven {
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
@@ -268,6 +269,8 @@ dependencies {
     implementation("org.http4k:http4k-client-apache:$http4kVersion")
     implementation("org.http4k:http4k-client-apache-async:$http4kVersion")
     //compile("org.http4k:http4k-server-jetty:$http4kVersion")
+
+    implementation("com.asarkar:jsemver:0.6.2")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatypes-collections:$jacksonVersion")

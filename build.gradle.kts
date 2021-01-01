@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -96,8 +96,8 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-tasks.named<Test>("test") {
-    // https://docs.gradle.org/current/userguide/java_testing.html#java_testing
+tasks.test {
+    // https://docs.gradle.org/current/userguide/java_testing.html#using_junit5
     useJUnitPlatform {
         excludeTags("slow")
     }
@@ -246,7 +246,6 @@ repositories {
 
 
 dependencies {
-    val junit5Version = "5.6.2"
     val http4kVersion = "3.248.0"
     val jacksonVersion = "2.11.2"
 
@@ -276,10 +275,10 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatypes-collections:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava:$jacksonVersion")
     implementation("org.freemarker:freemarker:2.3.30")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:$junit5Version")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
-    testImplementation("org.junit.vintage:junit-vintage-engine:$junit5Version")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
     testImplementation("com.google.guava:guava-testlib") // version in BOM above
 }
 

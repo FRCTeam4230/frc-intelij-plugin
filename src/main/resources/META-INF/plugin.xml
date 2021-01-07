@@ -194,9 +194,9 @@
         <applicationService id="FRC.RioLogUdpSocketManagerApplicationService" serviceImplementation="net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService" />
         <applicationService id="FRC.GradleRioMavenMetadataState" serviceImplementation="net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState" />
         <applicationService id="FRC.ComponentCreationSharedState" serviceImplementation="net.javaru.iip.frc.actions.create.advanced.ComponentCreationSharedState" />
-        <applicationService id="FRC.FrcPluginVersionManagerState" serviceImplementation="net.javaru.iip.frc.plugin.FrcPluginVersionManagerState" />
         <applicationService id="FRC.RestService" serviceImplementation="net.javaru.iip.frc.net.FrcPseudoRestService" />
         <applicationService id="FRC.FrcPluginVersionManagerApplicationService" serviceImplementation="net.javaru.iip.frc.plugin.FrcPluginVersionManagerApplicationService" />
+        <applicationService id="FRC.FrcPluginVersionManagerState" serviceImplementation="net.javaru.iip.frc.plugin.FrcPluginVersionManagerState" />
 
         <applicationConfigurable id="preferences.language.FRC"
                                  instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable"

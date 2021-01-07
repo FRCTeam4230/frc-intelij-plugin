@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ import net.javaru.iip.frc.facet.isFrcFacetedModule
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.notify.FrcNotificationsTracker
 import net.javaru.iip.frc.notify.notifyToConfigureTeamNumIfNecessary
-import net.javaru.iip.frc.plugin.FrcPluginVersionManager
 import net.javaru.iip.frc.riolog.RioLogProjectService
 import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService
 import net.javaru.iip.frc.settings.FrcProjectTeamNumberService

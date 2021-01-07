@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -281,6 +281,8 @@ object FrcNotifications
      * is expired, they are all expired. Use one of the `createNotification()` functions as the notification creation
      * lambda. The UUID is used as a key in the [FrcSharedNotificationTracker]. The notifications are removed
      * upon expiring.
+     *
+     * @sample notifyBalloonAllOpenProjectsExample
      */
     fun notifyBalloonAllOpenProjects(uuidKey: UUID = UUID.randomUUID(),
                                      notifyFrcProjectsOnly: Boolean = true,
@@ -776,5 +778,16 @@ object FrcNotifications
                                             // Update setting so this message is not shown again
                                         }
                                     }).notify(project)
+    }
+
+    private fun notifyBalloonAllOpenProjectsExample(contentFrcMessageKey: FrcMessageKey, subtitleFrcMessageKey: FrcMessageKey)
+    {
+        notifyBalloonAllOpenProjects(notifyFrcProjectsOnly = true) {
+            createNotification(
+                FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                contentFrcMessageKey, // Alternatively supply an HTML String
+                subtitleFrcMessageKey // Alternatively supply a String
+                              )
+        }
     }
 }

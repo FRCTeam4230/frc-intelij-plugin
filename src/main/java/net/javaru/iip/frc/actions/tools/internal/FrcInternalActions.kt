@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.LangDataKeys
-import com.intellij.openapi.application.Application
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
@@ -34,9 +33,8 @@ import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications
 import net.javaru.iip.frc.notify.FrcNotifications.createNotification
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllOpenProjects
-import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibLibrariesUtils
-import javax.swing.Icon
 import org.apache.commons.lang3.BooleanUtils
+import javax.swing.Icon
 
 
 val IS_IN_FRC_INTERNAL_MODE = BooleanUtils.toBoolean(System.getProperty("frc.is.internal", "false"))

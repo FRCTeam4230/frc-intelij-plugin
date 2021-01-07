@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2015-2020 the original author or authors
+  ~ Copyright 2015-2021 the original author or authors
   ~
   ~     Licensed under the Apache License, Version 2.0 (the "License");
   ~     you may not use this file except in compliance with the License.
@@ -54,6 +54,21 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v1.4.0</strong> <br>
+        &nbsp;&nbsp;&bull; Support for IntelliJ IDEA v2020.2 and later only.See the
+        <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin#eol-policy'>FRC Plugin's EOL Policy</a> for more detail.</strong><br>
+        &nbsp;&nbsp;&bull; Preparation for migrating the Plugin to be a dynamic plugin (i.e. restart of IDEA not required after upgrading FRC plugin).
+                           Full Dynamic Plugin capabilities are planned for a near future release.<br>
+        &nbsp;&nbsp;&bull; Some minor improvements to the Subsystem singleton templates.<br>
+        &nbsp;&nbsp;&bull; Replaced use of deprecated IntelliJ IDEA Plugin APIs with new APIs.<br>
+        &nbsp;&nbsp;&bull; Miscellaneous internal improvements.<br>
+        <br>
+        <strong>v1.3.1</strong> <br>
+        &nbsp;&nbsp;&bull; <strong>This is the last release for v2019.2, v2019.3 and v2020.1. The next release will only support
+        IntelliJ IDEA v2020.2 and later. See the <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin#eol-policy'>FRC Plugin's EOL Policy</a>
+        for more detail.</strong><br>
+        &nbsp;&nbsp;&bull; Miscellaneous internal improvements.<br>
+        <br>
         <strong>v1.3.0</strong> <br>
         &nbsp;&nbsp;&bull; This is a re-release of v1.2.1 but as v1.3.0. Due to the lack of a patch level indicator in the
                            v1.2 release, the IntelliJ IDEA plugin frameworks was not seeing v1.2.1-2020.1 as being newer than

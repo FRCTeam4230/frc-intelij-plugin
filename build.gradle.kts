@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ intellij {
     version = ideaVersion
     // Bundled plugin dependencies - comma separated list
     setPlugins("java", "gradle"/*, "Groovy"*/)  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/ 
-    sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
+    sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox-203"
 
     updateSinceUntilBuild = ideaUpdateSinceUntilBuild.toBoolean()
     sameSinceUntilBuild = isEAP.toBoolean() || ideaSameSinceUntilBuild.toBoolean()

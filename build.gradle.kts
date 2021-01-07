@@ -52,7 +52,7 @@ val ideaUntilBuild: String by project
 plugins {
     base
     java
-    kotlin("jvm") version "1.3.72"
+    kotlin("jvm") version "1.4.21"
     id("org.jetbrains.intellij") version "0.6.5" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
@@ -82,6 +82,7 @@ tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         all {
             kotlinOptions {
+                // Keep in sync with the java plugin configuration
                 jvmTarget = JavaVersion.VERSION_1_8.toString()
                 javaParameters = true
                 //noReflect = false
@@ -92,6 +93,7 @@ tasks {
 
 
 java {
+    // Keep in sync with the kotlinOptions.jvmTarget plugin configuration
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
@@ -249,9 +251,11 @@ dependencies {
     val http4kVersion = "3.248.0"
     val jacksonVersion = "2.11.2"
 
-    implementation(kotlin("stdlib"))
+    // For Kotlin dependencies, you can use shorthand for a dependency on a Kotlin module, for example, kotlin("test") for "org.jetbrains.kotlin:kotlin-test".
+    implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
     testImplementation(kotlin("test"))
+
     implementation("org.jdom:jdom2:2.0.6")
     implementation("commons-io:commons-io:2.7")
     implementation("org.apache.commons:commons-lang3:3.11")

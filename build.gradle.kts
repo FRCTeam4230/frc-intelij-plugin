@@ -275,7 +275,9 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatypes-collections:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava:$jacksonVersion")
     implementation("org.freemarker:freemarker:2.3.30")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
+
+    testImplementation(platform("org.junit:junit-bom:5.7.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine")

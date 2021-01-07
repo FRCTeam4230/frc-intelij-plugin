@@ -33,11 +33,10 @@ import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications
 import net.javaru.iip.frc.notify.FrcNotifications.createNotification
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllOpenProjects
-import org.apache.commons.lang3.BooleanUtils
 import javax.swing.Icon
 
 
-val IS_IN_FRC_INTERNAL_MODE = BooleanUtils.toBoolean(System.getProperty("frc.is.internal", "false"))
+
 
 
 
@@ -65,6 +64,7 @@ abstract class AbstractFrcInternalAction : AnAction
     @Suppress("UNUSED_PARAMETER")
     protected fun additionalIsVisibleChecks(project: Project, e: AnActionEvent): Boolean = true
 
+    @Suppress("MemberVisibilityCanBePrivate")
     protected fun showOnlyForFrcProjects(): Boolean = false
 
     private fun showForProject(project: Project): Boolean
@@ -87,7 +87,7 @@ open class FrcInternalActionsGroup : DefaultActionGroup()
         val project = e.project
         e.presentation.isVisible = project != null &&
                                    !project.isDisposed &&
-                                   IS_IN_FRC_INTERNAL_MODE
+                                   FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE
     }
 }
 
@@ -223,7 +223,7 @@ class FetchSpecifiedRestResource: AbstractFrcInternalAction()
                         }
                     }
                 }.queue()
-                true;
+                true
             }
         }
     }

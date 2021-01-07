@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2021 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -13,31 +13,23 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  */
+package net.javaru.iip.frc
 
-package net.javaru.iip.frc;
+import com.intellij.pom.java.LanguageLevel
+import org.apache.commons.lang3.BooleanUtils
 
-import org.jetbrains.annotations.NotNull;
-import com.intellij.pom.java.LanguageLevel;
-import com.intellij.util.lang.JavaVersion;
-
-
-
-public class FrcPluginGlobals
+object FrcPluginGlobals
 {
-    @SuppressWarnings("unused")
-    @NotNull
-    public static final String FRC_PLUGIN_ID_STRING = "net.javaru.idea.frc";
-    @NotNull
-    public static final String FRC_PLUGIN_NAME = "FRC";
-    
-    public static final int TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL = 12;
-    public static final int TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT = 8;
-    public static final int MAX_RUN_COUNT_TO_SAVE = 16;
-    
-    @NotNull
-    public static final LanguageLevel DEFAULT_MIN_REQUIRED_LANGUAGE_LEVEL = LanguageLevel.JDK_11;
-    @NotNull
-    public static final JavaVersion DEFAULT_MIN_REQUIRED_JAVA_VERSION = DEFAULT_MIN_REQUIRED_LANGUAGE_LEVEL.toJavaVersion();
+    const val FRC_PLUGIN_ID_STRING = "net.javaru.idea.frc"
+    const val FRC_PLUGIN_NAME = "FRC"
+    const val TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL = 12
+    const val TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT = 8
+    const val MAX_RUN_COUNT_TO_SAVE = 16
 
-    private FrcPluginGlobals() { }
+    @JvmField
+    val DEFAULT_MIN_REQUIRED_LANGUAGE_LEVEL = LanguageLevel.JDK_11
+    @JvmField
+    val DEFAULT_MIN_REQUIRED_JAVA_VERSION = DEFAULT_MIN_REQUIRED_LANGUAGE_LEVEL.toJavaVersion()
+    @JvmField
+    val IS_IN_FRC_INTERNAL_MODE = BooleanUtils.toBoolean(System.getProperty("frc.is.internal", "false"))
 }

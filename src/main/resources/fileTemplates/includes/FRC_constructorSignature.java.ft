@@ -1,9 +1,9 @@
 #set( $H = '#' )
 #if($makeSingleton == "true" && $singletonIncludeJavadoc == "true")
     /**
-     * Creates a new instance of this ${NAME}.
-     * This constructor is private since this class is a Singleton. External classes 
-     * should use the {@link ${H}getInstance()} method to get the instance.
+     * Creates a new instance of this ${NAME}. This constructor
+     * is private since this class is a Singleton. Code should use
+     * the {@link ${H}getInstance()} method to get the singleton instance.
      */
 #end
 #if($makeSingleton == "true")private #elseif($makeAbstract == "true")protected #else public #end${NAME}

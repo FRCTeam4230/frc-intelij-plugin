@@ -16,13 +16,18 @@
 
 package net.javaru.iip.frc.util
 
+import com.asarkar.semver.SemVer
+import com.intellij.ide.plugins.PluginManager
 import com.intellij.ide.plugins.cl.PluginClassLoader
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import icons.FrcIcons
+import net.javaru.iip.frc.FrcPluginGlobals.FRC_PLUGIN_ID_STRING
 import net.javaru.iip.frc.services.FrcApplicationDisposableService
 import net.javaru.iip.frc.services.FrcProjectLifecycleService
 import org.apache.commons.io.FilenameUtils
@@ -31,7 +36,7 @@ import java.net.URL
 import java.nio.file.Path
 
 private object FrcPluginUtils
-private val LOG = Logger.getInstance(FrcPluginUtils::class.java)
+private val LOG = logger<FrcPluginUtils>()
 
 inline fun invokeLater(crossinline func: () -> Unit)
 {
@@ -82,6 +87,29 @@ fun getPluginResourceAsStream(path: String): InputStream?
     }
 }
 
+@WillNotThrowException
+fun getPluginResourceAsText(resourcePath: String): String?
+{
+    val inputStream = getPluginResourceAsStream(resourcePath)
+    return if (inputStream == null)
+    {
+        LOG.warn("[FRC] Could not find resource: $resourcePath")
+        null
+    }
+    else
+    {
+        try
+        {
+            inputStream.bufferedReader().use { it.readText() }
+        }
+        catch (t: Throwable)
+        {
+            LOG.warn("[FRC] An exception occurred when trying to read resource '$resourcePath'. Cause Summary: $t", t)
+            null
+        }
+    }
+}
+
 fun Project?.getParentDisposable(): Disposable
 {
     return if (this != null) FrcProjectLifecycleService.getInstance(this) else getApplicationParentDisposable()
@@ -89,4 +117,23 @@ fun Project?.getParentDisposable(): Disposable
 
 fun getApplicationParentDisposable(): Disposable = FrcApplicationDisposableService.getInstance()
 
-
+/**
+ * Returns the full Semantic Version, including the IntelliJ IDEA Version, of the running FRC plugin. For example: `1.4.0-2020.3`.
+ * If you need just the "base"/"core" version, for example 1.4.0, use the `normalVersion` property: `getFrcPlugVersion()?.normalVersion`
+ * In the rare event the Plugin Version cannot be determined, or an exception occur during parsing, `null` is returned.
+ */
+fun getFrcPluginVersion(): SemVer?
+{
+    val pluginId = PluginId.getId(FRC_PLUGIN_ID_STRING)
+    val pluginDescriptor = PluginManager.getPlugin(pluginId)
+    val version =  pluginDescriptor?.version
+    // We're using SemVer from com.asarkar:jsemver but it should be noted IDEA has a built in SemVer in com.intellij.util.text - but it's less robust than the library one
+    return try
+    {
+        if (version == null) null else SemVer.parse(version)
+    } catch (e: Exception)
+    {
+        LOG.warn("[FRC] Could not parse '$version' to a Semantic Version. Cause Summary: $e", e)
+        null
+    }
+}

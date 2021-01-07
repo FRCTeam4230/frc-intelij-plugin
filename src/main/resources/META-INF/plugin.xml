@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2015-2020 the original author or authors
+  ~ Copyright 2015-2021 the original author or authors
   ~
   ~     Licensed under the Apache License, Version 2.0 (the "License");
   ~     you may not use this file except in compliance with the License.
@@ -40,8 +40,7 @@
             <em><a href='http://www.firstinspires.org/'>FIRST</a> Robotics Competition</em>
             (<a href='http://www.firstinspires.org/robotics/frc'>FRC</a>) development support for
             IntelliJ IDEA, including new project wizards, new class templates, robust RioLog console,
-            and more. Works with all v2019.2 or later editions (Community, Education, and Ultimate)
-            of IntelliJ IDEA. Enjoy using your favorite IDE when coding your team's robot in Java
+            and more. Enjoy using your favorite IDE when coding your team's robot in Java
             and/or Kotlin.
         </p>
         <p><br></p>
@@ -54,6 +53,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v1.3.1</strong> <br>
+        &nbsp;&nbsp;&bull; <strong>This is the last release for v2019.2, v2019.3 and v2020.1. The next release will only support
+        IntelliJ IDEA v2020.2 and later. See the <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin#eol-policy'>FRC Plugin's EOL Policy</a>
+        for more detail.</strong><br>
+        &nbsp;&nbsp;&bull; Miscellaneous internal improvements.<br>
+        <br>
         <strong>v1.3.0</strong> <br>
         &nbsp;&nbsp;&bull; This is a re-release of v1.2.1 but as v1.3.0. Due to the lack of a patch level indicator in the
                            v1.2 release, the IntelliJ IDEA plugin frameworks was not seeing v1.2.1-2020.1 as being newer than
@@ -120,7 +125,7 @@
     <!-- The unique identifiers of the plugins on which this plugin depends. -->
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
-    <depends>org.jetbrains.plugins.gradle</depends>
+    <depends>com.intellij.gradle</depends>
     <!--<depends>org.intellij.groovy</depends>-->
     <!--<depends>AntSupport</depends>-->
 
@@ -179,6 +184,9 @@
         <applicationService id="FRC.RioLogUdpSocketManagerApplicationService" serviceImplementation="net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService" />
         <applicationService id="FRC.GradleRioMavenMetadataState" serviceImplementation="net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState" />
         <applicationService id="FRC.ComponentCreationSharedState" serviceImplementation="net.javaru.iip.frc.actions.create.advanced.ComponentCreationSharedState" />
+        <applicationService id="FRC.RestService" serviceImplementation="net.javaru.iip.frc.net.FrcPseudoRestService" />
+        <applicationService id="FRC.FrcPluginVersionManagerApplicationService" serviceImplementation="net.javaru.iip.frc.plugin.FrcPluginVersionManagerApplicationService" />
+        <applicationService id="FRC.FrcPluginVersionManagerState" serviceImplementation="net.javaru.iip.frc.plugin.FrcPluginVersionManagerState" />
 
         <applicationConfigurable id="preferences.language.FRC"
                                  instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable"
@@ -199,23 +207,17 @@
         <projectService id="FRC.FrcRoboRioSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcRoboRioSettings" />
         <projectService id="FRC.FrcSshSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcSshSettings" />
         <projectService id ="FRC.VendordepsFileListener" serviceImplementation="net.javaru.iip.frc.services.VendordepsFileListener" />
-        <backgroundPostStartupActivity implementation="net.javaru.iip.frc.services.VendordepsFileListenerStartupActivity" />
-        
-        <projectService id="FRC.RioLogConsoleProjectService"
-                        serviceImplementation="net.javaru.iip.frc.riolog.RioLogProjectService" />
-
-        <projectService id="FRC.TcpRioLogConsoleProjectService"
-                        serviceImplementation="net.javaru.iip.frc.riolog.tcp.TcpRioLogMonitorProjectService" />
-
-        <projectService id="FRC.UdpRioLogConsoleProjectService"
-                        serviceImplementation="net.javaru.iip.frc.riolog.udp.UdpRioLogMonitorProjectService" />
-
-        <projectService id="FRC.SshRioLogConsoleProjectService"
-                        serviceImplementation="net.javaru.iip.frc.riolog.ssh.SshRioLogMonitorProjectService" />
-
-
+        <backgroundPostStartupActivity id="FRC.VendordepsFileListenerStartupActivity" implementation="net.javaru.iip.frc.services.VendordepsFileListenerStartupActivity" />
+        <postStartupActivity id="FRC.FrcPluginVersionManagerStartupActivity" implementation="net.javaru.iip.frc.plugin.FrcPluginVersionManagerStartupActivity" />
         <projectService id="FRC.WpiLibUpdateCheckingService" serviceImplementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionService" />
         <postStartupActivity implementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionStartupActivity" />
+        <projectService id="FRC.RioLogConsoleProjectService" serviceImplementation="net.javaru.iip.frc.riolog.RioLogProjectService" />
+        <projectService id="FRC.TcpRioLogConsoleProjectService" serviceImplementation="net.javaru.iip.frc.riolog.tcp.TcpRioLogMonitorProjectService" />
+        <projectService id="FRC.UdpRioLogConsoleProjectService" serviceImplementation="net.javaru.iip.frc.riolog.udp.UdpRioLogMonitorProjectService" />
+        <projectService id="FRC.SshRioLogConsoleProjectService" serviceImplementation="net.javaru.iip.frc.riolog.ssh.SshRioLogMonitorProjectService" />
+
+
+
 
         <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
 
@@ -350,10 +352,18 @@
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
             <add-to-group group-id="ToolsMenu" relative-to-action="FRC.FrcToolsActionsGroup" anchor="after" />
+            <action id="FRC.tools.internal.RunKotlinCode"
+                    class="net.javaru.iip.frc.actions.tools.internal.RunKotlinCodeForTestingAndDebuggingFrcInternalAction" />
+            <action id="FRC.tools.internal.RunJavaCode"
+                    class="net.javaru.iip.frc.actions.tools.internal.RunJavaCodeForTestingAndDebuggingFrcInternalAction" />
             <action id="FRC.tools.internal.CauseAnException"
                     class="net.javaru.iip.frc.actions.tools.internal.CauseAnExceptionAction" />
             <action id="FRC.tools.internal.LogAnErrorAction"
                     class="net.javaru.iip.frc.actions.tools.internal.LogAnErrorAction" />
+            <action id="FRC.tools.internal.FetchPredefinedRestResource"
+                    class="net.javaru.iip.frc.actions.tools.internal.FetchPredefinedRestResource" />
+            <action id="FRC.tools.internal.FetchSpecifiedRestResource"
+                    class="net.javaru.iip.frc.actions.tools.internal.FetchSpecifiedRestResource" />
         </group>
 
         <group id="FRC.FrcInternalNotificationsActionsGroup"
@@ -369,10 +379,22 @@
                     class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationActionableErrorAction" />
             <action id="FRC.tools.internal.TriggerNotificationActionableErrorImportantAction"
                     class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationActionableErrorImportantAction" />
+            <action id="FRC.tools.internal.TriggerNotificationThatUsesNotificationActionsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationThatUsesNotificationActionsAction" />
             <action id="FRC.tools.internal.TriggerNotificationBalloonAction"
                     class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationBalloonAction" />
             <action id="FRC.tools.internal.TriggerSmallNotificationBalloonAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerSmallNotificationBalloonAction" />
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationSmallBalloonAction" />
+            <action id="FRC.tools.internal.TriggerNotificationBalloonWithActionsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationBalloonWithActionsAction" />
+            <action id="FRC.tools.internal.TriggerNotificationSharedByFrcProjectsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationSharedByFrcProjectsAction" />
+            <action id="FRC.tools.internal.TriggerNotificationBalloonSharedByFrcProjectsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationBalloonSharedByFrcProjectsAction" />
+            <action id="FRC.tools.internal.TriggerNotificationSharedByAllOpenProjectsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationSharedByALLOpenProjectsAction" />
+            <action id="FRC.tools.internal.TriggerNotificationBalloonSharedByAllOpenProjectsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationBalloonSharedByALLOpenProjectsAction" />
         </group>
 
         <group id="frc.NewFileTemplates"

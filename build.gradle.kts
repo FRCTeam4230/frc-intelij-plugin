@@ -19,7 +19,7 @@ import org.jetbrains.gradle.ext.ProjectSettings
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.intellij.tasks.RunIdeTask
-import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
+//import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
 
 val frcPluginBaseVersion: String by project
@@ -35,7 +35,7 @@ version = "$frcPluginBaseVersion-$ideaMajorVersion$frcPluginEapDesignator"
 //}
 
 
-val kotlinVersion = plugins.getPlugin(KotlinPluginWrapper::class.java).kotlinPluginVersion
+//val kotlinVersion = plugins.getPlugin(KotlinPluginWrapper::class.java).kotlinPluginVersion
 
 val ideaVersion: String by project
 val isEAP: String by project
@@ -53,13 +53,13 @@ plugins {
     base
     java
     kotlin("jvm") version "1.4.21"
-    id("org.jetbrains.intellij") version "0.4.21" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
+    id("org.jetbrains.intellij") version "0.6.5" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
     //    https://github.com/jetbrains/gradle-idea-ext-plugin
     //    https://plugins.gradle.org/plugin/org.jetbrains.gradle.plugin.idea-ext
-    //    v0.6.1+ requires IntelliJ IDEA 2019.2
-    id("org.jetbrains.gradle.plugin.idea-ext") version "0.7"
+    //    v0.10+ requires IDEA 2020.2+   v0.6.1+ requires IntelliJ IDEA 2019.2
+    id("org.jetbrains.gradle.plugin.idea-ext") version "0.10"
 }
 
 
@@ -92,6 +92,9 @@ tasks {
 
 
 java {
+    // Keep in sync with the kotlinOptions.jvmTarget plugin configuration
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
     // Java 11 required when supporting v2020.3 and later only; Java 8 is no longer bundled.
     //      See  https://jetbrains.org/intellij/sdk/docs/reference_guide/api_changes/api_changes_list_2020.html#section
     //           https://blog.jetbrains.com/platform/2020/09/intellij-project-migrates-to-java-11/
@@ -99,8 +102,8 @@ java {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
-tasks.named<Test>("test") {
-    // https://docs.gradle.org/current/userguide/java_testing.html#java_testing
+tasks.test {
+    // https://docs.gradle.org/current/userguide/java_testing.html#using_junit5
     useJUnitPlatform {
         excludeTags("slow")
     }
@@ -117,7 +120,7 @@ intellij {
     // IntelliJ IDEA dependency
     version = ideaVersion
     // Bundled plugin dependencies - comma separated list
-    setPlugins("java", "gradle"/*, "Groovy"*/)  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/ 
+    setPlugins("java", "gradle"/*, "Groovy"*/)  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox-203"
 
     updateSinceUntilBuild = ideaUpdateSinceUntilBuild.toBoolean()
@@ -164,9 +167,9 @@ intellij {
 // Configure some IDEA Project settings (i.e. for Intellij IDEA used to code the plugin)
 idea {
     // https://github.com/JetBrains/gradle-idea-ext-plugin
-    // Note: The DSL apparently changed in v0.4 since if I upgrade to it or later, the following breaks. 
+    // Note: The DSL apparently changed in v0.4 since if I upgrade to it or later, the following breaks.
     //       But I have not had the time to dig into it and see what needs to change
-    //       The DSL spec is documented on the project's wiki, but it is no the most stellar documentation, 
+    //       The DSL spec is documented on the project's wiki, but it is no the most stellar documentation,
     //       and is only for the Groovy based DSL. When I find some time I can look at modifying.
     //       https://github.com/JetBrains/gradle-idea-ext-plugin/wiki
     //       This issue has some links to help using with the Kotlin Gradle DSL:  https://github.com/JetBrains/gradle-idea-ext-plugin/issues/44
@@ -199,7 +202,7 @@ idea {
                     }
                 }
             }
-            
+
             configure< org.jetbrains.gradle.ext.EncodingConfiguration> {
                 // setting EncodingConfiguration requires IDEA 2019.1+
                 this.encoding = "UTF-8"
@@ -211,8 +214,8 @@ idea {
                 // Haven't gotten this part working, if it is ever needed
                 //mapping = mapOf("../src/main/resources/Foo" to "ISO-8859-1")
             }
-            
-            
+
+
             // EXAMPLE OF CREATING A RUN CONFIGURATION from: https://github.com/JetBrains/gradle-idea-ext-plugin/issues/44#issuecomment-471340778
             // For available RunConfigurations, see https://github.com/JetBrains/gradle-idea-ext-plugin/blob/master/src/main/groovy/org/jetbrains/gradle/ext/RunConfigurations.groovy
             //     All potential configs "extends BaseRunConfiguration"
@@ -234,41 +237,59 @@ idea {
 
 repositories {
     mavenCentral()
-    maven("https://dl.bintray.com/jetbrains/intellij-plugin-service")
+    maven("https://jetbrains.bintray.com/intellij-plugin-service") // new repo
+    maven("https://dl.bintray.com/jetbrains/intellij-plugin-service/") // older repo
+    maven("https://dl.bintray.com/asarkar/mvn") //for jsemver
     maven("https://plugins.gradle.org/m2/")
+    maven {
+        url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
     jcenter()
 }
 
 
 dependencies {
-    val junit5Version = "5.6.2"
     val http4kVersion = "3.248.0"
-    val jacksonVersion = "2.10.1"
+    val jacksonVersion = "2.11.2"
 
-    implementation(kotlin("stdlib", kotlinVersion))
-    implementation(kotlin("reflect", kotlinVersion))
-    testImplementation(kotlin("test", kotlinVersion))
+    // For Kotlin dependencies, you can use shorthand for a dependency on a Kotlin module, for example, kotlin("test") for "org.jetbrains.kotlin:kotlin-test".
+    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("reflect"))
+    testImplementation(kotlin("test"))
+
     implementation("org.jdom:jdom2:2.0.6")
     implementation("commons-io:commons-io:2.7")
-    implementation("org.apache.commons:commons-lang3:3.10")
+    implementation("org.apache.commons:commons-lang3:3.11")
+    implementation("org.apache.commons:commons-text:1.9")
     implementation("com.jcraft:jsch:0.1.54")
     // Klaxon is a library to parse JSON in Kotlin.  https://github.com/cbeust/klaxon   Available in jcenter bintray: https://jcenter.bintray.com/com/beust/klaxon/   Help available in the #klaxon channel of the Kotlin Slack Workspace
-    implementation("com.beust:klaxon:5.0.9")
-    // https://www.http4k.org 
+    //implementation("com.beust:klaxon:5.0.9")
+    implementation(platform("com.google.guava:guava-bom:29.0-jre"))
+    implementation("com.google.guava:guava")
+
+    // https://www.http4k.org
     implementation("org.http4k:http4k-core:$http4kVersion")
     //compile("org.http4k:http4k-client-okhttp:$http4kVersion")
     implementation("org.http4k:http4k-client-apache:$http4kVersion")
     implementation("org.http4k:http4k-client-apache-async:$http4kVersion")
     //compile("org.http4k:http4k-server-jetty:$http4kVersion")
 
+    implementation("com.asarkar:jsemver:0.6.2")  // https://github.com/asarkar/jsemver  Requires one-off repo declaration of: maven("https://dl.bintray.com/asarkar/mvn")
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatypes-collections:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava:$jacksonVersion")
     implementation("org.freemarker:freemarker:2.3.30")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:$junit5Version")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
-    testImplementation("org.junit.vintage:junit-vintage-engine:$junit5Version")
+
+    testImplementation(platform("org.junit:junit-bom:5.7.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
+    testImplementation("com.google.guava:guava-testlib") // version in BOM above
 }
 
 

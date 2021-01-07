@@ -49,6 +49,7 @@ local.properties
 
 # Annotation Processing
 .apt_generated/
+.apt_generated_test/
 
 # Scala IDE specific (Scala & Java development for Eclipse)
 .cache-main
@@ -64,5 +65,5 @@ local.properties
 
 # Annotation Processing
 .apt_generated
-
+# Spring Boot Tooling
 .sts4-cache/

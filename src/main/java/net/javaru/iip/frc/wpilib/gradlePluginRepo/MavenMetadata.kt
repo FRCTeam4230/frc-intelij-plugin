@@ -25,11 +25,13 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.xmlb.XmlSerializerUtil
 import net.javaru.iip.frc.net.FrcHttpClient
+import net.javaru.iip.frc.util.fromJson
 import net.javaru.iip.frc.util.lastCheckedDateTimeFormatter
 import net.javaru.iip.frc.util.lastCheckedDateTimeZonedFormatter
 import net.javaru.iip.frc.util.mapExceptionFreeAndNotNull
 import net.javaru.iip.frc.util.mapper
 import net.javaru.iip.frc.util.prettyPrintWriter
+import net.javaru.iip.frc.util.toJson
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl
 import org.intellij.lang.annotations.Language
@@ -77,7 +79,7 @@ data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: 
 
     @Suppress("RemoveExplicitTypeArguments")
     val wpiLibMavenMetadata: WpiLibMavenMetadata
-        get() = WpiLibMavenMetadata(MavenMetadata.fromJson(mavenMetadataJson))
+        get() = WpiLibMavenMetadata(mavenMetadataJson.fromJson())
 
     fun setMavenMetadata(metadata: MavenMetadata)
     {
@@ -230,21 +232,7 @@ data class MavenMetadata(val groupId: String,
                          val versions: List<String>,
                          val lastUpdated: String /* ex: 20191123193733 */
                          )
-{
-    @Language("JSON")
-    fun toJson(prettyPrint: Boolean): String
-    {
-        val writer: ObjectWriter = if (prettyPrint) prettyPrintWriter else mapper.writer()
-        return writer.writeValueAsString(this)
-    }
 
-    companion object
-    {
-        @JvmStatic
-        fun fromJson(@Language("JSON") json: String): MavenMetadata = mapper.readValue<MavenMetadata>(json)
-    }
-
-}
 
 /**
  * A data class to represent a `maven-metadata.xml` file for a WpiLib artifact such as the GradleRIO plugin.

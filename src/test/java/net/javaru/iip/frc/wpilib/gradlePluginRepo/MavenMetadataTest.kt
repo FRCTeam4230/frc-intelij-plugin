@@ -16,7 +16,9 @@
 
 package net.javaru.iip.frc.wpilib.gradlePluginRepo
 
+import net.javaru.iip.frc.util.fromJson
 import net.javaru.iip.frc.util.lastCheckedDateTimeFormatter
+import net.javaru.iip.frc.util.toJson
 import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2018_06_21
 import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2019_0_0_alpha_1
 import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.v2020_1_1_beta_3a
@@ -56,7 +58,7 @@ internal class MavenMetadataTest
     fun testSerialization()
     {
         val mavenMetadataJSON = mavenMetadata.toJson(true)
-        assertEquals(mavenMetadata, MavenMetadata.fromJson(mavenMetadataJSON), "Could not round trip serialize the mavenMetadata object")
+        assertEquals(mavenMetadata, mavenMetadataJSON.fromJson<MavenMetadata>(), "Could not round trip serialize the mavenMetadata object")
     }
 
     @Test

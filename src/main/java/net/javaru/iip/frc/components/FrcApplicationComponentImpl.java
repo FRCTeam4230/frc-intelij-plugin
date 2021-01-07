@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 
+import net.javaru.iip.frc.FrcPluginGlobals;
 import net.javaru.iip.frc.notify.FrcTeamNumberNotificationsKt;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 
@@ -82,7 +83,10 @@ public class FrcApplicationComponentImpl implements FrcApplicationComponent
     {
         LOG.debug("[FRC] " + getClass().getSimpleName() + ".initComponent() called");
         Logger baseLogger = Logger.getInstance("#net.javaru.iip.frc");
-        baseLogger.info("[FRC] >>> isDebugEnabled = " + baseLogger.isDebugEnabled() + "  isTraceEnabled = " + baseLogger.isTraceEnabled() + " <<<");
+        if (FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE)
+        {
+            baseLogger.info("[FRC] >>> isDebugEnabled = " + baseLogger.isDebugEnabled() + "  isTraceEnabled = " + baseLogger.isTraceEnabled() + " <<<");
+        }
 
         final FrcApplicationSettings settings = FrcApplicationSettings.getInstance();
         settings.incrementRunCount();

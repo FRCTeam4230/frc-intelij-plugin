@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -16,6 +16,21 @@
 
 package net.javaru.iip.frc.util
 
+import org.jetbrains.annotations.Contract
+
+
+enum class EOL(
+    /**
+     * The end of line character(s).
+     */
+    val eol: String
+              )
+{
+    UNIX("\n"),
+    WINDOWS("\r\n"),
+    MAC_OLD("\r"),
+    SYSTEM(System.lineSeparator())
+}
 
 /**
  * Appends all on null arguments to the given [Appendable].
@@ -213,3 +228,33 @@ fun StringBuilder.appendItemIf(vararg value: Any?, condition: (Any?) -> Boolean)
             this.append(item)
     return this
 }
+
+
+/**
+ * A null safe implementation of Kotlin's built-in [kotlin.text.lines] method.
+ * The method splits this char sequence to a list of lines delimited by any of the following
+ * character sequences: CRLF, LF or CR.
+ *
+ * @return List of Strings representing the lines in the CharSequence. In the event the CharSequence
+ * is null, an empty list is returned.
+ */
+fun CharSequence?.textToLines(): List<String> = this?.lines() ?: ArrayList()
+
+
+/**
+ * Normalizes a CharSequence to a desired line ending, Unix LF by default.
+ *
+ * @param eol the EOL to change the text to.
+ */
+@JvmOverloads
+fun CharSequence.eolTo(eol: EOL = EOL.UNIX): String = this.textToLines().linesToText(eol, false)
+
+/**
+ * Normalizes a CharSequence to a desired line ending, Unix LF by default.
+ *
+ * @param eol the EOL to change the text to.
+ */
+@Contract("null,_ -> null, !null,_ -> !null")
+@JvmOverloads
+fun CharSequence?.eolToOrNull(eol: EOL = EOL.UNIX): String? = this?.eolTo(eol)
+

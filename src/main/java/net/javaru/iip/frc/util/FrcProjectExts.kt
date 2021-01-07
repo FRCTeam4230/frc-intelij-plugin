@@ -24,9 +24,11 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ProjectRootManager
+import net.javaru.iip.frc.facet.isFrcFacetedProject
 import org.jetbrains.plugins.gradle.settings.GradleSettings
 
 
@@ -106,3 +108,85 @@ fun Project.getProjectJdk(): ProjectJdkImpl?
 }
 fun Project.getProjectSdk(): Sdk? = ProjectRootManager.getInstance(this).projectSdk
 fun Project.getProjectSdkHomePath(): String? = ProjectRootManager.getInstance(this).projectSdk?.homePath
+
+fun getAllOpenFrcProjects(): Array<out Project>
+{
+    return getAllOpenProjects()
+        .filter { it.isFrcFacetedProject() && it.isOpen && !it.isDisposed }
+        .toTypedArray()
+}
+
+fun getAllOpenProjects(): Array<out Project>
+{
+    return ProjectManager
+        .getInstance()
+        .openProjects
+        .filter { it.isOpen && !it.isDisposed }
+        .toTypedArray()
+}
+
+
+
+/**
+ * Finds a project to be used for tasks that require a Project. It will favor projects in this order:
+ *
+ * 1. FRC project with Focus
+ * 2. Any FRC project
+ * 3. Project with focus (non-FRC)
+ * 4. Any project
+ * 5. null
+ */
+fun findAnAnchorProject(): Project?
+{
+    val frcProjects = getAllOpenFrcProjects()
+    return if (frcProjects.isNotEmpty())
+    {
+        frcProjects.findProjectWithFocus() ?: frcProjects[0]
+    }
+    else
+    {
+        val openProjects = getAllOpenProjects()
+        if (openProjects.isNotEmpty())
+        {
+            openProjects.findProjectWithFocus() ?: openProjects[0]
+        }
+        else
+        {
+            null
+        }
+
+    }
+}
+
+/**
+ * Looks for the project with focus, favoring FRC projects. If no FRC has focus,
+ * it will check non FRC projects, unless `mustBeFrcProject` is set to `true`.
+ */
+fun findProjectWithFocus(mustBeFrcProject: Boolean = true): Project?
+{
+    val project: Project? = getAllOpenFrcProjects().findProjectWithFocus()
+
+    return project ?: if (mustBeFrcProject)
+    {
+        project
+    }
+    else
+    {
+        ProjectManager.getInstance().openProjects.findProjectWithFocus()
+    }
+}
+
+
+
+
+/** Returns the project with focus, or null is no project has focus, or there are no open projects. */
+private fun Array<out Project>?.findProjectWithFocus(): Project?
+{
+    this?.forEach {
+        if (it.isOpen && !it.isDisposed && it.findIdeFrameOrAlternateParentComponent()?.isFocusOwner == true)
+        {
+            return it
+        }
+    }
+    return null
+}

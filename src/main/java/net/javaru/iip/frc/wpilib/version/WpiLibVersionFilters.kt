@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ fun Iterable<WpiLibVersion>.filterOutAllButLatestForYear(year: Int, excludePreRe
 }
 
 @JvmOverloads
-fun Iterable<WpiLibVersion>.filterToLatestForYear(year: Int, excludePreReleases: Boolean = true): WpiLibVersion? =  this.filterVersions(YearFilter(year, excludePreReleases)).max()
+fun Iterable<WpiLibVersion>.filterToLatestForYear(year: Int, excludePreReleases: Boolean = true): WpiLibVersion? =  this.filterVersions(YearFilter(year, excludePreReleases)).maxOrNull()
 
 
 /**
@@ -143,7 +143,7 @@ interface WpiLibVersionFilter
                     if (filter.predicate().invoke(wpiLibVersion))
                     {
                         result = true
-                        break;
+                        break
                     }
                 }
                 result
@@ -159,7 +159,7 @@ interface WpiLibVersionFilter
                     if (!filter.predicate().invoke(wpiLibVersion))
                     {
                         result = false
-                        break;
+                        break
                     }
                 }
                 result

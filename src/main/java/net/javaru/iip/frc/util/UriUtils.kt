@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2020 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import com.intellij.openapi.diagnostic.Logger
 import org.apache.commons.lang3.StringUtils
 import java.net.URI
 import java.net.URISyntaxException
+import java.net.URL
 import java.nio.file.Paths
 
 private object UriUtils
@@ -37,7 +38,26 @@ fun createUri(url: String): URI
     }
     catch (e: Exception)
     {
-        val baseMsg = "Could not create a URI from the URL '$url' due to the exception: $e"
+        val baseMsg = "Could not create a URI object from the URL path '$url' due to the exception: $e"
+        LOG.warn("[FRC] $baseMsg")
+        throw IllegalArgumentException(baseMsg, e)
+    }
+}
+
+/**
+ * Creates a `URL` from ` `URL` throwing a Runtime based `IllegalArgumentException` in the event the URL
+ * cannot be created.
+ */
+@Throws(IllegalArgumentException::class)
+fun createUrl(url: String): URL
+{
+    return try
+    {
+        URL(url)
+    }
+    catch (e: Exception)
+    {
+        val baseMsg = "Could not create a URL object from the URL path '$url' due to the exception: $e"
         LOG.warn("[FRC] $baseMsg")
         throw IllegalArgumentException(baseMsg, e)
     }

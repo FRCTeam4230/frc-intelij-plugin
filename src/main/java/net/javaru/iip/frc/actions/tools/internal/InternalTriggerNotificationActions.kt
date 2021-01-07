@@ -15,6 +15,8 @@
  */
 package net.javaru.iip.frc.actions.tools.internal
 
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.diagnostic.Logger
@@ -22,10 +24,12 @@ import com.intellij.openapi.project.Project
 import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications.createNotification
 import net.javaru.iip.frc.notify.FrcNotifications.notify
+import net.javaru.iip.frc.notify.FrcNotifications.notifyAllOpenProjects
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloon
+import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllOpenProjects
+import net.javaru.iip.frc.notify.FrcNotifications.showBalloon
 import org.apache.commons.lang3.RandomUtils
 import org.intellij.lang.annotations.Language
-import kotlin.random.Random
 
 
 class FrcInternalNotificationsActionsGroup : FrcInternalActionsGroup()
@@ -92,6 +96,29 @@ class TriggerNotificationActionableErrorImportantAction : AbstractTriggerNotific
     }
 }
 
+class TriggerNotificationThatUsesNotificationActionsAction : AbstractTriggerNotificationAction()
+{
+    override fun doNotification(project: Project?)
+    {
+        createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                          """Select an Option Please.""".trimIndent())
+            .addAction(object: NotificationAction("Option A") {
+                override fun actionPerformed(e: AnActionEvent, notification: Notification)
+                {
+                    val projectFromNotification = e.getData(CommonDataKeys.PROJECT)
+                    notify(FrcNotificationType.ACTIONABLE_INFO, "You selected option A from project ${projectFromNotification?.name}")
+                }
+            })
+            .addAction(object: NotificationAction("Option B") {
+                override fun actionPerformed(e: AnActionEvent, notification: Notification)
+                {
+                    val projectFromNotification = e.getData(CommonDataKeys.PROJECT)
+                    notify(FrcNotificationType.ACTIONABLE_INFO, "You selected option B from project ${projectFromNotification?.name}")
+                }
+            }).notify(project)
+    }
+}
+
 
 class TriggerNotificationBalloonAction : AbstractTriggerNotificationAction()
 {
@@ -153,7 +180,7 @@ class TriggerNotificationBalloonAction : AbstractTriggerNotificationAction()
 }
 
 
-class TriggerSmallNotificationBalloonAction : AbstractTriggerNotificationAction()
+class TriggerNotificationSmallBalloonAction : AbstractTriggerNotificationAction()
 {
     override fun doNotification(project: Project?)
     {
@@ -171,5 +198,95 @@ class TriggerSmallNotificationBalloonAction : AbstractTriggerNotificationAction(
     }
 }
 
+class TriggerNotificationBalloonWithActionsAction : AbstractTriggerNotificationAction()
+{
+    override fun doNotification(project: Project?)
+    {
+        @Suppress("HtmlRequiredLangAttribute")
+        @Language("HTML")
+        val content = """
+                          |<html>
+                          |Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt 
+                          |ut labore et dolore magna aliqua. Tempus iaculis urna id volutpat lacus laoreet non curabitur. 
+                          |Leo vel orci porta non pulvinar. Ullamcorper a lacus vestibulum sed arcu non odio euismod. 
+                          |Turpis nunc eget lorem dolor sed viverra ipsum nunc. Sed sed risus pretium quam. Sed libero enim 
+                          |sed faucibus turpis in. Facilisis magna etiam tempor orci. Ullamcorper sit amet risus nullam eget 
+                          |felis eget. Sit amet nulla facilisi morbi tempus. Ipsum suspendisse ultrices gravida dictum fusce ut.
+                          |</html>
+                      """.trimMargin()
 
+        val notification = createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON, content)
+            .addAction(object : NotificationAction("Option A")
+                       {
+                           override fun actionPerformed(e: AnActionEvent, notification: Notification)
+                           {
+                               val projectFromNotification = e.getData(CommonDataKeys.PROJECT)
+                               notify(FrcNotificationType.ACTIONABLE_INFO, "You selected option A from project ${projectFromNotification?.name}")
+                           }
+                       })
+            .addAction(object : NotificationAction("Option B")
+                       {
+                           override fun actionPerformed(e: AnActionEvent, notification: Notification)
+                           {
+                               val projectFromNotification = e.getData(CommonDataKeys.PROJECT)
+                               notify(FrcNotificationType.ACTIONABLE_INFO, "You selected option B from project ${projectFromNotification?.name}")
+                           }
+                       })
+
+        showBalloon(notification, project)
+    }
+}
+
+
+
+class TriggerNotificationSharedByFrcProjectsAction : AbstractTriggerNotificationAction()
+{
+    override fun doNotification(project: Project?)
+    {
+        val subTitle = "ID #${RandomUtils.nextInt(1, 5000)}"
+        notifyAllOpenProjects() { createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                                                     "This is a notification shared across all open FRC projects.",
+                                                     subTitle = subTitle)}
+    }
+}
+
+
+class TriggerNotificationSharedByALLOpenProjectsAction : AbstractTriggerNotificationAction()
+{
+    override fun doNotification(project: Project?)
+    {
+        val subTitle = "ID #${RandomUtils.nextInt(1, 5000)}"
+        notifyAllOpenProjects(notifyFrcProjectsOnly = false) { createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                                                     "This is a notification shared across ALL open projects (FRC & Non-FRC).",
+                                                     subTitle = subTitle)}
+    }
+}
+
+
+
+class TriggerNotificationBalloonSharedByFrcProjectsAction : AbstractTriggerNotificationAction()
+{
+    override fun doNotification(project: Project?)
+    {
+        val subTitle = "ID #${RandomUtils.nextInt(1, 5000)}"
+        notifyBalloonAllOpenProjects(notifyFrcProjectsOnly = true) {
+            createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                               "<html><h2>This is a notification shared across all open FRC projects.</h2></html>",
+                               subTitle = subTitle)
+        }
+    }
+}
+
+class TriggerNotificationBalloonSharedByALLOpenProjectsAction : AbstractTriggerNotificationAction()
+{
+    override fun doNotification(project: Project?)
+    {
+        val subTitle = "ID #${RandomUtils.nextInt(1, 5000)}"
+        notifyBalloonAllOpenProjects(notifyFrcProjectsOnly = false) {
+            createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                               "<html><h2>This is a notification shared across ALL open projects (FRC & Non-FRC).</h2></html>",
+                               subTitle = subTitle)
+        }
+    }
+}
 

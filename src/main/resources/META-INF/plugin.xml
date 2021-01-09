@@ -319,6 +319,7 @@
 
         <!-- (most) text & description attributes are defined in the resource-bundle (defined above)-->
         <!-- You MUST manually update the corresponding resource bundle keys if you change an ID -->
+        <!--suppress PluginXmlCapitalization -->
         <group id="FRC.FrcToolsActionsGroup"
                text="FRC"
                class="net.javaru.iip.frc.actions.tools.FrcToolsActionGroup"
@@ -406,6 +407,7 @@
                     class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationBalloonSharedByALLOpenProjectsAction" />
         </group>
 
+        <!--suppress PluginXmlCapitalization -->
         <group id="frc.NewFileTemplates"
                text="FRC"
                class="net.javaru.iip.frc.actions.create.FrcCreateComponentsActionGroup"

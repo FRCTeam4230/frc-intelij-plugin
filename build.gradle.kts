@@ -92,9 +92,6 @@ tasks {
 
 
 java {
-    // Keep in sync with the kotlinOptions.jvmTarget plugin configuration
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
     // Java 11 required when supporting v2020.3 and later only; Java 8 is no longer bundled.
     //      See  https://jetbrains.org/intellij/sdk/docs/reference_guide/api_changes/api_changes_list_2020.html#section
     //           https://blog.jetbrains.com/platform/2020/09/intellij-project-migrates-to-java-11/

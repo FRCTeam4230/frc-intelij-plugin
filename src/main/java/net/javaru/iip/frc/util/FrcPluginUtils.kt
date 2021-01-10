@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -22,10 +22,11 @@ import com.intellij.ide.plugins.cl.PluginClassLoader
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.openapi.vfs.VirtualFile
 import icons.FrcIcons
 import net.javaru.iip.frc.FrcPluginGlobals.FRC_PLUGIN_ID_STRING
 import net.javaru.iip.frc.services.FrcApplicationDisposableService
@@ -53,13 +54,36 @@ inline fun invokeLater(crossinline func: () -> Unit)
 @JvmOverloads
 fun getPluginClassloader(clazz: Class<*> = FrcIcons::class.java): PluginClassLoader = clazz.classLoader as PluginClassLoader
 
+/**
+ *  Gets the URL for a plugin classpath resource path.
+ *
+ * @receiver the relative path of the classpath resource
+ *
+ * @return the URL to the resource, or `null` if not found
+ *
+ * @see getPluginResource
+ */
 @WillNotThrowException
-fun getPluginResource(path: Path): URL? = getPluginResource(path.toString())
+fun Path?.asPluginResourceUrl(): URL? = if (this == null) null else getPluginResource(toString())
 
+/**
+ * Gets the URL for a plugin classpath resource path. For an equivalent
+ * `Path` object extension, see [asPluginResourceUrl].
+ *
+ * @param path the relative path of the classpath resource
+ *
+ * @return the URL to the resource, or `null` if not found
+ *
+ * @see asPluginResourceUrl
+ */
 @WillNotThrowException
-fun getPluginResource(path: String): URL?
+fun getPluginResource(path: String?): URL?
 {
-    return try
+    return if (path == null)
+    {
+        null
+    }
+    else try
     {
         getPluginClassloader().getResource(FilenameUtils.separatorsToUnix(path))
     }
@@ -70,13 +94,61 @@ fun getPluginResource(path: String): URL?
     }
 }
 
+/**
+ *  Gets the VirtualFile for a plugin classpath resource path.
+ *
+ * @receiver the relative path of the classpath resource
+ *
+ * @return the URL to the resource, or `null` if not found
+ *
+ * @see getPluginResource
+ */
 @WillNotThrowException
-fun getPluginResourceAsStream(path: Path): InputStream? = getPluginResourceAsStream(path.toString())
+fun Path?.asPluginResourceVF(): VirtualFile?
+{
+    return if (this == null)
+    {
+        null
+    }
+    else try
+    {
+        this.asPluginResourceUrl().toVirtualFile()
+    } catch (e: Exception)
+    {
+        LOG.warn("Could not find Virtual File for path '$this' due to an exception: $e", e)
+        null
+    }
+}
+
+fun java.net.URL?.toVirtualFile(): VirtualFile?
+{
+    return if (this == null)
+    {
+        null
+    }
+    else try
+    {
+        VfsUtil.findFileByURL(this)
+    }
+    catch (e: Exception)
+    {
+        LOG.warn("Could not find URL as a virtual file for URL '$this' due to an exception: $e", e)
+        null
+    }
+}
+
 
 @WillNotThrowException
-fun getPluginResourceAsStream(path: String): InputStream?
+fun Path?.asPluginResourceStream(): InputStream? = if (this == null) null else getPluginResourceAsStream(toString())
+
+@WillNotThrowException
+fun getPluginResourceAsStream(path: String?): InputStream?
 {
-    return try
+    return if (path == null)
+    {
+        null
+    }
+    else try
     {
         getPluginClassloader().getResourceAsStream(FilenameUtils.separatorsToUnix(path))
     }

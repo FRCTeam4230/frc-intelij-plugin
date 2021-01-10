@@ -50,6 +50,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.containers.ContainerUtil
+import com.intellij.util.containers.stream
 import freemarker.template.Template
 import icons.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION
@@ -60,7 +61,8 @@ import net.javaru.iip.frc.run.createDebuggingRunConfiguration
 import net.javaru.iip.frc.run.createGradleRunConfiguration
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.settings.RoboRioAddressType
-import net.javaru.iip.frc.util.getPluginResource
+import net.javaru.iip.frc.util.asPluginResourceUrl
+import net.javaru.iip.frc.util.asPluginResourceVF
 import net.javaru.iip.frc.util.getPluginResourceAsStream
 import net.javaru.iip.frc.util.importNewGradleProject
 import net.javaru.iip.frc.util.isValidJavaVersion
@@ -86,6 +88,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 import javax.swing.Icon
+import kotlin.NoSuchElementException
 
 class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 {
@@ -124,27 +127,93 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     
     val dataModel = FrcProjectWizardData()
 
+    // TODO: Can we make this an interface and an ExtensionPoint?
+    @Suppress("MemberVisibilityCanBePrivate")
+    class TemplatePaths(val version: WpiLibVersion)
+    {
+        /** The base templates directory. For example `frc-wizard-templates/2020` for FRC year 2020.
+         * In the event the directory of a year is not present, it will fallback to the latest year available. */
+        val frcWizardTemplatesBaseDirPath: Path
 
-    private fun frcWizardTemplatesBaseDir(version: WpiLibVersion) = Paths.get("frc-wizard-templates").resolve(version.frcYear.toString())
-    private fun defaultFilesResourceBase(version: WpiLibVersion) = frcWizardTemplatesBaseDir(version).resolve("default-files/")
-    private val gradleGroovyDslSubPath = Paths.get("gradle/groovy-dsl")
-    private fun gradleGroovyDslResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(gradleGroovyDslSubPath)
-    private val gradleKotlinDslSubPath = Paths.get("gradle/kotlin-dsl")
-    private fun gradleKotlinDslResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(gradleKotlinDslSubPath)
-    private val gradleWrapperSubPath = Paths.get("gradle/gradle-wrapper")
-    private fun gradleWrapperResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(gradleWrapperSubPath)
-    private val configsSubPath = "configs"
-    private fun configsResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(configsSubPath)
-    private val extrasSubPath = "extras"
-    private fun extrasResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(extrasSubPath)
-    private val vsCodeConfigsSubPath = "vs-code-configs"
-    private fun vsCodeConfigsResourceBase(version: WpiLibVersion) = extrasResourceBase(version).resolve(vsCodeConfigsSubPath)
-    private val commonCodeSubPath = Paths.get("code/common-code")
-    private fun commonCodeResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(commonCodeSubPath)
-    private val javaCodeSubPath = Paths.get("code/java-code")
-    private fun javaCodeResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(javaCodeSubPath)
-    private val kotlinCodeSubPath = Paths.get("code/kotlin-code")
-    private fun kotlinCodeResourceBase(version: WpiLibVersion) = defaultFilesResourceBase(version).resolve(kotlinCodeSubPath)
+        /** The base templates directory as identified as  by the constant [frcWizardTemplatesDirName]. */
+        val frcWizardTemplatesBaseDirVf: VirtualFile
+
+        init
+        {
+            val frcWizardTemplatesDirPath = Paths.get(frcWizardTemplatesDirName)
+            val frcWizardTemplatesDirVf = frcWizardTemplatesDirPath.asPluginResourceVF()
+
+            if (frcWizardTemplatesDirVf == null)
+            {
+                val msg = "Cannot find FRC Wizard Templates Base Dir '$frcWizardTemplatesDirName' as plugin resource."
+                LOG.warn("[FRC] $msg")
+                throw ConfigurationException(msg)
+            }
+
+
+            var baseDirForWpiLibVersionPath = frcWizardTemplatesDirPath.resolve(version.frcYear.toString())
+            var baseDirForWpiLibVersionVf = baseDirForWpiLibVersionPath.asPluginResourceVF()
+
+            @Suppress("ThrowableNotThrown")
+            if (baseDirForWpiLibVersionVf == null)
+            {
+                LOG.warn("[FRC] Cannot find FRC Wizard Templates Base Dir as resource for year ${version.frcYear}. Will use templates from latest available year.")
+                val lastAvailableYear =
+                    frcWizardTemplatesDirVf
+                        .children
+                        .stream()
+                        .filter { it.isDirectory }
+                        .map { it.name.toIntOrNull() }
+                        .filter { it != null }
+                        .mapToInt { it!! }
+                        .max()
+                        .orElseThrow { NoSuchElementException("No FRC child FRC year directories found in the FRC Wizard Templates directory '$frcWizardTemplatesDirName'") }
+
+                baseDirForWpiLibVersionPath = frcWizardTemplatesDirPath.resolve(lastAvailableYear.toString())
+                baseDirForWpiLibVersionVf = baseDirForWpiLibVersionPath.asPluginResourceVF()
+            }
+
+            if (baseDirForWpiLibVersionVf == null)
+            {
+                val msg = "Cannot find FRC Wizard Templates Base Dir (as plugin resource) for WPI Lib version '$version', nor can a template directory for any previous versions be found."
+                LOG.warn("[FRC] $msg")
+                throw ConfigurationException(msg)
+            }
+
+            frcWizardTemplatesBaseDirPath = baseDirForWpiLibVersionPath
+            frcWizardTemplatesBaseDirVf = baseDirForWpiLibVersionVf
+        }
+
+        val defaultFilesResourceBasePath: Path = frcWizardTemplatesBaseDirPath.resolve(defaultFilesDirName)
+        val gradleGroovyDslResourceBasePath: Path = defaultFilesResourceBasePath.resolve(gradleGroovyDslSubPath)
+        val gradleKotlinDslResourceBasePath: Path = defaultFilesResourceBasePath.resolve(gradleKotlinDslSubPath)
+        val gradleWrapperResourceBasePath: Path = defaultFilesResourceBasePath.resolve(gradleWrapperSubPath)
+        val configsResourceBasePath: Path = defaultFilesResourceBasePath.resolve(configsSubPath)
+        val extrasResourceBasePath: Path = defaultFilesResourceBasePath.resolve(extrasSubPath)
+        val vsCodeConfigsResourceBasePath: Path = extrasResourceBasePath.resolve(vsCodeConfigsSubPath)
+        val commonCodeResourceBasePath: Path = defaultFilesResourceBasePath.resolve(commonCodeSubPath)
+        val javaCodeResourceBasePath: Path = defaultFilesResourceBasePath.resolve(javaCodeSubPath)
+        val kotlinCodeResourceBasePath: Path = defaultFilesResourceBasePath.resolve(kotlinCodeSubPath)
+
+        companion object
+        {
+            const val frcWizardTemplatesDirName = "frc-wizard-templates"
+            const val defaultFilesDirName = "default-files"
+
+            val gradleGroovyDslSubPath: Path = Paths.get("gradle/groovy-dsl")
+            val gradleKotlinDslSubPath: Path = Paths.get("gradle/kotlin-dsl")
+            val gradleWrapperSubPath: Path = Paths.get("gradle/gradle-wrapper")
+            val configsSubPath: Path = Paths.get("configs")
+            val extrasSubPath: Path = Paths.get("extras")
+            val vsCodeConfigsSubPath: Path = Paths.get("vs-code-configs")
+            val commonCodeSubPath: Path = Paths.get("code/common-code")
+            val javaCodeSubPath: Path = Paths.get("code/java-code")
+            val kotlinCodeSubPath: Path = Paths.get("code/kotlin-code")
+        }
+    }
+    
+    
+
     
     override fun getGroupName(): String = MODULE_BUILDER_GROUP_NAME 
     override fun getParentGroup(): String = JavaModuleType.JAVA_GROUP // This is the top group in the New Project Wizard, and for now it makes sense to be part of it
@@ -204,7 +273,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
         else
         {
-            StartupManager.getInstance(module.project).runWhenProjectIsInitialized() {
+            StartupManager.getInstance(module.project).runWhenProjectIsInitialized {
                 try
                 {
                     if (module.project.basePath != null)
@@ -219,7 +288,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                         {
                             gradleNotifications.forEach { it.expire() }
                             // We only import if we found the notification. If we import and the user then clicks on the import action on the notification, the IDE throws an error
-                            ApplicationManager.getApplication().runWriteAction() {
+                            ApplicationManager.getApplication().runWriteAction {
                                 module.importNewGradleProject() // this is a function in this plugin's GradleUtils that wraps the API function 
                             }
                         }
@@ -301,9 +370,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 
 
         val wpilibVersion = dataModel.wpilibVersion
-        //TODO Need to enhance the calls to the defaults check if the template has overridden any of the files
-        copyAllResourcesToModuleRoot(modelContentRootDir, gradleGroovyDslResourceBase(wpilibVersion))
-        copyAllResourcesToModuleRoot(modelContentRootDir, gradleWrapperResourceBase(wpilibVersion))
+        //TODO Need to enhance the calls to the defaults check if the template has overridden any of the default files
+        val paths = TemplatePaths(wpilibVersion)
+
+        copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleGroovyDslResourceBasePath)
+        copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleWrapperResourceBasePath)
 
 
         val wpilibCommandsJsonFilter: (VirtualFile) -> Boolean = 
@@ -313,13 +384,13 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                     2-> { virtualFile -> !virtualFile.name.contains("WPILibOldCommands") }     // reject Old so we keep New
                     else -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") && !virtualFile.name.contains("WPILibOldCommands") } // reject both
                 }
-        copyAllResourcesToModuleRoot(modelContentRootDir, configsResourceBase(wpilibVersion), wpilibCommandsJsonFilter)
+        copyAllResourcesToModuleRoot(modelContentRootDir, paths.configsResourceBasePath, wpilibCommandsJsonFilter)
 
-        copyAllResourcesToModuleRoot(modelContentRootDir, commonCodeResourceBase(wpilibVersion))
-        copyAllResourcesToModuleRoot(modelContentRootDir, javaCodeResourceBase(wpilibVersion))
+        copyAllResourcesToModuleRoot(modelContentRootDir, paths.commonCodeResourceBasePath)
+        copyAllResourcesToModuleRoot(modelContentRootDir, paths.javaCodeResourceBasePath)
         if (dataModel.includeVsCodeConfigs)
         {
-            copyAllResourcesToModuleRoot(modelContentRootDir, vsCodeConfigsResourceBase(wpilibVersion))
+            copyAllResourcesToModuleRoot(modelContentRootDir, paths.vsCodeConfigsResourceBasePath)
         }
         
         if (dataModel.gitIgnoreConfiguration.includeGitIgnoreFile)
@@ -336,7 +407,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             }
         }
         
-        val selectedTemplateResourceBase = frcWizardTemplatesBaseDir(wpilibVersion).resolve(dataModel.frcWizardTemplateDefinition.templateResourcesDirName()).resolve(javaCodeSubPath)
+        val selectedTemplateResourceBase = paths.frcWizardTemplatesBaseDirPath.resolve(dataModel.frcWizardTemplateDefinition.templateResourcesDirName()).resolve(TemplatePaths.javaCodeSubPath)
         copyAllResourcesToModuleRoot(modelContentRootDir, selectedTemplateResourceBase)
         
         modelContentRootDir.refresh(false, true)
@@ -352,7 +423,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         if (module != null)
         {
             // We need to wait until the project is initialized because we need to get access to the gradle based "projectName.main" module when creating the debug configuration 
-            StartupManager.getInstance(project).runWhenProjectIsInitialized() { createRunConfigurations(project) }
+            StartupManager.getInstance(project).runWhenProjectIsInitialized { createRunConfigurations(project) }
         }
         return module
     }
@@ -372,7 +443,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 
     private fun copyAllResourcesToModuleRoot(modelContentRootDir: VirtualFile, resourceDirBase: Path, keepFilter: (VirtualFile) -> Boolean = { true })
     {
-        val pluginResourceDirUrl = getPluginResource(resourceDirBase)
+        val pluginResourceDirUrl = resourceDirBase.asPluginResourceUrl()
         LOG.debug("[FRC] pluginResourceDir URL = $pluginResourceDirUrl")
 
         if (pluginResourceDirUrl == null)
@@ -664,7 +735,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
      * @param context
      * @param parentDisposable
      */
-    override fun getCustomOptionsStep(context: WizardContext, parentDisposable: Disposable): ModuleWizardStep?
+    override fun getCustomOptionsStep(context: WizardContext, parentDisposable: Disposable): ModuleWizardStep
     {
         // This *normally* determines the potential frameworks  that can be selected (like kotlin, groovy, Thymeleaf, Ruby, etc., etc., etc.
         //     Notice that when setProviders is called  "java" is set for the "preselected" parameter    In IDEA project: service/project/wizard/GradleFrameworksWizardStep.java:99 as well as  service/project/wizard/GradleFrameworksWizardStep.java:91 for the Kotlin DSL

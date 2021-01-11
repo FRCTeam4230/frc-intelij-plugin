@@ -422,8 +422,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         val module = super.commitModule(project, model)
         if (module != null)
         {
-            // We need to wait until the project is initialized because we need to get access to the gradle based "projectName.main" module when creating the debug configuration 
-            StartupManager.getInstance(project).runWhenProjectIsInitialized { createRunConfigurations(project) }
+            // We need to wait until the project is initialized because we need to get access to the gradle based "projectName.main" module when creating the debug configuration
+            // Moreover, we can't use runWhenProjectIsInitialized, but must use runAfterOpened, as sharing in the .run directory fails wiht a log message of:
+            //       It's unexpected that the file doesn't exist at this point {pathToDesiredRunConfig}
+            // But it works fine if we wait until after the project is opened.
+            StartupManager.getInstance(project).runAfterOpened { createRunConfigurations(project) }
         }
         return module
     }

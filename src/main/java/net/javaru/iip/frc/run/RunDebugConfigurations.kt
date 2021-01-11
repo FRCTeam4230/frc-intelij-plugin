@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.run
 
+import com.intellij.configurationStore.MODERN_NAME_CONVERTER
 import com.intellij.execution.RunManager
 import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.configurations.ConfigurationType
@@ -23,6 +24,8 @@ import com.intellij.execution.remote.RemoteConfiguration
 import com.intellij.execution.remote.RemoteConfigurationType
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.text.StringUtil
+import com.intellij.openapi.vfs.LocalFileSystem
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.settings.FrcRoboRioSettings
 import net.javaru.iip.frc.settings.RoboRioAddressType
@@ -60,7 +63,7 @@ fun createGradleRunConfiguration(project: Project,
     //              2) RunnerAndConfigurationSettings
     //          which we can get by the fact we have a handle on the project
     //
-    // Based on org.jetbrains.idea.devkit.module.PluginModuleBuilder, it appears the commitModule method is the place to create the configurations. 
+    // Based on org.jetbrains.idea.devkit.module.PluginModuleBuilder, it appears the commitModule method is the place to create the configurations.
 
     try
     {
@@ -70,14 +73,18 @@ fun createGradleRunConfiguration(project: Project,
             val configurationFactory = GradleExternalTaskConfigurationType.getInstance().configurationFactories[0]
             val runnerAndConfigurationSettings = runManager.createConfiguration(runConfigName, configurationFactory)
             val gradleRunConfiguration = runnerAndConfigurationSettings.configuration as GradleRunConfiguration
-            runnerAndConfigurationSettings.isShared = setAsShared
-    
+
             val gradleTaskSettings = gradleRunConfiguration.settings
             gradleTaskSettings.externalProjectPath = project.basePath
             gradleTaskSettings.taskNames = gradleTasks
             if (arguments != null) gradleTaskSettings.scriptParameters = arguments
             if (vmOptions != null) gradleTaskSettings.vmOptions = arguments
-    
+
+            if (setAsShared)
+            {
+                shareRunConfiguration(project, runnerAndConfigurationSettings)
+            }
+
             runManager.addConfiguration(runnerAndConfigurationSettings)
             if (setAsSelected)
             {
@@ -108,15 +115,19 @@ fun createDebuggingRunConfiguration(project: Project, teamNumber: Int = project.
             val runManager = RunManager.getInstance(project)
             
             val baseName = "Debug Robot via ${addressType.name}"
-            val name = determineNextName(runManager, baseName, RemoteConfigurationType::class.java)
+            val runConfigName = determineNextName(runManager, baseName, RemoteConfigurationType::class.java)
             val configurationFactory = RemoteConfigurationType.getInstance().configurationFactories[0]
-            val runnerAndConfigurationSettings = runManager.createConfiguration(name, configurationFactory)
-            runnerAndConfigurationSettings.isShared = setAsShared
-    
+            val runnerAndConfigurationSettings = runManager.createConfiguration(runConfigName, configurationFactory)
+
             val remoteConfiguration = runnerAndConfigurationSettings.configuration as RemoteConfiguration
             remoteConfiguration.HOST = FrcRoboRioSettings.createRoboRioAddressDefault(teamNumber, addressType)
             remoteConfiguration.PORT = FrcApplicationSettings.getInstance().debuggingPort.toString()
             remoteConfiguration.setModule(mainModule)
+            if (setAsShared)
+            {
+                shareRunConfiguration(project, runnerAndConfigurationSettings)
+            }
+
             runManager.addConfiguration(runnerAndConfigurationSettings)
         }
         else
@@ -129,6 +140,21 @@ fun createDebuggingRunConfiguration(project: Project, teamNumber: Int = project.
         logger.warn("[FRC] Could not create Debugging Configuration for project '${project.name}' due to an exception: $e", e)
     }
 }
+
+private fun shareRunConfiguration(project: Project, settings: RunnerAndConfigurationSettings)
+{
+    val baseDir = LocalFileSystem.getInstance().findFileByPath(StringUtil.notNullize(project.basePath))
+    if (baseDir != null)
+    {
+        val dirPath = "${baseDir.path}/.run"
+        val fileName = createRunConfigFileName(settings.name)
+        val filePath = "$dirPath/$fileName"
+        settings.storeInArbitraryFileInProject(filePath)
+    }
+}
+
+/** Creates a safe file name for a run config. This is a copy of the private `RunConfigurationStorageUi.getFileNameByRCName` method. */
+private fun createRunConfigFileName(runConfigName: String): String = MODERN_NAME_CONVERTER.invoke(runConfigName) + ".run.xml"
 
 
 fun determineNextName(project: Project, baseName:String, type: Class<out ConfigurationType>): String = determineNextName(RunManager.getInstance(project), baseName, type)

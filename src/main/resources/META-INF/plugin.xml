@@ -56,6 +56,8 @@
         <strong>v1.4.0</strong> <br>
         &nbsp;&nbsp;&bull; Support for IntelliJ IDEA v2020.2 and later only.See the
                            <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin#eol-policy'>FRC Plugin's EOL Policy</a> for more detail.<br>
+        &nbsp;&nbsp;&bull; New Project Wizard: Gradle run configurations are now stored in <tt>{projectRoot}/.run<tt> rather then <tt>{projectRoot}/.idea/runConfigurations<tt>
+                           (as introduced in IntelliJ IDEA v2020.1) for easier/better sharing of run configurations.<br>
         &nbsp;&nbsp;&bull; Preparation for migrating the Plugin to be a dynamic plugin (i.e. restart of IDEA not required after upgrading FRC plugin).
                            Full Dynamic Plugin capabilities are planned for a near future release.<br>
         &nbsp;&nbsp;&bull; Some minor improvements to the Subsystem singleton templates.<br>

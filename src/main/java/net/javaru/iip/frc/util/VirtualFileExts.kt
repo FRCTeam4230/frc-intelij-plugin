@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -39,6 +39,23 @@ import java.nio.file.Path
 private val LOG = Logger.getInstance("#net.javaru.iip.frc.util.VirtualFileExts")
 
 private val AntDetectionXPathExpression = XPathFactory.instance().compile("//project/property[@file] | //bookstore/import[@file]", Filters.element())
+
+/**
+ * Gets a file in a directory. Example Use:
+ * ```
+ * val buildFile = projectRootDir["build.gradle.kts"] ?: modelContentRootDir["build.gradle"]
+ * ```
+ */
+operator fun VirtualFile?.get(path: String?): VirtualFile?
+{
+    // Copied from Ktor plugin "Utils.kt"
+    if (this == null || path == null || path == "" || path == ".") return this
+    val parts = path.split('/', limit = 2)
+    val firstName = parts[0]
+    val lastName = parts.getOrNull(1)
+    val child = this.findChild(firstName)
+    return if (lastName != null) child[lastName] else child
+}
 
 fun VirtualFile.isWpiAntBuildFile(): Boolean
 {

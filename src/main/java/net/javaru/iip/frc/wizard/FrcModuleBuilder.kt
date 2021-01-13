@@ -40,6 +40,7 @@ import com.intellij.openapi.projectRoots.impl.JavaSdkImpl
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider
+import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
@@ -58,6 +59,7 @@ import net.javaru.iip.frc.freemarker.freemarkerConfiguration
 import net.javaru.iip.frc.i18n.FrcBundle.message
 import net.javaru.iip.frc.run.createDebuggingRunConfiguration
 import net.javaru.iip.frc.run.createGradleRunConfiguration
+import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.settings.RoboRioAddressType
 import net.javaru.iip.frc.util.asPluginResourceUrl
 import net.javaru.iip.frc.util.asPluginResourceVF
@@ -288,13 +290,57 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         // This method gets called by the setupModule method
         LOG.debug("[FRC] FrcModuleBuilder.setupRootModel() called with template: '${dataModel.frcWizardTemplateDefinition.displayName}' from dir '${dataModel.frcWizardTemplateDefinition.templateResourcesDirName()}'")
         LOG.trace("[FRC] Data Model: $dataModel")
+
+        val modelContentRootDir = createAndGetRoot() ?: return
+        val project = rootModel.project
+        //val module = rootModel.module
+        rootModel.addContentEntry(modelContentRootDir)
+        if (myJdk != null) rootModel.sdk = myJdk else rootModel.inheritSdk()
+
+        project.runBackgroundTask("Setting Up FRC Project") { progress ->
+            progress.text = "Processing templates"
+            rootProjectPath = myParentProject?.linkedExternalProjectPath ?: FileUtil.toCanonicalPath(if (myWizardContext!!.isCreatingNewProject) project.basePath else modelContentRootDir.path)
+            assert(rootProjectPath != null) { "rootProjectPath is null" }
+
+            copyTemplateFilesToProject(modelContentRootDir)
+
+            progress.text = "Configuring project model"
+            modelContentRootDir.refresh(false, true)
+
+            if (FrcApplicationSettings.getInstance().enableGradleImportUponNewProjectCreation)
+            {
+                importGradleProject(modelContentRootDir, project)
+            }
+
+            progress.text = "Done."
+        }
+
+        StartupManager.getInstance(project).runWhenProjectIsInitialized {
+            createRunConfigurations(project)
+        }
+
+        LOG.trace("[FRC] FrcModuleBuilder.setupRootModel() completed")
+    }
+
+
+    override fun commitModule(project: Project, model: ModifiableModuleModel?): Module?
+    {
+        LOG.trace("[FRC] FrcModuleBuilder.moduleCreated() called for project: ${project.name} for moduleModel $model")
+        val module = super.commitModule(project, model)
+        LOG.trace("[FRC] FrcModuleBuilder.moduleCreated() completed for project: ${project.name} for moduleModel $model")
+        return module
+    }
+
+
+    private fun copyTemplateFilesToProject(modelContentRootDir: VirtualFile)
+    {
         /*
             We need to setup the following:
             A) The following are typically identical between templates
-                1) Gradle 
+                1) Gradle
                     - nice to have would be to add dependencies such as logging
                     - Files:
-                        a) build.gradle     (or build.gradle.kts)       
+                        a) build.gradle     (or build.gradle.kts)
                             - potentially modifiable
                             - will need to replace robot main class if we allow for alternate base package
                         b) settings.gradle  (or settings.gradle.kts)
@@ -313,7 +359,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                     - Will have replacements for team number and project year
                     - Files:
                         a) wpilib_preferences.json
-                    
+
             B) Template Specific files:
                 1) src/main/deploy/example.txt
                     - Same across all projects
@@ -323,92 +369,47 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 3) Robot.java
                     - differs per template
                 4) Other Java classes and packages
-            
-            
         */
 
+        val wpilibVersion = dataModel.wpilibVersion
+        //TODO Need to enhance the calls to the defaults check if the template has overridden any of the default files
+        val paths = TemplatePaths(wpilibVersion)
 
-        val modelContentRootDir = createAndGetRoot() ?: return
-        val project = rootModel.project
-        val module = rootModel.module
-        rootModel.addContentEntry(modelContentRootDir)
-        // There is a to  do comment in GradleModuleBuilder that this sdk work should be moved to generic ModuleBuilder
-        if (myJdk != null) rootModel.sdk = myJdk else rootModel.inheritSdk()
+        copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleGroovyDslResourceBasePath)
+        copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleWrapperResourceBasePath)
 
-        project.runBackgroundTask("Setting Up FRC Project") { progress ->
-            progress.text = "Processing templates"
 
-            rootProjectPath = if (myParentProject != null)
+        val wpilibCommandsJsonFilter: (VirtualFile) -> Boolean =
+            when (dataModel.frcWizardTemplateDefinition.commandVersion)
             {
-                myParentProject!!.linkedExternalProjectPath
+                1    -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") }    // reject New so we keep Old
+                2    -> { virtualFile -> !virtualFile.name.contains("WPILibOldCommands") }     // reject Old so we keep New
+                else -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") && !virtualFile.name.contains("WPILibOldCommands") } // reject both
             }
-            else
-            {
-                FileUtil.toCanonicalPath(if (myWizardContext!!.isCreatingNewProject) project.basePath else modelContentRootDir.path)
-            }
-            assert(rootProjectPath != null) { "rootProjectPath is null" }
+        copyAllResourcesToModuleRoot(modelContentRootDir, paths.configsResourceBasePath, wpilibCommandsJsonFilter)
 
-            val wpilibVersion = dataModel.wpilibVersion
-            //TODO Need to enhance the calls to the defaults check if the template has overridden any of the default files
-            val paths = TemplatePaths(wpilibVersion)
-
-            copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleGroovyDslResourceBasePath)
-            copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleWrapperResourceBasePath)
-
-
-            val wpilibCommandsJsonFilter: (VirtualFile) -> Boolean =
-                when (dataModel.frcWizardTemplateDefinition.commandVersion)
-                {
-                    1    -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") }    // reject New so we keep Old
-                    2    -> { virtualFile -> !virtualFile.name.contains("WPILibOldCommands") }     // reject Old so we keep New
-                    else -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") && !virtualFile.name.contains("WPILibOldCommands") } // reject both
-                }
-            copyAllResourcesToModuleRoot(modelContentRootDir, paths.configsResourceBasePath, wpilibCommandsJsonFilter)
-
-            copyAllResourcesToModuleRoot(modelContentRootDir, paths.commonCodeResourceBasePath)
-            copyAllResourcesToModuleRoot(modelContentRootDir, paths.javaCodeResourceBasePath)
-            if (dataModel.includeVsCodeConfigs)
-            {
-                copyAllResourcesToModuleRoot(modelContentRootDir, paths.vsCodeConfigsResourceBasePath)
-            }
-
-            if (dataModel.gitIgnoreConfiguration.includeGitIgnoreFile)
-            {
-                try
-                {
-                    val gitIgnoreContent = generateGitIgnoreFileContent(dataModel.gitIgnoreConfiguration)
-                    val file = Paths.get(modelContentRootDir.path).resolve(".gitignore")
-                    Files.newBufferedWriter(file, Charsets.UTF_8).use { it.write(gitIgnoreContent) }
-                } catch (e: Exception)
-                {
-                    LOG.warn("[FRC] Unable to create .gitignore file due to an exception: $e", e)
-                }
-            }
-
-            val selectedTemplateResourceBase = paths.frcWizardTemplatesBaseDirPath.resolve(dataModel.frcWizardTemplateDefinition.templateResourcesDirName()).resolve(TemplatePaths.javaCodeSubPath)
-            copyAllResourcesToModuleRoot(modelContentRootDir, selectedTemplateResourceBase)
-
-            progress.text = "Configuring project model"
-            modelContentRootDir.refresh(false, true)
-
-            importGradleProject(modelContentRootDir, project)
-
-            invokeLater { createRunConfigurations(project) }
-
-            progress.text = "Done."
+        copyAllResourcesToModuleRoot(modelContentRootDir, paths.commonCodeResourceBasePath)
+        copyAllResourcesToModuleRoot(modelContentRootDir, paths.javaCodeResourceBasePath)
+        if (dataModel.includeVsCodeConfigs)
+        {
+            copyAllResourcesToModuleRoot(modelContentRootDir, paths.vsCodeConfigsResourceBasePath)
         }
 
-        LOG.trace("[FRC] FrcModuleBuilder.setupRootModel() completed")
-    }
+        if (dataModel.gitIgnoreConfiguration.includeGitIgnoreFile)
+        {
+            try
+            {
+                val gitIgnoreContent = generateGitIgnoreFileContent(dataModel.gitIgnoreConfiguration)
+                val file = Paths.get(modelContentRootDir.path).resolve(".gitignore")
+                Files.newBufferedWriter(file, Charsets.UTF_8).use { it.write(gitIgnoreContent) }
+            } catch (e: Exception)
+            {
+                LOG.warn("[FRC] Unable to create .gitignore file due to an exception: $e", e)
+            }
+        }
 
-    
-    
-    override fun commitModule(project: Project, model: ModifiableModuleModel?): Module?
-    {
-        LOG.trace("[FRC] FrcModuleBuilder.moduleCreated() called for project: ${project.name} for moduleModel $model")
-        val module = super.commitModule(project, model)
-        LOG.trace("[FRC] FrcModuleBuilder.moduleCreated() completed for project: ${project.name} for moduleModel $model")
-        return module
+        val selectedTemplateResourceBase = paths.frcWizardTemplatesBaseDirPath.resolve(dataModel.frcWizardTemplateDefinition.templateResourcesDirName()).resolve(TemplatePaths.javaCodeSubPath)
+        copyAllResourcesToModuleRoot(modelContentRootDir, selectedTemplateResourceBase)
     }
 
 

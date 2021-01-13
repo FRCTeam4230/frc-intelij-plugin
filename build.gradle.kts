@@ -248,7 +248,6 @@ repositories {
 
 
 dependencies {
-    val http4kVersion = "3.248.0"
     val jacksonVersion = "2.11.2"
 
     // For Kotlin dependencies, you can use shorthand for a dependency on a Kotlin module, for example, kotlin("test") for "org.jetbrains.kotlin:kotlin-test".
@@ -265,13 +264,6 @@ dependencies {
     //implementation("com.beust:klaxon:5.0.9")
     implementation(platform("com.google.guava:guava-bom:29.0-jre"))
     implementation("com.google.guava:guava")
-
-    // https://www.http4k.org
-    implementation("org.http4k:http4k-core:$http4kVersion")
-    //compile("org.http4k:http4k-client-okhttp:$http4kVersion")
-    implementation("org.http4k:http4k-client-apache:$http4kVersion")
-    implementation("org.http4k:http4k-client-apache-async:$http4kVersion")
-    //compile("org.http4k:http4k-server-jetty:$http4kVersion")
 
     implementation("com.asarkar:jsemver:0.6.2")  // https://github.com/asarkar/jsemver  Requires one-off repo declaration of: maven("https://dl.bintray.com/asarkar/mvn")
 

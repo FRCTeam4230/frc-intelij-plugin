@@ -1,0 +1,132 @@
+<#ftl output_format="plainText" encoding="UTF-8">
+<#--noinspection WrongPackageStatement-->
+<#compress>
+<#-- @ftlvariable name="data" type="net.javaru.iip.frc.wizard.FrcProjectWizardData" -->
+<#--    
+    Template Language Refernce: https://freemarker.apache.org/docs/ref.html
+    Template Author's Guide:    https://freemarker.apache.org/docs/dgui.html
+-->
+<#--  To DEBUG templates, set system property 'frc.freemarker.debug' to true when luanching the testing instance of IntelliJ IDEA -->
+</#compress>
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+package ${data.basePackage};
+
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+
+/**
+ * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
+ * constants.  This class should not be used for any other purpose.  All constants should be
+ * declared globally (i.e. public static).  Do not put anything functional in this class.
+ * <p>
+ * It is advised to statically import this class (or one of its inner classes) wherever the
+ * constants are needed, to reduce verbosity.
+ */
+public final class Constants
+{
+    public static final class DriveConstants
+    {
+        public static final int FRONT_LEFT_DRIVE_MOTOR_PORT = 0;
+        public static final int REAR_LEFT_DRIVE_MOTOR_PORT = 2;
+        public static final int FRONT_RIGHT_DRIVE_MOTOR_PORT = 4;
+        public static final int REAR_RIGHT_DRIVE_MOTOR_PORT = 6;
+
+        public static final int FRONT_LEFT_TURNING_MOTOR_PORT = 1;
+        public static final int REAR_LEFT_TURNING_MOTOR_PORT = 3;
+        public static final int FRONT_RIGHT_TURNING_MOTOR_PORT = 5;
+        public static final int REAR_RIGHT_TURNING_MOTOR_PORT = 7;
+
+        public static final int[] FRONT_LEFT_TURNING_ENCODER_PORTS = {0, 1};
+        public static final int[] REAR_LEFT_TURNING_ENCODER_PORTS = {2, 3};
+        public static final int[] FRONT_RIGHT_TURNING_ENCODER_PORTS = {4, 5};
+        public static final int[] REAR_RIGHT_TURNING_ENCODER_PORTS = {5, 6};
+
+        public static final boolean FRONT_LEFT_TURNING_ENCODER_REVERSED = false;
+        public static final boolean REAR_LEFT_TURNING_ENCODER_REVERSED = true;
+        public static final boolean FRONT_RIGHT_TURNING_ENCODER_REVERSED = false;
+        public static final boolean REAR_RIGHT_TURNING_ENCODER_REVERSED = true;
+
+        public static final int[] FRONT_LEFT_DRIVE_ENCODER_PORTS = {7, 8};
+        public static final int[] REAR_LEFT_DRIVE_ENCODER_PORTS = {9, 10};
+        public static final int[] FRONT_RIGHT_DRIVE_ENCODER_PORTS = {11, 12};
+        public static final int[] REAR_RIGHT_DRIVE_ENCODER_PORTS = {13, 14};
+
+        public static final boolean FRONT_LEFT_DRIVE_ENCODER_REVERSED = false;
+        public static final boolean REAR_LEFT_DRIVE_ENCODER_REVERSED = true;
+        public static final boolean FRONT_RIGHT_DRIVE_ENCODER_REVERSED = false;
+        public static final boolean REAR_RIGHT_DRIVE_ENCODER_REVERSED = true;
+
+
+        public static final double TRACK_WIDTH = 0.5;
+        //Distance between centers of right and left wheels on robot
+        public static final double WHEEL_BASE = 0.7;
+        //Distance between front and back wheels on robot
+        public static final SwerveDriveKinematics DRIVE_KINEMATICS =
+                new SwerveDriveKinematics(
+                        new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
+                        new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+                        new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
+                        new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
+
+        public static final boolean GYRO_REVERSED = false;
+
+        // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
+        // These characterization values MUST be determined either experimentally or theoretically
+        // for *your* robot's drive.
+        // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
+        // values for your robot.
+        public static final double S_VOLTS = 1;
+        public static final double V_VOLT_SECONDS_PER_METER = 0.8;
+        public static final double A_VOLT_SECONDS_SQUARED_PER_METER = 0.15;
+
+    }
+
+    public static final class ModuleConstants
+    {
+        public static final double MAX_MODULE_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
+        public static final double MAX_MODULE_ANGULAR_ACCELERATION_RADIANS_PER_SECOND_SQUARED = 2 * Math.PI;
+
+        public static final int ENCODER_CPR = 1024;
+        public static final double WHEEL_DIAMETER_METERS = 0.15;
+        public static final double DRIVE_ENCODER_DISTANCE_PER_PULSE =
+                // Assumes the encoders are directly mounted on the wheel shafts
+                (WHEEL_DIAMETER_METERS * Math.PI) / (double) ENCODER_CPR;
+
+        public static final double TURNING_ENCODER_DISTANCE_PER_PULSE =
+                // Assumes the encoders are on a 1:1 reduction with the module shaft.
+                (2 * Math.PI) / (double) ENCODER_CPR;
+
+        public static final double P_MODULE_TURNING_CONTROLLER = 1;
+        public static final double P_MODULE_DRIVE_CONTROLLER = 1;
+    }
+
+    public static final class OIConstants
+    {
+        public static final int DRIVER_CONTROLLER_PORT = 1;
+
+    }
+
+    public static final class AutoConstants
+    {
+        public static final double MAX_SPEED_METERS_PER_SECOND = 3;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
+
+        public static final double P_X_CONTROLLER = 1;
+        public static final double P_Y_CONTROLLER = 1;
+        public static final double P_THETA_CONTROLLER = 1;
+
+        //Constraint for the motion profiled robot angle controller
+        public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
+                new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+                        MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
+    }
+}

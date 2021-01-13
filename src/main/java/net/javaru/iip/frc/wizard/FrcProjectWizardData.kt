@@ -36,10 +36,13 @@ class FrcProjectWizardData(
         var wpilibVersion: WpiLibVersion = GradleRioMavenMetadataState.getInstance().wpiLibMavenMetadata.releaseAsWpiLibVersion,
         var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizard2019ProjectTemplateDefinition.CommandBased,
         var includeVsCodeConfigs: Boolean = true,
+        var enableDesktopSupport: Boolean = false,
         var gitIgnoreConfiguration: GitIgnoreConfiguration = GitIgnoreConfiguration(true, generateFromSite = true),
         var includeJUnitSupport:Boolean = true,
         var junitOption: JUnitOption = JUnitOption.JUnit5,
-        var junit5Version: String = "5.5.2"
+        var junit4Version: String = "4.13.1",
+        var junit5Version: String = "5.7.0",
+        var isRomiRobot: Boolean = false
                           )
 {
 
@@ -61,7 +64,14 @@ class FrcProjectWizardData(
 
     val basePackageAsDirString: String
         get() = basePackage.replace('.', '/')
-    
+
+    val includeDesktopSupportGradleSetting: String
+        get()
+        {
+            val result = enableDesktopSupport || isRomiRobot
+            return result.toString()
+        }
+
     val basePackageAsDirPath: Path
         get() = Paths.get(basePackageAsDirString)
     
@@ -80,7 +90,17 @@ class FrcProjectWizardData(
                 2020 -> """https\://services.gradle.org/distributions/gradle-6.0.1-bin.zip"""
                 else -> """https\://services.gradle.org/distributions/gradle-6.0.1-bin.zip"""
             }
-        } 
+        }
+
+    val copyright: String
+        get(){
+            return when (wpilibVersion.frcYear)
+            {
+                /* Added in 2021. Did not backport to older version as in older one the year was in the stae,emnt and it varied from class to class */
+                2021 -> copyright2021
+                else -> copyright2021
+            }
+        }
     
     fun junitIncludeVintageSupport(): Boolean = includeJUnitSupport && (junitOption == JUnitOption.JUnit5withVintage)
     fun junitUseJUnitPlatform(): Boolean = includeJUnitSupport && (junitOption == JUnitOption.JUnit5 || junitOption == JUnitOption.JUnit5withVintage) 
@@ -88,17 +108,22 @@ class FrcProjectWizardData(
     
     override fun toString(): String
     {
-        return "FrcProjectWizardData(teamNumber=$teamNumber, mainClassSimpleName='$mainClassSimpleName', robotClassSimpleName='$robotClassSimpleName', basePackage='$basePackage', wpilibVersion=$wpilibVersion, frcWizardTemplateDefinition=$frcWizardTemplateDefinition, includeVsCodeConfigs=$includeVsCodeConfigs, gitIgnoreConfiguration=$gitIgnoreConfiguration, includeJUnitSupport=$includeJUnitSupport, junitOption=$junitOption, junit5Version='$junit5Version')"
+        return "FrcProjectWizardData(teamNumber=$teamNumber, mainClassSimpleName='$mainClassSimpleName', robotClassSimpleName='$robotClassSimpleName', basePackage='$basePackage', wpilibVersion=$wpilibVersion, frcWizardTemplateDefinition=$frcWizardTemplateDefinition, enableDesktopSupport=$enableDesktopSupport, includeVsCodeConfigs=$includeVsCodeConfigs, gitIgnoreConfiguration=$gitIgnoreConfiguration, includeJUnitSupport=$includeJUnitSupport, junitOption=$junitOption, junit5Version='$junit5Version')"
     }
 
     enum class JUnitOption() {JUnit5, JUnit5withVintage, JUnit4}
     
-    
+    private val copyright2021 = """
+        |// Copyright (c) FIRST and other WPILib contributors.
+        |
+        |// Open Source Software; you can modify and/or share it under the terms of
+        |// the WPILib BSD license file in the root directory of this project.
+    """.trimMargin()
 }
 
 data class GitIgnoreConfiguration(
         var includeGitIgnoreFile: Boolean = true,
-        var intellij: IdeConfigOption = IdeConfigOption.Share,
+        var intellij: IdeConfigOption = IdeConfigOption.Ignore,
         var vscode: IdeConfigOption = IdeConfigOption.Share,
         var eclipse: IdeConfigOption = IdeConfigOption.Share,
         var netbeans: IdeConfigOption = IdeConfigOption.Share,

@@ -20,6 +20,7 @@ import com.asarkar.semver.SemVer
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.ide.plugins.cl.PluginClassLoader
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.logger
@@ -39,6 +40,7 @@ import java.nio.file.Path
 private object FrcPluginUtils
 private val LOG = logger<FrcPluginUtils>()
 
+/** For details, see [Application.invokeLater] */
 inline fun invokeLater(crossinline func: () -> Unit)
 {
     if (ApplicationManager.getApplication().isDispatchThread)
@@ -50,6 +52,31 @@ inline fun invokeLater(crossinline func: () -> Unit)
         ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.defaultModalityState())
     }
 }
+
+/** For details, see [Application.invokeAndWait] */
+inline fun invokeLaterWait(crossinline func: () -> Unit)
+{
+    if (ApplicationManager.getApplication().isDispatchThread)
+    {
+        func()
+    }
+    else
+    {
+        ApplicationManager.getApplication().invokeAndWait({ func() }, ModalityState.defaultModalityState())
+    }
+}
+
+//inline fun invokeLaterOnWriteThread(crossinline func: () -> Unit)
+//{
+//    if (ApplicationManager.getApplication().isDispatchThread)
+//    {
+//        func()
+//    }
+//    else
+//    {
+//        ApplicationManager.getApplication().invokeLaterOnWriteThread({ func() }, ModalityState.defaultModalityState())
+//    }
+//}
 
 @JvmOverloads
 fun getPluginClassloader(clazz: Class<*> = FrcIcons::class.java): PluginClassLoader = clazz.classLoader as PluginClassLoader

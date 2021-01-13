@@ -24,8 +24,6 @@ import com.intellij.execution.remote.RemoteConfiguration
 import com.intellij.execution.remote.RemoteConfigurationType
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.text.StringUtil
-import com.intellij.openapi.vfs.LocalFileSystem
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.settings.FrcRoboRioSettings
 import net.javaru.iip.frc.settings.RoboRioAddressType
@@ -143,12 +141,17 @@ fun createDebuggingRunConfiguration(project: Project, teamNumber: Int = project.
 
 private fun shareRunConfiguration(project: Project, settings: RunnerAndConfigurationSettings)
 {
-    val baseDir = LocalFileSystem.getInstance().findFileByPath(StringUtil.notNullize(project.basePath))
-    if (baseDir != null)
+    val baseDir = project.basePath
+    if (baseDir == null)
     {
-        val dirPath = "${baseDir.path}/.run"
+        logger.warn("[FRC] Can't share run configurations because project.basePath was null")
+    }
+    else
+    {
+        val dirPath = "$baseDir/.run"
         val fileName = createRunConfigFileName(settings.name)
         val filePath = "$dirPath/$fileName"
+        logger.debug("[FRC] run config path set to: $filePath")
         settings.storeInArbitraryFileInProject(filePath)
     }
 }
@@ -157,6 +160,7 @@ private fun shareRunConfiguration(project: Project, settings: RunnerAndConfigura
 private fun createRunConfigFileName(runConfigName: String): String = MODERN_NAME_CONVERTER.invoke(runConfigName) + ".run.xml"
 
 
+@Suppress("unused")
 fun determineNextName(project: Project, baseName:String, type: Class<out ConfigurationType>): String = determineNextName(RunManager.getInstance(project), baseName, type)
 
 fun determineNextName(runManager: RunManager, baseName:String, type: Class<out ConfigurationType>): String = determineNextName(baseName, runManager.getConfigurationSettingsList(type))

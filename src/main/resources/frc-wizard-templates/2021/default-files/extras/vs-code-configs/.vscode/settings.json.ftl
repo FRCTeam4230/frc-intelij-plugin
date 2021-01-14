@@ -4,9 +4,7 @@
 </#compress>
 {
   "java.configuration.updateBuildConfiguration": "automatic",
-<#if !data.isRomiRobot()>
-  "java.server.launchMode":"Standard",
-</#if>
+  "java.server.launchMode": "Standard",
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
@@ -17,7 +15,8 @@
     "**/.classpath": true,
     "**/.project": true,
     "**/.settings": true,
-    "**/.factorypath": true<#if !data.isRomiRobot()>,
-    "**/*~":true</#if>
-  }
+    "**/.factorypath": true,
+    "**/*~": true
+  }<#if data.isRomiRobot()>,
+  "wpilib.skipSelectSimulateExtension": true</#if>
 }

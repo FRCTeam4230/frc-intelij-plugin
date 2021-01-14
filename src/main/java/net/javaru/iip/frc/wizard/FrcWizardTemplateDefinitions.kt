@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2021 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -61,6 +61,8 @@ interface FrcWizardTemplateDefinition
      * For now, we are setting 2019 templates to a 0 as it may be useful for filtering in the pending new design.
      */
     val commandVersion: Int
+
+    val isRomiBot:Boolean
 
     /** The base name of the template's resource directory. It is highly recommended that this value not include any spaces. */
     fun templateResourcesDirName(): String
@@ -123,7 +125,8 @@ enum class FrcWizard2019ProjectTemplateDefinition(
         @field:Language("HTML") @param:Language("HTML") private val _description: String,
         override val isDeprecated: Boolean = false,
         override val deprecationAlternative: String? = null,
-        override val commandVersion: Int = 0
+        override val commandVersion: Int = 0,
+        override val isRomiBot: Boolean = false
                                              ) : FrcWizardTemplateDefinition
 {
     CommandBased("Command Based Robot", "A robot project that allows robots to be implemented using the command based model to allow complex functionality to be developed from simpler functionality."),
@@ -152,7 +155,8 @@ enum class FrcWizard2019ExampleTemplateDefinition(
         @field:Language("HTML") @param:Language("HTML") private val _description: String,
         override val isDeprecated: Boolean = false,
         override val deprecationAlternative: String? = null,
-        override val commandVersion: Int = 0
+        override val commandVersion: Int = 0,
+        override val isRomiBot: Boolean = false
                                                  ) : FrcWizardTemplateDefinition
 {
     GettingStarted("Getting Started", "An example project which demonstrates the simplest autonomous and teleoperated routines."),
@@ -194,7 +198,8 @@ enum class FrcWizard2020ProjectTemplateDefinition(
         @field:Language("HTML") @param:Language("HTML") private val _description: String,
         override val isDeprecated: Boolean = false,
         override val deprecationAlternative: String? = null,
-        override val commandVersion: Int = 1
+        override val commandVersion: Int = 1,
+        override val isRomiBot: Boolean = false
                                                  ) : FrcWizardTemplateDefinition
 {
     // Old Command Based docs: https://docs.wpilib.org/en/latest/docs/software/old-commandbased/index.html
@@ -226,7 +231,8 @@ enum class FrcWizard2020ExampleTemplateDefinition(
         @field:Language("HTML") @param:Language("HTML") private val _description: String,
         override val isDeprecated: Boolean = false,
         override val deprecationAlternative: String? = null,
-        override val commandVersion: Int = 1
+        override val commandVersion: Int = 1,
+        override val isRomiBot: Boolean = false
                                                  ) : FrcWizardTemplateDefinition
 {
     GettingStarted("Getting Started", "An example project which demonstrates the simplest autonomous and teleoperated routines."),
@@ -295,7 +301,8 @@ enum class FrcWizard2021ProjectTemplateDefinition(
     @field:Language("HTML") @param:Language("HTML") private val _description: String,
     override val isDeprecated: Boolean = false,
     override val deprecationAlternative: String? = null,
-    override val commandVersion: Int = 1
+    override val commandVersion: Int = 1,
+    override val isRomiBot: Boolean = false
                                                  ) : FrcWizardTemplateDefinition
 {
     // Old Command Based docs: https://docs.wpilib.org/en/latest/docs/software/old-commandbased/index.html
@@ -317,8 +324,8 @@ enum class FrcWizard2021ProjectTemplateDefinition(
         "RobotBase Skeleton (Advanced)",
         "A skeleton (stub) for RobotBase, intended for <strong>highly advanced/experienced</strong> programmers, that provides more complete control over program flow."
                      ),
-    RomiCommand("Romi - Command Robot", "Romi Robot using (version 2 of) the Command Based framework/API, allowing complex functionality to be developed from simpler functionality/components. See the <em>Romi Robot</em> section of the WPI Lib Docs for more information and details.", commandVersion = 2),
-    RomiTimed("Romi - Timed Robot", "Romi Robot using TimedRobot as the base class, allowing robots to be implemented in an iterative manner synced to a timer. See the <em>Romi Robot</em> section of the WPI Lib Docs for more information and details.")
+    RomiCommand("Romi - Command Robot", "Romi Robot using (version 2 of) the Command Based framework/API, allowing complex functionality to be developed from simpler functionality/components. See the <em>Romi Robot</em> section of the WPI Lib Docs for more information and details.", commandVersion = 2, isRomiBot = true),
+    RomiTimed("Romi - Timed Robot", "Romi Robot using TimedRobot as the base class, allowing robots to be implemented in an iterative manner synced to a timer. See the <em>Romi Robot</em> section of the WPI Lib Docs for more information and details.", isRomiBot = true)
 
     ;
 
@@ -341,7 +348,8 @@ enum class FrcWizard2021ExampleTemplateDefinition(
     @field:Language("HTML") @param:Language("HTML") private val _description: String,
     override val isDeprecated: Boolean = false,
     override val deprecationAlternative: String? = null,
-    override val commandVersion: Int = 1
+    override val commandVersion: Int = 1,
+    override val isRomiBot: Boolean = false
                                                  ) : FrcWizardTemplateDefinition
 {
     GettingStarted("Getting Started", "An example project which demonstrates the simplest autonomous and teleoperated routines."),

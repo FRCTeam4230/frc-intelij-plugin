@@ -28,7 +28,7 @@ public class ExampleSubsystem extends Subsystem
     // here. Call these from Commands.
 
     @Override
-    public void initDefaultCommand()
+    protected void initDefaultCommand()
     {
         // Set the default command for a subsystem here.
         // setDefaultCommand(new MySpecialCommand());

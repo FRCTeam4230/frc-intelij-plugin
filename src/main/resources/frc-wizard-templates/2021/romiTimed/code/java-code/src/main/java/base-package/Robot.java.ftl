@@ -90,9 +90,25 @@ public class ${data.robotClassSimpleName} extends TimedRobot
         }
     }
 
+    /** This function is called once when teleop is enabled. */
+    @Override
+    public void teleopInit() {}
+
     /** This method is called periodically during operator control. */
     @Override
     public void teleopPeriodic() {}
+
+    /** This function is called once when the robot is disabled. */
+    @Override
+    public void disabledInit() {}
+
+    /** This function is called periodically when disabled. */
+    @Override
+    public void disabledPeriodic() {}
+
+    /** This function is called once when test mode is enabled. */
+    @Override
+    public void testInit() {}
 
     /** This method is called periodically during test mode. */
     @Override

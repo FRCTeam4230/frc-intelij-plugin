@@ -480,7 +480,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     
     private fun copyNonTemplateFile(modelContentRootDir: VirtualFile, srcFqVf: VirtualFile, srcFqBaseDir: VirtualFile): VirtualFile?
     {
-        try
+        return try
         {
             val endPath = Paths.get(srcFqVf.toString().removePrefix("$srcFqBaseDir")).removeBasePath(Paths.get("/"))
             val target = resolveTargetPath(modelContentRootDir, endPath)
@@ -488,12 +488,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             val file = target.toFile()
 
             FileUtils.copyInputStreamToFile(srcFqVf.inputStream, file)
-            return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file)
-        }
-        catch (e: Exception)
+            LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file)
+        } catch (e: Exception)
         {
             LOG.warn("[FRC] Could not copy new project wizard file '$srcFqVf' to new project root '${modelContentRootDir}' exception: $e", e)
-            return null
+            null
         }
     }
     
@@ -502,6 +501,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     {
         try
         {
+            srcFqBaseDir.refresh(false, false)
             val srcEndPath = Paths.get(srcFqVf.toString().removePrefix("$srcFqBaseDir")).removeBasePath(Paths.get("/"))
             val fmTemplateName = srcEndPath.fileName.toString()
             val targetEndPath = srcEndPath.resolveSibling(fmTemplateName.removeSuffix(FM_TEMPLATE_EXT_WITH_DOT))

@@ -57,7 +57,7 @@ test {
     useJUnitPlatform()
 }
 </#if>
-        
+
 dependencies {
     implementation wpi.deps.wpilib()
 <#if !data.isRomiRobot()>
@@ -73,7 +73,7 @@ dependencies {
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
 
 <#if data.junitIsJUnit4Only()>
-    testImplementation "junit:junit:4.13"
+    testImplementation "junit:junit:4.13.1"
 </#if>
 <#if data.junitUseJUnitPlatform()>
     implementation platform('org.junit:junit-bom:${data.junit5Version}')
@@ -82,7 +82,7 @@ dependencies {
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
 </#if>
 <#if data.junitIncludeVintageSupport()>
-    testImplementation "junit:junit:4.13"
+    testImplementation "junit:junit:4.13.1"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine"
 </#if>
 
@@ -93,7 +93,7 @@ dependencies {
 
     // Websocket extensions require additional configuration.
     // simulation wpi.deps.sim.ws_server(wpi.platforms.desktop, false)
-    <#if !data.isRomiRobot()>//</#if> simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, false)
+    <#if !data.isRomiRobot()>// </#if>simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, false)
 }
 
 <#if data.isRomiRobot()>

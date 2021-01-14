@@ -51,71 +51,54 @@ public class ${data.robotClassSimpleName} extends TimedRobot
 
     }
 
-    /**
-     * This method is called every robot packet, no matter the mode. Use
-     * this for items like diagnostics that you want ran during disabled,
-     * autonomous, teleoperated and test.
-     * <p>
-     * This runs after the mode specific periodic methods, but before
-     * LiveWindow and SmartDashboard integrated updating.
-     */
     @Override
     public void robotPeriodic()
     {
 
     }
 
-  /**
-   * Initialization code for autonomous mode should go here.
-   * <p>
-   * Users should use this method for initialization code which will be called each time the
-   * robot enters autonomous mode.
-   */
     @Override
     public void autonomousInit()
     {
 
     }
 
-    /** This method is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic()
     {
         
     }
 
-    /**
-     * Initialization code for teleop mode should go here.
-     * <p>
-     * Users should use this method for initialization code which will be called each time the
-     * robot enters teleop mode.
-     */
     @Override
     public void teleopInit()
     {
         
     }
 
-    /** This method is called periodically during operator control. */
     @Override
     public void teleopPeriodic()
     {
         
     }
 
-  /**
-   * Initialization code for test mode should go here.
-   * <p>
-   * Users should use this method for initialization code which will be called each time the
-   * robot enters test mode.
-   */
+    @Override
+    public void disabledInit()
+    {
+
+    }
+
+    @Override
+    public void disabledPeriodic()
+    {
+
+    }
+
     @Override
     public void testInit()
     {
         
     }
 
-    /** This method is called periodically during test mode. */
     @Override
     public void testPeriodic()
     {

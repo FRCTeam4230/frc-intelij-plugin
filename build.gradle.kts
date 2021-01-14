@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2021 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -110,6 +110,14 @@ val patchPluginXml: PatchPluginXmlTask by tasks
 val publishPlugin: PublishTask by tasks
 val runIde: RunIdeTask by tasks
 
+val sandboxPath = "${project.rootDir.canonicalPath}/${project.properties["sandboxName"]}"
+
+tasks.clean {
+    doFirst {
+        File("$sandboxPath/plugins/${rootProject.name}").deleteRecursively()
+    }
+}
+
 // The Gradle plugin for writing intellij plugins
 intellij {
     pluginName = "FRC"
@@ -117,7 +125,7 @@ intellij {
     version = ideaVersion
     // Bundled plugin dependencies - comma separated list
     setPlugins("java", "gradle"/*, "Groovy"*/)  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
-    sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
+    sandboxDirectory =  sandboxPath
 
     updateSinceUntilBuild = ideaUpdateSinceUntilBuild.toBoolean()
     sameSinceUntilBuild = isEAP.toBoolean() || ideaSameSinceUntilBuild.toBoolean()
@@ -181,7 +189,7 @@ idea {
                         this.keyword = "Copyright"
                         this.notice = """
                                     #set( ${'$'}inceptionYear = 2015 )
-                                    Copyright ${'$'}inceptionYear#if(${'$'}today.year!=${'$'}inceptionYear)-${'$'}today.year#end the original author or authors
+                                    Copyright ${'$'}inceptionYear#if(${'$'}today.year!=${'$'}inceptionYear)-${'$'}today.year#end the original author or authors.
                                     
                                         Licensed under the Apache License, Version 2.0 (the "License");
                                         you may not use this file except in compliance with the License.

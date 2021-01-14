@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2021 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.wizard
 
+import com.intellij.ide.SaveAndSyncHandler
 import com.intellij.ide.actions.ImportModuleAction
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder
 import com.intellij.ide.util.projectWizard.ModuleBuilderListener
@@ -91,7 +92,7 @@ import kotlin.NoSuchElementException
 class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 {
     private val mySdkChangedListeners: MutableList<Runnable> = ContainerUtil.createLockFreeCopyOnWriteList()
-    private val fmConfig = freemarkerConfiguration(this, "/")
+    private val fmConfiguration = freemarkerConfiguration(this, "/")
     /** 
      * Tracks the configured SDK since the `myJdk` property (in the super class `ModuleBuilder`) and the value in `WizardContext.getProjectJdk()` 
      * is not set until we pass the initial step. 
@@ -133,7 +134,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
          * In the event the directory of a year is not present, it will fallback to the latest year available. */
         val frcWizardTemplatesBaseDirPath: Path
 
-        /** The base templates directory as identified as  by the constant [frcWizardTemplatesDirName]. */
+        /** The `frc-wizard-templates` base templates directory as identified as  by the constant [frcWizardTemplatesDirName]. */
         val frcWizardTemplatesBaseDirVf: VirtualFile
 
         init
@@ -261,28 +262,6 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     }
 
 
-    private fun importGradleProject(modelContentRootDir: VirtualFile, project: Project)
-    {
-        // Primarily copied from KtorModuleBuilder in Ktor plugin
-        val buildGradle = modelContentRootDir["build.gradle.kts"] ?: modelContentRootDir["build.gradle"]
-        if (buildGradle != null)
-        {
-            invokeLater {
-                val provider = ProjectImportProvider.PROJECT_IMPORT_PROVIDER.extensions
-                    .firstOrNull { it.canImport(buildGradle, project) }
-                    ?: return@invokeLater
-
-                val wizard = ImportModuleAction.createImportWizard(project, null, buildGradle, provider)
-
-                if (wizard != null && (wizard.stepCount <= 0 || wizard.showAndGet()))
-                {
-                    ImportModuleAction.createFromWizard(project, wizard)
-                }
-            }
-        }
-    }
-
-
     @Throws(ConfigurationException::class)
     override fun setupRootModel(rootModel: ModifiableRootModel)
     {
@@ -375,6 +354,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         //TODO Need to enhance the calls to the defaults check if the template has overridden any of the default files
         val paths = TemplatePaths(wpilibVersion)
 
+        paths.frcWizardTemplatesBaseDirPath.asPluginResourceVF()?.refresh(false, true)
         copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleGroovyDslResourceBasePath)
         copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleWrapperResourceBasePath)
 
@@ -413,8 +393,38 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     }
 
 
+    private fun importGradleProject(modelContentRootDir: VirtualFile, project: Project)
+    {
+        // Primarily copied from KtorModuleBuilder in Ktor plugin
+        val buildGradle = modelContentRootDir["build.gradle.kts"] ?: modelContentRootDir["build.gradle"]
+        if (buildGradle != null)
+        {
+            LOG.trace("[FRC] preparing for gradle import")
+            invokeLater {
+                LOG.trace("[FRC] gradle import lambda starting")
+                val provider = ProjectImportProvider.PROJECT_IMPORT_PROVIDER.extensions
+                    .firstOrNull { it.canImport(buildGradle, project) }
+                    ?: return@invokeLater
+
+                val wizard = ImportModuleAction.createImportWizard(project, null, buildGradle, provider)
+
+                if (wizard != null && (wizard.stepCount <= 0 || wizard.showAndGet()))
+                {
+                    ImportModuleAction.createFromWizard(project, wizard)
+                }
+                LOG.trace("[FRC] gradle import lambda finished")
+            }
+            LOG.trace("[FRC] gradle import prep completed")
+        } else
+        {
+            LOG.info("[FRC] gradle import not executed as build.gradle/build.gradle.kts was not found ")
+        }
+    }
+
+
     private fun createRunConfigurations(project: Project)
     {
+        LOG.trace("[FRC] Creating run configurations")
         val debugModeArgument = "-PdebugMode=true"
         createGradleRunConfiguration(project, message("frc.wizard.run.configuration.buildAndDeploy.name"), listOf("deploy"), setAsSelected = true)
         createGradleRunConfiguration(project, message("frc.wizard.run.configuration.buildAndDeployForDebug.name"), listOf("deploy"), arguments = debugModeArgument)
@@ -424,6 +434,10 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         createGradleRunConfiguration(project, message("frc.wizard.run.configuration.cleanBuild.name"), listOf("clean", "build"))
         createDebuggingRunConfiguration(project, dataModel.teamNumber, RoboRioAddressType.IP)
         createDebuggingRunConfiguration(project, dataModel.teamNumber, RoboRioAddressType.USB)
+        // We need to do a Save here or the run config files are not created, which then causes all sorts of issues (to say the least)
+        //TODO: Look at switching to SaveAndSyncHandler.getInstance().scheduleSave(task: SaveTask, forceExecuteImmediately: Boolean) once it is no longer marked internal. See SaveAllAction for use example
+        SaveAndSyncHandler.getInstance().scheduleProjectSave(project)
+        LOG.trace("[FRC] Completed run configurations")
     }
 
     private fun copyAllResourcesToModuleRoot(modelContentRootDir: VirtualFile, resourceDirBase: Path, keepFilter: (VirtualFile) -> Boolean = { true })
@@ -449,6 +463,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                     .filter { keepFilter.invoke(it) }
                     .forEach {
                     val resourceRelativePath = Paths.get(it.toString().removePrefix("$srcFqBaseDir")).removeBasePath(Paths.get("/"))
+                    // We refresh to resolve an issue where the source file is cached by IntelliJ IDEA, even after a restart, and we get the old content
+                    // We probably only need to do this when testing since a new plugin release would have a new jar file name... and IntelliJ *should*
+                    // see that as a new file as its full path would be different. But since this is in the new project wizard, and thus is only used
+                    // occasionally, the slight performance hit is worth the complete assurance of using the most recent file
+                    it.refresh(false, true)
                     if (resourceRelativePath.fileName.toString().endsWith(FM_TEMPLATE_EXT_WITH_DOT))
                         copyFreemarkerTemplate(modelContentRootDir, it, srcFqBaseDir)
                     else
@@ -467,8 +486,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             val target = resolveTargetPath(modelContentRootDir, endPath)
             Files.createDirectories(target.parent)
             val file = target.toFile()
-            
-            
+
             FileUtils.copyInputStreamToFile(srcFqVf.inputStream, file)
             return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file)
         }
@@ -488,7 +506,9 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             val fmTemplateName = srcEndPath.fileName.toString()
             val targetEndPath = srcEndPath.resolveSibling(fmTemplateName.removeSuffix(FM_TEMPLATE_EXT_WITH_DOT))
             val target = resolveTargetPath(modelContentRootDir, targetEndPath)
-            val template = Template(FilenameUtils.separatorsToUnix(srcEndPath.toString()), srcFqVf.reader(), fmConfig)
+            // name ==> The path of the template file relatively to the (virtual) directory that you use to store the templates
+            val name = FilenameUtils.separatorsToUnix(srcEndPath.toString())!!
+            val template = Template(name, srcFqVf.reader(), fmConfiguration)
             processFreemarkerTemplate(template, target)
         }
         catch (e: Exception)

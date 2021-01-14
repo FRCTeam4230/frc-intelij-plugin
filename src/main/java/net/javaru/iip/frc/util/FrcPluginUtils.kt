@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2021 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,20 +16,16 @@
 
 package net.javaru.iip.frc.util
 
-import com.asarkar.semver.SemVer
-import com.intellij.ide.plugins.PluginManager
 import com.intellij.ide.plugins.cl.PluginClassLoader
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import icons.FrcIcons
-import net.javaru.iip.frc.FrcPluginGlobals.FRC_PLUGIN_ID_STRING
 import net.javaru.iip.frc.services.FrcApplicationDisposableService
 import net.javaru.iip.frc.services.FrcProjectLifecycleService
 import org.apache.commons.io.FilenameUtils
@@ -221,18 +217,18 @@ fun getApplicationParentDisposable(): Disposable = FrcApplicationDisposableServi
  * If you need just the "base"/"core" version, for example 1.4.0, use the `normalVersion` property: `getFrcPlugVersion()?.normalVersion`
  * In the rare event the Plugin Version cannot be determined, or an exception occur during parsing, `null` is returned.
  */
-fun getFrcPluginVersion(): SemVer?
-{
-    val pluginId = PluginId.getId(FRC_PLUGIN_ID_STRING)
-    val pluginDescriptor = PluginManager.getPlugin(pluginId)
-    val version =  pluginDescriptor?.version
-    // We're using SemVer from com.asarkar:jsemver but it should be noted IDEA has a built in SemVer in com.intellij.util.text - but it's less robust than the library one
-    return try
-    {
-        if (version == null) null else SemVer.parse(version)
-    } catch (e: Exception)
-    {
-        LOG.warn("[FRC] Could not parse '$version' to a Semantic Version. Cause Summary: $e", e)
-        null
-    }
-}
+//fun getFrcPluginVersion(): SemVer?
+//{
+//    val pluginId = PluginId.getId(FRC_PLUGIN_ID_STRING)
+//    val pluginDescriptor = PluginManager.getPlugin(pluginId)
+//    val version =  pluginDescriptor?.version
+//    // We're using SemVer from com.asarkar:jsemver but it should be noted IDEA has a built in SemVer in com.intellij.util.text - but it's less robust than the library one
+//    return try
+//    {
+//        if (version == null) null else SemVer.parse(version)
+//    } catch (e: Exception)
+//    {
+//        LOG.warn("[FRC] Could not parse '$version' to a Semantic Version. Cause Summary: $e", e)
+//        null
+//    }
+//}

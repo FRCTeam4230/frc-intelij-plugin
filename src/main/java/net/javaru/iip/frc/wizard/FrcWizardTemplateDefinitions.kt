@@ -436,6 +436,7 @@ enum class FrcWizard2021ExampleTemplateDefinition(
                          ),
     MecanumControllerCommand("MecanumControllerCommand", "An example command-based robot demonstrating the use of a MecanumControllerCommand to follow a pregenerated trajectory.", commandVersion = 2),
     SwerveControllerCommand("SwerveControllerCommand", "An example command-based robot demonstrating the use of a SwerveControllerCommand to follow a pregenerated trajectory.", commandVersion = 2),
+    RomiReference("Romi Reference", "An example command-based robot program that can be used with the Romi reference robot design", commandVersion = 2, isRomiBot = true),
     ;
 
 

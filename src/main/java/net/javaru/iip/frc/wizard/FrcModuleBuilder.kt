@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.wizard
 
-import com.intellij.ide.SaveAndSyncHandler
 import com.intellij.ide.actions.ImportModuleAction
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder
 import com.intellij.ide.util.projectWizard.ModuleBuilderListener
@@ -25,7 +24,7 @@ import com.intellij.ide.util.projectWizard.SdkSettingsStep
 import com.intellij.ide.util.projectWizard.SettingsStep
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.model.project.ProjectId
 import com.intellij.openapi.module.JavaModuleType
@@ -57,11 +56,8 @@ import icons.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION
 import net.javaru.iip.frc.freemarker.FM_TEMPLATE_EXT_WITH_DOT
 import net.javaru.iip.frc.freemarker.freemarkerConfiguration
-import net.javaru.iip.frc.i18n.FrcBundle.message
-import net.javaru.iip.frc.run.createDebuggingRunConfiguration
-import net.javaru.iip.frc.run.createGradleRunConfiguration
+import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.settings.FrcApplicationSettings
-import net.javaru.iip.frc.settings.RoboRioAddressType
 import net.javaru.iip.frc.util.asPluginResourceUrl
 import net.javaru.iip.frc.util.asPluginResourceVF
 import net.javaru.iip.frc.util.get
@@ -70,6 +66,7 @@ import net.javaru.iip.frc.util.invokeLater
 import net.javaru.iip.frc.util.isValidJavaVersion
 import net.javaru.iip.frc.util.isValidJdk
 import net.javaru.iip.frc.util.reader
+import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.removeBasePath
 import net.javaru.iip.frc.util.runBackgroundTask
 import net.javaru.iip.frc.util.toCommaDelimitedString
@@ -294,10 +291,6 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             progress.text = "Done."
         }
 
-        StartupManager.getInstance(project).runWhenProjectIsInitialized {
-            createRunConfigurations(project)
-        }
-
         LOG.trace("[FRC] FrcModuleBuilder.setupRootModel() completed")
     }
 
@@ -396,49 +389,45 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     private fun importGradleProject(modelContentRootDir: VirtualFile, project: Project)
     {
         // Primarily copied from KtorModuleBuilder in Ktor plugin
-        val buildGradle = modelContentRootDir["build.gradle.kts"] ?: modelContentRootDir["build.gradle"]
-        if (buildGradle != null)
+        val gradleBuildVf = modelContentRootDir["build.gradle.kts"] ?: modelContentRootDir["build.gradle"]
+        if (gradleBuildVf == null)
+        {
+            LOG.info("[FRC] gradle import not executed as build.gradle/build.gradle.kts was not found ")
+
+        }
+        else
         {
             LOG.trace("[FRC] preparing for gradle import")
             invokeLater {
                 LOG.trace("[FRC] gradle import lambda starting")
+
                 val provider = ProjectImportProvider.PROJECT_IMPORT_PROVIDER.extensions
-                    .firstOrNull { it.canImport(buildGradle, project) }
+                    .firstOrNull { it.canImport(gradleBuildVf, project) }
                     ?: return@invokeLater
 
-                val wizard = ImportModuleAction.createImportWizard(project, null, buildGradle, provider)
-
+                val wizard = ImportModuleAction.createImportWizard(project, null, gradleBuildVf, provider)
                 if (wizard != null && (wizard.stepCount <= 0 || wizard.showAndGet()))
                 {
                     ImportModuleAction.createFromWizard(project, wizard)
                 }
+
+                LOG.trace("[FRC] scheduling run configuration creation to runWhenProjectIsInitialized.")
+                StartupManager.getInstance(project).runWhenProjectIsInitialized {
+                            LOG.trace("[FRC] run configuration creation lambda called")
+                            createAllRunDebugConfigurations(project, dataModel.teamNumber)
+                            LOG.trace("[FRC] reimporting gradle project")
+                            // reimport gradle project so the run configurations show in the gradle tool window
+                            project.reimportGradleProject()
+                }
+
                 LOG.trace("[FRC] gradle import lambda finished")
             }
             LOG.trace("[FRC] gradle import prep completed")
-        } else
-        {
-            LOG.info("[FRC] gradle import not executed as build.gradle/build.gradle.kts was not found ")
         }
+
     }
 
 
-    private fun createRunConfigurations(project: Project)
-    {
-        LOG.trace("[FRC] Creating run configurations")
-        val debugModeArgument = "-PdebugMode=true"
-        createGradleRunConfiguration(project, message("frc.wizard.run.configuration.buildAndDeploy.name"), listOf("deploy"), setAsSelected = true)
-        createGradleRunConfiguration(project, message("frc.wizard.run.configuration.buildAndDeployForDebug.name"), listOf("deploy"), arguments = debugModeArgument)
-        createGradleRunConfiguration(project, message("frc.wizard.run.configuration.build.name"), listOf("build"))
-        createGradleRunConfiguration(project, message("frc.wizard.run.configuration.cleanBuildAndDeploy.name"), listOf("clean", "deploy"))
-        createGradleRunConfiguration(project, message("frc.wizard.run.configuration.cleanBuildAndDeployForDebug.name"), listOf("clean", "deploy"), arguments = debugModeArgument)
-        createGradleRunConfiguration(project, message("frc.wizard.run.configuration.cleanBuild.name"), listOf("clean", "build"))
-        createDebuggingRunConfiguration(project, dataModel.teamNumber, RoboRioAddressType.IP)
-        createDebuggingRunConfiguration(project, dataModel.teamNumber, RoboRioAddressType.USB)
-        // We need to do a Save here or the run config files are not created, which then causes all sorts of issues (to say the least)
-        //TODO: Look at switching to SaveAndSyncHandler.getInstance().scheduleSave(task: SaveTask, forceExecuteImmediately: Boolean) once it is no longer marked internal. See SaveAllAction for use example
-        SaveAndSyncHandler.getInstance().scheduleProjectSave(project)
-        LOG.trace("[FRC] Completed run configurations")
-    }
 
     private fun copyAllResourcesToModuleRoot(modelContentRootDir: VirtualFile, resourceDirBase: Path, keepFilter: (VirtualFile) -> Boolean = { true })
     {
@@ -803,6 +792,6 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     
     companion object
     {
-        private val LOG = Logger.getInstance(FrcModuleBuilder::class.java)
+        private val LOG = logger<FrcModuleBuilder>()
     }
 }

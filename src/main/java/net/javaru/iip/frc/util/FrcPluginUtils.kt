@@ -23,6 +23,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Condition
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import icons.FrcIcons
@@ -47,6 +48,19 @@ inline fun invokeLater(crossinline func: () -> Unit)
     {
         ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.defaultModalityState())
     }
+}
+
+/**
+ * Example:
+ * ```
+ * invokeLater({ project.getMainModule() != null }) {
+ *      // do work here
+ * }
+ * ```
+ * */
+inline fun invokeLater(condition: Condition<*>, crossinline func: () -> Unit)
+{
+    ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.defaultModalityState(), condition)
 }
 
 /** For details, see [Application.invokeAndWait] */

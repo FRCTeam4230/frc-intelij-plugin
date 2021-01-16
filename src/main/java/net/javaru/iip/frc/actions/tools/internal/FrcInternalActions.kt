@@ -33,6 +33,7 @@ import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications
 import net.javaru.iip.frc.notify.FrcNotifications.createNotification
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllOpenProjects
+import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import javax.swing.Icon
 
 abstract class AbstractFrcInternalAction : AnAction
@@ -74,6 +75,29 @@ abstract class AbstractFrcInternalAction : AnAction
         }
     }
 }
+
+private fun executeIfProjectNotNull(actionEvent: AnActionEvent, actionName: String = "", function: (project: Project) -> Unit)
+{
+    val project = actionEvent.project
+    if (project == null)
+        notifyOfFailureDueToNullProject(actionName)
+    else
+        function(project)
+}
+
+private fun notifyOfFailureDueToNullProject(actionName: String = "")
+{
+    FrcNotifications.notifyAllOpenProjects(notifyFrcProjectsOnly = false) {
+        createFailedActionDueToNullProjectNotification(actionName)
+    }
+}
+
+private fun createFailedActionDueToNullProjectNotification(actionName: String = "") = createNotification(
+    FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+    "Cannot run $actionName Action because the project was null on the ActionEvent.",
+    subTitle = "$actionName Action Failed".trim()
+                                                                                                        )
+
 
 open class FrcInternalActionsGroup : DefaultActionGroup()
 {
@@ -180,19 +204,7 @@ class FetchSpecifiedRestResource: AbstractFrcInternalAction()
 {
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
-        val project = actionEvent.project
-        if (project == null)
-        {
-            FrcNotifications.notifyAllOpenProjects(notifyFrcProjectsOnly = false) {
-                createNotification(
-                    FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
-                    "Project was null on the ActionEvent. Need a Project in order to fetch the resource on a read action thread",
-                    subTitle = "Fetch REST Service Failure"
-                                  )
-            }
-        }
-        else
-        {
+        executeIfProjectNotNull(actionEvent, actionName = "Fetch REST Service") { project: Project ->
             DumbService.getInstance(project).runReadActionInSmartMode<Boolean> {
                 val defaultResourcePath = "dynamic-notifications/eol.json"
                 val message =
@@ -220,6 +232,17 @@ class FetchSpecifiedRestResource: AbstractFrcInternalAction()
                 }.queue()
                 true
             }
+        }
+    }
+}
+
+
+class CreateRunConfigurationsFrcInternalAction: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, "Create Run Configs") {
+            createAllRunDebugConfigurations(it)
         }
     }
 }

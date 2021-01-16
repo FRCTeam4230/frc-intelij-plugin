@@ -41,7 +41,8 @@ class FrcProjectWizardData(
         var includeJUnitSupport:Boolean = true,
         var junitOption: JUnitOption = JUnitOption.JUnit5,
         var junit4Version: String = "4.13.1",
-        var junit5Version: String = "5.7.0"
+        var junit5Version: String = "5.7.0",
+        var gradleDslOption: GradleDslOption = GradleDslOption.GroovyDSL
                           )
 {
 
@@ -114,6 +115,7 @@ class FrcProjectWizardData(
     }
 
     enum class JUnitOption() {JUnit5, JUnit5withVintage, JUnit4}
+    enum class GradleDslOption() {GroovyDSL, KotlinDSL}
     
     private val copyright2021 = """
         |// Copyright (c) FIRST and other WPILib contributors.

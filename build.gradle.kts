@@ -115,6 +115,8 @@ val sandboxPath = "${project.rootDir.canonicalPath}/${project.properties["sandbo
 tasks.clean {
     doFirst {
         File("$sandboxPath/plugins/${rootProject.name}").deleteRecursively()
+        // Delete system to resolve issues of new project templates being read from cache
+        File("$sandboxPath/system").deleteRecursively()
     }
 }
 

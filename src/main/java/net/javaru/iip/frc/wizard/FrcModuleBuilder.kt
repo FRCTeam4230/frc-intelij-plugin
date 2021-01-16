@@ -116,11 +116,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 //    private val myInheritVersion = false
     private var myProjectId: ProjectId? = null
     private var rootProjectPath: String? = null
-    
-    
-//    private val myUseKotlinDSL = false
-//    private val myShowGradleConfig = true
-    
+
     val dataModel = FrcProjectWizardData()
 
     // TODO: Can we make this an interface and an ExtensionPoint?
@@ -348,7 +344,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         val paths = TemplatePaths(wpilibVersion)
 
         paths.frcWizardTemplatesBaseDirPath.asPluginResourceVF()?.refresh(false, true)
-        copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleGroovyDslResourceBasePath)
+        when(dataModel.gradleDslOption)
+        {
+            FrcProjectWizardData.GradleDslOption.GroovyDSL -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleGroovyDslResourceBasePath)
+            FrcProjectWizardData.GradleDslOption.KotlinDSL -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleKotlinDslResourceBasePath)
+        }
         copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleWrapperResourceBasePath)
 
 

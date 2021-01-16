@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -84,6 +84,21 @@ fun Project.runBackgroundTask(
                                               callback(indicator)
                                           }
                                       })
+}
+
+@Deprecated(message = "Use runBackgroundTask instead. If background is 'true', use PerformInBackgroundOption.ALWAYS_BACKGROUND, if 'false' use PerformInBackgroundOption.DEAF",
+            replaceWith = ReplaceWith("Project.runBackgroundTask(name, indeterminate, cancellable, (if (background) PerformInBackgroundOption.ALWAYS_BACKGROUND else PerformInBackgroundOption.DEAF), callback)"),
+            level = DeprecationLevel.WARNING)
+fun Project.backgroundTask(
+    name: String,
+    indeterminate: Boolean = true,
+    cancellable: Boolean = false,
+    background: Boolean = false,
+    callback: (indicator: ProgressIndicator) -> Unit
+                          )
+{
+    val backgroundOption = if (background) PerformInBackgroundOption.ALWAYS_BACKGROUND else PerformInBackgroundOption.DEAF
+    this.runBackgroundTask(name, indeterminate, cancellable, backgroundOption, callback)
 }
 
 /**

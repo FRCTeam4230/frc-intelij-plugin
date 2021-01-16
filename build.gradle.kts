@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2021 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -82,6 +82,7 @@ tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         all {
             kotlinOptions {
+                // Keep in sync with the java plugin configuration
                 jvmTarget = JavaVersion.VERSION_1_8.toString()
                 javaParameters = true
                 //noReflect = false
@@ -111,6 +112,16 @@ val patchPluginXml: PatchPluginXmlTask by tasks
 val publishPlugin: PublishTask by tasks
 val runIde: RunIdeTask by tasks
 
+val sandboxPath = "${project.rootDir.canonicalPath}/${project.properties["sandboxName"]}"
+
+tasks.clean {
+    doFirst {
+        File("$sandboxPath/plugins/${rootProject.name}").deleteRecursively()
+        // Delete system to resolve issues of new project templates being read from cache
+        File("$sandboxPath/system").deleteRecursively()
+    }
+}
+
 // The Gradle plugin for writing intellij plugins
 intellij {
     pluginName = "FRC"
@@ -118,7 +129,7 @@ intellij {
     version = ideaVersion
     // Bundled plugin dependencies - comma separated list
     setPlugins("java", "gradle"/*, "Groovy"*/)  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
-    sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox-203"
+    sandboxDirectory =  sandboxPath
 
     updateSinceUntilBuild = ideaUpdateSinceUntilBuild.toBoolean()
     sameSinceUntilBuild = isEAP.toBoolean() || ideaSameSinceUntilBuild.toBoolean()
@@ -182,13 +193,13 @@ idea {
                         this.keyword = "Copyright"
                         this.notice = """
                                     #set( ${'$'}inceptionYear = 2015 )
-                                    Copyright ${'$'}inceptionYear#if(${'$'}today.year!=${'$'}inceptionYear)-${'$'}today.year#end the original author or authors
+                                    Copyright ${'$'}inceptionYear#if(${'$'}today.year!=${'$'}inceptionYear)-${'$'}today.year#end the original author or authors.
                                     
                                         Licensed under the Apache License, Version 2.0 (the "License");
                                         you may not use this file except in compliance with the License.
                                         You may obtain a copy of the License at
                                     
-                                          http://www.apache.org/licenses/LICENSE-2.0
+                                          https://www.apache.org/licenses/LICENSE-2.0
                                         
                                         Unless required by applicable law or agreed to in writing, software
                                         distributed under the License is distributed on an "AS IS" BASIS,
@@ -249,7 +260,6 @@ repositories {
 
 
 dependencies {
-    val http4kVersion = "3.248.0"
     val jacksonVersion = "2.11.2"
 
     // For Kotlin dependencies, you can use shorthand for a dependency on a Kotlin module, for example, kotlin("test") for "org.jetbrains.kotlin:kotlin-test".
@@ -266,13 +276,6 @@ dependencies {
     //implementation("com.beust:klaxon:5.0.9")
     implementation(platform("com.google.guava:guava-bom:29.0-jre"))
     implementation("com.google.guava:guava")
-
-    // https://www.http4k.org
-    implementation("org.http4k:http4k-core:$http4kVersion")
-    //compile("org.http4k:http4k-client-okhttp:$http4kVersion")
-    implementation("org.http4k:http4k-client-apache:$http4kVersion")
-    implementation("org.http4k:http4k-client-apache-async:$http4kVersion")
-    //compile("org.http4k:http4k-server-jetty:$http4kVersion")
 
     implementation("com.asarkar:jsemver:0.6.2")  // https://github.com/asarkar/jsemver  Requires one-off repo declaration of: maven("https://dl.bintray.com/asarkar/mvn")
 

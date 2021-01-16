@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,9 +16,11 @@
 
 package net.javaru.iip.frc.freemarker
 
+import freemarker.cache.NullCacheStorage
 import freemarker.template.Configuration
 import freemarker.template.TemplateExceptionHandler
 import icons.FrcIcons
+import net.javaru.iip.frc.FrcPluginGlobals
 import org.apache.commons.lang3.BooleanUtils
 
 // todoc document this System property
@@ -53,13 +55,23 @@ fun freemarkerConfiguration(resourceLoaderClass:  Any, basePackagePath: String =
 @JvmOverloads
 fun freemarkerConfiguration(basePackagePath: String = "/", resourceLoaderClass: Class<*> = FrcIcons::class.java): Configuration
 {
-    val cfg = Configuration(Configuration.VERSION_2_3_29)
+    val cfg = Configuration(Configuration.VERSION_2_3_30)
     // we just need a class on our classpath, so we use FrcIcons as a convenient class
     cfg.setClassForTemplateLoading(resourceLoaderClass, basePackagePath)
     cfg.defaultEncoding = "UTF-8"
     // Sets how errors will appear.
-    cfg.templateExceptionHandler = if  (DEBUG_MODE) TemplateExceptionHandler.DEBUG_HANDLER else TemplateExceptionHandler . RETHROW_HANDLER 
+    cfg.templateExceptionHandler = if (DEBUG_MODE) TemplateExceptionHandler.DEBUG_HANDLER else TemplateExceptionHandler.RETHROW_HANDLER
     // Sets if exceptions are logged in the processed templates 
     cfg.logTemplateExceptions = DEBUG_MODE
+    // We clear cache as we do not want any stale templates, and since we only create the config one time, there is no significant penalty.
+    cfg.cacheStorage?.clear()
+
+    if (DEBUG_MODE || FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE)
+    {
+        // Turn off caching when debugging & testing
+        FrcPluginGlobals.GENERAL_LOGGER.info("[FRC] Disabling Freemarker Caching/Cache")
+        cfg.cacheStorage = NullCacheStorage() // turn off caching
+    }
+
     return cfg
 }

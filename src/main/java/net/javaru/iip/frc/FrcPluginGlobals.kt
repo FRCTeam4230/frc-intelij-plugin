@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2021 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,7 @@
  */
 package net.javaru.iip.frc
 
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.pom.java.LanguageLevel
 import org.apache.commons.lang3.BooleanUtils
 
@@ -26,6 +27,9 @@ object FrcPluginGlobals
     const val TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT = 8
     const val MAX_RUN_COUNT_TO_SAVE = 16
 
+    /** A logger name `#net.javaru.iip.frc` for logging plugin level events. It should be used sparingly. */
+    @JvmField
+    val GENERAL_LOGGER = Logger.getInstance("#net.javaru.iip.frc")
     @JvmField
     val DEFAULT_MIN_REQUIRED_LANGUAGE_LEVEL = LanguageLevel.JDK_11
     @JvmField

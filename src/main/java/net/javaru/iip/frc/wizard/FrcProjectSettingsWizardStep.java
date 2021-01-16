@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -40,8 +40,8 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.lang.JavaVersion;
 
-import kotlin.Unit;
 import icons.FrcIcons.FRC;
+import kotlin.Unit;
 import net.javaru.iip.frc.FrcPluginGlobals;
 import net.javaru.iip.frc.i18n.FrcMessageKey;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
@@ -78,6 +78,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     private JBTextField basePackageTextField;
     private JButton basePackageDefaultButton;
     private JBLabel teamNumberWarningIconLabel;
+    private JCheckBox enableDesktopSupportCheckBox;
     private JCheckBox includeVsCodeConfigsCheckBox;
     private JBLabel basePackageWarningLabel;
     private JPanel gitignorePanel;
@@ -121,6 +122,8 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         });
         basePackageDefaultButton.addActionListener(e -> basePackageTextField.setText(FrcProjectWizardDataKt.DEFAULT_BASE_PACKAGE));
         includeVsCodeConfigsCheckBox.setSelected(dataModel.getIncludeVsCodeConfigs());
+        enableDesktopSupportCheckBox.setSelected(dataModel.getEnableDesktopSupport());
+        updateEnableDesktopSupportVisibility();
         includeGitignoreFileCheckBox.setSelected(dataModel.getGitIgnoreConfiguration().getIncludeGitIgnoreFile());
         includeGitignoreFileCheckBox.addActionListener(e -> {dataModel.getGitIgnoreConfiguration().setIncludeGitIgnoreFile(includeGitignoreFileCheckBox.isSelected());});
         configureGitignoreButton.setEnabled(dataModel.getGitIgnoreConfiguration().getIncludeGitIgnoreFile());
@@ -401,9 +404,8 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         final String configuredTeamNum = teamNumberTextField.getText().trim();
         
         dataModel.setTeamNumber(Integer.parseInt(configuredTeamNum));
-        
         dataModel.setBasePackage(basePackageTextField.getText().trim());
-        
+        dataModel.setEnableDesktopSupport(enableDesktopSupportCheckBox.isSelected());
         dataModel.setIncludeVsCodeConfigs(includeVsCodeConfigsCheckBox.isSelected());
         
         myBuilder.setProjectId(new ProjectId("frc.team" + configuredTeamNum,
@@ -434,12 +436,16 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     private void updateComponents()
     {
         LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.updateComponents()");
-        final boolean isAddToVisible = myParentProjectForm.isVisible();
-        
+        //final FrcProjectWizardData dataModel = myBuilder.getDataModel();
+        updateEnableDesktopSupportVisibility();
         myParentProjectForm.updateComponents();
         LOG.trace("[FRC] Exiting FrcProjectSettingsWizardStep.updateComponents()");
     }
     
+    private void updateEnableDesktopSupportVisibility()
+    {
+        enableDesktopSupportCheckBox.setVisible(myBuilder.getDataModel().getWpilibVersion().getFrcYear() >= 2021);
+    }
     
     @Override
     public Icon getIcon()

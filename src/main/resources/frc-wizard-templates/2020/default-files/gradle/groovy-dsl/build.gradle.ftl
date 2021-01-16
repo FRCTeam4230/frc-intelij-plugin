@@ -2,7 +2,7 @@
 <#compress>
 <#-- @ftlvariable name="data" type="net.javaru.iip.frc.wizard.FrcProjectWizardData" -->
 <#--    
-    Template Language Refernce: https://freemarker.apache.org/docs/ref.html
+    Template Language Reference: https://freemarker.apache.org/docs/ref.html
     Template Author's Guide:    https://freemarker.apache.org/docs/dgui.html
 -->
 <#--  To DEBUG templates, set system property 'frc.freemarker.debug' to true when luanching the testing instance of IntelliJ IDEA -->
@@ -57,9 +57,6 @@ test {
 </#if>
         
 dependencies {
-<#if data.junitUseJUnitPlatform()>
-    def junit5Version = '${data.junit5Version}'
-</#if>
     implementation wpi.deps.wpilib()
     nativeZip wpi.deps.wpilibJni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.wpilibJni(wpi.platforms.desktop)
@@ -70,16 +67,17 @@ dependencies {
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
 
 <#if data.junitIsJUnit4Only()>
-    testImplementation "junit:junit:4.12"
+    testImplementation "junit:junit:${data.junit4Version}"
 </#if>
 <#if data.junitUseJUnitPlatform()>
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit5Version"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:$junit5Version"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5Version"
+    implementation platform('org.junit:junit-bom:${data.junit5Version}')
+    testImplementation "org.junit.jupiter:junit-jupiter-api"
+    testImplementation "org.junit.jupiter:junit-jupiter-params"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
 </#if>
 <#if data.junitIncludeVintageSupport()>
-    testImplementation "junit:junit:4.12"
-    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$junit5Version"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine"
+    testImplementation "junit:junit:${data.junit4Version}"
 </#if>
 
     // Enable simulation gui support. Must check the box in vscode to enable support

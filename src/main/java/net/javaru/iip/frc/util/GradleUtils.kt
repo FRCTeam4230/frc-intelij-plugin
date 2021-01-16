@@ -21,7 +21,6 @@ import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
 import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode
 import com.intellij.openapi.externalSystem.service.project.ExternalProjectRefreshCallback
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
-import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
@@ -42,40 +41,44 @@ fun Project.getGradleBuildVirtualFile(): VirtualFile?
 
 fun Project.getGradleBuildPsiFile(): PsiFile? = this.getGradleBuildVirtualFile()?.findPsiFile(this)
 
-/**
- * Imports a new gradle project. In most cases this needs to wrapped in a write action:
- * ```
- * ApplicationManager.getApplication().runWriteAction() {
- *     module.importNewGradleProject()
- * }
- * ```
- * This wraps the IntelliJ IDEA API call so that some logistics can be handled in a single place.
- */
-fun Module.importNewGradleProject() = this.project.importNewGradleProject()
+///**
+// * Imports a new gradle project. In most cases this needs to wrapped in a write action:
+// * ```
+// * ApplicationManager.getApplication().runWriteAction() {
+// *     module.importNewGradleProject()
+// * }
+// * ```
+// * This wraps the IntelliJ IDEA API call so that some logistics can be handled in a single place.
+// */
+//fun Module.importNewGradleProject() = this.project.importNewGradleProject()
+//
+///**
+// * Imports a new gradle project. In most cases this needs to wrapped in a write action:
+// * ```
+// * ApplicationManager.getApplication().runWriteAction() {
+// *     project.importNewGradleProject()
+// * }
+// * ```
+// * This wraps the IntelliJ IDEA API call so that some logistics can be handled in a single place.
+// */
+//fun Project.importNewGradleProject()
+//{
+//    // Version 2019.2 has the experimental API function: org.jetbrains.plugins.gradle.service.project.open.importProject(this.basePath!!, this)
+//    // Version 2019.3 has the new API function:          org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject(this.basePath!!, this)
+//    //
+//    // Eventually, once we stop supporting v2019.2, we can just call the linkAndRefreshGradleProject directly
+//    /* 2019.2  */  //org.jetbrains.plugins.gradle.service.project.open.importProject(this.basePath!!, this)
+//    /* 2019.3+ */  org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject(this.basePath!!, this)
+//
+//}
 
-/**
- * Imports a new gradle project. In most cases this needs to wrapped in a write action:
- * ```
- * ApplicationManager.getApplication().runWriteAction() {
- *     project.importNewGradleProject()
- * }
- * ```
- * This wraps the IntelliJ IDEA API call so that some logistics can be handled in a single place.
- */
-fun Project.importNewGradleProject()
-{
-    // Version 2019.2 has the experimental API function: org.jetbrains.plugins.gradle.service.project.open.importProject(this.basePath!!, this)
-    // Version 2019.3 has the new API function:          org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject(this.basePath!!, this)
-    //
-    // Eventually, once we stop supporting v2019.2, we can just call the linkAndRefreshGradleProject directly
-    /* 2019.2  */  //org.jetbrains.plugins.gradle.service.project.open.importProject(this.basePath!!, this)
-    /* 2019.3+ */  org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject(this.basePath!!, this)
-    
-}
 
 @JvmOverloads
 fun Project.reimportGradleProject(callback: ExternalProjectRefreshCallback? = null)
 {
+    // Should we instead use:
+    //ImportModuleAction.doImport(this)
+
     // derived from looking at RefreshAllExternalProjectsAction, specifically when it calls ExternalSystemUtil.refreshProjects
     ExternalSystemUtil.refreshProjects(ImportSpecBuilder(this, GradleConstants.SYSTEM_ID)
                                            .forceWhenUptodate(true)

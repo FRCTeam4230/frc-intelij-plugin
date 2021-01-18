@@ -392,7 +392,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     private void initTemplateLanguageOption()
     {
         templateLanguageOuterMainPanel.setVisible(BooleanUtils.toBoolean(System.getProperty("frc.experimental.kotlinTemplates", "false")));
-        
+        javaLanguageOptionRadioButton.setSelected(true);
         // We default to disabled, and enable as need when a template is selected
         templateOptionsPanel.setEnabled(false);
         javaLanguageOptionRadioButton.setActionCommand(TemplateLanguageOption.Java.name());

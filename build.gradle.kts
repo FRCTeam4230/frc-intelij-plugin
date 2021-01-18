@@ -148,7 +148,7 @@ intellij {
                 systemPropertyGetOrDefault("frc.show.betas.in.new.project.wizard", "true"),
                 systemPropertyGetOrDefault("frc.is.internal", "true"),
                 systemPropertyGetOrDefault("frc.experimental.gradleDslSelection", "true"),
-                systemPropertyGetOrDefault("frc.experimental.kotlinTemplates", "false")
+                systemPropertyGetOrDefault("frc.experimental.kotlinTemplates", "true")
                 // Legacy Ant based robot project system properties
                 //systemPropertyGetOrDefault("frc.simulated.log.service.enabled", "false"),
                 //systemPropertyGetOrDefault("frc.simulated.log.service.use.configured.port", "false"),

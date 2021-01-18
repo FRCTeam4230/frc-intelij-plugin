@@ -42,7 +42,8 @@ class FrcProjectWizardData(
         var junitOption: JUnitOption = JUnitOption.JUnit5,
         var junit4Version: String = "4.13.1",
         var junit5Version: String = "5.7.0",
-        var gradleDslOption: GradleDslOption = GradleDslOption.GroovyDSL
+        var gradleDslOption: GradleDslOption = GradleDslOption.GroovyDSL,
+        var templateLanguageOption: TemplateLanguageOption = TemplateLanguageOption.Java
                           )
 {
 

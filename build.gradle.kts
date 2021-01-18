@@ -147,7 +147,8 @@ intellij {
                 systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, "idea-sandbox-log4j-config.xml")),
                 systemPropertyGetOrDefault("frc.show.betas.in.new.project.wizard", "true"),
                 systemPropertyGetOrDefault("frc.is.internal", "true"),
-                systemPropertyGetOrDefault("frc.experimental.gradleDslSelection", "true")
+                systemPropertyGetOrDefault("frc.experimental.gradleDslSelection", "true"),
+                systemPropertyGetOrDefault("frc.experimental.kotlinTemplates", "false")
                 // Legacy Ant based robot project system properties
                 //systemPropertyGetOrDefault("frc.simulated.log.service.enabled", "false"),
                 //systemPropertyGetOrDefault("frc.simulated.log.service.use.configured.port", "false"),

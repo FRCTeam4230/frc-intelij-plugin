@@ -359,10 +359,17 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 2    -> { virtualFile -> !virtualFile.name.contains("WPILibOldCommands") }     // reject Old so we keep New
                 else -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") && !virtualFile.name.contains("WPILibOldCommands") } // reject both
             }
-        copyAllResourcesToModuleRoot(modelContentRootDir, paths.configsResourceBasePath, wpilibCommandsJsonFilter)
 
+        copyAllResourcesToModuleRoot(modelContentRootDir, paths.configsResourceBasePath, wpilibCommandsJsonFilter)
         copyAllResourcesToModuleRoot(modelContentRootDir, paths.commonCodeResourceBasePath)
-        copyAllResourcesToModuleRoot(modelContentRootDir, paths.javaCodeResourceBasePath)
+
+        LOG.trace("[FRC] templateLanguageOption: ${dataModel.templateLanguageOption}")
+        when(dataModel.templateLanguageOption)
+        {
+           TemplateLanguageOption.Java -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.javaCodeResourceBasePath)
+           TemplateLanguageOption.Kotlin -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.kotlinCodeResourceBasePath)
+        }
+
         if (dataModel.includeVsCodeConfigs)
         {
             copyAllResourcesToModuleRoot(modelContentRootDir, paths.vsCodeConfigsResourceBasePath)

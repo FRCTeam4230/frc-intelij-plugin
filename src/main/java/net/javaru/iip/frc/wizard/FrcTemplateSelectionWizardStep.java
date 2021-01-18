@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,9 +17,14 @@
 package net.javaru.iip.frc.wizard;
 
 import java.awt.*;
+import java.awt.event.ItemListener;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.esotericsoftware.minlog.Log;
@@ -32,8 +37,10 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.ui.ContextHelpLabel;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.components.JBTabbedPane;
 
 import icons.FrcIcons.FRC;
@@ -73,7 +80,41 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     private JBList<FrcWizardTemplateDefinition> projectTemplatesJBList;
     private JScrollPane projectExamplesScrollPane;
     private JBList<FrcWizardTemplateDefinition> exampleTemplatesJBList;
+    /**
+     * The outer most panel that fully contains all the template language options. Only need to
+     * access would be is if we want to set `visible` to false to completely hide all language
+     * options. If a template does not support language options, the {@link #templateLanguageRightSelectionPanel}
+     * should be disabled, NOT this panel. That way the Context Help icon remains enabled.
+     */
+    private JPanel templateLanguageOuterMainPanel;
+    /**
+     * The left inner template language option panel that contains the Context Help icon.
+     * Generally speaking, this panel does not need to nbe accessed at all.
+     */
+    private JPanel templateLanguageLeftHelpPanel;
+    /**
+     * The Context Help Label -- i.e. the (?) icon -- that we want to
+     * always be enabled.
+     */
+    private ContextHelpLabel languageOptionsContextHelpLabel;
+    /**
+     * The right inner template language option that contains the
+     * {@code #templateOptionsPanel}. Right now this panel is
+     * present to make future changes easier if needed.
+     */
+    private JPanel templateLanguageRightSelectionPanel;
+    /**
+     * A panel within the {@code #templateLanguageRightSelectionPanel} that groups the
+     * the selection button group. This is what should be enabled and disabled as needed.
+     * For example disable if the selected template only supports a single language.
+     */
+    private JPanel templateOptionsPanel;
+    private JBLabel templateLanguageLabel;
+    private JBRadioButton javaLanguageOptionRadioButton;
+    private JBRadioButton kotlinLanguageOptionRadioButton;
+    private ButtonGroup langOptionButtonGroup;
     
+    private final Map<FrcWizardTemplateDefinition, TemplateLanguageOption> lastSelectedLanguage = new HashMap<>();
     
     public FrcTemplateSelectionWizardStep(@NotNull FrcModuleBuilder builder,
                                           @NotNull WizardContext context)
@@ -98,6 +139,8 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
 
         initTabPane();
         initTemplatesLists();
+        initTemplateLanguageOption();
+        lastSelectedLanguage.clear();
         LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.initComponents()");
     }
     
@@ -121,6 +164,16 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     
     private void saveSettings()
     {
+        /*
+        JPanel templateLanguageOuterMainPanel;
+            JPanel templateLanguageLeftHelpPanel;
+            JPanel templateLanguageRightSelectionPanel;
+                JPanel templateOptionsPanel;
+                    JBLabel templateLanguageLabel;
+                    JBRadioButton javaLanguageOptionRadioButton;
+                    JBRadioButton kotlinLanguageOptionRadioButton;
+         */
+        
         
     }
     
@@ -242,6 +295,8 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         if (templateDefinition != null)
         {
             dataModel.setFrcWizardTemplateDefinition(templateDefinition);
+            String langSelection = langOptionButtonGroup.getSelection().getActionCommand();
+            dataModel.setTemplateLanguageOption(TemplateLanguageOption.valueOf(langSelection));
         }
         else 
         {
@@ -318,14 +373,45 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         // NOTE: its important that in the form the min width for the tabbed pane is set to 200 (or so), otherwise the tabs can end up stacked on top of each other in some situations, 
         //        such as if the template names for the selected wpiLib version are shorter (than one tab's needed width for its name)
         templateListsTabbedPane.setSelectedIndex(PROJECTS_TAB_INDEX);
-        templateListsTabbedPane.addChangeListener(e -> updateTemplateDescription());
+        templateListsTabbedPane.addChangeListener(e -> {
+            updateTemplateDescription();
+            updateTemplateLanguageSelection();
+        });
     }
     
     private void initTemplatesLists()
     {
-        ListSelectionListener templatesListSelectionListener = e -> updateTemplateDescription();
+        ListSelectionListener templatesListSelectionListener = e -> {
+            updateTemplateDescription();
+            updateTemplateLanguageSelection();
+        };
         projectTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
         exampleTemplatesJBList.addListSelectionListener(templatesListSelectionListener);
+    }
+    
+    private void initTemplateLanguageOption()
+    {
+        templateLanguageOuterMainPanel.setVisible(BooleanUtils.toBoolean(System.getProperty("frc.experimental.kotlinTemplates", "false")));
+        
+        // We default to disabled, and enable as need when a template is selected
+        templateOptionsPanel.setEnabled(false);
+        javaLanguageOptionRadioButton.setActionCommand(TemplateLanguageOption.Java.name());
+        kotlinLanguageOptionRadioButton.setActionCommand(TemplateLanguageOption.Kotlin.name());
+    
+        ItemListener languageOptionChangeListener = e -> {
+            final AbstractButton button = (AbstractButton) e.getSource();
+            final ButtonModel model = button.getModel();
+            final String actionCommand = model.getActionCommand();
+            final TemplateLanguageOption languageOption = TemplateLanguageOption.valueOf(actionCommand);
+            final FrcWizardTemplateDefinition selectedTemplate = determineSelectedTemplate();
+            if (selectedTemplate != null)
+            {
+                lastSelectedLanguage.put(selectedTemplate, languageOption);
+            }
+        };
+       
+        kotlinLanguageOptionRadioButton.addItemListener(languageOptionChangeListener);
+        javaLanguageOptionRadioButton.addItemListener(languageOptionChangeListener);
     }
     
     
@@ -433,5 +519,72 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
             templateDescriptionLabel.setText("");
             LOG.debug("[FRC] selectedTemplate was null. Template description set to empty string.");
         }
+    }
+    
+    protected void updateTemplateLanguageSelection()
+    {
+        try
+        {
+            updateTemplateLanguageSelection(determineSelectedTemplate());
+        }
+        catch (Exception e)
+        {
+            LOG.warn("[FRC] An exception occurred when attempting to update the template description: " + e.toString(), e);
+        }
+    }
+    
+    
+    protected void updateTemplateLanguageSelection(@Nullable FrcWizardTemplateDefinition selectedTemplate)
+    {
+        if (selectedTemplate != null)
+        {
+            // Set to the last selected language for the template, or the template's default if no previous language
+            TemplateLanguageOption lastLanguageOption =
+                lastSelectedLanguage.computeIfAbsent(selectedTemplate, frcWizardTemplateDefinition -> selectedTemplate.getAvailableTemplateLanguages().get(0));
+            setSelectedTemplateLanguageOptionButton(lastLanguageOption);
+                
+            
+            // Disable buttons for unsupported languages
+            final Enumeration<AbstractButton> buttons = langOptionButtonGroup.getElements();
+            while (buttons.hasMoreElements())
+            {
+                final AbstractButton button = buttons.nextElement();
+                final TemplateLanguageOption buttonLanguageOption = TemplateLanguageOption.valueOf(button.getActionCommand());
+                final boolean isSupportedLang = selectedTemplate.supportsLanguageOption(buttonLanguageOption);
+                button.setEnabled(isSupportedLang);
+                button.setVisible(isSupportedLang);
+            }
+        }
+        else
+        {
+            LOG.debug("[FRC] selectedTemplate was null. Disabling Template Language Option.");
+            templateOptionsPanel.setEnabled(false);
+        }
+    }
+
+    
+    
+    protected void setSelectedTemplateLanguageOptionButton(TemplateLanguageOption languageOption)
+    {
+        switch (languageOption)
+        {
+            case Kotlin:
+                kotlinLanguageOptionRadioButton.setSelected(true);
+                break;
+            case Java:
+                javaLanguageOptionRadioButton.setSelected(true);
+                break;
+            default:
+                LOG.warn("Unknown TemplateLanguageOption of " + languageOption + " in setSelectedTemplateLanguageOptionButton()");
+                javaLanguageOptionRadioButton.setSelected(true);
+                break;
+        }
+    }
+    
+    
+    private void createUIComponents()
+    {
+        languageOptionsContextHelpLabel = ContextHelpLabel.create(message("frc.ui.wizard.templateSelectionStep.languageOption.helpContext.title"),
+                                                                  message("frc.ui.wizard.templateSelectionStep.languageOption.helpContext.text"));
     }
 }

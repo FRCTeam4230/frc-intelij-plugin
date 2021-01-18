@@ -1,3 +1,15 @@
+# Normalize line endings to LF, but with special care given to gradlew files, especially the .bat files for windows.
+* text eol=lf
 **/gradlew text eol=lf
 **/*.sh text eol=lf
 **/*.bat text eol=crlf
+
+# Ensure the following are treated as binary.
+*.gif   binary
+*.ico   binary
+*.jar   binary
+*.jpeg  binary
+*.jpg   binary
+*.png   binary
+*.vsd   binary
+*.zip   binary

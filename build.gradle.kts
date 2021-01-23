@@ -147,7 +147,7 @@ intellij {
                 systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, "idea-sandbox-log4j-config.xml")),
                 systemPropertyGetOrDefault("frc.show.betas.in.new.project.wizard", "true"),
                 // Turn on frc.i10n to see a notification character appended to all localized messages to aid in testing/debugging of message bundles and localization needs
-                systemPropertyGetOrDefault("frc.i10n", "true"),
+                systemPropertyGetOrDefault("frc.i10n", "false"),
                 systemPropertyGetOrDefault("frc.is.internal", "true"),
                 systemPropertyGetOrDefault("frc.experimental.gradleDslSelection", "true"),
                 systemPropertyGetOrDefault("frc.experimental.kotlinTemplates", "true")

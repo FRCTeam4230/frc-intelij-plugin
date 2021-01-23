@@ -242,16 +242,16 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     override fun moduleCreated(module: Module)
     {
         // This method is from the ModuleBuilderListener
-        LOG.trace("[FRC] FrcModuleBuilder.moduleCreated() called and completed for module: ${module.name} at ${module.moduleFilePath}")
+        LOG.trace("[FRC] FrcModuleBuilder.moduleCreated() called and completed for module: ${module.name}")
         // Module Configuration work could be done here
     }
 
     override fun setupModule(module: Module?)
     {
         // This implementation is heavily based on the impl in GradleModelBuilder, along with a bit from  the KtorModuleBuilder impl in the JetBrains ktor plugin
-        LOG.trace("[FRC] FrcModuleBuilder.setupModule() called for module: ${module?.name} at ${module?.moduleFilePath}")
+        LOG.trace("[FRC] FrcModuleBuilder.setupModule() called for module: ${module?.name}")
         super.setupModule(module) // this will call (our overridden) setupRootModel method
-        LOG.trace("[FRC] FrcModuleBuilder.setupModule() completed for module: ${module?.name} at ${module?.moduleFilePath}")
+        LOG.trace("[FRC] FrcModuleBuilder.setupModule() completed for module: ${module?.name}")
     }
 
 

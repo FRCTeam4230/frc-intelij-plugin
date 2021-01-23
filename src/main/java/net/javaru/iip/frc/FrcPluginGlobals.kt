@@ -26,6 +26,7 @@ object FrcPluginGlobals
     const val TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL = 12
     const val TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT = 8
     const val MAX_RUN_COUNT_TO_SAVE = 16
+    const val FRC_IN_UNIT_TEST_MODE_KEY = "frc.testing.inUnitTestMode"
 
     /** A logger name `#net.javaru.iip.frc` for logging plugin level events. It should be used sparingly. */
     @JvmField
@@ -35,5 +36,7 @@ object FrcPluginGlobals
     @JvmField
     val DEFAULT_MIN_REQUIRED_JAVA_VERSION = DEFAULT_MIN_REQUIRED_LANGUAGE_LEVEL.toJavaVersion()
     @JvmField
-    val IS_IN_FRC_INTERNAL_MODE = BooleanUtils.toBoolean(System.getProperty("frc.is.internal", "false"))
+    val IS_IN_FRC_INTERNAL_MODE = BooleanUtils.toBoolean(System.getProperty("frc.is.internal", false.toString()))
+    @JvmField
+    val IS_IN_FRC_UNIT_TEST_MODE = BooleanUtils.toBoolean(System.getProperty(FRC_IN_UNIT_TEST_MODE_KEY, false.toString()))
 }

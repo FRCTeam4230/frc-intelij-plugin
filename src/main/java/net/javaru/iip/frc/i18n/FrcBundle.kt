@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,76 +15,44 @@
  */
 package net.javaru.iip.frc.i18n
 
-import com.intellij.BundleBase
-import com.intellij.reference.SoftReference
-import net.javaru.iip.frc.util.centerLabelText
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
-import java.lang.ref.Reference
-import java.util.*
 
 /**
  * FRC Message Bundle.
  */
-object FrcBundle
+object FrcBundle: FrcBundleBase()
 {
-    @NonNls
-    const val BUNDLE_NAME = "i18n.FrcBundle"
+    const val bundleName: String = "i18n.FrcBundle"
 
-    private var ourBundle: Reference<ResourceBundle?>? = null
-
-    private val bundle: ResourceBundle?
-        get()
-        {
-            var bundle = SoftReference.dereference(ourBundle)
-            if (bundle == null)
-            {
-                bundle = ResourceBundle.getBundle(BUNDLE_NAME)
-                ourBundle = java.lang.ref.SoftReference(bundle)
-            }
-            return bundle
-        }
+    override val ourBundleName: String
+        get() = bundleName
 
     @JvmStatic
-    fun message(@PropertyKey(resourceBundle = BUNDLE_NAME) key: String, vararg params: Any): String = BundleBase.message(bundle!!, key, *params)
+    fun message(@PropertyKey(resourceBundle = bundleName) key: String, vararg params: Any): String = messageImpl(key, *params)
 
     @JvmStatic
-    fun message(messageKey: FrcMessageKey): String = message(messageKey.key, *messageKey.params)
+    fun message(messageKey: FrcMessageKey): String = messageImpl(messageKey)
 
     /**
      * Returns the message for the provided `FrcMessageKey`, which wil be null if the provided key is null.
      */
     @Contract("null->null, !null->!null")
     @JvmStatic
-    fun messageNullable(messageKey: FrcMessageKey?): String? = if (messageKey == null) null else message(messageKey)
+    fun messageNullable(messageKey: FrcMessageKey?): String? = messageNullableImpl(messageKey)
 
     @JvmStatic
-    @Contract("_,!null,_ -> !null")
-    fun messageOrDefault(@PropertyKey(resourceBundle = BUNDLE_NAME) key: String,
-                         defaultValue: String?,
-                         vararg params: Any): String?
-    {
-        return BundleBase.messageOrDefault(bundle, key, defaultValue, *params)
-    }
-
+    fun messageOrDefault(@PropertyKey(resourceBundle = bundleName) key: String, defaultValue: String?, vararg params: Any): String = messageOrDefaultImpl(key, defaultValue, *params)
 
     @JvmStatic
-    @Contract("_,!null -> !null")
-    fun messageOrDefault(messageKey: FrcMessageKey, defaultValue: String?): String? = messageOrDefault(messageKey.key, defaultValue, *messageKey.params)
+    fun messageOrDefault(messageKey: FrcMessageKey, defaultValue: String?): String = messageOrDefaultImpl(messageKey, defaultValue)
 
     @JvmStatic
-    fun messageOrNull(@PropertyKey(resourceBundle = BUNDLE_NAME) key: String,
-                      vararg params: Any): String?
-    {
-        val value = messageOrDefault(key, key, *params)
-        return if (key == value) null else value
-    }
+    fun messageOrNull(@PropertyKey(resourceBundle = bundleName) key: String, vararg params: Any): String? = messageOrNullImpl(key, *params)
 
     @JvmStatic
-    fun messageOrNull(messageKey: FrcMessageKey): String? = messageOrNull(messageKey.key, *messageKey.params)
-
-
+    fun messageOrNull(messageKey: FrcMessageKey): String? = messageOrNullImpl(messageKey)
 
     /**
      * Gets a resource bundled message and returns it in inside HTML tags centering the text for use on a Swing label.
@@ -98,11 +66,7 @@ object FrcBundle
      * @return the localized message inside HTML tags centering the text
      */
     @JvmStatic
-    fun messageLabelCentered(@PropertyKey(resourceBundle = BUNDLE_NAME) key: String,
-                             vararg params: Any): String
-    {
-        return centerLabelText(message(key, *params))
-    }
+    fun messageLabelCentered(@PropertyKey(resourceBundle = bundleName) key: String, vararg params: Any): String = messageLabelCenteredImpl(key, *params)
 
     /**
      * Gets a resource bundled message and returns it in inside HTML tags centering the text for use on a Swing label.
@@ -115,6 +79,11 @@ object FrcBundle
      * @return the localized message inside HTML tags centering the text
      */
     @JvmStatic
-    fun messageLabelCentered(messageKey: FrcMessageKey): String = messageLabelCentered(messageKey.key, *messageKey.params)
+    fun messageLabelCentered(messageKey: FrcMessageKey): String = messageLabelCenteredImpl(messageKey)
 
+    @JvmStatic
+    fun actionText(@NonNls actionId: String): String = actionTextImpl(actionId)
+
+    @JvmStatic
+    fun actionDescription(@NonNls actionId: String): String = actionDescriptionImpl(actionId)
 }

@@ -195,6 +195,12 @@
 
         <spellchecker.bundledDictionaryProvider implementation="net.javaru.iip.frc.spellchecker.FrcBundledDictionaryProvider" />
 
+        <!--suppress PluginXmlCapitalization -->
+        <notificationGroup id="FRC.notificationGroup.GeneralNotifications"    displayType="BALLOON"        bundle="i18n.FrcPluginConfigBundle" key="frc.notifications.group.name.general"    isLogByDefault="true"/>
+        <!--suppress PluginXmlCapitalization -->
+        <notificationGroup id="FRC.notificationGroup.ActionableNotifications" displayType="STICKY_BALLOON" bundle="i18n.FrcPluginConfigBundle" key="frc.notifications.group.name.actionable" isLogByDefault="true" />
+
+
         <applicationService id="FRC.FrcApplicationDisposableService" serviceImplementation="net.javaru.iip.frc.services.FrcApplicationDisposableService" />
         <applicationService id="FRC.FrcApplicationSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcApplicationSettings" />
         <applicationService id="FRC.FrcNotificationsSettings"   serviceImplementation="net.javaru.iip.frc.settings.FrcNotificationsSettings" />

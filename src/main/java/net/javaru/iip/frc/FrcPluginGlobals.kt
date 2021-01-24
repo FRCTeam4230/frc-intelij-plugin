@@ -39,4 +39,6 @@ object FrcPluginGlobals
     val IS_IN_FRC_INTERNAL_MODE = BooleanUtils.toBoolean(System.getProperty("frc.is.internal", false.toString()))
     @JvmField
     val IS_IN_FRC_UNIT_TEST_MODE = BooleanUtils.toBoolean(System.getProperty(FRC_IN_UNIT_TEST_MODE_KEY, false.toString()))
+    @JvmField
+    val IS_NOT_IN_FRC_UNIT_TEST_MODE = !IS_IN_FRC_UNIT_TEST_MODE
 }

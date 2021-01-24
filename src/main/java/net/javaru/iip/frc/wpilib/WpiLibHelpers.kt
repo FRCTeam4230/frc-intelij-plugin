@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,11 +16,19 @@
 
 package net.javaru.iip.frc.wpilib
 
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.psi.PsiLiteralExpression
+import com.intellij.util.io.exists
 import com.intellij.util.io.isFile
 import com.intellij.util.lang.JavaVersion
+import net.javaru.iip.frc.FrcPluginGlobals
+import net.javaru.iip.frc.i18n.FrcMessageKey
+import net.javaru.iip.frc.notify.FrcNotificationType
+import net.javaru.iip.frc.notify.FrcNotifications
 import net.javaru.iip.frc.util.findClass
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl
@@ -31,6 +39,8 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 
+object WpiLibHelpers
+private val LOG = logger<WpiLibHelpers>()
 /**
  * Determines the `projectYear` String used in the `wpilib_preferences.json` file. Typically, it is just the year such as `2020`, but it may be an alternate
  * value during the pre-releases, such as `Beta2020` or `Beta2020-2`. There doesn't appear to be any pattern to it as in the WPI repo, it
@@ -51,30 +61,71 @@ fun determineProjectYearStringForVersion(version: WpiLibVersion): String = if (v
 //            If Current User is chosen, then shortcuts and environment variables are set for only the current user.
 
 /**
- * Returns the standard path for the wpilib installation, **but does not check if it exists**.
+ * Returns the root path for the WPI Lib installation. It does check if the directory exists, and if not its
+ * missing is logged and the user is notified with a warn notification, but no other action is taken and the
+ * Path is still returned.
+ * @param forWpiLibVersion The WpiLibVersion to get the root path for
+ */
+fun getWpiLibRootPath(forWpiLibVersion: WpiLibVersion): Path = getWpiLibRootPath(forWpiLibVersion.frcYear)
+
+/**
+ * Returns the root path for the WPI Lib installation. It does check if the directory exists, and if not its
+ * missing is logged and the user is notified with a warn notification, but no other action is taken and the
+ * Path is still returned.
+ * @param year The FRC season year
  */
 fun getWpiLibRootPath(year: Int): Path
 {
+    // TODO: let's provide for user overriding of the install location See Issue #85: https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues/85
+    val wpiLibRootPath = getDefaultWpiLibRootPath(year)
+
+    if (!wpiLibRootPath.exists() && !FrcPluginGlobals.IS_NOT_IN_FRC_UNIT_TEST_MODE)
+    {
+        // TODO: when we implement above ability for user to override, prompt the user for the location here and set it
+        LOG.warn("[FRC] The WPI Lib root was not found at its expected location of: $wpiLibRootPath")
+        FrcNotifications.notify(FrcNotificationType.ACTIONABLE_WARN, FrcMessageKey.of("frc.wpilib.root.path.not.found.user.notification", wpiLibRootPath))
+    }
+    return wpiLibRootPath
+}
+
+/**
+ * Returns the OS specific default/standard path for the wpilib installation, **but does not check if it exists**.
+ * Generally, the [getWpiLibRootPath] should be preferred over this method.
+ */
+fun getDefaultWpiLibRootPath(forWpiLibVersion: WpiLibVersion): Path = getDefaultWpiLibRootPath(forWpiLibVersion.frcYear)
+
+/**
+ * Returns the OS specific default/standard path for the wpilib installation, **but does not check if it exists**.
+ * Generally, the [getWpiLibRootPath] should be preferred over this method.
+ */
+fun getDefaultWpiLibRootPath(year: Int): Path
+{
     //        From https://docs.wpilib.org/en/latest/docs/getting-started/getting-started-frc-control-system/wpilib-setup.html
-    //        The installation directory has changed for 2020. In 2019 the software was installed to  ~\frcYYYY where ~ is C:\Users\Public on Windows and YYYY is the FRC year. 
+    //        The installation directory has changed for 2020. In 2019 the software was installed to  ~\frcYYYY where ~ is C:\Users\Public on Windows and YYYY is the FRC year.
     //        In 2020 and later it is installed to  ~\wpilib\YYYY  This lessens clutter when multiple years software are installed.
-    //        Regardless of whether All Users or Current User is chosen, the software is installed to C:\Users\Public\wpilib\YYYY where YYYY is the current FRC year. 
-    //            If you choose All Users, then shortcuts are installed to all users desktop and start menu and system environment variables are set. 
+    //        Regardless of whether All Users or Current User is chosen, the software is installed to C:\Users\Public\wpilib\YYYY where YYYY is the current FRC year.
+    //            If you choose All Users, then shortcuts are installed to all users desktop and start menu and system environment variables are set.
     //            If Current User is chosen, then shortcuts and environment variables are set for only the current user.
     //
-    // 2019  C:\Users\Public\frc${frcYear}\jdk
-    // 2020+ C:\Users\Public\wpilib\${frcYear}\jdk 
+    // 2019  C:\Users\Public\frc${frcYear}          Mac & Linux: ~/frc${frcYear}
+    // 2020+ C:\Users\Public\wpilib\${frcYear}      Mac & Linux: ~/wpilib/${frcYear}
 
-    // technically 2018 and earlier is different. But at this point we can't deal with legacy anymore
-    val publicRoot = Paths.get(System.getenv("PUBLIC") ?: "C:\\Users\\Public")
+    val basePath = if (SystemInfo.isWindows)
+    {
+        Paths.get(System.getenv("PUBLIC") ?: "C:\\Users\\Public").toAbsolutePath()
+    } else
+    {
+        VfsUtil.getUserHomeDir()?.toNioPath()?.toAbsolutePath() ?: Paths.get("/").toAbsolutePath()
+    }
+
     return if (year <= 2019)
     {
-        publicRoot.resolve("frc${year}")
+        // technically 2018 and earlier is different. But at this point we can't deal with legacy anymore
+        basePath.resolve("frc${year}")
 
-    }
-    else
+    } else
     {
-        publicRoot.resolve("wpilib").resolve("$year")
+        basePath.resolve("wpilib").resolve("$year")
     }
 }
 

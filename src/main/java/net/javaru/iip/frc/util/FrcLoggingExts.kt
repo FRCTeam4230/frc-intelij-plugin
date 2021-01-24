@@ -31,3 +31,19 @@ val shouldAssert: Boolean by lazy {
     else
         FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE
 }
+
+@JvmOverloads
+fun com.intellij.openapi.diagnostic.Logger.infoWhenNotInTestMode(message: String, t: Throwable? = null)
+{
+    if (IS_IN_FRC_UNIT_TEST_MODE) this.debug(message, t) else this.info(message, t)
+}
+@JvmOverloads
+fun com.intellij.openapi.diagnostic.Logger.warnWhenNotInTestMode(message: String, t: Throwable? = null)
+{
+    if (IS_IN_FRC_UNIT_TEST_MODE) this.debug(message, t) else this.warn(message, t)
+}
+@JvmOverloads
+fun com.intellij.openapi.diagnostic.Logger.errorWhenNotInTestMode(message: String, t: Throwable? = null)
+{
+    if (IS_IN_FRC_UNIT_TEST_MODE) this.debug(message, t) else this.error(message, t)
+}

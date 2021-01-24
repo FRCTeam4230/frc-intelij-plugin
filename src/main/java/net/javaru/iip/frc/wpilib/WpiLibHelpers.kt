@@ -30,10 +30,12 @@ import net.javaru.iip.frc.i18n.FrcMessageKey
 import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications
 import net.javaru.iip.frc.util.findClass
+import net.javaru.iip.frc.util.warnWhenNotInTestMode
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl
 import net.javaru.iip.frc.wpilib.version.firstRelease
 import net.javaru.iip.frc.wpilib.version.minVersion
+import org.apache.commons.lang3.SystemUtils
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -79,7 +81,7 @@ fun getWpiLibRootPath(year: Int): Path
     // TODO: let's provide for user overriding of the install location See Issue #85: https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues/85
     val wpiLibRootPath = getDefaultWpiLibRootPath(year)
 
-    if (!wpiLibRootPath.exists() && !FrcPluginGlobals.IS_NOT_IN_FRC_UNIT_TEST_MODE)
+    if (!wpiLibRootPath.exists() && FrcPluginGlobals.IS_NOT_IN_FRC_UNIT_TEST_MODE)
     {
         // TODO: when we implement above ability for user to override, prompt the user for the location here and set it
         LOG.warn("[FRC] The WPI Lib root was not found at its expected location of: $wpiLibRootPath")
@@ -113,9 +115,26 @@ fun getDefaultWpiLibRootPath(year: Int): Path
     val basePath = if (SystemInfo.isWindows)
     {
         Paths.get(System.getenv("PUBLIC") ?: "C:\\Users\\Public").toAbsolutePath()
-    } else
+    }
+    else
     {
-        VfsUtil.getUserHomeDir()?.toNioPath()?.toAbsolutePath() ?: Paths.get("/").toAbsolutePath()
+        try
+        {
+            VfsUtil.getUserHomeDir()?.toNioPath()?.toAbsolutePath() ?: Paths.get("/").toAbsolutePath()
+        }
+        catch (t1: Throwable)
+        {
+            LOG.warnWhenNotInTestMode("[FRC] Could not determine WPI Lib path via VfUtils due to an exception. Will use Commons Lang SystemUtils.getUserHome() instead. Cause Summary: $t1")
+            try
+            {
+                SystemUtils.getUserHome()?.toPath()?.toAbsolutePath() ?: Paths.get("/").toAbsolutePath()
+            }
+            catch (t2: Throwable)
+            {
+                LOG.warnWhenNotInTestMode("[FRC] Could not determine WPI Lib path via Commons Lang SystemUtils.getUserHome() due the exception: $t2")
+                Paths.get("/")
+            }
+        }
     }
 
     return if (year <= 2019)

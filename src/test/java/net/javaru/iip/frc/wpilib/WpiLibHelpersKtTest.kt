@@ -34,6 +34,7 @@ internal class WpiLibHelpersKtTest
     companion object
     {
         @BeforeAll
+        @JvmStatic
         fun initAll()
         {
             setInTestModeSystemProperty()

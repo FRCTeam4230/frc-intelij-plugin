@@ -102,7 +102,14 @@ tasks.test {
     // https://docs.gradle.org/current/userguide/java_testing.html#using_junit5
     useJUnitPlatform {
         excludeTags("slow")
+        options {
+            System.setProperty("frc.testing.inUnitTestMode", true.toString())
+        }
     }
+    options {
+        System.setProperty("frc.testing.inUnitTestMode", true.toString())
+    }
+    System.setProperty("frc.testing.inUnitTestMode", true.toString())
 }
 
 

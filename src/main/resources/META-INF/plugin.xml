@@ -195,10 +195,10 @@
 
         <spellchecker.bundledDictionaryProvider implementation="net.javaru.iip.frc.spellchecker.FrcBundledDictionaryProvider" />
 
+        <!--suppress PluginXmlCapitalization NOTE: It's best to keep the id that same as the text so that the group is auto found in the Notifications settings from a balloon's config icon -->
+        <notificationGroup id="FRC General Notifications"                 displayType="BALLOON"        bundle="i18n.FrcPluginConfigBundle" key="frc.notifications.group.name.general"    isLogByDefault="true"/>
         <!--suppress PluginXmlCapitalization -->
-        <notificationGroup id="FRC.notificationGroup.GeneralNotifications"    displayType="BALLOON"        bundle="i18n.FrcPluginConfigBundle" key="frc.notifications.group.name.general"    isLogByDefault="true"/>
-        <!--suppress PluginXmlCapitalization -->
-        <notificationGroup id="FRC.notificationGroup.ActionableNotifications" displayType="STICKY_BALLOON" bundle="i18n.FrcPluginConfigBundle" key="frc.notifications.group.name.actionable" isLogByDefault="true" />
+        <notificationGroup id="FRC Important or Actionable Notifications" displayType="STICKY_BALLOON" bundle="i18n.FrcPluginConfigBundle" key="frc.notifications.group.name.actionable" isLogByDefault="true" />
 
 
         <applicationService id="FRC.FrcApplicationDisposableService" serviceImplementation="net.javaru.iip.frc.services.FrcApplicationDisposableService" />

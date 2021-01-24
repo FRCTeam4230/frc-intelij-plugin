@@ -121,10 +121,10 @@ object FrcNotifications
     const val Title = "FRC"
 
     @JvmStatic
-    val FRC_GENERAL_NOTIFICATION_GROUP = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/"FRC.notificationGroup.GeneralNotifications")!!
+    val FRC_GENERAL_NOTIFICATION_GROUP = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/"FRC General Notifications")!!
 
     @JvmStatic
-    val FRC_ACTIONABLE_NOTIFICATION_GROUP = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/ "FRC.notificationGroup.ActionableNotifications")!!
+    val FRC_ACTIONABLE_NOTIFICATION_GROUP = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/ "FRC Important or Actionable Notifications")!!
 
     @JvmStatic
     val IconInfo: Icon = AllIcons.General.BalloonInformation

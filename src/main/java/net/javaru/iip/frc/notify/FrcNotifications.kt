@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.notify
 
-import com.intellij.build.BuildContentManager
 import com.intellij.icons.AllIcons
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
@@ -132,7 +131,7 @@ object FrcNotifications
     val FRC_ACTIONABLE_NOTIFICATION_GROUP = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/ "FRC Important or Actionable Notifications")!!
 
     @JvmStatic
-    val FRC_BUILD_TOOL_WINDOW_GROUP = NotificationGroup.toolWindowGroup("", BuildContentManager.TOOL_WINDOW_ID)
+    val FRC_BUILD_TOOL_WINDOW_GROUP = NotificationGroupManager.getInstance().getNotificationGroup("FRC Build Tool Window Notifications")!!
 
     @JvmStatic
     val IconInfo: Icon = AllIcons.General.BalloonInformation

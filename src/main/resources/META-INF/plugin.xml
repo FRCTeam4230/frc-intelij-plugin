@@ -53,8 +53,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v1.5.0</strong> <br>
+        &nbsp;&nbsp;&bull; Added action link to "WPI Lib update available" notification to automatically update the gradle build file to use the new version<br>
+        <br>
         <strong>v1.4.0</strong> <br>
-        &nbsp;&nbsp;&bull; Support for IntelliJ IDEA v2020.2 and later only.See the
+        &nbsp;&nbsp;&bull; Support for IntelliJ IDEA v2020.2 and later only. See the
                            <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin#eol-policy'>FRC Plugin's EOL Policy</a> for more detail.<br>
         &nbsp;&nbsp;&bull; New Project Wizard: Updated Project Templates for 2021 to match the WPI Lib ones. This included adding the new Romi projects.
                            Also added the Romi Reference example template. However, the other example templates still need to be check for any
@@ -143,7 +146,7 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
     <depends>com.intellij.gradle</depends>
-    <!--<depends>org.intellij.groovy</depends>-->
+    <depends>org.intellij.groovy</depends>
     <!--<depends>AntSupport</depends>-->
 
     <!-- Optional dependency on another plugin.

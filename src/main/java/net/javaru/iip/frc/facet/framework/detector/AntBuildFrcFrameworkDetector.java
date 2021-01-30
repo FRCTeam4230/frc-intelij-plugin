@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,9 +25,9 @@ import org.jetbrains.annotations.NotNull;
 import com.intellij.framework.detection.DetectedFrameworkDescription;
 import com.intellij.framework.detection.FileContentPattern;
 import com.intellij.framework.detection.FrameworkDetectionContext;
+import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.util.indexing.FileContent;
@@ -58,7 +58,7 @@ public class AntBuildFrcFrameworkDetector extends FrcAbstractFrameworkDetector
     public FileType getFileType()
     {
         //return XmlFileType.INSTANCE;
-        return StdFileTypes.XML;
+        return XmlFileType.INSTANCE;
     }
 
 

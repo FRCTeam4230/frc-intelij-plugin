@@ -117,8 +117,9 @@ val sandboxPath = "${project.rootDir.canonicalPath}/${project.properties["sandbo
 tasks.clean {
     doFirst {
         File("$sandboxPath/plugins/${rootProject.name}").deleteRecursively()
-        // Delete system to resolve issues of new project templates being read from cache
-        File("$sandboxPath/system").deleteRecursively()
+        // Delete indexes & cache to resolve issues of new project templates being read from cache
+        File("$sandboxPath/system/caches").deleteRecursively()
+        File("$sandboxPath/system/index").deleteRecursively()
     }
 }
 
@@ -128,7 +129,7 @@ intellij {
     // IntelliJ IDEA dependency
     version = ideaVersion
     // Bundled plugin dependencies - comma separated list
-    setPlugins("java", "gradle"/*, "Groovy"*/)  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
+    setPlugins("java", "gradle", "Groovy")  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
     sandboxDirectory =  sandboxPath
 
     updateSinceUntilBuild = ideaUpdateSinceUntilBuild.toBoolean()
@@ -147,7 +148,11 @@ intellij {
                 //systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, ".sandbox", "log.xml")),
                 systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, "idea-sandbox-log4j-config.xml")),
                 systemPropertyGetOrDefault("frc.show.betas.in.new.project.wizard", "true"),
-                systemPropertyGetOrDefault("frc.is.internal", "true")
+                // Turn on frc.i10n to see a notification character appended to all localized messages to aid in testing/debugging of message bundles and localization needs
+                systemPropertyGetOrDefault("frc.i10n", "false"),
+                systemPropertyGetOrDefault("frc.is.internal", "true"),
+                systemPropertyGetOrDefault("frc.experimental.gradleDslSelection", "true"),
+                systemPropertyGetOrDefault("frc.experimental.kotlinTemplates", "true")
                 // Legacy Ant based robot project system properties
                 //systemPropertyGetOrDefault("frc.simulated.log.service.enabled", "false"),
                 //systemPropertyGetOrDefault("frc.simulated.log.service.use.configured.port", "false"),

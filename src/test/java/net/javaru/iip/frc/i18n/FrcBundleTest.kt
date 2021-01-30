@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +20,9 @@ import net.javaru.iip.frc.i18n.FrcBundle.message
 import net.javaru.iip.frc.i18n.FrcBundle.messageLabelCentered
 import net.javaru.iip.frc.i18n.FrcBundle.messageOrDefault
 import net.javaru.iip.frc.i18n.FrcBundle.messageOrNull
+import net.javaru.iip.frc.setInTestModeSystemProperty
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import java.util.*
@@ -38,6 +40,14 @@ internal class FrcBundleTest
     private val expected3 = "My test message with parameter 0 of «foo», parameter 1 of «bar» and parameter 2 of «${uuid}»."
     private val myDefaultMsg = "My Unit Test's Default Message"
 
+
+    @Suppress("unused")
+    companion object
+    {
+        @JvmStatic
+        @BeforeAll
+        internal fun initAll() = setInTestModeSystemProperty()
+    }
 
     @Test
     fun testMessage()

@@ -18,6 +18,8 @@
 
 package net.javaru.iip.frc.wizard
 
+import net.javaru.iip.frc.wizard.TemplateLanguageOption.Companion.templateLanguageOptionListJavaAndKotlin
+import net.javaru.iip.frc.wizard.TemplateLanguageOption.Companion.templateLanguageOptionListJavaOnly
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import org.intellij.lang.annotations.Language
 
@@ -64,6 +66,10 @@ interface FrcWizardTemplateDefinition
 
     val isRomiBot:Boolean
 
+    val availableTemplateLanguages: List<TemplateLanguageOption>
+        get() = templateLanguageOptionListJavaOnly
+
+
     /** The base name of the template's resource directory. It is highly recommended that this value not include any spaces. */
     fun templateResourcesDirName(): String
 
@@ -74,8 +80,27 @@ interface FrcWizardTemplateDefinition
     fun isProjectBootstrapTemplate(): Boolean
     
     fun id(): String = "${templateResourcesDirName()}--$displayName"
+
+    fun supportsLanguageOption(templateLanguageOption: TemplateLanguageOption) = availableTemplateLanguages.contains(templateLanguageOption)
+    fun supportsMultipleLanguageOption() = availableTemplateLanguages.size > 1
 }
 
+enum class TemplateLanguageOption
+{
+    Kotlin, Java;
+
+    companion object
+    {
+        @JvmStatic
+        val templateLanguageOptionListKotlinOnly = listOf(Kotlin)
+
+        @JvmStatic
+        val templateLanguageOptionListJavaOnly = listOf(Java)
+
+        @JvmStatic
+        val templateLanguageOptionListJavaAndKotlin = listOf(Java, Kotlin)
+    }
+}
 
 fun projectTemplateDefinitionsFor(version: WpiLibVersion): Array<FrcWizardTemplateDefinition> = projectTemplateDefinitionsFor(version.frcYear)
 @Suppress("UNCHECKED_CAST")
@@ -302,7 +327,8 @@ enum class FrcWizard2021ProjectTemplateDefinition(
     override val isDeprecated: Boolean = false,
     override val deprecationAlternative: String? = null,
     override val commandVersion: Int = 1,
-    override val isRomiBot: Boolean = false
+    override val isRomiBot: Boolean = false,
+    override val availableTemplateLanguages: List<TemplateLanguageOption> = templateLanguageOptionListJavaOnly
                                                  ) : FrcWizardTemplateDefinition
 {
     // Old Command Based docs: https://docs.wpilib.org/en/latest/docs/software/old-commandbased/index.html
@@ -310,7 +336,8 @@ enum class FrcWizard2021ProjectTemplateDefinition(
     CommandBased(
         "Command Based (v2) Robot",
         "A robot project for coding robots using version 2 of the Command Based framework/API introduced in 2020. Command Based robots allow complex functionality to be developed from simpler functionality/components. This is the updated for 2020 Command Based Robot, using classes from the <tt>edu.wpi.first.wpilibj<strong>2</strong></tt> package from the <tt>wpilibNewCommands-java-2020-x.x.jar</tt> See the <em>Command-Based Programming</em> section of the WPI Lib Docs for more information and details on programming Command Based robots.",
-        commandVersion = 2
+        commandVersion = 2,
+        availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
                 ),
     CommandBasedOld(
         "Command Based (v1) Robot (aka Old Command)",

@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.notify
 
+import com.intellij.build.BuildContentManager
 import com.intellij.icons.AllIcons
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
@@ -64,7 +65,7 @@ import javax.swing.event.HyperlinkEvent
 val URL_OPENING_LISTENER_NO_EXPIRE = NotificationListener.UrlOpeningListener(false)
 
 @Suppress("unused")
-enum class FrcNotificationType(val group: NotificationGroup, val notificationType: NotificationType, val icon: Icon)
+enum class FrcNotificationType(val group: NotificationGroup, val notificationType: NotificationType, val icon: Icon?)
 {
     GENERAL_INFO(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP, NotificationType.INFORMATION, FrcNotifications.IconInfo),
     GENERAL_WARN(FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP, NotificationType.WARNING, FrcNotifications.IconWarn),
@@ -72,7 +73,11 @@ enum class FrcNotificationType(val group: NotificationGroup, val notificationTyp
     ACTIONABLE_INFO(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP, NotificationType.INFORMATION, FrcNotifications.IconInfo),
     ACTIONABLE_INFO_WITH_FRC_ICON(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP, NotificationType.INFORMATION, FrcIcons.FRC.FIRST_ICON_MEDIUM_16),
     ACTIONABLE_WARN(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP, NotificationType.WARNING, FrcNotifications.IconWarn),
-    ACTIONABLE_ERROR(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP, NotificationType.ERROR, FrcNotifications.IconError);
+    ACTIONABLE_ERROR(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP, NotificationType.ERROR, FrcNotifications.IconError),
+    BUILD__INFO(FrcNotifications.FRC_BUILD_TOOL_WINDOW_GROUP, NotificationType.INFORMATION, icon = null),
+    BUILD__WARN(FrcNotifications.FRC_BUILD_TOOL_WINDOW_GROUP, NotificationType.WARNING, icon = null),
+    BUILD__ERROR(FrcNotifications.FRC_BUILD_TOOL_WINDOW_GROUP, NotificationType.ERROR, icon = null),
+    ;
 
     @JvmOverloads
     fun notify(content: String,
@@ -128,6 +133,9 @@ object FrcNotifications
     val FRC_ACTIONABLE_NOTIFICATION_GROUP = NotificationGroup(message("frc.notifications.group.name.actionable"),
                                                               NotificationDisplayType.STICKY_BALLOON,
                                                               true)
+
+    @JvmStatic
+    val FRC_BUILD_TOOL_WINDOW_GROUP = NotificationGroup.toolWindowGroup("", BuildContentManager.TOOL_WINDOW_ID)
 
     @JvmStatic
     val IconInfo: Icon = AllIcons.General.BalloonInformation
@@ -244,6 +252,155 @@ object FrcNotifications
         return notification
     }
 
+    /**
+     * Creates and shows -- i.e. calls `notification.notify(project)` -- a notification. The notification is returned in
+     * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
+     * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
+     * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
+     *
+     * This version of the `notify` function takes Strings and an (optional) `NotificationListener` instance.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun notifyWithActions(
+        type: FrcNotificationType,
+        content: String,
+        subTitle: String? = null,
+        project: Project? = null,
+        vararg actions: NotificationAction = emptyArray()
+              ): Notification
+    {
+        val notification = createNotification(type, content, subTitle)
+        actions.forEach { notification.addAction(it) }
+        notification.notify(project)
+        return notification
+    }
+
+    /**
+     * Creates and shows -- i.e. calls `notification.notify(project)` -- a notification. The notification is returned in
+     * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
+     * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
+     * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
+     *
+     * This version of the `notify` function takes FrcMessageKeys and an (optional) `NotificationListener` instance.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun notifyWithActions(
+        type: FrcNotificationType,
+        contentKey: FrcMessageKey,
+        subTitleKey: FrcMessageKey? = null,
+        project: Project? = null,
+        vararg actions: NotificationAction = emptyArray()
+              ): Notification
+    {
+        val notification = createNotification(type, contentKey, subTitleKey)
+        actions.forEach { notification.addAction(it) }
+        notification.notify(project)
+        return notification
+    }
+
+
+
+    /**
+     * Creates and shows -- i.e. calls `notification.notify(project)` -- a notification. The notification is returned in
+     * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
+     * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
+     * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
+     *
+     * This version of the `notify` function takes Strings and an (optional) `NotificationListener` instance.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun notifyNoTitle(
+        type: FrcNotificationType,
+        content: String,
+        project: Project? = null,
+        listener: NotificationListener? = null
+              ): Notification
+    {
+        val notification = createNotificationNoTitle(type, content, listener)
+        notification.notify(project)
+        return notification
+    }
+
+    /**
+     * Creates and shows -- i.e. calls `notification.notify(project)` -- a notification. The notification is returned in
+     * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
+     * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
+     * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
+     *
+     * This version of the `notify` function takes Strings and an (optional) `NotificationListener` instance.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun notifyNoTitle(
+        type: FrcNotificationType,
+        content: String,
+        project: Project? = null,
+        listener: (notification: Notification, event: HyperlinkEvent) -> Unit
+              ): Notification
+    {
+        val notification = createNotificationNoTitle(type, content, listener)
+        notification.notify(project)
+        return notification
+    }
+
+    /**
+     * Creates and shows -- i.e. calls `notification.notify(project)` -- a notification. The notification is returned in
+     * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
+     * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
+     * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
+     *
+     * This version of the `notify` function takes FrcMessageKeys and an (optional) `NotificationListener` instance.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun notifyNoTitle(
+        type: FrcNotificationType,
+        contentKey: FrcMessageKey,
+        project: Project? = null,
+        listener: NotificationListener? = null
+              ): Notification
+    {
+        val notification = createNotificationNoTitle(type, contentKey, listener)
+        notification.notify(project)
+        return notification
+    }
+
+    /**
+     * Creates and shows -- i.e. calls `notification.notify(project)` -- a notification. The notification is returned in
+     * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
+     * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
+     * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
+     *
+     * This version of the `notify` function takes FrcMessageKeys and an (optional) `NotificationListener` lambda.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun notifyNoTitle(
+        type: FrcNotificationType,
+        contentKey: FrcMessageKey,
+        project: Project? = null,
+        listener: (notification: Notification, event: HyperlinkEvent) -> Unit
+              ): Notification
+    {
+        val notification = createNotificationNoTitle(type, contentKey, listener)
+        notification.notify(project)
+        return notification
+    }
     // endregion == notify ==
 
 
@@ -338,6 +495,7 @@ object FrcNotifications
                             listener)
     }
 
+
     /**
      * Creates, but does *not* show a notification. The caller will be responsible for queuing up (i.e. showing) the notification
      * by calling `Notification.notify()` Prior to that, the caller can make changes such as adding a
@@ -363,6 +521,7 @@ object FrcNotifications
                             listener)
 
     }
+
 
     /**
      * Creates, but does *not* show a notification. The caller will be responsible for queuing up (i.e. showing) the notification
@@ -413,6 +572,122 @@ object FrcNotifications
                             message(contentKey),
                             type.notificationType,
                             listener)
+
+    }
+
+
+    /**
+     * Creates, but does *not* show a notification. The caller will be responsible for queuing up (i.e. showing) the notification
+     * by calling `Notification.notify()` Prior to that, the caller can make changes such as adding a
+     * `whenExpired` listener, or setting `isImportant(true)`.
+     *
+     * This version of the `notify` function takes Strings and an (optional) `NotificationListener` instance.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun createNotificationNoTitle(
+        type: FrcNotificationType,
+        content: String,
+        listener: NotificationListener? = null
+                          ): Notification
+    {
+        return Notification(
+            type.group.displayId,
+            type.icon,
+            null,
+            null,
+            content,
+            type.notificationType,
+            listener
+                           )
+    }
+
+
+    /**
+     * Creates, but does *not* show a notification. The caller will be responsible for queuing up (i.e. showing) the notification
+     * by calling `Notification.notify()` Prior to that, the caller can make changes such as adding a
+     * `whenExpired` listener, or setting `isImportant(true)`.
+     *
+     * This version of the `notify` function takes Strings and an (optional) `NotificationListener` lambda.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    fun createNotificationNoTitle(
+        type: FrcNotificationType,
+        content: String,
+        listener: (notification: Notification, event: HyperlinkEvent) -> Unit
+                          ): Notification
+    {
+        return Notification(
+            type.group.displayId,
+            type.icon,
+            null,
+            null,
+            content,
+            type.notificationType,
+            listener
+                           )
+
+    }
+
+
+    /**
+     * Creates, but does *not* show a notification. The caller will be responsible for queuing up (i.e. showing) the notification
+     * by calling `Notification.notify()` Prior to that, the caller can make changes such as adding a
+     * `whenExpired` listener, or setting `isImportant(true)`.
+     *
+     * This version of the `notify` function takes FrcMessageKeys and an (optional) `NotificationListener` instance.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun createNotificationNoTitle(
+        type: FrcNotificationType,
+        contentKey: FrcMessageKey,
+        listener: NotificationListener? = null
+                          ): Notification
+    {
+        return Notification(
+            type.group.displayId,
+            type.icon,
+            null,
+           null,
+            message(contentKey),
+            type.notificationType,
+            listener
+                           )
+    }
+
+
+    /**
+     * Creates, but does *not* show a notification. The caller will be responsible for queuing up (i.e. showing) the notification
+     * by calling `Notification.notify()` Prior to that, the caller can make changes such as adding a
+     * `whenExpired` listener, or setting `isImportant(true)`.
+     *
+     * This version of the `notify` function takes FrcMessageKeys and an (optional) `NotificationListener` lambda.
+     *
+     * @sample notificationExamples
+     */
+    @JvmStatic
+    fun createNotificationNoTitle(
+        type: FrcNotificationType,
+        contentKey: FrcMessageKey,
+        listener: (notification: Notification, event: HyperlinkEvent) -> Unit
+                          ): Notification
+    {
+        return Notification(
+            type.group.displayId,
+            type.icon,
+            null,
+            null,
+            message(contentKey),
+            type.notificationType,
+            listener
+                           )
 
     }
 

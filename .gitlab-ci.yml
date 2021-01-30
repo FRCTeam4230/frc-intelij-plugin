@@ -1,3 +1,6 @@
+# Based on "Gradle.gitlab-ci.yml" Template from https://gitlab.com/gitlab-org/gitlab-foss
+#     https://gitlab.com/gitlab-org/gitlab-foss/-/blob/master/lib/gitlab/ci/templates/Gradle.gitlab-ci.yml
+
 # This file is a template, and might need editing before it works on your project.
 # This is the Gradle build system for JVM applications
 # https://gradle.org/

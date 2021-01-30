@@ -202,6 +202,8 @@
         <notificationGroup id="FRC General Notifications"                 displayType="BALLOON"        bundle="i18n.FrcPluginConfigBundle" key="frc.notifications.group.name.general"    isLogByDefault="true"/>
         <!--suppress PluginXmlCapitalization -->
         <notificationGroup id="FRC Important or Actionable Notifications" displayType="STICKY_BALLOON" bundle="i18n.FrcPluginConfigBundle" key="frc.notifications.group.name.actionable" isLogByDefault="true" />
+        <!-- toolWindowId from BuildContentManager.TOOL_WINDOW_ID -->
+        <notificationGroup id="FRC Build Tool Window Notifications" displayType="TOOL_WINDOW" toolWindowId="Build"  />
 
 
         <applicationService id="FRC.FrcApplicationDisposableService" serviceImplementation="net.javaru.iip.frc.services.FrcApplicationDisposableService" />

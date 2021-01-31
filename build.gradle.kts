@@ -109,6 +109,7 @@ tasks.test {
 val patchPluginXml: PatchPluginXmlTask by tasks
 val publishPlugin: PublishTask by tasks
 val runIde: RunIdeTask by tasks
+val runPluginVerifier: org.jetbrains.intellij.tasks.RunPluginVerifierTask by tasks
 
 val sandboxPath = "${project.rootDir.canonicalPath}/${project.properties["sandboxName"]}"
 
@@ -120,6 +121,7 @@ tasks.clean {
         File("$sandboxPath/system/index").deleteRecursively()
     }
 }
+
 
 // The Gradle plugin for writing intellij plugins
 intellij {
@@ -158,6 +160,20 @@ intellij {
                 //systemPropertyGetOrDefault("frc.alt.wpilib.base.dir", ""),
                 //systemPropertyGetOrDefault("wpilib.base.dir", "")
                                        )
+    }
+
+    runPluginVerifier {
+        // See: https://github.com/JetBrains/gradle-intellij-plugin#plugin-verifier-dsl
+        //      https://github.com/JetBrains/intellij-plugin-verifier#common-options
+        // List of releases:
+        //      https://www.jetbrains.com/idea/download/other.html
+        //      All including EAPs RCs
+        //          https://data.services.jetbrains.com/products?fields=code,name,releases.downloads,releases.version,releases.build,releases.type&code=IIC,IIU,IIE
+        //      Just Releases:
+        //          https://data.services.jetbrains.com/products?fields=code,name,releases.downloads,releases.version,releases.build,releases.type&code=IIC,IIU,IIE&type=release
+        //ideVersions(listOf("IC-2020.2", "IC-2020.2.1", "IC-2020.2.2", "IC-2020.2.3", "IC-2020.2.4", "IC-2020.3", "IC-2020.3.1", "IC-2020.3.2"))
+        ideVersions(listOf("IC-2020.2.4", "IC-2020.3.2"))
+        // Reports appear in ${project.buildDir}/reports/pluginVerifier by default. Set `verificationReportsDirectory` to change
     }
 
     publishPlugin {

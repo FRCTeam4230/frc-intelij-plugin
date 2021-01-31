@@ -44,10 +44,12 @@ public class FrcRioLogToolWindowExecutor extends Executor
 
 
     @Override
+    @NotNull
     public String getToolWindowId() { return FRC_RIO_LOG_TOOL_WINDOW_ID; }
 
 
     @Override
+    @NotNull
     public Icon getToolWindowIcon() { return FrcIcons.FRC.FIRST_ICON_SMALL_13_ELEVATED; }
 
 
@@ -61,12 +63,12 @@ public class FrcRioLogToolWindowExecutor extends Executor
 
 
     @Override
-    public String getDescription() { return "FRC RioLog Tool Window"; }
+    public String getDescription() { return "FRC riolog tool window"; }
 
 
     @NotNull
-    @Override
-    public String getActionName() { return "FRC RioLog Tool Window"; }
+    @Override // NOTE: as of 2020.3, this value gets used as the tool window name. See Issue #87
+    public String getActionName() { return FRC_RIO_LOG_TOOL_WINDOW_ID; }
 
 
     @NotNull

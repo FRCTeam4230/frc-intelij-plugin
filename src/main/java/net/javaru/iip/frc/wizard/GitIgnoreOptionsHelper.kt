@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,13 +16,13 @@
 
 package net.javaru.iip.frc.wizard
 
+import com.intellij.ui.components.JBRadioButton
 import java.awt.event.ItemEvent
 import java.awt.event.ItemListener
 import javax.swing.AbstractButton
-import javax.swing.JRadioButton
 
 
-fun initIdeButtonGroupChangeListener(sharedButton: JRadioButton, ignoreButton: JRadioButton, noEntryButton: JRadioButton, updateConfigAction: (IdeConfigOption) -> Unit)
+fun initIdeButtonGroupChangeListener(sharedButton: JBRadioButton, ignoreButton: JBRadioButton, noEntryButton: JBRadioButton, updateConfigAction: (IdeConfigOption) -> Unit)
 {
     sharedButton.actionCommand = IdeConfigOption.Share.name
     ignoreButton.actionCommand = IdeConfigOption.Ignore.name
@@ -43,7 +43,7 @@ fun initIdeButtonGroupChangeListener(sharedButton: JRadioButton, ignoreButton: J
     noEntryButton.addItemListener(listener)
 }
 
-fun initIdeButtonGroupChangeListener(sharedButton: JRadioButton, ignoreButton: JRadioButton, noEntryButton: JRadioButton, config: GitIgnoreConfiguration, configPropertyToUpdate: String)
+fun initIdeButtonGroupChangeListener(sharedButton: JBRadioButton, ignoreButton: JBRadioButton, noEntryButton: JBRadioButton, config: GitIgnoreConfiguration, configPropertyToUpdate: String)
 {
     initIdeButtonGroupChangeListener(sharedButton, ignoreButton, noEntryButton) { ideConfigOption ->
         val clazz = config::class.java

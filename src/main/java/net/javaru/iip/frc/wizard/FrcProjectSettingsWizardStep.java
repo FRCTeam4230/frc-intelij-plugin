@@ -37,7 +37,9 @@ import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.lang.JavaVersion;
 
@@ -80,21 +82,21 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     private JBTextField basePackageTextField;
     private JButton basePackageDefaultButton;
     private JBLabel teamNumberWarningIconLabel;
-    private JCheckBox enableDesktopSupportCheckBox;
-    private JCheckBox includeVsCodeConfigsCheckBox;
+    private JBCheckBox enableDesktopSupportCheckBox;
+    private JBCheckBox includeVsCodeConfigsCheckBox;
     private JBLabel basePackageWarningLabel;
     private JPanel gitignorePanel;
-    private JCheckBox includeGitignoreFileCheckBox;
+    private JBCheckBox includeGitignoreFileCheckBox;
     private JButton configureGitignoreButton;
     private JPanel junitPanel;
-    private JCheckBox junitCheckBox;
-    private JRadioButton junit5RadioButton;
-    private JRadioButton junit5withVintageRadioButton;
-    private JRadioButton junit4RadioButton;
+    private JBCheckBox junitCheckBox;
+    private JBRadioButton junit5RadioButton;
+    private JBRadioButton junit5withVintageRadioButton;
+    private JBRadioButton junit4RadioButton;
     private JPanel gradlePanel;
     private JBLabel gradleLabel;
-    private JRadioButton groovyDslRadioButton;
-    private JRadioButton kotlinDslRadioButton;
+    private JBRadioButton groovyDslRadioButton;
+    private JBRadioButton kotlinDslRadioButton;
     
     
     public FrcProjectSettingsWizardStep(@NotNull FrcModuleBuilder builder, @NotNull WizardContext context)

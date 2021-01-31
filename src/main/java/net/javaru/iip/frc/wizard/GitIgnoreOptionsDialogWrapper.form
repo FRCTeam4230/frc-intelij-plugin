@@ -25,7 +25,7 @@
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.intellij.label.tooltip"/>
             </properties>
           </component>
-          <component id="5f409" class="javax.swing.JRadioButton" binding="intellijShareRadioButton">
+          <component id="5f409" class="com.intellij.ui.components.JBRadioButton" binding="intellijShareRadioButton">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
             </constraints>
@@ -34,7 +34,7 @@
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.intellij.radioButton.share.tooltip"/>
             </properties>
           </component>
-          <component id="4cbf" class="javax.swing.JRadioButton" binding="intellijIgnoreRadioButton">
+          <component id="4cbf" class="com.intellij.ui.components.JBRadioButton" binding="intellijIgnoreRadioButton">
             <constraints>
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
             </constraints>
@@ -43,7 +43,7 @@
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.intellij.radioButton.ignore.tooltip"/>
             </properties>
           </component>
-          <component id="cb816" class="javax.swing.JRadioButton" binding="intellijNoEntryRadioButton">
+          <component id="cb816" class="com.intellij.ui.components.JBRadioButton" binding="intellijNoEntryRadioButton">
             <constraints>
               <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
             </constraints>
@@ -61,7 +61,7 @@
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.vscode.label.tooltip"/>
             </properties>
           </component>
-          <component id="c23bb" class="javax.swing.JRadioButton" binding="vscodeShareRadioButton">
+          <component id="c23bb" class="com.intellij.ui.components.JBRadioButton" binding="vscodeShareRadioButton">
             <constraints>
               <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
             </constraints>
@@ -70,7 +70,7 @@
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.vscode.radioButton.share.tooltip"/>
             </properties>
           </component>
-          <component id="92477" class="javax.swing.JRadioButton" binding="vscodeIgnoreRadioButton">
+          <component id="92477" class="com.intellij.ui.components.JBRadioButton" binding="vscodeIgnoreRadioButton">
             <constraints>
               <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
             </constraints>
@@ -79,7 +79,7 @@
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.vscode.radioButton.ignore.tooltip"/>
             </properties>
           </component>
-          <component id="4b9e1" class="javax.swing.JRadioButton" binding="vscodeNoEntryRadioButton">
+          <component id="4b9e1" class="com.intellij.ui.components.JBRadioButton" binding="vscodeNoEntryRadioButton">
             <constraints>
               <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
             </constraints>
@@ -88,7 +88,7 @@
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.vscode.radioButton.noEntry.tooltip"/>
             </properties>
           </component>
-          <component id="3fc79" class="javax.swing.JCheckBox" binding="gradleCheckBox">
+          <component id="3fc79" class="com.intellij.ui.components.JBCheckBox" binding="gradleCheckBox">
             <constraints>
               <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -97,7 +97,7 @@
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.gradle.checkBox.tooltip"/>
             </properties>
           </component>
-          <component id="d195f" class="javax.swing.JCheckBox" binding="javaCheckBox">
+          <component id="d195f" class="com.intellij.ui.components.JBCheckBox" binding="javaCheckBox">
             <constraints>
               <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -106,7 +106,7 @@
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.java.checkBox.tooltip"/>
             </properties>
           </component>
-          <component id="e1c2" class="javax.swing.JCheckBox" binding="linuxCheckBox">
+          <component id="e1c2" class="com.intellij.ui.components.JBCheckBox" binding="linuxCheckBox">
             <constraints>
               <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -115,7 +115,7 @@
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.linux.checkBox.tooltip"/>
             </properties>
           </component>
-          <component id="add54" class="javax.swing.JCheckBox" binding="macCheckBox">
+          <component id="add54" class="com.intellij.ui.components.JBCheckBox" binding="macCheckBox">
             <constraints>
               <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -124,7 +124,7 @@
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.macos.checkBox.tooltip"/>
             </properties>
           </component>
-          <component id="5e70c" class="javax.swing.JCheckBox" binding="winCheckBox">
+          <component id="5e70c" class="com.intellij.ui.components.JBCheckBox" binding="winCheckBox">
             <constraints>
               <grid row="13" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -133,7 +133,7 @@
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.win.checkBox.tooltip"/>
             </properties>
           </component>
-          <component id="c462" class="javax.swing.JCheckBox" binding="cppCheckBox">
+          <component id="c462" class="com.intellij.ui.components.JBCheckBox" binding="cppCheckBox">
             <constraints>
               <grid row="14" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -176,7 +176,7 @@
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitIgnoreSelection.restoreDefaults.button.tooltip"/>
             </properties>
           </component>
-          <component id="d22aa" class="javax.swing.JCheckBox" binding="generateFromSiteCheckBox">
+          <component id="d22aa" class="com.intellij.ui.components.JBCheckBox" binding="generateFromSiteCheckBox">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>

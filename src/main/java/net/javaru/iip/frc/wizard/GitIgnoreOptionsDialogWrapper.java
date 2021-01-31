@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +21,9 @@ import javax.swing.*;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.components.JBTextField;
 
 import kotlin.Unit;
@@ -37,24 +39,24 @@ public class GitIgnoreOptionsDialogWrapper extends DialogWrapper
     
     private JPanel rootPanel;
     private JBLabel intellijIdeaOptionsLabel;
-    private JRadioButton intellijShareRadioButton;
-    private JRadioButton intellijIgnoreRadioButton;
-    private JRadioButton intellijNoEntryRadioButton;
+    private JBRadioButton intellijShareRadioButton;
+    private JBRadioButton intellijIgnoreRadioButton;
+    private JBRadioButton intellijNoEntryRadioButton;
     private JBLabel vscodeOptionsLabel;
-    private JRadioButton vscodeShareRadioButton;
-    private JRadioButton vscodeIgnoreRadioButton;
-    private JRadioButton vscodeNoEntryRadioButton;
-    private JCheckBox gradleCheckBox;
-    private JCheckBox javaCheckBox;
-    private JCheckBox linuxCheckBox;
-    private JCheckBox macCheckBox;
-    private JCheckBox winCheckBox;
-    private JCheckBox cppCheckBox;
+    private JBRadioButton vscodeShareRadioButton;
+    private JBRadioButton vscodeIgnoreRadioButton;
+    private JBRadioButton vscodeNoEntryRadioButton;
+    private JBCheckBox gradleCheckBox;
+    private JBCheckBox javaCheckBox;
+    private JBCheckBox linuxCheckBox;
+    private JBCheckBox macCheckBox;
+    private JBCheckBox winCheckBox;
+    private JBCheckBox cppCheckBox;
     private JLabel advancedLabel;
     private JBLabel additionalGitignoreTemplatesLabel;
     private JBTextField additionalGitignoreTemplatesTextField;
     private JButton defaultButton;
-    private JCheckBox generateFromSiteCheckBox;
+    private JBCheckBox generateFromSiteCheckBox;
     
     private GitIgnoreConfiguration configuration;
     

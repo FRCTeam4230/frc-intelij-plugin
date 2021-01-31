@@ -227,6 +227,22 @@ fun Project?.getParentDisposable(): Disposable
 fun getApplicationParentDisposable(): Disposable = FrcApplicationDisposableService.getInstance()
 
 /**
+ * Gets an application service. This is for use in a Project extension function as using the built-in one
+ * calls the `fun Project.service()` method rather then the `fun service()` because of the implicit `this`
+ * inside the Project extension function.
+ * ```
+ * fun Project.work()
+ * {
+ *      // DON'T DO THIS
+ *      service<SomeApplicationService>().foo()  // <-- Can't use as it actually calls this.service() (i.e. the Project extension function)
+ *      // DO THIS INSTEAD
+ *      applicationService<SomeApplicationService>().foo()
+ * }
+ * ```
+ */
+inline fun <reified T : Any> applicationService(): T = ApplicationManager.getApplication().getService(T::class.java)
+
+/**
  * Returns the full Semantic Version, including the IntelliJ IDEA Version, of the running FRC plugin. For example: `1.4.0-2020.3`.
  * If you need just the "base"/"core" version, for example 1.4.0, use the `normalVersion` property: `getFrcPlugVersion()?.normalVersion`
  * In the rare event the Plugin Version cannot be determined, or an exception occur during parsing, `null` is returned.

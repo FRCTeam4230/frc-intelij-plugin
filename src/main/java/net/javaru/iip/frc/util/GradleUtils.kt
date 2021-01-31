@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.util
 
-import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
 import com.intellij.openapi.externalSystem.model.DataNode
@@ -122,7 +121,9 @@ fun Project.reimportGradleProject(executionMode: ProgressExecutionMode = Progres
             if (externalProject != null)
             {
                 val synchronous = executionMode == ProgressExecutionMode.MODAL_SYNC
-                service<ProjectDataManager>().importData(externalProject, this@reimportGradleProject, synchronous)
+                // We can't use the IntelliJ API built in service<T> function because we are in a Project extension function which causes an implicit `this`
+                // being applied, resulting in this.service<T> which is ultimately Project.service<T> and not the ApplicationService service<T> function
+                applicationService<ProjectDataManager>().importData(externalProject, this@reimportGradleProject, synchronous)
             }
         }
     }

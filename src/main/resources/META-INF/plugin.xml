@@ -167,6 +167,10 @@
     <resource-bundle>i18n.FrcPluginConfigBundle</resource-bundle>
 
 
+    <applicationListeners>
+        <listener class="net.javaru.iip.frc.plugin.FrcAppLifecycleListener" topic="com.intellij.ide.AppLifecycleListener" activeInHeadlessMode="false" />
+    </applicationListeners>
+
 
     <!-- Extension points defined by the plugin. Extension points are registered by a plugin so that other plugins can
          provide this plugin with certain data. The "beanClass" attribute specifies the class the implementations of
@@ -269,17 +273,6 @@
     <extensions defaultExtensionNs="JavaScript.JsonSchema">
         <ProviderFactory implementation="net.javaru.iip.frc.wpilib.jsonSchema.WpiLibJsonSchemaProviderFactory" />
     </extensions>
-
-
-
-    <application-components>
-        <!-- Add your application components here -->
-        <component>
-            <interface-class>net.javaru.iip.frc.components.FrcApplicationComponent</interface-class>
-            <implementation-class>net.javaru.iip.frc.components.FrcApplicationComponentImpl</implementation-class>
-        </component>
-    </application-components>
-
 
 
     <actions>

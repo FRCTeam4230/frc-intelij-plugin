@@ -643,9 +643,18 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         {
             ApplicationManager.getApplication().invokeLater(() ->
                                                             {
-                                                                rioLogMonitorProcess.stop();
+                                                                // There's a corner case of at least the myProcessHandler being null when
+                                                                // the dynamic plugin is unloaded/disabled while an FRC project is open
+                                                                if (rioLogMonitorProcess != null)
+                                                                {
+                                                                    rioLogMonitorProcess.stop();
+                                                                }
                                                                 
-                                                                myProcessHandler.destroyProcess();
+                                                                if (myProcessHandler != null)
+                                                                {
+                                                                    myProcessHandler.destroyProcess();
+                                                                }
+                                                                
                                                                 if (getRioLogMonitorProcess() != null)
                                                                 {
                                                                     getRioLogMonitorProcess().monitoringStopped();

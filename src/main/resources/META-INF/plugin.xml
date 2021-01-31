@@ -55,6 +55,7 @@
     <change-notes><![CDATA[
         <strong>v1.5.0</strong> <br>
         &nbsp;&nbsp;&bull; Added action link to "WPI Lib update available" notification to automatically update the gradle build file to use the new version<br>
+        &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/87'>issue #87</a>, FRC Tool Window name shows long name in 2020.3
         <br>
         <strong>v1.4.0</strong> <br>
         &nbsp;&nbsp;&bull; Support for IntelliJ IDEA v2020.2 and later only. See the

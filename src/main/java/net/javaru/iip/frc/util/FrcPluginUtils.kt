@@ -227,6 +227,16 @@ fun Project?.getParentDisposable(): Disposable
 fun getApplicationParentDisposable(): Disposable = FrcApplicationDisposableService.getInstance()
 
 /**
+ * DEPRECATED: Just fully qualify the 'application' service version in the Project extension function:
+ * ```
+ * fun Project.work()
+ * {
+ *      com.intellij.openapi.components.service<SomeApplicationService>().foo()
+ *      // DON'T DO THIS:
+ *      service<SomeApplicationService>().foo()  // <-- Can't use as it actually calls this.service() (i.e. the Project extension function)
+ * }
+ *```
+ *
  * Gets an application service. This is for use in a Project extension function as using the built-in one
  * calls the `fun Project.service()` method rather then the `fun service()` because of the implicit `this`
  * inside the Project extension function.
@@ -240,7 +250,8 @@ fun getApplicationParentDisposable(): Disposable = FrcApplicationDisposableServi
  * }
  * ```
  */
-inline fun <reified T : Any> applicationService(): T = ApplicationManager.getApplication().getService(T::class.java)
+@Deprecated("Fully qualify the com.intellij.openapi.components.service<T>() call instead", ReplaceWith("com.intellij.openapi.components.service<T>()"))
+inline fun <reified T : Any> applicationService(): T = com.intellij.openapi.components.service<T>()
 
 /**
  * Returns the full Semantic Version, including the IntelliJ IDEA Version, of the running FRC plugin. For example: `1.4.0-2020.3`.

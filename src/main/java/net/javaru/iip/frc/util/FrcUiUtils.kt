@@ -39,14 +39,11 @@ import org.intellij.lang.annotations.Language
 import java.awt.Component
 import java.awt.Container
 import java.awt.Dimension
-import java.net.URL
 import java.util.*
 import javax.swing.AbstractButton
 import javax.swing.ButtonGroup
 import javax.swing.ButtonModel
 import javax.swing.DefaultButtonModel
-import javax.swing.Icon
-import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -559,64 +556,6 @@ fun <T : AbstractButton> initClassSelectionPanel(topComponent: JComponent,
     return mapBuilder.build()
 }
 
-/**
- * *A better alternative to this is to use a JetBrains JBCheckBox and call the [JBCheckBox.setTextIcon] method.*
- * Modifies a Button -- including JCheckBox--  so it has both an icon and text. The text should be currently set on the Button.
- * @param iconPath classpath relative path to the icon.
- * @param paddingWidthPx the amount of padding, in pixels, between the icon and the test. 1 tends to be a good value
- * @param position The position of the icon, either before (default) or after, the text.
- * @param clazz the class to use for loading the icon form the classpath
- *
- * @sample UiUtilsExamples.addIconToTextExample
- */
-@JvmOverloads
-fun AbstractButton.addIconToText(
-    iconPath: String,
-    position: Position = Position.Before,
-    paddingWidthPx: Int = 1,
-    clazz: Class<*> = FrcUiUtils::class.java
-                           ) = this.addIconToText(clazz.classLoader.getResource(iconPath), position, paddingWidthPx)
-
-/**
- * *A better alternative to this is to use a JetBrains JBCheckBox and call the [JBCheckBox.setTextIcon] method.*
- * Modifies a Button -- including JCheckBox--  so it has both an icon and text. The text should be currently set on the Button.
- * @param iconPath URL to the icon. If null, the icon will not be added
- * @param paddingWidthPx the amount of padding, in pixels, between the icon and the test. 1 tends to be a good value
- * @param position The position of the icon, either before (default) or after, the text.
- *
- * @sample UiUtilsExamples.addIconToTextExample
- */
-@JvmOverloads
-fun AbstractButton.addIconToText(iconPath: URL?, position: Position = Position.Before, paddingWidthPx: Int = 1)
-{
-
-    if (iconPath != null)
-    {
-        when (position)
-        {
-            Position.Before ->
-            {
-                this.text =
-                    """<html><table cellpadding=0>
-                    |<tr>
-                    |<td><img src=$iconPath/></td>
-                    |<td width=$paddingWidthPx><td>
-                    |<td>${this.text.removeHtmlTags() ?: ""}</td>
-                    |</tr></table></html>""".trimMargin()
-            }
-            Position.After  ->
-            {
-                this.text =
-                    """<html><table cellpadding=0>
-                    |<tr>
-                    |<td>${this.text.removeHtmlTags() ?: ""}</td>
-                    |<td width=$paddingWidthPx><td>
-                    |<td><img src=$iconPath/></td>
-                    |</tr></table></html>""".trimMargin()
-            }
-        }
-    }
-}
 
 /**
  * Remove the opening and closing html tags (if present) from a string. If the receiver
@@ -629,18 +568,3 @@ fun String?.removeHtmlTags(): String =
         ?.removePrefix("<HTML>")
         ?.removeSuffix("</html>")
         ?.removeSuffix("</HTML>") ?: ""
-
-
-@Suppress("unused")
-private object UiUtilsExamples
-{
-    fun addIconToTextExample(icon: Icon)
-    {
-        // BEST TO USE A JBCheckBox AS IT AUTO HANDLES DARCULA THEME
-        val checkbox1 = JBCheckBox("Some text")
-        checkbox1.setTextIcon(icon)
-        // BUT IF NOT, YOU CAN DO THIS:
-        val checkbox2 = JCheckBox("Some text")
-        checkbox2.addIconToText("icons/foo.png")
-    }
-}

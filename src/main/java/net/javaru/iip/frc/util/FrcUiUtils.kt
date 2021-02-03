@@ -531,7 +531,7 @@ fun <T : AbstractButton> initClassSelectionPanel(topComponent: JComponent,
                 {
                     // Although psiClass.getIcon would probably never return null, we default to the emptyNode Icon just in case.
                     val icon =  psiClass.getIcon(0) ?: AllIcons.Nodes.EmptyNode // for flags, we could use: getIcon(Iconable.ICON_FLAG_VISIBILITY or Iconable.ICON_FLAG_READ_STATUS)
-                    val xButton = IconAndLabelButton(optionButton, icon, text)
+                    val xButton = IconAndLabelButton.createForButtonWithoutText(optionButton, icon, text)
                     xButton.toolTipText = psiClass.qualifiedName
                     if (mnemonic != null)
                     {

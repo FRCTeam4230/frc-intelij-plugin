@@ -40,15 +40,19 @@ import net.javaru.iip.frc.i18n.FrcMessageKey;
 
 
 /**
- * A Button (JRadioButton, JCHeckBox, etc) wrapper to allow the button
- * to have both an icon and a label. Generally speaking, external code should
- * work directly with the button for most operations, other than enabling
- * and disabling.
+ * A Button (JRadioButton, JCheckBox, etc) wrapper to allow the button
+ * to have both an icon and a label. It does this by creating a label
+ * containing the icon and the text, and then placing that label and
+ * the button into a JPanel (with a small spacer between them).
+ *
+ * Generally speaking, external code should work directly with the button
+ * for most operations. Although enabling and disabling can be done directly
+ * if needed.
  */
 @SuppressWarnings("unused")
-public class IconAndLabelButton extends JPanel implements ItemSelectable
+public class ButtonWithIconAndText extends JPanel implements ItemSelectable
 {
-    private static final Logger LOG = Logger.getInstance(IconAndLabelButton.class);
+    private static final Logger LOG = Logger.getInstance(ButtonWithIconAndText.class);
     
     private static final long serialVersionUID = -392212524102824537L;
     @NotNull
@@ -59,44 +63,44 @@ public class IconAndLabelButton extends JPanel implements ItemSelectable
     
     
     /**
-     * @param button the button, with text already set on it, which will be used for the label
+     * @param button the button -- JRadioButton, JCheckBox, etc. -- with text already set on it, which will be used for the icon & text combination label
      * @param icon   the icon for the button's label
      */
     @Contract("_, _ -> new")
-    public static @NotNull IconAndLabelButton createForButtonWithText(@NotNull AbstractButton button, @NotNull Icon icon)
+    public static @NotNull ButtonWithIconAndText createForButtonWithText(@NotNull AbstractButton button, @NotNull Icon icon)
     {
-        return new IconAndLabelButton(button, icon, button.getText());
+        return new ButtonWithIconAndText(button, icon, button.getText());
     }
     
     
     /**
-     * @param button the button, without any text set on it
+     * @param button the button -- JRadioButton, JCheckBox, etc. -- WITHOUT any text set on it as the text defined by the textMessageKey parameter will be used
      * @param icon   the icon for the button's label
      * @param textMessageKey   message key for the text for the button's label
      */
     @Contract("_, _, _ -> new")
-    public static @NotNull IconAndLabelButton createForButtonWithoutText(@NotNull AbstractButton button, @NotNull Icon icon, @NotNull FrcMessageKey textMessageKey)
+    public static @NotNull ButtonWithIconAndText createForButtonWithoutText(@NotNull AbstractButton button, @NotNull Icon icon, @NotNull FrcMessageKey textMessageKey)
     {
         return createForButtonWithoutText(button, icon, FrcBundle.message(textMessageKey));
     }
 
-                                                                         /**
-     * @param button the button, without any text set on it
+    /**
+     * @param button the button -- JRadioButton, JCheckBox, etc. -- WITHOUT any text set on it as the text parameter will be used
      * @param icon   the icon for the button's label
      * @param text   the text for the button's label
      */
     @Contract("_, _, _ -> new")
-    public static @NotNull IconAndLabelButton createForButtonWithoutText(@NotNull AbstractButton button, @NotNull Icon icon, @NotNull String text)
+    public static @NotNull ButtonWithIconAndText createForButtonWithoutText(@NotNull AbstractButton button, @NotNull Icon icon, @NotNull String text)
     {
         if (StringUtils.isNotBlank(button.getText()) && !button.getText().equals(text))
         {
             LOG.warn("[FRC] Button passed in to constructor had text which will be ignored. Button text: " + button.getText());
         }
-        return new IconAndLabelButton(button, icon, text);
+        return new ButtonWithIconAndText(button, icon, text);
     }
     
     
-    private IconAndLabelButton(@NotNull AbstractButton button, @NotNull Icon icon, @NotNull String text)
+    private ButtonWithIconAndText(@NotNull AbstractButton button, @NotNull Icon icon, @NotNull String text)
     {
         this.button = button;
         this.button.setText("");
@@ -261,7 +265,6 @@ public class IconAndLabelButton extends JPanel implements ItemSelectable
         public void focusGained(FocusEvent e)
         {
             if (!buttonHasMouseHover && isEnabled()) toggleButtonSelection();
-    
         }
     
         @Override

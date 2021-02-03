@@ -34,7 +34,7 @@ import com.intellij.uiDesigner.core.GridConstraints
 import com.intellij.uiDesigner.core.GridLayoutManager
 import com.intellij.uiDesigner.core.Spacer
 import net.javaru.iip.frc.i18n.FrcBundle.message
-import net.javaru.iip.frc.ui.IconAndLabelButton
+import net.javaru.iip.frc.ui.ButtonWithIconAndText
 import org.intellij.lang.annotations.Language
 import java.awt.Component
 import java.awt.Container
@@ -531,7 +531,7 @@ fun <T : AbstractButton> initClassSelectionPanel(topComponent: JComponent,
                 {
                     // Although psiClass.getIcon would probably never return null, we default to the emptyNode Icon just in case.
                     val icon =  psiClass.getIcon(0) ?: AllIcons.Nodes.EmptyNode // for flags, we could use: getIcon(Iconable.ICON_FLAG_VISIBILITY or Iconable.ICON_FLAG_READ_STATUS)
-                    val xButton = IconAndLabelButton.createForButtonWithoutText(optionButton, icon, text)
+                    val xButton = ButtonWithIconAndText.createForButtonWithoutText(optionButton, icon, text)
                     xButton.toolTipText = psiClass.qualifiedName
                     if (mnemonic != null)
                     {

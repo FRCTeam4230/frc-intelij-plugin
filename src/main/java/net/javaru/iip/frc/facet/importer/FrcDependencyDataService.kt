@@ -78,7 +78,7 @@ class FrcDependencyDataService : AbstractProjectDataService<LibraryDependencyDat
 //        }
     }
 
-    override fun postProcess(toImport: MutableCollection<DataNode<LibraryDependencyData>>, projectData: ProjectData?, project: Project, modelsProvider: IdeModifiableModelsProvider)
+    override fun postProcess(toImport: MutableCollection<out DataNode<LibraryDependencyData>>, projectData: ProjectData?, project: Project, modelsProvider: IdeModifiableModelsProvider)
     {
         LOG.debug("[FRC] toImport reached in postProcess")
     }

@@ -67,7 +67,7 @@ public class FrcProjectDataService extends AbstractProjectDataService<JavaProjec
      * @param modelsProvider
      */
     @Override
-    public void importData(@NotNull Collection<DataNode<JavaProjectData>> toImport,
+    public void importData(@NotNull Collection<? extends DataNode<JavaProjectData>> toImport,
                            @Nullable ProjectData projectData,
                            @NotNull Project project,
                            @NotNull IdeModifiableModelsProvider modelsProvider)

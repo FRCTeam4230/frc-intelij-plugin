@@ -154,7 +154,7 @@ class GradleReimportTask(private val project: Project): TimerTask()
 
     private fun doGradleReimport(recursiveCount: Int = 0)
     {
-        project.reimportGradleProject(object : ExternalProjectRefreshCallback
+        project.reimportGradleProject(callback = object : ExternalProjectRefreshCallback
                                       {
                                           val subtitle = message("frc.notification.vendordeps.reimport.title")
 

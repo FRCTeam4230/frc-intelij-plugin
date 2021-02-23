@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -110,12 +110,5 @@ public class FrcToolWindowFactory implements ToolWindowFactory,
         // Called when the tool window is created (i.e. when the tool window button is put on the tool window bar)
         // At this point we don't have access to the Project. So any project specific initialization should occur in createToolWindowContent()
         LOG.debug("[FRC] FrcToolWindowFactory.init() called");
-    }
-
-    @Override
-    public boolean isDoNotActivateOnStart()
-    {
-        LOG.debug("[FRC] FrcToolWindowFactory.isDoNotActivateOnStart() called");
-        return false;
     }
 }

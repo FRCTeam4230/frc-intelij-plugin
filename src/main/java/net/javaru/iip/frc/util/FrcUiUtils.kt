@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -58,6 +58,23 @@ import javax.swing.text.JTextComponent
 private object FrcUiUtils
 
 private val LOG = Logger.getInstance(FrcUiUtils::class.java)
+
+/**
+ * Sets the `isEnabled` property on all components of a panel.
+ */
+fun JPanel.setPanelAndComponentsEnabled(isEnabled: Boolean)
+{
+    this.isEnabled = isEnabled
+    val components = components
+    for (component in components)
+    {
+        if (component is JPanel)
+        {
+            component.setPanelAndComponentsEnabled(isEnabled)
+        }
+        component.isEnabled = isEnabled
+    }
+}
 
 @JvmOverloads
 fun displayExceptionDialog(t: Throwable, project: Project?, title: String = "An error has occurred")

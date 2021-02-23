@@ -18,26 +18,37 @@ package net.javaru.iip.frc.util
 
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
+import com.intellij.openapi.externalSystem.model.DataNode
+import com.intellij.openapi.externalSystem.model.project.ProjectData
+import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskId
 import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode
 import com.intellij.openapi.externalSystem.service.project.ExternalProjectRefreshCallback
+import com.intellij.openapi.externalSystem.service.project.ProjectDataManager
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataCache
 import org.jetbrains.plugins.gradle.util.GradleConstants
+import java.io.File
+import java.nio.file.Path
 
 // NOTE: AddGradleDslPluginActionHandler has example of modifying the gradle build file (for a groovy build file)
 
 private val LOG = Logger.getInstance("#net.javaru.iip.frc.util.GradleUtils")
 
-fun Project.getGradleBuildVirtualFile(): VirtualFile?
+fun Project.getGradleBuildIoFile(): File?
 {
+    if (this.basePath == null) return null
     val cache = ExternalProjectDataCache.getInstance(this)
     val rootExternalProject = cache.getRootExternalProject(this.basePath!!)
-    val buildFile = rootExternalProject?.buildFile
-    return buildFile?.findVirtualFile(true)
+    return rootExternalProject?.buildFile
 }
+
+fun Project.getGradleBuildNIoPath(): Path? = this.getGradleBuildIoFile()?.toPath()
+
+fun Project.getGradleBuildVirtualFile(): VirtualFile? = this.getGradleBuildIoFile()?.findVirtualFile(true)
 
 fun Project.getGradleBuildPsiFile(): PsiFile? = this.getGradleBuildVirtualFile()?.findPsiFile(this)
 
@@ -74,15 +85,60 @@ fun Project.getGradleBuildPsiFile(): PsiFile? = this.getGradleBuildVirtualFile()
 
 
 @JvmOverloads
-fun Project.reimportGradleProject(callback: ExternalProjectRefreshCallback? = null)
+fun Project.reimportGradleProject(executionMode: ProgressExecutionMode = ProgressExecutionMode.IN_BACKGROUND_ASYNC,
+                                  callback: ExternalProjectRefreshCallback? = null)
 {
-    // Should we instead use:
-    //ImportModuleAction.doImport(this)
+    //ImportModuleAction.doImport(this)  <-- this is for an initial import it looks like
 
-    // derived from looking at RefreshAllExternalProjectsAction, specifically when it calls ExternalSystemUtil.refreshProjects
+    // The default call back (in the ImportSpecBuilder) calls ProjectDataManager.importData() on success.
+    // This syncs IntelliJ IDEA's project structure (such as libraries)
+    // So if we want to provide a call back, we need to wrap the passed in callback so that we are sure that importData() is called
+    val ourCallback: ExternalProjectRefreshCallback = object : ExternalProjectRefreshCallback {
+        override fun onSuccess(externalTaskId: ExternalSystemTaskId, externalProject: DataNode<ProjectData>?)
+        {
+            doProjectDataImport(externalProject)
+            callback?.onSuccess(externalTaskId, externalProject)
+        }
+
+        override fun onSuccess(externalProject: DataNode<ProjectData>?)
+        {
+            doProjectDataImport(externalProject)
+            callback?.onSuccess(externalProject)
+        }
+
+        override fun onFailure(externalTaskId: ExternalSystemTaskId, errorMessage: String, errorDetails: String?)
+        {
+            callback?.onFailure(externalTaskId, errorMessage, errorDetails)
+        }
+
+        override fun onFailure(errorMessage: String, errorDetails: String?)
+        {
+            callback?.onFailure(errorMessage, errorDetails)
+        }
+
+        fun doProjectDataImport(externalProject: DataNode<ProjectData>?)
+        {
+            if (externalProject != null)
+            {
+                val synchronous = executionMode == ProgressExecutionMode.MODAL_SYNC
+                // We can't use the IntelliJ API built in service<T> function because we are in a Project extension function which causes an implicit `this`
+                // being applied, resulting in this.service<T> which is ultimately Project.service<T> and not the ApplicationService service<T> function
+                applicationService<ProjectDataManager>().importData(externalProject, this@reimportGradleProject, synchronous)
+            }
+        }
+    }
+
+    // We save all documents because there is a possible case that there is an external system config file changed inside the ide.
+    FileDocumentManager.getInstance().saveAllDocuments()
+    // derived from looking at RefreshAllExternalProjectsAction, specifically when it calls ExternalSystemUtil.refreshProject
     ExternalSystemUtil.refreshProjects(ImportSpecBuilder(this, GradleConstants.SYSTEM_ID)
                                            .forceWhenUptodate(true)
-                                           .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
-                                           .callback(callback)
+                                           .use(executionMode)
+                                           .callback(ourCallback)
                                       )
+
+    // The ExternalSystemProjectTracker is newer, and is what the new small popup square (when you edit a build file) uses.
+    // But it lacks a callback option
+    //    val projectTracker = ExternalSystemProjectTracker.getInstance(this)
+    //    projectTracker.scheduleProjectRefresh()
 }

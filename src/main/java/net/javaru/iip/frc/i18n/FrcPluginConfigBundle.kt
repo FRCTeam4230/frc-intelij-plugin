@@ -20,12 +20,11 @@ import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 /**
- * FRC Message Bundle.
+ * FRC Plugin Config Message Bundle.
  */
-object FrcBundle: FrcBundleBase()
+object FrcPluginConfigBundle: FrcBundleBase()
 {
-    const val bundleName: String = "i18n.FrcBundle"
-
+    const val bundleName = "i18n.FrcPluginConfigBundle"
     override val ourBundleName: String
         get() = bundleName
 

@@ -53,8 +53,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v1.5.0</strong> <br>
+        &nbsp;&nbsp;&bull; Added action link to "WPI Lib update available" notification to automatically update the gradle build file to use the new version<br>
+        &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/87'>issue #87</a>, FRC Tool Window name shows long name in 2020.3
+        <br>
         <strong>v1.4.0</strong> <br>
-        &nbsp;&nbsp;&bull; Support for IntelliJ IDEA v2020.2 and later only.See the
+        &nbsp;&nbsp;&bull; Support for IntelliJ IDEA v2020.2 and later only. See the
                            <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin#eol-policy'>FRC Plugin's EOL Policy</a> for more detail.<br>
         &nbsp;&nbsp;&bull; New Project Wizard: Updated Project Templates for 2021 to match the WPI Lib ones. This included adding the new Romi projects.
                            Also added the Romi Reference example template. However, the other example templates still need to be check for any
@@ -143,7 +147,7 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
     <depends>com.intellij.gradle</depends>
-    <!--<depends>org.intellij.groovy</depends>-->
+    <depends>org.intellij.groovy</depends>
     <!--<depends>AntSupport</depends>-->
 
     <!-- Optional dependency on another plugin.
@@ -194,6 +198,14 @@
         <executor id="FrcRioLogToolWindowExecutor" implementation="net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor" />
 
         <spellchecker.bundledDictionaryProvider implementation="net.javaru.iip.frc.spellchecker.FrcBundledDictionaryProvider" />
+
+        <!--suppress PluginXmlCapitalization NOTE: It's best to keep the id that same as the text so that the group is auto found in the Notifications settings from a balloon's config icon -->
+        <notificationGroup id="FRC General Notifications"                 displayType="BALLOON"        bundle="i18n.FrcPluginConfigBundle" key="frc.notifications.group.name.general"    isLogByDefault="true"/>
+        <!--suppress PluginXmlCapitalization -->
+        <notificationGroup id="FRC Important or Actionable Notifications" displayType="STICKY_BALLOON" bundle="i18n.FrcPluginConfigBundle" key="frc.notifications.group.name.actionable" isLogByDefault="true" />
+        <!-- toolWindowId from BuildContentManager.TOOL_WINDOW_ID -->
+        <notificationGroup id="FRC Build Tool Window Notifications" displayType="TOOL_WINDOW" toolWindowId="Build"  />
+
 
         <applicationService id="FRC.FrcApplicationDisposableService" serviceImplementation="net.javaru.iip.frc.services.FrcApplicationDisposableService" />
         <applicationService id="FRC.FrcApplicationSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcApplicationSettings" />

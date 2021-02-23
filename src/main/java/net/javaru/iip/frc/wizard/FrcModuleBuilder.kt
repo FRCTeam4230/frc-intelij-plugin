@@ -116,11 +116,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 //    private val myInheritVersion = false
     private var myProjectId: ProjectId? = null
     private var rootProjectPath: String? = null
-    
-    
-//    private val myUseKotlinDSL = false
-//    private val myShowGradleConfig = true
-    
+
     val dataModel = FrcProjectWizardData()
 
     // TODO: Can we make this an interface and an ExtensionPoint?
@@ -246,16 +242,16 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     override fun moduleCreated(module: Module)
     {
         // This method is from the ModuleBuilderListener
-        LOG.trace("[FRC] FrcModuleBuilder.moduleCreated() called and completed for module: ${module.name} at ${module.moduleFilePath}")
+        LOG.trace("[FRC] FrcModuleBuilder.moduleCreated() called and completed for module: ${module.name}")
         // Module Configuration work could be done here
     }
 
     override fun setupModule(module: Module?)
     {
         // This implementation is heavily based on the impl in GradleModelBuilder, along with a bit from  the KtorModuleBuilder impl in the JetBrains ktor plugin
-        LOG.trace("[FRC] FrcModuleBuilder.setupModule() called for module: ${module?.name} at ${module?.moduleFilePath}")
+        LOG.trace("[FRC] FrcModuleBuilder.setupModule() called for module: ${module?.name}")
         super.setupModule(module) // this will call (our overridden) setupRootModel method
-        LOG.trace("[FRC] FrcModuleBuilder.setupModule() completed for module: ${module?.name} at ${module?.moduleFilePath}")
+        LOG.trace("[FRC] FrcModuleBuilder.setupModule() completed for module: ${module?.name}")
     }
 
 
@@ -348,7 +344,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         val paths = TemplatePaths(wpilibVersion)
 
         paths.frcWizardTemplatesBaseDirPath.asPluginResourceVF()?.refresh(false, true)
-        copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleGroovyDslResourceBasePath)
+        when(dataModel.gradleDslOption)
+        {
+            FrcProjectWizardData.GradleDslOption.GroovyDSL -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleGroovyDslResourceBasePath)
+            FrcProjectWizardData.GradleDslOption.KotlinDSL -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleKotlinDslResourceBasePath)
+        }
         copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleWrapperResourceBasePath)
 
 
@@ -359,10 +359,17 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 2    -> { virtualFile -> !virtualFile.name.contains("WPILibOldCommands") }     // reject Old so we keep New
                 else -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") && !virtualFile.name.contains("WPILibOldCommands") } // reject both
             }
-        copyAllResourcesToModuleRoot(modelContentRootDir, paths.configsResourceBasePath, wpilibCommandsJsonFilter)
 
+        copyAllResourcesToModuleRoot(modelContentRootDir, paths.configsResourceBasePath, wpilibCommandsJsonFilter)
         copyAllResourcesToModuleRoot(modelContentRootDir, paths.commonCodeResourceBasePath)
-        copyAllResourcesToModuleRoot(modelContentRootDir, paths.javaCodeResourceBasePath)
+
+        LOG.trace("[FRC] templateLanguageOption: ${dataModel.templateLanguageOption}")
+        when(dataModel.templateLanguageOption)
+        {
+           TemplateLanguageOption.Java -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.javaCodeResourceBasePath)
+           TemplateLanguageOption.Kotlin -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.kotlinCodeResourceBasePath)
+        }
+
         if (dataModel.includeVsCodeConfigs)
         {
             copyAllResourcesToModuleRoot(modelContentRootDir, paths.vsCodeConfigsResourceBasePath)

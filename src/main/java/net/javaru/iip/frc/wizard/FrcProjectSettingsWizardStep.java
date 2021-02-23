@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2021 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import javax.swing.*;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,6 +52,7 @@ import net.javaru.iip.frc.settings.TeamNumberKeyChangeListener;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
 import net.javaru.iip.frc.util.FrcPsiNameHelper;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
+import net.javaru.iip.frc.wizard.FrcProjectWizardData.GradleDslOption;
 import net.javaru.iip.frc.wizard.FrcProjectWizardData.JUnitOption;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
@@ -89,6 +91,10 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     private JRadioButton junit5RadioButton;
     private JRadioButton junit5withVintageRadioButton;
     private JRadioButton junit4RadioButton;
+    private JPanel gradlePanel;
+    private JBLabel gradleLabel;
+    private JRadioButton groovyDslRadioButton;
+    private JRadioButton kotlinDslRadioButton;
     
     
     public FrcProjectSettingsWizardStep(@NotNull FrcModuleBuilder builder, @NotNull WizardContext context)
@@ -134,7 +140,6 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         junit5withVintageRadioButton.setActionCommand(JUnitOption.JUnit5withVintage.name());
         junit4RadioButton.setActionCommand(JUnitOption.JUnit4.name());
         
-        
         junitCheckBox.setSelected(dataModel.getIncludeJUnitSupport());
         junit5RadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
         junit5withVintageRadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
@@ -150,6 +155,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
                 break;
             case JUnit4:
                 junit4RadioButton.setSelected(true);
+                break;
         }
     
         ItemListener junitVersionOptionChangeListener = e -> {
@@ -169,6 +175,33 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
             junit5withVintageRadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
             junit4RadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
         });
+    
+    
+        groovyDslRadioButton.setActionCommand(GradleDslOption.GroovyDSL.name());
+        kotlinDslRadioButton.setActionCommand(GradleDslOption.KotlinDSL.name());
+        
+        switch (dataModel.getGradleDslOption())
+        {
+            case GroovyDSL:
+                groovyDslRadioButton.setSelected(true);
+                break;
+            case KotlinDSL:
+                kotlinDslRadioButton.setSelected(true);
+                break;
+        }
+    
+        ItemListener gradleDslOptionChangeListener = e -> {
+            final AbstractButton button = (AbstractButton) e.getSource();
+            final ButtonModel model = button.getModel();
+            final String actionCommand = model.getActionCommand();
+            dataModel.setGradleDslOption(GradleDslOption.valueOf(actionCommand));
+        };
+        groovyDslRadioButton.addItemListener(gradleDslOptionChangeListener);
+        kotlinDslRadioButton.addItemListener(gradleDslOptionChangeListener);
+        
+        
+        // REMOVE ONCE NO LONGER IN DEVELOPMENT/EXPERIMENTAL
+        gradlePanel.setVisible(BooleanUtils.toBoolean(System.getProperty("frc.experimental.gradleDslSelection", "false")));
         
         LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.initComponents()");
     }

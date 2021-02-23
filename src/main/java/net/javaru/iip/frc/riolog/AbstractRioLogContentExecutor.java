@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.compiler.server.BuildManager;
 import com.intellij.execution.ExecutionBundle;
-import com.intellij.execution.ExecutionManager;
 import com.intellij.execution.Executor;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.filters.TextConsoleBuilder;
@@ -220,9 +219,9 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         Disposer.register(myProject, this);
         Disposer.register(this, myRunContentDescriptor);
         addActionsToActionGroup(actions);
-
-
-        ExecutionManager.getInstance(myProject).getContentManager().showRunContent(myExecutor, myRunContentDescriptor);
+    
+    
+        RunContentManager.getInstance(myProject).showRunContent(myExecutor, myRunContentDescriptor);
 
         if (myActivateToolWindow)
         {
@@ -497,7 +496,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
         if (myRunContentDescriptor != null)
         {
-            final boolean removedOk = ExecutionManager.getInstance(myProject).getContentManager().removeRunContent(myExecutor, myRunContentDescriptor);
+            final boolean removedOk = RunContentManager.getInstance(myProject).removeRunContent(myExecutor, myRunContentDescriptor);
 
             // This is a bit of overkill... but there is a bug that sometimes multiple content tabs are added to the run window. 
             //    The bug should not happen in real world use as it seems to occur after repeatedly removing and re-adding the facet during testing.
@@ -535,7 +534,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         {
             try
             {
-                final RunContentManager contentManager = ExecutionManager.getInstance(project).getContentManager();
+                final RunContentManager contentManager = RunContentManager.getInstance(myProject);
                 final java.util.List<RunContentDescriptor> allDescriptors = contentManager.getAllDescriptors();
                 for (RunContentDescriptor runContentDescriptor : allDescriptors)
                 {

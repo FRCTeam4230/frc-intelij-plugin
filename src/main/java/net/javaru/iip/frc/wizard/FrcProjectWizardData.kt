@@ -69,11 +69,13 @@ class FrcProjectWizardData(
     val includeDesktopSupportGradleSetting: String
         get()
         {
-            val result = enableDesktopSupport || isRomiRobot
+            // We now honor the enableDesktopSupport option as it is automatically selected when a romi template is selected.
+            // We'll add a warning to the wizard to warn user if the option is not selected and a Romi template is in use.
+            val result = enableDesktopSupport //|| isRomiRobotTemplate
             return result.toString()
         }
 
-    val isRomiRobot
+    val isRomiRobotTemplate
         get() = frcWizardTemplateDefinition.isRomiBot
 
     val basePackageAsDirPath: Path

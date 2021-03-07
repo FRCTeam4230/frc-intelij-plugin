@@ -37,6 +37,7 @@ import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.ui.ContextHelpLabel;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBRadioButton;
@@ -97,7 +98,10 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     private JBLabel gradleLabel;
     private JBRadioButton groovyDslRadioButton;
     private JBRadioButton kotlinDslRadioButton;
+    @SuppressWarnings("unused")
+    private ContextHelpLabel desktopSupportContextHelpLabel;
     
+    private boolean userHasModifiedDesktopSupport = false;
     
     public FrcProjectSettingsWizardStep(@NotNull FrcModuleBuilder builder, @NotNull WizardContext context)
     {
@@ -131,7 +135,10 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         basePackageDefaultButton.addActionListener(e -> basePackageTextField.setText(FrcProjectWizardDataKt.DEFAULT_BASE_PACKAGE));
         includeVsCodeConfigsCheckBox.setSelected(dataModel.getIncludeVsCodeConfigs());
         enableDesktopSupportCheckBox.setSelected(dataModel.getEnableDesktopSupport());
-        updateEnableDesktopSupportVisibility();
+        updateEnableDesktopSupportOptions();
+        // We use an ActionListener and not a ChangeListener as we only want to catch a user initiated change. ChangeListener is fired is we programmatically change the value
+        enableDesktopSupportCheckBox.addActionListener(e -> userHasModifiedDesktopSupport = true);
+        
         includeGitignoreFileCheckBox.setSelected(dataModel.getGitIgnoreConfiguration().getIncludeGitIgnoreFile());
         includeGitignoreFileCheckBox.addActionListener(e -> {dataModel.getGitIgnoreConfiguration().setIncludeGitIgnoreFile(includeGitignoreFileCheckBox.isSelected());});
         configureGitignoreButton.setEnabled(dataModel.getGitIgnoreConfiguration().getIncludeGitIgnoreFile());
@@ -472,14 +479,18 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     {
         LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.updateComponents()");
         //final FrcProjectWizardData dataModel = myBuilder.getDataModel();
-        updateEnableDesktopSupportVisibility();
+        updateEnableDesktopSupportOptions();
         myParentProjectForm.updateComponents();
         LOG.trace("[FRC] Exiting FrcProjectSettingsWizardStep.updateComponents()");
     }
     
-    private void updateEnableDesktopSupportVisibility()
+    private void updateEnableDesktopSupportOptions()
     {
         enableDesktopSupportCheckBox.setVisible(myBuilder.getDataModel().getWpilibVersion().getFrcYear() >= 2021);
+        if (!userHasModifiedDesktopSupport)
+        {
+            enableDesktopSupportCheckBox.setSelected(myBuilder.getDataModel().isRomiRobotTemplate());
+        }
     }
     
     @Override
@@ -504,4 +515,10 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     }
     
     
+    private void createUIComponents()
+    {
+        desktopSupportContextHelpLabel = ContextHelpLabel.create(
+            message("frc.ui.wizard.projectSettingsStep.enableDesktopSupport.contextHelpLabel.title"),
+            message("frc.ui.wizard.projectSettingsStep.enableDesktopSupport.contextHelpLabel.text"));
+    }
 }

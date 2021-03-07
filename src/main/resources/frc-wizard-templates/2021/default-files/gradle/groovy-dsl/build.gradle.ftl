@@ -17,7 +17,7 @@ targetCompatibility = JavaVersion.VERSION_11
 
 def ROBOT_MAIN_CLASS = "${data.mainClassFQ}"
 
-<#if !data.isRomiRobot()>
+<#if !data.isRomiRobotTemplate()>
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project EmbeddedTools.
 deploy {
@@ -60,14 +60,14 @@ test {
 
 dependencies {
     implementation wpi.deps.wpilib()
-<#if !data.isRomiRobot()>
+<#if !data.isRomiRobotTemplate()>
     nativeZip wpi.deps.wpilibJni(wpi.platforms.roborio)
 </#if>
     nativeDesktopZip wpi.deps.wpilibJni(wpi.platforms.desktop)
 
 
     implementation wpi.deps.vendor.java()
-<#if !data.isRomiRobot()>
+<#if !data.isRomiRobotTemplate()>
     nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
 </#if>
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
@@ -93,10 +93,10 @@ dependencies {
 
     // Websocket extensions require additional configuration.
     // simulation wpi.deps.sim.ws_server(wpi.platforms.desktop, false)
-    <#if !data.isRomiRobot()>// </#if>simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, false)
+    <#if !data.isRomiRobotTemplate()>// </#if>simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, false)
 }
 
-<#if data.isRomiRobot()>
+<#if data.isRomiRobotTemplate()>
 // Set the websocket remote host (the Romi IP address).
 sim {
     envVar "HALSIMWS_HOST", "10.0.0.2"

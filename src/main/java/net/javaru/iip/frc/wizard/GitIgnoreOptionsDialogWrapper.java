@@ -121,6 +121,7 @@ public class GitIgnoreOptionsDialogWrapper extends DialogWrapper
     
         generateFromSiteCheckBox.setSelected(configuration.getGenerateFromSite());
         additionalGitignoreTemplatesTextField.setEnabled(configuration.getGenerateFromSite());
+        additionalGitignoreTemplatesLabel.setCopyable(true);
         additionalGitignoreTemplatesLabel.setEnabled(configuration.getGenerateFromSite());
         generateFromSiteCheckBox.addActionListener(e-> {
             final boolean isSelected = generateFromSiteCheckBox.isSelected();

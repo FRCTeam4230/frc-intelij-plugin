@@ -230,8 +230,27 @@ enum class FrcWizard2020ProjectTemplateDefinition(
     // Old Command Based docs: https://docs.wpilib.org/en/latest/docs/software/old-commandbased/index.html
     // New Command Based docs: https://docs.wpilib.org/en/latest/docs/software/commandbased/index.html
 
-    CommandBased("Command Based (v2) Robot", "A robot project for coding robots using version 2 of the Command Based framework/API introduced in 2020. Command Based robots allow complex functionality to be developed from simpler functionality/components. This is the updated for 2020 Command Based Robot, using classes from the <tt>edu.wpi.first.wpilibj<strong>2</strong></tt> package from the <tt>wpilibNewCommands-java-2020-x.x.jar</tt> See <em>Command-Based Programming</em> in the WPI Lib Docs for more information and details on the changes.", commandVersion = 2),
-    CommandBasedOld("Command Based (v1) Robot", "A robot project for coding robots using using version 1 of the Command Based framework/API introduced in 2012. Command Based robots allow complex functionality to be developed from simpler functionality/components. This is the original Command Based Robot introduced in 2012, using classes from the <tt>edu.wpi.first.wpilibj</tt> package from the <tt>wpilibOldCommands-java-2020-x.x.jar</tt>", commandVersion = 1),
+    CommandBased(
+        "Command Based v2 Robot",
+        """A robot project for coding robots using version 2 (aka 'New') of the Command Based framework/API introduced in 2020. 
+            |Command Based robots allow complex functionality to be developed from simpler functionality/components. 
+            |This version uses classes from the <tt>edu.wpi.first.wpilibj<strong>2</strong></tt> 
+            |package. See the 
+            |<a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based Programming</a> 
+            |section of the WPI Lib Docs for more information.""".trimMargin(), commandVersion = 2
+                ),
+    CommandBasedOld(
+        "Command Based v1 Robot (aka Old Command)",
+        """A robot project for coding robots using using version 1 of the Command Based framework/API introduced in 2012. 
+            |Command Based robots allow complex functionality to be developed from simpler functionality/components. 
+            |This is the original Command Based Robot, using classes from the <tt>edu.wpi.first.wpilibj</tt> package.
+            |Version 1 is deprecated, and new robot projects are strongly encouraged to use the <em>${FrcWizard2021ProjectTemplateDefinition.CommandBased.displayName}</em> 
+            |Template. See the 
+            |<a href="https://docs.wpilib.org/en/stable/docs/software/old-commandbased/index.html"> Old Command-Based Programming</a> 
+            |section of the WPI Lib Docs for more information.""".trimMargin(),
+        commandVersion = 1,
+        isDeprecated = true
+                   ),
     Timed("Timed Robot", "A robot project that allows robots to be implemented in an iterative manner synced to a timer."),
     TimedSkeleton("Timed Skeleton (Advanced)", "A skeleton (stub) Timed Robot project for advanced programmers."),
     RobotBaseSkeleton("RobotBase Skeleton (Advanced)", "A skeleton (stub) for RobotBase, intended for <strong>highly advanced/experienced</strong> programmers, that provides more complete control over program flow.")
@@ -334,14 +353,25 @@ enum class FrcWizard2021ProjectTemplateDefinition(
     // Old Command Based docs: https://docs.wpilib.org/en/latest/docs/software/old-commandbased/index.html
     // New Command Based docs: https://docs.wpilib.org/en/latest/docs/software/commandbased/index.html
     CommandBased(
-        "Command Based (v2) Robot",
-        "A robot project for coding robots using version 2 of the Command Based framework/API introduced in 2020. Command Based robots allow complex functionality to be developed from simpler functionality/components. This is the updated for 2020 Command Based Robot, using classes from the <tt>edu.wpi.first.wpilibj<strong>2</strong></tt> package from the <tt>wpilibNewCommands-java-2020-x.x.jar</tt> See the <em>Command-Based Programming</em> section of the WPI Lib Docs for more information and details on programming Command Based robots.",
+        "Command Based v2 Robot",
+        """A robot project for coding robots using version 2 (aka 'New') of the Command Based framework/API introduced in 2020. 
+            |Command Based robots allow complex functionality to be developed from simpler functionality/components. 
+            |This version uses classes from the <tt>edu.wpi.first.wpilibj<strong>2</strong></tt> 
+            |package. See the 
+            |<a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based Programming</a> 
+            |section of the WPI Lib Docs for more information.""".trimMargin(),
         commandVersion = 2,
         availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
                 ),
     CommandBasedOld(
-        "Command Based (v1) Robot (aka Old Command)",
-        "A robot project for coding robots using using version 1 of the Command Based framework/API introduced in 2012. Command Based robots allow complex functionality to be developed from simpler functionality/components. This is the original Command Based Robot introduced in 2012, using classes from the <tt>edu.wpi.first.wpilibj</tt> package from the <tt>wpilibOldCommands-java-2020-x.x.jar</tt> Version 1 has been deprecated, and new robot projects are strongly encouraged to use the <em>Command Based (v2) Robot</em> Template. See the <em>Command-Based Programming</em> section of the WPI Lib Docs for more information and details.",
+        "Command Based v1 Robot (aka Old Command)",
+        """A robot project for coding robots using using version 1 of the Command Based framework/API introduced in 2012. 
+            |Command Based robots allow complex functionality to be developed from simpler functionality/components. 
+            |This is the original Command Based Robot, using classes from the <tt>edu.wpi.first.wpilibj</tt> package.
+            |Version 1 is deprecated, and new robot projects are strongly encouraged to use the <em>${CommandBased.displayName}</em> 
+            |Template. See the 
+            |<a href="https://docs.wpilib.org/en/stable/docs/software/old-commandbased/index.html">Old Command-Based Programming</a> 
+            |section of the WPI Lib Docs for more information.""".trimMargin(),
         commandVersion = 1,
         isDeprecated = true
                    ),
@@ -351,8 +381,19 @@ enum class FrcWizard2021ProjectTemplateDefinition(
         "RobotBase Skeleton (Advanced)",
         "A skeleton (stub) for RobotBase, intended for <strong>highly advanced/experienced</strong> programmers, that provides more complete control over program flow."
                      ),
-    RomiCommand("Romi - Command Robot", "Romi Robot using (version 2 of) the Command Based framework/API, allowing complex functionality to be developed from simpler functionality/components. See the <em>Romi Robot</em> section of the WPI Lib Docs for more information and details.", commandVersion = 2, isRomiBot = true),
-    RomiTimed("Romi - Timed Robot", "Romi Robot using TimedRobot as the base class, allowing robots to be implemented in an iterative manner synced to a timer. See the <em>Romi Robot</em> section of the WPI Lib Docs for more information and details.", isRomiBot = true)
+    RomiCommand("Romi - Command Robot",
+                """Romi Robot using (version 2 of) the Command Based framework/API, which allows complex functionality to be 
+                    |developed from simpler functionality/components. See the 
+                    |<a href="https://docs.wpilib.org/en/stable/docs/romi-robot/index.html">Romi Robot</a> and
+                    |<a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based Programming</a>
+                    |sections of the WPI Lib Docs for more information.""".trimMargin(),
+                commandVersion = 2,
+                isRomiBot = true),
+    RomiTimed("Romi - Timed Robot",
+              """Romi Robot using TimedRobot as the base class, allowing robots to be implemented in an iterative manner 
+                  |synced to a timer. See the 
+                  |<a href="https://docs.wpilib.org/en/stable/docs/romi-robot/index.html">Romi Robot</a> section of 
+                  |the WPI Lib Docs for more information.""".trimMargin(), isRomiBot = true)
 
     ;
 
@@ -463,7 +504,12 @@ enum class FrcWizard2021ExampleTemplateDefinition(
                          ),
     MecanumControllerCommand("MecanumControllerCommand", "An example command-based robot demonstrating the use of a MecanumControllerCommand to follow a pregenerated trajectory.", commandVersion = 2),
     SwerveControllerCommand("SwerveControllerCommand", "An example command-based robot demonstrating the use of a SwerveControllerCommand to follow a pregenerated trajectory.", commandVersion = 2),
-    RomiReference("Romi Reference", "An example command-based robot program that can be used with the Romi reference robot design", commandVersion = 2, isRomiBot = true),
+    RomiReference("Romi Reference",
+                  """An example command-based robot program that can be used with the Romi reference robot design.
+                      |See the <a href="https://docs.wpilib.org/en/stable/docs/romi-robot/index.html">Romi Robot</a> and
+                      |<a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based Programming</a>
+                      |sections of the WPI Lib Docs for more information.""".trimMargin(),
+                  commandVersion = 2, isRomiBot = true),
     ;
 
 

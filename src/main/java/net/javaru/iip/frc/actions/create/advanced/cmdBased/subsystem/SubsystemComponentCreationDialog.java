@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,11 +16,14 @@
 
 package net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableMap.Builder;
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
@@ -166,8 +169,14 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
         optionsPanel.setLayout(layoutManager);
         optionsPanel.add(makeSingletonCheckbox, gc);
     
-        final ContextHelpLabel helpLabel = ContextHelpLabel.create(message("frc.new.class.adv.subsystem.dialog.makeSingleton.help.title"), 
-                                                                   message("frc.new.class.adv.subsystem.dialog.makeSingleton.help.text"));
+        final ContextHelpLabel helpLabel = ContextHelpLabel.create(message("frc.new.class.adv.subsystem.dialog.makeSingleton.contextHelp.text"));
+        helpLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e)
+            {
+                BrowserUtil.browse("https://www.geeksforgeeks.org/singleton-design-pattern");
+            }
+        });
         gc.setIndent(0);
         gc.setColumn(1);
         gc.setHSizePolicy(GridConstraints.SIZEPOLICY_FIXED);

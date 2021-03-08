@@ -173,7 +173,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         enableDesktopSupportCheckBox.addChangeListener(e -> updateDesktopSupportWarningVisibility());
         
         includeGitignoreFileCheckBox.setSelected(dataModel.getGitIgnoreConfiguration().getIncludeGitIgnoreFile());
-        includeGitignoreFileCheckBox.addActionListener(e -> {dataModel.getGitIgnoreConfiguration().setIncludeGitIgnoreFile(includeGitignoreFileCheckBox.isSelected());});
+        includeGitignoreFileCheckBox.addActionListener(e -> dataModel.getGitIgnoreConfiguration().setIncludeGitIgnoreFile(includeGitignoreFileCheckBox.isSelected()));
         configureGitignoreButton.setEnabled(dataModel.getGitIgnoreConfiguration().getIncludeGitIgnoreFile());
         includeGitignoreFileCheckBox.addChangeListener(e -> configureGitignoreButton.setEnabled(includeGitignoreFileCheckBox.isSelected()));
         configureGitignoreButton.addActionListener(e -> displayGitIgnoreConfigurationDialog());

@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="net.javaru.iip.frc.wizard.FrcProjectSettingsWizardStep">
-  <grid id="27dc6" binding="rootPanel" layout-manager="GridLayoutManager" row-count="6" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="27dc6" binding="rootPanel" layout-manager="GridLayoutManager" row-count="7" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="964" height="430"/>
+      <xy x="20" y="20" width="612" height="433"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
-      <grid id="40419" binding="robotDetailsPanel" layout-manager="GridLayoutManager" row-count="4" column-count="7" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="5ceec" binding="generalSettingsPanel" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
-          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="1" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties/>
         <border type="none"/>
         <children>
-          <component id="9432b" class="com.intellij.ui.components.JBLabel">
+          <component id="ccdd4" class="com.intellij.ui.components.JBLabel" binding="teamNumberLabel">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -25,18 +25,7 @@
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.mws.teamNumberLabel.tooltip"/>
             </properties>
           </component>
-          <component id="7027c" class="com.intellij.ui.components.JBTextField" binding="teamNumberTextField">
-            <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="-1"/>
-                <maximum-size width="150" height="-1"/>
-              </grid>
-            </constraints>
-            <properties>
-              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.mws.teamNumberLabel.tooltip"/>
-            </properties>
-          </component>
-          <component id="747f1" class="com.intellij.ui.components.JBLabel" binding="basePackageLabel">
+          <component id="3750d" class="com.intellij.ui.components.JBLabel" binding="basePackageLabel">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -45,106 +34,87 @@
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.basePackageLabel.tooltip"/>
             </properties>
           </component>
-          <component id="d9cac" class="com.intellij.ui.components.JBTextField" binding="basePackageTextField">
+          <grid id="27f3f" binding="teamEntryNumberPanel" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <grid row="1" column="1" row-span="1" col-span="4" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false">
-                <preferred-size width="500" height="-1"/>
-                <maximum-size width="500" height="-1"/>
-              </grid>
-            </constraints>
-            <properties/>
-          </component>
-          <component id="9f4fa" class="javax.swing.JButton" binding="basePackageDefaultButton">
-            <constraints>
-              <grid row="1" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text resource-bundle="i18n/FrcBundle" key="frc.ui.common.defaultButton.text"/>
-              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.common.defaultButton.tooltip"/>
-            </properties>
-          </component>
-          <component id="a114a" class="com.intellij.ui.components.JBLabel" binding="teamNumberWarningIconLabel">
-            <constraints>
-              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <icon value="general/balloonError.png"/>
-              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.teamNumberWarningIcon.tooltip"/>
-            </properties>
-          </component>
-          <hspacer id="1d99a">
-            <constraints>
-              <grid row="0" column="3" row-span="1" col-span="2" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-          </hspacer>
-          <component id="6495e" class="com.intellij.ui.components.JBCheckBox" binding="includeVsCodeConfigsCheckBox">
-            <constraints>
-              <grid row="3" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.includeVsCodeConfigsCheckBox.text"/>
-              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.includeVsCodeConfigsCheckBox.tooltip"/>
-            </properties>
-          </component>
-          <hspacer id="6d7a8">
-            <constraints>
-              <grid row="3" column="4" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-          </hspacer>
-          <component id="f038" class="com.intellij.ui.components.JBLabel" binding="basePackageWarningLabel">
-            <constraints>
-              <grid row="1" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <icon value="general/balloonError.png"/>
-              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.validate.blankPackageName.message"/>
-            </properties>
-          </component>
-          <component id="311ca" class="com.intellij.ui.components.JBCheckBox" binding="enableDesktopSupportCheckBox">
-            <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <enabled value="true"/>
-              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.enableDesktopSupportCheckBox.text"/>
-              <toolTipText value=""/>
             </properties>
-          </component>
-          <component id="b9280" class="com.intellij.ui.ContextHelpLabel" binding="desktopSupportContextHelpLabel" custom-create="true">
+            <border type="none"/>
+            <children>
+              <component id="ee4f3" class="com.intellij.ui.components.JBTextField" binding="teamNumberTextField">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false">
+                    <minimum-size width="100" height="-1"/>
+                    <preferred-size width="175" height="-1"/>
+                    <maximum-size width="250" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="7cc8" class="com.intellij.ui.components.JBLabel" binding="teamNumberWarningIconLabel">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <icon value="general/error.png"/>
+                  <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.teamNumberWarningIcon.tooltip"/>
+                </properties>
+              </component>
+              <hspacer id="9fecd">
+                <constraints>
+                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+              </hspacer>
+            </children>
+          </grid>
+          <grid id="c118f" binding="packageEntryPanel" layout-manager="GridLayoutManager" row-count="1" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties/>
-          </component>
+            <border type="none"/>
+            <children>
+              <component id="d8512" class="com.intellij.ui.components.JBTextField" binding="basePackageTextField">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false">
+                    <minimum-size width="100" height="-1"/>
+                    <preferred-size width="175" height="-1"/>
+                    <maximum-size width="250" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="c45a2" class="javax.swing.JButton" binding="basePackageDefaultButton">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text resource-bundle="i18n/FrcBundle" key="frc.ui.common.defaultButton.text"/>
+                  <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.common.defaultButton.tooltip"/>
+                </properties>
+              </component>
+              <component id="71491" class="com.intellij.ui.components.JBLabel" binding="basePackageWarningLabel">
+                <constraints>
+                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <icon value="general/error.png"/>
+                </properties>
+              </component>
+              <hspacer id="49dc1">
+                <constraints>
+                  <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+              </hspacer>
+            </children>
+          </grid>
         </children>
       </grid>
-      <hspacer id="a9e8a">
-        <constraints>
-          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-      </hspacer>
-      <vspacer id="8ea00">
-        <constraints>
-          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-        </constraints>
-      </vspacer>
-      <grid id="e4064" binding="nextPanelToBeRenamed" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-        <margin top="0" left="0" bottom="0" right="0"/>
-        <constraints>
-          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
-            <preferred-size width="300" height="-1"/>
-          </grid>
-        </constraints>
-        <properties/>
-        <border type="none"/>
-        <children/>
-      </grid>
-      <hspacer id="785ef">
-        <constraints>
-          <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-      </hspacer>
-      <grid id="c51dc" binding="gitignorePanel" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="80562" binding="generalOptionsPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -152,31 +122,64 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="8bc28" class="com.intellij.ui.components.JBCheckBox" binding="includeGitignoreFileCheckBox" default-binding="true">
+          <grid id="7dc62" binding="desktopSupportPanel" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties>
-              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gitignore.include.checkbox.txt"/>
-            </properties>
-          </component>
-          <hspacer id="bc7fc">
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="6d5cb" class="com.intellij.ui.ContextHelpLabel" binding="desktopSupportContextHelpLabel" custom-create="true">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="fbc09" class="com.intellij.ui.components.JBLabel" binding="enableDesktopSupportWarningMessage">
+                <constraints>
+                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <icon value="general/warning.png"/>
+                  <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.enableDesktopSupport.warningMessage.text"/>
+                </properties>
+              </component>
+              <grid id="e75ba" binding="enableDesktopSupportOptionPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="cce83" class="com.intellij.ui.components.JBCheckBox" binding="enableDesktopSupportCheckBox">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties/>
+                  </component>
+                  <component id="8f39a" class="com.intellij.ui.components.JBLabel" binding="enableDesktopSupportCheckBoxLabel">
+                    <constraints>
+                      <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <icon value="nodes/desktop.png"/>
+                      <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.enableDesktopSupportCheckBox.text"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+            </children>
+          </grid>
+          <hspacer id="b003e">
             <constraints>
-              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
           </hspacer>
-          <component id="2b213" class="javax.swing.JButton" binding="configureGitignoreButton">
-            <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gitignore.configure.button.text"/>
-              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gitignore.configure.button.tooltip"/>
-            </properties>
-          </component>
         </children>
       </grid>
-      <grid id="7d323" binding="junitPanel" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="9cd44" binding="vsCodeOptionsPanel" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -184,49 +187,46 @@
         <properties/>
         <border type="none"/>
         <children>
-          <hspacer id="4374b">
+          <component id="5821f" class="com.intellij.ui.ContextHelpLabel" binding="includeVsCodeContextHelpLabel" custom-create="true">
             <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+          </component>
+          <grid id="5efa6" binding="includeVsCodeConfigsOptionPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="f0d76" class="com.intellij.ui.components.JBCheckBox" binding="includeVsCodeConfigsCheckBox">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="7754d" class="com.intellij.ui.components.JBLabel" binding="includeVsCodeConfigsCheckBoxLabel">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <icon value="icons/technologies/vscode.png"/>
+                  <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.includeVsCodeConfigsCheckBox.text"/>
+                  <toolTipText value=""/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <hspacer id="994d2">
+            <constraints>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
           </hspacer>
-          <component id="186f5" class="com.intellij.ui.components.JBCheckBox" binding="junitCheckBox">
-            <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.junit.includeJunitCheckBox.text"/>
-            </properties>
-          </component>
-          <component id="628eb" class="com.intellij.ui.components.JBRadioButton" binding="junit5RadioButton">
-            <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.junit.option.junit5.text"/>
-              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.junit.option.junit5.tooltip"/>
-            </properties>
-          </component>
-          <component id="8a6e5" class="com.intellij.ui.components.JBRadioButton" binding="junit5withVintageRadioButton">
-            <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.junit.option.junit4plus4.text"/>
-              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.junit.option.junit4plus4.tooltip"/>
-            </properties>
-          </component>
-          <component id="9178c" class="com.intellij.ui.components.JBRadioButton" binding="junit4RadioButton">
-            <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.junit.option.junit4.text"/>
-              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.junit.option.junit4.tooltip"/>
-            </properties>
-          </component>
         </children>
       </grid>
-      <grid id="8dd7b" binding="gradlePanel" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="d0381" binding="gitPanel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -234,53 +234,232 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="29ce7" class="com.intellij.ui.components.JBLabel" binding="gradleLabel">
+          <grid id="49238" binding="gitIgnorePanel" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <grid id="8d838" binding="includeGitIgnoreFileOptionPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="196b" class="com.intellij.ui.components.JBCheckBox" binding="includeGitignoreFileCheckBox">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties/>
+                  </component>
+                  <component id="e4386" class="com.intellij.ui.components.JBLabel" binding="includeGitignoreFileCheckBoxLabel">
+                    <constraints>
+                      <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <icon value="icons/technologies/git.png"/>
+                      <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gitignore.include.checkbox.txt"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <component id="20de2" class="javax.swing.JButton" binding="configureGitignoreButton">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gitignore.configure.button.text"/>
+                  <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gitignore.configure.button.tooltip"/>
+                </properties>
+              </component>
+              <hspacer id="9ace7">
+                <constraints>
+                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+              </hspacer>
+            </children>
+          </grid>
+        </children>
+      </grid>
+      <grid id="120cf" binding="junitPanel" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="1792c" binding="includeJunitSupportOptionPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="631cd" class="com.intellij.ui.components.JBCheckBox" binding="includeJunitSupportCheckBox">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="6787e" class="com.intellij.ui.components.JBLabel" binding="includeJunitSupportCheckBoxLabel">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <icon value="icons/technologies/junit.png"/>
+                  <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.junit.includeJunitCheckBox.text"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <component id="7d3e8" class="com.intellij.ui.components.JBRadioButton" binding="junit5RadioButton">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="3" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gradle.gradleDslLabel.text"/>
+              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.junit.option.junit5.text"/>
+              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.junit.option.junit5.tooltip"/>
             </properties>
           </component>
-          <hspacer id="c3536">
+          <component id="dae85" class="com.intellij.ui.components.JBRadioButton" binding="junit5withVintageRadioButton">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="3" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.junit.option.junit5plus4.text"/>
+              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.junit.option.junit5plus4.tooltip"/>
+            </properties>
+          </component>
+          <component id="dc35d" class="com.intellij.ui.components.JBRadioButton" binding="junit4RadioButton">
+            <constraints>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="3" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.junit.option.junit4.text"/>
+              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.junit.option.junit4.tooltip"/>
+            </properties>
+          </component>
+          <hspacer id="59774">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
           </hspacer>
-          <component id="43abe" class="com.intellij.ui.components.JBRadioButton" binding="groovyDslRadioButton">
+        </children>
+      </grid>
+      <vspacer id="14d5c">
+        <constraints>
+          <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+      <grid id="79009" binding="gradlePanel" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="13f" binding="gradleDslPanel" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties>
-              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gradle.groovyDsl.radioButton.text"/>
-              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gradle.groovyDsl.radioButton.tooltip"/>
-            </properties>
-          </component>
-          <component id="77bf1" class="com.intellij.ui.components.JBRadioButton" binding="kotlinDslRadioButton">
+            <properties/>
+            <border type="none"/>
+            <children>
+              <grid id="ec5ac" binding="groovyDslSupportOptionPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="63324" class="com.intellij.ui.components.JBRadioButton" binding="groovyDslRadioButton">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="0" anchor="4" fill="0" indent="3" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value=""/>
+                    </properties>
+                  </component>
+                  <component id="167d7" class="com.intellij.ui.components.JBLabel" binding="groovyDslRadioButtonLabel">
+                    <constraints>
+                      <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <icon value="icons/technologies/gradle_script_groovy.png"/>
+                      <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gradle.groovyDsl.radioButton.text"/>
+                      <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gradle.groovyDsl.radioButton.tooltip"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="507a4" binding="kotlinDslSupportOptionPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="663cd" class="com.intellij.ui.components.JBRadioButton" binding="kotlinDslRadioButton">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="0" anchor="4" fill="0" indent="3" use-parent-layout="false"/>
+                    </constraints>
+                    <properties/>
+                  </component>
+                  <component id="d3c95" class="com.intellij.ui.components.JBLabel" binding="kotlinDslRadioButtonLabel">
+                    <constraints>
+                      <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <icon value="icons/technologies/gradle_script_kotlin.png"/>
+                      <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gradle.kotlinDsl.radioButton.text"/>
+                      <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gradle.kotlinDsl.radioButton.tooltip"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <component id="873d4" class="com.intellij.ui.components.JBLabel" binding="gradleDslLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gradle.gradleDslLabel.text"/>
+                </properties>
+              </component>
+              <hspacer id="4b446">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+              </hspacer>
+            </children>
+          </grid>
+          <vspacer id="f870e">
             <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties>
-              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gradle.kotlinDsl.radioButton.text"/>
-              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.projectSettingsStep.gradle.kotlinDsl.radioButton.tooltip"/>
-            </properties>
-          </component>
+          </vspacer>
         </children>
       </grid>
     </children>
   </grid>
   <buttonGroups>
-    <group name="gitignoreOptionButtonGroup">
-      <member id="f9261"/>
-    </group>
     <group name="junitVersionButtonGroup">
-      <member id="628eb"/>
-      <member id="9178c"/>
-      <member id="8a6e5"/>
+      <member id="7d3e8"/>
+      <member id="dae85"/>
+      <member id="dc35d"/>
     </group>
     <group name="gradleDslButtonGroup">
-      <member id="43abe"/>
-      <member id="77bf1"/>
+      <member id="63324"/>
+      <member id="663cd"/>
     </group>
   </buttonGroups>
 </form>

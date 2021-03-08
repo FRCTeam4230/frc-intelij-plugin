@@ -6,7 +6,7 @@
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *     
+ *
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,26 +39,16 @@ import net.javaru.iip.frc.i18n.FrcMessageKey;
 
 
 
-/**
- * A Button (JRadioButton, JCheckBox, etc) wrapper to allow the button
- * to have both an icon and a label. It does this by creating a label
- * containing the icon and the text, and then placing that label and
- * the button into a JPanel (with a small spacer between them).
- *
- * Generally speaking, external code should work directly with the button
- * for most operations. Although enabling and disabling can be done directly
- * if needed.
- */
 @SuppressWarnings("unused")
-public class ButtonWithIconAndText extends JPanel implements ItemSelectable
+public class ButtonWithIconAndTextBase<T extends AbstractButton> extends JPanel implements ItemSelectable
 {
-    private static final Logger LOG = Logger.getInstance(ButtonWithIconAndText.class);
+    private static final Logger LOG = Logger.getInstance(ButtonWithIconAndTextBase.class);
     
     private static final long serialVersionUID = -392212524102824537L;
+    @Nullable
+    private T button;
     @NotNull
-    private final AbstractButton button;
-    @NotNull
-    private final JLabel label;
+    private final JLabel label = new JLabel();
     private boolean buttonHasMouseHover = false;
     
     
@@ -67,44 +57,50 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
      * @param icon   the icon for the button's label
      */
     @Contract("_, _ -> new")
-    public static @NotNull ButtonWithIconAndText createForButtonWithText(@NotNull AbstractButton button, @NotNull Icon icon)
+    public static <T extends AbstractButton> @NotNull ButtonWithIconAndTextBase<T> createForButtonWithText(@NotNull T button, @NotNull Icon icon)
     {
-        return new ButtonWithIconAndText(button, icon, button.getText());
+        return new ButtonWithIconAndTextBase<>(button, icon, button.getText());
     }
     
     
     /**
-     * @param button the button -- JRadioButton, JCheckBox, etc. -- WITHOUT any text set on it as the text defined by the textMessageKey parameter will be used
-     * @param icon   the icon for the button's label
-     * @param textMessageKey   message key for the text for the button's label
+     * @param button         the button -- JRadioButton, JCheckBox, etc. -- WITHOUT any text set on it as the text defined by the textMessageKey parameter will be used
+     * @param icon           the icon for the button's label
+     * @param textMessageKey message key for the text for the button's label
      */
     @Contract("_, _, _ -> new")
-    public static @NotNull ButtonWithIconAndText createForButtonWithoutText(@NotNull AbstractButton button, @NotNull Icon icon, @NotNull FrcMessageKey textMessageKey)
+    public static <T extends AbstractButton> @NotNull ButtonWithIconAndTextBase<T> createForButtonWithoutText(@NotNull T button, @NotNull Icon icon, @NotNull FrcMessageKey textMessageKey)
     {
         return createForButtonWithoutText(button, icon, FrcBundle.message(textMessageKey));
     }
-
+    
+    
     /**
      * @param button the button -- JRadioButton, JCheckBox, etc. -- WITHOUT any text set on it as the text parameter will be used
      * @param icon   the icon for the button's label
      * @param text   the text for the button's label
      */
     @Contract("_, _, _ -> new")
-    public static @NotNull ButtonWithIconAndText createForButtonWithoutText(@NotNull AbstractButton button, @NotNull Icon icon, @NotNull String text)
+    public static <T extends AbstractButton> @NotNull ButtonWithIconAndTextBase<T> createForButtonWithoutText(@NotNull T button, @NotNull Icon icon, @NotNull String text)
     {
         if (StringUtils.isNotBlank(button.getText()) && !button.getText().equals(text))
         {
             LOG.warn("[FRC] Button passed in to constructor had text which will be ignored. Button text: " + button.getText());
         }
-        return new ButtonWithIconAndText(button, icon, text);
+        return new ButtonWithIconAndTextBase<>(button, icon, text);
     }
     
+    protected ButtonWithIconAndTextBase()
+    {
+        this.label.setLabelFor(this.button);
+        final JComponent spacer = createSpacer();
+        
+    }
     
-    private ButtonWithIconAndText(@NotNull AbstractButton button, @NotNull Icon icon, @NotNull String text)
+    protected ButtonWithIconAndTextBase(@NotNull T button, @NotNull Icon icon, @NotNull String text)
     {
         this.button = button;
         this.button.setText("");
-        this.label = new JLabel();
         this.label.setLabelFor(this.button);
         final JComponent spacer = createSpacer();
         setIcon(icon);
@@ -120,6 +116,7 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
         this.button.addPropertyChangeListener(new OurSyncLabelEnablingListener());
     }
     
+    
     private static JComponent createSpacer()
     {
         JLabel spacer = new JLabel("");
@@ -132,7 +129,22 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
     
     
     @NotNull
-    protected AbstractButton getButton() { return button; }
+    protected T getButton() { return button; }
+    
+    
+    /**
+     * Sets the button. This is meant for use solely in the UI Designer.
+     * @param button the backing button
+     */
+    public void setButton(T button)
+    {
+        this.button = button;
+        this.button.addMouseListener(new OurButtonMouseStatusListener());
+        this.button.addFocusListener(new OurMnemonicSelectionListener());
+        this.label.addMouseListener(new OurLabelClickListener());
+        this.button.addPropertyChangeListener(new OurSyncLabelEnablingListener());
+    }
+    
     
     
     @NotNull
@@ -141,15 +153,18 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
         return label;
     }
     
+    
     public void setMnemonic(char aChar)
     {
         label.setDisplayedMnemonic(aChar);
     }
     
+    
     public void setMnemonic(int key)
     {
         label.setDisplayedMnemonic(key);
     }
+    
     
     public int getMnemonic()
     {
@@ -168,7 +183,8 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
      * @param text the string to display; if the text is <code>null</code>,
      *             the tool tip is turned off for this component
      *
-     * description: The text to display in a tool tip.
+     *             description: The text to display in a tool tip.
+     *
      * @see #TOOL_TIP_TEXT_KEY
      */
     public void setToolTipText(@Nullable String text)
@@ -178,6 +194,7 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
         button.setToolTipText(text);
     }
     
+    
     @Nullable
     public String getToolTipText()
     {
@@ -186,13 +203,22 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
     
     
     public void setText(String text) { label.setText(text); }
+    
+    
     public String getText() { return label.getText(); }
     
+    
     public void setIcon(Icon icon) { label.setIcon(icon); }
+    
+    
     public Icon getIcon() { return label.getIcon(); }
     
+    
     public void setDisabledIcon(Icon icon) {label.setDisabledIcon(icon); }
+    
+    
     public Icon getDisabledIcon() { return label.getDisabledIcon(); }
+    
     
     public void setEnabled(boolean enabled)
     {
@@ -201,31 +227,51 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
         label.setEnabled(enabled);
     }
     
+    
     @Override
     public boolean isEnabled() { return button.isEnabled();}
     
     
     public void setActionCommand(String actionCommand) {button.setActionCommand(actionCommand);}
+    
+    
     public String getActionCommand() {return button.getActionCommand();}
     
+    
     public void setAction(Action a) {button.setAction(a);}
+    
+    
     public Action getAction() {return button.getAction();}
+    
     
     private void toggleButtonSelection() { button.setSelected(!button.isSelected()); }
     
+    
     public void addActionListener(ActionListener listener) { button.addActionListener(listener); }
+    
+    
     public void removeActionListener(ActionListener listener) { button.removeActionListener(listener); }
+    
+    
     public ActionListener[] getActionListeners() {return button.getActionListeners();}
     
+    
     public void addChangeListener(ChangeListener listener) {button.addChangeListener(listener);}
+    
+    
     public void removeChangeListener(ChangeListener listener) {button.removeChangeListener(listener);}
+    
+    
     public ChangeListener[] getChangeListeners() {return button.getChangeListeners();}
     
     
     @Override
     public void addItemListener(ItemListener listener) { button.addItemListener(listener);}
+    
+    
     @Override
     public void removeItemListener(ItemListener listener) { button.removeItemListener(listener);}
+    
     
     public ItemListener[] getItemListeners() {return button.getItemListeners();}
     
@@ -241,6 +287,7 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
         selectedObjects[0] = getText();
         return selectedObjects;
     }
+    
     
     /**
      * Returns the state of the button. True if the
@@ -260,6 +307,7 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
      */
     public void setSelected(boolean b) { button.setSelected(b); }
     
+    
     class OurMnemonicSelectionListener implements FocusListener
     {
         @Override
@@ -267,6 +315,7 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
         {
             if (!buttonHasMouseHover && isEnabled()) toggleButtonSelection();
         }
+    
     
         @Override
         public void focusLost(FocusEvent e) {}
@@ -279,8 +328,8 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
         {
             buttonHasMouseHover = true;
         }
-    
-    
+        
+        
         @Override
         public void mouseExited(MouseEvent e)
         {
@@ -340,7 +389,7 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
             }
             catch (Throwable e)
             {
-                 LOG.warn("An exception occurred in OurSyncLabelEnablingListener. Cause Summary: " + e.toString(), e);
+                LOG.warn("An exception occurred in OurSyncLabelEnablingListener. Cause Summary: " + e.toString(), e);
             }
         }
     }

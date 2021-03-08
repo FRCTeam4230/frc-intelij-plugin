@@ -6,7 +6,7 @@
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *     
+ *
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.ui;
 
-import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -29,114 +28,80 @@ import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.diagnostic.Logger;
 
-import net.javaru.iip.frc.i18n.FrcBundle;
-import net.javaru.iip.frc.i18n.FrcMessageKey;
-
 
 
 /**
- * A Button (JRadioButton, JCheckBox, etc) wrapper to allow the button
- * to have both an icon and a label. It does this by creating a label
- * containing the icon and the text, and then placing that label and
- * the button into a JPanel (with a small spacer between them).
- *
- * Generally speaking, external code should work directly with the button
- * for most operations. Although enabling and disabling can be done directly
- * if needed.
+ * A decorator that synchronizes a Button (JRadioButton, JCheckBox, etc) and a JLabel.
+ * The primary use case if in to allow for the virtual creation of a Button
+ * that has both an icon and a text label. Since a Button cannot have both an icon and
+ * text, a button without any text or icon is used alongside a JLabel that has both the
+ * icon and text set on it.
+ * @param <T> The Button type (JRadioButton, JCheckBox, etc)
  */
 @SuppressWarnings("unused")
-public class ButtonWithIconAndText extends JPanel implements ItemSelectable
+public class ButtonAndLabelSynchronizer<T extends AbstractButton>
 {
-    private static final Logger LOG = Logger.getInstance(ButtonWithIconAndText.class);
+    private static final Logger LOG = Logger.getInstance(ButtonAndLabelSynchronizer.class);
     
-    private static final long serialVersionUID = -392212524102824537L;
     @NotNull
-    private final AbstractButton button;
+    private final T button;
     @NotNull
     private final JLabel label;
+    
+    @Nullable final JPanel panel;
+    
     private boolean buttonHasMouseHover = false;
     
-    
-    /**
-     * @param button the button -- JRadioButton, JCheckBox, etc. -- with text already set on it, which will be used for the icon & text combination label
-     * @param icon   the icon for the button's label
-     */
-    @Contract("_, _ -> new")
-    public static @NotNull ButtonWithIconAndText createForButtonWithText(@NotNull AbstractButton button, @NotNull Icon icon)
+    public ButtonAndLabelSynchronizer(@NotNull T buttonOrCheckbox, @NotNull JLabel label)
     {
-        return new ButtonWithIconAndText(button, icon, button.getText());
+        this(null, buttonOrCheckbox, label);
     }
-    
-    
-    /**
-     * @param button the button -- JRadioButton, JCheckBox, etc. -- WITHOUT any text set on it as the text defined by the textMessageKey parameter will be used
-     * @param icon   the icon for the button's label
-     * @param textMessageKey   message key for the text for the button's label
-     */
-    @Contract("_, _, _ -> new")
-    public static @NotNull ButtonWithIconAndText createForButtonWithoutText(@NotNull AbstractButton button, @NotNull Icon icon, @NotNull FrcMessageKey textMessageKey)
+    public ButtonAndLabelSynchronizer(@Nullable JPanel panel, @NotNull T buttonOrCheckbox, @NotNull JLabel label)
     {
-        return createForButtonWithoutText(button, icon, FrcBundle.message(textMessageKey));
-    }
-
-    /**
-     * @param button the button -- JRadioButton, JCheckBox, etc. -- WITHOUT any text set on it as the text parameter will be used
-     * @param icon   the icon for the button's label
-     * @param text   the text for the button's label
-     */
-    @Contract("_, _, _ -> new")
-    public static @NotNull ButtonWithIconAndText createForButtonWithoutText(@NotNull AbstractButton button, @NotNull Icon icon, @NotNull String text)
-    {
-        if (StringUtils.isNotBlank(button.getText()) && !button.getText().equals(text))
+        if (StringUtils.isNotBlank(buttonOrCheckbox.getText()))
         {
-            LOG.warn("[FRC] Button passed in to constructor had text which will be ignored. Button text: " + button.getText());
+            LOG.warn("[FRC] Button passed in to constructor had text. Buttons used should have not text. Set the icon and/or text on the label.");
         }
-        return new ButtonWithIconAndText(button, icon, text);
-    }
-    
-    
-    private ButtonWithIconAndText(@NotNull AbstractButton button, @NotNull Icon icon, @NotNull String text)
-    {
-        this.button = button;
-        this.button.setText("");
-        this.label = new JLabel();
-        this.label.setLabelFor(this.button);
-        final JComponent spacer = createSpacer();
-        setIcon(icon);
-        setText(text);
-        setLayout(new GridBagLayout());
-        add(button);
-        add(spacer); // without the spacer, the label is too tight next to the radioButton or checkBox
-        add(getLabel());
-        addMouseListener(new OurPanelClickListener());
+        if (buttonOrCheckbox.getIcon() != null)
+        {
+            LOG.warn("[FRC] Button passed in to constructor had an icon set on it. Buttons used should have icons. Set the icon and/or text on the label.");
+        }
+        this.panel = panel;
+        this.button = buttonOrCheckbox;
+        this.label = label;
+        if (panel != null) panel.addMouseListener(new OurPanelClickListener());
         this.button.addMouseListener(new OurButtonMouseStatusListener());
         this.button.addFocusListener(new OurMnemonicSelectionListener());
         this.label.addMouseListener(new OurLabelClickListener());
         this.button.addPropertyChangeListener(new OurSyncLabelEnablingListener());
+        
+        if (StringUtils.isNotBlank(button.getToolTipText()))
+        {
+            if (!button.getToolTipText().equals(label.getToolTipText()))
+            {
+                if (StringUtils.isNotBlank(label.getToolTipText()))
+                {
+                    LOG.warn("[FRC] label tooltip does not match button tool tip and will be replaced with button tooltip. Label tip: >>" + label.getToolTipText() + "<< will be replaced with >>" + button.getToolTipText() +"<<");
+                }
+                setToolTipText(button.getText());
+            }
+        }
+        else if (StringUtils.isNotBlank(label.getToolTipText()))
+        {
+            setToolTipText(label.getToolTipText());
+        }
     }
     
-    private static JComponent createSpacer()
-    {
-        JLabel spacer = new JLabel("");
-        final Dimension size = new Dimension(5, -1);
-        spacer.setMinimumSize(size);
-        spacer.setMaximumSize(size);
-        spacer.setPreferredSize(size);
-        return spacer;
-    }
+    @NotNull
+    public T getButton() { return button; }
     
     
     @NotNull
-    protected AbstractButton getButton() { return button; }
-    
-    
-    @NotNull
-    protected JLabel getLabel()
+    public JLabel getLabel()
     {
         return label;
     }
@@ -169,11 +134,10 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
      *             the tool tip is turned off for this component
      *
      * description: The text to display in a tool tip.
-     * @see #TOOL_TIP_TEXT_KEY
      */
     public void setToolTipText(@Nullable String text)
     {
-        super.setToolTipText(text);
+        if (panel != null) panel.setToolTipText(text);
         label.setToolTipText(text);
         button.setToolTipText(text);
     }
@@ -196,12 +160,11 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
     
     public void setEnabled(boolean enabled)
     {
-        super.setEnabled(enabled);
+        if (panel != null) panel.setEnabled(enabled);
         button.setEnabled(enabled);
         label.setEnabled(enabled);
     }
     
-    @Override
     public boolean isEnabled() { return button.isEnabled();}
     
     
@@ -222,15 +185,11 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
     public ChangeListener[] getChangeListeners() {return button.getChangeListeners();}
     
     
-    @Override
     public void addItemListener(ItemListener listener) { button.addItemListener(listener);}
-    @Override
     public void removeItemListener(ItemListener listener) { button.removeItemListener(listener);}
     
     public ItemListener[] getItemListeners() {return button.getItemListeners();}
     
-    
-    @Override
     public Object[] getSelectedObjects()
     {
         if (!isSelected())
@@ -344,4 +303,6 @@ public class ButtonWithIconAndText extends JPanel implements ItemSelectable
             }
         }
     }
+    
+    
 }

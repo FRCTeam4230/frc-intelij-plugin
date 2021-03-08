@@ -59,9 +59,15 @@ class FrcProjectWizardData(
     /** The project year, such as `2019` or `2020`, as a String. */
     val frcYear: String
         get() = wpilibVersion.frcYear.toString()
-    
-    val teamNumberString: String
+    /** Returns the reamNumber as a String, which can be 0 if not set. @see teamNumberOrEmptyString */
+    val teamNumberAsString: String
         get() = teamNumber.toString()
+
+    /** Returns the team number as a String, returning an empty String if the team number is zero. */
+    val teamNumberAsStringOrEmptyString: String
+        get() = if (teamNumber == 0 ) "" else teamNumber.toString()
+
+
 
     val basePackageAsDirString: String
         get() = basePackage.replace('.', '/')

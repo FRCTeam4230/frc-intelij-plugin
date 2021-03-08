@@ -1,0 +1,46 @@
+= Icons
+:imagesdir: assets/images
+:icons: font
+:sectanchors:
+:sectlinks:
+ifdef::env-github[]
+:caution-caption: :zap:
+:important-caption: :exclamation:
+:note-caption: :information_source:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+
+== General Info
+https://plugins.jetbrains.com/docs/intellij/work-with-icons-and-images.html[SDK Documentation]
+
+
+== Naming
+The `IconLoader` class will load the icon that matches the best depending on the current environment.
+
+=== https://plugins.jetbrains.com/docs/intellij/work-with-icons-and-images.html#png-format[PNG Naming]
+
+* `foo.png`
+* `foo_dark.png`
+* `foo@2x.png`
+* `foo@2x_dark.png`
+
+=== https://plugins.jetbrains.com/docs/intellij/work-with-icons-and-images.html#svg-format[SVG Naming]
+The naming notation used for PNG icons is still relevant. However, the @2x version of an SVG icon should still provide the same base size.
+The icon graphics of such an icon can be expressed in more details via double precision. *If the icon graphics are simple enough so that it renders perfectly in every scale, then the @2x version can be omitted*.
+
+* `foo.svg`
+* `foo_dark.svg`
+* `foo@2x.svg` _(if needed for improved detail)_
+* `foo@2x_dark.svg` _(if needed for improved detail)_
+
+
+=== Sizing
+
+|===
+|Usage                      |Icon Size (pixels)
+
+|Node, Action, Filetype     |16x16
+|Tool Window                |13x13
+|Editor Gutter              |12x12
+|===

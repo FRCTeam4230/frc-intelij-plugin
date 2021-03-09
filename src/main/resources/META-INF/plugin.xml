@@ -151,6 +151,7 @@
     <depends>com.intellij.modules.java</depends>
     <depends>com.intellij.gradle</depends>
     <depends>org.intellij.groovy</depends>
+    <depends>com.jetbrains.sh</depends>
     <!--<depends>AntSupport</depends>-->
 
     <!-- Optional dependency on another plugin.

@@ -34,6 +34,7 @@ import net.javaru.iip.frc.notify.FrcNotifications
 import net.javaru.iip.frc.notify.FrcNotifications.createNotification
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllOpenProjects
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
+import net.javaru.iip.frc.wizard.FrcProjectWizardData
 import javax.swing.Icon
 
 abstract class AbstractFrcInternalAction : AnAction
@@ -242,7 +243,8 @@ class CreateRunConfigurationsFrcInternalAction: AbstractFrcInternalAction()
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
         executeIfProjectNotNull(actionEvent, "Create Run Configs") {
-            createAllRunDebugConfigurations(it)
+            val data = FrcProjectWizardData()
+            createAllRunDebugConfigurations(it, data)
         }
     }
 }

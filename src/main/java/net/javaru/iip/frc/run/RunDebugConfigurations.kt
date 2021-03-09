@@ -27,6 +27,8 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.vfs.LocalFileSystem
 import net.javaru.iip.frc.i18n.FrcBundle
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.settings.FrcRoboRioSettings
@@ -35,8 +37,11 @@ import net.javaru.iip.frc.settings.getProjectTeamNumber
 import net.javaru.iip.frc.util.asDate
 import net.javaru.iip.frc.util.getMainModule
 import net.javaru.iip.frc.util.getModules
+import net.javaru.iip.frc.wizard.FrcProjectWizardData
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
 import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
@@ -44,6 +49,35 @@ import java.util.*
 private object RunDebugConfigurations 
 
 private val logger = Logger.getInstance(RunDebugConfigurations::class.java)
+
+
+fun createAllRunDebugConfigurations(project: Project, dataModel: FrcProjectWizardData)
+{
+    FileDocumentManager.getInstance().saveAllDocuments()
+    SaveAndSyncHandler.getInstance().scheduleProjectSave(project)
+    val isRomiTemplate = dataModel.isRomiRobotTemplate
+    if (!isRomiTemplate)
+    {
+        createGradleRoboRioBuildRunConfigurations(project)
+        createRoboRioDebuggingRunConfigurations(project, dataModel.teamNumber)
+    }
+
+    if (isRomiTemplate || dataModel.enableDesktopSupport)
+    {
+        createGradeSimulateJavaRunConfigurations(project, isRomiTemplate)
+        if (SystemInfo.isMac || SystemInfo.isLinux)
+        {
+            createTailSimulateJavaLogShellScriptRunConfiguration(project, isRomiTemplate)
+        }
+    }
+
+    // We need to do a Save here or the run config files are not created, which then causes all sorts of issues (to say the least)
+    FileDocumentManager.getInstance().saveAllDocuments()
+    //TODO: Look at using SaveAndSyncHandler.getInstance().scheduleSave(task: SaveTask, forceExecuteImmediately: Boolean)
+    //      once it is no longer marked Experimental. See SaveAllAction for use example. Any advantages to using it?
+    SaveAndSyncHandler.getInstance().scheduleProjectSave(project)
+}
+
 
 /**
  * @param arguments the (optional) arguments to send to Gradle when it runs. For example "-PdebugMode=true" 
@@ -58,19 +92,20 @@ fun createGradleRunConfiguration(project: Project,
                                  arguments:String? = null,
                                  vmOptions: String? = null)
 {
-    // For reference and examples:
-    //     A) runCustomTask in org.jetbrains.plugins.gradle.service.task.GradleTaskManager
-    //     B) org.jetbrains.plugins.gradle.service.execution.GradleRunConfigurationImporter
-    //     C) CreateAndEditPolicy static class in com.intellij.execution.actions.CreateAction
-    //          This is what is used for the "Create 'FRC [build]'.." popup in the Gradle tool window
-    //          Found via the "create.run.configuration.for.item.action.name" bundle message from P:\ij\platform\platform-resources-en\src\messages\ExecutionBundle.properties
-    //          It extends CreatePolicy
-    //          While it has/uses a ConfigurationContext, the context is used to get:
-    //              1) RunManager
-    //              2) RunnerAndConfigurationSettings
-    //          which we can get by the fact we have a handle on the project
-    //
-    // Based on org.jetbrains.idea.devkit.module.PluginModuleBuilder, it appears the commitModule method is the place to create the configurations.
+    /* For reference and examples:
+           A) runCustomTask in org.jetbrains.plugins.gradle.service.task.GradleTaskManager
+           B) org.jetbrains.plugins.gradle.service.execution.GradleRunConfigurationImporter
+           C) CreateAndEditPolicy static class in com.intellij.execution.actions.CreateAction
+                This is what is used for the "Create 'FRC [build]'.." popup in the Gradle tool window
+                Found via the "create.run.configuration.for.item.action.name" bundle message from P:\ij\platform\platform-resources-en\src\messages\ExecutionBundle.properties
+                It extends CreatePolicy
+                While it has/uses a ConfigurationContext, the context is used to get:
+                    1) RunManager
+                    2) RunnerAndConfigurationSettings
+                which we can get by the fact we have a handle on the project
+
+       Based on org.jetbrains.idea.devkit.module.PluginModuleBuilder, it appears the commitModule method is the place to create the configurations.
+    */
 
     try
     {
@@ -109,22 +144,75 @@ fun createGradleRunConfiguration(project: Project,
     }
 }
 
-fun createAllRunDebugConfigurations(project: Project, teamNumber: Int = project.getProjectTeamNumber())
+
+
+
+private fun createGradeSimulateJavaRunConfigurations(project: Project, isRomi: Boolean, setAsShared: Boolean = true)
 {
-    FileDocumentManager.getInstance().saveAllDocuments()
-    SaveAndSyncHandler.getInstance().scheduleProjectSave(project)
-    createGradleRunConfigurations(project)
-    createDebuggingRunConfigurations(project, teamNumber)
-    // We need to do a Save here or the run config files are not created, which then causes all sorts of issues (to say the least)
-    FileDocumentManager.getInstance().saveAllDocuments()
-    //TODO: Look at using SaveAndSyncHandler.getInstance().scheduleSave(task: SaveTask, forceExecuteImmediately: Boolean)
-    //      once it is no longer marked Experimental. See SaveAllAction for use example. Any advantages to using it?
-    SaveAndSyncHandler.getInstance().scheduleProjectSave(project)
+    logger.trace("[FRC] Creating Gradle simulateJava run configurations")
+    val nameSuffix = if (isRomi) "Romi" else "Simulate Java"
+    createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.simulateJava.buildAndRun.name", nameSuffix), listOf("simulateJava"), setAsShared = setAsShared, setAsSelected = isRomi)
+    createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.simulateJava.cleanBuildAndRun.name", nameSuffix), listOf("clean", "simulateJava"), setAsShared = setAsShared)
+    logger.trace("[FRC] Completed Gradle simulateJava run configurations")
 }
 
-private fun createGradleRunConfigurations(project: Project)
+
+fun createTailSimulateJavaLogShellScriptRunConfiguration(project: Project, isRomi: Boolean, setAsShared: Boolean = true)
 {
-    logger.trace("[FRC] Creating Gradle run configurations")
+    // This is not the ideal methodology. But it works in v2020.2+
+    // In v2020.3+ we can switch to running in terminal and defining the script as /user/bin/tail
+
+    val nameSuffix = if (isRomi) "Romi" else "Simulate Java"
+    val runConfigName = FrcBundle.message("frc.wizard.run.configuration.simulateJava.tail.name", nameSuffix)
+    try
+    {
+        if (project.basePath != null)
+        {
+            val runManager = RunManager.getInstance(project)
+            val runnerAndConfigurationSettings = runManager.createConfiguration(runConfigName, com.intellij.sh.run.ShConfigurationType::class.java)
+            val shRunConfiguration = runnerAndConfigurationSettings.configuration as com.intellij.sh.run.ShRunConfiguration
+
+            shRunConfiguration.scriptPath = "${project.basePath}/build/stdout/simulateJava.log"
+            //shRunConfiguration.scriptOptions = ""
+            shRunConfiguration.scriptWorkingDirectory = project.basePath
+            shRunConfiguration.interpreterPath = "/usr/bin/tail"
+            shRunConfiguration.interpreterOptions = "-f"
+
+            shRunConfiguration.isAllowRunningInParallel = false
+            // Note the "execute in terminal" option is only available in 2020.3+ That said, using the run ToolWindow is ultimately a better option.
+            runnerAndConfigurationSettings.isActivateToolWindowBeforeRun = true
+
+            if (setAsShared)
+            {
+                shareRunConfiguration(project, runnerAndConfigurationSettings)
+            }
+
+            // To prevent a "script not found" error showing in the log, we need to create a place holder file
+            try
+            {
+                val file = Paths.get(shRunConfiguration.scriptPath)
+                Files.createDirectories(file.parent)
+                Files.createFile(file)
+                LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file.toFile())
+            }
+            catch(e:Exception)
+            {
+                logger.warn("[FRC] An exception occurred when attempting to create simulateJava.log placeholder file.")
+            }
+
+            runManager.addConfiguration(runnerAndConfigurationSettings)
+        }
+    }
+    catch (e: Exception)
+    {
+        logger.warn("[FRC] Could not create '$runConfigName' Shell Script Run Configuration for project '${project.name}' due to an exception: $e", e)
+    }
+}
+
+
+private fun createGradleRoboRioBuildRunConfigurations(project: Project)
+{
+    logger.trace("[FRC] Creating Gradle roboRIO run configurations")
     val debugModeArgument = "-PdebugMode=true"
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.buildAndDeploy.name"), listOf("deploy"), setAsSelected = true)
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.buildAndDeployForDebug.name"), listOf("deploy"), arguments = debugModeArgument)
@@ -132,10 +220,10 @@ private fun createGradleRunConfigurations(project: Project)
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.cleanBuildAndDeploy.name"), listOf("clean", "deploy"))
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.cleanBuildAndDeployForDebug.name"), listOf("clean", "deploy"), arguments = debugModeArgument)
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.cleanBuild.name"), listOf("clean", "build"))
-    logger.trace("[FRC] Completed Gradle run configurations")
+    logger.trace("[FRC] Completed Gradle roboRIO run configurations")
 }
 
-private fun createDebuggingRunConfigurations(project: Project, teamNumber: Int = project.getProjectTeamNumber())
+private fun createRoboRioDebuggingRunConfigurations(project: Project, teamNumber: Int = project.getProjectTeamNumber())
 {
     logger.trace("[FRC] Creating Debugging run configurations")
     createDebuggingRunConfiguration(project, teamNumber, RoboRioAddressType.IP)

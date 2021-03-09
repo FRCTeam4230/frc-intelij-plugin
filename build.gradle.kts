@@ -129,7 +129,7 @@ intellij {
     // IntelliJ IDEA dependency
     version = ideaVersion
     // Bundled plugin dependencies - comma separated list
-    setPlugins("java", "gradle", "Groovy")  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
+    setPlugins("java", "gradle", "Groovy", "com.jetbrains.sh")  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
     sandboxDirectory =  sandboxPath
 
     updateSinceUntilBuild = ideaUpdateSinceUntilBuild.toBoolean()

@@ -288,7 +288,7 @@ dependencies {
 
     implementation("org.jdom:jdom2:2.0.6")
     implementation("commons-io:commons-io:2.7")
-    implementation("org.apache.commons:commons-lang3:3.11")
+    implementation("org.apache.commons:commons-lang3:3.12")
     implementation("org.apache.commons:commons-text:1.9")
     implementation("com.jcraft:jsch:0.1.54")
     // Klaxon is a library to parse JSON in Kotlin.  https://github.com/cbeust/klaxon   Available in jcenter bintray: https://jcenter.bintray.com/com/beust/klaxon/   Help available in the #klaxon channel of the Kotlin Slack Workspace
@@ -303,7 +303,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava:$jacksonVersion")
     implementation("org.freemarker:freemarker:2.3.30")
 
-    testImplementation(platform("org.junit:junit-bom:5.7.0"))
+    testImplementation(platform("org.junit:junit-bom:5.7.1"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")

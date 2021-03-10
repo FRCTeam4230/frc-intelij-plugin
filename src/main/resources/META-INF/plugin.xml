@@ -230,6 +230,7 @@
 
         <projectService id="FRC.FrcProjectLifecycleService" serviceImplementation="net.javaru.iip.frc.services.FrcProjectLifecycleService"  />
         <postStartupActivity id="FRC.FrcProjectLifecycleServiceStartupActivity" implementation="net.javaru.iip.frc.services.FrcProjectLifecycleServiceStartupActivity"  />
+        <projectService id="FRC.FrcGradleService" serviceImplementation="net.javaru.iip.frc.services.FrcGradleService" />
         <projectService id="FRC.TcpRioSocketConnectorProjectService" serviceImplementation="net.javaru.iip.frc.riolog.tcp.TcpRioSocketConnectorProjectService" />
         <projectService id="FRC.FrcProjectTeamNumberService" serviceImplementation="net.javaru.iip.frc.settings.FrcProjectTeamNumberService" />
         <projectService id="FRC.FrcProjectSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcProjectGeneralSettings" />
@@ -385,6 +386,8 @@
                     class="net.javaru.iip.frc.actions.tools.internal.FetchSpecifiedRestResource" />
             <action id="FRC.tools.internal.CreateRunConfigurationsFrcInternalAction"
                 class="net.javaru.iip.frc.actions.tools.internal.CreateRunConfigurationsFrcInternalAction"/>
+            <action id="FRC.tools.internal.CheckIncludeDesktopSupportSetting"
+                    class="net.javaru.iip.frc.actions.tools.internal.CheckIncludeDesktopSupportSetting" />
         </group>
 
         <group id="FRC.FrcInternalNotificationsActionsGroup"

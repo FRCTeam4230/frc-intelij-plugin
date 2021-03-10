@@ -23,7 +23,6 @@ import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowId;
 
-import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.riolog.AbstractRioLogContentExecutor;
 import net.javaru.iip.frc.riolog.AbstractRioLogMonitorProcess;
 import net.javaru.iip.frc.riolog.AnnouncementRioLogMonitorProcess;
@@ -68,14 +67,9 @@ public class TcpRioLogRunWindowContentExecutor extends AbstractRioLogContentExec
     @Override
     protected AbstractRioLogMonitorProcess createAnnouncementRioLogMonitoringProcess()
     {
+        StringBuffer message = createRioLogMessage();
         return new AnnouncementRioLogMonitorProcess(myProject, this::invokeClearAll,
                                                     this::invokeStop,
-                                                    new StringBuffer("\n")
-                                                            .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line1"))
-                                                            .append("\n")
-                                                            .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line2"))
-                                                            .append("\n")
-                                                            .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line3"))
-                                                            .append("\n"));
+                                                    message);
     }
 }

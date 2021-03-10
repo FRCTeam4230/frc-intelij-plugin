@@ -21,7 +21,6 @@ import org.jetbrains.annotations.Nullable;
 import com.intellij.execution.Executor;
 import com.intellij.openapi.project.Project;
 
-import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.riolog.AbstractRioLogContentExecutor;
 import net.javaru.iip.frc.riolog.AbstractRioLogMonitorProcess;
 import net.javaru.iip.frc.riolog.AnnouncementRioLogMonitorProcess;
@@ -67,15 +66,9 @@ public class TcpRioLogFrcWindowContentExecutor extends AbstractRioLogContentExec
     @Override
     protected AbstractRioLogMonitorProcess createAnnouncementRioLogMonitoringProcess()
     {
+        StringBuffer message = createRioLogMessage();
         return new AnnouncementRioLogMonitorProcess(myProject, this::invokeClearAll,
                                                     this::invokeStop,
-                                                    new StringBuffer("\n")
-                                                             .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line1"))
-                                                             .append("\n")
-                                                             .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line2"))
-                                                             .append("\n")
-                                                             // TODO Have appear only if includeDesktopSupport is set to true in the build script
-                                                             .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line3"))
-                                                             .append("\n"));
+                                                    message);
     }
 }

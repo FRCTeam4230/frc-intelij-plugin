@@ -32,8 +32,10 @@ import net.javaru.iip.frc.net.FrcPseudoRestService
 import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications
 import net.javaru.iip.frc.notify.FrcNotifications.createNotification
+import net.javaru.iip.frc.notify.FrcNotifications.notify
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllOpenProjects
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
+import net.javaru.iip.frc.services.FrcGradleService
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
 import javax.swing.Icon
 
@@ -237,6 +239,16 @@ class FetchSpecifiedRestResource: AbstractFrcInternalAction()
     }
 }
 
+class CheckIncludeDesktopSupportSetting : AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, actionName = "Fetch REST Service") { project: Project ->
+            val result = FrcGradleService.getInstance(project).isIncludeDesktopSupport()
+            notify(FrcNotificationType.ACTIONABLE_INFO, "includeDesktopSupport: $result")
+        }
+    }
+}
 
 class CreateRunConfigurationsFrcInternalAction: AbstractFrcInternalAction()
 {

@@ -70,7 +70,9 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 
 import icons.FrcIcons;
+import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor;
+import net.javaru.iip.frc.services.FrcGradleService;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 
 
@@ -564,6 +566,24 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     {
         Disposer.dispose(this);
         LOG.debug("[FRC] Disposing of " + getClass().getSimpleName() + " complete.");
+    }
+    
+    
+    @NotNull
+    protected StringBuffer createRioLogMessage()
+    {
+        StringBuffer message =
+            new StringBuffer("\n")
+                .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line1"))
+                .append("\n")
+                .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line2"))
+                .append("\n");
+        Boolean includeDesktopSupport = FrcGradleService.Companion.getInstance(myProject).isIncludeDesktopSupport();
+        if (includeDesktopSupport != null && includeDesktopSupport)
+        {
+            message.append(FrcBundle.message("frc.riolog.first.start.message.tcp.line3")).append("\n");
+        }
+        return message;
     }
 
 

@@ -158,7 +158,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                                                             invokeClearAll();
                                                             myProcessHandler.waitFor(2000L);
                                                             run(false);
-                                                            ensureContentIsPinned();
+                                                            // Commenting out for now as it is causing issues
+                                                            //ensureContentIsPinned();
                                                         });
     }
 
@@ -680,7 +681,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                                                                     getRioLogMonitorProcess().monitoringStopped();
                                                                 }
                                                                 update(event);
-                                                                ensureContentIsPinned();
+                                                                // Commenting out for now as it is causing issues
+                                                                //ensureContentIsPinned();
                                                             });
         }
 

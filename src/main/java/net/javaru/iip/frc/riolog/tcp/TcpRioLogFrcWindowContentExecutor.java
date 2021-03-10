@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -73,6 +73,9 @@ public class TcpRioLogFrcWindowContentExecutor extends AbstractRioLogContentExec
                                                              .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line1"))
                                                              .append("\n")
                                                              .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line2"))
+                                                             .append("\n")
+                                                             // TODO Have appear only if includeDesktopSupport is set to true in the build script
+                                                             .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line3"))
                                                              .append("\n"));
     }
 }

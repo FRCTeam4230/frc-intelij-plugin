@@ -48,12 +48,16 @@ val ideaUpdateSinceUntilBuild: String by project
 val ideaSinceBuild: String by project
 val ideaUntilBuild: String by project
 
+// Java 11 required when supporting v2020.3 and later; Java 8 is no longer bundled. For previous versions we should target Java 1.8
+//      See  https://jetbrains.org/intellij/sdk/docs/reference_guide/api_changes/api_changes_list_2020.html#section
+//           https://blog.jetbrains.com/platform/2020/09/intellij-project-migrates-to-java-11/
+val ourTargetJavaVersion: JavaVersion = JavaVersion.VERSION_1_8
 
 plugins {
     base
     java
     kotlin("jvm") version "1.4.21"
-    id("org.jetbrains.intellij") version "0.6.5" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
+    id("org.jetbrains.intellij") version "0.7.2" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
     //    https://github.com/jetbrains/gradle-idea-ext-plugin
@@ -82,8 +86,7 @@ tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         all {
             kotlinOptions {
-                // Keep in sync with the java plugin configuration
-                jvmTarget = JavaVersion.VERSION_1_8.toString()
+                jvmTarget = ourTargetJavaVersion.toString()
                 javaParameters = true
                 //noReflect = false
             }
@@ -93,9 +96,9 @@ tasks {
 
 
 java {
-    // Keep in sync with the kotlinOptions.jvmTarget plugin configuration
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+
+    sourceCompatibility = ourTargetJavaVersion
+    targetCompatibility = ourTargetJavaVersion
 }
 
 tasks.test {

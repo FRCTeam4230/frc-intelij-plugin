@@ -21,13 +21,9 @@ import net.javaru.iip.frc.actions.create.advanced.ClassCreator
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractCmdBaseV2ComponentCreationAction
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.SubsystemComponentCreationDialog
-import net.javaru.iip.frc.i18n.FrcBundle.message
 
-class TrapezoidProfileSubsystem2ComponentCreationAction : AbstractCmdBaseV2ComponentCreationAction(
-    message("frc.new.class.trapezoidProfiledSubsystem.action.name"),
-    message("frc.new.class.trapezoidProfiledSubsystem.action.description"),
-    TrapezoidProfileSubsystem2ComponentCreationDataProvider
-                                                                                                  )
+class TrapezoidProfileSubsystem2ComponentCreationAction :
+    AbstractCmdBaseV2ComponentCreationAction(TrapezoidProfileSubsystem2ComponentCreationDataProvider)
 {
     override fun constructCreateFrcComponentDialogInstance(module: Module, classCreator: ClassCreator, directory: PsiDirectory): FrcComponentCreationDialog
     {

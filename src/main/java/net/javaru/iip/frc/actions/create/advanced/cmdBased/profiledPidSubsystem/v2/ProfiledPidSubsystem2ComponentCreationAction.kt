@@ -21,13 +21,9 @@ import net.javaru.iip.frc.actions.create.advanced.ClassCreator
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractCmdBaseV2ComponentCreationAction
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.SubsystemComponentCreationDialog
-import net.javaru.iip.frc.i18n.FrcBundle.message
 
-class ProfiledPidSubsystem2ComponentCreationAction : AbstractCmdBaseV2ComponentCreationAction(
-    message("frc.new.class.profiledPidSubsystem.action.name"),
-    message("frc.new.class.profiledPidSubsystem.action.description"),
-    ProfiledPidSubsystem2ComponentCreationDataProvider
-                                                                                             )
+class ProfiledPidSubsystem2ComponentCreationAction :
+    AbstractCmdBaseV2ComponentCreationAction(ProfiledPidSubsystem2ComponentCreationDataProvider)
 {
     override fun constructCreateFrcComponentDialogInstance(module: Module, classCreator: ClassCreator, directory: PsiDirectory): FrcComponentCreationDialog
     {

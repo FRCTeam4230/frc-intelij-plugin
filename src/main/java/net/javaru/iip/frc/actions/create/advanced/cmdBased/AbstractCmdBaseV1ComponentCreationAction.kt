@@ -22,8 +22,8 @@ import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvid
 import net.javaru.iip.frc.wpilib.isVersion1CommandBaseLibAttached
 
 abstract class AbstractCmdBaseV1ComponentCreationAction
-    protected constructor(text: String?, description: String?, dataProvider: FrcComponentCreationDataProvider?) :
-        AbstractFrcComponentCreationAction(text!!, description!!, dataProvider!!)
+    protected constructor(dataProvider: FrcComponentCreationDataProvider?) :
+        AbstractFrcComponentCreationAction(dataProvider!!)
 {
     override fun shouldBeEnabledAdditionalCriteria(module: Module, e: AnActionEvent): Boolean
     {

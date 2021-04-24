@@ -57,8 +57,10 @@
         &nbsp;&nbsp;&bull; Added action link to "WPI Lib update available" notification to automatically update the gradle build file to use the new version<br>
         &nbsp;&nbsp;&bull; Some additional work towards migrating the FRC Plugin to be a dynamic plugin (i.e. restart of IDEA not required after upgrading FRC plugin).
         &nbsp;&nbsp;&bull; Refactorings to remove use of a number of methods and classes recently deprecated in the IntelliJ IDEA Plugin API.
-        &nbsp;&nbsp;&bull; Refactorings to remove use of of a couple of items recently marked as "Internal Use Only" in the IntelliJ IDEA Plugin API.
+        &nbsp;&nbsp;&bull; Refactorings to remove use of a few items recently marked as "Internal Use Only" in the IntelliJ IDEA Plugin API.
         &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/87'>issue #87</a>, FRC Tool Window name shows long name in 2020.3
+        &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/84'>issue #84</a>, WPI Lib root path not discovered on Mac or Linux
+        &nbsp;&nbsp;&bull; Resolves a corner case issue in the Command creation template in which the rules to determine if a Subsystem was a singleton or not were a bit too strict
         <br>
         <strong>v1.4.0</strong> <br>
         &nbsp;&nbsp;&bull; Support for IntelliJ IDEA v2020.2 and later only. See the

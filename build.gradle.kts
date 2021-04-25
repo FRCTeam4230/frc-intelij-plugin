@@ -271,7 +271,7 @@ repositories {
     maven("https://dl.bintray.com/jetbrains/intellij-plugin-service/") // older repo
     maven("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/intellij-plugin-verifier/intellij-plugin-structure")
     maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
-    maven("https://dl.bintray.com/asarkar/mvn") //for jsemver  TODO: Issue #93 - Need to migrate off bintray, and likely jsemver
+    maven("https://dl.bintray.com/asarkar/mvn") //for jsemver  TODO: Issue #93 - Need to migrate off bintray as it is being sunset, and likely jsemver
     maven("https://plugins.gradle.org/m2/")
     maven {
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")

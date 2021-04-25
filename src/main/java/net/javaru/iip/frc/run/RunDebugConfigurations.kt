@@ -74,7 +74,7 @@ fun createAllRunDebugConfigurations(project: Project, dataModel: FrcProjectWizar
             createTailSimulateJavaLogShellScriptRunConfiguration(project, isRomiTemplate)
         }
         // For now we will create both. A future enhancement can make this selectable in the wizard
-        createLaunchShuffleBoardRunConfiguration(project, dataModel.wpilibVersion)
+        createLaunchShuffleboardRunConfiguration(project, dataModel.wpilibVersion)
         createLaunchSmartDashboardRunConfiguration(project, dataModel.wpilibVersion)
     }
 
@@ -217,27 +217,43 @@ fun createTailSimulateJavaLogShellScriptRunConfiguration(project: Project, isRom
 }
 
 @JvmOverloads
-fun createLaunchShuffleBoardRunConfiguration(project: Project, wpiLibVersion: WpiLibVersion, activateToolWindow: Boolean = false,setAsShared: Boolean = true)
+fun createLaunchShuffleboardRunConfiguration(project: Project,
+                                             wpiLibVersion: WpiLibVersion,
+                                             activateToolWindow: Boolean = false,
+                                             setAsShared: Boolean = true,
+                                             setAsSelected: Boolean = false)
 {
     val jarPath = getWpiLibToolsPath(wpiLibVersion).resolve("shuffleboard.jar").toAbsolutePath().toString()
-    createJarApplicationRunConfiguration(project, "Launch Shuffleboard", jarPath, activateToolWindow, setAsShared)
+    createJarApplicationRunConfiguration(project, "Launch Shuffleboard", jarPath, activateToolWindow, setAsShared, setAsSelected)
 }
 
 @JvmOverloads
-fun createLaunchSmartDashboardRunConfiguration(project: Project, wpiLibVersion: WpiLibVersion, activateToolWindow: Boolean = false, setAsShared: Boolean = true)
+fun createLaunchSmartDashboardRunConfiguration(project: Project,
+                                               wpiLibVersion: WpiLibVersion,
+                                               activateToolWindow:
+                                               Boolean = false,
+                                               setAsShared: Boolean = true,
+                                               setAsSelected: Boolean = false)
 {
     val jarPath = getWpiLibToolsPath(wpiLibVersion).resolve("SmartDashboard.jar").toAbsolutePath().toString()
-    createJarApplicationRunConfiguration(project, "Launch SmartDashboard", jarPath, activateToolWindow, setAsShared)
+    createJarApplicationRunConfiguration(project, "Launch SmartDashboard", jarPath, activateToolWindow, setAsShared, setAsSelected)
 }
 
 @JvmOverloads
-fun createJarApplicationRunConfiguration(project: Project, runConfigName: String, jarPath: String, activateToolWindow: Boolean = false, setAsShared: Boolean = true)
+fun createJarApplicationRunConfiguration(project: Project,
+                                         runConfigName: String,
+                                         jarPath: String,
+                                         activateToolWindow: Boolean = false,
+                                         setAsShared: Boolean = true,
+                                         setAsSelected: Boolean = false)
 {
     try
     {
         val runManager = RunManager.getInstance(project)
         val configurationType = JarApplicationConfigurationType.getInstance()
         val runnerAndConfigurationSettings = runManager.createConfiguration(runConfigName, configurationType)
+        @Suppress("UNUSED_VARIABLE")
+        val nameWasChanged = runManager.setUniqueNameIfNeeded(runnerAndConfigurationSettings)
         val runConfiguration = runnerAndConfigurationSettings.configuration as JarApplicationConfiguration
 
         runConfiguration.jarPath = jarPath
@@ -261,6 +277,11 @@ fun createJarApplicationRunConfiguration(project: Project, runConfigName: String
         }
 
         runManager.addConfiguration(runnerAndConfigurationSettings)
+
+        if (setAsSelected)
+        {
+            runManager.selectedConfiguration = runnerAndConfigurationSettings
+        }
     }
     catch (e: Exception)
     {
@@ -362,7 +383,8 @@ class ModuleSettingAction(val remoteConfiguration: RemoteConfiguration, val proj
             logger.debug("[FRC] Main Module is available. Updating Configuration")
             remoteConfiguration.setModule(mainModule)
 
-        } else
+        }
+        else
         {
             logger.debug("[FRC] Main module is not available yet. Run Count: $count   modules: ${project.getModules()}")
             if (count <= 16)

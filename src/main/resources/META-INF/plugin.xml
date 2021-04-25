@@ -371,6 +371,16 @@
                     class="net.javaru.iip.frc.actions.tools.ShowRioLogUdpConsoleAction" />
         </group>
 
+        <group id="FRC.CreateRunConfigsActionGroup"
+               class="net.javaru.iip.frc.actions.FrcRunConfigCreationActionGroup"
+               popup="true">
+            <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="after" relative-to-action="frc.tools.CheckForWpiLibUpdateAction" />
+            <action id="FRC.crate.run.config.LaunchShuffleboard"
+                    class="net.javaru.iip.frc.actions.CreateLaunchShuffleboardRunConfigurationAction" />
+            <action id="FRC.crate.run.config.LaunchSmartDashboard"
+                    class="net.javaru.iip.frc.actions.CreateLaunchSmartDashboardRunConfigurationAction" />
+        </group>
+
         <group id="FRC.FrcInternalActionsGroup"
                class="net.javaru.iip.frc.actions.tools.internal.FrcInternalActionsGroup"
                popup="true"

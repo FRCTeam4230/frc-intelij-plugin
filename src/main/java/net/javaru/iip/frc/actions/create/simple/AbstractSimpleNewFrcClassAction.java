@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,30 +44,16 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 public abstract class AbstractSimpleNewFrcClassAction extends JavaCreateTemplateInPackageAction<PsiClass> implements DumbAware
 {
     protected static final Icon DEFAULT_ICON = FrcIcons.FRC.FIRST_ICON_MEDIUM_16;
+    
 
-
-    @SuppressWarnings("unused")
-    protected AbstractSimpleNewFrcClassAction(String text)
+    protected AbstractSimpleNewFrcClassAction(Icon icon)
     {
-        this(text, DEFAULT_ICON);
+        super(null, (String) null, icon, true);
     }
 
-
-    protected AbstractSimpleNewFrcClassAction(String text, Icon icon)
+    protected AbstractSimpleNewFrcClassAction(Icon icon, boolean inSourceOnly)
     {
-        this(text, text, icon, true);
-    }
-
-
-    protected AbstractSimpleNewFrcClassAction(String text, String description, Icon icon)
-    {
-        this(text, description, icon, true);
-    }
-
-
-    protected AbstractSimpleNewFrcClassAction(String text, String description, Icon icon, boolean inSourceOnly)
-    {
-        super(text, description, icon, inSourceOnly);
+        super(null, (String) null, icon, inSourceOnly);
     }
 
 

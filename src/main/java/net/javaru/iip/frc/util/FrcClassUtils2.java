@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -81,35 +81,48 @@ public class FrcClassUtils2
     
     
     @Contract("null -> false")
-    public static boolean isSingleton(@Nullable PsiClass aClass)
+    public static boolean isSingleton(@Nullable PsiClass psiClass)
     {
-        if (aClass == null || aClass.isInterface() || aClass instanceof PsiTypeParameter || aClass instanceof PsiAnonymousClass)
+        if (psiClass == null || psiClass.isInterface() || psiClass instanceof PsiTypeParameter || psiClass instanceof PsiAnonymousClass)
         {
             return false;
         }
-        if (aClass.isEnum())
+        if (psiClass.isEnum())
         {
-            if (!ControlFlowUtils.hasChildrenOfTypeCount(aClass, 1, PsiEnumConstant.class))
+            if (!ControlFlowUtils.hasChildrenOfTypeCount(psiClass, 1, PsiEnumConstant.class))
             {
                 return false;
             }
             // has at least on accessible instance method
-            return Arrays.stream(aClass.getMethods())
+            return Arrays.stream(psiClass.getMethods())
                          .anyMatch(m -> !m.isConstructor() && !m.hasModifierProperty(PsiModifier.PRIVATE) && !m.hasModifierProperty(PsiModifier.STATIC));
         }
-        if (getIfOnlyInvisibleConstructors(aClass).length == 0)
+        @NotNull PsiMethod[] invisibleConstructors = getConstructorsOnlyIfAllAreInvisible(psiClass);
+        if (invisibleConstructors.length == 0)
         {
             return false;
         }
-        final PsiField selfInstance = getIfOneStaticSelfInstance(aClass);
-        return selfInstance != null && newOnlyAssignsToStaticSelfInstance(getIfOnlyInvisibleConstructors(aClass)[0], selfInstance);
+        
+        final PsiField selfInstance = getIfOneStaticSelfInstance(psiClass);
+        // TODO: Consider improving the constructor check so that it allows for constructors that take args and assigns values to fields so long as the
+        //       the instance field is either ultimate assigned via the no args constructor.
+        //       For now, as long as all constructors are private, we'll consider it a singleton. This allows for a pattern where a no-arg constructor
+        //       calls one with args to allow for easier configuration changes via source code changes
+        // return selfInstance != null && newOnlyAssignsToStaticSelfInstance(invisibleConstructors, selfInstance);
+        return selfInstance != null;
     }
     
     
+    /**
+     * Returns an array of constrictors iff they are *all* invisible externally. If there is at
+     * least one externally visible constructor, an empty array is returned.
+     * @param psiClass the class to validate the constructors for
+     * @return an array of constrictors iff they are *all* invisible externally
+     */
     @NotNull
-    private static PsiMethod[] getIfOnlyInvisibleConstructors(PsiClass aClass)
+    private static PsiMethod[] getConstructorsOnlyIfAllAreInvisible(PsiClass psiClass)
     {
-        final PsiMethod[] constructors = aClass.getConstructors();
+        final PsiMethod[] constructors = psiClass.getConstructors();
         if (constructors.length == 0)
         {
             return PsiMethod.EMPTY_ARRAY;
@@ -130,11 +143,45 @@ public class FrcClassUtils2
     }
     
     
-    private static boolean newOnlyAssignsToStaticSelfInstance(PsiMethod method, final PsiField field)
+    /**
+     * Checks that that the provided constructor is a no-args constructor. Technically, in a singleton, there should only
+     * be one no-arg constructor. However, someone may want to have to have a secondary constructor that takes args that the
+     * no-args constructor calls, This allows for some configuration via code changes in the no-arg constructor by changing
+     * the parameters sent to the no-arg constructor.
+     *
+     * @param constructors   the constructors to validate
+     * @param instanceField the instance field in the class
+     *
+     * @return true iff the constructors only assign a value to an instance field and no other fields
+     */
+    private static boolean newOnlyAssignsToStaticSelfInstance(PsiMethod[] constructors, final PsiField instanceField)
     {
-        if (field instanceof LightElement) return true;
-        final Query<PsiReference> search = MethodReferencesSearch.search(method, field.getUseScope(), false);
-        final NewOnlyAssignedToFieldProcessor processor = new NewOnlyAssignedToFieldProcessor(field);
+        for (PsiMethod constructor : constructors)
+        {
+            if (!newOnlyAssignsToStaticSelfInstance(constructor, instanceField))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    
+    /**
+     * Checks that that the provided constructor is a no-args constructor. Technically, in a singleton, there should only
+     * be one no-arg constructor. However, someone may want to have to have a secondary constructor that takes args that the
+     * no-args constructor calls, This allows for some configuration via code changes in the no-arg constructor by changing
+     * the parameters sent to the no-arg constructor.
+     *
+     * @param constructor the constructor to validate
+     * @param instanceField the instance field in the class
+     * @return true iff the constructor only assigns a value to an instance field and no other fields
+     */
+    private static boolean newOnlyAssignsToStaticSelfInstance(PsiMethod constructor, final PsiField instanceField)
+    {
+        if (instanceField instanceof LightElement) return true;
+        final Query<PsiReference> search = MethodReferencesSearch.search(constructor, instanceField.getUseScope(), false);
+        final NewOnlyAssignedToFieldProcessor processor = new NewOnlyAssignedToFieldProcessor(instanceField);
         search.forEach(processor);
         return processor.isNewOnlyAssignedToField();
     }

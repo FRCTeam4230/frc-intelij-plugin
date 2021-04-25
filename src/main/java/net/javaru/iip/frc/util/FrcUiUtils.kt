@@ -34,7 +34,7 @@ import com.intellij.uiDesigner.core.GridConstraints
 import com.intellij.uiDesigner.core.GridLayoutManager
 import com.intellij.uiDesigner.core.Spacer
 import net.javaru.iip.frc.i18n.FrcBundle.message
-import net.javaru.iip.frc.ui.IconAndLabelButton
+import net.javaru.iip.frc.ui.ButtonWithIconAndText
 import org.intellij.lang.annotations.Language
 import java.awt.Component
 import java.awt.Container
@@ -58,6 +58,9 @@ import javax.swing.text.JTextComponent
 private object FrcUiUtils
 
 private val LOG = Logger.getInstance(FrcUiUtils::class.java)
+
+enum class Position
+{ Before, After }
 
 /**
  * Sets the `isEnabled` property on all components of a panel.
@@ -296,7 +299,6 @@ fun findAllUsedMnemonics(component: Component?, mnemonics: MutableSet<Char>, con
     }
 }
 
-
 fun <T> calculateMnemonics(topComponent: JComponent?, elements: Collection<T>, getNameFunction: (T) -> String?): Map<T, Char> = calculateMnemonics(elements, findAllUsedMnemonics(topComponent), getNameFunction)
 
 fun <T> calculateMnemonics(elements: Collection<T>, unavailableMnemonics: Set<Char>, getNameFunction: (T) -> String?): MutableMap<T, Char>
@@ -529,7 +531,7 @@ fun <T : AbstractButton> initClassSelectionPanel(topComponent: JComponent,
                 {
                     // Although psiClass.getIcon would probably never return null, we default to the emptyNode Icon just in case.
                     val icon =  psiClass.getIcon(0) ?: AllIcons.Nodes.EmptyNode // for flags, we could use: getIcon(Iconable.ICON_FLAG_VISIBILITY or Iconable.ICON_FLAG_READ_STATUS)
-                    val xButton = IconAndLabelButton(optionButton, icon, text)
+                    val xButton = ButtonWithIconAndText.createForButtonWithoutText(optionButton, icon, text)
                     xButton.toolTipText = psiClass.qualifiedName
                     if (mnemonic != null)
                     {
@@ -553,3 +555,16 @@ fun <T : AbstractButton> initClassSelectionPanel(topComponent: JComponent,
     }
     return mapBuilder.build()
 }
+
+
+/**
+ * Remove the opening and closing html tags (if present) from a string. If the receiver
+ * String is null, an empty string is returned. The HTML tags must be all lowercase or
+ * all uppercase. And must be the first and last things in the String
+ */
+fun String?.removeHtmlTags(): String =
+    this?.trim()
+        ?.removePrefix("<html>")
+        ?.removePrefix("<HTML>")
+        ?.removeSuffix("</html>")
+        ?.removeSuffix("</HTML>") ?: ""

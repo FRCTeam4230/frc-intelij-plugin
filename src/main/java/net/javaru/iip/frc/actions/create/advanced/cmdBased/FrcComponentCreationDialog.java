@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,6 +41,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiNameHelper;
 import com.intellij.psi.PsiPackage;
+import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.components.JBTextField;
@@ -85,10 +86,10 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
     private JPanel myTopPanel;
     private JBLabel myComponentNameLabel;
     protected JBTextField myComponentNameTextField;
-    protected JCheckBox myAutoAppendComponentTypeCheckBox;
+    protected JBCheckBox myAutoAppendComponentTypeCheckBox;
     private JPanel myMajorOptionsPanel;
     private JPanel mySuperClassPanel;
-    private JCheckBox myIncludeJavaDocCheckBox;
+    private JBCheckBox myIncludeJavaDocCheckBox;
     private JPanel myMinorOptionsPanel;
     
     

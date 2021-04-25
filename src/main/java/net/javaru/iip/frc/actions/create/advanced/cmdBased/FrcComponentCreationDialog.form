@@ -28,7 +28,7 @@
         </constraints>
         <properties/>
       </component>
-      <component id="2159a" class="javax.swing.JCheckBox" binding="myAutoAppendComponentTypeCheckBox">
+      <component id="2159a" class="com.intellij.ui.components.JBCheckBox" binding="myAutoAppendComponentTypeCheckBox">
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
         </constraints>
@@ -54,7 +54,7 @@
         <border type="none"/>
         <children/>
       </grid>
-      <component id="70e7a" class="javax.swing.JCheckBox" binding="myIncludeJavaDocCheckBox">
+      <component id="70e7a" class="com.intellij.ui.components.JBCheckBox" binding="myIncludeJavaDocCheckBox">
         <constraints>
           <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
         </constraints>

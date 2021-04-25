@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +27,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.PsiElementProcessor
 import com.intellij.psi.search.PsiElementProcessorAdapter
 import com.intellij.psi.search.searches.ClassInheritorsSearch
+import com.intellij.util.containers.map2Array
 import net.javaru.iip.frc.i18n.FrcBundle
 import org.jetbrains.annotations.Contract
 import java.util.*
@@ -37,8 +38,25 @@ object FindClassUtils{}
 private val LOG = Logger.getInstance(FindClassUtils::class.java)
 
 
+enum class ClassDeduplicationMethodology
+{
+    /** Indicates no de-duplication will occur. */
+    None,
+    /** Strict deduplication done based on the content of the found class. */
+    Content,
+    /** Looser deduplication done based solely on the full qualified name of the class. */
+    FullyQualifiedName;
+}
+
+/**
+ * Finds class by its fully qualified name, within the project, optionally
+ * performing deduplication on the array. Deduplication is needed in rare
+ * corner cases, including the presence of symbolic links to the gradle caches
+ * on some systems, or the class being contained in two different libraries.
+ */
 @Contract("null, _ -> !null; !null, null -> !null")
-fun findClass(project: Project?, fqn: String?): Array<PsiClass?>
+@JvmOverloads
+fun findClass(project: Project?, fqn: String?, deduplicationMethodology: ClassDeduplicationMethodology = ClassDeduplicationMethodology.Content): Array<PsiClass?>
 {
     if (project == null || fqn == null)
     {
@@ -46,7 +64,84 @@ fun findClass(project: Project?, fqn: String?): Array<PsiClass?>
     }
     val scope = GlobalSearchScope.allScope(project)
     val facade = JavaPsiFacade.getInstance(project)
-    return facade.findClasses(fqn, scope)
+    val classes = facade.findClasses(fqn, scope)
+    return classes.deduplicate(deduplicationMethodology)
+}
+
+fun Array<PsiClass?>.deduplicate(methodology: ClassDeduplicationMethodology): Array<PsiClass?>
+{
+    return when (methodology)
+    {
+        ClassDeduplicationMethodology.None               -> this
+        ClassDeduplicationMethodology.Content            -> this.deduplicate { psiClass -> ContentBasedPsiClassWrapper(psiClass) }
+        ClassDeduplicationMethodology.FullyQualifiedName -> this.deduplicate { psiClass -> QualifiedNamePsiClassWrapper(psiClass) }
+    }
+}
+
+private fun Array<PsiClass?>.deduplicate(wrap: (psiClass: PsiClass) -> PsiClassWrapper): Array<PsiClass?>
+{
+    val set: MutableSet<PsiClassWrapper> = TreeSet()
+    for (psiClass in this)
+    {
+        if (psiClass != null)
+        {
+            set.add(wrap.invoke(psiClass))
+        }
+    }
+    return set.map2Array { it.psiClass }
+}
+
+private abstract class PsiClassWrapper(val psiClass: PsiClass): Comparable<PsiClassWrapper>
+{
+    override fun compareTo(other: PsiClassWrapper): Int
+    {
+        val thisQN = psiClass.qualifiedName
+        val thatQN = other.psiClass.qualifiedName
+        if (thisQN == null && thatQN == null) return 0
+        if (thisQN == null && thatQN != null) return -1
+        if (thisQN != null && thatQN == null) return 1
+        if (thisQN != null && thatQN != null) return thisQN.compareTo(thatQN)
+        return 0
+    }
+}
+
+private class ContentBasedPsiClassWrapper(psiClass: PsiClass):PsiClassWrapper(psiClass)
+{
+    override fun equals(other: Any?): Boolean
+    {
+        return try
+        {
+            if (other == null) return false
+            if (other !is PsiClassWrapper) return false
+            val thisContent = String(psiClass.containingFile.virtualFile.contentsToByteArray())
+            val thatContent = String(other.psiClass.containingFile.virtualFile.contentsToByteArray())
+            thisContent == thatContent
+        }
+        catch (e: Exception)
+        {
+            false
+        }
+    }
+
+    override fun hashCode(): Int
+    {
+        return psiClass::javaClass.hashCode()
+    }
+}
+
+private class QualifiedNamePsiClassWrapper(psiClass: PsiClass) : PsiClassWrapper(psiClass)
+{
+    override fun equals(other: Any?): Boolean
+    {
+        if (other == null) return false
+        if (other !is PsiClassWrapper) return false
+        return psiClass.qualifiedName.equals(other.psiClass.qualifiedName)
+    }
+
+    override fun hashCode(): Int
+    {
+        return psiClass::javaClass.hashCode()
+    }
 }
 
 fun findClassAssumeOneIfAny(project: Project?, fqn: String?): PsiClass?

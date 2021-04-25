@@ -17,6 +17,6 @@
     "**/.settings": true,
     "**/.factorypath": true,
     "**/*~": true
-  }<#if data.isRomiRobot()>,
+  }<#if data.isRomiRobotTemplate()>,
   "wpilib.skipSelectSimulateExtension": true</#if>
 }

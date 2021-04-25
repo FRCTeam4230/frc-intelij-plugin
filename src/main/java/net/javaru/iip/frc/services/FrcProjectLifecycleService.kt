@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2021 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ import com.intellij.facet.Facet
 import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetManagerAdapter
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
@@ -30,6 +31,7 @@ import com.intellij.openapi.project.ModuleListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootListener
 import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.util.messages.MessageBusConnection
 import net.javaru.iip.frc.facet.isFrcFacet
 import net.javaru.iip.frc.facet.isFrcFacetedModule
@@ -38,6 +40,7 @@ import net.javaru.iip.frc.notify.FrcNotificationsTracker
 import net.javaru.iip.frc.notify.notifyToConfigureTeamNumIfNecessary
 import net.javaru.iip.frc.riolog.RioLogProjectService
 import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService
+import net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor
 import net.javaru.iip.frc.settings.FrcProjectTeamNumberService
 
 
@@ -78,6 +81,15 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
             checkLegacyIssue8Refresh(project)
             //RioLogProjectService.getInstance(project).activateTcp()
             RioLogProjectService.getInstance(project).update()
+
+            // TODO Move into the RioLogProjectService so the update method takes a setting if we should open or not
+            val includeDesktopSupport = FrcGradleService.getInstance(project).isIncludeDesktopSupport() ?: false
+            if (includeDesktopSupport)
+            {
+                invokeLater {
+                    ToolWindowManager.getInstance(project).getToolWindow(FrcRioLogToolWindowExecutor.FRC_RIO_LOG_TOOL_WINDOW_ID)?.hide()
+                }
+            }
 
             // initialize the registering of the VFS Change Listener so we can detect changes to the project team number
             FrcProjectTeamNumberService.getInstance(project)

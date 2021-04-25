@@ -37,7 +37,10 @@ import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.ui.ContextHelpLabel;
+import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.lang.JavaVersion;
 
@@ -49,6 +52,7 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.settings.FrcTeamNumberKt;
 import net.javaru.iip.frc.settings.TeamNumberFormChangeListener;
 import net.javaru.iip.frc.settings.TeamNumberKeyChangeListener;
+import net.javaru.iip.frc.ui.ButtonAndLabelSynchronizer;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
 import net.javaru.iip.frc.util.FrcPsiNameHelper;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
@@ -59,6 +63,7 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 
 
+@SuppressWarnings({"FieldCanBeLocal", "unused" })
 public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements TeamNumberFormChangeListener
 {
     private static final Logger LOG = Logger.getInstance(FrcProjectSettingsWizardStep.class);
@@ -73,29 +78,60 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     private final FrcParentProjectForm myParentProjectForm;
     
     private JPanel rootPanel;
-    private JPanel robotDetailsPanel;
+    private JPanel teamEntryNumberPanel;
+    private JBLabel teamNumberLabel;
     private JBTextField teamNumberTextField;
-    private JPanel nextPanelToBeRenamed;
+    private JBLabel teamNumberWarningIconLabel;
+    private JPanel packageEntryPanel;
     private JBLabel basePackageLabel;
     private JBTextField basePackageTextField;
     private JButton basePackageDefaultButton;
-    private JBLabel teamNumberWarningIconLabel;
-    private JCheckBox enableDesktopSupportCheckBox;
-    private JCheckBox includeVsCodeConfigsCheckBox;
     private JBLabel basePackageWarningLabel;
-    private JPanel gitignorePanel;
-    private JCheckBox includeGitignoreFileCheckBox;
+    private JPanel generalSettingsPanel;
+    private JPanel generalOptionsPanel;
+    private JPanel desktopSupportPanel;
+    private JBCheckBox enableDesktopSupportCheckBox;
+    private JBLabel enableDesktopSupportCheckBoxLabel;
+    private JPanel vsCodeOptionsPanel;
+    private ContextHelpLabel desktopSupportContextHelpLabel;
+    private JBLabel enableDesktopSupportWarningMessage;
+    private JBCheckBox includeVsCodeConfigsCheckBox;
+    private JBLabel includeVsCodeConfigsCheckBoxLabel;
+    private ContextHelpLabel includeVsCodeContextHelpLabel;
+    private JPanel gitPanel;
+    private JPanel gitIgnorePanel;
+    private JBCheckBox includeGitignoreFileCheckBox;
+    private JBLabel includeGitignoreFileCheckBoxLabel;
     private JButton configureGitignoreButton;
+    private JPanel includeGitIgnoreFileOptionPanel;
+    private JPanel includeVsCodeConfigsOptionPanel;
+    private JPanel enableDesktopSupportOptionPanel;
     private JPanel junitPanel;
-    private JCheckBox junitCheckBox;
-    private JRadioButton junit5RadioButton;
-    private JRadioButton junit5withVintageRadioButton;
-    private JRadioButton junit4RadioButton;
+    private JPanel includeJunitSupportOptionPanel;
+    private JBCheckBox includeJunitSupportCheckBox;
+    private JBLabel includeJunitSupportCheckBoxLabel;
+    private JBRadioButton junit5RadioButton;
+    private JBRadioButton junit5withVintageRadioButton;
+    private JBRadioButton junit4RadioButton;
     private JPanel gradlePanel;
-    private JBLabel gradleLabel;
-    private JRadioButton groovyDslRadioButton;
-    private JRadioButton kotlinDslRadioButton;
+    private JPanel gradleDslPanel;
+    private JBLabel gradleDslLabel;
+    private JBRadioButton groovyDslRadioButton;
+    private JBLabel groovyDslRadioButtonLabel;
+    private JBRadioButton kotlinDslRadioButton;
+    private JBLabel kotlinDslRadioButtonLabel;
+    private JPanel groovyDslSupportOptionPanel;
+    private JPanel kotlinDslSupportOptionPanel;
     
+    
+    private ButtonAndLabelSynchronizer<JBCheckBox> enableDesktopSupportOption;
+    private ButtonAndLabelSynchronizer<JBCheckBox> includeVsCodeConfigsOption;
+    private ButtonAndLabelSynchronizer<JBCheckBox> includeGitIgnoreFileOption;
+    private ButtonAndLabelSynchronizer<JBCheckBox> includeJunitSupportOption;
+    private ButtonAndLabelSynchronizer<JBRadioButton> groovyDslSupportOption;
+    private ButtonAndLabelSynchronizer<JBRadioButton> kotlinDslSupportOption;
+    
+    private boolean userHasModifiedDesktopSupport = false;
     
     public FrcProjectSettingsWizardStep(@NotNull FrcModuleBuilder builder, @NotNull WizardContext context)
     {
@@ -113,25 +149,31 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     private void initComponents()
     {
         LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.initComponents()");
- //       myAddToPanel.add(myParentProjectForm.getComponent());
+        initOptionSynchronizers();
+    
+        // TODO add this Action Listener to any components that need to take action upon updating
         ActionListener updatingListener = e -> updateComponents();
-        // TODO add the Action Listener to any components that need to take action upon updating
-        
        
         initTeamNumberField();
         final FrcProjectWizardData dataModel = myBuilder.getDataModel();
         
         FrcUiUtilsKt.setTextIfEmpty(basePackageTextField, dataModel.getBasePackage());
         basePackageWarningLabel.setVisible(false);
-        FrcUiUtilsKt.addTextChangedListener(basePackageTextField, text -> { basePackageWarningLabel.setVisible(StringUtils.isBlank(text));
+        FrcUiUtilsKt.addTextChangedListener(basePackageTextField, text -> {
+            basePackageWarningLabel.setVisible(StringUtils.isBlank(text));
             return Unit.INSTANCE;
         });
         basePackageDefaultButton.addActionListener(e -> basePackageTextField.setText(FrcProjectWizardDataKt.DEFAULT_BASE_PACKAGE));
         includeVsCodeConfigsCheckBox.setSelected(dataModel.getIncludeVsCodeConfigs());
         enableDesktopSupportCheckBox.setSelected(dataModel.getEnableDesktopSupport());
-        updateEnableDesktopSupportVisibility();
+        updateEnableDesktopSupportOptions();
+        updateDesktopSupportWarningVisibility();
+        // We use an ActionListener and not a ChangeListener as we only want to catch a user initiated change. ChangeListener is fired is we programmatically change the value
+        enableDesktopSupportCheckBox.addActionListener(e -> userHasModifiedDesktopSupport = true);
+        enableDesktopSupportCheckBox.addChangeListener(e -> updateDesktopSupportWarningVisibility());
+        
         includeGitignoreFileCheckBox.setSelected(dataModel.getGitIgnoreConfiguration().getIncludeGitIgnoreFile());
-        includeGitignoreFileCheckBox.addActionListener(e -> {dataModel.getGitIgnoreConfiguration().setIncludeGitIgnoreFile(includeGitignoreFileCheckBox.isSelected());});
+        includeGitignoreFileCheckBox.addActionListener(e -> dataModel.getGitIgnoreConfiguration().setIncludeGitIgnoreFile(includeGitignoreFileCheckBox.isSelected()));
         configureGitignoreButton.setEnabled(dataModel.getGitIgnoreConfiguration().getIncludeGitIgnoreFile());
         includeGitignoreFileCheckBox.addChangeListener(e -> configureGitignoreButton.setEnabled(includeGitignoreFileCheckBox.isSelected()));
         configureGitignoreButton.addActionListener(e -> displayGitIgnoreConfigurationDialog());
@@ -140,7 +182,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         junit5withVintageRadioButton.setActionCommand(JUnitOption.JUnit5withVintage.name());
         junit4RadioButton.setActionCommand(JUnitOption.JUnit4.name());
         
-        junitCheckBox.setSelected(dataModel.getIncludeJUnitSupport());
+        includeJunitSupportCheckBox.setSelected(dataModel.getIncludeJUnitSupport());
         junit5RadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
         junit5withVintageRadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
         junit4RadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
@@ -169,8 +211,8 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         junit5withVintageRadioButton.addItemListener(junitVersionOptionChangeListener);
         junit4RadioButton.addItemListener(junitVersionOptionChangeListener);
     
-        junitCheckBox.addChangeListener(e -> {
-            dataModel.setIncludeJUnitSupport(junitCheckBox.isSelected());
+        includeJunitSupportCheckBox.addChangeListener(e -> {
+            dataModel.setIncludeJUnitSupport(includeJunitSupportCheckBox.isSelected());
             junit5RadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
             junit5withVintageRadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
             junit4RadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
@@ -207,6 +249,20 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     }
     
     
+    
+    
+    
+    private void initOptionSynchronizers()
+    {
+        enableDesktopSupportOption = new ButtonAndLabelSynchronizer<>(enableDesktopSupportOptionPanel, enableDesktopSupportCheckBox, enableDesktopSupportCheckBoxLabel);
+        includeVsCodeConfigsOption = new ButtonAndLabelSynchronizer<>(includeVsCodeConfigsOptionPanel, includeVsCodeConfigsCheckBox, includeVsCodeConfigsCheckBoxLabel);
+        includeGitIgnoreFileOption = new ButtonAndLabelSynchronizer<>(includeGitIgnoreFileOptionPanel, includeGitignoreFileCheckBox, includeGitignoreFileCheckBoxLabel);
+        includeJunitSupportOption = new ButtonAndLabelSynchronizer<>(includeJunitSupportOptionPanel, includeJunitSupportCheckBox, includeJunitSupportCheckBoxLabel);
+        groovyDslSupportOption = new ButtonAndLabelSynchronizer<>(groovyDslSupportOptionPanel, groovyDslRadioButton, groovyDslRadioButtonLabel);
+        kotlinDslSupportOption = new ButtonAndLabelSynchronizer<>(kotlinDslSupportOptionPanel, kotlinDslRadioButton, kotlinDslRadioButtonLabel);
+    }
+    
+    
     private void displayGitIgnoreConfigurationDialog()
     {
     
@@ -224,7 +280,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     private void initTeamNumberField()
     {
         // We may need to update this when the team number changed from an application setting to a project setting
-        FrcUiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getDataModel().getTeamNumber()));
+        FrcUiUtilsKt.setTextIfEmpty(teamNumberTextField, myBuilder.getDataModel().getTeamNumberAsStringOrEmptyString());
         updateTeamNumberWarningVisibility(FrcTeamNumberKt.isValidTeamNumber(teamNumberTextField.getText()));
         // The TeamNumberKeyChangeListener calls the 'onTeamNumberFormChange' method upon changes to the team number text field
         teamNumberTextField.addKeyListener(new TeamNumberKeyChangeListener(teamNumberTextField, this));
@@ -247,6 +303,10 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         {
             teamNumberWarningIconLabel.setVisible(false);         
             LOG.warn("[FRC] could not update team number warning icon visibility due to an exception: " + e.toString());
+        }
+        if ("0".equals(teamNumberTextField.getText()))
+        {
+            teamNumberTextField.setText("");
         }
     }
     
@@ -304,14 +364,20 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     @Override
     public JComponent getPreferredFocusedComponent()
     {
-        return teamNumberTextField;
+        if (!FrcTeamNumberKt.isValidTeamNumber(teamNumberTextField.getText()))
+        {
+            return teamNumberTextField;
+        }
+        else
+        {
+            return basePackageTextField;
+        }
     }
     
     
     @Override
     public JComponent getComponent()
     {
-        // return new JLabel("A placeholder. New Project Form will go here :)");
         return rootPanel;
     }
     
@@ -336,7 +402,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
             }
             catch (NumberFormatException e)
             {
-                LOG.warn("[FRC] Could not parse configured team number of '" + teamNumberTextField.getText() + "' despite it having just passed validation." );
+                LOG.warn("[FRC] Could not parse configured team number of '" + teamNumberTextField.getText() + "' despite it having just passed validation.");
             }
             final TeamNumberDialogWrapper dialogWrapper = new TeamNumberDialogWrapper(rootPanel, projectTeamNumber);
             final boolean ok = dialogWrapper.showAndGet();
@@ -379,9 +445,6 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     }
     
     
-    
-    
-    
     private JavaVersion determineJavaVersion()
     {
         @Nullable
@@ -407,9 +470,6 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     }
     
     
-    
-    
-    
     @Override
     public void updateStep()
     {
@@ -417,7 +477,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
 //        ProjectData parentProject = myParentProjectForm.getParentProject();
 //        ProjectId projectId = myBuilder.getProjectId();
         
-        FrcUiUtilsKt.setTextIfEmpty(teamNumberTextField, Integer.toString(myBuilder.getDataModel().getTeamNumber()));
+        FrcUiUtilsKt.setTextIfEmpty(teamNumberTextField, myBuilder.getDataModel().getTeamNumberAsStringOrEmptyString());
         
         updateComponents();
         LOG.trace("[FRC] Exiting FrcProjectSettingsWizardStep.updateStep()");
@@ -470,15 +530,30 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     {
         LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.updateComponents()");
         //final FrcProjectWizardData dataModel = myBuilder.getDataModel();
-        updateEnableDesktopSupportVisibility();
+        updateEnableDesktopSupportOptions();
+        updateDesktopSupportWarningVisibility();
         myParentProjectForm.updateComponents();
         LOG.trace("[FRC] Exiting FrcProjectSettingsWizardStep.updateComponents()");
     }
     
-    private void updateEnableDesktopSupportVisibility()
+    
+    private void updateEnableDesktopSupportOptions()
     {
-        enableDesktopSupportCheckBox.setVisible(myBuilder.getDataModel().getWpilibVersion().getFrcYear() >= 2021);
+        final FrcProjectWizardData dataModel = myBuilder.getDataModel();
+        
+        enableDesktopSupportCheckBox.setVisible(dataModel.getWpilibVersion().getFrcYear() >= 2021);
+        if (!userHasModifiedDesktopSupport)
+        {
+            enableDesktopSupportCheckBox.setSelected(dataModel.isRomiRobotTemplate());
+        }
     }
+    
+    
+    private void updateDesktopSupportWarningVisibility()
+    {
+        enableDesktopSupportWarningMessage.setVisible(myBuilder.getDataModel().isRomiRobotTemplate() && !enableDesktopSupportCheckBox.isSelected());
+    }
+    
     
     @Override
     public Icon getIcon()
@@ -501,5 +576,15 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         Disposer.dispose(myParentProjectForm);
     }
     
-    
+    private void createUIComponents()
+    {
+        // WEHen titles are added, the main content shows in a lighter colored font. Since the titles aren't really needed, we are commenting... at least for now
+        desktopSupportContextHelpLabel = ContextHelpLabel.create(
+           /* message("frc.ui.wizard.projectSettingsStep.enableDesktopSupport.contextHelpLabel.title"),*/
+            message("frc.ui.wizard.projectSettingsStep.enableDesktopSupport.contextHelpLabel.text"));
+        
+        includeVsCodeContextHelpLabel = ContextHelpLabel.create(
+            /*message("frc.ui.wizard.projectSettingsStep.includeVsCodeConfigs.contextHelpLabel.title"),*/
+            message("frc.ui.wizard.projectSettingsStep.includeVsCodeConfigs.contextHelpLabel.text"));
+    }
 }

@@ -70,7 +70,9 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 
 import icons.FrcIcons;
+import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor;
+import net.javaru.iip.frc.services.FrcGradleService;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 
 
@@ -156,7 +158,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                                                             invokeClearAll();
                                                             myProcessHandler.waitFor(2000L);
                                                             run(false);
-                                                            ensureContentIsPinned();
+                                                            // Commenting out for now as it is causing issues
+                                                            //ensureContentIsPinned();
                                                         });
     }
 
@@ -565,6 +568,24 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         Disposer.dispose(this);
         LOG.debug("[FRC] Disposing of " + getClass().getSimpleName() + " complete.");
     }
+    
+    
+    @NotNull
+    protected StringBuffer createRioLogMessage()
+    {
+        StringBuffer message =
+            new StringBuffer("\n")
+                .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line1"))
+                .append("\n")
+                .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line2"))
+                .append("\n");
+        Boolean includeDesktopSupport = FrcGradleService.Companion.getInstance(myProject).isIncludeDesktopSupport();
+        if (includeDesktopSupport != null && includeDesktopSupport)
+        {
+            message.append(FrcBundle.message("frc.riolog.first.start.message.tcp.line3")).append("\n");
+        }
+        return message;
+    }
 
 
     //Taken from com.intellij.execution.configurations.CommandLineState - need to modify to use in this class
@@ -643,15 +664,25 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         {
             ApplicationManager.getApplication().invokeLater(() ->
                                                             {
-                                                                rioLogMonitorProcess.stop();
+                                                                // There's a corner case of at least the myProcessHandler being null when
+                                                                // the dynamic plugin is unloaded/disabled while an FRC project is open
+                                                                if (rioLogMonitorProcess != null)
+                                                                {
+                                                                    rioLogMonitorProcess.stop();
+                                                                }
                                                                 
-                                                                myProcessHandler.destroyProcess();
+                                                                if (myProcessHandler != null)
+                                                                {
+                                                                    myProcessHandler.destroyProcess();
+                                                                }
+                                                                
                                                                 if (getRioLogMonitorProcess() != null)
                                                                 {
                                                                     getRioLogMonitorProcess().monitoringStopped();
                                                                 }
                                                                 update(event);
-                                                                ensureContentIsPinned();
+                                                                // Commenting out for now as it is causing issues
+                                                                //ensureContentIsPinned();
                                                             });
         }
 

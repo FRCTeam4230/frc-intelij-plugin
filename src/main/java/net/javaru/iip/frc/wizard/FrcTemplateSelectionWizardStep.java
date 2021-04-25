@@ -136,7 +136,10 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     
         // add the Action Listener to any components that need to take action upon updating
         // ActionListener updatingListener = e -> updateComponents();
-
+    
+        // Enable copyable so that html links are clickable. But first need to set to allow auto wrapping
+        templateDescriptionLabel.setAllowAutoWrapping(true);
+        templateDescriptionLabel.setCopyable(true);
         initTabPane();
         initTemplatesLists();
         initTemplateLanguageOption();
@@ -157,8 +160,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     
     private void loadSettings()
     {
-        // TODO: might be nice to load "primary" team number, or last used team number
-        
+    
     }
     
     
@@ -516,8 +518,8 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         }
         else 
         {
-            templateDescriptionLabel.setText("");
-            LOG.debug("[FRC] selectedTemplate was null. Template description set to empty string.");
+            templateDescriptionLabel.setText(message("frc.ui.wizard.templateSelectionStep.templateDescriptionLabel.default.text"));
+            LOG.debug("[FRC] selectedTemplate was null. Template description set default string.");
         }
     }
     

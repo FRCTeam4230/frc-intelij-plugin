@@ -421,7 +421,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 LOG.trace("[FRC] scheduling run configuration creation to runWhenProjectIsInitialized.")
                 StartupManager.getInstance(project).runWhenProjectIsInitialized {
                             LOG.trace("[FRC] run configuration creation lambda called")
-                            createAllRunDebugConfigurations(project, dataModel.teamNumber)
+                            createAllRunDebugConfigurations(project, dataModel)
                             LOG.trace("[FRC] reimporting gradle project")
                             // reimport gradle project so the run configurations show in the gradle tool window
                             project.reimportGradleProject()
@@ -431,7 +431,6 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             }
             LOG.trace("[FRC] gradle import prep completed")
         }
-
     }
 
 

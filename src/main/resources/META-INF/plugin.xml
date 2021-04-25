@@ -55,7 +55,14 @@
     <change-notes><![CDATA[
         <strong>v1.5.0</strong> <br>
         &nbsp;&nbsp;&bull; Added action link to "WPI Lib update available" notification to automatically update the gradle build file to use the new version<br>
-        &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/87'>issue #87</a>, FRC Tool Window name shows long name in 2020.3
+        &nbsp;&nbsp;&bull; Improved Romi projects support in New Project Wizard. It now creates some additional Romi specific Run Configurations including
+                           Shuffleboard and Smart Dashboard launch configs, and on Mac &amp; Linux a run config for tailing the 'simulateJava.log' file.<br>
+        &nbsp;&nbsp;&bull; Some additional work towards migrating the FRC Plugin to be a dynamic plugin (i.e. restart of IDEA not required after upgrading FRC plugin).<br>
+        &nbsp;&nbsp;&bull; Refactorings to remove use of a number of methods and classes recently deprecated in the IntelliJ IDEA Plugin API.<br>
+        &nbsp;&nbsp;&bull; Refactorings to remove use of a few items recently marked as "Internal Use Only" in the IntelliJ IDEA Plugin API.<br>
+        &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/87'>issue #87</a>, FRC Tool Window name shows long name in 2020.3<br>
+        &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/84'>issue #84</a>, WPI Lib root path not discovered on Mac or Linux<br>
+        &nbsp;&nbsp;&bull; Resolves a corner case issue in the Command creation template in which the rules to determine if a Subsystem was a singleton or not were a bit too strict<br>
         <br>
         <strong>v1.4.0</strong> <br>
         &nbsp;&nbsp;&bull; Support for IntelliJ IDEA v2020.2 and later only. See the
@@ -148,6 +155,7 @@
     <depends>com.intellij.modules.java</depends>
     <depends>com.intellij.gradle</depends>
     <depends>org.intellij.groovy</depends>
+    <depends>com.jetbrains.sh</depends>
     <!--<depends>AntSupport</depends>-->
 
     <!-- Optional dependency on another plugin.
@@ -166,6 +174,10 @@
     <!-- Resource bundle from which the text of plugin descriptions, action names and etc. will be loaded -->
     <resource-bundle>i18n.FrcPluginConfigBundle</resource-bundle>
 
+
+    <applicationListeners>
+        <listener class="net.javaru.iip.frc.plugin.FrcAppLifecycleListener" topic="com.intellij.ide.AppLifecycleListener" activeInHeadlessMode="false" />
+    </applicationListeners>
 
 
     <!-- Extension points defined by the plugin. Extension points are registered by a plugin so that other plugins can
@@ -230,6 +242,7 @@
 
         <projectService id="FRC.FrcProjectLifecycleService" serviceImplementation="net.javaru.iip.frc.services.FrcProjectLifecycleService"  />
         <postStartupActivity id="FRC.FrcProjectLifecycleServiceStartupActivity" implementation="net.javaru.iip.frc.services.FrcProjectLifecycleServiceStartupActivity"  />
+        <projectService id="FRC.FrcGradleService" serviceImplementation="net.javaru.iip.frc.services.FrcGradleService" />
         <projectService id="FRC.TcpRioSocketConnectorProjectService" serviceImplementation="net.javaru.iip.frc.riolog.tcp.TcpRioSocketConnectorProjectService" />
         <projectService id="FRC.FrcProjectTeamNumberService" serviceImplementation="net.javaru.iip.frc.settings.FrcProjectTeamNumberService" />
         <projectService id="FRC.FrcProjectSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcProjectGeneralSettings" />
@@ -277,17 +290,6 @@
     <extensions defaultExtensionNs="JavaScript.JsonSchema">
         <ProviderFactory implementation="net.javaru.iip.frc.wpilib.jsonSchema.WpiLibJsonSchemaProviderFactory" />
     </extensions>
-
-
-
-    <application-components>
-        <!-- Add your application components here -->
-        <component>
-            <interface-class>net.javaru.iip.frc.components.FrcApplicationComponent</interface-class>
-            <implementation-class>net.javaru.iip.frc.components.FrcApplicationComponentImpl</implementation-class>
-        </component>
-    </application-components>
-
 
 
     <actions>
@@ -342,7 +344,7 @@
         <!--suppress PluginXmlCapitalization -->
         <group id="FRC.FrcToolsActionsGroup"
                text="FRC"
-               class="net.javaru.iip.frc.actions.tools.FrcToolsActionGroup"
+               class="net.javaru.iip.frc.actions.FrcToolsActionGroup"
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
             <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after" />
@@ -365,7 +367,7 @@
         </group>
 
         <group id="FRC.FrcRioLogActionsGroup"
-               class="net.javaru.iip.frc.actions.tools.riolog.FrcRioLogActionGroup"
+               class="net.javaru.iip.frc.actions.FrcRioLogActionGroup"
                popup="true"
                icon="FrcIcons.RioLog.RIOLOG">
             <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="first" />
@@ -375,6 +377,16 @@
                     class="net.javaru.iip.frc.actions.tools.ShowRioLogSshConsoleAction" />
             <action id="frc.tools.ShowUdp"
                     class="net.javaru.iip.frc.actions.tools.ShowRioLogUdpConsoleAction" />
+        </group>
+
+        <group id="FRC.CreateRunConfigsActionGroup"
+               class="net.javaru.iip.frc.actions.FrcRunConfigCreationActionGroup"
+               popup="true">
+            <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="after" relative-to-action="frc.tools.CheckForWpiLibUpdateAction" />
+            <action id="FRC.crate.run.config.LaunchShuffleboard"
+                    class="net.javaru.iip.frc.actions.CreateLaunchShuffleboardRunConfigurationAction" />
+            <action id="FRC.crate.run.config.LaunchSmartDashboard"
+                    class="net.javaru.iip.frc.actions.CreateLaunchSmartDashboardRunConfigurationAction" />
         </group>
 
         <group id="FRC.FrcInternalActionsGroup"
@@ -396,6 +408,8 @@
                     class="net.javaru.iip.frc.actions.tools.internal.FetchSpecifiedRestResource" />
             <action id="FRC.tools.internal.CreateRunConfigurationsFrcInternalAction"
                 class="net.javaru.iip.frc.actions.tools.internal.CreateRunConfigurationsFrcInternalAction"/>
+            <action id="FRC.tools.internal.CheckIncludeDesktopSupportSetting"
+                    class="net.javaru.iip.frc.actions.tools.internal.CheckIncludeDesktopSupportSetting" />
         </group>
 
         <group id="FRC.FrcInternalNotificationsActionsGroup"
@@ -432,7 +446,7 @@
         <!--suppress PluginXmlCapitalization -->
         <group id="frc.NewFileTemplates"
                text="FRC"
-               class="net.javaru.iip.frc.actions.create.FrcCreateComponentsActionGroup"
+               class="net.javaru.iip.frc.actions.FrcCreateComponentsActionGroup"
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile" />
@@ -457,7 +471,7 @@
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v2.PidSubsystem2ComponentCreationAction" />
             <action id="frc.action.new.profiledPidSubsystem2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.profiledPidSubsystem.v2.ProfiledPidSubsystem2ComponentCreationAction" />
-            <action id="frc.action.new.basic.trigger"
+            <action id="frc.action.new.trigger"
                     class="net.javaru.iip.frc.actions.create.simple.SimpleNewFrcTriggerClassAction" />
 
             <!--<action id="frc.action.new.build.file" class="net.javaru.iip.frc.actions.create.build.NewFrcAntBuildFileAction" text="FRC New Ant Build File" />-->

@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,30 +33,16 @@ public abstract class AbstractSimpleNewFrcCmdBasedVersion1ClassAction extends Ab
     private static final Logger LOG = Logger.getInstance(AbstractSimpleNewFrcCmdBasedVersion1ClassAction.class);
     
     
-    @SuppressWarnings("unused")
-    protected AbstractSimpleNewFrcCmdBasedVersion1ClassAction(String text)
+    protected AbstractSimpleNewFrcCmdBasedVersion1ClassAction(Icon icon)
     {
-        this(text, DEFAULT_ICON);
+        super(icon);
     }
     
     
-    protected AbstractSimpleNewFrcCmdBasedVersion1ClassAction(String text, Icon icon)
+    protected AbstractSimpleNewFrcCmdBasedVersion1ClassAction(Icon icon, boolean inSourceOnly)
     {
-        this(text, text, icon, true);
+        super(icon, inSourceOnly);
     }
-    
-    
-    protected AbstractSimpleNewFrcCmdBasedVersion1ClassAction(String text, String description, Icon icon)
-    {
-        this(text, description, icon, true);
-    }
-    
-    
-    protected AbstractSimpleNewFrcCmdBasedVersion1ClassAction(String text, String description, Icon icon, boolean inSourceOnly)
-    {
-        super(text, description, icon, inSourceOnly);
-    }
-    
     
     @Override
     protected boolean shouldBeEnabledAdditionalCriteria(@NotNull Project project, @NotNull DataContext dataContext)

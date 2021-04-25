@@ -48,12 +48,16 @@ val ideaUpdateSinceUntilBuild: String by project
 val ideaSinceBuild: String by project
 val ideaUntilBuild: String by project
 
+// Java 11 required when supporting v2020.3 and later; Java 8 is no longer bundled. For previous versions we should target Java 1.8
+//      See  https://jetbrains.org/intellij/sdk/docs/reference_guide/api_changes/api_changes_list_2020.html#section
+//           https://blog.jetbrains.com/platform/2020/09/intellij-project-migrates-to-java-11/
+val ourTargetJavaVersion: JavaVersion = JavaVersion.VERSION_11
 
 plugins {
     base
     java
-    kotlin("jvm") version "1.4.21"
-    id("org.jetbrains.intellij") version "0.6.5" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
+    kotlin("jvm") version "1.4.31"
+    id("org.jetbrains.intellij") version "0.7.2" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
     //    https://github.com/jetbrains/gradle-idea-ext-plugin
@@ -82,8 +86,7 @@ tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         all {
             kotlinOptions {
-                // Keep in sync with the java plugin configuration
-                jvmTarget = JavaVersion.VERSION_1_8.toString()
+                jvmTarget = ourTargetJavaVersion.toString()
                 javaParameters = true
                 //noReflect = false
             }
@@ -93,11 +96,9 @@ tasks {
 
 
 java {
-    // Java 11 required when supporting v2020.3 and later only; Java 8 is no longer bundled.
-    //      See  https://jetbrains.org/intellij/sdk/docs/reference_guide/api_changes/api_changes_list_2020.html#section
-    //           https://blog.jetbrains.com/platform/2020/09/intellij-project-migrates-to-java-11/
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+
+    sourceCompatibility = ourTargetJavaVersion
+    targetCompatibility = ourTargetJavaVersion
 }
 
 tasks.test {
@@ -111,6 +112,7 @@ tasks.test {
 val patchPluginXml: PatchPluginXmlTask by tasks
 val publishPlugin: PublishTask by tasks
 val runIde: RunIdeTask by tasks
+val runPluginVerifier: org.jetbrains.intellij.tasks.RunPluginVerifierTask by tasks
 
 val sandboxPath = "${project.rootDir.canonicalPath}/${project.properties["sandboxName"]}"
 
@@ -123,13 +125,14 @@ tasks.clean {
     }
 }
 
+
 // The Gradle plugin for writing intellij plugins
 intellij {
     pluginName = "FRC"
     // IntelliJ IDEA dependency
     version = ideaVersion
     // Bundled plugin dependencies - comma separated list
-    setPlugins("java", "gradle", "Groovy")  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
+    setPlugins("java", "gradle", "Groovy", "com.jetbrains.sh")  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
     sandboxDirectory =  sandboxPath
 
     updateSinceUntilBuild = ideaUpdateSinceUntilBuild.toBoolean()
@@ -160,6 +163,20 @@ intellij {
                 //systemPropertyGetOrDefault("frc.alt.wpilib.base.dir", ""),
                 //systemPropertyGetOrDefault("wpilib.base.dir", "")
                                        )
+    }
+
+    runPluginVerifier {
+        // See: https://github.com/JetBrains/gradle-intellij-plugin#plugin-verifier-dsl
+        //      https://github.com/JetBrains/intellij-plugin-verifier#common-options
+        // List of releases:
+        //      https://www.jetbrains.com/idea/download/other.html
+        //      All including EAPs RCs
+        //          https://data.services.jetbrains.com/products?fields=code,name,releases.downloads,releases.version,releases.build,releases.type&code=IIC,IIU,IIE
+        //      Just Releases:
+        //          https://data.services.jetbrains.com/products?fields=code,name,releases.downloads,releases.version,releases.build,releases.type&code=IIC,IIU,IIE&type=release
+        //ideVersions(listOf("IC-2020.2", "IC-2020.2.1", "IC-2020.2.2", "IC-2020.2.3", "IC-2020.2.4", "IC-2020.3", "IC-2020.3.1", "IC-2020.3.2"))
+        ideVersions(listOf("IC-2021.1"))
+        // Reports appear in ${project.buildDir}/reports/pluginVerifier by default. Set `verificationReportsDirectory` to change
     }
 
     publishPlugin {
@@ -250,9 +267,11 @@ idea {
 
 repositories {
     mavenCentral()
-    maven("https://jetbrains.bintray.com/intellij-plugin-service") // new repo
+    maven("https://jetbrains.bintray.com/intellij-plugin-service") // outgoing bintray repo
     maven("https://dl.bintray.com/jetbrains/intellij-plugin-service/") // older repo
-    maven("https://dl.bintray.com/asarkar/mvn") //for jsemver
+    maven("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/intellij-plugin-verifier/intellij-plugin-structure")
+    maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
+    maven("https://dl.bintray.com/asarkar/mvn") //for jsemver  TODO: Issue #93 - Need to migrate off bintray as it is being sunset, and likely jsemver
     maven("https://plugins.gradle.org/m2/")
     maven {
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
@@ -274,7 +293,7 @@ dependencies {
 
     implementation("org.jdom:jdom2:2.0.6")
     implementation("commons-io:commons-io:2.7")
-    implementation("org.apache.commons:commons-lang3:3.11")
+    implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("org.apache.commons:commons-text:1.9")
     implementation("com.jcraft:jsch:0.1.54")
     // Klaxon is a library to parse JSON in Kotlin.  https://github.com/cbeust/klaxon   Available in jcenter bintray: https://jcenter.bintray.com/com/beust/klaxon/   Help available in the #klaxon channel of the Kotlin Slack Workspace
@@ -289,7 +308,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava:$jacksonVersion")
     implementation("org.freemarker:freemarker:2.3.30")
 
-    testImplementation(platform("org.junit:junit-bom:5.7.0"))
+    testImplementation(platform("org.junit:junit-bom:5.7.1"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")

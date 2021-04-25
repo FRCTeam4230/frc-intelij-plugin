@@ -1,12 +1,12 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *     
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,11 +16,13 @@
 
 package net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem;
 
+import java.awt.*;
 import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableMap.Builder;
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
@@ -34,6 +36,7 @@ import kotlin.Unit;
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider;
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog;
+import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.util.FrcClassUtilsKt;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
 
@@ -55,12 +58,12 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
     protected JBCheckBox makeSingletonCheckbox;
     protected JBRadioButton eagerSingletonRadioButton;
     protected JBRadioButton lazySingletonRadioButton;
-    protected JBRadioButton threadSafeSingletonRadioButton;
-    protected ButtonGroup singletonButtonGroup;
+    protected JBRadioButton doubleCheckedLockSingletonRadioButton;
+    protected ButtonGroup singletonInitOptionButtonGroup;
     
     protected JBCheckBox includeSingletonJavadocCheckbox;
     
-    private enum  SingletonMethodology { EAGER, LAZY, THREAD_SAFE}
+    public enum  SingletonMethodology { NON_SINGLETON, EAGER, LAZY, DOUBLE_CHECKED_LOCKING}
     
     public SubsystemComponentCreationDialog(@NotNull Module module,
                                             @NotNull ClassCreator classCreator,
@@ -87,63 +90,98 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
         boolean makeSingleton = (makeSingletonCheckbox != null && makeSingletonCheckbox.isEnabled() && makeSingletonCheckbox.isSelected());
         props.put(MAKE_SINGLETON, Boolean.toString(makeSingleton));
         
-        final String singletonMethodology = makeSingleton ? singletonButtonGroup.getSelection().getActionCommand() : "NONE";
+        final String singletonMethodology = makeSingleton ? singletonInitOptionButtonGroup.getSelection().getActionCommand() : "NONE";
         props.put(SINGLETON_INIT_METHODOLOGY, singletonMethodology);
         
         boolean includeJavadoc = (makeSingleton && includeSingletonJavadocCheckbox != null && includeSingletonJavadocCheckbox.isEnabled() && includeSingletonJavadocCheckbox.isSelected());
         props.put(SINGLETON_INCLUDE_JAVADOC, Boolean.toString(includeJavadoc));
     }
     
+    public SingletonMethodology getDefaultSingletonMethodology()
+    {
+        if (FrcApplicationSettings.getInstance().isTeam3838())
+            return SingletonMethodology.DOUBLE_CHECKED_LOCKING;
+        else
+            return SingletonMethodology.EAGER;
+    }
     
     @Override
     protected void initMinorOptionsPanel(JPanel topPanel, JPanel optionsPanel)
     {
-        makeSingletonCheckbox = new JBCheckBox(message("frc.new.class.adv.subsystem.dialog.makeSingleton.checkbox.text"));
+        makeSingletonCheckbox = new JBCheckBox(message("frc.templates.options.singletonSubsystems.checkbox.text.one"));
         makeSingletonCheckbox.setSelected(sharedState.getBooleanOption(STATE_KEY_SUBSYSTEMS_MAKE_SINGLETON, true));
     
-        includeSingletonJavadocCheckbox = new JBCheckBox(message("frc.new.class.adv.subsystem.dialog.includeSingletonJavadoc.checkbox.text"));
+        includeSingletonJavadocCheckbox = new JBCheckBox(message("frc.templates.options.singletonSubsystems.includeJavadoc.checkbox.text"));
         includeSingletonJavadocCheckbox.setSelected(sharedState.getBooleanOption(STATE_KEY_SUBSYSTEMS_SINGLETON_INCLUDE_JAVADOC, true));
+        
+        final ContextHelpLabel includeSingletonJavadocContextHelp =
+            ContextHelpLabel.create(message("frc.templates.options.singletonSubsystems.includeJavadoc.contextHelp.text"));
+        
     
-        SingletonMethodology selectedMethodology;
+        SingletonMethodology selectedMethodology = getDefaultSingletonMethodology();
     
         try
         {
-            selectedMethodology = SingletonMethodology.valueOf(sharedState.getStringOption(STATE_KEY_SUBSYSTEMS_SINGLETON_INIT_METHODOLOGY,
-                                                                                           SingletonMethodology.THREAD_SAFE.name()));
+            String singleMethodology = sharedState.getStringOption(STATE_KEY_SUBSYSTEMS_SINGLETON_INIT_METHODOLOGY,
+                                                                   selectedMethodology.name());
+            // handle previous name of DOUBLE_CHECKED_LOCKING option
+            if ("THREAD_SAFE".equals(singleMethodology))
+            {
+                singleMethodology = SingletonMethodology.DOUBLE_CHECKED_LOCKING.name();
+            }
+            selectedMethodology = SingletonMethodology.valueOf(singleMethodology);
         }
         catch (Exception ignore)
         {
-            selectedMethodology = SingletonMethodology.THREAD_SAFE;
+            selectedMethodology = getDefaultSingletonMethodology();
         }
     
-        singletonButtonGroup = new ButtonGroup();
+        singletonInitOptionButtonGroup = new ButtonGroup();
         final boolean buttonsEnabled = makeSingletonCheckbox.isEnabled() && makeSingletonCheckbox.isSelected();
     
-        threadSafeSingletonRadioButton =
-                initSingletonMethodologyButton(message("frc.new.class.adv.subsystem.dialog.makeSingleton.threadSafeOption"),
-                                               SingletonMethodology.THREAD_SAFE,
-                                               selectedMethodology, 
-                                               buttonsEnabled);
+        final ContextHelpLabel makeSingletonContextHelp =
+            ContextHelpLabel.createWithLink(null,
+                                            message("frc.templates.options.singletonSubsystems.contextHelp.text"),
+                                            message("frc.ui.common.learnMore.link.text"),
+                                            () -> {BrowserUtil.browse("https://www.geeksforgeeks.org/singleton-design-pattern");});
     
+        doubleCheckedLockSingletonRadioButton =
+                initSingletonMethodologyButton(message("frc.templates.options.singletonSubsystems.doubleCheckedLockOption.text"),
+                                               SingletonMethodology.DOUBLE_CHECKED_LOCKING,
+                                               selectedMethodology,
+                                               buttonsEnabled);
+        
+        final ContextHelpLabel doubleCheckedLockSingletonContextHelp =
+            ContextHelpLabel.create(SubsystemOptionsHelpKt.getDoubleCheckedLockingInitializationHelp());
+    
+        
         lazySingletonRadioButton =
-                initSingletonMethodologyButton(message("frc.new.class.adv.subsystem.dialog.makeSingleton.lazyOption"),
+                initSingletonMethodologyButton(message("frc.templates.options.singletonSubsystems.lazyOption.text"),
                                                SingletonMethodology.LAZY,
-                                               selectedMethodology, 
+                                               selectedMethodology,
                                                buttonsEnabled);
     
+        final ContextHelpLabel lazySingletonContextHelp =
+            ContextHelpLabel.create(SubsystemOptionsHelpKt.getClassicLazyInitializationHelp());
+    
+        
         eagerSingletonRadioButton =
-                initSingletonMethodologyButton(message("frc.new.class.adv.subsystem.dialog.makeSingleton.eagerOption"),
+                initSingletonMethodologyButton(message("frc.templates.options.singletonSubsystems.eagerOption.text"),
                                                SingletonMethodology.EAGER,
-                                               selectedMethodology, 
+                                               selectedMethodology,
                                                buttonsEnabled);
     
+        final ContextHelpLabel eagerSingletonContextHelp =
+            ContextHelpLabel.create(SubsystemOptionsHelpKt.getEagerInitializationHelp());
+    
+        
         // Disable the make Singleton option is the name contains "abstract"
         FrcUiUtilsKt.addTextChangedListener(myComponentNameTextField, (documentEvent, text) -> {
             final String name = myComponentNameTextField.getText();
             makeSingletonCheckbox.setEnabled(name != null && !name.toLowerCase().contains("abstract"));
             includeSingletonJavadocCheckbox.setEnabled(makeSingletonCheckbox.isEnabled());
             final boolean optionsEnabled = makeSingletonCheckbox.isEnabled() && makeSingletonCheckbox.isSelected();
-            threadSafeSingletonRadioButton.setEnabled(optionsEnabled);
+            doubleCheckedLockSingletonRadioButton.setEnabled(optionsEnabled);
             lazySingletonRadioButton.setEnabled(optionsEnabled);
             eagerSingletonRadioButton.setEnabled(optionsEnabled);
             return Unit.INSTANCE;
@@ -153,7 +191,7 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
         makeSingletonCheckbox.addActionListener(e -> {
             final boolean optionsEnabled = makeSingletonCheckbox.isEnabled() && makeSingletonCheckbox.isSelected();
             includeSingletonJavadocCheckbox.setEnabled(optionsEnabled);
-            threadSafeSingletonRadioButton.setEnabled(optionsEnabled);
+            doubleCheckedLockSingletonRadioButton.setEnabled(optionsEnabled);
             lazySingletonRadioButton.setEnabled(optionsEnabled);
             eagerSingletonRadioButton.setEnabled(optionsEnabled);
         });
@@ -166,12 +204,10 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
         optionsPanel.setLayout(layoutManager);
         optionsPanel.add(makeSingletonCheckbox, gc);
     
-        final ContextHelpLabel helpLabel = ContextHelpLabel.create(message("frc.new.class.adv.subsystem.dialog.makeSingleton.help.title"), 
-                                                                   message("frc.new.class.adv.subsystem.dialog.makeSingleton.help.text"));
         gc.setIndent(0);
         gc.setColumn(1);
         gc.setHSizePolicy(GridConstraints.SIZEPOLICY_FIXED);
-        optionsPanel.add(helpLabel, gc);
+        optionsPanel.add(makeSingletonContextHelp, gc);
         FrcUiUtilsKt.addHorizontalSpacer(optionsPanel, 0, 2);
     
         
@@ -180,24 +216,36 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
         gc.setColSpan(3);
     
         gc.setRow(1);
-        optionsPanel.add(threadSafeSingletonRadioButton, gc);
+        optionsPanel.add(createSubOptionPanel(eagerSingletonRadioButton, eagerSingletonContextHelp), gc);
         gc.setRow(2);
-        optionsPanel.add(lazySingletonRadioButton, gc);
+        optionsPanel.add(createSubOptionPanel(doubleCheckedLockSingletonRadioButton, doubleCheckedLockSingletonContextHelp), gc);
         gc.setRow(3);
-        optionsPanel.add(eagerSingletonRadioButton, gc);
+        optionsPanel.add(createSubOptionPanel(lazySingletonRadioButton, lazySingletonContextHelp), gc);
         gc.setRow(4);
-        optionsPanel.add(includeSingletonJavadocCheckbox, gc);
+        optionsPanel.add(createSubOptionPanel(includeSingletonJavadocCheckbox, includeSingletonJavadocContextHelp), gc);
+    }
+    
+    private JPanel createSubOptionPanel(Component button, ContextHelpLabel contextHelpLabel)
+    {
+        final GridLayoutManager layoutManager = new GridLayoutManager(1, 2);
+        final GridConstraints gc = createStandardGridConstraints();
+        JPanel panel = new JPanel(layoutManager);
+        gc.setColumn(0);
+        panel.add(button, gc);
+        gc.setColumn(1);
+        panel.add(contextHelpLabel, gc);
+        return panel;
     }
     
     
     private JBRadioButton initSingletonMethodologyButton(@NotNull String buttonText,
                                                          @NotNull SingletonMethodology methodology,
-                                                         @NotNull SingletonMethodology selectedMethodology, 
+                                                         @NotNull SingletonMethodology selectedMethodology,
                                                          boolean makeEnabled)
     {
         JBRadioButton button = new JBRadioButton();
         button.setText(buttonText);
-        singletonButtonGroup.add(button);
+        singletonInitOptionButtonGroup.add(button);
         button.setActionCommand(methodology.name());
         button.setSelected(methodology.equals(selectedMethodology));
         button.setEnabled(makeEnabled);
@@ -211,6 +259,6 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
         super.saveState();
         sharedState.updateBooleanOption(STATE_KEY_SUBSYSTEMS_MAKE_SINGLETON, makeSingletonCheckbox);
         sharedState.updateBooleanOption(STATE_KEY_SUBSYSTEMS_SINGLETON_INCLUDE_JAVADOC, includeSingletonJavadocCheckbox);
-        sharedState.updateStringOption(STATE_KEY_SUBSYSTEMS_SINGLETON_INIT_METHODOLOGY, singletonButtonGroup);
+        sharedState.updateStringOption(STATE_KEY_SUBSYSTEMS_SINGLETON_INIT_METHODOLOGY, singletonInitOptionButtonGroup);
     }
 }

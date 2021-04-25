@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,12 +25,15 @@ import com.intellij.openapi.util.IconLoader;
 // "Working with Icons and Images" in the SDK DevGuide: http://www.jetbrains.org/intellij/sdk/docs/reference_guide/work_with_icons_and_images.html
 // Icon design guidelines: https://jetbrains.design/intellij/principles/icons/
 // SVG images are supported since v2018.2
+// Also see IntelliJ Icon Generator (A third party tool for genrating 'standard' IntelliJ circrl and square icons)
+//     https://bjansen.github.io/intellij-icon-generator/
 
 
 public final class FrcIcons
 {
     private static final Logger LOG = Logger.getInstance(FrcIcons.class);
 
+    private static final Icon NOT_FOUND_ICON = loadNotFoundIcon();
 
     public static class FRC
     {
@@ -120,6 +123,58 @@ public final class FrcIcons
 
     }
     
+    public static class Tech
+    {
+        /** A 16x16 PNG Icon for Git. */
+        public static final String GIT_PNG_PATH = "/icons/technologies/git.png";
+        /** A 16x16 PNG Icon for Git. */
+        public static final Icon GIT_PNG = loadIcon(GIT_PNG_PATH); // 16x16
+        /** A 16x16 SVG Icon for Git. */
+        public static final String GIT_SVG_PATH = "/icons/technologies/git.svg";
+        /** A 16x16 SVG Icon for Git. */
+        public static final Icon GIT_SVG = loadIcon(GIT_SVG_PATH); // 16x16
+        
+        /** A 16x16 PNG Icon for Kotlin. */
+        public static final String KOTLIN_PNG_PATH = "/icons/technologies/kotlin.png";
+        /** A 16x16 PNG Icon for Kotlin. */
+        public static final Icon KOTLIN_PNG = loadIcon(KOTLIN_PNG_PATH); // 16x16
+        /** A 16x16 SVG Icon for Kotlin. */
+        public static final String KOTLIN_SVG_PATH = "/icons/technologies/kotlin.svg";
+        /** A 16x16 SVG Icon for Kotlin. */
+        public static final Icon KOTLIN_SVG = loadIcon(KOTLIN_SVG_PATH); // 16x16
+       
+        /** A 13x13 PNG Icon for Kotlin. */
+        public static final String KOTLIN_13_PNG_PATH = "/icons/technologies/kotlin13.png";
+        /** A 13x13 PNG Icon for Kotlin. */
+        public static final Icon KOTLIN_13_PNG = loadIcon(KOTLIN_13_PNG_PATH); // 13x13
+        /** A 13x13 SVG Icon for Kotlin. */
+        public static final String KOTLIN_13_SVG_PATH = "/icons/technologies/kotlin13.svg";
+        /** A 13x13 SVG Icon for Kotlin. */
+        public static final Icon KOTLIN_13_SVG = loadIcon(KOTLIN_13_SVG_PATH); // 13x13
+    
+        /** A 16x16 SVG Icon for Kotlin File. */
+        public static final String KOTLIN_FILE_SVG_PATH = "/icons/technologies/kotlin_file.svg";
+        /** A 16x16 SVG Icon for Kotlin FIle. */
+        public static final Icon KOTLIN_FILE_SVG = loadIcon(KOTLIN_FILE_SVG_PATH); // 16x16
+    
+        /** A 16x16 SVG Icon for Kotlin Gradle Script. */
+        public static final String KOTLIN_GRADLE_SCRIPT_SVG_PATH = "/icons/technologies/kotlin.svg";
+        /** A 16x16 SVG Icon for Kotlin Gradle Script. */
+        public static final Icon KOTLIN_GRADLE_SCRIPT_SVG = loadIcon(KOTLIN_GRADLE_SCRIPT_SVG_PATH); // 16x16
+    
+        /** A 16x16 SVG Icon for Kotlin launch configuration. */
+        public static final String KOTLIN_LAUNCH_CONFIGURATION_SVG_PATH = "/icons/technologies/kotlin.svg";
+        /** A 16x16 SVG Icon for Kotlin launch configuration. */
+        public static final Icon KOTLIN_LAUNCH_CONFIGURATION_SVG = loadIcon(KOTLIN_LAUNCH_CONFIGURATION_SVG_PATH); // 16x16
+    
+        /** A 16x16 SVG Icon for Kotlin Script. */
+        public static final String KOTLIN_SCRIPT_SVG_PATH = "/icons/technologies/kotlin.svg";
+        /** A 16x16 SVG Icon for Kotlin Script. */
+        public static final Icon KOTLIN_SCRIPT_SVG = loadIcon(KOTLIN_SCRIPT_SVG_PATH); // 16x16
+        
+    }
+    
+    
     public static class WpiLib
     {
         /** An SVG file of the new (2019+) WpiLib 'official' icon.  */
@@ -164,11 +219,21 @@ public final class FrcIcons
         /** A 16x16 ico file Icon of the legacy (i.e. pre 2019) Wpi 'official' icon.  */
         public static final Icon WPI_LIB_LEGACY_16_ICO = loadIcon("/icons/wpi/wpi-16.ico");
     }
-
+    
+    
+    /**
+     * Safely uses the IDEA {@link IconLoader} to load an icon from the classpath. In the event
+     * the icon can not be found, or an exception occurs during the load, the exception is logged
+     * and a stand-in Icon is returned to prevent nullability issues.
+     * @param path the path to the icon. MUST START WITH A LEADING SLASH
+     *
+     * @return the icon
+     */
     public static Icon loadIcon(String path)
     {
         try
         {
+            // The path to the icon passed in as argument to IconLoader.getIcon() must start with leading slash
             return IconLoader.getIcon(path, FrcIcons.class);
         }
         catch (Throwable throwable)
@@ -177,10 +242,25 @@ public final class FrcIcons
             // it will prevent things (such as actions) from completely breaking because an icon was not loaded. We
             // use what is basically a blank icon as it seems like a good substitute.
             LOG.warn("[FRC] An exception occurred when loading the icon from '" + path + "'; Cause Summary: " + throwable.toString());
-            return AllIcons.Nodes.EmptyNode;
+            return NOT_FOUND_ICON;
         }
     }
 
+    
+    private static Icon loadNotFoundIcon()
+    {
+        try
+        {
+            // The path to the icon passed in as argument to IconLoader.getIcon() must start with leading slash
+            return IconLoader.getIcon("/icons/iconNotFoundIcon.svg", FrcIcons.class);
+        }
+        catch (Throwable throwable)
+        {
+            
+            LOG.warn("[FRC] An exception occurred when loading the Not Found stand-in icon Cause Summary: " + throwable.toString());
+            return AllIcons.Nodes.EmptyNode;
+        }
+    }
 
     private FrcIcons() { }
 }

@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -74,7 +74,8 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
             b) there are other modules with FRC facets still configured on the project
             Handled via: FrcOpenRioLogStartupActivity.disposeComponent()
         7) Change to the target window in the FrcSettings
-            Handled via: FrcApplicationComponent's impl of UnnamedConfigurable.apply()
+            Previously handled via in FrcApplicationComponent's impl of UnnamedConfigurable.apply()
+            Need to see if we still handle this properly
      */
 
 

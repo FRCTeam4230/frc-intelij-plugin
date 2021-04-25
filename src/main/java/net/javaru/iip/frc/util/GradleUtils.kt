@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2021 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -121,9 +121,11 @@ fun Project.reimportGradleProject(executionMode: ProgressExecutionMode = Progres
             if (externalProject != null)
             {
                 val synchronous = executionMode == ProgressExecutionMode.MODAL_SYNC
-                // We can't use the IntelliJ API built in service<T> function because we are in a Project extension function which causes an implicit `this`
-                // being applied, resulting in this.service<T> which is ultimately Project.service<T> and not the ApplicationService service<T> function
-                applicationService<ProjectDataManager>().importData(externalProject, this@reimportGradleProject, synchronous)
+                // We have to fully qualify the function so that there is not an imp0licit use of 'this'. Because we are in a Project extension function
+                // an implicit `this` is added if we just type `service<ProjectDataManager>()` which results in Project.service<T> being called and
+                // and not the ApplicationService service<T> function. Another word around would be to add a forwarding function outside this function.
+                // and using it. For example:   inline fun <reified T : Any> appService() = service<T>()
+                com.intellij.openapi.components.service<ProjectDataManager>().importData(externalProject, this@reimportGradleProject, synchronous)
             }
         }
     }

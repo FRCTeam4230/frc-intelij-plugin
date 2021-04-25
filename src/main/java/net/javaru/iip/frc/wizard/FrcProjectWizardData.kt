@@ -41,7 +41,7 @@ class FrcProjectWizardData(
         var includeJUnitSupport:Boolean = true,
         var junitOption: JUnitOption = JUnitOption.JUnit5,
         var junit4Version: String = "4.13.1",
-        var junit5Version: String = "5.7.0",
+        var junit5Version: String = "5.7.1",
         var gradleDslOption: GradleDslOption = GradleDslOption.GroovyDSL,
         var templateLanguageOption: TemplateLanguageOption = TemplateLanguageOption.Java
                           )
@@ -59,9 +59,15 @@ class FrcProjectWizardData(
     /** The project year, such as `2019` or `2020`, as a String. */
     val frcYear: String
         get() = wpilibVersion.frcYear.toString()
-    
-    val teamNumberString: String
+    /** Returns the reamNumber as a String, which can be 0 if not set. @see teamNumberOrEmptyString */
+    val teamNumberAsString: String
         get() = teamNumber.toString()
+
+    /** Returns the team number as a String, returning an empty String if the team number is zero. */
+    val teamNumberAsStringOrEmptyString: String
+        get() = if (teamNumber == 0 ) "" else teamNumber.toString()
+
+
 
     val basePackageAsDirString: String
         get() = basePackage.replace('.', '/')
@@ -69,11 +75,13 @@ class FrcProjectWizardData(
     val includeDesktopSupportGradleSetting: String
         get()
         {
-            val result = enableDesktopSupport || isRomiRobot
+            // We now honor the enableDesktopSupport option as it is automatically selected when a romi template is selected.
+            // We'll add a warning to the wizard to warn user if the option is not selected and a Romi template is in use.
+            val result = enableDesktopSupport //|| isRomiRobotTemplate
             return result.toString()
         }
 
-    val isRomiRobot
+    val isRomiRobotTemplate
         get() = frcWizardTemplateDefinition.isRomiBot
 
     val basePackageAsDirPath: Path

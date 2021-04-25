@@ -6,5 +6,5 @@
     "enableCppIntellisense": false,
     "currentLanguage": "java",
     "projectYear": "${data.frcYear}",
-    "teamNumber": ${data.teamNumberString}
+    "teamNumber": ${data.teamNumberAsString}
 }

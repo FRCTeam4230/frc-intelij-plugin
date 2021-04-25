@@ -154,6 +154,16 @@ fun getDefaultWpiLibRootPath(year: Int): Path
 fun getWpiLibJdkHomePath(year: Int): Path = getWpiLibRootPath(year).resolve("jdk")
 
 /**
+ * Returns the standard path for the wpilib 'tools' directory, **but does not check if it exists**.
+ */
+fun getWpiLibToolsPath(year: Int): Path = getWpiLibRootPath(year).resolve("tools")
+
+/**
+ * Returns the standard path for the wpilib 'tools' directory, **but does not check if it exists**.
+ */
+fun getWpiLibToolsPath(forWpiLibVersion: WpiLibVersion): Path = getWpiLibRootPath(forWpiLibVersion).resolve("tools")
+
+/**
  * Returns the standard path for the Java `RELEASE` file for the wpilib JDK installation, **but does not check if it exists**.
  * Some example content:
  *

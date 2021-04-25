@@ -54,6 +54,7 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actions.ScrollToTheEndToolbarAction;
@@ -453,13 +454,16 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         //     com.intellij.openapi.actionSystem.ex.CheckboxAction.createCustomComponent()
         if (actionToolbar != null && rioLogStopAction != null)
         {
-            final DataContext dataContext = actionToolbar.getToolbarDataContext();
-            rioLogStopAction.actionPerformed(new AnActionEvent(null, 
-                                                               dataContext, 
-                                                               ActionPlaces.UNKNOWN, 
-                                                               rioLogStopAction.getTemplatePresentation(), 
-                                                               ActionManager.getInstance(), 
-                                                               0));
+            // Issue #92 - need to wrap in invokeLater to prevent exception: Access is allowed from event dispatch thread with IW lock only.
+            ApplicationManager.getApplication().invokeLater(() -> {
+                final DataContext dataContext = actionToolbar.getToolbarDataContext();
+                rioLogStopAction.actionPerformed(new AnActionEvent(null,
+                                                                   dataContext,
+                                                                   ActionPlaces.UNKNOWN,
+                                                                   rioLogStopAction.getTemplatePresentation(),
+                                                                   ActionManager.getInstance(),
+                                                                   0));
+            }, ModalityState.any());
         }
         else
         {

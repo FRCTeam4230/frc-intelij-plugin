@@ -336,7 +336,7 @@
         <!--suppress PluginXmlCapitalization -->
         <group id="FRC.FrcToolsActionsGroup"
                text="FRC"
-               class="net.javaru.iip.frc.actions.tools.FrcToolsActionGroup"
+               class="net.javaru.iip.frc.actions.FrcToolsActionGroup"
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
             <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after" />
@@ -359,7 +359,7 @@
         </group>
 
         <group id="FRC.FrcRioLogActionsGroup"
-               class="net.javaru.iip.frc.actions.tools.riolog.FrcRioLogActionGroup"
+               class="net.javaru.iip.frc.actions.FrcRioLogActionGroup"
                popup="true"
                icon="FrcIcons.RioLog.RIOLOG">
             <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="first" />
@@ -428,7 +428,7 @@
         <!--suppress PluginXmlCapitalization -->
         <group id="frc.NewFileTemplates"
                text="FRC"
-               class="net.javaru.iip.frc.actions.create.FrcCreateComponentsActionGroup"
+               class="net.javaru.iip.frc.actions.FrcCreateComponentsActionGroup"
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile" />

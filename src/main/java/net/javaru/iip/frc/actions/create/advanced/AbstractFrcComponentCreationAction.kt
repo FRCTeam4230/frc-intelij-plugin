@@ -40,6 +40,7 @@ abstract class AbstractFrcComponentCreationAction protected constructor(
         directory: PsiDirectory
                                                                     ): FrcComponentCreationDialog
 
+    @Suppress("MemberVisibilityCanBePrivate")
     protected fun constructClassCreatorInstance(module: Module): ClassCreator
     {
         return ClassCreator(module, dataProvider)
@@ -66,7 +67,7 @@ abstract class AbstractFrcComponentCreationAction protected constructor(
         }
         val dir = view.orChooseDirectory ?: return
         val classCreator = constructClassCreatorInstance(module)
-        val createdClasses = invokeDialog(module, classCreator, dir) ?: return
+        val createdClasses = invokeDialog(module, classCreator, dir)
         for (createdClass in createdClasses)
         {
             view.selectElement(createdClass)

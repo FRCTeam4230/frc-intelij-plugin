@@ -56,12 +56,13 @@
         <strong>v1.5.0</strong> <br>
         &nbsp;&nbsp;&bull; Added action link to "WPI Lib update available" notification to automatically update the gradle build file to use the new version<br>
         &nbsp;&nbsp;&bull; Improved Romi projects support in New Project Wizard. It now creates some additional Romi specific Run Configurations including
-                           Shuffleboard and Smart Dashboard launch configs, and on Mac &amp; Linux a run config for tailing the 'simulateJava.log' file.<br>
+                           Shuffleboard and Smart Dashboard launch configs.<br>
         &nbsp;&nbsp;&bull; Some additional work towards migrating the FRC Plugin to be a dynamic plugin (i.e. restart of IDEA not required after upgrading FRC plugin).<br>
         &nbsp;&nbsp;&bull; Refactorings to remove use of a number of methods and classes recently deprecated in the IntelliJ IDEA Plugin API.<br>
         &nbsp;&nbsp;&bull; Refactorings to remove use of a few items recently marked as "Internal Use Only" in the IntelliJ IDEA Plugin API.<br>
         &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/87'>issue #87</a>, FRC Tool Window name shows long name in 2020.3<br>
         &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/84'>issue #84</a>, WPI Lib root path not discovered on Mac or Linux<br>
+        &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/92'>issue #92</a>, a Dispatch Thread access issue on opening an FRC project in IntelliJ IDEA v2021.1<br>
         &nbsp;&nbsp;&bull; Resolves a corner case issue in the Command creation template in which the rules to determine if a Subsystem was a singleton or not were a bit too strict<br>
         <br>
         <strong>v1.4.0</strong> <br>

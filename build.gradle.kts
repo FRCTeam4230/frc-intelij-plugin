@@ -56,7 +56,7 @@ val ourTargetJavaVersion: JavaVersion = JavaVersion.VERSION_1_8
 plugins {
     base
     java
-    kotlin("jvm") version "1.4.21"
+    kotlin("jvm") version "1.4.31"
     id("org.jetbrains.intellij") version "0.7.2" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
@@ -267,9 +267,11 @@ idea {
 
 repositories {
     mavenCentral()
-    maven("https://jetbrains.bintray.com/intellij-plugin-service") // new repo
+    maven("https://jetbrains.bintray.com/intellij-plugin-service") // outgoing bintray repo
     maven("https://dl.bintray.com/jetbrains/intellij-plugin-service/") // older repo
-    maven("https://dl.bintray.com/asarkar/mvn") //for jsemver
+    maven("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/intellij-plugin-verifier/intellij-plugin-structure")
+    maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
+    maven("https://dl.bintray.com/asarkar/mvn") //for jsemver  TODO: Issue #93 - Need to migrate off bintray, and likely jsemver
     maven("https://plugins.gradle.org/m2/")
     maven {
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")

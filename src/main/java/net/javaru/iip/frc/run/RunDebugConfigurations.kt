@@ -20,6 +20,8 @@ import com.intellij.configurationStore.MODERN_NAME_CONVERTER
 import com.intellij.execution.RunManager
 import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.configurations.ConfigurationType
+import com.intellij.execution.jar.JarApplicationConfiguration
+import com.intellij.execution.jar.JarApplicationConfigurationType
 import com.intellij.execution.remote.RemoteConfiguration
 import com.intellij.execution.remote.RemoteConfigurationType
 import com.intellij.ide.SaveAndSyncHandler
@@ -38,6 +40,8 @@ import net.javaru.iip.frc.util.asDate
 import net.javaru.iip.frc.util.getMainModule
 import net.javaru.iip.frc.util.getModules
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
+import net.javaru.iip.frc.wpilib.getWpiLibToolsPath
+import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
 import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
 import java.nio.file.Files
@@ -69,6 +73,9 @@ fun createAllRunDebugConfigurations(project: Project, dataModel: FrcProjectWizar
         {
             createTailSimulateJavaLogShellScriptRunConfiguration(project, isRomiTemplate)
         }
+        // For now we will create both. A future enhancement can make this selectable in the wizard
+        createLaunchShuffleBoardRunConfiguration(project, dataModel.wpilibVersion)
+        createLaunchSmartDashboardRunConfiguration(project, dataModel.wpilibVersion)
     }
 
     // We need to do a Save here or the run config files are not created, which then causes all sorts of issues (to say the least)
@@ -156,7 +163,7 @@ private fun createGradeSimulateJavaRunConfigurations(project: Project, isRomi: B
     logger.trace("[FRC] Completed Gradle simulateJava run configurations")
 }
 
-
+@JvmOverloads
 fun createTailSimulateJavaLogShellScriptRunConfiguration(project: Project, isRomi: Boolean, setAsShared: Boolean = true)
 {
     // This is not the ideal methodology. But it works in v2020.2+
@@ -209,6 +216,57 @@ fun createTailSimulateJavaLogShellScriptRunConfiguration(project: Project, isRom
     }
 }
 
+@JvmOverloads
+fun createLaunchShuffleBoardRunConfiguration(project: Project, wpiLibVersion: WpiLibVersion, activateToolWindow: Boolean = false,setAsShared: Boolean = true)
+{
+    val jarPath = getWpiLibToolsPath(wpiLibVersion).resolve("shuffleboard.jar").toAbsolutePath().toString()
+    createJarApplicationRunConfiguration(project, "Launch Shuffleboard", jarPath, activateToolWindow, setAsShared)
+}
+
+@JvmOverloads
+fun createLaunchSmartDashboardRunConfiguration(project: Project, wpiLibVersion: WpiLibVersion, activateToolWindow: Boolean = false, setAsShared: Boolean = true)
+{
+    val jarPath = getWpiLibToolsPath(wpiLibVersion).resolve("SmartDashboard.jar").toAbsolutePath().toString()
+    createJarApplicationRunConfiguration(project, "Launch SmartDashboard", jarPath, activateToolWindow, setAsShared)
+}
+
+@JvmOverloads
+fun createJarApplicationRunConfiguration(project: Project, runConfigName: String, jarPath: String, activateToolWindow: Boolean = false, setAsShared: Boolean = true)
+{
+    try
+    {
+        val runManager = RunManager.getInstance(project)
+        val configurationType = JarApplicationConfigurationType.getInstance()
+        val runnerAndConfigurationSettings = runManager.createConfiguration(runConfigName, configurationType)
+        val runConfiguration = runnerAndConfigurationSettings.configuration as JarApplicationConfiguration
+
+        runConfiguration.jarPath = jarPath
+        var module = project.getMainModule()
+        if (module == null) module = project.getModules().firstOrNull() // We really just need any module so the project JDK is used
+        if (module != null)
+        {
+            runConfiguration.module = module
+        }
+        else
+        {
+            // This should be pretty rare. We'll just have to leave the configuration without a module defined ands the user will need to resolve
+            logger.warn("[FRC] Could not discover a module to use when configuring the $runConfigName Run Configuration")
+        }
+
+        runnerAndConfigurationSettings.isActivateToolWindowBeforeRun = activateToolWindow
+
+        if (setAsShared)
+        {
+            shareRunConfiguration(project, runnerAndConfigurationSettings)
+        }
+
+        runManager.addConfiguration(runnerAndConfigurationSettings)
+    }
+    catch (e: Exception)
+    {
+        logger.warn("[FRC] Could not create '$runConfigName' Run Configuration for project '${project.name}' due to an exception: $e", e)
+    }
+}
 
 private fun createGradleRoboRioBuildRunConfigurations(project: Project)
 {

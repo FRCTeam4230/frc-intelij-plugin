@@ -17,9 +17,9 @@
 package net.javaru.iip.frc.settings
 
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.Transient
@@ -85,10 +85,8 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
     companion object Settings
     {
         @JvmStatic
-        fun getInstance(): FrcApplicationSettings
-        {
-            return ServiceManager.getService(FrcApplicationSettings::class.java)
-        }
+        fun getInstance(): FrcApplicationSettings = service()
+
 
         @JvmStatic
         fun clone(original: FrcApplicationSettings): FrcApplicationSettings

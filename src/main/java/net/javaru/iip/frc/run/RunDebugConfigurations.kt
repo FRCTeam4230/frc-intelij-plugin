@@ -30,7 +30,6 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
-import com.intellij.openapi.vfs.LocalFileSystem
 import net.javaru.iip.frc.i18n.FrcBundle
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.settings.FrcRoboRioSettings
@@ -44,8 +43,6 @@ import net.javaru.iip.frc.wpilib.getWpiLibToolsPath
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
 import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
@@ -169,51 +166,53 @@ fun createTailSimulateJavaLogShellScriptRunConfiguration(project: Project, isRom
     // This is not the ideal methodology. But it works in v2020.2+
     // In v2020.3+ we can switch to running in terminal and defining the script as /user/bin/tail
 
-    val nameSuffix = if (isRomi) "Romi" else "Simulate Java"
-    val runConfigName = FrcBundle.message("frc.wizard.run.configuration.simulateJava.tail.name", nameSuffix)
-    try
-    {
-        if (project.basePath != null)
-        {
-            val runManager = RunManager.getInstance(project)
-            val runnerAndConfigurationSettings = runManager.createConfiguration(runConfigName, com.intellij.sh.run.ShConfigurationType::class.java)
-            val shRunConfiguration = runnerAndConfigurationSettings.configuration as com.intellij.sh.run.ShRunConfiguration
-
-            shRunConfiguration.scriptPath = "${project.basePath}/build/stdout/simulateJava.log"
-            //shRunConfiguration.scriptOptions = ""
-            shRunConfiguration.scriptWorkingDirectory = project.basePath
-            shRunConfiguration.interpreterPath = "/usr/bin/tail"
-            shRunConfiguration.interpreterOptions = "-f"
-
-            shRunConfiguration.isAllowRunningInParallel = false
-            // Note the "execute in terminal" option is only available in 2020.3+ That said, using the run ToolWindow is ultimately a better option.
-            runnerAndConfigurationSettings.isActivateToolWindowBeforeRun = true
-
-            if (setAsShared)
-            {
-                shareRunConfiguration(project, runnerAndConfigurationSettings)
-            }
-
-            // To prevent a "script not found" error showing in the log, we need to create a place holder file
-            try
-            {
-                val file = Paths.get(shRunConfiguration.scriptPath)
-                Files.createDirectories(file.parent)
-                Files.createFile(file)
-                LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file.toFile())
-            }
-            catch(e:Exception)
-            {
-                logger.warn("[FRC] An exception occurred when attempting to create simulateJava.log placeholder file.")
-            }
-
-            runManager.addConfiguration(runnerAndConfigurationSettings)
-        }
-    }
-    catch (e: Exception)
-    {
-        logger.warn("[FRC] Could not create '$runConfigName' Shell Script Run Configuration for project '${project.name}' due to an exception: $e", e)
-    }
+    // TODO: Waiting to see about the resolution of https://youtrack.jetbrains.com/issue/IDEA-267920 to see if we can add this feature back in
+    logger.warn("[FRC] Due to a change in the access level of the ShRunConfiguration and ShConfigurationType classes in IntelliJ IDEA v2021.1, a tail simulateJava.log Run Configuration cannot be created. Waiting on the resolution of IDEA-267920 to see if this functionality can be added back.")
+//    val nameSuffix = if (isRomi) "Romi" else "Simulate Java"
+//    val runConfigName = FrcBundle.message("frc.wizard.run.configuration.simulateJava.tail.name", nameSuffix)
+//    try
+//    {
+//        if (project.basePath != null)
+//        {
+//            val runManager = RunManager.getInstance(project)
+//            val runnerAndConfigurationSettings = runManager.createConfiguration(runConfigName, com.intellij.sh.run.ShConfigurationType::class.java)
+//            val shRunConfiguration = runnerAndConfigurationSettings.configuration as com.intellij.sh.run.ShRunConfiguration
+//
+//            shRunConfiguration.scriptPath = "${project.basePath}/build/stdout/simulateJava.log"
+//            //shRunConfiguration.scriptOptions = ""
+//            shRunConfiguration.scriptWorkingDirectory = project.basePath
+//            shRunConfiguration.interpreterPath = "/usr/bin/tail"
+//            shRunConfiguration.interpreterOptions = "-f"
+//
+//            shRunConfiguration.isAllowRunningInParallel = false
+//            // Note the "execute in terminal" option is only available in 2020.3+ That said, using the run ToolWindow is ultimately a better option.
+//            runnerAndConfigurationSettings.isActivateToolWindowBeforeRun = true
+//
+//            if (setAsShared)
+//            {
+//                shareRunConfiguration(project, runnerAndConfigurationSettings)
+//            }
+//
+//            // To prevent a "script not found" error showing in the log, we need to create a place holder file
+//            try
+//            {
+//                val file = Paths.get(shRunConfiguration.scriptPath)
+//                Files.createDirectories(file.parent)
+//                Files.createFile(file)
+//                LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file.toFile())
+//            }
+//            catch(e:Exception)
+//            {
+//                logger.warn("[FRC] An exception occurred when attempting to create simulateJava.log placeholder file.")
+//            }
+//
+//            runManager.addConfiguration(runnerAndConfigurationSettings)
+//        }
+//    }
+//    catch (e: Exception)
+//    {
+//        logger.warn("[FRC] Could not create '$runConfigName' Shell Script Run Configuration for project '${project.name}' due to an exception: $e", e)
+//    }
 }
 
 @JvmOverloads
@@ -409,6 +408,7 @@ class ModuleSettingAction(val remoteConfiguration: RemoteConfiguration, val proj
 private fun shareRunConfiguration(project: Project, settings: RunnerAndConfigurationSettings)
 {
     // Continuing to use the deprecated isShared for now until we can figure out the "It's unexpected that the file doesn't exist at this point" issue
+    @Suppress("UnstableApiUsage") // To be removed in 2021.3
     settings.isShared = true
 //    val baseDir = project.basePath
 //    if (baseDir == null)

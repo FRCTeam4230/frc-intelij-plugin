@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.util
 
-import com.intellij.ide.plugins.cl.PluginClassLoader
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
@@ -89,7 +88,7 @@ inline fun invokeLaterWait(crossinline func: () -> Unit)
 //}
 
 @JvmOverloads
-fun getPluginClassloader(clazz: Class<*> = FrcIcons::class.java): PluginClassLoader = clazz.classLoader as PluginClassLoader
+fun getPluginClassloader(clazz: Class<*> = FrcIcons::class.java): ClassLoader = clazz.classLoader
 
 /**
  *  Gets the URL for a plugin classpath resource path.

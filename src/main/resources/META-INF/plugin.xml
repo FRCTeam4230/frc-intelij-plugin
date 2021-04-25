@@ -53,6 +53,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v1.6.0</strong> <br>
+        &nbsp;&nbsp;&bull; <br>
+        <br>
         <strong>v1.5.0</strong> <br>
         &nbsp;&nbsp;&bull; Added action link to "WPI Lib update available" notification to automatically update the gradle build file to use the new version<br>
         &nbsp;&nbsp;&bull; Improved Romi projects support in New Project Wizard. It now creates some additional Romi specific Run Configurations including

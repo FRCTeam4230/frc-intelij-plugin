@@ -271,7 +271,6 @@ repositories {
     maven("https://dl.bintray.com/jetbrains/intellij-plugin-service/") // older repo
     maven("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/intellij-plugin-verifier/intellij-plugin-structure")
     maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
-    maven("https://dl.bintray.com/asarkar/mvn") //for jsemver  TODO: Issue #93 - Need to migrate off bintray as it is being sunset, and likely jsemver
     maven("https://plugins.gradle.org/m2/")
     maven {
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
@@ -301,7 +300,6 @@ dependencies {
     implementation(platform("com.google.guava:guava-bom:29.0-jre"))
     implementation("com.google.guava:guava")
 
-    implementation("com.asarkar:jsemver:0.6.2")  // https://github.com/asarkar/jsemver  Requires one-off repo declaration of: maven("https://dl.bintray.com/asarkar/mvn")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatypes-collections:$jacksonVersion")

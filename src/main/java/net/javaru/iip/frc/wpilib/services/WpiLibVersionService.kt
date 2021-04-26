@@ -246,9 +246,9 @@ class WpiLibVersionService private constructor(private val project: Project) : P
     {
 
         // Keep an eye on:  com.intellij.externalSystem.DependencyModifierService
-        // It's experimantal, but allows you to moodify the build model such as adding a dependency
-        // It does not (yet) support modifying a Plugin version. But JB seems to indicate that is
-        // possibley planned:
+        // It's experimental, but allows you to modify the build model such as adding a dependency
+        // It does not (yet) support modifying a Plugin version. But JetBrains seems to indicate
+        // that that is possibly planned:
         // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360010674120-Programatically-Update-Plugin-Version-in-Gradle-Build-File
 
         DocumentUtil.writeInRunUndoTransparentAction {

@@ -1,10 +1,7 @@
 # Based on "Gradle.gitlab-ci.yml" Template from https://gitlab.com/gitlab-org/gitlab-foss
 #     https://gitlab.com/gitlab-org/gitlab-foss/-/blob/master/lib/gitlab/ci/templates/Gradle.gitlab-ci.yml
 
-# This file is a template, and might need editing before it works on your project.
-# This is the Gradle build system for JVM applications
-# https://gradle.org/
-# https://github.com/gradle/gradle
+# Official Gradle Docker Images: https://hub.docker.com/_/gradle?tab=tags&page=1&ordering=last_updated
 image: gradle:6.8.3-jdk11-hotspot
 
 # Disable the Gradle daemon for Continuous Integration servers as correctness

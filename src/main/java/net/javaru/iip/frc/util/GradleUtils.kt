@@ -36,6 +36,12 @@ import java.nio.file.Path
 
 // NOTE: AddGradleDslPluginActionHandler has example of modifying the gradle build file (for a groovy build file)
 
+// Keep an eye on:  com.intellij.externalSystem.DependencyModifierService
+// It's experimantal, but allows you to moodify the build model such as adding a dependency
+// It does not (yet) support modifying a Plugin version. But JB seems to indicate that is
+// possibley planned:
+// https://intellij-support.jetbrains.com/hc/en-us/community/posts/360010674120-Programatically-Update-Plugin-Version-in-Gradle-Build-File
+
 private val LOG = Logger.getInstance("#net.javaru.iip.frc.util.GradleUtils")
 
 fun Project.getGradleBuildIoFile(): File?

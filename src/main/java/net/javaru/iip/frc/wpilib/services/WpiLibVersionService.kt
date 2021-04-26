@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -237,8 +237,20 @@ class WpiLibVersionService private constructor(private val project: Project) : P
         FrcNotifications.notify(FrcNotificationType.GENERAL_INFO, content, project = project)
     }
 
+    /**
+     * Function to update the WPI Lib plugin version in the Gradle build file.
+     *
+     * @param version the new wpilib version.
+     */
     fun updateWpiLibVersionInGradleBuild(version: WpiLibVersion)
     {
+
+        // Keep an eye on:  com.intellij.externalSystem.DependencyModifierService
+        // It's experimantal, but allows you to moodify the build model such as adding a dependency
+        // It does not (yet) support modifying a Plugin version. But JB seems to indicate that is
+        // possibley planned:
+        // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360010674120-Programatically-Update-Plugin-Version-in-Gradle-Build-File
+
         DocumentUtil.writeInRunUndoTransparentAction {
             val psiFile = project.getGradleBuildPsiFile()
             if (psiFile == null)

@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,11 +16,8 @@
 
 package net.javaru.iip.frc.util;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.DumbModeTask;
-import com.intellij.openapi.project.DumbServiceImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -36,7 +33,7 @@ public class IndexUtils
     /**
      * Calls, in sequence:
      * <ol>
-     *     <li>{@link #refreshProjectIndexes(Project)}  (if project is not null</li>
+     *     <li>{@link FileBasedIndexProjectHandler#scheduleReindexingInDumbMode(Project)}  (if project is not null)</li>
      *     <li>{@link #refreshFileSystem()}</li>
      *     <li>{@link #refreshVirtualFileSystem()}</li>
      *     
@@ -47,7 +44,12 @@ public class IndexUtils
     {
         if (project != null)
         {
-            refreshProjectIndexes(project);
+            // Refresh project indexes
+            // See:  com.intellij.openapi.roots.impl.PushedFilePropertiesUpdaterImpl.scheduleDumbModeReindexingIfNeeded()
+            //       com.intellij.openapi.roots.impl.ProjectRootManagerComponent.doUpdateOnRefresh()
+            // Although those examples used the now deprecated createChangedFilesIndexingTask() and then queued the task in the DumbService
+            // As of 2021.1, there is the new scheduleReindexingInDumbMode() method that does all that for you
+            FileBasedIndexProjectHandler.scheduleReindexingInDumbMode(project);
         }
         refreshFileSystem();
         refreshVirtualFileSystem();
@@ -64,19 +66,5 @@ public class IndexUtils
     {
         LOG.debug("[FRC] Refreshing file System");
         LocalFileSystem.getInstance().refresh(true);  //TODO look at the See also in the Javadoc
-    }
-
-
-    public static void refreshProjectIndexes(@NotNull Project project)
-    {
-        // See:  com.intellij.openapi.roots.impl.PushedFilePropertiesUpdaterImpl.scheduleDumbModeReindexingIfNeeded()
-        //       com.intellij.openapi.roots.impl.ProjectRootManagerComponent.doUpdateOnRefresh()
-        DumbServiceImpl dumbService = DumbServiceImpl.getInstance(project);
-        DumbModeTask task = FileBasedIndexProjectHandler.createChangedFilesIndexingTask(project);
-        if (task != null)
-        {
-            LOG.debug("[FRC] Queuing up Reindexing task");
-            dumbService.queueTask(task);
-        }
     }
 }

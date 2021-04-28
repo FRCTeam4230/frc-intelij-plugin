@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,8 @@
  */
 package net.javaru.iip.frc.util
 
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
 import org.apache.commons.lang3.StringUtils
 import java.net.URI
 import java.net.URISyntaxException
@@ -23,7 +24,7 @@ import java.net.URL
 import java.nio.file.Paths
 
 private object UriUtils
-private val LOG = Logger.getInstance(UriUtils::class.java)
+private val LOG = logger<UriUtils>()
 
 /**
  * Creates a `URI` from ` `URL` throwing a Runtime based `IllegalArgumentException` in the event the URI
@@ -75,11 +76,11 @@ fun URI.resolveSiblingResource(siblingResource: String): URI
 {
     return try
     {
-        LOG.debug("    [FRC] uri =          $this")
+        LOG.debug {"    [FRC] uri =          $this"}
         val pathString = path
         val path = Paths.get(pathString)
-        LOG.debug("    [FRC] path =         $path")
-        LOG.debug("    [FRC] host =         $host")
+        LOG.debug {"    [FRC] path =         $path"}
+        LOG.debug {"    [FRC] host =         $host"}
         //The File System wil "normalize" to the proper forward or back slash
         val rootPath = Paths.get("/")
         val siblingUri: URI
@@ -97,7 +98,7 @@ fun URI.resolveSiblingResource(siblingResource: String): URI
                 sibling.toString().replace('\\', '/'),
                 null)
         }
-        LOG.debug("    [FRC] siblingUri =   $siblingUri")
+        LOG.debug {"    [FRC] siblingUri =   $siblingUri"}
         siblingUri
     }
     catch (e: URISyntaxException)

@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +20,9 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.project.Project
 import com.intellij.util.xmlb.XmlSerializerUtil
 
@@ -34,7 +36,7 @@ data class FrcProjectGeneralSettings @JvmOverloads constructor(
 
     companion object Settings
     {
-        val LOG = Logger.getInstance(FrcProjectGeneralSettings::class.java)
+        val logger = logger<FrcProjectGeneralSettings>()
         
         @JvmStatic
         fun getInstance(project: Project) = project.service<FrcProjectGeneralSettings>() 
@@ -46,22 +48,22 @@ data class FrcProjectGeneralSettings @JvmOverloads constructor(
         
         private fun initTeamNumber(project: Project): Int
         {
-            LOG.debug("[FRC] initializing team number for project: $project   Type: ${project::class.java}")
+            logger.debug {"[FRC] initializing team number for project: $project   Type: ${project::class.java}"}
             try
             {
-                if (!project.isDefault)
-                {
-                    // TODO Need to get from the WpiLibPreferences data class once that is done
-                }
+                //if (!project.isDefault)
+                //{
+                //    // TODO Need to get from the WpiLibPreferences data class once that is done
+                //}
                 
             }
             catch (e: Exception)
             {
-                LOG.warn("[FRC] An exception occurred when trying to read team number from wpilib_preferences.json file. Cause summary: $e", e)
+                logger.warn("[FRC] An exception occurred when trying to read team number from wpilib_preferences.json file. Cause summary: $e", e)
             }
             
             
-            return UN_CONFIGURED_TEAM_NUMBER;
+            return UN_CONFIGURED_TEAM_NUMBER
         }
     }
 
@@ -73,7 +75,7 @@ data class FrcProjectGeneralSettings @JvmOverloads constructor(
      */
     override fun getState(): FrcProjectGeneralSettings
     {
-        LOG.trace("[FRC] FrcProjectGeneralSettings.getState() called. Returning current state of: ${toString()}")
+        logger.trace {"[FRC] FrcProjectGeneralSettings.getState() called. Returning current state of: ${toString()}"}
         return this
     }
 
@@ -89,7 +91,7 @@ data class FrcProjectGeneralSettings @JvmOverloads constructor(
      */
     override fun loadState(state: FrcProjectGeneralSettings)
     {
-        LOG.trace("[FRC] FrcProjectGeneralSettings.loadState() called with state object of: $state")
+        logger.trace {"[FRC] FrcProjectGeneralSettings.loadState() called with state object of: $state"}
         XmlSerializerUtil.copyBean(state, this)
     }
 

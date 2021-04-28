@@ -25,8 +25,9 @@ import com.intellij.execution.jar.JarApplicationConfigurationType
 import com.intellij.execution.remote.RemoteConfiguration
 import com.intellij.execution.remote.RemoteConfigurationType
 import com.intellij.ide.SaveAndSyncHandler
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
@@ -52,7 +53,7 @@ import java.util.*
 
 private object RunDebugConfigurations 
 
-private val logger = Logger.getInstance(RunDebugConfigurations::class.java)
+private val logger = logger<RunDebugConfigurations>()
 
 
 fun createAllRunDebugConfigurations(project: Project, dataModel: FrcProjectWizardData)
@@ -156,11 +157,11 @@ fun createGradleRunConfiguration(project: Project,
 
 private fun createGradeSimulateJavaRunConfigurations(project: Project, isRomi: Boolean, setAsShared: Boolean = true)
 {
-    logger.trace("[FRC] Creating Gradle simulateJava run configurations")
+    logger.trace {"[FRC] Creating Gradle simulateJava run configurations"}
     val nameSuffix = if (isRomi) "Romi" else "Simulate Java"
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.simulateJava.buildAndRun.name", nameSuffix), listOf("simulateJava"), setAsShared = setAsShared, setAsSelected = isRomi)
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.simulateJava.cleanBuildAndRun.name", nameSuffix), listOf("clean", "simulateJava"), setAsShared = setAsShared)
-    logger.trace("[FRC] Completed Gradle simulateJava run configurations")
+    logger.trace {"[FRC] Completed Gradle simulateJava run configurations"}
 }
 
 @JvmOverloads
@@ -291,7 +292,7 @@ fun createJarApplicationRunConfiguration(project: Project,
 
 private fun createGradleRoboRioBuildRunConfigurations(project: Project)
 {
-    logger.trace("[FRC] Creating Gradle roboRIO run configurations")
+    logger.trace {"[FRC] Creating Gradle roboRIO run configurations"}
     val debugModeArgument = "-PdebugMode=true"
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.buildAndDeploy.name"), listOf("deploy"), setAsSelected = true)
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.buildAndDeployForDebug.name"), listOf("deploy"), arguments = debugModeArgument)
@@ -299,15 +300,15 @@ private fun createGradleRoboRioBuildRunConfigurations(project: Project)
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.cleanBuildAndDeploy.name"), listOf("clean", "deploy"))
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.cleanBuildAndDeployForDebug.name"), listOf("clean", "deploy"), arguments = debugModeArgument)
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.cleanBuild.name"), listOf("clean", "build"))
-    logger.trace("[FRC] Completed Gradle roboRIO run configurations")
+    logger.trace {"[FRC] Completed Gradle roboRIO run configurations"}
 }
 
 private fun createRoboRioDebuggingRunConfigurations(project: Project, teamNumber: Int = project.getProjectTeamNumber())
 {
-    logger.trace("[FRC] Creating Debugging run configurations")
+    logger.trace {"[FRC] Creating Debugging run configurations"}
     createDebuggingRunConfiguration(project, teamNumber, RoboRioAddressType.IP)
     createDebuggingRunConfiguration(project, teamNumber, RoboRioAddressType.USB)
-    logger.trace("[FRC] Completed Debugging run configurations")
+    logger.trace {"[FRC] Completed Debugging run configurations"}
 }
 
 @JvmOverloads
@@ -334,12 +335,12 @@ fun createDebuggingRunConfiguration(project: Project, teamNumber: Int = project.
 //            val mainModule = project.getMainModule()
 //            if (mainModule != null)
 //            {
-//                logger.debug("[FRC] For Debugging Configuration '$runConfigName', setting module directly.")
+//                logger.debug {"[FRC] For Debugging Configuration '$runConfigName', setting module directly."}
 //                remoteConfiguration.setModule(mainModule)
 //            }
 //            else
 //            {
-                logger.debug("[FRC] For Debugging Configuration '$runConfigName', setting module by name.")
+                logger.debug {"[FRC] For Debugging Configuration '$runConfigName', setting module by name."}
                 remoteConfiguration.setModuleName("${project.name}.main")
 //            }
             }
@@ -380,16 +381,16 @@ class ModuleSettingAction(private val remoteConfiguration: RemoteConfiguration, 
         val mainModule = project.getMainModule()
         if (mainModule != null)
         {
-            logger.debug("[FRC] Main Module is available. Updating Configuration")
+            logger.debug {"[FRC] Main Module is available. Updating Configuration"}
             remoteConfiguration.setModule(mainModule)
 
         }
         else
         {
-            logger.debug("[FRC] Main module is not available yet. Run Count: $count   modules: ${project.getModules()}")
+            logger.debug {"[FRC] Main module is not available yet. Run Count: $count   modules: ${project.getModules()}"}
             if (count <= 16)
             {
-                logger.debug("[FRC] Scheduling next check for 15 seconds")
+                logger.debug {"[FRC] Scheduling next check for 15 seconds"}
                 timer.schedule(object : TimerTask()
                                {
                                    override fun run()
@@ -400,7 +401,7 @@ class ModuleSettingAction(private val remoteConfiguration: RemoteConfiguration, 
                                }, LocalDateTime.now().plus(Duration.ofSeconds(15)).asDate())
             } else
             {
-                logger.debug("[FRC] Max attempts reached")
+                logger.debug {"[FRC] Max attempts reached"}
             }
         }
     }
@@ -417,7 +418,7 @@ private fun shareRunConfiguration(project: Project, settings: RunnerAndConfigura
         val dirPath = "$baseDir/.run"
         val fileName = createRunConfigFileName(settings.name)
         val filePath = "$dirPath/$fileName"
-        logger.debug("[FRC] run config path set to: $filePath")
+        logger.debug {"[FRC] run config path set to: $filePath"}
         settings.storeInArbitraryFileInProject(filePath)
     }
     else

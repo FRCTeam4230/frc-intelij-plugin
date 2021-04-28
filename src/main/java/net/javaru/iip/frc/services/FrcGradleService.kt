@@ -35,7 +35,7 @@ import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.literals
 
 class FrcGradleService private constructor(val project: Project)
 {
-    private val LOG = logger<FrcGradleService>()
+    private val logger = logger<FrcGradleService>()
     companion object
     {
         fun getInstance(project: Project): FrcGradleService = project.service()
@@ -49,7 +49,7 @@ class FrcGradleService private constructor(val project: Project)
             val psiFile = project.getGradleBuildPsiFile()
             if (psiFile == null)
             {
-                LOG.info("[FRC] Could not find gradle project file to look up includeDesktopSupport setting.")
+                logger.info("[FRC] Could not find gradle project file to look up includeDesktopSupport setting.")
             }
             else
             {
@@ -71,7 +71,7 @@ class FrcGradleService private constructor(val project: Project)
                             })
                     }
                     else -> {
-                        LOG.info("[FRC] non groovy gradle files is not yet supported. Unable to determine if includeDesktopSupport setting.")
+                        logger.info("[FRC] non groovy gradle files is not yet supported. Unable to determine if includeDesktopSupport setting.")
                     }
                 }
             }
@@ -81,7 +81,7 @@ class FrcGradleService private constructor(val project: Project)
         }
         catch (e: Exception)
         {
-            LOG.info("[FRC] an exception occurred when checking includeDesktopSupport setting: $e")
+            logger.info("[FRC] an exception occurred when checking includeDesktopSupport setting: $e")
         }
         return result
     }

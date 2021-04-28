@@ -25,7 +25,8 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.StoragePathMacros
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.service.project.ExternalProjectRefreshCallback
@@ -90,7 +91,7 @@ class WpiLibVersionStartupActivity : StartupActivity
 class WpiLibVersionService private constructor(private val project: Project) : PersistentStateComponent<WpiLibVersionServiceState>,
                                                                                Disposable
 {
-    private val LOG = Logger.getInstance(WpiLibVersionService::class.java)
+    private val logger = logger<WpiLibVersionService>()
 
     private var myState: WpiLibVersionServiceState = WpiLibVersionServiceState()
 
@@ -121,12 +122,12 @@ class WpiLibVersionService private constructor(private val project: Project) : P
         maxTimeSinceLastCheck: Duration = Duration.ofSeconds(10)
                                          )
     {
-        LOG.debug("[FRC] Preparing to check WPI Lib for update. notifyIfNoUpdateAvailable = $notifyIfNoUpdateAvailable  maxTimeSinceLastCheck = $maxTimeSinceLastCheck")
+        logger.debug {"[FRC] Preparing to check WPI Lib for update. notifyIfNoUpdateAvailable = $notifyIfNoUpdateAvailable  maxTimeSinceLastCheck = $maxTimeSinceLastCheck"}
         val durationSinceLastCheck = myState.durationSinceLastCheck
         if (durationSinceLastCheck < maxTimeSinceLastCheck)
         {
             // TODO: Do we need to call scheduleStatusCheck here?
-            LOG.debug("[FRC] time since last check of $durationSinceLastCheck is less than maxTimeSinceLastCheck or $maxTimeSinceLastCheck. No update check will be performed.")
+            logger.debug {"[FRC] time since last check of $durationSinceLastCheck is less than maxTimeSinceLastCheck or $maxTimeSinceLastCheck. No update check will be performed."}
             return
         }
 
@@ -137,23 +138,23 @@ class WpiLibVersionService private constructor(private val project: Project) : P
         {
             if (versionStatus.updateAvailableForAttachedYear())
             {
-                LOG.debug("[FRC] notifying WPI Lib update is available. WpiLibVersionStatus: $versionStatus")
+                logger.debug {"[FRC] notifying WPI Lib update is available. WpiLibVersionStatus: $versionStatus"}
                 updateAvailableNotification = notifyNewerWpiLibVersionIsAvailable(versionStatus)
             }
             else if (notifyIfNoUpdateAvailable)
             {
-                LOG.debug("[FRC] notifying WPILib update NOT available. WpiLibVersionStatus: $versionStatus")
+                logger.debug {"[FRC] notifying WPILib update NOT available. WpiLibVersionStatus: $versionStatus"}
                 notifyNoUpdateAvailable(versionStatus.attachedVersion.frcYear)
             }
         }
         else if (notifyIfNoUpdateAvailable)
         {
-            LOG.debug("[FRC] notifying WPILib update NOT available due to null WpiLibVersionStatus")
+            logger.debug {"[FRC] notifying WPILib update NOT available due to null WpiLibVersionStatus"}
             notifyUnableToCheckVersionStatus()
         }
         else
         {
-            LOG.debug("[FRC] WpiLibVersionStatus was null, indicating it couold not be determined.")
+            logger.debug {"[FRC] WpiLibVersionStatus was null, indicating it could not be determined."}
         }
         // If we've notified an update is available, we do no want to schedule the next check until the user acknowledges the previous check
         if (updateAvailableNotification != null) updateAvailableNotification.whenExpired(::scheduleStatusCheck) else scheduleStatusCheck()
@@ -179,7 +180,7 @@ class WpiLibVersionService private constructor(private val project: Project) : P
             }
             timerTask = CheckStatusTimerTask(project)
             timer.schedule(timerTask, next.asDate())
-            LOG.info("[FRC] next check for WPI Lib update scheduled for $next")
+            logger.info("[FRC] next check for WPI Lib update scheduled for $next")
         }
     }
 
@@ -255,7 +256,7 @@ class WpiLibVersionService private constructor(private val project: Project) : P
             val psiFile = project.getGradleBuildPsiFile()
             if (psiFile == null)
             {
-                LOG.warn("[FRC] could not find Gradle Build File to update the WPI Lib / GradleRIO plugin")
+                logger.warn("[FRC] could not find Gradle Build File to update the WPI Lib / GradleRIO plugin")
                 FrcNotifications.notify(
                     FrcNotificationType.ACTIONABLE_WARN,
                     FrcMessageKey.of("frc.notification.wpiLibVersionStatus.gradle.not.able.to.update", version.versionString)
@@ -320,7 +321,7 @@ class WpiLibVersionService private constructor(private val project: Project) : P
 
                                         if (gradleRioCallExpression == null)
                                         {
-                                            LOG.warn("[FRC] Could not find GradleRIO plugin Call Expression in order to update the WPI Lib / GradleRIO plugin")
+                                            logger.warn("[FRC] Could not find GradleRIO plugin Call Expression in order to update the WPI Lib / GradleRIO plugin")
                                             FrcNotifications.notify(
                                                 FrcNotificationType.ACTIONABLE_WARN,
                                                 FrcMessageKey.of("frc.notification.wpiLibVersionStatus.gradle.not.able.to.update", version.versionString)
@@ -362,7 +363,7 @@ class WpiLibVersionService private constructor(private val project: Project) : P
                 }
                 else
                 {
-                    LOG.warn("[FRC] Unknown file type for gradle build: ${psiFile.name}")
+                    logger.warn("[FRC] Unknown file type for gradle build: ${psiFile.name}")
                     FrcNotifications.notify(
                         FrcNotificationType.ACTIONABLE_WARN,
                         FrcMessageKey.of("frc.notification.wpiLibVersionStatus.gradle.not.able.to.update", version.versionString)
@@ -400,12 +401,12 @@ class WpiLibVersionService private constructor(private val project: Project) : P
 
     private fun getWpiLibVersionStatus(): WpiLibVersionStatus?
     {
-        LOG.debug("[FRC] getWpiLibVersionStatus() called. Will perform work in runReadActionInSmartMode")
+        logger.debug {"[FRC] getWpiLibVersionStatus() called. Will perform work in runReadActionInSmartMode"}
         var versionStatus: WpiLibVersionStatus? = null
         DumbService.getInstance(project).runReadActionInSmartMode() {
             if (!project.isDisposed && project.isFrcFacetedProject())
             {
-                LOG.debug("[FRC] getWpiLibVersionStatus() : runReadActionInSmartMode has started.")
+                logger.debug {"[FRC] getWpiLibVersionStatus() : runReadActionInSmartMode has started."}
                 val state = GradleRioMavenMetadataState.getInstance(true)
                 val latestAvailableVersion = state.wpiLibMavenMetadata.latestAsWpiLibVersion
 
@@ -422,13 +423,13 @@ class WpiLibVersionService private constructor(private val project: Project) : P
                     if (latestAvailableForSameYear != null)
                     {
                         versionStatus = WpiLibVersionStatus(attachedVersion, latestAvailableForSameYear, latestAvailableVersion)
-                        LOG.debug("[FRC] WpiLibVersionStatus readActionInSmartMode determined to be: $versionStatus")
+                        logger.debug {"[FRC] WpiLibVersionStatus readActionInSmartMode determined to be: $versionStatus"}
                     }
                 }
             }
         }
         myState.updateLastCheckedTime()
-        LOG.debug("[FRC] getWpiLibVersionStatus() returning WpiLibVersionStatus of:  $versionStatus")
+        logger.debug {"[FRC] getWpiLibVersionStatus() returning WpiLibVersionStatus of:  $versionStatus"}
         return versionStatus
     }
 

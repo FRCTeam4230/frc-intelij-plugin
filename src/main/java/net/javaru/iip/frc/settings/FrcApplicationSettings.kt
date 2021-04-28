@@ -20,7 +20,9 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.Transient
 import net.javaru.iip.frc.FrcPluginGlobals.MAX_RUN_COUNT_TO_SAVE
@@ -96,17 +98,17 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
     }
 
 
-    private val LOG = Logger.getInstance(FrcApplicationSettings::class.java)
+    private val logger = logger <FrcApplicationSettings>()
 
     override fun getState(): FrcApplicationSettings
     {
-        LOG.trace("[FRC] FrcApplicationSettings.getState() called. Returning current state of: ${toString()}")
+        logger.trace {"[FRC] FrcApplicationSettings.getState() called. Returning current state of: ${toString()}"}
         return this
     }
 
     override fun loadState(state: FrcApplicationSettings)
     {
-        LOG.trace("[FRC] FrcApplicationSettings.loadState() called with state object of: $state")
+        logger.trace {"[FRC] FrcApplicationSettings.loadState() called with state object of: $state"}
         XmlSerializerUtil.copyBean(state, this)
     }
 
@@ -122,7 +124,7 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
 
 fun determineWpiLibDir(): Path
 {
-    val logger = Logger.getInstance(FrcApplicationSettings::class.java)
+    val logger = logger <FrcApplicationSettings>()
     var basePath: Path? = null
 
     if (StringUtils.isNotBlank(System.getProperty (ALT_WPILIB_BASE_DIR_SYS_PROP)))
@@ -130,7 +132,7 @@ fun determineWpiLibDir(): Path
         try
         {
             basePath = Paths.get(System.getProperty(ALT_WPILIB_BASE_DIR_SYS_PROP))
-            logger.debug("[FRC] calculated wpilib base dir set to '$basePath' via system property '$ALT_WPILIB_BASE_DIR_SYS_PROP'")
+            logger.debug {"[FRC] calculated wpilib base dir set to '$basePath' via system property '$ALT_WPILIB_BASE_DIR_SYS_PROP'"}
         }
         catch (e: InvalidPathException)
         {
@@ -148,7 +150,7 @@ fun determineWpiLibDir(): Path
                 try
                 {
                     basePath = Paths.get(envVar).toAbsolutePath()
-                    logger.debug("[FRC] calculated wpilib base dir set to '$basePath' via env var '$WPILIB_BASE_DIR_ENV_VAR'")
+                    logger.debug{"[FRC] calculated wpilib base dir set to '$basePath' via env var '$WPILIB_BASE_DIR_ENV_VAR'"}
                 }
                 catch (e: InvalidPathException)
                 {
@@ -166,12 +168,12 @@ fun determineWpiLibDir(): Path
     if (basePath == null)
     {
         basePath = Paths.get(System.getProperty("user.home", "C:\\Users\\Public"))
-        logger.debug("[FRC] calculated wpilib base dir set to '$basePath' via (default) system property 'user.home'")
+        logger.debug {"[FRC] calculated wpilib base dir set to '$basePath' via (default) system property 'user.home'"}
     }
 
 
     val wpiLibDir = basePath!!.resolve("wpilib").toAbsolutePath()
-    logger.debug("[FRC] calculated wpilib dir set to '$wpiLibDir'.")
+    logger.debug {"[FRC] calculated wpilib dir set to '$wpiLibDir'."}
 
     return wpiLibDir
 }

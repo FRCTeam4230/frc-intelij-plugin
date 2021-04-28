@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2021 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,11 +17,11 @@
 package net.javaru.iip.frc.net
 
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.io.HttpRequests
 import net.javaru.iip.frc.util.getPluginResourceAsText
 
-private val LOG = Logger.getInstance(FrcPseudoRestService::class.java)
+private val logger = logger<FrcPseudoRestService>()
 const val gitBaseRawUrl = "https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/raw"
 
 /**
@@ -97,7 +97,7 @@ object FrcPseudoRestService
         catch (e: Exception)
         {
             val additionalMsg = if (defaultToBundled) " Will check for resource on classpath." else ""
-            LOG.info("[FRC] getPseudoRestServiceResource() could not get resource from url '$urlPath'.$additionalMsg Cause: $e")
+            logger.info("[FRC] getPseudoRestServiceResource() could not get resource from url '$urlPath'.$additionalMsg Cause: $e")
             return if (defaultToBundled)
             {
                 // First look for the resource directly on the class path, then look for it along with the basePath if not found

@@ -42,7 +42,7 @@ import java.nio.file.Paths
 import java.util.*
 
 object WpiLibHelpers
-private val LOG = logger<WpiLibHelpers>()
+private val logger = logger<WpiLibHelpers>()
 /**
  * Determines the `projectYear` String used in the `wpilib_preferences.json` file. Typically, it is just the year such as `2020`, but it may be an alternate
  * value during the pre-releases, such as `Beta2020` or `Beta2020-2`. There doesn't appear to be any pattern to it as in the WPI repo, it
@@ -84,7 +84,7 @@ fun getWpiLibRootPath(year: Int): Path
     if (!wpiLibRootPath.exists() && FrcPluginGlobals.IS_NOT_IN_FRC_UNIT_TEST_MODE)
     {
         // TODO: when we implement above ability for user to override, prompt the user for the location here and set it
-        LOG.warn("[FRC] The WPI Lib root was not found at its expected location of: $wpiLibRootPath")
+        logger.warn("[FRC] The WPI Lib root was not found at its expected location of: $wpiLibRootPath")
         FrcNotifications.notify(FrcNotificationType.ACTIONABLE_WARN, FrcMessageKey.of("frc.wpilib.root.path.not.found.user.notification", wpiLibRootPath))
     }
     return wpiLibRootPath
@@ -124,14 +124,14 @@ fun getDefaultWpiLibRootPath(year: Int): Path
         }
         catch (t1: Throwable)
         {
-            LOG.warnWhenNotInTestMode("[FRC] Could not determine WPI Lib path via VfUtils due to an exception. Will use Commons Lang SystemUtils.getUserHome() instead. Cause Summary: $t1")
+            logger.warnWhenNotInTestMode("[FRC] Could not determine WPI Lib path via VfUtils due to an exception. Will use Commons Lang SystemUtils.getUserHome() instead. Cause Summary: $t1")
             try
             {
                 SystemUtils.getUserHome()?.toPath()?.toAbsolutePath() ?: Paths.get("/").toAbsolutePath()
             }
             catch (t2: Throwable)
             {
-                LOG.warnWhenNotInTestMode("[FRC] Could not determine WPI Lib path via Commons Lang SystemUtils.getUserHome() due the exception: $t2")
+                logger.warnWhenNotInTestMode("[FRC] Could not determine WPI Lib path via Commons Lang SystemUtils.getUserHome() due the exception: $t2")
                 Paths.get("/")
             }
         }

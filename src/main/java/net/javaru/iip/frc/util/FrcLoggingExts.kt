@@ -19,6 +19,22 @@ package net.javaru.iip.frc.util
 import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.FrcPluginGlobals.IS_IN_FRC_UNIT_TEST_MODE
 
+/**
+ * If `IS_IN_FRC_UNIT_TEST_MODE` is true, the supplied message is always logged at the DEBUG level (assuming DEBUG is enabled for the logger).
+ * If we are not `IS_IN_FRC_UNIT_TEST_MODE`, the message is logged at the WARN level, unless we are `IS_IN_FRC_INTERNAL_MODE` in which case
+ * it is logged at the ERROR level in order to call the developer's attention to the issue.
+ */
+@JvmOverloads
+fun com.intellij.openapi.diagnostic.Logger.asserted(t: Throwable? = null, message: ()-> String)
+{
+    if (IS_IN_FRC_UNIT_TEST_MODE && this.isDebugEnabled) this.debug(message.invoke(), t) else if (shouldAssert) this.error(message.invoke(), t) else this.warn(message.invoke(), t)
+}
+
+/**
+ * If `IS_IN_FRC_UNIT_TEST_MODE` is true, the supplied message is always logged at the DEBUG level (assuming DEBUG is enabled for the logger).
+ * If we are not `IS_IN_FRC_UNIT_TEST_MODE`, the message is logged at the WARN level, unless we are `IS_IN_FRC_INTERNAL_MODE` in which case
+ * it is logged at the ERROR level in order to call the developer's attention to the issue.
+ */
 @JvmOverloads
 fun com.intellij.openapi.diagnostic.Logger.asserted(message: String, t: Throwable? = null)
 {

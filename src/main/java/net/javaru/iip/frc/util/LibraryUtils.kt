@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,8 @@
 package net.javaru.iip.frc.util
 
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.roots.JavadocOrderRootType
 import com.intellij.openapi.roots.ModuleRootManager
@@ -32,7 +33,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 
-    private val LOG = Logger.getInstance("#net.javaru.iip.frc.util.LibraryUtils")
+private val LOG =logger("#net.javaru.iip.frc.util.LibraryUtils")
 
 
 
@@ -40,7 +41,7 @@ import java.nio.file.Path
     {
         ApplicationManager.getApplication().runWriteAction {
             
-            LOG.debug("[FRC] Attaching Library: $libDef")
+            LOG.debug {"[FRC] Attaching Library: $libDef"}
             val rootManager = ModuleRootManager.getInstance(libDef.module)
             val modifiableRootModel = rootManager.modifiableModel
             val libraryTable = modifiableRootModel.moduleLibraryTable
@@ -67,7 +68,7 @@ import java.nio.file.Path
             
             libraryModifiableModel.commit()
             modifiableRootModel.commit()
-            LOG.debug("[FRC] Library attach competed for '${libDef.libName}")
+            LOG.debug {"[FRC] Library attach competed for '${libDef.libName}"}
         }
     }
 

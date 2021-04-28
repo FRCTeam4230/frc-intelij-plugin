@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.util
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
@@ -42,7 +41,7 @@ import java.nio.file.Path
 // that that is possibly planned:
 // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360010674120-Programatically-Update-Plugin-Version-in-Gradle-Build-File
 
-private val LOG = Logger.getInstance("#net.javaru.iip.frc.util.GradleUtils")
+//private val LOG = logger("#net.javaru.iip.frc.util.GradleUtils")
 
 fun Project.getGradleBuildIoFile(): File?
 {

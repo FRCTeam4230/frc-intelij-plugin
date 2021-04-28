@@ -54,6 +54,8 @@
 
     <change-notes><![CDATA[
         <strong>v1.6.0</strong> <br>
+        &nbsp;&nbsp;&bull; FRC Project Wizard: modified created Run Configurations to be shared via the (newer) methodology of storing them in
+                           a <tt>.run</tt> directory in the project's base/root directory rather than in <tt>.idea/runConfigurations</tt><br>
         &nbsp;&nbsp;&bull; <br>
         <br>
         <strong>v1.5.0</strong> <br>
@@ -71,13 +73,11 @@
         <strong>v1.4.0</strong> <br>
         &nbsp;&nbsp;&bull; Support for IntelliJ IDEA v2020.2 and later only. See the
                            <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin#eol-policy'>FRC Plugin's EOL Policy</a> for more detail.<br>
-        &nbsp;&nbsp;&bull; New Project Wizard: Updated Project Templates for 2021 to match the WPI Lib ones. This included adding the new Romi projects.
+        &nbsp;&nbsp;&bull; FRC Project Wizard: Updated Project Templates for 2021 to match the WPI Lib ones. This included adding the new Romi projects.
                            Also added the Romi Reference example template. However, the other example templates still need to be check for any
                            potential updates. An an initial look seems to indicate the changes made for 2021 are mostly superficial.<br>
-        &nbsp;&nbsp;&bull; New Project Wizard: Gradle run configurations are now stored in <tt>{projectRoot}/.run<tt> rather then <tt>{projectRoot}/.idea/runConfigurations<tt>
-                           (as introduced in IntelliJ IDEA v2020.1) for easier/better sharing of run configurations.<br>
-        &nbsp;&nbsp;&bull; New Project Wizard: .idea files are now ignored by default in .gitignore rather than shared as the default.<br>
-        &nbsp;&nbsp;&bull; New Project Wizard: Improved auto import of gradle project upon project creation.<br>
+        &nbsp;&nbsp;&bull; FRC Project Wizard: .idea files are now ignored by default in .gitignore rather than shared as the default.<br>
+        &nbsp;&nbsp;&bull; FRC Project Wizard: Improved auto import of gradle project upon project creation.<br>
         &nbsp;&nbsp;&bull; Preparation for migrating the Plugin to be a dynamic plugin (i.e. restart of IDEA not required after upgrading FRC plugin).
                            Full Dynamic Plugin capabilities are planned for a near future release.<br>
         &nbsp;&nbsp;&bull; Some minor improvements to the Subsystem singleton templates.<br>
@@ -157,6 +157,7 @@
     <!-- The unique identifiers of the plugins on which this plugin depends. -->
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
+    <depends>org.jetbrains.plugins.gradle</depends>
     <depends>com.intellij.gradle</depends>
     <depends>org.intellij.groovy</depends>
     <depends>com.jetbrains.sh</depends>

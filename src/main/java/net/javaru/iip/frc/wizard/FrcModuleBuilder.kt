@@ -24,6 +24,7 @@ import com.intellij.ide.util.projectWizard.SdkSettingsStep
 import com.intellij.ide.util.projectWizard.SettingsStep
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.model.project.ProjectId
@@ -33,14 +34,15 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.module.StdModuleTypes
 import com.intellij.openapi.options.ConfigurationException
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.runWhenProjectOpened
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkTypeId
 import com.intellij.openapi.projectRoots.impl.JavaSdkImpl
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider
-import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
@@ -62,7 +64,7 @@ import net.javaru.iip.frc.util.asPluginResourceUrl
 import net.javaru.iip.frc.util.asPluginResourceVF
 import net.javaru.iip.frc.util.get
 import net.javaru.iip.frc.util.getPluginResourceAsStream
-import net.javaru.iip.frc.util.invokeLater
+import net.javaru.iip.frc.util.invokeLaterWait
 import net.javaru.iip.frc.util.isValidJavaVersion
 import net.javaru.iip.frc.util.isValidJdk
 import net.javaru.iip.frc.util.reader
@@ -115,7 +117,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 //    private val myInheritGroupId = false
 //    private val myInheritVersion = false
     private var myProjectId: ProjectId? = null
-    private var rootProjectPath: String? = null
+    private var rootProjectPath: Path? = null
 
     val dataModel = FrcProjectWizardData()
 
@@ -251,7 +253,55 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         // This implementation is heavily based on the impl in GradleModelBuilder, along with a bit from  the KtorModuleBuilder impl in the JetBrains ktor plugin
         LOG.trace("[FRC] FrcModuleBuilder.setupModule() called for module: ${module?.name}")
         super.setupModule(module) // this will call (our overridden) setupRootModel method
+        callCreateRunConfigurations(module)
         LOG.trace("[FRC] FrcModuleBuilder.setupModule() completed for module: ${module?.name}")
+    }
+
+
+    private fun callCreateRunConfigurations(module: Module?)
+    {
+        val project = module?.project
+        if (project != null)
+        {
+            callCreateRunConfigurations(project)
+        }
+        else
+        {
+            LOG.warn("[FRC] Could not create run debug configurations due to null module or project.")
+        }
+    }
+
+    private fun callCreateRunConfigurations(project: Project)
+    {
+        LOG.trace("[FRC] scheduling run configuration creation to runWhenProjectOpened.")
+        /*
+          To prevent the below logged warning (from  RCInArbitraryFileManager.loadChangedRunConfigsFromFile() (~line 97)
+                "It's unexpected that the file doesn't exist at this point ($filePath)"
+          We need wait until the project is opened, and is not indexing
+          From some debugging, the issue happens when the project is initially importing
+          A race condition occurs (if we do not wait)
+          So we need to wait until the initial import is complete. But there does not
+          appear to be a way to register a callback with the ImportModuleAction,createFromWizard()
+          So we use the below coded construct which seems to work fine.
+          High level call stack (some intermediary methods not listed)
+               RCInArbitraryFileManager.loadChangedRunConfigsFromFile()
+               RunManagerImpl.deleteRunConfigsFromArbitraryFilesNotWithinProjectContent()
+               RCInArbitraryFileManager.findRunConfigsThatAreNotWithinProjectContent()
+               RunManagerImpl.findRunConfigsThatAreNotWithinProjectContent()
+               ExternalSystemUtil.refreshProject()
+               GradleOpenProjectProvider.attachGradleProjectAndRefresh()
+               ImportModuleAction.createFromWizard()
+               FrcModuleBuilder.importGradleProject()
+         */
+
+        runWhenProjectOpened(project) {
+            DumbService.getInstance(it).runWhenSmart {
+                runWriteAction {
+                    createAllRunDebugConfigurations(it, dataModel)
+                    it.reimportGradleProject()
+                }
+            }
+        }
     }
 
 
@@ -271,7 +321,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 
         project.runBackgroundTask("Setting Up FRC Project") { progress ->
             progress.text = "Processing templates"
-            rootProjectPath = myParentProject?.linkedExternalProjectPath ?: FileUtil.toCanonicalPath(if (myWizardContext!!.isCreatingNewProject) project.basePath else modelContentRootDir.path)
+
+            rootProjectPath = if (myParentProject != null)
+                Paths.get(myParentProject!!.linkedExternalProjectPath)
+            else
+                Paths.get(FileUtil.toCanonicalPath(if (myWizardContext!!.isCreatingNewProject) project.basePath else modelContentRootDir.path))
             assert(rootProjectPath != null) { "rootProjectPath is null" }
 
             copyTemplateFilesToProject(modelContentRootDir)
@@ -400,33 +454,22 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         if (gradleBuildVf == null)
         {
             LOG.info("[FRC] gradle import not executed as build.gradle/build.gradle.kts was not found ")
-
         }
         else
         {
             LOG.trace("[FRC] preparing for gradle import")
-            invokeLater {
+            invokeLaterWait {
                 LOG.trace("[FRC] gradle import lambda starting")
 
                 val provider = ProjectImportProvider.PROJECT_IMPORT_PROVIDER.extensions
                     .firstOrNull { it.canImport(gradleBuildVf, project) }
-                    ?: return@invokeLater
+                    ?: return@invokeLaterWait
 
                 val wizard = ImportModuleAction.createImportWizard(project, null, gradleBuildVf, provider)
                 if (wizard != null && (wizard.stepCount <= 0 || wizard.showAndGet()))
                 {
                     ImportModuleAction.createFromWizard(project, wizard)
                 }
-
-                LOG.trace("[FRC] scheduling run configuration creation to runWhenProjectIsInitialized.")
-                StartupManager.getInstance(project).runWhenProjectIsInitialized {
-                            LOG.trace("[FRC] run configuration creation lambda called")
-                            createAllRunDebugConfigurations(project, dataModel)
-                            LOG.trace("[FRC] reimporting gradle project")
-                            // reimport gradle project so the run configurations show in the gradle tool window
-                            project.reimportGradleProject()
-                }
-
                 LOG.trace("[FRC] gradle import lambda finished")
             }
             LOG.trace("[FRC] gradle import prep completed")

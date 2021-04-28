@@ -368,7 +368,7 @@ fun createDebuggingRunConfiguration(project: Project, teamNumber: Int = project.
     }
 }
 
-class ModuleSettingAction(val remoteConfiguration: RemoteConfiguration, val project: Project)
+class ModuleSettingAction(private val remoteConfiguration: RemoteConfiguration, val project: Project)
 {
     private val logger = logger<ModuleSettingAction>()
     private var count = 0
@@ -408,21 +408,22 @@ class ModuleSettingAction(val remoteConfiguration: RemoteConfiguration, val proj
 
 private fun shareRunConfiguration(project: Project, settings: RunnerAndConfigurationSettings)
 {
-    // Continuing to use the deprecated isShared for now until we can figure out the "It's unexpected that the file doesn't exist at this point" issue
-    settings.isShared = true
-//    val baseDir = project.basePath
-//    if (baseDir == null)
-//    {
-//        logger.warn("[FRC] Can't share run configurations because project.basePath was null")
-//    }
-//    else
-//    {
-//        val dirPath = "$baseDir/.run"
-//        val fileName = createRunConfigFileName(settings.name)
-//        val filePath = "$dirPath/$fileName"
-//        logger.debug("[FRC] run config path set to: $filePath")
-//        settings.storeInArbitraryFileInProject(filePath)
-//    }
+    // Example from:  creating path:  com/intellij/execution/impl/RunConfigurationStorageUi.java:319
+    //                applying it:    com/intellij/execution/impl/RunConfigurationStorageUi.java:394
+    // it's the only place I could find setting/using the new .run directory
+    val baseDir = project.basePath
+    if (baseDir != null)
+    {
+        val dirPath = "$baseDir/.run"
+        val fileName = createRunConfigFileName(settings.name)
+        val filePath = "$dirPath/$fileName"
+        logger.debug("[FRC] run config path set to: $filePath")
+        settings.storeInArbitraryFileInProject(filePath)
+    }
+    else
+    {
+        logger.warn("[FRC] Can't share run configurations because project.basePath was null")
+    }
 }
 
 /** Creates a safe file name for a run config. This is a copy of the private `RunConfigurationStorageUi.getFileNameByRCName` method. */

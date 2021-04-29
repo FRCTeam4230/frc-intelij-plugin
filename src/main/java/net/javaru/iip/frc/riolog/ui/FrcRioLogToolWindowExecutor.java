@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,7 +25,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.IconLoader;
 
-import icons.FrcIcons;
+import icons.FrcIcons.FRC;
 
 
 
@@ -41,8 +41,9 @@ public class FrcRioLogToolWindowExecutor extends Executor
     public static final String FRC_RIO_LOG_TOOL_WINDOW_ID = "FRC"; // We may want to change this to RioLog if/when we create an FRC tool window for other features
     // The executor ID must match the id attribute of the <extensions>/<executor> element in the plugin.xml file
     public static final String EXECUTOR_ID = FrcRioLogToolWindowExecutor.class.getSimpleName();
-
-
+    public static final Icon FRC_TOOL_WINDOW_ICON = FRC.FIRST_ICON_SMALL_13_ELEVATED;
+    
+    
     @Override
     @NotNull
     public String getToolWindowId() { return FRC_RIO_LOG_TOOL_WINDOW_ID; }
@@ -50,7 +51,7 @@ public class FrcRioLogToolWindowExecutor extends Executor
 
     @Override
     @NotNull
-    public Icon getToolWindowIcon() { return FrcIcons.FRC.FIRST_ICON_SMALL_13_ELEVATED; }
+    public Icon getToolWindowIcon() { return FRC_TOOL_WINDOW_ICON; }
 
 
     @NotNull

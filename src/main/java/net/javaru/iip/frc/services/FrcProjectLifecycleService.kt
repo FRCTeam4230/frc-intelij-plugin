@@ -151,8 +151,9 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
     {
         if (facet.isFrcFacet())
         {
-            RioLogProjectService.getInstance(facet.module.project).update()
-            checkProjectFrcStatus(facet.module.project, knownFacetedProject = true, checkTeamNumConfigStatus = true)
+            val theProject = facet.module.project
+            RioLogProjectService.getInstance(theProject).update()
+            checkProjectFrcStatus(theProject, knownFacetedProject = true, checkTeamNumConfigStatus = true)
         }
     }
 

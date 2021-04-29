@@ -58,7 +58,7 @@ fun getCurrentFrcYear(adjustment: Duration = Duration.ofDays(30)): Int = LocalDa
  * since it is within 14 days until the end of the year.
  */
 @Deprecated("Use getCurrentFrcYear(0 instead", replaceWith = ReplaceWith("getCurrentFrcYear(adjustment)"))
-fun getCurrentBuildYear(adjustment: Duration = Duration.ofDays(30)): Int = getCurrentFrcYear()
+fun getCurrentBuildYear(adjustment: Duration = Duration.ofDays(30)): Int = getCurrentFrcYear(adjustment)
 
 
 

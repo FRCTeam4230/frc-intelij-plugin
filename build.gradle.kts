@@ -172,10 +172,12 @@ intellij {
         //      https://www.jetbrains.com/idea/download/other.html
         //      All including EAPs RCs
         //          https://data.services.jetbrains.com/products?fields=code,name,releases.downloads,releases.version,releases.build,releases.type&code=IIC,IIU,IIE
+        //      Just RCs & Releases:
+        //          https://data.services.jetbrains.com/products?fields=code,name,releases.downloads,releases.version,releases.build,releases.type&code=IIC,IIU,IIE&type=release,rc
         //      Just Releases:
         //          https://data.services.jetbrains.com/products?fields=code,name,releases.downloads,releases.version,releases.build,releases.type&code=IIC,IIU,IIE&type=release
         //ideVersions(listOf("IC-2020.2", "IC-2020.2.1", "IC-2020.2.2", "IC-2020.2.3", "IC-2020.2.4", "IC-2020.3", "IC-2020.3.1", "IC-2020.3.2"))
-        ideVersions(listOf("IC-2021.1"))
+        ideVersions(listOf("IC-2021.2"))
         // Reports appear in ${project.buildDir}/reports/pluginVerifier by default. Set `verificationReportsDirectory` to change
     }
 

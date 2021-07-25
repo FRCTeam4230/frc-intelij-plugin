@@ -17,7 +17,6 @@
 package net.javaru.iip.frc.riolog;
 
 import org.jetbrains.annotations.NotNull;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -39,7 +38,7 @@ import net.javaru.iip.frc.settings.FrcProjectTeamNumberService;
  * <a href="http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_services.html">Plugin Services</a>.
  * For example:
  * <pre>
- * final RioLogProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogProjectService.class);
+ * final RioLogProjectService rioLogConsoleProjectService = project.getService(RioLogProjectService.class);
  * </pre>
  * There are also three static {@code update} methods that can be used when the caller has access to a facet, a module, or a project.
  */
@@ -95,14 +94,14 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
     
     public static RioLogProjectService getInstance(@NotNull Project project)
     {
-        return ServiceManager.getService(project, RioLogProjectService.class);
+        return project.getService(RioLogProjectService.class);
     }
 
 
     /**
      * Do not call the constructor directly. Use as a project service via {@code com.intellij.openapi.components.ServiceManager}:<br/>
      * <pre>
-     * final RioLogProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogProjectService.class);
+     * final RioLogProjectService rioLogConsoleProjectService = project.getService(RioLogProjectService.class);
      * </pre>
      *
      * @param myProject the project

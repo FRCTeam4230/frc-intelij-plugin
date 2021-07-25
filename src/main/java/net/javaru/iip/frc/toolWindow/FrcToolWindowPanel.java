@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,7 +23,6 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
@@ -63,14 +62,14 @@ public class FrcToolWindowPanel extends SimpleToolWindowPanel implements Disposa
         
         /* We've implemented the RioLogRootPanel as a SimpleToolWindowPanel in the event we want to break the RioLog out
            as a separate tool window in the event we add additional features to the FRC tool window. */
-        final RioLogRootPanel rioLogRootPanel = ServiceManager.getService(project, RioLogRootPanel.class);
+        final RioLogRootPanel rioLogRootPanel = project.getService(RioLogRootPanel.class);
         setContent(rioLogRootPanel);
     }
 
 
     public static FrcToolWindowPanel getInstance(@NotNull final Project project)
     {
-        return ServiceManager.getService(project, FrcToolWindowPanel.class);
+        return project.getService(FrcToolWindowPanel.class);
     }
 
 

@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +36,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jetbrains.annotations.NotNull;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 
@@ -53,7 +53,7 @@ public class TcpRioSocketConnectorProjectService
 {
     private static final Logger LOG = Logger.getInstance(TcpRioSocketConnectorProjectService.class);
 
-    private static Pattern dsPattern = Pattern.compile("\"robotIP\"[^:]*:[^0-9]*([0-9]+)");
+    private static final Pattern dsPattern = Pattern.compile("\"robotIP\"[^:]*:[^0-9]*([0-9]+)");
     
     private final Project project;
     
@@ -70,7 +70,7 @@ public class TcpRioSocketConnectorProjectService
 
     public static TcpRioSocketConnectorProjectService getInstance(@NotNull Project project)
     {
-        return ServiceManager.getService(project, TcpRioSocketConnectorProjectService.class);
+        return project.getService(TcpRioSocketConnectorProjectService.class);
     }
 
 
@@ -162,7 +162,7 @@ public class TcpRioSocketConnectorProjectService
                     return;
                 }
 
-                String json = buf.toString("UTF-8");
+                String json = buf.toString(StandardCharsets.UTF_8);
 
                 // Look for "robotIP":12345, and get 12345 portion
                 Matcher m = dsPattern.matcher(json);

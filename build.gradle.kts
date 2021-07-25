@@ -16,19 +16,16 @@
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.gradle.ext.ProjectSettings
-import org.jetbrains.intellij.tasks.PatchPluginXmlTask
-import org.jetbrains.intellij.tasks.PublishTask
-import org.jetbrains.intellij.tasks.RunIdeTask
-//import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
 
 val frcPluginBaseVersion: String by project
 val ideaMajorVersion: String by project
 val frcPluginEapDesignator: String by project
+val frcPluginVersion = "$frcPluginBaseVersion-$ideaMajorVersion$frcPluginEapDesignator"
 
 group = "net.javaru.iip.frc"
 // ex: v1.3.0-2019.2,  1.3.1-2020.1-eap.1
-version = "$frcPluginBaseVersion-$ideaMajorVersion$frcPluginEapDesignator"
+version = frcPluginVersion
 
 //buildscript {
 //    build.loadExtraPropertiesOf(project)
@@ -36,28 +33,36 @@ version = "$frcPluginBaseVersion-$ideaMajorVersion$frcPluginEapDesignator"
 
 
 //val kotlinVersion = plugins.getPlugin(KotlinPluginWrapper::class.java).kotlinPluginVersion
-
-val ideaVersion: String by project
-val isEAP: String by project
-val ideaSameSinceUntilBuild: String by project
-val ideaDownloadSources: String by project
-val publishRepoUsername: String by project
-val publishRepoPassword: String by project
-val publishRepoChannel: String by project
-val ideaUpdateSinceUntilBuild: String by project
-val ideaSinceBuild: String by project
-val ideaUntilBuild: String by project
-
 // Java 11 required when supporting v2020.3 and later; Java 8 is no longer bundled. For previous versions we should target Java 1.8
 //      See  https://jetbrains.org/intellij/sdk/docs/reference_guide/api_changes/api_changes_list_2020.html#section
 //           https://blog.jetbrains.com/platform/2020/09/intellij-project-migrates-to-java-11/
-val ourTargetJavaVersion: JavaVersion = JavaVersion.VERSION_1_8
+val ourTargetJavaVersion: JavaVersion = JavaVersion.VERSION_11
+val sandboxPath = "${project.rootDir.canonicalPath}/${project.properties["sandboxName"]}"
 
 plugins {
     base
     java
     kotlin("jvm") version "1.4.31"
-    id("org.jetbrains.intellij") version "0.7.3" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
+    // gradle plugin-for writing IntelliJ plugins:  
+    //     https://github.com/JetBrains/gradle-intellij-plugin
+    //     https://lp.jetbrains.com/gradle-intellij-plugin/
+    /*
+    TODO: Version 1.1.4.1 is a custom version stored in my local maven repo
+          v1.1.4 fails on windows due an archive extraction issue:
+                  Execution failed for task ':runIde'
+                  A problem occurred starting process 'command 'tar''
+                  when it tries to run:
+                  Starting process 'command 'tar''. Working directory: P:\dev\proj\javaru\intellij-idea-plugins\IntelliFRC\code\FRC Command: tar -xpf C:\Users\Mark\.gradle\caches\modules-2\files-2.1\com.jetbrains\jbre\jbr_jcef-11_0_11-windows-x64-b1504.13\906f1067164b4a0c3396e2ebd875d4f9cdbde853\jbre-jbr_jcef-11_0_11-windows-x64-b1504.13.tar.gz --directory C:\Users\Mark\.gradle\caches\modules-2\files-2.1\com.jetbrains\jbre\jbr_jcef-11_0_11-windows-x64-b1504.13\extracted
+        It is fixed in this PR: https://github.com/JetBrains/gradle-intellij-plugin/pull/747
+        which is "Use FileSystemOperations for extracting tar archives on Windows"
+        It is pending to be included in a release. Once it is, we can migrate to that the new release, likely 1.1.5 or 1.2
+        We set via an if condition so the CI build does not fail
+        *************************************************************************************
+        **  WE CAN THEN ALSO COMMENT OUT THE pluginManagement BLOCK IN settings.gradle.kts **
+        *************************************************************************************
+     */
+    val ver = if (System.getProperty("os.name").contains("windows", true)) "1.1.4.1" else "1.1.4"
+    id("org.jetbrains.intellij") version ver
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
     //    https://github.com/jetbrains/gradle-idea-ext-plugin
@@ -108,14 +113,6 @@ tasks.test {
     }
 }
 
-
-val patchPluginXml: PatchPluginXmlTask by tasks
-val publishPlugin: PublishTask by tasks
-val runIde: RunIdeTask by tasks
-val runPluginVerifier: org.jetbrains.intellij.tasks.RunPluginVerifierTask by tasks
-
-val sandboxPath = "${project.rootDir.canonicalPath}/${project.properties["sandboxName"]}"
-
 tasks.clean {
     doFirst {
         File("$sandboxPath/plugins/${rootProject.name}").deleteRecursively()
@@ -125,46 +122,48 @@ tasks.clean {
     }
 }
 
-
-// The Gradle plugin for writing intellij plugins
 intellij {
-    pluginName = "FRC"
+    // The Gradle plugin for writing intellij plugins
+    pluginName.set("FRC")
     // IntelliJ IDEA dependency
-    version = ideaVersion
+    version.setViaProjectProperty("ideaVersion")
     // Bundled plugin dependencies - comma separated list
-    setPlugins("java", "gradle", "org.jetbrains.plugins.gradle", "Groovy", "com.jetbrains.sh")  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
-    sandboxDirectory =  sandboxPath
+    plugins.set(listOf("java", "gradle", "Groovy", "com.jetbrains.sh"))  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
+    sandboxDir.set(sandboxPath)
+    updateSinceUntilBuild.setBooleanViaProjectProperty("ideaUpdateSinceUntilBuild")
+    sameSinceUntilBuild.set(projectPropertyBoolean("isEAP") || projectPropertyBoolean("ideaSameSinceUntilBuild"))
+    downloadSources.setBooleanViaProjectProperty("ideaDownloadSources")
+    // Setting to false for now to avoid error: No value has been specified for property 'compilerClassPathFromMaven'
+    instrumentCode.set(false)
+}
 
-    updateSinceUntilBuild = ideaUpdateSinceUntilBuild.toBoolean()
-    sameSinceUntilBuild = isEAP.toBoolean() || ideaSameSinceUntilBuild.toBoolean()
-    downloadSources = ideaDownloadSources.toBoolean()
-
+tasks {
     patchPluginXml {
-        version(version)
-        sinceBuild(ideaSinceBuild)
-        untilBuild(ideaUntilBuild)
+        version.set(frcPluginVersion)
+        sinceBuild.setViaProjectProperty("ideaSinceBuild")
+        untilBuild.setViaProjectProperty("ideaUntilBuild")
     }
-
+    
     runIde {
-        runIde.systemProperties = mapOf(
-                //"key" to "value",
-                //systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, ".sandbox", "log.xml")),
-                systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, "idea-sandbox-log4j-config.xml")),
-                systemPropertyGetOrDefault("frc.show.betas.in.new.project.wizard", "true"),
-                // Turn on frc.i10n to see a notification character appended to all localized messages to aid in testing/debugging of message bundles and localization needs
-                systemPropertyGetOrDefault("frc.i10n", "false"),
-                systemPropertyGetOrDefault("frc.is.internal", "true"),
-                systemPropertyGetOrDefault("frc.experimental.gradleDslSelection", "true"),
-                systemPropertyGetOrDefault("frc.experimental.kotlinTemplates", "true")
-                // Legacy Ant based robot project system properties
-                //systemPropertyGetOrDefault("frc.simulated.log.service.enabled", "false"),
-                //systemPropertyGetOrDefault("frc.simulated.log.service.use.configured.port", "false"),
-                //systemPropertyGetOrDefault("frc.use.wpilib.beta.site", "false"),
-                //systemPropertyGetOrDefault("frc.alt.wpilib.base.dir", ""),
-                //systemPropertyGetOrDefault("wpilib.base.dir", "")
-                                       )
+        systemProperties = mapOf(
+            //"key" to "value",
+            //systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, ".sandbox", "log.xml")),
+            systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, "idea-sandbox-log4j-config.xml")),
+            systemPropertyGetOrDefault("frc.show.betas.in.new.project.wizard", "true"),
+            // Turn on frc.i10n to see a notification character appended to all localized messages to aid in testing/debugging of message bundles and localization needs
+            systemPropertyGetOrDefault("frc.i10n", "false"),
+            systemPropertyGetOrDefault("frc.is.internal", "true"),
+            systemPropertyGetOrDefault("frc.experimental.gradleDslSelection", "true"),
+            systemPropertyGetOrDefault("frc.experimental.kotlinTemplates", "true")
+            // Legacy Ant based robot project system properties
+            //systemPropertyGetOrDefault("frc.simulated.log.service.enabled", "false"),
+            //systemPropertyGetOrDefault("frc.simulated.log.service.use.configured.port", "false"),
+            //systemPropertyGetOrDefault("frc.use.wpilib.beta.site", "false"),
+            //systemPropertyGetOrDefault("frc.alt.wpilib.base.dir", ""),
+            //systemPropertyGetOrDefault("wpilib.base.dir", "")
+                                )
     }
-
+    
     runPluginVerifier {
         // See: https://github.com/JetBrains/gradle-intellij-plugin#plugin-verifier-dsl
         //      https://github.com/JetBrains/intellij-plugin-verifier#common-options
@@ -172,23 +171,29 @@ intellij {
         //      https://www.jetbrains.com/idea/download/other.html
         //      All including EAPs RCs
         //          https://data.services.jetbrains.com/products?fields=code,name,releases.downloads,releases.version,releases.build,releases.type&code=IIC,IIU,IIE
+        //      Just RCs & Releases:
+        //          https://data.services.jetbrains.com/products?fields=code,name,releases.downloads,releases.version,releases.build,releases.type&code=IIC,IIU,IIE&type=release,rc
         //      Just Releases:
         //          https://data.services.jetbrains.com/products?fields=code,name,releases.downloads,releases.version,releases.build,releases.type&code=IIC,IIU,IIE&type=release
-        //ideVersions(listOf("IC-2020.2", "IC-2020.2.1", "IC-2020.2.2", "IC-2020.2.3", "IC-2020.2.4", "IC-2020.3", "IC-2020.3.1", "IC-2020.3.2"))
-        ideVersions(listOf("IC-2020.2.4", "IC-2020.3.2"))
+        //ideVersions.set(listOf("IC-2020.2", "IC-2020.2.1", "IC-2020.2.2", "IC-2020.2.3", "IC-2020.2.4", "IC-2020.3", "IC-2020.3.1", "IC-2020.3.2"))
+        //ideVersions.set(listOf("IC-2020.2"))
+        localPaths.set(listOf(File("${System.getProperty("user.home")}/.pluginVerifier/ides-local/idea-IC-212.4746.52")))
         // Reports appear in ${project.buildDir}/reports/pluginVerifier by default. Set `verificationReportsDirectory` to change
     }
 
     publishPlugin {
-        // See http://www.jetbrains.org/intellij/sdk/docs/tutorials/build_system/deployment.html
-        // See https://github.com/minecraft-dev/MinecraftDev/blob/dev/build.gradle.kts
-        if (properties["publish"] != null)
+        // See https://plugins.jetbrains.com/docs/intellij/deployment.html  and  https://github.com/JetBrains/intellij-platform-plugin-template/blob/main/build.gradle.kts
+        dependsOn("patchChangelog")
+        // For now, we will not use the publish task unless this project property is set. Once we have tested things, we can remove this guard
+        if (projectPropertyBoolean("autoPublish", defaultValue = false))
         {
             project.version = "${project.version}" //-${properties["buildNumber"]}"
 
-            username(publishRepoUsername)
-            password(publishRepoPassword)
-            channels(publishRepoChannel)
+            token.set(System.getenv("JETBRAINS_MARKETPLACE_PUBLISH_TOKEN"))
+            // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
+            // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
+            // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
+            channels.set(listOf(projectProperty("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
         }
     }
 }
@@ -266,11 +271,8 @@ idea {
 
 
 repositories {
+    mavenLocal()
     mavenCentral()
-    maven("https://jetbrains.bintray.com/intellij-plugin-service") // outgoing bintray repo
-    maven("https://dl.bintray.com/jetbrains/intellij-plugin-service/") // older repo
-    maven("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/intellij-plugin-verifier/intellij-plugin-structure")
-    maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
     maven("https://plugins.gradle.org/m2/")
     maven {
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
@@ -278,7 +280,6 @@ repositories {
             snapshotsOnly()
         }
     }
-    jcenter()
 }
 
 
@@ -322,6 +323,25 @@ inline fun <reified T : Task> task(noinline configuration: T.() -> Unit) = tasks
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
 
 fun systemPropertyGetOrDefault(key: String, default: String) = Pair<String, String>(key, System.getProperty(key, default))
+
+/** Retrieves a project property as a String. */
+fun projectProperty(key: String) = project.findProperty(key).toString()
+/** Retrieves a project property as a String, using the default value if the property is not defined. */
+fun projectProperty(key: String, defaultValue: String) = project.findProperty(key)?.toString() ?: defaultValue
+/** Retrieves a project property as a Boolean. */
+fun projectPropertyBoolean(key: String) = projectProperty(key).toBoolean()
+/** Retrieves a project property as a Boolean, using the default value if the property is not defined. */
+fun projectPropertyBoolean(key: String, defaultValue: Boolean) = projectProperty(key, defaultValue.toString()).toBoolean()
+
+/** Sets a Gradle Property value via a Project Property (usually set in gradle.properties). */
+fun Property<String>.setViaProjectProperty(key: String) = this.set(projectProperty(key))
+/** Sets a Gradle Property value via a Project Property (usually set in gradle.properties). */
+fun Property<String>.setViaProjectProperty(key: String, defaultValue: String) = this.set(projectProperty(key, defaultValue))
+/** Sets a Gradle Property value via a Project Property (usually set in gradle.properties). */
+fun Property<Boolean>.setBooleanViaProjectProperty(key: String) = this.set(projectPropertyBoolean(key))
+/** Sets a Gradle Property value via a Project Property (usually set in gradle.properties), using the default value if the property is not defined. */
+fun Property<Boolean>.setBooleanViaProjectProperty(key: String, defaultValue: Boolean) = this.set(projectPropertyBoolean(key, defaultValue))
+
 
 fun resolvePath(base: String, vararg children: String): String
 {

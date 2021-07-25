@@ -6,7 +6,7 @@
   ~     You may obtain a copy of the License at
   ~
   ~       https://www.apache.org/licenses/LICENSE-2.0
-  ~
+  ~     
   ~     Unless required by applicable law or agreed to in writing, software
   ~     distributed under the License is distributed on an "AS IS" BASIS,
   ~     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -177,12 +177,7 @@
 
     <!-- Resource bundle from which the text of plugin descriptions, action names and etc. will be loaded -->
     <resource-bundle>i18n.FrcPluginConfigBundle</resource-bundle>
-
-
-    <applicationListeners>
-        <listener class="net.javaru.iip.frc.plugin.FrcAppLifecycleListener" topic="com.intellij.ide.AppLifecycleListener" activeInHeadlessMode="false" />
-    </applicationListeners>
-
+    
 
     <!-- Extension points defined by the plugin. Extension points are registered by a plugin so that other plugins can
          provide this plugin with certain data. The "beanClass" attribute specifies the class the implementations of
@@ -236,6 +231,8 @@
         <applicationConfigurable id="preferences.language.FRC"
                                  instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable"
                                  groupId="language" />
+        
+        <preloadingActivity implementation="net.javaru.iip.frc.plugin.FrcPreloadingActivity" />
 
         <!-- Commenting out for now. Rethinking that these should be at the module/facet level rather than project level. -->
         <!--<projectConfigurable id="preferences.language.FRC.project"

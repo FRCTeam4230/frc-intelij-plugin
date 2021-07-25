@@ -70,7 +70,7 @@ fun notifyToConfigureTeamNumIfNecessary(project: Project, knownFacetedProject: B
         LOG.debug("[FRC] Publishing 'configure team number' notification for Project '$project'")
         // Expire any application level notification to prevent duplicate notification in the event log
         FrcNotificationsTracker.expireAppNotification(notificationKey)
-        val notification = notifyAboutTeamNumberNeedingToBeConfigured(project, true, false)
+        val notification = notifyAboutTeamNumberNeedingToBeConfigured(project, useSticky = true, asWarning = false)
         FrcNotificationsTracker.putNotification(project, notificationKey, notification)
     }
 }

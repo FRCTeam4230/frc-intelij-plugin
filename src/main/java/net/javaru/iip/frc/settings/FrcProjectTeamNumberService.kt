@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +20,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.messages.Topic
-import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFile
+import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask
 import java.util.*
 
 /**
@@ -37,15 +37,16 @@ class FrcProjectTeamNumberService private constructor(val project:Project)
 {
     private val LOG = Logger.getInstance(FrcProjectTeamNumberService::class.java)
     
-    var teamNumber = UN_CONFIGURED_TEAM_NUMBER // default value, but then is set in the init block
+    var teamNumber = FrcApplicationSettings.getInstance().teamNumber // default value, but then is set in the init block in the event it is different
         private set
                 
     
     init
     {
         LOG.debug("[FRC] Initializing FrcProjectTeamNumberService for project $project")
-        teamNumber = project.getTeamNumberConfiguredInWpiLibPreferencesFile()
-        
+        project.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask { foundTeamNumber -> 
+            teamNumber = foundTeamNumber
+        }
         // Examples: com/intellij/openapi/externalSystem/service/project/manage/SourceFolderManagerImpl.kt:115
         //           schemeManager/SchemeManagerFactoryImpl.kt:133  along with  com.intellij.configurationStore.schemeManager.SchemeFileTracker
         // As noted in https://www.jetbrains.org/intellij/sdk/docs/basics/virtual_file_system.html#virtual-file-system-events

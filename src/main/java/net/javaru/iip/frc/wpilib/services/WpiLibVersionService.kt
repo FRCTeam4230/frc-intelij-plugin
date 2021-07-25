@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,6 +45,7 @@ import net.javaru.iip.frc.util.asDate
 import net.javaru.iip.frc.util.getGradleBuildPsiFile
 import net.javaru.iip.frc.util.lastCheckedDateTimeFormatter
 import net.javaru.iip.frc.util.reimportGradleProject
+import net.javaru.iip.frc.util.runBackgroundTask
 import net.javaru.iip.frc.wpilib.getAttachedWpiLibVersion
 import net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
@@ -76,11 +77,15 @@ class WpiLibVersionStartupActivity : StartupActivity
         if (project.isFrcFacetedProject())
         {
             StartupManager.getInstance(project).runWhenProjectIsInitialized() {
-                val versionService = WpiLibVersionService.getInstance(project)
-                if (FrcApplicationSettings.getInstance().checkWpiLibStatusOnProjectStartup)
-                    versionService.checkWpiLibStatusAndAlertIfNeeded()
-                else
-                    versionService.scheduleStatusCheck()
+                // We need to run as a BackgroundTask as it is a slow operation.
+                // See Javadoc for com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed
+                project.runBackgroundTask("Initializing WPI Lib version service") {
+                    val versionService = WpiLibVersionService.getInstance(project)
+                    if (FrcApplicationSettings.getInstance().checkWpiLibStatusOnProjectStartup)
+                        versionService.checkWpiLibStatusAndAlertIfNeeded()
+                    else
+                        versionService.scheduleStatusCheck()
+                }
             }
         }
     }
@@ -104,6 +109,16 @@ class WpiLibVersionService private constructor(private val project: Project) : P
         fun getInstance(project: Project) = project.service<WpiLibVersionService>()
     }
 
+    
+    fun checkWpiLibStatusAndAlertIfNeededAsBackgroundTask(notifyIfNoUpdateAvailable: Boolean = false,
+                                                          maxTimeSinceLastCheck: Duration = Duration.ofSeconds(10), 
+                                                          taskName: String = "Checking WPI Lib version status")
+    {
+        project.runBackgroundTask(taskName, cancellable = true) {
+            checkWpiLibStatusAndAlertIfNeeded(notifyIfNoUpdateAvailable, maxTimeSinceLastCheck)
+        }
+    }
+    
     /**
      * Checks if there is a newer version of the WPI Lib available as compared to the one configured for the project, notifying the user
      * is an update is available.
@@ -153,7 +168,7 @@ class WpiLibVersionService private constructor(private val project: Project) : P
         }
         else
         {
-            LOG.debug("[FRC] WpiLibVersionStatus was null, indicating it couold not be determined.")
+            LOG.debug("[FRC] WpiLibVersionStatus was null, indicating it could not be determined.")
         }
         // If we've notified an update is available, we do no want to schedule the next check until the user acknowledges the previous check
         if (updateAvailableNotification != null) updateAvailableNotification.whenExpired(::scheduleStatusCheck) else scheduleStatusCheck()
@@ -440,7 +455,7 @@ class WpiLibVersionService private constructor(private val project: Project) : P
 
     class CheckStatusTimerTask(private val project: Project) : TimerTask()
     {
-        override fun run() = project.service<WpiLibVersionService>().checkWpiLibStatusAndAlertIfNeeded()
+        override fun run() = project.service<WpiLibVersionService>().checkWpiLibStatusAndAlertIfNeededAsBackgroundTask()
     }
 }
 

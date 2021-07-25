@@ -60,11 +60,11 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
         1) Project Open
             Handled via: This classes implementation of FrcOpenRioLogStartupActivity.runActivity()
         2) Facet Added to Project
-            Handled via: FrcProjectLifecycleService.facetAdded() (via its extending of FacetManagerAdapter, an impl of FacetManagerListener)
+            Handled via: FrcProjectLifecycleService.facetAdded() (via its impl of FacetManagerListener)
         3) Facet Removed from Project
             a) was only facet and  we want to close the console
             b) there are other FRC facets still configured on the project
-            Handled via: FrcProjectLifecycleService.facetRemoved() (via its extending of FacetManagerAdapter, an impl of FacetManagerListener)
+            Handled via: FrcProjectLifecycleService.facetRemoved() (via its impl of FacetManagerListener)
         4) New module created and facet was Added - likely dup of #2, but we want to test it
             Handled via: FrcOpenRioLogStartupActivity.moduleAdded()
         5) Module imported (with FRC facet)

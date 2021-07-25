@@ -16,12 +16,10 @@
 
 package net.javaru.iip.frc.wpilib.gradlePluginRepo
 
-import com.fasterxml.jackson.databind.ObjectWriter
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.xmlb.XmlSerializerUtil
 import net.javaru.iip.frc.net.FrcHttpClient
@@ -29,8 +27,6 @@ import net.javaru.iip.frc.util.fromJson
 import net.javaru.iip.frc.util.lastCheckedDateTimeFormatter
 import net.javaru.iip.frc.util.lastCheckedDateTimeZonedFormatter
 import net.javaru.iip.frc.util.mapExceptionFreeAndNotNull
-import net.javaru.iip.frc.util.mapper
-import net.javaru.iip.frc.util.prettyPrintWriter
 import net.javaru.iip.frc.util.toJson
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl
@@ -122,7 +118,7 @@ data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: 
             {
                 updateFromRepo()
             }
-            return ServiceManager.getService(GradleRioMavenMetadataState::class.java)
+            return service()
         }
 
         /**
@@ -132,7 +128,7 @@ data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: 
         @JvmStatic
         fun getInstance(maxAge: Duration): GradleRioMavenMetadataState
         {
-            val state = ServiceManager.getService(GradleRioMavenMetadataState::class.java)
+            val state = service<GradleRioMavenMetadataState>()
             return if (state.durationSinceLastCheck >= maxAge)
             {
                 getInstance(true)
@@ -162,7 +158,7 @@ data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: 
         @JvmStatic
         fun updateState(updated: MavenMetadata, checkTime: LocalDateTime = LocalDateTime.now())
         {
-            val state = ServiceManager.getService(GradleRioMavenMetadataState::class.java)
+            val state = service<GradleRioMavenMetadataState>()
             state.mavenMetadataJson = updated.toJson(false)
             state.updateLastCheckedTime(checkTime)
         }
@@ -172,7 +168,7 @@ data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: 
         @JvmStatic
         fun updateState(updated: GradleRioMavenMetadataState, checkTime: LocalDateTime = LocalDateTime.now())
         {
-            val state = ServiceManager.getService(GradleRioMavenMetadataState::class.java)
+            val state = service<GradleRioMavenMetadataState>()
             state.mavenMetadataJson = updated.mavenMetadataJson
             state.updateLastCheckedTime(checkTime)
         }
@@ -191,7 +187,7 @@ data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: 
             return try
             {
                 val fetched = fetchGradleRioMavenMetadata()
-                val state = ServiceManager.getService(GradleRioMavenMetadataState::class.java)
+                val state = service<GradleRioMavenMetadataState>()
 
                 return when (fetched)
                 {

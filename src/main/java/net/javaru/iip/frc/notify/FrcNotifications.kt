@@ -6,7 +6,7 @@
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *
+ *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -482,13 +482,11 @@ object FrcNotifications
                            subTitle: String? = null,
                            listener: NotificationListener? = null): Notification
     {
-        return Notification(type.group.displayId,
-                            type.icon,
-                            Title,
-                            subTitle,
-                            content,
-                            type.notificationType,
-                            listener)
+        return Notification(type.group.displayId, Title, content, type.notificationType).apply {
+            icon = type.icon
+            subtitle = subTitle
+            listener?.let { setListener(it) }
+        }
     }
 
 
@@ -508,14 +506,11 @@ object FrcNotifications
                            subTitle: String? = null,
                            listener: (notification: Notification, event: HyperlinkEvent) -> Unit): Notification
     {
-        return Notification(type.group.displayId,
-                            type.icon,
-                            Title,
-                            subTitle,
-                            content,
-                            type.notificationType,
-                            listener)
-
+        return Notification(type.group.displayId, Title, content, type.notificationType).apply {
+            icon = type.icon
+            subtitle = subTitle
+            setListener(listener)
+        }
     }
 
 
@@ -535,13 +530,11 @@ object FrcNotifications
                            subTitleKey: FrcMessageKey? = null,
                            listener: NotificationListener? = null): Notification
     {
-        return Notification(type.group.displayId,
-                            type.icon,
-                            Title,
-                            messageNullable(subTitleKey),
-                            message(contentKey),
-                            type.notificationType,
-                            listener)
+        return Notification(type.group.displayId, Title, message(contentKey), type.notificationType).apply {
+            icon = type.icon
+            subtitle = messageNullable(subTitleKey)
+            listener?.let { setListener(it) }
+        }
     }
 
 
@@ -561,14 +554,11 @@ object FrcNotifications
                            subTitleKey: FrcMessageKey? = null,
                            listener: (notification: Notification, event: HyperlinkEvent) -> Unit): Notification
     {
-        return Notification(type.group.displayId,
-                            type.icon,
-                            Title,
-                            messageNullable(subTitleKey),
-                            message(contentKey),
-                            type.notificationType,
-                            listener)
-
+        return Notification(type.group.displayId, Title, message(contentKey),type.notificationType).apply {
+            icon = type.icon
+            subtitle = messageNullable(subTitleKey)
+            setListener(listener)
+        }
     }
 
 
@@ -589,15 +579,11 @@ object FrcNotifications
         listener: NotificationListener? = null
                           ): Notification
     {
-        return Notification(
-            type.group.displayId,
-            type.icon,
-            null,
-            null,
-            content,
-            type.notificationType,
-            listener
-                           )
+        return Notification(type.group.displayId, content,type.notificationType).apply {
+            icon = type.icon
+            // subtitle = null
+            listener?.let { setListener(it) }
+        }
     }
 
 
@@ -617,16 +603,11 @@ object FrcNotifications
         listener: (notification: Notification, event: HyperlinkEvent) -> Unit
                           ): Notification
     {
-        return Notification(
-            type.group.displayId,
-            type.icon,
-            null,
-            null,
-            content,
-            type.notificationType,
-            listener
-                           )
-
+        return Notification(type.group.displayId, content, type.notificationType).apply {
+            icon = type.icon
+            // subtitle = null
+            setListener(listener)
+        }
     }
 
 
@@ -647,15 +628,11 @@ object FrcNotifications
         listener: NotificationListener? = null
                           ): Notification
     {
-        return Notification(
-            type.group.displayId,
-            type.icon,
-            null,
-           null,
-            message(contentKey),
-            type.notificationType,
-            listener
-                           )
+        return Notification(type.group.displayId, message(contentKey), type.notificationType).apply {
+            icon = type.icon
+            // subtitle = null
+            listener?.let { setListener(it) } 
+        }
     }
 
 
@@ -675,16 +652,11 @@ object FrcNotifications
         listener: (notification: Notification, event: HyperlinkEvent) -> Unit
                           ): Notification
     {
-        return Notification(
-            type.group.displayId,
-            type.icon,
-            null,
-            null,
-            message(contentKey),
-            type.notificationType,
-            listener
-                           )
-
+        return Notification(type.group.displayId, message(contentKey), type.notificationType).apply {
+            icon = type.icon
+            // subtitle = null
+            setListener(listener)
+        }
     }
 
     // endregion createNotification

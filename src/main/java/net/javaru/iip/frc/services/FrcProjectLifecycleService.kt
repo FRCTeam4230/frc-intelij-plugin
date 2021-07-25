@@ -6,7 +6,7 @@
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *
+ *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,10 +19,9 @@ package net.javaru.iip.frc.services
 import com.intellij.ProjectTopics
 import com.intellij.facet.Facet
 import com.intellij.facet.FacetManager
-import com.intellij.facet.FacetManagerAdapter
+import com.intellij.facet.FacetManagerListener
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.invokeLater
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
@@ -48,7 +47,7 @@ import net.javaru.iip.frc.settings.FrcProjectTeamNumberService
 class FrcProjectLifecycleService private constructor(val project: Project) : ModuleRootListener,
                                                                              ModuleListener,
                                                                              Disposable,
-                                                                             FacetManagerAdapter()
+                                                                             FacetManagerListener
 {
     private val LOG = Logger.getInstance(FrcProjectLifecycleService::class.java)
 
@@ -104,10 +103,7 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
     {
         LOG.trace("[FRC] FrcProjectLifecycleService.dispose() called for project '$project'")
         FrcNotificationsTracker.clearAllForProject(project)
-        ServiceManager
-            .getService(RioLogUdpSocketManagerApplicationService::class.java)
-            .deregister(project)
-
+        service<RioLogUdpSocketManagerApplicationService>().deregister(project)
     }
 
     override fun moduleAdded(project: Project, module: Module)

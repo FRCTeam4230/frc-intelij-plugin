@@ -134,7 +134,6 @@ fun Project.reimportGradleProject(executionMode: ProgressExecutionMode = Progres
     FileDocumentManager.getInstance().saveAllDocuments()
     // derived from looking at RefreshAllExternalProjectsAction, specifically when it calls ExternalSystemUtil.refreshProject
     ExternalSystemUtil.refreshProjects(ImportSpecBuilder(this, GradleConstants.SYSTEM_ID)
-                                           .forceWhenUptodate(true)
                                            .use(executionMode)
                                            .callback(ourCallback)
                                       )

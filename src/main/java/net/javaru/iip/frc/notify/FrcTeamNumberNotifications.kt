@@ -1,12 +1,12 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -77,31 +77,30 @@ fun notifyToConfigureTeamNumIfNecessary(project: Project, knownFacetedProject: B
 
 private fun createConfigureTeamNotification(project: Project?, useSticky: Boolean, asWarning: Boolean): Notification
 {
-    val subtitle = if (asWarning) "Team Number Not Set" else "Configuration Needed"
+    val subtitle = if (asWarning) "Team number not Set" else "Configuration needed"
     val contentPrefix = if (asWarning) "Without your FRC team number being set, robot deploys will fail. " else ""
     val content = contentPrefix + "Please <a href='configure'>configure</a> your FRC Team Number."
     val icon = if (asWarning) FrcNotifications.IconWarn else FrcNotifications.IconInfo
     val notificationType = if (asWarning) NotificationType.WARNING else NotificationType.INFORMATION
 
     val notificationGroup = if (useSticky) FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP else FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP
-    return Notification(notificationGroup.displayId,
-                        icon,
-                        FrcNotifications.Title,
-                        subtitle,
-                        content,
-                        notificationType
-                       ) { theNotification, event ->
-        if ("configure" == event.description)
-        {
-            //  final Configurable configurable = FrcApplicationSettingsConfigurable.getInstance();
-            //  IdeFrame ideFrame = WindowManagerEx.getInstanceEx().findFrameFor(project);
-            //  ShowSettingsUtil.getInstance().editConfigurable((JFrame) ideFrame, configurable);
-            ConfigureTeamNumberBasicAction.openConfigureTeamNumberDialog(project)
-        }
 
-        if (FrcApplicationSettings.getInstance().isTeamNumberConfigured())
-        {
-            theNotification.expire()
+    return Notification(notificationGroup.displayId, FrcNotifications.Title, content, notificationType).apply {
+        this.icon = icon
+        this.subtitle = subtitle
+        setListener{ theNotification, event ->
+            if ("configure" == event.description)
+            {
+                //  final Configurable configurable = FrcApplicationSettingsConfigurable.getInstance();
+                //  IdeFrame ideFrame = WindowManagerEx.getInstanceEx().findFrameFor(project);
+                //  ShowSettingsUtil.getInstance().editConfigurable((JFrame) ideFrame, configurable);
+                ConfigureTeamNumberBasicAction.openConfigureTeamNumberDialog(project)
+            }
+
+            if (FrcApplicationSettings.getInstance().isTeamNumberConfigured())
+            {
+                theNotification.expire()
+            }
         }
     }
 }

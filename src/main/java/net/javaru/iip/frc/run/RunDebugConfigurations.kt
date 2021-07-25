@@ -160,6 +160,7 @@ private fun createGradeSimulateJavaRunConfigurations(project: Project, isRomi: B
     logger.trace("[FRC] Completed Gradle simulateJava run configurations")
 }
 
+@Suppress("UNUSED_PARAMETER")
 @JvmOverloads
 fun createTailSimulateJavaLogShellScriptRunConfiguration(project: Project, isRomi: Boolean, setAsShared: Boolean = true)
 {
@@ -405,6 +406,7 @@ class ModuleSettingAction(val remoteConfiguration: RemoteConfiguration, val proj
     }
 }
 
+@Suppress("UNUSED_PARAMETER")
 private fun shareRunConfiguration(project: Project, settings: RunnerAndConfigurationSettings)
 {
     // Continuing to use the deprecated isShared for now until we can figure out the "It's unexpected that the file doesn't exist at this point" issue

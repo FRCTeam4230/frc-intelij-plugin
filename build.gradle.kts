@@ -133,8 +133,6 @@ intellij {
     updateSinceUntilBuild.setBooleanViaProjectProperty("ideaUpdateSinceUntilBuild")
     sameSinceUntilBuild.set(projectPropertyBoolean("isEAP") || projectPropertyBoolean("ideaSameSinceUntilBuild"))
     downloadSources.setBooleanViaProjectProperty("ideaDownloadSources")
-    // Setting to false for now to avoid error: No value has been specified for property 'compilerClassPathFromMaven'
-    instrumentCode.set(false)
 }
 
 tasks {

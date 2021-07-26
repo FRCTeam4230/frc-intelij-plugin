@@ -70,11 +70,11 @@
         <br>
         <strong>v1.4.0</strong> <br>
         &nbsp;&nbsp;&bull; Support for IntelliJ IDEA v2020.2 and later only. See the
-                           <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin#eol-policy'>FRC Plugin's EOL Policy</a> for more detail.<br>
+                           <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/blob/master/README.adoc#eol-policy'>FRC Plugin's EOL Policy</a> for more detail.<br>
         &nbsp;&nbsp;&bull; New Project Wizard: Updated Project Templates for 2021 to match the WPI Lib ones. This included adding the new Romi projects.
                            Also added the Romi Reference example template. However, the other example templates still need to be check for any
                            potential updates. An an initial look seems to indicate the changes made for 2021 are mostly superficial.<br>
-        &nbsp;&nbsp;&bull; New Project Wizard: Gradle run configurations are now stored in <tt>{projectRoot}/.run<tt> rather then <tt>{projectRoot}/.idea/runConfigurations<tt>
+        &nbsp;&nbsp;&bull; New Project Wizard: Gradle run configurations are now stored in <tt>{projectRoot}/.run</tt> rather then <tt>{projectRoot}/.idea/runConfigurations</tt>
                            (as introduced in IntelliJ IDEA v2020.1) for easier/better sharing of run configurations.<br>
         &nbsp;&nbsp;&bull; New Project Wizard: .idea files are now ignored by default in .gitignore rather than shared as the default.<br>
         &nbsp;&nbsp;&bull; New Project Wizard: Improved auto import of gradle project upon project creation.<br>
@@ -87,7 +87,7 @@
         <br>
         <strong>v1.3.1</strong> <br>
         &nbsp;&nbsp;&bull; <strong>This is the last release for v2019.2, v2019.3 and v2020.1. The next release will only support
-        IntelliJ IDEA v2020.2 and later. See the <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin#eol-policy'>FRC Plugin's EOL Policy</a>
+        IntelliJ IDEA v2020.2 and later. See the <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/blob/master/README.adoc#eol-policy'>FRC Plugin's EOL Policy</a>
         for more detail.</strong><br>
         &nbsp;&nbsp;&bull; Miscellaneous internal improvements.<br>
         <br>

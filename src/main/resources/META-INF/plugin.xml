@@ -53,9 +53,6 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <strong>v1.6.0</strong> <br>
-        &nbsp;&nbsp;&bull; <br>
-        <br>
         <strong>v1.5.0</strong> <br>
         &nbsp;&nbsp;&bull; Added action link to "WPI Lib update available" notification to automatically update the gradle build file to use the new version<br>
         &nbsp;&nbsp;&bull; Improved Romi projects support in New Project Wizard. It now creates some additional Romi specific Run Configurations including
@@ -67,6 +64,7 @@
         &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/84'>issue #84</a>, WPI Lib root path not discovered on Mac or Linux<br>
         &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/92'>issue #92</a>, a Dispatch Thread access issue on opening an FRC project in IntelliJ IDEA v2021.1<br>
         &nbsp;&nbsp;&bull; Resolves a corner case issue in the Command creation template in which the rules to determine if a Subsystem was a singleton or not were a bit too strict<br>
+        &nbsp;&nbsp;&bull; 1.5.0-2021.2 only: Refactorings to remove use of a number of methods and classes deprecated in the IntelliJ IDEA Plugin API in v2021.2.<br>
         <br>
         <strong>v1.4.0</strong> <br>
         &nbsp;&nbsp;&bull; Support for IntelliJ IDEA v2020.2 and later only. See the

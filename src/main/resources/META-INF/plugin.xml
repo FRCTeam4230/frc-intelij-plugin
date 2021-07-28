@@ -284,6 +284,12 @@
         <externalProjectDataService id="FrcDependencyDataService" implementation="net.javaru.iip.frc.facet.importer.FrcDependencyDataService" />
 
         <framework.detector implementation="net.javaru.iip.frc.facet.framework.detector.RobotSubclassFrcFrameworkDetector" />
+        
+        <!-- dependencySupport: Notifies users that a plugin supporting a particular dependency is available and asks if they want to install it -->
+        <dependencySupport displayName="FRC WPILib"           kind="java" coordinate="edu.wpi.first.wpilibj:wpilibj-java" />
+        <dependencySupport displayName="FRC Command Robot"    kind="java" coordinate="edu.wpi.first.wpilibNewCommands:wpilibNewCommands-java" />
+        <dependencySupport displayName="FRC Command Robot"    kind="java" coordinate="edu.wpi.first.wpilibOldCommands:wpilibOldCommands-java" />
+        <dependencySupport displayName="FRC GradleRIO"        kind="java" coordinate="edu.wpi.first:GradleRIO" />
     </extensions>
 
     <extensions defaultExtensionNs="JavaScript.JsonSchema">

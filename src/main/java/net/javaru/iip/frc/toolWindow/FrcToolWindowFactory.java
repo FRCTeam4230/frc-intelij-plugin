@@ -75,6 +75,7 @@ public class FrcToolWindowFactory implements ToolWindowFactory,
     
     
     // TODO: Let's use EventLogToolWindowFactory as a starting example
+    // TODO: Make it a Facet Based Tool Window. See https://plugins.jetbrains.com/docs/intellij/facet.html#facet-based-tool-window
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow)

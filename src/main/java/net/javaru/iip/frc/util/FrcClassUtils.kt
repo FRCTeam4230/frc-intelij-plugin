@@ -16,7 +16,8 @@
 package net.javaru.iip.frc.util
 
 import com.esotericsoftware.minlog.Log
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
@@ -33,9 +34,9 @@ import org.jetbrains.annotations.Contract
 import java.util.*
 import javax.swing.JComponent
 
-object FindClassUtils{}
+private object FindClassUtils{}
 
-private val LOG = Logger.getInstance(FindClassUtils::class.java)
+private val logger = logger<FindClassUtils>()
 
 
 enum class ClassDeduplicationMethodology
@@ -178,7 +179,7 @@ private fun takeFirstPsiClass(classes: Array<PsiClass?>, fqn: String?): PsiClass
     {
         if (classes.size > 1)
         {
-            LOG.warn("[FRC] Multiple classes found for '$fqn' when it was assumed only a single instance would be found. Found instances: $classes")
+            logger.warn("[FRC] Multiple classes found for '$fqn' when it was assumed only a single instance would be found. Found instances: $classes")
         }
         classes[0]
     }
@@ -337,8 +338,8 @@ fun findImplementationsForScope(psiClass: PsiClass,
                         .search(psiClass, implementationsSearchScope, true)
                     query
                         .forEach(PsiElementProcessorAdapter(PsiElementProcessor { psiClass ->
-                            LOG
-                                .trace("[FRC] Checking psiClass '" + psiClass.qualifiedName + "' of type " + psiClass.javaClass)
+                            logger
+                                .trace {"[FRC] Checking psiClass '${psiClass.qualifiedName}' of type ${psiClass.javaClass}"}
                             if (!psiClass.isInterface)
                             {
                                 inheritors

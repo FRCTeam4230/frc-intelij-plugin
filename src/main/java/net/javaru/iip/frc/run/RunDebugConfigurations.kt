@@ -25,11 +25,13 @@ import com.intellij.execution.jar.JarApplicationConfigurationType
 import com.intellij.execution.remote.RemoteConfiguration
 import com.intellij.execution.remote.RemoteConfigurationType
 import com.intellij.ide.SaveAndSyncHandler
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.vfs.LocalFileSystem
 import net.javaru.iip.frc.i18n.FrcBundle
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.settings.FrcRoboRioSettings
@@ -43,13 +45,15 @@ import net.javaru.iip.frc.wpilib.getWpiLibToolsPath
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
 import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
 
 private object RunDebugConfigurations 
 
-private val logger = Logger.getInstance(RunDebugConfigurations::class.java)
+private val logger = logger<RunDebugConfigurations>()
 
 
 fun createAllRunDebugConfigurations(project: Project, dataModel: FrcProjectWizardData)
@@ -153,11 +157,11 @@ fun createGradleRunConfiguration(project: Project,
 
 private fun createGradeSimulateJavaRunConfigurations(project: Project, isRomi: Boolean, setAsShared: Boolean = true)
 {
-    logger.trace("[FRC] Creating Gradle simulateJava run configurations")
+    logger.trace {"[FRC] Creating Gradle simulateJava run configurations"}
     val nameSuffix = if (isRomi) "Romi" else "Simulate Java"
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.simulateJava.buildAndRun.name", nameSuffix), listOf("simulateJava"), setAsShared = setAsShared, setAsSelected = isRomi)
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.simulateJava.cleanBuildAndRun.name", nameSuffix), listOf("clean", "simulateJava"), setAsShared = setAsShared)
-    logger.trace("[FRC] Completed Gradle simulateJava run configurations")
+    logger.trace {"[FRC] Completed Gradle simulateJava run configurations"}
 }
 
 @Suppress("UNUSED_PARAMETER")
@@ -167,53 +171,51 @@ fun createTailSimulateJavaLogShellScriptRunConfiguration(project: Project, isRom
     // This is not the ideal methodology. But it works in v2020.2+
     // In v2020.3+ we can switch to running in terminal and defining the script as /user/bin/tail
 
-    // TODO: Waiting to see about the resolution of https://youtrack.jetbrains.com/issue/IDEA-267920 to see if we can add this feature back in
-    logger.warn("[FRC] Due to a change in the access level of the ShRunConfiguration and ShConfigurationType classes in IntelliJ IDEA v2021.1, a tail simulateJava.log Run Configuration cannot be created. Waiting on the resolution of IDEA-267920 to see if this functionality can be added back.")
-//    val nameSuffix = if (isRomi) "Romi" else "Simulate Java"
-//    val runConfigName = FrcBundle.message("frc.wizard.run.configuration.simulateJava.tail.name", nameSuffix)
-//    try
-//    {
-//        if (project.basePath != null)
-//        {
-//            val runManager = RunManager.getInstance(project)
-//            val runnerAndConfigurationSettings = runManager.createConfiguration(runConfigName, com.intellij.sh.run.ShConfigurationType::class.java)
-//            val shRunConfiguration = runnerAndConfigurationSettings.configuration as com.intellij.sh.run.ShRunConfiguration
-//
-//            shRunConfiguration.scriptPath = "${project.basePath}/build/stdout/simulateJava.log"
-//            //shRunConfiguration.scriptOptions = ""
-//            shRunConfiguration.scriptWorkingDirectory = project.basePath
-//            shRunConfiguration.interpreterPath = "/usr/bin/tail"
-//            shRunConfiguration.interpreterOptions = "-f"
-//
-//            shRunConfiguration.isAllowRunningInParallel = false
-//            // Note the "execute in terminal" option is only available in 2020.3+ That said, using the run ToolWindow is ultimately a better option.
-//            runnerAndConfigurationSettings.isActivateToolWindowBeforeRun = true
-//
-//            if (setAsShared)
-//            {
-//                shareRunConfiguration(project, runnerAndConfigurationSettings)
-//            }
-//
-//            // To prevent a "script not found" error showing in the log, we need to create a place holder file
-//            try
-//            {
-//                val file = Paths.get(shRunConfiguration.scriptPath)
-//                Files.createDirectories(file.parent)
-//                Files.createFile(file)
-//                LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file.toFile())
-//            }
-//            catch(e:Exception)
-//            {
-//                logger.warn("[FRC] An exception occurred when attempting to create simulateJava.log placeholder file.")
-//            }
-//
-//            runManager.addConfiguration(runnerAndConfigurationSettings)
-//        }
-//    }
-//    catch (e: Exception)
-//    {
-//        logger.warn("[FRC] Could not create '$runConfigName' Shell Script Run Configuration for project '${project.name}' due to an exception: $e", e)
-//    }
+    val nameSuffix = if (isRomi) "Romi" else "Simulate Java"
+    val runConfigName = FrcBundle.message("frc.wizard.run.configuration.simulateJava.tail.name", nameSuffix)
+    try
+    {
+        if (project.basePath != null)
+        {
+            val runManager = RunManager.getInstance(project)
+            val runnerAndConfigurationSettings = runManager.createConfiguration(runConfigName, com.intellij.sh.run.ShConfigurationType::class.java)
+            val shRunConfiguration = runnerAndConfigurationSettings.configuration as com.intellij.sh.run.ShRunConfiguration
+
+            shRunConfiguration.scriptPath = "${project.basePath}/build/stdout/simulateJava.log"
+            //shRunConfiguration.scriptOptions = ""
+            shRunConfiguration.scriptWorkingDirectory = project.basePath
+            shRunConfiguration.interpreterPath = "/usr/bin/tail"
+            shRunConfiguration.interpreterOptions = "-f"
+
+            shRunConfiguration.isAllowRunningInParallel = false
+            // Note the "execute in terminal" option is only available in 2020.3+ That said, using the run ToolWindow is ultimately a better option.
+            runnerAndConfigurationSettings.isActivateToolWindowBeforeRun = true
+
+            if (setAsShared)
+            {
+                shareRunConfiguration(project, runnerAndConfigurationSettings)
+            }
+
+            // To prevent a "script not found" error showing in the log, we need to create a place holder file
+            try
+            {
+                val file = Paths.get(shRunConfiguration.scriptPath)
+                Files.createDirectories(file.parent)
+                Files.createFile(file)
+                LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file.toFile())
+            }
+            catch(e:Exception)
+            {
+                logger.warn("[FRC] An exception occurred when attempting to create simulateJava.log placeholder file.")
+            }
+
+            runManager.addConfiguration(runnerAndConfigurationSettings)
+        }
+    }
+    catch (e: Exception)
+    {
+        logger.warn("[FRC] Could not create '$runConfigName' Shell Script Run Configuration for project '${project.name}' due to an exception: $e", e)
+    }
 }
 
 @JvmOverloads
@@ -291,7 +293,7 @@ fun createJarApplicationRunConfiguration(project: Project,
 
 private fun createGradleRoboRioBuildRunConfigurations(project: Project)
 {
-    logger.trace("[FRC] Creating Gradle roboRIO run configurations")
+    logger.trace {"[FRC] Creating Gradle roboRIO run configurations"}
     val debugModeArgument = "-PdebugMode=true"
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.buildAndDeploy.name"), listOf("deploy"), setAsSelected = true)
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.buildAndDeployForDebug.name"), listOf("deploy"), arguments = debugModeArgument)
@@ -299,15 +301,15 @@ private fun createGradleRoboRioBuildRunConfigurations(project: Project)
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.cleanBuildAndDeploy.name"), listOf("clean", "deploy"))
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.cleanBuildAndDeployForDebug.name"), listOf("clean", "deploy"), arguments = debugModeArgument)
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.cleanBuild.name"), listOf("clean", "build"))
-    logger.trace("[FRC] Completed Gradle roboRIO run configurations")
+    logger.trace {"[FRC] Completed Gradle roboRIO run configurations"}
 }
 
 private fun createRoboRioDebuggingRunConfigurations(project: Project, teamNumber: Int = project.getProjectTeamNumber())
 {
-    logger.trace("[FRC] Creating Debugging run configurations")
+    logger.trace {"[FRC] Creating Debugging run configurations"}
     createDebuggingRunConfiguration(project, teamNumber, RoboRioAddressType.IP)
     createDebuggingRunConfiguration(project, teamNumber, RoboRioAddressType.USB)
-    logger.trace("[FRC] Completed Debugging run configurations")
+    logger.trace {"[FRC] Completed Debugging run configurations"}
 }
 
 @JvmOverloads
@@ -334,12 +336,12 @@ fun createDebuggingRunConfiguration(project: Project, teamNumber: Int = project.
 //            val mainModule = project.getMainModule()
 //            if (mainModule != null)
 //            {
-//                logger.debug("[FRC] For Debugging Configuration '$runConfigName', setting module directly.")
+//                logger.debug {"[FRC] For Debugging Configuration '$runConfigName', setting module directly."}
 //                remoteConfiguration.setModule(mainModule)
 //            }
 //            else
 //            {
-                logger.debug("[FRC] For Debugging Configuration '$runConfigName', setting module by name.")
+                logger.debug {"[FRC] For Debugging Configuration '$runConfigName', setting module by name."}
                 remoteConfiguration.setModuleName("${project.name}.main")
 //            }
             }
@@ -368,7 +370,7 @@ fun createDebuggingRunConfiguration(project: Project, teamNumber: Int = project.
     }
 }
 
-class ModuleSettingAction(val remoteConfiguration: RemoteConfiguration, val project: Project)
+class ModuleSettingAction(private val remoteConfiguration: RemoteConfiguration, val project: Project)
 {
     private val logger = logger<ModuleSettingAction>()
     private var count = 0
@@ -380,16 +382,16 @@ class ModuleSettingAction(val remoteConfiguration: RemoteConfiguration, val proj
         val mainModule = project.getMainModule()
         if (mainModule != null)
         {
-            logger.debug("[FRC] Main Module is available. Updating Configuration")
+            logger.debug {"[FRC] Main Module is available. Updating Configuration"}
             remoteConfiguration.setModule(mainModule)
 
         }
         else
         {
-            logger.debug("[FRC] Main module is not available yet. Run Count: $count   modules: ${project.getModules()}")
+            logger.debug {"[FRC] Main module is not available yet. Run Count: $count   modules: ${project.getModules()}"}
             if (count <= 16)
             {
-                logger.debug("[FRC] Scheduling next check for 15 seconds")
+                logger.debug {"[FRC] Scheduling next check for 15 seconds"}
                 timer.schedule(object : TimerTask()
                                {
                                    override fun run()
@@ -400,7 +402,7 @@ class ModuleSettingAction(val remoteConfiguration: RemoteConfiguration, val proj
                                }, LocalDateTime.now().plus(Duration.ofSeconds(15)).asDate())
             } else
             {
-                logger.debug("[FRC] Max attempts reached")
+                logger.debug {"[FRC] Max attempts reached"}
             }
         }
     }
@@ -412,6 +414,9 @@ private fun shareRunConfiguration(project: Project, settings: RunnerAndConfigura
     // Continuing to use the deprecated isShared for now until we can figure out the "It's unexpected that the file doesn't exist at this point" issue
     @Suppress("UnstableApiUsage") // To be removed in 2021.3
     settings.isShared = true
+//    // Example from:  creating path:  com/intellij/execution/impl/RunConfigurationStorageUi.java:319
+//    //                applying it:    com/intellij/execution/impl/RunConfigurationStorageUi.java:394
+//    // it's the only place I could find setting/using the new .run directory
 //    val baseDir = project.basePath
 //    if (baseDir == null)
 //    {

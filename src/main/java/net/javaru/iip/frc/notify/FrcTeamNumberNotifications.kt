@@ -19,7 +19,8 @@ package net.javaru.iip.frc.notify
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.actions.ConfigureTeamNumberBasicAction
@@ -27,7 +28,7 @@ import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 
 
-private val LOG = Logger.getInstance(FrcNotifications::class.java)
+private val logger = logger<FrcNotifications>()
 
 private  val notificationKey = FrcNotificationsTracker.NotificationKey.ConfigureTeamNumberQuery
 
@@ -67,7 +68,7 @@ fun notifyToConfigureTeamNumIfNecessary(project: Project, knownFacetedProject: B
 
     if (shouldNotify)
     {
-        LOG.debug("[FRC] Publishing 'configure team number' notification for Project '$project'")
+        logger.debug {"[FRC] Publishing 'configure team number' notification for Project '$project'"}
         // Expire any application level notification to prevent duplicate notification in the event log
         FrcNotificationsTracker.expireAppNotification(notificationKey)
         val notification = notifyAboutTeamNumberNeedingToBeConfigured(project, useSticky = true, asWarning = false)
@@ -77,7 +78,7 @@ fun notifyToConfigureTeamNumIfNecessary(project: Project, knownFacetedProject: B
 
 private fun createConfigureTeamNotification(project: Project?, useSticky: Boolean, asWarning: Boolean): Notification
 {
-    val subtitle = if (asWarning) "Team number not Set" else "Configuration needed"
+    val subtitle = if (asWarning) "Team number not set" else "Configuration needed"
     val contentPrefix = if (asWarning) "Without your FRC team number being set, robot deploys will fail. " else ""
     val content = contentPrefix + "Please <a href='configure'>configure</a> your FRC Team Number."
     val icon = if (asWarning) FrcNotifications.IconWarn else FrcNotifications.IconInfo

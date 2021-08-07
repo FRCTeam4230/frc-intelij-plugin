@@ -20,7 +20,7 @@ package net.javaru.iip.frc.util
 import com.google.common.collect.ImmutableMap
 import com.intellij.icons.AllIcons
 import com.intellij.navigation.NavigationItem
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.text.StringUtil
@@ -57,7 +57,7 @@ import javax.swing.text.JTextComponent
 
 private object FrcUiUtils
 
-private val LOG = Logger.getInstance(FrcUiUtils::class.java)
+private val LOG = logger<FrcUiUtils>()
 
 enum class Position
 { Before, After }

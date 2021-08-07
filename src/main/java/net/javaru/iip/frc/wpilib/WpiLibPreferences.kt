@@ -16,10 +16,10 @@
 
 package net.javaru.iip.frc.wpilib
 
-import com.esotericsoftware.minlog.Log
 import com.intellij.json.psi.JsonFile
 import com.intellij.openapi.application.runReadAction
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
@@ -40,7 +40,7 @@ import net.javaru.iip.frc.util.getStringPropertyValue
 import net.javaru.iip.frc.util.runBackgroundTask
 
 private object WpiLibPreferencesFunctions
-private val LOG = Logger.getInstance(WpiLibPreferencesFunctions::class.java)
+private val LOG = logger<WpiLibPreferencesFunctions>()
 
 const val wpiLibDirName = ".wpilib"
 const val wpiLibPreferencesFileName: String = "wpilib_preferences.json"
@@ -159,7 +159,7 @@ fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
             contentRoots.forEach { contentRoot: VirtualFile? ->
                 if (contentRoot != null)
                 {
-                    Log.trace("[FRC] content Root Found: ${contentRoot.path}")
+                    LOG.trace {"[FRC] content Root Found: ${contentRoot.path}"}
                     val psiDirectory = psiManager.findDirectory(contentRoot)
                     if (psiDirectory != null)
                     {
@@ -172,7 +172,7 @@ fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
                                 val files = FilenameIndex.getFilesByName(project, wpiLibPreferencesFileName, wpiLibDirScope)
                                 if (LOG.isTraceEnabled)
                                 {
-                                    files.forEach { LOG.trace("[FRC] Found: ${it.virtualFile.path}") }
+                                    files.forEach { LOG.trace {"[FRC] Found: ${it.virtualFile.path}"} }
                                 }
                                 foundFiles.addAll(files)
                             }

@@ -19,6 +19,8 @@ package net.javaru.iip.frc.settings
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.xmlb.XmlSerializerUtil
@@ -38,17 +40,17 @@ data class FrcNotificationsSettings(var appLevelConfigureTeamNumNotifyCount: Int
         }
     }
 
-    private val LOG = Logger.getInstance(FrcNotificationsSettings::class.java)
+    private val logger = logger<FrcNotificationsSettings>()
 
     override fun getState(): FrcNotificationsSettings
     {
-        LOG.trace("[FRC] FrcNotificationsSettings.getState() called. Returning current state of: ${toString()}")
+        logger.trace {"[FRC] FrcNotificationsSettings.getState() called. Returning current state of: ${toString()}"}
         return this
     }
 
     override fun loadState(state: FrcNotificationsSettings)
     {
-        LOG.trace("[FRC] FrcNotificationsSettings.loadState() called with state object of: $state")
+        logger.trace {"[FRC] FrcNotificationsSettings.loadState() called with state object of: $state"}
         XmlSerializerUtil.copyBean<FrcNotificationsSettings>(state, this)
     }
 }

@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,8 @@
 
 package net.javaru.iip.frc.facet.importer
 
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.Key
 import com.intellij.openapi.externalSystem.model.ProjectKeys
@@ -38,7 +39,7 @@ class FrcDependencyDataService : AbstractProjectDataService<LibraryDependencyDat
 {
     companion object
     {
-        private val LOG = Logger.getInstance(FrcDependencyDataService::class.java)
+        private val logger = logger <FrcDependencyDataService>()
     }
 
     override fun getTargetDataKey(): Key<LibraryDependencyData>
@@ -52,7 +53,7 @@ class FrcDependencyDataService : AbstractProjectDataService<LibraryDependencyDat
                             project: Project,
                             modelsProvider: IdeModifiableModelsProvider)
     {
-        LOG.debug("[FRC] toImport reached in FrcDependencyDataService")
+        logger.debug {"[FRC] toImport reached in FrcDependencyDataService"}
         
         // Gradle: edu.wpi.first.wpilibj:wpilibj-java:2019.4.12                     <-- Has the base Robot super classes and the primary Robot classes 
         // Gradle: edu.wpi.first.wpiutil:wpiutil-java:2019.4.1                      <-- 2 Runtime based classes
@@ -80,12 +81,12 @@ class FrcDependencyDataService : AbstractProjectDataService<LibraryDependencyDat
 
     override fun postProcess(toImport: MutableCollection<out DataNode<LibraryDependencyData>>, projectData: ProjectData?, project: Project, modelsProvider: IdeModifiableModelsProvider)
     {
-        LOG.debug("[FRC] toImport reached in postProcess")
+        logger.debug {"[FRC] toImport reached in postProcess"}
     }
 
     override fun onSuccessImport(imported: MutableCollection<DataNode<LibraryDependencyData>>, projectData: ProjectData?, project: Project, modelsProvider: IdeModelsProvider)
     {
-        LOG.debug("[FRC] toImport reached in onSuccessImport")
+        logger.debug {"[FRC] toImport reached in onSuccessImport"}
         imported.forEach { dataNode: DataNode<LibraryDependencyData> ->
             val externalName = dataNode.data.externalName
             if (externalName.contains("edu.wpi.first.wpilibj:wpilibj"))

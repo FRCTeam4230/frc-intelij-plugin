@@ -53,6 +53,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v1.6.0</strong> <br>
+        &nbsp;&nbsp;&bull; FRC Project Wizard: modified created Run Configurations to be shared via the (newer) methodology of storing them in
+                           a <tt>.run</tt> directory in the project's base/root directory rather than in <tt>.idea/runConfigurations</tt><br>
+        &nbsp;&nbsp;&bull; <br>
+        <br>
         <strong>v1.5.0</strong> <br>
         &nbsp;&nbsp;&bull; Added action link to "WPI Lib update available" notification to automatically update the gradle build file to use the new version<br>
         &nbsp;&nbsp;&bull; Improved Romi projects support in New Project Wizard. It now creates some additional Romi specific Run Configurations including
@@ -69,13 +74,13 @@
         <strong>v1.4.0</strong> <br>
         &nbsp;&nbsp;&bull; Support for IntelliJ IDEA v2020.2 and later only. See the
                            <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/blob/master/README.adoc#eol-policy'>FRC Plugin's EOL Policy</a> for more detail.<br>
-        &nbsp;&nbsp;&bull; New Project Wizard: Updated Project Templates for 2021 to match the WPI Lib ones. This included adding the new Romi projects.
+        &nbsp;&nbsp;&bull; FRC Project Wizard: Updated Project Templates for 2021 to match the WPI Lib ones. This included adding the new Romi projects.
                            Also added the Romi Reference example template. However, the other example templates still need to be check for any
                            potential updates. An an initial look seems to indicate the changes made for 2021 are mostly superficial.<br>
-        &nbsp;&nbsp;&bull; New Project Wizard: Gradle run configurations are now stored in <tt>{projectRoot}/.run</tt> rather then <tt>{projectRoot}/.idea/runConfigurations</tt>
+        &nbsp;&nbsp;&bull; FRC Project Wizard: Gradle run configurations are now stored in <tt>{projectRoot}/.run</tt> rather then <tt>{projectRoot}/.idea/runConfigurations</tt>
                            (as introduced in IntelliJ IDEA v2020.1) for easier/better sharing of run configurations.<br>
-        &nbsp;&nbsp;&bull; New Project Wizard: .idea files are now ignored by default in .gitignore rather than shared as the default.<br>
-        &nbsp;&nbsp;&bull; New Project Wizard: Improved auto import of gradle project upon project creation.<br>
+        &nbsp;&nbsp;&bull; FRC Project Wizard: .idea files are now ignored by default in .gitignore rather than shared as the default.<br>
+        &nbsp;&nbsp;&bull; FRC Project Wizard: Improved auto import of gradle project upon project creation.<br>
         &nbsp;&nbsp;&bull; Preparation for migrating the Plugin to be a dynamic plugin (i.e. restart of IDEA not required after upgrading FRC plugin).
                            Full Dynamic Plugin capabilities are planned for a near future release.<br>
         &nbsp;&nbsp;&bull; Some minor improvements to the Subsystem singleton templates.<br>
@@ -175,7 +180,7 @@
 
     <!-- Resource bundle from which the text of plugin descriptions, action names and etc. will be loaded -->
     <resource-bundle>i18n.FrcPluginConfigBundle</resource-bundle>
-    
+
 
     <!-- Extension points defined by the plugin. Extension points are registered by a plugin so that other plugins can
          provide this plugin with certain data. The "beanClass" attribute specifies the class the implementations of

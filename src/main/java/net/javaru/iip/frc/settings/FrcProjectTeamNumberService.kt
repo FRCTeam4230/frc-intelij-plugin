@@ -17,7 +17,8 @@
 package net.javaru.iip.frc.settings
 
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.messages.Topic
 import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask
@@ -35,7 +36,7 @@ import java.util.*
  */
 class FrcProjectTeamNumberService private constructor(val project:Project)
 {
-    private val LOG = Logger.getInstance(FrcProjectTeamNumberService::class.java)
+    private val logger = logger<FrcProjectTeamNumberService>()
     
     var teamNumber = FrcApplicationSettings.getInstance().teamNumber // default value, but then is set in the init block in the event it is different
         private set
@@ -43,7 +44,7 @@ class FrcProjectTeamNumberService private constructor(val project:Project)
     
     init
     {
-        LOG.debug("[FRC] Initializing FrcProjectTeamNumberService for project $project")
+        logger.debug {"[FRC] Initializing FrcProjectTeamNumberService for project $project"}
         project.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask { foundTeamNumber -> 
             teamNumber = foundTeamNumber
         }

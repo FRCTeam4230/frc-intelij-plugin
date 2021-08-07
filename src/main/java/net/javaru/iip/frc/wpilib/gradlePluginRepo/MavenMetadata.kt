@@ -20,7 +20,8 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.xmlb.XmlSerializerUtil
 import net.javaru.iip.frc.net.FrcHttpClient
 import net.javaru.iip.frc.util.fromJson
@@ -42,7 +43,7 @@ import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 
-val LOG = Logger.getInstance(MavenMetadata::class.java)
+val logger = logger<MavenMetadata>()
 
 val wpiLibGradlePluginMavenMetadataURI = URI("https://plugins.gradle.org/m2/edu/wpi/first/GradleRIO/edu.wpi.first.GradleRIO.gradle.plugin/maven-metadata.xml")
 
@@ -212,7 +213,7 @@ data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: 
             }
             catch (e: Exception)
             {
-                LOG.warn("[FRC] Could not complete a check for a new version of WPI Lib from the Gradle Repo due to an exception: $e", e)
+                logger.warn("[FRC] Could not complete a check for a new version of WPI Lib from the Gradle Repo due to an exception: $e", e)
                 false
             }
         }
@@ -255,7 +256,7 @@ fun parseMavenMetadata(@Language("XML") mavenMetadata: String): MavenMetadata?
     }
     catch (e: Exception)
     {
-        LOG.warn("[FRC] Could not convert the mavenMetadata XML to a Document object. Cause Details: $e", e)
+        logger.warn("[FRC] Could not convert the mavenMetadata XML to a Document object. Cause Details: $e", e)
         null
     }
 
@@ -266,7 +267,7 @@ fun parseMavenMetadata(document: Document?): MavenMetadata?
 {
     if (document == null)
     {
-        LOG.warn("[FRC] Could not parse the mavenMetadata Document to a MavenMetadata object as a null document was received.")
+        logger.warn("[FRC] Could not parse the mavenMetadata Document to a MavenMetadata object as a null document was received.")
         return null
     }
 
@@ -305,7 +306,7 @@ fun parseMavenMetadata(document: Document?): MavenMetadata?
     }
     catch (e: Exception)
     {
-        LOG.warn("[FRC] Could not parse the mavenMetadata document to a MavenMetadata object. Cause Details: $e", e)
+        logger.warn("[FRC] Could not parse the mavenMetadata document to a MavenMetadata object. Cause Details: $e", e)
         null
     }
 }
@@ -337,7 +338,7 @@ fun fetchGradleRioMavenMetadata(): WpiLibMavenMetadata?
     }
     catch (e: Exception)
     {
-        LOG.warn("[FRC] Could not convert mavenMetadata to WpiLibMavenMetadata due to an exception: $e", e)
+        logger.warn("[FRC] Could not convert mavenMetadata to WpiLibMavenMetadata due to an exception: $e", e)
         null
     }
 }
@@ -346,13 +347,13 @@ fun fetchLatestMavenMetadata(metadataURI: URI): MavenMetadata?
 {
     return try
     {
-        LOG.debug("[FRC] Checking for MavenMetadata update from: $metadataURI")
+        logger.debug {"[FRC] Checking for MavenMetadata update from: $metadataURI"}
         val mavenMetadataDocument = FrcHttpClient.fetchXmlResourceAsDocument(metadataURI)
         parseMavenMetadata(mavenMetadataDocument)
     }
     catch (e: Exception)
     {
-        LOG.warn("[FRC] Could not complete a check for maven metadata update from $metadataURI due to an exception: $e", e)
+        logger.warn("[FRC] Could not complete a check for maven metadata update from $metadataURI due to an exception: $e", e)
         null
     }
 }

@@ -17,6 +17,7 @@
 package net.javaru.iip.frc.riolog;
 
 import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -42,12 +43,15 @@ import net.javaru.iip.frc.settings.FrcProjectTeamNumberService;
  * </pre>
  * There are also three static {@code update} methods that can be used when the caller has access to a facet, a module, or a project.
  */
-public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
+public class RioLogProjectService implements FrcProjectTeamNumberChangeListener,
+                                             Disposable
 {
     private static final Logger LOG = Logger.getInstance(RioLogProjectService.class);
 
     @NotNull
     private final Project myProject;
+    
+    //private boolean hasToolWindowBeenRegistered = false;
 
     private final AbstractRioLogMonitorProjectService udpRioLogConsoleProjectService;
     private final AbstractRioLogMonitorProjectService sshRioLogConsoleProjectService;
@@ -78,6 +82,7 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
      */
 
 
+    @SuppressWarnings("unused")
     public static void updateAllOpenProjects()
     {
         final Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
@@ -127,6 +132,7 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
         tcpRioLogConsoleProjectService.update();
     }
 
+    @SuppressWarnings("unused")
     public synchronized void updateAll()
     {
         sshRioLogConsoleProjectService.update();
@@ -193,5 +199,19 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
         stopSsh();
         stopUdp();
         stopTcp();
+    }
+    
+    
+    @Override
+    public void dispose()
+    {
+        try
+        {
+            stopAll();
+        }
+        catch (Exception e)
+        {
+            LOG.info("[FRC] An exception occurred when disposing of " + getClass().getSimpleName() + ": " + e.toString());
+        }
     }
 }

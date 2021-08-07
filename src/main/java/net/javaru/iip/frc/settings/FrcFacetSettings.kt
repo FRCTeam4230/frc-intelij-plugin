@@ -19,6 +19,8 @@ package net.javaru.iip.frc.settings
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.util.xmlb.XmlSerializerUtil
 
 
@@ -35,17 +37,17 @@ data class FrcFacetSettings(val unusedPlaceholder: Int = 0) : PersistentStateCom
     }
 
 
-    private val LOG = Logger.getInstance(FrcFacetSettings::class.java)
+    private val logger = logger <FrcFacetSettings>()
 
     override fun getState(): FrcFacetSettings
     {
-        LOG.trace("[FRC] FrcFacetSettings.getState() called. Returning current state of: " + toString())
+        logger.trace {"[FRC] FrcFacetSettings.getState() called. Returning current state of: ${toString()}"}
         return this
     }
 
     override fun loadState(state: FrcFacetSettings)
     {
-        LOG.trace("[FRC] FrcFacetSettings.loadState() called with state object of: " + state)
+        logger.trace {"[FRC] FrcFacetSettings.loadState() called with state object of: $state"}
         XmlSerializerUtil.copyBean<FrcFacetSettings>(state, this)
     }
 }

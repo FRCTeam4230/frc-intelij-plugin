@@ -17,7 +17,8 @@
 package net.javaru.iip.frc.services
 
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.service.project.ExternalProjectRefreshCallback
@@ -43,7 +44,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 class VendordepsFileListener private constructor(val project: Project)
 {
-    private val LOG = Logger.getInstance(VendordepsFileListener::class.java)
+    private val logger = logger<VendordepsFileListener>()
 
     private val timer = Timer("VendordepsFileListener do Gradle Reimport Timer")
     private var taskRef: AtomicReference<GradleReimportTask> = AtomicReference()
@@ -56,14 +57,14 @@ class VendordepsFileListener private constructor(val project: Project)
     
     init
     {
-        LOG.info("[FRC] Initializing VendordepsFileListener")
+        logger.info("[FRC] Initializing VendordepsFileListener")
         project.messageBus.connect()
             .subscribe(VirtualFileManager.VFS_CHANGES,
                        object : BulkFileListener
                        {
                            override fun after(events: List<VFileEvent>)
                            {
-                               //LOG.trace("[FRC] VendordepsFileListener.AFTER called with ${events.size} events")
+                               //LOG.trace {"[FRC] VendordepsFileListener.AFTER called with ${events.size} events"}
                                for (event in events)
                                {
                                    val file = event.file
@@ -73,7 +74,7 @@ class VendordepsFileListener private constructor(val project: Project)
                                        file.name.endsWith(".json", ignoreCase = true))
                                    {
                                        // For now we react to any change to any json file  in the the directory
-                                       LOG.debug("[FRC] VendordepsFileListener.AFTER: Change detected to the 'vendordeps' file: ${file.name}")
+                                       logger.debug {"[FRC] VendordepsFileListener.AFTER: Change detected to the 'vendordeps' file: ${file.name}"}
                                        scheduleGradleReimport()
                                        break // we only want/need to do the import once in the event multiple files were changed.
                                    }
@@ -82,7 +83,7 @@ class VendordepsFileListener private constructor(val project: Project)
 
                            override fun before(events: MutableList<out VFileEvent>)
                            {
-                               //LOG.trace("[FRC] VendordepsFileListener.BEFORE called with ${events.size} events")
+                               //LOG.trace {"[FRC] VendordepsFileListener.BEFORE called with ${events.size} events"}
                                for (event in events)
                                { 
                                    val file = event.file
@@ -92,7 +93,7 @@ class VendordepsFileListener private constructor(val project: Project)
                                        file.name.endsWith(".json", ignoreCase = true) &&
                                        !VfsUtil.virtualToIoFile(file).exists()) // We only want to react to deletions in the before method. Note: Although there is a VirtualFile.exists method, we dont want to use it as it reports true since it is the state of the file before the deletion
                                    {
-                                       LOG.debug("[FRC] VendordepsFileListenerBEFORE: Change detected to the 'vendordeps' file: ${file.name}  io-file exists: ${VfsUtil.virtualToIoFile(file).exists()}")
+                                       logger.debug {"[FRC] VendordepsFileListenerBEFORE: Change detected to the 'vendordeps' file: ${file.name}  io-file exists: ${VfsUtil.virtualToIoFile(file).exists()}"}
                                        scheduleGradleReimport()
                                        break // we only want/need to do the import once in the event multiple files were changed.
                                    }
@@ -111,9 +112,9 @@ class VendordepsFileListener private constructor(val project: Project)
                                if (previousTask != null && !previousTask.importHasStarted)
                                {
                                    previousTask.cancel()
-                                   LOG.debug("[FRC] canceled previously scheduled GradleReimportTask.")
+                                   logger.debug {"[FRC] canceled previously scheduled GradleReimportTask."}
                                }
-                               LOG.debug("[FRC] scheduling GradleReimportTask.")
+                               logger.debug {"[FRC] scheduling GradleReimportTask."}
                                val task = GradleReimportTask(project)
                                taskRef.set(task)
                                timer.schedule(task, LocalDateTime.now().plusSeconds(1).asDate())
@@ -142,12 +143,12 @@ class VendordepsFileListenerStartupActivity : StartupActivity.Background
 class GradleReimportTask(private val project: Project): TimerTask()
 {
     var importHasStarted = false
-    private val LOG = Logger.getInstance(GradleReimportTask::class.java)
+    private val logger = logger<GradleReimportTask>()
     
     override fun run()
     {
         importHasStarted = true
-        LOG.debug("[FRC] Starting GradleReimportTask")
+        logger.debug {"[FRC] Starting GradleReimportTask"}
         doGradleReimport()
     }
 

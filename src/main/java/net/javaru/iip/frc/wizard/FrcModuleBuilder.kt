@@ -24,7 +24,10 @@ import com.intellij.ide.util.projectWizard.SdkSettingsStep
 import com.intellij.ide.util.projectWizard.SettingsStep
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.model.project.ProjectId
 import com.intellij.openapi.module.JavaModuleType
@@ -33,14 +36,15 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.module.StdModuleTypes
 import com.intellij.openapi.options.ConfigurationException
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.runWhenProjectOpened
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkTypeId
 import com.intellij.openapi.projectRoots.impl.JavaSdkImpl
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider
-import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
@@ -62,7 +66,7 @@ import net.javaru.iip.frc.util.asPluginResourceUrl
 import net.javaru.iip.frc.util.asPluginResourceVF
 import net.javaru.iip.frc.util.get
 import net.javaru.iip.frc.util.getPluginResourceAsStream
-import net.javaru.iip.frc.util.invokeLater
+import net.javaru.iip.frc.util.invokeLaterWait
 import net.javaru.iip.frc.util.isValidJavaVersion
 import net.javaru.iip.frc.util.isValidJdk
 import net.javaru.iip.frc.util.reader
@@ -99,7 +103,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     var selectedSdk: Sdk? = null
         set(sdk) 
         {
-            LOG.trace("[FRC] selectedSdk setter called with value of '$sdk'  Previous value was '$field'")
+            logger.trace {"[FRC] selectedSdk setter called with value of '$sdk'  Previous value was '$field'"}
             if (field != sdk)
             {
                 field = sdk
@@ -115,7 +119,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 //    private val myInheritGroupId = false
 //    private val myInheritVersion = false
     private var myProjectId: ProjectId? = null
-    private var rootProjectPath: String? = null
+    private var rootProjectPath: Path? = null
 
     val dataModel = FrcProjectWizardData()
 
@@ -138,7 +142,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             if (frcWizardTemplatesDirVf == null)
             {
                 val msg = "Cannot find FRC Wizard Templates Base Dir '$frcWizardTemplatesDirName' as plugin resource."
-                LOG.warn("[FRC] $msg")
+                logger.warn("[FRC] $msg")
                 throw ConfigurationException(msg)
             }
 
@@ -149,7 +153,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             @Suppress("ThrowableNotThrown")
             if (baseDirForWpiLibVersionVf == null)
             {
-                LOG.warn("[FRC] Cannot find FRC Wizard Templates Base Dir as resource for year ${version.frcYear}. Will use templates from latest available year.")
+                logger.warn("[FRC] Cannot find FRC Wizard Templates Base Dir as resource for year ${version.frcYear}. Will use templates from latest available year.")
                 val lastAvailableYear =
                     frcWizardTemplatesDirVf
                         .children
@@ -168,7 +172,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             if (baseDirForWpiLibVersionVf == null)
             {
                 val msg = "Cannot find FRC Wizard Templates Base Dir (as plugin resource) for WPI Lib version '$version', nor can a template directory for any previous versions be found."
-                LOG.warn("[FRC] $msg")
+                logger.warn("[FRC] $msg")
                 throw ConfigurationException(msg)
             }
 
@@ -232,9 +236,9 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 
     override fun createProject(name: String?, path: String?): Project?
     {
-        LOG.trace("[FRC] FrcModuleBuilder.createProject() called with name: $name and path: $path")
+        logger.trace {"[FRC] FrcModuleBuilder.createProject() called with name: $name and path: $path"}
         val project = super.createProject(name, path)
-        LOG.trace("[FRC] FrcModuleBuilder.createProject() completed. project: $project")
+        logger.trace {"[FRC] FrcModuleBuilder.createProject() completed. project: $project"}
         return project
     }
 
@@ -242,16 +246,64 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     override fun moduleCreated(module: Module)
     {
         // This method is from the ModuleBuilderListener
-        LOG.trace("[FRC] FrcModuleBuilder.moduleCreated() called and completed for module: ${module.name}")
+        logger.trace {"[FRC] FrcModuleBuilder.moduleCreated() called and completed for module: ${module.name}"}
         // Module Configuration work could be done here
     }
 
     override fun setupModule(module: Module?)
     {
         // This implementation is heavily based on the impl in GradleModelBuilder, along with a bit from  the KtorModuleBuilder impl in the JetBrains ktor plugin
-        LOG.trace("[FRC] FrcModuleBuilder.setupModule() called for module: ${module?.name}")
+        logger.trace {"[FRC] FrcModuleBuilder.setupModule() called for module: ${module?.name}"}
         super.setupModule(module) // this will call (our overridden) setupRootModel method
-        LOG.trace("[FRC] FrcModuleBuilder.setupModule() completed for module: ${module?.name}")
+        callCreateRunConfigurations(module)
+        logger.trace {"[FRC] FrcModuleBuilder.setupModule() completed for module: ${module?.name}"}
+    }
+
+
+    private fun callCreateRunConfigurations(module: Module?)
+    {
+        val project = module?.project
+        if (project != null)
+        {
+            callCreateRunConfigurations(project)
+        }
+        else
+        {
+            logger.warn("[FRC] Could not create run debug configurations due to null module or project.")
+        }
+    }
+
+    private fun callCreateRunConfigurations(project: Project)
+    {
+        logger.trace {"[FRC] scheduling run configuration creation to runWhenProjectOpened."}
+        /*
+          To prevent the below logged warning (from  RCInArbitraryFileManager.loadChangedRunConfigsFromFile() (~line 97)
+                "It's unexpected that the file doesn't exist at this point ($filePath)"
+          We need wait until the project is opened, and is not indexing
+          From some debugging, the issue happens when the project is initially importing
+          A race condition occurs (if we do not wait)
+          So we need to wait until the initial import is complete. But there does not
+          appear to be a way to register a callback with the ImportModuleAction,createFromWizard()
+          So we use the below coded construct which seems to work fine.
+          High level call stack (some intermediary methods not listed)
+               RCInArbitraryFileManager.loadChangedRunConfigsFromFile()
+               RunManagerImpl.deleteRunConfigsFromArbitraryFilesNotWithinProjectContent()
+               RCInArbitraryFileManager.findRunConfigsThatAreNotWithinProjectContent()
+               RunManagerImpl.findRunConfigsThatAreNotWithinProjectContent()
+               ExternalSystemUtil.refreshProject()
+               GradleOpenProjectProvider.attachGradleProjectAndRefresh()
+               ImportModuleAction.createFromWizard()
+               FrcModuleBuilder.importGradleProject()
+         */
+
+        runWhenProjectOpened(project) {
+            DumbService.getInstance(it).runWhenSmart {
+                runWriteAction {
+                    createAllRunDebugConfigurations(it, dataModel)
+                    it.reimportGradleProject()
+                }
+            }
+        }
     }
 
 
@@ -260,8 +312,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     {
         // This implementation is heavily based on the impl in AbstractGradleModuleBuilder (v2019.3+, was previously GradleModelBuilder), along with a bit from the KtorModuleBuilder impl in the JetBrains ktor plugin
         // This method gets called by the setupModule method
-        LOG.debug("[FRC] FrcModuleBuilder.setupRootModel() called with template: '${dataModel.frcWizardTemplateDefinition.displayName}' from dir '${dataModel.frcWizardTemplateDefinition.templateResourcesDirName()}'")
-        LOG.trace("[FRC] Data Model: $dataModel")
+        logger.debug {"[FRC] FrcModuleBuilder.setupRootModel() called with template: '${dataModel.frcWizardTemplateDefinition.displayName}' from dir '${dataModel.frcWizardTemplateDefinition.templateResourcesDirName()}'"}
+        logger.trace {"[FRC] Data Model: $dataModel"}
 
         val modelContentRootDir = createAndGetRoot() ?: return
         val project = rootModel.project
@@ -271,7 +323,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 
         project.runBackgroundTask("Setting Up FRC Project") { progress ->
             progress.text = "Processing templates"
-            rootProjectPath = myParentProject?.linkedExternalProjectPath ?: FileUtil.toCanonicalPath(if (myWizardContext!!.isCreatingNewProject) project.basePath else modelContentRootDir.path)
+
+            rootProjectPath = if (myParentProject != null)
+                Paths.get(myParentProject!!.linkedExternalProjectPath)
+            else
+                Paths.get(FileUtil.toCanonicalPath(if (myWizardContext!!.isCreatingNewProject) project.basePath else modelContentRootDir.path))
             assert(rootProjectPath != null) { "rootProjectPath is null" }
 
             copyTemplateFilesToProject(modelContentRootDir)
@@ -287,15 +343,15 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             progress.text = "Done."
         }
 
-        LOG.trace("[FRC] FrcModuleBuilder.setupRootModel() completed")
+        logger.trace {"[FRC] FrcModuleBuilder.setupRootModel() completed"}
     }
 
 
     override fun commitModule(project: Project, model: ModifiableModuleModel?): Module?
     {
-        LOG.trace("[FRC] FrcModuleBuilder.moduleCreated() called for project: ${project.name} for moduleModel $model")
+        logger.trace {"[FRC] FrcModuleBuilder.moduleCreated() called for project: ${project.name} for moduleModel $model"}
         val module = super.commitModule(project, model)
-        LOG.trace("[FRC] FrcModuleBuilder.moduleCreated() completed for project: ${project.name} for moduleModel $model")
+        logger.trace {"[FRC] FrcModuleBuilder.moduleCreated() completed for project: ${project.name} for moduleModel $model"}
         return module
     }
 
@@ -363,7 +419,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         copyAllResourcesToModuleRoot(modelContentRootDir, paths.configsResourceBasePath, wpilibCommandsJsonFilter)
         copyAllResourcesToModuleRoot(modelContentRootDir, paths.commonCodeResourceBasePath)
 
-        LOG.trace("[FRC] templateLanguageOption: ${dataModel.templateLanguageOption}")
+        logger.trace {"[FRC] templateLanguageOption: ${dataModel.templateLanguageOption}"}
         when(dataModel.templateLanguageOption)
         {
            TemplateLanguageOption.Java -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.javaCodeResourceBasePath)
@@ -384,7 +440,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 Files.newBufferedWriter(file, Charsets.UTF_8).use { it.write(gitIgnoreContent) }
             } catch (e: Exception)
             {
-                LOG.warn("[FRC] Unable to create .gitignore file due to an exception: $e", e)
+                logger.warn("[FRC] Unable to create .gitignore file due to an exception: $e", e)
             }
         }
 
@@ -399,37 +455,26 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         val gradleBuildVf = modelContentRootDir["build.gradle.kts"] ?: modelContentRootDir["build.gradle"]
         if (gradleBuildVf == null)
         {
-            LOG.info("[FRC] gradle import not executed as build.gradle/build.gradle.kts was not found ")
-
+            logger.info("[FRC] gradle import not executed as build.gradle/build.gradle.kts was not found ")
         }
         else
         {
-            LOG.trace("[FRC] preparing for gradle import")
-            invokeLater {
-                LOG.trace("[FRC] gradle import lambda starting")
+            logger.trace {"[FRC] preparing for gradle import"}
+            invokeLaterWait {
+                logger.trace {"[FRC] gradle import lambda starting"}
 
                 val provider = ProjectImportProvider.PROJECT_IMPORT_PROVIDER.extensions
                     .firstOrNull { it.canImport(gradleBuildVf, project) }
-                    ?: return@invokeLater
+                    ?: return@invokeLaterWait
 
                 val wizard = ImportModuleAction.createImportWizard(project, null, gradleBuildVf, provider)
                 if (wizard != null && (wizard.stepCount <= 0 || wizard.showAndGet()))
                 {
                     ImportModuleAction.createFromWizard(project, wizard)
                 }
-
-                LOG.trace("[FRC] scheduling run configuration creation to runWhenProjectIsInitialized.")
-                StartupManager.getInstance(project).runWhenProjectIsInitialized {
-                            LOG.trace("[FRC] run configuration creation lambda called")
-                            createAllRunDebugConfigurations(project, dataModel)
-                            LOG.trace("[FRC] reimporting gradle project")
-                            // reimport gradle project so the run configurations show in the gradle tool window
-                            project.reimportGradleProject()
-                }
-
-                LOG.trace("[FRC] gradle import lambda finished")
+                logger.trace {"[FRC] gradle import lambda finished"}
             }
-            LOG.trace("[FRC] gradle import prep completed")
+            logger.trace {"[FRC] gradle import prep completed"}
         }
     }
 
@@ -438,18 +483,18 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     private fun copyAllResourcesToModuleRoot(modelContentRootDir: VirtualFile, resourceDirBase: Path, keepFilter: (VirtualFile) -> Boolean = { true })
     {
         val pluginResourceDirUrl = resourceDirBase.asPluginResourceUrl()
-        LOG.debug("[FRC] pluginResourceDir URL = $pluginResourceDirUrl")
+        logger.debug {"[FRC] pluginResourceDir URL = $pluginResourceDirUrl"}
 
         if (pluginResourceDirUrl == null)
         {
-            LOG.warn("[FRC] Could  not find resourceDir '$resourceDirBase' for 'copy all template files' operation.")
+            logger.warn("[FRC] Could  not find resourceDir '$resourceDirBase' for 'copy all template files' operation.")
         }
         else
         {
             val srcFqBaseDir = VfsUtil.findFileByURL(pluginResourceDirUrl)
             if (srcFqBaseDir == null)
             {
-                LOG.debug("[FRC] Could not convert URL '$pluginResourceDirUrl' to a VirtualFile for 'copy all wizard template files' operation.")
+                logger.debug {"[FRC] Could not convert URL '$pluginResourceDirUrl' to a VirtualFile for 'copy all wizard template files' operation."}
             }
             else
             {
@@ -486,7 +531,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file)
         } catch (e: Exception)
         {
-            LOG.warn("[FRC] Could not copy new project wizard file '$srcFqVf' to new project root '${modelContentRootDir}' exception: $e", e)
+            logger.warn("[FRC] Could not copy new project wizard file '$srcFqVf' to new project root '${modelContentRootDir}' exception: $e", e)
             null
         }
     }
@@ -508,7 +553,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
         catch (e: Exception)
         {
-            LOG.warn("[FRC] Could not copy new project wizard template file '$srcFqVf' to new project root '${modelContentRootDir}' exception: $e", e)
+            logger.warn("[FRC] Could not copy new project wizard template file '$srcFqVf' to new project root '${modelContentRootDir}' exception: $e", e)
         }
     }
 
@@ -528,7 +573,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
         catch (e: Exception)
         {
-            LOG.warn("'[FRC] Could not process new project wizard freemarker template '${fmTemplate.sourceName}' to destination '$target' due to the exception: $e", e)
+            logger.warn("'[FRC] Could not process new project wizard freemarker template '${fmTemplate.sourceName}' to destination '$target' due to the exception: $e", e)
             return null
         }
     }
@@ -595,7 +640,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 catch (e: Exception)
                 {
                     // TODO: we need to notify the user that the gitignore was not generated from the site and therefore may be out of date: https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues/72
-                    LOG.warn("[FRC] An exception occurred when attempting to dynamically create .gitignore file from gitignore APT at https://www.toptal.com/developers/gitignore/api. Will generate from cache. Cause Summary: $e", e)
+                    logger.warn("[FRC] An exception occurred when attempting to dynamically create .gitignore file from gitignore APT at https://www.toptal.com/developers/gitignore/api. Will generate from cache. Cause Summary: $e", e)
                     createFromCache = true
                 }
             }
@@ -635,7 +680,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             val path = "frc-wizard-gitignore/$templateName.txt"
             val inputStream = getPluginResourceAsStream(path)
             if (inputStream == null) {
-                LOG.warn("[FRC] could not find gitignore cached template '$path' in plugin resources")
+                logger.warn("[FRC] could not find gitignore cached template '$path' in plugin resources")
             }
             else {
                 inputStream.use { innerStream ->
@@ -699,11 +744,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 
     override fun createWizardSteps(wizardContext: WizardContext, modulesProvider: ModulesProvider): Array<ModuleWizardStep>
     {
-        LOG.trace("[FRC] FrcModuleBuilder.createWizardSteps() called")
+        logger.trace {"[FRC] FrcModuleBuilder.createWizardSteps() called"}
         myWizardContext = wizardContext
         // These are the steps that come after the initial "built-in" step. 
         // The FrcInitialCustomOptionsWizardStep shows as a pane in the initial built-in step
-        LOG.trace("[FRC] FrcModuleBuilder.createWizardSteps() completed")
+        logger.trace {"[FRC] FrcModuleBuilder.createWizardSteps() completed"}
         return arrayOf(FrcTemplateSelectionWizardStep(this, wizardContext),
                        FrcProjectSettingsWizardStep(this, wizardContext))
     }
@@ -745,10 +790,10 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         //     this would allow other plugins to add frameworks for a project type. Note something we need to worry about
         // So..... with all that said, we are not going to do a traditional "FrameworksWizardStep" or even an "options step",
         //     but rather a fairly simple "show some information" step
-        LOG.trace("[FRC] FrcModuleBuilder.getCustomOptionsStep() called")
+        logger.trace {"[FRC] FrcModuleBuilder.getCustomOptionsStep() called"}
         val step = FrcInitialCustomOptionsWizardStep(this, context)
         Disposer.register(parentDisposable, step)
-        LOG.trace("[FRC] FrcModuleBuilder.getCustomOptionsStep() completed")
+        logger.trace {"[FRC] FrcModuleBuilder.getCustomOptionsStep() completed"}
         return step
     }
 
@@ -764,7 +809,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         // The parent ModuleBuilder class also has the  `boolean isSuitableSdkType(SdkTypeId sdkType)`  method, but that is limited to the type, so no version info
         
         // We apply filters so that only JDKs that meet the required version level show in the "Project SDK" drop down list
-        LOG.trace("[FRC] FrcModuleBuilder.modifyProjectTypeStep() Executing")
+        logger.trace {"[FRC] FrcModuleBuilder.modifyProjectTypeStep() Executing"}
         return object : SdkSettingsStep(settingsStep, 
                                         this, 
                                         Condition { id: SdkTypeId -> JavaSdkImpl.getInstance() === id },
@@ -776,7 +821,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 // So we don't want to pop up a (modal) dialog. But we can set an internal "selected SDK tracking" property and then use that value in the validate method
                 // If no valid JDK is available in the list (after filtering), this method is simply NOT called. (i.e. it is not called with a null value)
                 @Suppress("SpellCheckingInspection")
-                LOG.debug("[FRC] onSdkSelected called with sdk: sdk='$sdk' [type='${sdk?.sdkType}' version='${sdk?.versionString}' name = '${sdk?.name}'  homePath = '${sdk?.homePath}' sdkModificator = '${sdk?.sdkModificator}'" )
+                logger.debug {"[FRC] onSdkSelected called with sdk: sdk='$sdk' [type='${sdk?.sdkType}' version='${sdk?.versionString}' name = '${sdk?.name}'  homePath = '${sdk?.homePath}' sdkModificator = '${sdk?.sdkModificator}'"}
                 selectedSdk = sdk
             }
         }
@@ -798,6 +843,6 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     
     companion object
     {
-        private val LOG = logger<FrcModuleBuilder>()
+        private val logger = logger<FrcModuleBuilder>()
     }
 }

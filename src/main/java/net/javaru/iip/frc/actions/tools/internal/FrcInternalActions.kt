@@ -19,7 +19,8 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.LangDataKeys
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbService
@@ -120,13 +121,13 @@ class LogAnErrorAction : AbstractFrcInternalAction()
 {
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
-        LOG.info("[FRC] logging a simulated error message for testing exception handling")
-        LOG.error("[FRC] Sample error logging for testing exception handling", RuntimeException("Sample exception for testing exception handling"))
+        logger.info("[FRC] logging a simulated error message for testing exception handling")
+        logger.error("[FRC] Sample error logging for testing exception handling", RuntimeException("Sample exception for testing exception handling"))
     }
 
     companion object
     {
-        private val LOG = Logger.getInstance(LogAnErrorAction::class.java)
+        private val logger = logger<LogAnErrorAction>()
     }
 }
 
@@ -137,13 +138,13 @@ class CauseAnExceptionAction : AbstractFrcInternalAction()
 {
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
-        LOG.info("[FRC] Throwing simulated exception for testing exception handling")
+        logger.info("[FRC] Throwing simulated exception for testing exception handling")
         throw RuntimeException("Sample exception for testing exception handling")
     }
 
     companion object
     {
-        private val LOG = Logger.getInstance(CauseAnExceptionAction::class.java)
+        private val logger = logger<CauseAnExceptionAction>()
     }
 }
 
@@ -156,31 +157,31 @@ class RunKotlinCodeForTestingAndDebuggingFrcInternalAction : AbstractFrcInternal
         val module =  actionEvent.getData(LangDataKeys.MODULE)
         val project =  actionEvent.project
 
-        LOG.trace("[FRC] BREAKPOINT")
+        logger.trace {"[FRC] BREAKPOINT"}
 
         try
         {
-            LOG.trace("[FRC] BREAKPOINT")
+            logger.trace {"[FRC] BREAKPOINT"}
 
             // Put code here, but do N0T commit it - paying attention to import statements
 
 
 
 
-            LOG.trace("[FRC] BREAKPOINT")
+            logger.trace {"[FRC] BREAKPOINT"}
         }
         catch (t: Throwable)
         {
             // We log as an error so we can more easily grab the stacktrace from the exception reporter
-            LOG.error("[FRC] Exception: $t", t)
+            logger.error("[FRC] Exception: $t", t)
         }
 
-        LOG.trace("[FRC] BREAKPOINT")
+        logger.trace {"[FRC] BREAKPOINT"}
     }
 
     companion object
     {
-        private val LOG = Logger.getInstance(CauseAnExceptionAction::class.java)
+        private val logger = logger<CauseAnExceptionAction>()
     }
 }
 

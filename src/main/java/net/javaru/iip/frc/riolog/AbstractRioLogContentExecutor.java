@@ -93,11 +93,11 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     protected ProcessHandler myProcessHandler;
     private ConsoleView myConsoleView;
     @Nullable
-    private Runnable myAfterCompletionRunnable;
+    private final Runnable myAfterCompletionRunnable;
     private Computable<Boolean> myStopEnabled;
 
-    private String myHelpId = null;
-    private boolean myActivateToolWindow;
+    //private final String myHelpId = null;
+    private final boolean myActivateToolWindow;
     private Executor myExecutor;
     private RunContentDescriptor myRunContentDescriptor;
     private AbstractRioLogMonitorProcess rioLogMonitorProcess;
@@ -192,10 +192,10 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         myConsoleView = createConsole(myProject, myProcessHandler);
         myStopEnabled = () -> !myProcessHandler.isProcessTerminated();
 
-        if (myHelpId != null)
-        {
-            myConsoleView.setHelpId(myHelpId);
-        }
+//        if (myHelpId != null)
+//        {
+//            myConsoleView.setHelpId(myHelpId);
+//        }
 
         //Executor executor = DefaultRunExecutor.getRunExecutorInstance(); //Gets the Run Window I believe
         myExecutor = createExecutor();
@@ -220,7 +220,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         consolePanel = createConsolePanel(myConsoleView, actions);
         myRunContentDescriptor = new RunContentDescriptor(myConsoleView, myProcessHandler, consolePanel, getTabTitle(), FrcIcons.RioLog.RIOLOG);
 
-        Disposer.register(myProject, this);
+        Disposer.register(myProject.getService(RioLogProjectService.class), this);
         Disposer.register(this, myRunContentDescriptor);
         addActionsToActionGroup(actions);
     
@@ -383,8 +383,11 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         {
             final ToolWindow toolWindow = ToolWindowManager.getInstance(myProject)
                                                            .getToolWindow(getToolWindowId());
-            final ContentManager contentManager = toolWindow.getContentManager();
-            ensureContentIsPinned(contentManager);
+            if (toolWindow != null)
+            {
+                final ContentManager contentManager = toolWindow.getContentManager();
+                ensureContentIsPinned(contentManager);
+            }
         }
     }
 
@@ -416,6 +419,11 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             {
                 final ToolWindow toolWindow = ToolWindowManager.getInstance(myProject)
                                                                .getToolWindow(getToolWindowId());
+                if (toolWindow == null)
+                {
+                    LOG.warn("[FRC] Could get instance of FRC Tool Window");
+                    return;
+                }
                 toolWindow.activate(null);
                 final ContentManager contentManager = toolWindow.getContentManager();
                 final Content content = contentManager.findContent(getTabTitle());
@@ -535,7 +543,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     }
 
 
-    private void removeAllContent(Executor executor, Project project)
+    private void removeAllContent(Executor executor, @SuppressWarnings("unused") Project project)
     {
         if (executor != null)
         {
@@ -569,6 +577,14 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     @Override
     public void dispose()
     {
+        try
+        {
+            invokeStop();
+        }
+        catch (Exception e)
+        {
+            LOG.info("[FRC] An exception occurred when disposing of RioLogContentExecutor: " + e.toString());
+        }
         Disposer.dispose(this);
         LOG.debug("[FRC] Disposing of " + getClass().getSimpleName() + " complete.");
     }
@@ -610,14 +626,14 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
 
         @Override
-        public boolean isSelected(final AnActionEvent event)
+        public boolean isSelected(final @NotNull AnActionEvent event)
         {
             return myConsole.isOutputPaused();
         }
 
 
         @Override
-        public void setSelected(final AnActionEvent event, final boolean flag)
+        public void setSelected(final @NotNull AnActionEvent event, final boolean flag)
         {
             myConsole.setOutputPaused(flag);
             ApplicationManager.getApplication().invokeLater(() -> update(event));
@@ -664,7 +680,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
 
         @Override
-        public void actionPerformed(AnActionEvent event)
+        public void actionPerformed(@NotNull AnActionEvent event)
         {
             ApplicationManager.getApplication().invokeLater(() ->
                                                             {
@@ -716,7 +732,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
 
         @Override
-        public void actionPerformed(AnActionEvent event)
+        public void actionPerformed(@NotNull AnActionEvent event)
         {
             reRun();
         }
@@ -751,14 +767,14 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
 
         @Override
-        public void actionPerformed(AnActionEvent anActionEvent)
+        public void actionPerformed(@NotNull AnActionEvent anActionEvent)
         {
             myConsoleView.clear();
         }
 
 
         @Override
-        public void update(AnActionEvent e)
+        public void update(@NotNull AnActionEvent e)
         {
             boolean enabled = myConsoleView.getContentSize() > 0;
             if (!enabled)
@@ -775,7 +791,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     }
 
 
-    private class RioLogToggleAutoClearAction extends ToggleAction
+    private static class RioLogToggleAutoClearAction extends ToggleAction
     {
         public RioLogToggleAutoClearAction()
         {
@@ -786,14 +802,14 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
 
         @Override
-        public boolean isSelected(AnActionEvent e)
+        public boolean isSelected(@NotNull AnActionEvent e)
         {
             return FrcApplicationSettings.getInstance().getClearRioLogOnRobotRestart();
         }
 
 
         @Override
-        public void setSelected(AnActionEvent event, boolean state)
+        public void setSelected(@NotNull AnActionEvent event, boolean state)
         {
             try
             {

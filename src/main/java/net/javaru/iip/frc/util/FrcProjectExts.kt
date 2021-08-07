@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2021 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,7 @@
 
 package net.javaru.iip.frc.util
 
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.PerformInBackgroundOption
@@ -34,7 +34,7 @@ import org.jetbrains.plugins.gradle.settings.GradleSettings
 
 // Note: There are also some Project Extension functions in FrcFacet.kt
 
-private val LOG = Logger.getInstance("#net.javaru.iip.frc.util.ProjectExts")
+private val LOG = logger("#net.javaru.iip.frc.util.ProjectExts")
 
 fun Project?.isAntBasedFrcProject(): Boolean
 {

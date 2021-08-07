@@ -57,7 +57,7 @@ plugins {
     base
     java
     kotlin("jvm") version "1.4.31"
-    id("org.jetbrains.intellij") version "0.7.2" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
+    id("org.jetbrains.intellij") version "0.7.3" // gradle plugin-for writing IntelliJ plugins:  https://github.com/JetBrains/gradle-intellij-plugin
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
     //    https://github.com/jetbrains/gradle-idea-ext-plugin
@@ -132,7 +132,7 @@ intellij {
     // IntelliJ IDEA dependency
     version = ideaVersion
     // Bundled plugin dependencies - comma separated list
-    setPlugins("java", "gradle", "Groovy", "com.jetbrains.sh")  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
+    setPlugins("java", "gradle", "org.jetbrains.plugins.gradle", "Groovy", "com.jetbrains.sh")  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
     sandboxDirectory =  sandboxPath
 
     updateSinceUntilBuild = ideaUpdateSinceUntilBuild.toBoolean()

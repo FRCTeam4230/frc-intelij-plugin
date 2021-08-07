@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +20,8 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.project.Project
 import com.intellij.util.xmlb.XmlSerializerUtil
 import net.javaru.iip.frc.riolog.RioLogGlobals
@@ -53,17 +54,17 @@ data class FrcSshSettings @JvmOverloads constructor(
         fun clone(original: FrcSshSettings): FrcSshSettings = original.copy()
     }
 
-    private val LOG = Logger.getInstance(FrcSshSettings::class.java)
+    private val logger = logger<FrcSshSettings>()
 
     override fun getState(): FrcSshSettings
     {
-        LOG.trace("[FRC] FrcSshSettings.getState() called. Returning current state of: " + toString())
+        logger.trace { "[FRC] FrcSshSettings.getState() called. Returning current state of: ${toString()}" }
         return this
     }
 
     override fun loadState(state: FrcSshSettings)
     {
-        LOG.trace("[FRC] FrcSshSettings.loadState() called with state object of: $state")
+        logger.trace {"[FRC] FrcSshSettings.loadState() called with state object of: $state"}
         XmlSerializerUtil.copyBean(state, this)
     }
 }

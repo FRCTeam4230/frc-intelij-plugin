@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2021 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,9 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
@@ -38,7 +40,7 @@ import org.intellij.lang.annotations.Language
 import java.util.*
 
 
-private val LOG = logger<FrcPluginVersionManagerApplicationService>()
+private val logger = logger<FrcPluginVersionManagerApplicationService>()
 
 
 /**
@@ -62,7 +64,7 @@ class FrcPluginVersionManagerApplicationService : Disposable
 
     fun checkPluginUpdateStatus(project: Project?)
     {
-        LOG.debug("[FRC] checking plugin status. project? = $project")
+        logger.debug {"[FRC] checking plugin status. project? = $project"}
         // TODO This is a temp to get an EOL notification out. This needs to be improved.
         try
         {
@@ -70,7 +72,7 @@ class FrcPluginVersionManagerApplicationService : Disposable
             val build: BuildNumber = appInfo.build
             val baselineVersion = build.baselineVersion
 
-            LOG.debug("[FRC] baseline version: $baselineVersion")
+            logger.debug {"[FRC] baseline version: $baselineVersion"}
 
             if(baselineVersion < oldestSupportedBaseBuild)
             {
@@ -97,7 +99,7 @@ class FrcPluginVersionManagerApplicationService : Disposable
         }
         catch (t: Throwable)
         {
-            LOG.warn("[FRC] could not check Plugin Update status. Cause: $t", t)
+            logger.warn("[FRC] could not check Plugin Update status. Cause: $t", t)
         }
     }
 
@@ -143,13 +145,13 @@ data class FrcPluginVersionManagerState(var eolNotifiedForBuild: MutableSet<Int>
 {
     override fun getState(): FrcPluginVersionManagerState
     {
-        LOG.trace("[FRC] FrcPluginVersionManagerState.getState() called. Returning current state of: ${toString()}")
+        logger.trace {"[FRC] FrcPluginVersionManagerState.getState() called. Returning current state of: ${toString()}"}
         return this
     }
 
     override fun loadState(state: FrcPluginVersionManagerState)
     {
-        LOG.trace("[FRC] FrcPluginVersionManagerState.loadState() called with state object of: $state")
+        logger.trace {"[FRC] FrcPluginVersionManagerState.loadState() called with state object of: $state"}
         XmlSerializerUtil.copyBean<FrcPluginVersionManagerState>(state, this)
     }
 

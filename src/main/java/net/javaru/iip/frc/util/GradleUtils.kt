@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.util
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
@@ -36,7 +35,13 @@ import java.nio.file.Path
 
 // NOTE: AddGradleDslPluginActionHandler has example of modifying the gradle build file (for a groovy build file)
 
-private val LOG = Logger.getInstance("#net.javaru.iip.frc.util.GradleUtils")
+// Keep an eye on:  com.intellij.externalSystem.DependencyModifierService
+// It's experimental, but allows you to modify the build model such as adding a dependency
+// It does not (yet) support modifying a Plugin version. But JetBrains seems to indicate
+// that that is possibly planned:
+// https://intellij-support.jetbrains.com/hc/en-us/community/posts/360010674120-Programatically-Update-Plugin-Version-in-Gradle-Build-File
+
+//private val LOG = logger("#net.javaru.iip.frc.util.GradleUtils")
 
 fun Project.getGradleBuildIoFile(): File?
 {

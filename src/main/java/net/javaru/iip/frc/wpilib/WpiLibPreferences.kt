@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,10 +16,10 @@
 
 package net.javaru.iip.frc.wpilib
 
-import com.esotericsoftware.minlog.Log
 import com.intellij.json.psi.JsonFile
 import com.intellij.openapi.application.runReadAction
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
@@ -39,7 +39,7 @@ import net.javaru.iip.frc.util.getModules
 import net.javaru.iip.frc.util.getStringPropertyValue
 
 private object WpiLibPreferencesFunctions
-private val LOG = Logger.getInstance(WpiLibPreferencesFunctions::class.java)
+private val LOG = logger<WpiLibPreferencesFunctions>()
 
 const val wpiLibDirName = ".wpilib"
 const val wpiLibPreferencesFileName: String = "wpilib_preferences.json"
@@ -135,7 +135,7 @@ fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
             contentRoots.forEach { contentRoot: VirtualFile? ->
                 if (contentRoot != null)
                 {
-                    Log.trace("[FRC] content Root Found: ${contentRoot.path}")
+                    LOG.trace {"[FRC] content Root Found: ${contentRoot.path}"}
                     val psiDirectory = psiManager.findDirectory(contentRoot)
                     if (psiDirectory != null)
                     {
@@ -148,7 +148,7 @@ fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
                                 val files = FilenameIndex.getFilesByName(project, wpiLibPreferencesFileName, wpiLibDirScope)
                                 if (LOG.isTraceEnabled)
                                 {
-                                    files.forEach { LOG.trace("[FRC] Found: ${it.virtualFile.path}") }
+                                    files.forEach { LOG.trace {"[FRC] Found: ${it.virtualFile.path}"} }
                                 }
                                 foundFiles.addAll(files)
                             }

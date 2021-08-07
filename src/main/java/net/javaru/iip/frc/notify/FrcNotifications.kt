@@ -28,6 +28,8 @@ import com.intellij.notification.NotificationsConfiguration
 import com.intellij.notification.impl.NotificationsManagerImpl
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.popup.Balloon
@@ -120,7 +122,7 @@ data class BalloonResult(val notification: Notification, val balloon: Balloon?)
 @Suppress("unused")
 object FrcNotifications
 {
-    private val LOG = Logger.getInstance(FrcNotifications::class.java)
+    private val LOG = logger<FrcNotifications>()
 
     const val Title = "FRC"
 
@@ -145,7 +147,7 @@ object FrcNotifications
 
     init
     {
-        LOG.debug("[FRC] Registering FRC Notification Groups")
+        LOG.debug {"[FRC] Registering FRC Notification Groups"}
         NotificationsConfiguration.getNotificationsConfiguration().register(FRC_GENERAL_NOTIFICATION_GROUP.displayId,
                                                                             NotificationDisplayType.BALLOON,
                                                                             true)
@@ -980,16 +982,16 @@ object FrcNotifications
             notification.expire()
             when (event.description)
             {
-                "this"  -> logger.debug("Do 'this' action")
-                "that"  -> logger.debug("Do 'that' action")
-                "other" -> logger.debug("Do 'other' action")
+                "this"  -> logger.debug {"Do 'this' action"}
+                "that"  -> logger.debug {"Do 'that' action"}
+                "other" -> logger.debug {"Do 'other' action"}
             }
         }
 
 
         // Adding a when expired listener
         createNotification(FrcNotificationType.ACTIONABLE_INFO, content = "Some message")
-            .whenExpired { logger.debug("When expired action code would go here") }
+            .whenExpired { logger.debug {"When expired action code would go here"} }
             .notify(project)
 
 
@@ -1003,7 +1005,7 @@ object FrcNotifications
             }
 
         }.whenExpired {
-            logger.debug("When expired action code would go here")
+            logger.debug {"When expired action code would go here"}
         }
             .notify(project)
 

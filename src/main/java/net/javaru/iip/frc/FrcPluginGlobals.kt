@@ -15,7 +15,7 @@
  */
 package net.javaru.iip.frc
 
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.pom.java.LanguageLevel
 import org.apache.commons.lang3.BooleanUtils
 
@@ -30,7 +30,7 @@ object FrcPluginGlobals
 
     /** A logger name `#net.javaru.iip.frc` for logging plugin level events. It should be used sparingly. */
     @JvmField
-    val GENERAL_LOGGER = Logger.getInstance("#net.javaru.iip.frc")
+    val GENERAL_LOGGER = logger("#net.javaru.iip.frc")
     @JvmField
     val DEFAULT_MIN_REQUIRED_LANGUAGE_LEVEL = LanguageLevel.JDK_11
     @JvmField

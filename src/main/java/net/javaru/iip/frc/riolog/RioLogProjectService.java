@@ -17,6 +17,7 @@
 package net.javaru.iip.frc.riolog;
 
 import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -43,12 +44,15 @@ import net.javaru.iip.frc.settings.FrcProjectTeamNumberService;
  * </pre>
  * There are also three static {@code update} methods that can be used when the caller has access to a facet, a module, or a project.
  */
-public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
+public class RioLogProjectService implements FrcProjectTeamNumberChangeListener,
+                                             Disposable
 {
     private static final Logger LOG = Logger.getInstance(RioLogProjectService.class);
 
     @NotNull
     private final Project myProject;
+    
+    //private boolean hasToolWindowBeenRegistered = false;
 
     private final AbstractRioLogMonitorProjectService udpRioLogConsoleProjectService;
     private final AbstractRioLogMonitorProjectService sshRioLogConsoleProjectService;
@@ -79,6 +83,7 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
      */
 
 
+    @SuppressWarnings("unused")
     public static void updateAllOpenProjects()
     {
         final Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
@@ -95,7 +100,15 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
     
     public static RioLogProjectService getInstance(@NotNull Project project)
     {
-        return ServiceManager.getService(project, RioLogProjectService.class);
+        RioLogProjectService service = ServiceManager.getService(project, RioLogProjectService.class);
+        // This was an attempt to make ti so we can put the FRC ToolWindow in the secondary (i.e. right side) group on the bottom
+        // While it does show in that position, for some reason he icon is missing (event though it is being set and shows set
+        // on the ToolWindow object in the debugger) and an exception is thrown due to a null icon when the Executor goes to show.
+        // In the end, since we want to completely rework the FRC tool window (especially given this implementation was the very
+        // first thing ever done and a lot has been learned about the Plugin API since then), we'll wqorry about doing that when
+        // the Tool Window rework is done.
+        //RiologUtilsKt.registerFrcToolWindowIfNeeded(project);
+        return service;
     }
 
 
@@ -128,6 +141,7 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
         tcpRioLogConsoleProjectService.update();
     }
 
+    @SuppressWarnings("unused")
     public synchronized void updateAll()
     {
         sshRioLogConsoleProjectService.update();
@@ -194,5 +208,19 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener
         stopSsh();
         stopUdp();
         stopTcp();
+    }
+    
+    
+    @Override
+    public void dispose()
+    {
+        try
+        {
+            stopAll();
+        }
+        catch (Exception e)
+        {
+            LOG.info("[FRC] An exception occurred when disposing of " + getClass().getSimpleName() + ": " + e.toString());
+        }
     }
 }

@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,7 @@ import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications.createNotification
@@ -39,11 +39,11 @@ class FrcInternalNotificationsActionsGroup : FrcInternalActionsGroup()
  */
 abstract class AbstractTriggerNotificationAction : AbstractFrcInternalAction()
 {
-    internal val LOG = Logger.getInstance(AbstractTriggerNotificationAction::class.java)
+    internal val logger =logger<AbstractTriggerNotificationAction>()
 
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
-        LOG.info("[FRC] Making a simulated FRC Notification via ${javaClass.simpleName}")
+        logger.info("[FRC] Making a simulated FRC Notification via ${javaClass.simpleName}")
         val project = actionEvent.getData(CommonDataKeys.PROJECT)
         doNotification(project)
     }

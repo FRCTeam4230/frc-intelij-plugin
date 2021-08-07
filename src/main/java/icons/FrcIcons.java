@@ -25,8 +25,11 @@ import com.intellij.openapi.util.IconLoader;
 // "Working with Icons and Images" in the SDK DevGuide: http://www.jetbrains.org/intellij/sdk/docs/reference_guide/work_with_icons_and_images.html
 // Icon design guidelines: https://jetbrains.design/intellij/principles/icons/
 // SVG images are supported since v2018.2
-// Also see IntelliJ Icon Generator (A third party tool for genrating 'standard' IntelliJ circrl and square icons)
+//
+// Also see IntelliJ Icon Generator (A third party tool for generating 'standard' IntelliJ circle and square icons)
 //     https://bjansen.github.io/intellij-icon-generator/
+// Web Page showing all the built-in IDE Icons
+//     https://jetbrains.design/intellij/resources/icons_list/
 
 
 public final class FrcIcons

@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,8 @@
 package net.javaru.iip.frc.settings
 
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.messages.Topic
 import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFile
@@ -35,7 +36,7 @@ import java.util.*
  */
 class FrcProjectTeamNumberService private constructor(val project:Project)
 {
-    private val LOG = Logger.getInstance(FrcProjectTeamNumberService::class.java)
+    private val logger = logger<FrcProjectTeamNumberService>()
     
     var teamNumber = UN_CONFIGURED_TEAM_NUMBER // default value, but then is set in the init block
         private set
@@ -43,7 +44,7 @@ class FrcProjectTeamNumberService private constructor(val project:Project)
     
     init
     {
-        LOG.debug("[FRC] Initializing FrcProjectTeamNumberService for project $project")
+        logger.debug {"[FRC] Initializing FrcProjectTeamNumberService for project $project"}
         teamNumber = project.getTeamNumberConfiguredInWpiLibPreferencesFile()
         
         // Examples: com/intellij/openapi/externalSystem/service/project/manage/SourceFolderManagerImpl.kt:115

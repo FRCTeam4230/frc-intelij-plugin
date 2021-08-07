@@ -24,7 +24,9 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.ModuleListener
@@ -50,7 +52,7 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
                                                                              Disposable,
                                                                              FacetManagerAdapter()
 {
-    private val LOG = Logger.getInstance(FrcProjectLifecycleService::class.java)
+    private val logger = logger<FrcProjectLifecycleService>()
 
 
     companion object
@@ -62,7 +64,7 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
 
     internal fun registerListeners()
     {
-        LOG.trace("[FRC] FrcProjectLifecycleService.registerListeners() called for project '$project'")
+        logger.trace {"[FRC] FrcProjectLifecycleService.registerListeners() called for project '$project'"}
         val connection: MessageBusConnection = project.messageBus.connect()
         connection.subscribe(ProjectTopics.MODULES, this)
         connection.subscribe(ProjectTopics.PROJECT_ROOTS, this)
@@ -102,7 +104,7 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
 
     override fun dispose() // This is basically our projectClosed() method
     {
-        LOG.trace("[FRC] FrcProjectLifecycleService.dispose() called for project '$project'")
+        logger.trace {"[FRC] FrcProjectLifecycleService.dispose() called for project '$project'"}
         FrcNotificationsTracker.clearAllForProject(project)
         ServiceManager
             .getService(RioLogUdpSocketManagerApplicationService::class.java)
@@ -112,7 +114,7 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
 
     override fun moduleAdded(project: Project, module: Module)
     {
-        LOG.trace("[FRC] FrcProjectLifecycleService.moduleAdded() called for module '$module' on project '$project'")
+        logger.trace {"[FRC] FrcProjectLifecycleService.moduleAdded() called for module '$module' on project '$project'"}
         // We only want to update the RioLogConsole if the project is fully opened. In other words, this is a
         // case where the user is adding a module to an open project rather than this moduleAdded() method being
         // called as part of the initial project loading when opening a project. In the latter case, the
@@ -129,7 +131,7 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
 
     override fun beforeModuleRemoved(project: Project, module: Module)
     {
-        LOG.trace("[FRC] FrcProjectLifecycleService.beforeModuleRemoved() called for module '$module'")
+        logger.trace {"[FRC] FrcProjectLifecycleService.beforeModuleRemoved() called for module '$module'"}
         if (module.isFrcFacetedModule() && !module.isDisposed)
         {
             RioLogProjectService.getInstance(module.project).update()
@@ -138,7 +140,7 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
 
     override fun moduleRemoved(project: Project, module: Module)
     {
-        LOG.debug("[FRC] FrcProjectLifecycleService.disposeComponent() called for module '$module'")
+        logger.debug {"[FRC] FrcProjectLifecycleService.disposeComponent() called for module '$module'"}
         if (module.isFrcFacetedModule() && !module.isDisposed)
         {
             RioLogProjectService.getInstance(module.project).update()
@@ -149,8 +151,9 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
     {
         if (facet.isFrcFacet())
         {
-            RioLogProjectService.getInstance(facet.module.project).update()
-            checkProjectFrcStatus(facet.module.project, knownFacetedProject = true, checkTeamNumConfigStatus = true)
+            val theProject = facet.module.project
+            RioLogProjectService.getInstance(theProject).update()
+            checkProjectFrcStatus(theProject, knownFacetedProject = true, checkTeamNumConfigStatus = true)
         }
     }
 

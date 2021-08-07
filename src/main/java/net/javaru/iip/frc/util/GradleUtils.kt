@@ -41,7 +41,7 @@ import java.nio.file.Path
 // that that is possibly planned:
 // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360010674120-Programatically-Update-Plugin-Version-in-Gradle-Build-File
 
-//private val LOG = logger("#net.javaru.iip.frc.util.GradleUtils")
+//private val LOG = Logger.getInstance("#net.javaru.iip.frc.util.GradleUtils")
 
 fun Project.getGradleBuildIoFile(): File?
 {

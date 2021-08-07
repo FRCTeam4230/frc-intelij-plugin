@@ -17,8 +17,8 @@
 package net.javaru.iip.frc.util
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.roots.JavadocOrderRootType
 import com.intellij.openapi.roots.ModuleRootManager
@@ -33,7 +33,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 
-private val LOG =logger("#net.javaru.iip.frc.util.LibraryUtils")
+private val LOG = Logger.getInstance("#net.javaru.iip.frc.util.LibraryUtils")
 
 
 

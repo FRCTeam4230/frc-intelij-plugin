@@ -17,7 +17,7 @@
 package net.javaru.iip.frc.util
 
 import com.intellij.application.options.CodeStyle
-import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.impl.LoadTextUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtilRt
@@ -36,7 +36,7 @@ import java.nio.charset.Charset
 import java.nio.file.Path
 
 
-private val LOG = logger("#net.javaru.iip.frc.util.VirtualFileExts")
+private val LOG = Logger.getInstance("#net.javaru.iip.frc.util.VirtualFileExts")
 
 private val AntDetectionXPathExpression = XPathFactory.instance().compile("//project/property[@file] | //bookstore/import[@file]", Filters.element())
 

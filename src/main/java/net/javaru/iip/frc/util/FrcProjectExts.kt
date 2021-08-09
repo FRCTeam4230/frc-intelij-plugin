@@ -16,7 +16,7 @@
 
 package net.javaru.iip.frc.util
 
-import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.PerformInBackgroundOption
@@ -34,7 +34,7 @@ import org.jetbrains.plugins.gradle.settings.GradleSettings
 
 // Note: There are also some Project Extension functions in FrcFacet.kt
 
-private val LOG = logger("#net.javaru.iip.frc.util.ProjectExts")
+private val LOG = Logger.getInstance("#net.javaru.iip.frc.util.ProjectExts")
 
 fun Project?.isAntBasedFrcProject(): Boolean
 {

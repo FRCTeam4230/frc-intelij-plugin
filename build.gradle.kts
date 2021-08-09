@@ -21,23 +21,13 @@ import org.jetbrains.gradle.ext.ProjectSettings
 val frcPluginBaseVersion: String by project
 val ideaMajorVersion: String by project
 val frcPluginEapDesignator: String by project
-val frcPluginVersion = "$frcPluginBaseVersion-$ideaMajorVersion$frcPluginEapDesignator"
+val frcPluginVersion = "$frcPluginBaseVersion-$ideaMajorVersion$frcPluginEapDesignator" // ex: v1.3.0-2019.2,  1.3.1-2020.1-eap.1
+//val kotlinVersion = plugins.getPlugin(KotlinPluginWrapper::class.java).kotlinPluginVersion
+val javaVersion: JavaVersion = JavaVersion.VERSION_11
+val sandboxPath = determineSandboxDir()
 
 group = "net.javaru.iip.frc"
-// ex: v1.3.0-2019.2,  1.3.1-2020.1-eap.1
-version = frcPluginVersion
-
-//buildscript {
-//    build.loadExtraPropertiesOf(project)
-//}
-
-
-//val kotlinVersion = plugins.getPlugin(KotlinPluginWrapper::class.java).kotlinPluginVersion
-// Java 11 required when supporting v2020.3 and later; Java 8 is no longer bundled. For previous versions we should target Java 1.8
-//      See  https://jetbrains.org/intellij/sdk/docs/reference_guide/api_changes/api_changes_list_2020.html#section
-//           https://blog.jetbrains.com/platform/2020/09/intellij-project-migrates-to-java-11/
-val ourTargetJavaVersion: JavaVersion = JavaVersion.VERSION_11
-val sandboxPath = "${project.rootDir.canonicalPath}/${project.properties["sandboxName"]}"
+version = frcPluginVersion 
 
 plugins {
     base
@@ -91,7 +81,7 @@ tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         all {
             kotlinOptions {
-                jvmTarget = ourTargetJavaVersion.toString()
+                jvmTarget = javaVersion.toString()
                 javaParameters = true
                 //noReflect = false
             }
@@ -99,11 +89,10 @@ tasks {
     }
 }
 
-
 java {
 
-    sourceCompatibility = ourTargetJavaVersion
-    targetCompatibility = ourTargetJavaVersion
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
 }
 
 tasks.test {
@@ -130,9 +119,9 @@ intellij {
     // Bundled plugin dependencies - comma separated list
     plugins.set(listOf("java", "gradle", "Groovy", "com.jetbrains.sh"))  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
     sandboxDir.set(sandboxPath)
-    updateSinceUntilBuild.setBooleanViaProjectProperty("ideaUpdateSinceUntilBuild")
-    sameSinceUntilBuild.set(projectPropertyBoolean("isEAP") || projectPropertyBoolean("ideaSameSinceUntilBuild"))
-    downloadSources.setBooleanViaProjectProperty("ideaDownloadSources")
+    updateSinceUntilBuild.set(true)
+    sameSinceUntilBuild.set(false)
+    downloadSources.set(true)
 }
 
 tasks {
@@ -163,20 +152,10 @@ tasks {
     }
     
     runPluginVerifier {
-        // See: https://github.com/JetBrains/gradle-intellij-plugin#plugin-verifier-dsl
-        //      https://github.com/JetBrains/intellij-plugin-verifier#common-options
-        // List of releases:
-        //      https://www.jetbrains.com/idea/download/other.html
-        //      All including EAPs RCs
-        //          https://data.services.jetbrains.com/products?fields=code,name,releases.downloads,releases.version,releases.build,releases.type&code=IIC,IIU,IIE
-        //      Just RCs & Releases:
-        //          https://data.services.jetbrains.com/products?fields=code,name,releases.downloads,releases.version,releases.build,releases.type&code=IIC,IIU,IIE&type=release,rc
-        //      Just Releases:
-        //          https://data.services.jetbrains.com/products?fields=code,name,releases.downloads,releases.version,releases.build,releases.type&code=IIC,IIU,IIE&type=release
-        //ideVersions.set(listOf("IC-2020.2", "IC-2020.2.1", "IC-2020.2.2", "IC-2020.2.3", "IC-2020.2.4", "IC-2020.3", "IC-2020.3.1", "IC-2020.3.2"))
-        ideVersions.set(listOf("IC-2021.1"))
-        //localPaths.set(listOf(File("${System.getProperty("user.home")}/.pluginVerifier/ides-local/idea-IC-212.4746.52")))
         // Reports appear in ${project.buildDir}/reports/pluginVerifier by default. Set `verificationReportsDirectory` to change
+        val baseDir = File(projectProperty("verifierLocalIdesBaseDir").replace("~", System.getProperty("user.home")))
+        localPaths.set(projectPropertyList("verifierLocalIdes").map { File(baseDir, it) })
+        ideVersions.set(projectPropertyList("verifierIdeVersions")) 
     }
 
     publishPlugin {
@@ -196,9 +175,8 @@ tasks {
     }
 }
 
-
-// Configure some IDEA Project settings (i.e. for Intellij IDEA used to code the plugin)
 idea {
+    // Configure some IDEA Project settings (i.e. for Intellij IDEA used to code the plugin)
     // https://github.com/JetBrains/gradle-idea-ext-plugin
     // Note: The DSL apparently changed in v0.4 since if I upgrade to it or later, the following breaks.
     //       But I have not had the time to dig into it and see what needs to change
@@ -330,6 +308,8 @@ fun projectProperty(key: String, defaultValue: String) = project.findProperty(ke
 fun projectPropertyBoolean(key: String) = projectProperty(key).toBoolean()
 /** Retrieves a project property as a Boolean, using the default value if the property is not defined. */
 fun projectPropertyBoolean(key: String, defaultValue: Boolean) = projectProperty(key, defaultValue.toString()).toBoolean()
+/** Retrieves a project property that is a delimited String and returns it as a List of String, or an empty List if the property is not set. */
+fun projectPropertyList(key: String, vararg delimiters: Char = charArrayOf(',')): List<String> = project.findProperty(key)?.toString()?.split(*delimiters)?.map { it.trim() } ?: emptyList()
 
 /** Sets a Gradle Property value via a Project Property (usually set in gradle.properties). */
 fun Property<String>.setViaProjectProperty(key: String) = this.set(projectProperty(key))
@@ -346,5 +326,26 @@ fun resolvePath(base: String, vararg children: String): String
     var file = File(base)
     children.forEach { file = file.resolve(it) }
     return file.absolutePath.toString()
+}
+
+fun determineSandboxDir(): String
+{
+    val ideaVersion = project.properties["ideaVersion"]?.toString() ?: "UNKNOWN"
+    val sandboxSuffix =
+        when
+        {
+            ideaVersion.endsWith("LATEST-EAP-SNAPSHOT", ignoreCase = true)                                        ->
+                "LATEST-EAP-SNAPSHOT"
+            ideaVersion.contains("""([\d]{3})-EAP-SNAPSHOT""".toRegex(RegexOption.IGNORE_CASE))                         ->
+                """[\d]{3}""".toRegex().find(ideaVersion)!!.value
+            ideaVersion.contains("""([A-Z]{2}-)?(2[\d]{3})\.[\d](\.[\d]{1,2})?""".toRegex(RegexOption.IGNORE_CASE))     ->
+                """(2[\d]{3})\.[\d]""".toRegex().find(ideaVersion)!!.value.substring(2, 6).replace(".", "")
+            ideaVersion.contains("""([A-Z]{2}-)?([\d]{3})\.[\d]{1,5}(\.[\d]{1,4})?""".toRegex(RegexOption.IGNORE_CASE)) ->
+                """[\d]{3}""".toRegex().find(ideaVersion)!!.value
+            else                                                                                                        ->
+                ideaVersion
+        }
+
+    return "${project.rootDir.canonicalPath}/.sandboxes/.sandbox-$sandboxSuffix}"
 }
 

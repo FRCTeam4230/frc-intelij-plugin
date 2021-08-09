@@ -346,6 +346,6 @@ fun determineSandboxDir(): String
                 ideaVersion
         }
 
-    return "${project.rootDir.canonicalPath}/.sandboxes/.sandbox-$sandboxSuffix}"
+    return "${project.rootDir.canonicalPath}/.sandboxes/.sandbox-$sandboxSuffix"
 }
 

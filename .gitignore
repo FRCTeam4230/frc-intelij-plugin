@@ -18,8 +18,9 @@ runtime\.properties$
 .*dist\.zip$
 .*workspace\.xml$
 .*[\.-]?HOLD.*
+.sandboxes/
 .sandbox/
-.sandbox-*
+.sandbox-*/
 
 
 syntax: glob

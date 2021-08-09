@@ -167,10 +167,12 @@ tasks {
             project.version = "${project.version}" //-${properties["buildNumber"]}"
 
             token.set(System.getenv("JETBRAINS_MARKETPLACE_PUBLISH_TOKEN"))
-            // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
+            // 
             // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
             // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-            channels.set(listOf(projectProperty("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
+            // example of setting programmatically, which assumes pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
+            //   channels.set(listOf(projectProperty("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
+            channels.set(listOf("default" ))
         }
     }
 }

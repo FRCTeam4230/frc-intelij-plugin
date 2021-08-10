@@ -6,7 +6,7 @@
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *
+ *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,10 +33,13 @@ import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.util.BuildNumber
 import com.intellij.util.xmlb.XmlSerializerUtil
 import net.javaru.iip.frc.facet.isFrcFacetedProject
+import net.javaru.iip.frc.net.FrcPseudoRestService
 import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications
 import net.javaru.iip.frc.notify.FrcNotifications.createNotification
+import net.javaru.iip.frc.util.runBackgroundTask
 import org.intellij.lang.annotations.Language
+import java.io.StringReader
 import java.util.*
 
 
@@ -52,22 +55,36 @@ class FrcPluginVersionManagerStartupActivity : StartupActivity, DumbAware
 {
     override fun runActivity(project: Project)
     {
-        FrcPluginVersionManagerApplicationService.getInstance().checkPluginUpdateStatus(project)
+        FrcPluginVersionManagerApplicationService.getInstance().checkPluginUpdateStatusViaBackGroundTask(project)
     }
 }
 
 class FrcPluginVersionManagerApplicationService : Disposable
 {
-    private val oldestSupportedBaseBuild = 202
-    private val oldestVersionString = "20${(oldestSupportedBaseBuild / 10)}.${oldestSupportedBaseBuild % 10}"
+    
     private val notificationUUID = UUID.randomUUID()!!
 
+    fun checkPluginUpdateStatusViaBackGroundTask(project: Project)
+    {
+        project.runBackgroundTask("FRC Plugin Status Check") {
+            checkPluginUpdateStatus(project)
+        }
+    }
+    
+    @Suppress("MemberVisibilityCanBePrivate")
     fun checkPluginUpdateStatus(project: Project?)
     {
         logger.debug {"[FRC] checking plugin status. project? = $project"}
         // TODO This is a temp to get an EOL notification out. This needs to be improved.
         try
         {
+            val resourcePath = "dynamic-notifications/eol.properties"
+            val resource = FrcPseudoRestService.getResource(resourcePath) ?: "oldestSupportedBaseBuild=202"
+            val properties = Properties()
+            properties.load(StringReader(resource))
+            val oldestSupportedBaseBuild = properties["oldestSupportedBaseBuild"]?.toString()?.toInt() ?: 202
+            val oldestVersionString = "20${(oldestSupportedBaseBuild / 10)}.${oldestSupportedBaseBuild % 10}"
+            
             val appInfo = ApplicationInfoEx.getInstanceEx() as ApplicationInfoImpl
             val build: BuildNumber = appInfo.build
             val baselineVersion = build.baselineVersion
@@ -76,6 +93,30 @@ class FrcPluginVersionManagerApplicationService : Disposable
 
             if(baselineVersion < oldestSupportedBaseBuild)
             {
+                @Suppress("HtmlRequiredLangAttribute")
+                @Language("HTML")
+                val eolMessage = """
+                    <html>
+                    <strong><em>FRC Plugin</em> support for IntelliJ IDEA versions older than $oldestVersionString has ended.</strong><br/>
+                    You will need to upgrade to Intellij IDEA $oldestVersionString or later to get the latest FRC Plugin features.
+                    <br/><br/>
+                    While I wish I could support more older IntelliJ IDEA versions, doing so adds considerable time to the
+                    development and maintenance of the plugin as new features often have to be back ported to the older versions
+                    since the Intellij IDEA Plugin API evolves between versions. I would much rather put that
+                    time into adding new features. Given that this plugin works fully with the free
+                    IntelliJ IDEA Community edition (and Education edition), I do not think asking users to use
+                    a fairly recent version is overly burdensome.
+                    Please note that if you use the JetBrains <a href='https://www.jetbrains.com/toolbox-app/'>Toolbox App</a> to
+                    install IntelliJ IDEA, upgrading is super easy, and you can have multiple versions of IntelliJ IDEA installed
+                    simultaneously if needed. 
+                    <br/><br/>
+                    See the <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/blob/master/README.adoc#eol-policy'>FRC Plugin's EOL Policy</a> 
+                    for more detail.
+                    <br/><br/>
+                    Thank you for your understanding.
+                    </html>
+                """.trimIndent()
+                
                 if (project.isFrcFacetedProject())
                 {
                     FrcNotifications.notifyBalloonAllOpenProjects(notificationUUID, notifyFrcProjectsOnly = true) {
@@ -108,29 +149,7 @@ class FrcPluginVersionManagerApplicationService : Disposable
         // Nothing at this time
     }
 
-    @Suppress("HtmlRequiredLangAttribute")
-    @Language("HTML")
-    val eolMessage = """
-                    <html>
-                    <strong><em>FRC Plugin</em> support for IntelliJ IDEA versions older than $oldestVersionString has ended.</strong><br/>
-                    You will need to upgrade to Intellij IDEA $oldestVersionString or later to get the latest FRC Plugin features.
-                    <br/><br/>
-                    While I wish I could support more older IntelliJ IDEA versions, doing so adds considerable time to the
-                    development and maintenance of the plugin as new features often have to be back ported to the older versions
-                    since the Intellij IDEA Plugin API evolves between versions. I would much rather put that
-                    time into adding new features. Given that this plugin works fully with the free
-                    IntelliJ IDEA Community edition (and Education edition), I do not think asking users to use
-                    a fairly recent version is overly burdensome.
-                    Please note that if you use the JetBrains <a href='https://www.jetbrains.com/toolbox-app/'>Toolbox App</a> to
-                    install IntelliJ IDEA, upgrading is super easy, and you can have multiple versions of IntelliJ IDEA installed
-                    simultaneously if needed. 
-                    <br/><br/>
-                    See the <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/blob/master/README.adoc#eol-policy'>FRC Plugin's EOL Policy</a> 
-                    for more detail.
-                    <br/><br/>
-                    Thank you for your understanding.
-                    </html>
-                """.trimIndent()
+    
 
     companion object
     {

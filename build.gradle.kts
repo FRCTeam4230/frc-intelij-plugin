@@ -140,6 +140,7 @@ tasks {
             // Turn on frc.i10n to see a notification character appended to all localized messages to aid in testing/debugging of message bundles and localization needs
             systemPropertyGetOrDefault("frc.i10n", "false"),
             systemPropertyGetOrDefault("frc.is.internal", "true"),
+            systemPropertyGetOrDefault("frc.rest.use.qa", "true"),
             systemPropertyGetOrDefault("frc.experimental.gradleDslSelection", "true"),
             systemPropertyGetOrDefault("frc.experimental.kotlinTemplates", "true")
             // Legacy Ant based robot project system properties

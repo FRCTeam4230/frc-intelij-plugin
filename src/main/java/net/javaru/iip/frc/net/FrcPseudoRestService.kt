@@ -6,7 +6,7 @@
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *
+ *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@ package net.javaru.iip.frc.net
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.io.HttpRequests
+import net.javaru.iip.frc.util.getBooleanSystemProperty
 import net.javaru.iip.frc.util.getPluginResourceAsText
 
 private val logger = logger<FrcPseudoRestService>()
@@ -81,7 +82,10 @@ object FrcPseudoRestService
      *                         in the plugin will be read from the classpath and used if available.
      */
     @JvmOverloads
-    fun getResource(resourcePath: String, basePath: String? = "src/main/resources", branchName: String = "rest-v1", defaultToBundled: Boolean = true): String?
+    fun getResource(resourcePath: String,
+                    basePath: String? = "src/main/resources",
+                    branchName: String = if (getBooleanSystemProperty("frc.rest.use.qa")) "rest-v1-qa" else "rest-v1",
+                    defaultToBundled: Boolean = true): String?
     {
         // NOTE: We can not test or run this outside the IDE. Doing so results in 403 errors
         //       as the HttpRequests code is run without certificate stores loaded

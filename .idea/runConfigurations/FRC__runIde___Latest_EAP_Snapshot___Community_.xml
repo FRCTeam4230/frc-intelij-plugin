@@ -1,6 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="FRC [runIde] (Latest EAP Snapshot - Community)" type="GradleRunConfiguration" factoryName="Gradle">
-    <log_file alias="idea.log" path="$PROJECT_DIR$/.sandbox/system/log/idea.log" />
+    <log_file alias="idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox/system/log/idea.log" />
+    <log_file alias="idea-laest-eap.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-LATEST-EAP-SNAPSHOT/system/log/idea.log" />
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -19,7 +20,9 @@
       </option>
       <option name="vmOptions" value="-Dfrc.simulated.log.service.enabled=false -Dfrc.simulated.log.service.use.configured.port=true -Dfrc.use.wpilib.beta.site=false" />
     </ExternalSystemSettings>
-    <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
+    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+    <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+    <DebugAllEnabled>false</DebugAllEnabled>
     <method v="2" />
   </configuration>
 </component>

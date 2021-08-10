@@ -30,15 +30,14 @@
        The optional "email" attribute specifies the e-mail address of the vendor. -->
     <vendor url="https://gitlab.com/Javaru/frc-intellij-idea-plugin" >Javaru</vendor>
 
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <!-- Minimum ('since-build') and maximum ('until-build') build of IDEA compatible with the plugin -->
+    <!-- please see https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html for description -->
     <idea-version since-build="*.*" until-build="*.*"/>
 
     <description><![CDATA[
         <p>
             <!-- The first sentence gets used as a summary at the JetBrains Plugins Repository. -->
-            <em><a href='http://www.firstinspires.org/'>FIRST</a> Robotics Competition</em>
-            (<a href='http://www.firstinspires.org/robotics/frc'>FRC</a>) development support for
+            <em><a href='https://www.firstinspires.org'>FIRST</a> Robotics Competition</em>
+            (<a href='https://www.firstinspires.org/robotics/frc'>FRC</a>) development support for
             IntelliJ IDEA, including new project wizards, new class templates, robust RioLog console,
             and more. Enjoy using your favorite IDE when coding your team's robot in Java
             and/or Kotlin.
@@ -53,10 +52,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <strong>v1.6.0</strong> <br>
-        &nbsp;&nbsp;&bull; FRC Project Wizard: modified created Run Configurations to be shared via the (newer) methodology of storing them in
-                           a <tt>.run</tt> directory in the project's base/root directory rather than in <tt>.idea/runConfigurations</tt><br>
-        &nbsp;&nbsp;&bull; <br>
+        <strong>v1.5.1</strong> <br>
+        &nbsp;&nbsp;&bull; Miscellaneous internal refactoring and improvements<br>
+        &nbsp;&nbsp;&bull; This is the last release for IntelliJ IDEA 2020.2, 2020.3, and 2021.1. IntelliJ IDEA 2021.2 or newer will be required 
+                           for the next FRC Plugin release, which will support the 2022 FRC Season. Please see the
+                           <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/blob/master/README.adoc#eol-policy'>FRC Plugin's EOL Policy</a> 
+                           for more detail.<br>
         <br>
         <strong>v1.5.0</strong> <br>
         &nbsp;&nbsp;&bull; Added action link to "WPI Lib update available" notification to automatically update the gradle build file to use the new version<br>
@@ -155,7 +156,7 @@
     </change-notes>
 
 
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html on how to target different products -->
+    <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html on how to target different products -->
     <!-- The unique identifiers of the plugins on which this plugin depends. -->
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
@@ -190,7 +191,6 @@
     <!-- Extension points defined by the plugin. Extension points are registered by a plugin so that other plugins can
          provide this plugin with certain data. The "beanClass" attribute specifies the class the implementations of
          which can be used for the extension point. -->
-    <!-- Ref: http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_extensions_and_extension_points.html -->
     <extensionPoints>
         <!--<extensionPoint name="fooExtensionPoint" beanClass="com.foo.impl.FooExtensionBean" />-->
     </extensionPoints>
@@ -203,14 +203,6 @@
          "com.intellij" if the extension point is defined by the IDEA core. The name of the tag within the <extensions>
          tag matches the name of the extension point, and the "implementation" class specifies the name of the class
          added to the extension point. -->
-    <!-- **REFERENCES**
-             General Info:              http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_extensions_and_extension_points.html
-             Detailed attribute info:   https://sites.google.com/site/malenkov/java/150403
-             To get a list of extension points available in the IntelliJ Platform core, consult the <extensionPoints> section of the following XML configuration files:
-                    LangExtensionPoints.xml        https://upsource.jetbrains.com/idea-ce/file/idea-ce-c6ad05b2d01e9cd9e95f1d3eca236cc5aa62e0a4/platform/platform-resources/src/META-INF/LangExtensionPoints.xml
-                    PlatformExtensionPoints.xml    https://upsource.jetbrains.com/idea-ce/file/idea-ce-c6ad05b2d01e9cd9e95f1d3eca236cc5aa62e0a4/platform/platform-resources/src/META-INF/PlatformExtensionPoints.xml
-                    VcsExtensionPoints.xml         https://upsource.jetbrains.com/idea-ce/file/idea-ce-130563882ed14f7d2462b1968dab8eec93aa1262/platform/platform-resources/src/META-INF/VcsExtensionPoints.xml
-             -->
     <extensions defaultExtensionNs="com.intellij">
         <facetType id="FRC_FACET" implementation="net.javaru.iip.frc.facet.FrcFacetType" />
 
@@ -300,7 +292,7 @@
 
 
     <actions>
-        <!--   Ref:  http://www.jetbrains.org/intellij/sdk/docs/basics/action_system.html  -->
+        <!--   Ref:  https://plugins.jetbrains.com/docs/intellij/basic-action-system.html  -->
         <!--
             The <action> element defines an action to register.
                     The mandatory "id" attribute specifies an unique identifier for the action.

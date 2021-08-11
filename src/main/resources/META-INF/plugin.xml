@@ -283,10 +283,14 @@
         <framework.detector implementation="net.javaru.iip.frc.facet.framework.detector.RobotSubclassFrcFrameworkDetector" />
         
         <!-- dependencySupport: Notifies users that a plugin supporting a particular dependency is available and asks if they want to install it -->
-        <dependencySupport displayName="FRC WPILib"           kind="java" coordinate="edu.wpi.first.wpilibj:wpilibj-java" />
-        <dependencySupport displayName="FRC Command Robot"    kind="java" coordinate="edu.wpi.first.wpilibNewCommands:wpilibNewCommands-java" />
-        <dependencySupport displayName="FRC Command Robot"    kind="java" coordinate="edu.wpi.first.wpilibOldCommands:wpilibOldCommands-java" />
-        <dependencySupport displayName="FRC GradleRIO"        kind="java" coordinate="edu.wpi.first:GradleRIO" />
+        <dependencySupport displayName="FRC WPILib"     kind="java" coordinate="edu.wpi.first.wpilibj:wpilibj-java" />
+        <!-- COMMENTING OUT COMMAND LIBS FOR NOW:
+             The displayName is currently not getting used, resulting in dependency coordinates getting used. See https://youtrack.jetbrains.com/issue/IDEA-275873
+             When it shows both the main lib and the command lib coordinates, the resulting message is very dense, especially given how long the command coordinates are. 
+             Since the command libs depend on the primary lib, we should be fine just specifying the main lib for now, giving a better message. -->
+        <!--<dependencySupport displayName="FRC WPILib"     kind="java" coordinate="edu.wpi.first.wpilibNewCommands:wpilibNewCommands-java" />
+        <dependencySupport displayName="FRC WPILib"     kind="java" coordinate="edu.wpi.first.wpilibOldCommands:wpilibOldCommands-java" />-->
+        <dependencySupport displayName="FRC GradleRIO"  kind="java" coordinate="edu.wpi.first:GradleRIO" />
     </extensions>
 
     <extensions defaultExtensionNs="JavaScript.JsonSchema">

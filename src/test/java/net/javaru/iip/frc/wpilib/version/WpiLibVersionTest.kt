@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -109,14 +109,15 @@ internal class WpiLibVersionTest
     fun parseList()
     {
         val versionStrings = versionList.stream().map { it.versionString }.toList()
-        val versionStrings2 = ArrayList(versionStrings)
-        versionStrings2.add("2020.99.99")
-        versionStrings2.add("an.invalid.version.string.for.testing")
-        val expected2 = ArrayList(versionList)
-        expected2.add(ExpectedWpiLibVersion(2019, 2020, 99, 99))
+        // Commenting out the check with t invalid string for now as it is disconcerting to see the exception logged during the build
+        //val versionStrings2 = ArrayList(versionStrings)
+        //versionStrings2.add("2020.99.99")
+        //versionStrings2.add("an.invalid.version.string.for.testing")
+        //val expected2 = ArrayList(versionList)
+        //expected2.add(ExpectedWpiLibVersion(2019, 2020, 99, 99))
         assertAll(
             { assertEquals(versionList, WpiLibVersionImpl.parse(versionStrings), "Could not convert list of version strings to a list of WpiLibVersion objects")},
-            { assertEquals(expected2, WpiLibVersionImpl.parse(versionStrings2), "Could not convert list of version strings with an invalid string to a list of WpiLibVersion objects")}
+            //{ assertEquals(expected2, WpiLibVersionImpl.parse(versionStrings2), "Could not convert list of version strings with an invalid string to a list of WpiLibVersion objects")}
                  )
     }
 

@@ -21,7 +21,7 @@ import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.messages.Topic
-import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFile
+import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask
 import java.util.*
 
 /**
@@ -38,15 +38,16 @@ class FrcProjectTeamNumberService private constructor(val project:Project)
 {
     private val logger = logger<FrcProjectTeamNumberService>()
     
-    var teamNumber = UN_CONFIGURED_TEAM_NUMBER // default value, but then is set in the init block
+    var teamNumber = FrcApplicationSettings.getInstance().teamNumber // default value, but then is set in the init block in the event it is different
         private set
                 
     
     init
     {
         logger.debug {"[FRC] Initializing FrcProjectTeamNumberService for project $project"}
-        teamNumber = project.getTeamNumberConfiguredInWpiLibPreferencesFile()
-        
+        project.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask { foundTeamNumber -> 
+            teamNumber = foundTeamNumber
+        }
         // Examples: com/intellij/openapi/externalSystem/service/project/manage/SourceFolderManagerImpl.kt:115
         //           schemeManager/SchemeManagerFactoryImpl.kt:133  along with  com.intellij.configurationStore.schemeManager.SchemeFileTracker
         // As noted in https://www.jetbrains.org/intellij/sdk/docs/basics/virtual_file_system.html#virtual-file-system-events

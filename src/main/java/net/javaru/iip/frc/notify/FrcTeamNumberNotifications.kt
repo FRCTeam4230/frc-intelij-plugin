@@ -6,7 +6,7 @@
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *
+ *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -85,24 +85,23 @@ private fun createConfigureTeamNotification(project: Project?, useSticky: Boolea
     val notificationType = if (asWarning) NotificationType.WARNING else NotificationType.INFORMATION
 
     val notificationGroup = if (useSticky) FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP else FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP
-    return Notification(notificationGroup.displayId,
-                        icon,
-                        FrcNotifications.Title,
-                        subtitle,
-                        content,
-                        notificationType
-                       ) { theNotification, event ->
-        if ("configure" == event.description)
-        {
-            //  final Configurable configurable = FrcApplicationSettingsConfigurable.getInstance();
-            //  IdeFrame ideFrame = WindowManagerEx.getInstanceEx().findFrameFor(project);
-            //  ShowSettingsUtil.getInstance().editConfigurable((JFrame) ideFrame, configurable);
-            ConfigureTeamNumberBasicAction.openConfigureTeamNumberDialog(project)
-        }
 
-        if (FrcApplicationSettings.getInstance().isTeamNumberConfigured())
-        {
-            theNotification.expire()
+    return Notification(notificationGroup.displayId, FrcNotifications.Title, content, notificationType).apply {
+        this.icon = icon
+        this.subtitle = subtitle
+        setListener{ theNotification, event ->
+            if ("configure" == event.description)
+            {
+                //  final Configurable configurable = FrcApplicationSettingsConfigurable.getInstance();
+                //  IdeFrame ideFrame = WindowManagerEx.getInstanceEx().findFrameFor(project);
+                //  ShowSettingsUtil.getInstance().editConfigurable((JFrame) ideFrame, configurable);
+                ConfigureTeamNumberBasicAction.openConfigureTeamNumberDialog(project)
+            }
+
+            if (FrcApplicationSettings.getInstance().isTeamNumberConfigured())
+            {
+                theNotification.expire()
+            }
         }
     }
 }

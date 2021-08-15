@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2018 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,6 @@
 package net.javaru.iip.frc.riolog.udp;
 
 import org.jetbrains.annotations.NotNull;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 
@@ -32,14 +31,14 @@ public class UdpRioLogMonitorProjectService extends AbstractRioLogMonitorProject
 
     public static UdpRioLogMonitorProjectService getInstance(@NotNull Project project)
     {
-        return ServiceManager.getService(project, UdpRioLogMonitorProjectService.class);
+        return project.getService(UdpRioLogMonitorProjectService.class);
     }
 
 
     /**
      * Do not call the constructor directly. Use as a project service via {@code com.intellij.openapi.components.ServiceManager}:<br/>
      * <pre>
-     * final AbstractRioLogMonitorProjectService rioLogConsoleProjectService = ServiceManager.getService(project, UdpRioLogMonitorProjectService.class);
+     * final AbstractRioLogMonitorProjectService rioLogConsoleProjectService = project.getService(UdpRioLogMonitorProjectService.class);
      * </pre>
      * or use the {@link #getInstance(Project)} convenience method
      * @param myProject the project

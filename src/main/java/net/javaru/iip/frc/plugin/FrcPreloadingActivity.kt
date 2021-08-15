@@ -6,7 +6,7 @@
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *
+ *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,30 +16,16 @@
 
 package net.javaru.iip.frc.plugin
 
-import com.intellij.ide.AppLifecycleListener
-import com.intellij.openapi.project.Project
+import com.intellij.openapi.application.PreloadingActivity
+import com.intellij.openapi.progress.ProgressIndicator
 import net.javaru.iip.frc.FrcPluginGlobals
-import net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL
 import net.javaru.iip.frc.notify.notifyAboutTeamNumberNeedingToBeConfigured
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 
 
-class FrcAppLifecycleListener: AppLifecycleListener
+class FrcPreloadingActivity: PreloadingActivity()
 {
-    /*
-        1. appFrameCreated()
-        2. welcomeScreenDisplayed()
-            • Obviously only called is the welcome screen is displayed rather than a project immediately
-            • It is NOT called again if all projects are closed and you return to the Welcome screen, even id Welcome screen was not initially displayed on startup
-        3. appStarting()
-        4. appStarted() !!!!INTERNAL USE ONLY!!!!
-
-        5. appClosing()
-        6. appWillBeClosed()
-    */
-
-
-    override fun appStarting(projectFromCommandLine: Project?)
+    override fun preload(indicator: ProgressIndicator)
     {
         if (FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE)
         {
@@ -47,13 +33,13 @@ class FrcAppLifecycleListener: AppLifecycleListener
             FrcPluginGlobals.GENERAL_LOGGER.info("[FRC] >>> isDebugEnabled = ${baseLogger.isDebugEnabled}  isTraceEnabled = ${baseLogger.isTraceEnabled} <<<")
         }
 
-        // We should consider removing this functionality and have it only prompt for FRC projects and the on the Welcome Screen iva that configured Action
+        // We should consider removing this functionality and have it only prompt when an FRC project is loaded and the on the Welcome Screen via that configured Action
         val settings = FrcApplicationSettings.getInstance()
         settings.incrementRunCount()
-        if (!settings.isTeamNumberConfigured() && settings.prc <= TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL)
+        if (!settings.isTeamNumberConfigured() && settings.prc <= FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL)
         {
-            notifyAboutTeamNumberNeedingToBeConfigured(null, true, false)
+            notifyAboutTeamNumberNeedingToBeConfigured(project = null, useSticky = true, asWarning = false)
         }
     }
-}
 
+}

@@ -18,7 +18,6 @@ package net.javaru.iip.frc.riolog;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -40,7 +39,7 @@ import net.javaru.iip.frc.settings.FrcProjectTeamNumberService;
  * <a href="http://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_services.html">Plugin Services</a>.
  * For example:
  * <pre>
- * final RioLogProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogProjectService.class);
+ * final RioLogProjectService rioLogConsoleProjectService = project.getService(RioLogProjectService.class);
  * </pre>
  * There are also three static {@code update} methods that can be used when the caller has access to a facet, a module, or a project.
  */
@@ -64,11 +63,11 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener,
         1) Project Open
             Handled via: This classes implementation of FrcOpenRioLogStartupActivity.runActivity()
         2) Facet Added to Project
-            Handled via: FrcProjectLifecycleService.facetAdded() (via its extending of FacetManagerAdapter, an impl of FacetManagerListener)
+            Handled via: FrcProjectLifecycleService.facetAdded() (via its impl of FacetManagerListener)
         3) Facet Removed from Project
             a) was only facet and  we want to close the console
             b) there are other FRC facets still configured on the project
-            Handled via: FrcProjectLifecycleService.facetRemoved() (via its extending of FacetManagerAdapter, an impl of FacetManagerListener)
+            Handled via: FrcProjectLifecycleService.facetRemoved() (via its impl of FacetManagerListener)
         4) New module created and facet was Added - likely dup of #2, but we want to test it
             Handled via: FrcOpenRioLogStartupActivity.moduleAdded()
         5) Module imported (with FRC facet)
@@ -100,22 +99,14 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener,
     
     public static RioLogProjectService getInstance(@NotNull Project project)
     {
-        RioLogProjectService service = ServiceManager.getService(project, RioLogProjectService.class);
-        // This was an attempt to make ti so we can put the FRC ToolWindow in the secondary (i.e. right side) group on the bottom
-        // While it does show in that position, for some reason he icon is missing (event though it is being set and shows set
-        // on the ToolWindow object in the debugger) and an exception is thrown due to a null icon when the Executor goes to show.
-        // In the end, since we want to completely rework the FRC tool window (especially given this implementation was the very
-        // first thing ever done and a lot has been learned about the Plugin API since then), we'll wqorry about doing that when
-        // the Tool Window rework is done.
-        //RiologUtilsKt.registerFrcToolWindowIfNeeded(project);
-        return service;
+        return project.getService(RioLogProjectService.class);
     }
 
 
     /**
      * Do not call the constructor directly. Use as a project service via {@code com.intellij.openapi.components.ServiceManager}:<br/>
      * <pre>
-     * final RioLogProjectService rioLogConsoleProjectService = ServiceManager.getService(project, RioLogProjectService.class);
+     * final RioLogProjectService rioLogConsoleProjectService = project.getService(RioLogProjectService.class);
      * </pre>
      *
      * @param myProject the project

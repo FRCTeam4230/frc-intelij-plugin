@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.services
 
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
@@ -164,8 +163,7 @@ class GradleReimportTask(private val project: Project): TimerTask()
                                               if (externalProject != null)
                                               {
                                                   // This first line is taken from the Default callback. Not sure we need it. But it can't hurt
-                                                  ServiceManager.getService(ProjectDataManager::class.java)
-                                                      .importData(externalProject, project, false)
+                                                 service<ProjectDataManager>().importData(externalProject, project, false)
 
                                                   FrcNotifications
                                                       .notify(FrcNotificationType.GENERAL_INFO,

@@ -17,7 +17,8 @@
 package net.javaru.iip.frc.settings
 
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.util.xmlb.XmlSerializerUtil
@@ -27,10 +28,7 @@ data class FrcFacetSettings(val unusedPlaceholder: Int = 0) : PersistentStateCom
 {
     companion object Settings
     {
-        fun getInstance(): FrcFacetSettings
-        {
-            return ServiceManager.getService(FrcFacetSettings::class.java)
-        }
+        fun getInstance(): FrcFacetSettings = service()
 
         fun clone(original: FrcFacetSettings): FrcFacetSettings
         {

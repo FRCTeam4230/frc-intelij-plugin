@@ -6,7 +6,7 @@
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *
+ *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,11 +17,12 @@
 package net.javaru.iip.frc.settings
 
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
+import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.xmlb.XmlSerializerUtil
 
 @State(name = "FrcPluginNotifications", storages = [Storage("frc.xml")])
@@ -31,10 +32,7 @@ data class FrcNotificationsSettings(var appLevelConfigureTeamNumNotifyCount: Int
     companion object Settings
     {
         @JvmStatic
-        fun getInstance(): FrcNotificationsSettings
-        {
-            return ServiceManager.getService(FrcNotificationsSettings::class.java)
-        }
+        fun getInstance(): FrcNotificationsSettings = service()
 
         fun clone(original: FrcNotificationsSettings): FrcNotificationsSettings
         {

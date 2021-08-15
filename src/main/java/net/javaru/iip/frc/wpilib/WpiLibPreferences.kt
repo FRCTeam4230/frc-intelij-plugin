@@ -37,6 +37,7 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.util.getIntPropertyValue
 import net.javaru.iip.frc.util.getModules
 import net.javaru.iip.frc.util.getStringPropertyValue
+import net.javaru.iip.frc.util.runBackgroundTask
 
 private object WpiLibPreferencesFunctions
 private val LOG = logger<WpiLibPreferencesFunctions>()
@@ -49,12 +50,25 @@ const val projectYearPropertyName = "projectYear"
 //const val enableCppIntellisensePropertyName = "enableCppIntellisense"
 
 
+
+
+
+/**
+ * This needs to be run via a background task to prevent a `SlowOperations` exceptions.
+ * See Javadoc for [com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed]
+ * The call(s) to `FilenameIndex.getFilesByName` (called by module based overload function) are slow operations.
+ */
 fun findLikelyWpiLibPreferencesPsiFileAsJsonFile(project: Project): JsonFile?
 {
     val psiFile = findLikelyWpiLibPreferencesPsiFile(project)
     return if (psiFile is JsonFile) psiFile else null
 }
 
+/**
+ * This needs to be run via a background task to prevent a `SlowOperations` exceptions.
+ * See Javadoc for [com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed]
+ * The call(s) to `FilenameIndex.getFilesByName` (called by module based overload function) are slow operations.
+ */
 fun findLikelyWpiLibPreferencesPsiFile(project: Project): PsiFile?
 {
     val psiFiles = findWpiLibPreferencesPsiFiles(project) { module ->  !(module.name.endsWith("-test") || module.name.endsWith("-main"))}
@@ -75,6 +89,11 @@ fun findLikelyWpiLibPreferencesPsiFile(project: Project): PsiFile?
     }
 }
 
+/**
+ * This needs to be run via a background task to prevent a `SlowOperations` exceptions.
+ * See Javadoc for [com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed]
+ * The call(s) to `FilenameIndex.getFilesByName` (called by module based overload function) are slow operations.
+ */
 fun findWpiLibPreferencesPsiFiles(project: Project, filter: (module: Module) -> Boolean = { _ -> true}): List<PsiFile>
 {
     if (project.isDefault)
@@ -120,6 +139,11 @@ fun findWpiLibPreferencesPsiFiles(project: Project, filter: (module: Module) -> 
     return foundFiles
 }
 
+/**
+ * This needs to be run via a background task to prevent a `SlowOperations` exceptions.
+ * See Javadoc for [com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed]
+ * The call(s) to `FilenameIndex.getFilesByName` are slow operations. 
+ */
 fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
 {
     val foundFiles = SmartList<PsiFile>()
@@ -166,16 +190,31 @@ fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
     }
     catch (t: Throwable)
     {
-        // Issue #60: a Throwable can be thrown by during an indexing event
+        // Issue #60: a Throwable can be thrown by FilenameIndex.getFilesByName() during an indexing event
         LOG.warn("[FRC] An exception occurred when finding $wpiLibPreferencesFileName files for module ${module}. Cause Summary: $t", t)
     }
     
     return foundFiles
 }
 
+fun Project.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask(taskName: String = "Determining configured FRC team number", resultCallback: (teamNumber:Int) -> Unit)
+{
+    this.runBackgroundTask(taskName) {progress ->
+        progress.text = "Reading team number from wpilib_preferences.json"
+        val teamNum = findLikelyWpiLibPreferencesPsiFileAsJsonFile(this)?.getIntPropertyValue(teamNumberPropertyName) ?: FrcApplicationSettings.getInstance().teamNumber
+        resultCallback.invoke(teamNum)
+    }
+}
+
+
 /**
  * **Generally, this function is meant for use solely by the `FrcProjectTeamNumberService`. Other services and code should use
  * the [Project.getProjectTeamNumber()] extension function available in the `FrcProjectTeamNumberService` file.**
+ * 
+ * This function needs to be run via a background task to prevent a `SlowOperations` exceptions.
+ * See Javadoc for [com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed].
+ * The call(s) to `FilenameIndex.getFilesByName` (called by functions used byt this one) are slow operations.
+ * Use [getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask] for easy background use.
  * 
  * Returns the configured teamNumber in the `wpilib_preferences.json` file, or the team number configured in the application settings,
  * which may be `UN_CONFIGURED_TEAM_NUMBER` (i.e. 0), if the file is not found, the `teamNumber` key is not in the JSON file, or its 
@@ -188,8 +227,21 @@ fun Project.getTeamNumberConfiguredInWpiLibPreferencesFile(): Int
     }
 }
 
+fun Project.getConfiguredProjectYearAsBackgroundTask(taskName: String = "Determining FRC project year", resultCallback: (projectYear:String?) -> Unit)
+{
+    this.runBackgroundTask(taskName) { progress ->
+        progress.text = "Reading FRC project year from wpilib_preferences.json"
+        val projectYear = getConfiguredProjectYear()
+        resultCallback.invoke(projectYear)
+    }
+}
+
 /**
  * Returns the project year, **which may not be just the year** but may also have character text, e.g. "Beta2020-2".
+ * This function needs to be run via a background task to prevent a `SlowOperations` exceptions.
+ * See Javadoc for [com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed].
+ * The call(s) to `FilenameIndex.getFilesByName` (called by functions used byt this one) are slow operations.
+ * Use [getConfiguredProjectYearAsBackgroundTask] for easy background use.
  */
 fun Project.getConfiguredProjectYear(): String?
 {

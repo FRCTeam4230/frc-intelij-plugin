@@ -61,6 +61,10 @@ plugins {
     id("org.jetbrains.gradle.plugin.idea-ext") version "0.10"
 }
 
+java {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+}
 
 tasks {
     withType<JavaCompile> {
@@ -87,12 +91,6 @@ tasks {
             }
         }
     }
-}
-
-java {
-
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
 }
 
 tasks.test {

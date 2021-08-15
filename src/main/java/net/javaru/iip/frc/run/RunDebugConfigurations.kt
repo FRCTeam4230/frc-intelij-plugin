@@ -164,14 +164,13 @@ private fun createGradeSimulateJavaRunConfigurations(project: Project, isRomi: B
     logger.trace {"[FRC] Completed Gradle simulateJava run configurations"}
 }
 
+@Suppress("UNUSED_PARAMETER")
 @JvmOverloads
 fun createTailSimulateJavaLogShellScriptRunConfiguration(project: Project, isRomi: Boolean, setAsShared: Boolean = true)
 {
     // This is not the ideal methodology. But it works in v2020.2+
     // In v2020.3+ we can switch to running in terminal and defining the script as /user/bin/tail
-    // NOTE: Shell Script run configurations were mistakenly made private and thus 
-    //       not available in 2021.1 and 2021.1.1 See: https://youtrack.jetbrains.com/issue/IDEA-267920
-    //       The issue was resolved in 2021.1.2
+
     val nameSuffix = if (isRomi) "Romi" else "Simulate Java"
     val runConfigName = FrcBundle.message("frc.wizard.run.configuration.simulateJava.tail.name", nameSuffix)
     try
@@ -409,6 +408,7 @@ class ModuleSettingAction(private val remoteConfiguration: RemoteConfiguration, 
     }
 }
 
+@Suppress("UNUSED_PARAMETER")
 private fun shareRunConfiguration(project: Project, settings: RunnerAndConfigurationSettings)
 {
     // Continuing to use the deprecated isShared for now until we can figure out the "It's unexpected that the file doesn't exist at this point" issue
@@ -418,17 +418,17 @@ private fun shareRunConfiguration(project: Project, settings: RunnerAndConfigura
 //    //                applying it:    com/intellij/execution/impl/RunConfigurationStorageUi.java:394
 //    // it's the only place I could find setting/using the new .run directory
 //    val baseDir = project.basePath
-//    if (baseDir != null)
+//    if (baseDir == null)
+//    {
+//        logger.warn("[FRC] Can't share run configurations because project.basePath was null")
+//    }
+//    else
 //    {
 //        val dirPath = "$baseDir/.run"
 //        val fileName = createRunConfigFileName(settings.name)
 //        val filePath = "$dirPath/$fileName"
-//        logger.debug {"[FRC] run config path set to: $filePath"}
+//        logger.debug("[FRC] run config path set to: $filePath")
 //        settings.storeInArbitraryFileInProject(filePath)
-//    }
-//    else
-//    {
-//        logger.warn("[FRC] Can't share run configurations because project.basePath was null")
 //    }
 }
 

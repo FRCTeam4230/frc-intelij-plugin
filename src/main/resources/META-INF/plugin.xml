@@ -70,6 +70,7 @@
         &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/84'>issue #84</a>, WPI Lib root path not discovered on Mac or Linux<br>
         &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/92'>issue #92</a>, a Dispatch Thread access issue on opening an FRC project in IntelliJ IDEA v2021.1<br>
         &nbsp;&nbsp;&bull; Resolves a corner case issue in the Command creation template in which the rules to determine if a Subsystem was a singleton or not were a bit too strict<br>
+        &nbsp;&nbsp;&bull; 1.5.0-2021.2 only: Refactorings to remove use of a number of methods and classes deprecated in the IntelliJ IDEA Plugin API in v2021.2.<br>
         <br>
         <strong>v1.4.0</strong> <br>
         &nbsp;&nbsp;&bull; Support for IntelliJ IDEA v2020.2 and later only. See the
@@ -160,7 +161,6 @@
     <!-- The unique identifiers of the plugins on which this plugin depends. -->
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
-    <depends>org.jetbrains.plugins.gradle</depends>
     <depends>com.intellij.gradle</depends>
     <depends>org.intellij.groovy</depends>
     <depends>com.jetbrains.sh</depends>
@@ -181,11 +181,6 @@
 
     <!-- Resource bundle from which the text of plugin descriptions, action names and etc. will be loaded -->
     <resource-bundle>i18n.FrcPluginConfigBundle</resource-bundle>
-
-
-    <applicationListeners>
-        <listener class="net.javaru.iip.frc.plugin.FrcAppLifecycleListener" topic="com.intellij.ide.AppLifecycleListener" activeInHeadlessMode="false" />
-    </applicationListeners>
 
 
     <!-- Extension points defined by the plugin. Extension points are registered by a plugin so that other plugins can
@@ -231,6 +226,8 @@
         <applicationConfigurable id="preferences.language.FRC"
                                  instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable"
                                  groupId="language" />
+        
+        <preloadingActivity implementation="net.javaru.iip.frc.plugin.FrcPreloadingActivity" />
 
         <!-- Commenting out for now. Rethinking that these should be at the module/facet level rather than project level. -->
         <!--<projectConfigurable id="preferences.language.FRC.project"
@@ -284,6 +281,16 @@
         <externalProjectDataService id="FrcDependencyDataService" implementation="net.javaru.iip.frc.facet.importer.FrcDependencyDataService" />
 
         <framework.detector implementation="net.javaru.iip.frc.facet.framework.detector.RobotSubclassFrcFrameworkDetector" />
+        
+        <!-- dependencySupport: Notifies users that a plugin supporting a particular dependency is available and asks if they want to install it -->
+        <dependencySupport displayName="FRC WPILib"     kind="java" coordinate="edu.wpi.first.wpilibj:wpilibj-java" />
+        <!-- COMMENTING OUT COMMAND LIBS FOR NOW:
+             The displayName is currently not getting used, resulting in dependency coordinates getting used. See https://youtrack.jetbrains.com/issue/IDEA-275873
+             When it shows both the main lib and the command lib coordinates, the resulting message is very dense, especially given how long the command coordinates are. 
+             Since the command libs depend on the primary lib, we should be fine just specifying the main lib for now, giving a better message. -->
+        <!--<dependencySupport displayName="FRC WPILib"     kind="java" coordinate="edu.wpi.first.wpilibNewCommands:wpilibNewCommands-java" />
+        <dependencySupport displayName="FRC WPILib"     kind="java" coordinate="edu.wpi.first.wpilibOldCommands:wpilibOldCommands-java" />-->
+        <dependencySupport displayName="FRC GradleRIO"  kind="java" coordinate="edu.wpi.first:GradleRIO" />
     </extensions>
 
     <extensions defaultExtensionNs="JavaScript.JsonSchema">

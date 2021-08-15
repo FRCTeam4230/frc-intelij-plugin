@@ -64,7 +64,7 @@ fun Project?.isGradleProject(): Boolean
 }
 
 /**
- * Convenience function for running a progress in the background. Per the [SDK Guide](https://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/general_threading_rules.html)
+ * Convenience function for running a progress in the background. Per the [SDK Guide](https://plugins.jetbrains.com/docs/intellij/general-threading-rules.html#background-processes-and-processcanceledexception)
  * callers should be prepared to catch and rethrow a `ProcessCanceledException`. "**This exception should never be logged**, it 
  * should be rethrown, and it’ll be handled in the infrastructure that started the process." 
  */

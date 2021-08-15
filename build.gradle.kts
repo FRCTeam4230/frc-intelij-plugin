@@ -22,7 +22,6 @@ val frcPluginBaseVersion: String by project
 val ideaMajorVersion: String by project
 val frcPluginEapDesignator: String by project
 val frcPluginVersion = "$frcPluginBaseVersion-$ideaMajorVersion$frcPluginEapDesignator" // ex: v1.3.0-2019.2,  1.3.1-2020.1-eap.1
-//val kotlinVersion = plugins.getPlugin(KotlinPluginWrapper::class.java).kotlinPluginVersion
 val javaVersion: JavaVersion = JavaVersion.VERSION_11
 val sandboxPath = determineSandboxDir()
 
@@ -32,7 +31,7 @@ version = frcPluginVersion
 plugins {
     base
     java
-    kotlin("jvm") version "1.4.31"
+    kotlin("jvm") version "1.5.21"
     // gradle plugin-for writing IntelliJ plugins:  
     //     https://github.com/JetBrains/gradle-intellij-plugin
     //     https://lp.jetbrains.com/gradle-intellij-plugin/
@@ -263,10 +262,10 @@ repositories {
 dependencies {
     val jacksonVersion = "2.11.2"
 
-    // For Kotlin dependencies, you can use shorthand for a dependency on a Kotlin module, for example, kotlin("test") for "org.jetbrains.kotlin:kotlin-test".
+    // For Kotlin dependencies, you can use shorthand for a dependency on a Kotlin module, for example, kotlin("test-junit5") for "org.jetbrains.kotlin:kotlin-test-junit5".
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit5"))
 
     implementation("org.jdom:jdom2:2.0.6")
     implementation("commons-io:commons-io:2.7")

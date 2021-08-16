@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,33 +17,24 @@
 package net.javaru.iip.frc.actions;
 
 import java.awt.*;
-import java.io.IOException;
 import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.intellij.notification.Notification;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.InputValidator;
 import com.intellij.openapi.ui.Messages;
 
 import icons.FrcIcons.FRC;
 import net.javaru.iip.frc.FrcPluginGlobals;
-import net.javaru.iip.frc.facet.FrcFacetKt;
 import net.javaru.iip.frc.i18n.FrcBundle;
-import net.javaru.iip.frc.notify.FrcNotificationType;
-import net.javaru.iip.frc.notify.FrcNotifications;
 import net.javaru.iip.frc.notify.FrcTeamNumberNotificationsKt;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.settings.FrcTeamNumberKt;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
-import net.javaru.iip.frc.wpilib.legacy.LegacyWpiLibPaths;
-import net.javaru.iip.frc.wpilib.legacy.retrieval.LegacyWpiLibDownloader;
 
 import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL;
 
@@ -106,7 +97,7 @@ public class ConfigureTeamNumberBasicAction extends AnAction
         if (teamNumString != null && FrcTeamNumberKt.isValidTeamNumber(teamNumString))
         {
             settings.setTeamNumber(Integer.parseInt(teamNumString));
-            performTeamNumberChangeUpdates();
+            // TODO publish team number change
             FrcTeamNumberNotificationsKt.expireConfigureTeamNumberNotification(project);
         }
     }
@@ -124,35 +115,5 @@ public class ConfigureTeamNumberBasicAction extends AnAction
     {
         final FrcApplicationSettings settings = FrcApplicationSettings.getInstance();
         return (!settings.isTeamNumberConfigured() && settings.getPrc() <= TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL);
-    }
-    
-    //TODO Need to remove this legacy functionality
-    @Deprecated
-    public static void performTeamNumberChangeUpdates()
-    {
-        ApplicationManager.getApplication().runWriteAction(() -> {
-            try
-            {
-                LegacyWpiLibDownloader.updateOrCreateWpilibPropertiesFile();
-            }
-            catch (IOException e)
-            {
-                final Notification notification =
-                        FrcNotifications.createNotification(FrcNotificationType.ACTIONABLE_ERROR,
-                                                             "The '" + LegacyWpiLibPaths.getWpilibPropertiesFile() + "' file could not be updated with "
-                                                             + "the change to the team number. You will need to manually update the 'team-number' "
-                                                             + "property in the file in order for your robot deploys to work. Update Failure Cause: "
-                                                             + e.toString(),
-                                                            "Team Number Update Failure");
-                final Project[] projects = ProjectManager.getInstance().getOpenProjects();
-                for (Project project : projects)
-                {
-                    if (FrcFacetKt.isFrcFacetedProject(project))
-                    {
-                        notification.notify(project);
-                    }
-                }
-            }
-        });
     }
 }

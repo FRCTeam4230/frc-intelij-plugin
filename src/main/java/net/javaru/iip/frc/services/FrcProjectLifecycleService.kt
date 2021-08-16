@@ -79,7 +79,6 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
         {
             // FYI: The FrcPluginVersionManagerStartupActivity also does some notification work
 
-            checkLegacyIssue8Refresh(project)
             //RioLogProjectService.getInstance(project).activateTcp()
             RioLogProjectService.getInstance(project).update()
 
@@ -175,9 +174,6 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
             {
                 notifyToConfigureTeamNumIfNecessary(project, knownFacetedProject)
             }
-
-            // Check for new (Gradle) WpiLib Version is done in WpiLibVersionService
-            checkLegacyProjectLibraryAttachmentStatus(project, knownFacetedProject)
         }
     }
 

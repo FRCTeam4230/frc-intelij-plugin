@@ -354,22 +354,9 @@
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
             <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after" />
-            <action id="frc.tools.CheckForWpiLibUpdateAction" class="net.javaru.iip.frc.actions.tools.CheckForWpiLibUpdateAction" icon="FrcIcons.WpiLib.WPI_LIB_16" />
-
-            <!-- LEGACY ACTIONS -->
-            <action id="frc.tools.AttachWpilibAction"
-                    class="net.javaru.iip.frc.actions.tools.legacy.AttachLegacyWpilibAction"
-                    icon="AllIcons.Nodes.PpLib" />
-            <!--suppress PluginXmlCapitalization -->
-            <action id="frc.tools.AttachUserLibDirAction"
-                    class="net.javaru.iip.frc.actions.tools.legacy.AttachLegacyUserLibDirAction"
-                    icon="AllIcons.General.User" />
-            <action id="frc.tools.CheckWpiLbVersionStatusAction"
-                    class="net.javaru.iip.frc.actions.tools.legacy.CheckSystemLegacyWpiLbVersionAction"
-                    icon="FrcIcons.WpiLib.WPI_LIB_16"/>
-            <action id="frc.tools.DownloadWpiLibAction"
-                    class="net.javaru.iip.frc.actions.tools.legacy.DownloadLegacyWpiLibAction"
-                    icon="AllIcons.Actions.Download" />
+            <action id="frc.tools.CheckForWpiLibUpdateAction" 
+                    class="net.javaru.iip.frc.actions.tools.CheckForWpiLibUpdateAction" 
+                    icon="FrcIcons.WpiLib.WPI_LIB_16" />
         </group>
 
         <group id="FRC.FrcRioLogActionsGroup"

@@ -88,7 +88,6 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 import javax.swing.Icon
-import kotlin.NoSuchElementException
 
 class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 {
@@ -279,7 +278,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         /*
           To prevent the below logged warning (from  RCInArbitraryFileManager.loadChangedRunConfigsFromFile() (~line 97)
                 "It's unexpected that the file doesn't exist at this point ($filePath)"
-          We need wait until the project is opened, and is not indexing
+          We need wait until the project is opened, AND is not indexing
+          Unfortunately it does still seem to happen intermittently on rare occasion
+          I _think_ it might be a case of indexing finishes, our task starts, and then some more indexing starts?
+          
+          
           From some debugging, the issue happens when the project is initially importing
           A race condition occurs (if we do not wait)
           So we need to wait until the initial import is complete. But there does not

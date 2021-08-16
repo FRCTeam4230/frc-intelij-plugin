@@ -18,6 +18,7 @@
 
 package net.javaru.iip.frc.wizard
 
+import net.javaru.iip.frc.util.decapitalize2
 import net.javaru.iip.frc.wizard.TemplateLanguageOption.Companion.templateLanguageOptionListJavaAndKotlin
 import net.javaru.iip.frc.wizard.TemplateLanguageOption.Companion.templateLanguageOptionListJavaOnly
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
@@ -169,8 +170,9 @@ enum class FrcWizard2019ProjectTemplateDefinition(
         @get:Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
-   
-    override fun templateResourcesDirName(): String = if (name.length >= 2 && Character.isUpperCase(name[0]) && Character.isUpperCase(name[1])) name else name.decapitalize()
+
+    override fun templateResourcesDirName(): String =
+        if (name.length >= 2 && Character.isUpperCase(name[0]) && Character.isUpperCase(name[1])) name else name.decapitalize2()
 
     override fun isProjectBootstrapTemplate(): Boolean = true
 }
@@ -213,7 +215,8 @@ enum class FrcWizard2019ExampleTemplateDefinition(
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
-    override fun templateResourcesDirName(): String = if (name.length >= 2 && Character.isUpperCase(name[0]) && Character.isUpperCase(name[1])) name else name.decapitalize()
+    override fun templateResourcesDirName(): String =
+        if (name.length >= 2 && Character.isUpperCase(name[0]) && Character.isUpperCase(name[1])) name else name.decapitalize2()
 
     override fun isProjectBootstrapTemplate(): Boolean = false
 }
@@ -265,7 +268,8 @@ enum class FrcWizard2020ProjectTemplateDefinition(
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
-    override fun templateResourcesDirName(): String = if (name.length >= 2 && Character.isUpperCase(name[0]) && Character.isUpperCase(name[1])) name else name.decapitalize()
+    override fun templateResourcesDirName(): String =
+        if (name.length >= 2 && Character.isUpperCase(name[0]) && Character.isUpperCase(name[1])) name else name.decapitalize2()
 
     override fun isProjectBootstrapTemplate(): Boolean = true
 }
@@ -335,7 +339,8 @@ enum class FrcWizard2020ExampleTemplateDefinition(
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
-    override fun templateResourcesDirName(): String = if (name.length >= 2 && Character.isUpperCase(name[0]) && Character.isUpperCase(name[1])) name else name.decapitalize()
+    override fun templateResourcesDirName(): String =
+        if (name.length >= 2 && Character.isUpperCase(name[0]) && Character.isUpperCase(name[1])) name else name.decapitalize2()
 
     override fun isProjectBootstrapTemplate(): Boolean = false
 }
@@ -406,7 +411,8 @@ enum class FrcWizard2021ProjectTemplateDefinition(
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
-    override fun templateResourcesDirName(): String = if (name.length >= 2 && Character.isUpperCase(name[0]) && Character.isUpperCase(name[1])) name else name.decapitalize()
+    override fun templateResourcesDirName(): String =
+        if (name.length >= 2 && Character.isUpperCase(name[0]) && Character.isUpperCase(name[1])) name else name.decapitalize2()
 
     override fun isProjectBootstrapTemplate(): Boolean = true
 }
@@ -521,7 +527,8 @@ enum class FrcWizard2021ExampleTemplateDefinition(
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
-    override fun templateResourcesDirName(): String = if (name.length >= 2 && Character.isUpperCase(name[0]) && Character.isUpperCase(name[1])) name else name.decapitalize()
+    override fun templateResourcesDirName(): String =
+        if (name.length >= 2 && Character.isUpperCase(name[0]) && Character.isUpperCase(name[1])) name else name.decapitalize2()
 
     override fun isProjectBootstrapTemplate(): Boolean = false
 }

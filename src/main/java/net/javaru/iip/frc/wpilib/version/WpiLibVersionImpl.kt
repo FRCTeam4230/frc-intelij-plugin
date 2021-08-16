@@ -18,6 +18,7 @@ package net.javaru.iip.frc.wpilib.version
 
 import com.intellij.openapi.diagnostic.logger
 import net.javaru.iip.frc.util.mapExceptionFreeAndNotNull
+import java.util.*
 
 private val logger = logger<WpiLibVersionImpl>()
 
@@ -71,7 +72,7 @@ class WpiLibVersionImpl private constructor(override val versionString: String,
         @Throws(IllegalArgumentException::class)
         fun parse(version: String): WpiLibVersion
         {
-            var matcher = post2017Pattern.matcher(version.toLowerCase())
+            var matcher = post2017Pattern.matcher(version.lowercase(Locale.getDefault()))
             if (matcher.find())
             {
                 val major = Integer.parseInt(matcher.group("major"))

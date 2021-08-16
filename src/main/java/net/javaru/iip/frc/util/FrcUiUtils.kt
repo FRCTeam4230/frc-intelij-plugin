@@ -39,7 +39,6 @@ import org.intellij.lang.annotations.Language
 import java.awt.Component
 import java.awt.Container
 import java.awt.Dimension
-import java.util.*
 import javax.swing.AbstractButton
 import javax.swing.ButtonGroup
 import javax.swing.ButtonModel
@@ -288,7 +287,7 @@ fun findAllUsedMnemonics(component: Component?, mnemonics: MutableSet<Char>, con
 
         if (convertAllToUpperCase)
         {
-            val upperCase = mnemonics.map { it.toUpperCase() }
+            val upperCase = mnemonics.map { it.uppercaseChar() }
             mnemonics.clear()
             mnemonics.addAll(upperCase)
         }
@@ -303,7 +302,7 @@ fun <T> calculateMnemonics(topComponent: JComponent?, elements: Collection<T>, g
 
 fun <T> calculateMnemonics(elements: Collection<T>, unavailableMnemonics: Set<Char>, getNameFunction: (T) -> String?): MutableMap<T, Char>
 {
-    val usedMnemonics = unavailableMnemonics.map { it.toUpperCase() }.toMutableSet()
+    val usedMnemonics = unavailableMnemonics.map { it.uppercaseChar() }.toMutableSet()
 
     val mnemonicsMap: MutableMap<T, Char> = HashMap()
 
@@ -314,9 +313,9 @@ fun <T> calculateMnemonics(elements: Collection<T>, unavailableMnemonics: Set<Ch
         elements.forEach { element ->
             val name = getNameFunction.invoke(element)
             val first = name?.first()
-            if (first != null && !usedMnemonics.contains(first.toUpperCase()))
+            if (first != null && !usedMnemonics.contains(first.uppercaseChar()))
             {
-                usedMnemonics.add(first.toUpperCase())
+                usedMnemonics.add(first.uppercaseChar())
                 mnemonicsMap[element] = first
             }
         }
@@ -334,9 +333,9 @@ fun <T> calculateMnemonics(elements: Collection<T>, unavailableMnemonics: Set<Ch
                         // first look for camel casing
                         camel@ for (char in chars)
                         {
-                            if (char.isUpperCase() && !usedMnemonics.contains(char.toUpperCase()))
+                            if (char.isUpperCase() && !usedMnemonics.contains(char.uppercaseChar()))
                             {
-                                usedMnemonics.add(char.toUpperCase())
+                                usedMnemonics.add(char.uppercaseChar())
                                 mnemonicsMap[element] = char
                                 break@camel
                             }
@@ -358,9 +357,9 @@ fun <T> calculateMnemonics(elements: Collection<T>, unavailableMnemonics: Set<Ch
                         // first look for camel casing
                         forChars@ for (char in chars)
                         {
-                            if (!usedMnemonics.contains(char.toUpperCase()))
+                            if (!usedMnemonics.contains(char.uppercaseChar()))
                             {
-                                usedMnemonics.add(char.toUpperCase())
+                                usedMnemonics.add(char.uppercaseChar())
                                 mnemonicsMap[it] = char
                                 break@forChars
                             }

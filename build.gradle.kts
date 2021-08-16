@@ -99,13 +99,24 @@ tasks.test {
     }
 }
 
+tasks.register<Delete>("cleanPluginFromSandbox") {
+    delete(File("$sandboxPath/plugins/${rootProject.name}"))
+}
+
+tasks.register<Delete>("cleanIdeCaches") {
+    dependsOn("cleanPluginFromSandbox")
+    // Delete indexes & cache to resolve issues of new project templates being read from cache
+    delete(
+           File("$sandboxPath/system/caches"),
+           File("$sandboxPath/system/index")
+          )
+//    File("$sandboxPath/plugins/${rootProject.name}").deleteRecursively()
+//    File("$sandboxPath/system/caches").deleteRecursively()
+//    File("$sandboxPath/system/index").deleteRecursively()
+}
+
 tasks.clean {
-    doFirst {
-        File("$sandboxPath/plugins/${rootProject.name}").deleteRecursively()
-        // Delete indexes & cache to resolve issues of new project templates being read from cache
-        File("$sandboxPath/system/caches").deleteRecursively()
-        File("$sandboxPath/system/index").deleteRecursively()
-    }
+    dependsOn("cleanPluginFromSandbox", "cleanIdeCaches")
 }
 
 intellij {

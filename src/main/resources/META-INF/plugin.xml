@@ -201,6 +201,9 @@
     <extensions defaultExtensionNs="com.intellij">
         <facetType id="FRC_FACET" implementation="net.javaru.iip.frc.facet.FrcFacetType" />
 
+        <iconProvider id="FRC.FrcIconProvider" order="first" implementation="net.javaru.iip.frc.services.FrcIconProvider" />
+        <fileIconProvider id="FRC.FrcFIleIconProvider" order="first"  implementation="net.javaru.iip.frc.services.FrcIconProvider" />
+
         <executor id="FrcRioLogToolWindowExecutor" implementation="net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor" />
 
         <spellchecker.bundledDictionaryProvider implementation="net.javaru.iip.frc.spellchecker.FrcBundledDictionaryProvider" />

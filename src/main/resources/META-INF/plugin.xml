@@ -294,7 +294,7 @@
     </extensions>
 
     <extensions defaultExtensionNs="JavaScript.JsonSchema">
-        <ProviderFactory implementation="net.javaru.iip.frc.wpilib.jsonSchema.WpiLibJsonSchemaProviderFactory" />
+        <ProviderFactory id="FrcJsonSchemaProviderFactory" implementation="net.javaru.iip.frc.services.FrcJsonSchemaProviderFactory" />
     </extensions>
 
 

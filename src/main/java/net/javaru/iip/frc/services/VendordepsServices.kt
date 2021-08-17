@@ -114,16 +114,19 @@ fun PsiFile?.isVendordepsJsonFile(project: Project) : Boolean = this?.virtualFil
 
 /**
  * Determines if the `VirtualFile` is a `vendordeps.json` file, returning false if the `VirtualFile` is null.
+ * If a project is provided (i.e. not null), then the file must exist within the project's content and it must be an FRC Faceted project.
  */
 @Contract("null,_ -> false")
-fun VirtualFile?.isVendordepsJsonFile(project: Project) : Boolean
+fun VirtualFile?.isVendordepsJsonFile(project: Project?) : Boolean
 {
-    // TODO: We should check the content to see if it matches the schema, or at least has a key property in it.
-    //       Not super critical since it is unlikely any other JSON files would get put in vendordeps. But still.
-    return this != null &&
-        project.isFrcFacetedProject() &&
-        ProjectFileIndex.getInstance(project).isInContent(this) &&
-        this.parent.name == vendordepsDirName &&
+    if (this == null) return false
+    val isWithinProject = 
+        if (project == null) 
+            true 
+        else 
+            project.isFrcFacetedProject() &&  ProjectFileIndex.getInstance(project).isInContent(this)
+    return isWithinProject && 
+        this.parent.name == vendordepsDirName && 
         this.name.endsWith(".json", ignoreCase = true)
 }
 

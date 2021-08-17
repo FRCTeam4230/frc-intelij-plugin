@@ -17,6 +17,7 @@ package net.javaru.iip.frc.actions.tools.internal
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.LangDataKeys
 import com.intellij.openapi.diagnostic.logger
@@ -37,6 +38,7 @@ import net.javaru.iip.frc.notify.FrcNotifications.notify
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllOpenProjects
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.services.FrcGradleService
+import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
 import javax.swing.Icon
 
@@ -259,5 +261,14 @@ class CreateRunConfigurationsFrcInternalAction: AbstractFrcInternalAction()
             val data = FrcProjectWizardData()
             createAllRunDebugConfigurations(it, data)
         }
+    }
+}
+
+class MarkGradleProjectDirtyInternalAction: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(e: AnActionEvent)
+    {
+        val project = e.getData(CommonDataKeys.PROJECT)
+        project?.markGradleProjectAsNeedingReimport()
     }
 }

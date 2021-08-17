@@ -16,15 +16,16 @@
 
 package net.javaru.iip.frc.util
 
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
+import com.intellij.openapi.externalSystem.ExternalSystemManager
+import com.intellij.openapi.externalSystem.autoimport.ExternalSystemProjectId
+import com.intellij.openapi.externalSystem.autoimport.ExternalSystemProjectTracker
 import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
-import com.intellij.openapi.externalSystem.model.DataNode
-import com.intellij.openapi.externalSystem.model.project.ProjectData
-import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskId
 import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode
 import com.intellij.openapi.externalSystem.service.project.ExternalProjectRefreshCallback
-import com.intellij.openapi.externalSystem.service.project.ProjectDataManager
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
-import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
@@ -41,7 +42,9 @@ import java.nio.file.Path
 // that that is possibly planned:
 // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360010674120-Programatically-Update-Plugin-Version-in-Gradle-Build-File
 
-//private val LOG = Logger.getInstance("#net.javaru.iip.frc.util.GradleUtils")
+private object GradleUtils
+
+private val logger = logger<GradleUtils>()
 
 fun Project.getGradleBuildIoFile(): File?
 {
@@ -88,63 +91,63 @@ fun Project.getGradleBuildPsiFile(): PsiFile? = this.getGradleBuildVirtualFile()
 //
 //}
 
-
 @JvmOverloads
-fun Project.reimportGradleProject(executionMode: ProgressExecutionMode = ProgressExecutionMode.IN_BACKGROUND_ASYNC,
-                                  callback: ExternalProjectRefreshCallback? = null)
+fun Project.reimportGradleProject(callback: ExternalProjectRefreshCallback? = null)
 {
-    //ImportModuleAction.doImport(this)  <-- this is for an initial import it looks like
+    // Should we instead use:
+    //ImportModuleAction.doImport(this)
 
-    // The default call back (in the ImportSpecBuilder) calls ProjectDataManager.importData() on success.
-    // This syncs IntelliJ IDEA's project structure (such as libraries)
-    // So if we want to provide a call back, we need to wrap the passed in callback so that we are sure that importData() is called
-    val ourCallback: ExternalProjectRefreshCallback = object : ExternalProjectRefreshCallback {
-        override fun onSuccess(externalTaskId: ExternalSystemTaskId, externalProject: DataNode<ProjectData>?)
-        {
-            doProjectDataImport(externalProject)
-            callback?.onSuccess(externalTaskId, externalProject)
-        }
+    // derived from looking at RefreshAllExternalProjectsAction, specifically when it calls ExternalSystemUtil.refreshProjects
+    ExternalSystemUtil.refreshProjects(
+        ImportSpecBuilder(this, GradleConstants.SYSTEM_ID)
+            .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
+            .callback(callback))
+}
 
-        override fun onSuccess(externalProject: DataNode<ProjectData>?)
+fun Project.markGradleProjectAsNeedingReimport(scheduleForAutoReimport: Boolean = false)
+{
+    val projectTracker = ExternalSystemProjectTracker.getInstance(this)
+    val projectSettings = this.findAllProjectSettings()
+    logger.trace{"[FRC] Marking Gradle for project '${this.name}' as dirty. scheduleForAutoReimport = $scheduleForAutoReimport"}
+    
+    // The externalProjectsWatcher.markDirty method auto imports, which we don't want. So we basically duplicate its functionality here
+    //val externalProjectsManager = ExternalProjectsManagerImpl.getInstance(this)
+    //projectSettings.forEach {
+    //    externalProjectsManager.externalProjectsWatcher.markDirty(it.externalProjectPath)
+    //}
+    
+    ApplicationManager.getApplication().invokeLater(
         {
-            doProjectDataImport(externalProject)
-            callback?.onSuccess(externalProject)
-        }
-
-        override fun onFailure(externalTaskId: ExternalSystemTaskId, errorMessage: String, errorDetails: String?)
-        {
-            callback?.onFailure(externalTaskId, errorMessage, errorDetails)
-        }
-
-        override fun onFailure(errorMessage: String, errorDetails: String?)
-        {
-            callback?.onFailure(errorMessage, errorDetails)
-        }
-
-        fun doProjectDataImport(externalProject: DataNode<ProjectData>?)
-        {
-            if (externalProject != null)
-            {
-                val synchronous = executionMode == ProgressExecutionMode.MODAL_SYNC
-                // We have to fully qualify the function so that there is not an imp0licit use of 'this'. Because we are in a Project extension function
-                // an implicit `this` is added if we just type `service<ProjectDataManager>()` which results in Project.service<T> being called and
-                // and not the ApplicationService service<T> function. Another word around would be to add a forwarding function outside this function.
-                // and using it. For example:   inline fun <reified T : Any> appService() = service<T>()
-                com.intellij.openapi.components.service<ProjectDataManager>().importData(externalProject, this@reimportGradleProject, synchronous)
+            projectSettings.forEach {
+                projectTracker.markDirty(it)
             }
+            // Note, in the externalProjectsWatcher.markDirty implementation, it also iterates over
+            //       contributors. However, the gradle plugin does not implement the ExternalSystemProjectsWatcherImpl.Contributor
+            //       extension point (only8 maven does) so it would be an empyt list
+            if (scheduleForAutoReimport) 
+                projectTracker.scheduleProjectRefresh() 
+            else 
+                projectTracker.scheduleProjectNotificationUpdate()
+        }, this.disposed)
+        
+    
+
+}
+
+private fun Project.findAllProjectSettings(): List<ExternalSystemProjectId>
+{
+    val list: MutableList<ExternalSystemProjectId> = ArrayList()
+    ExternalSystemManager.EP_NAME.forEachExtensionSafe { manager: ExternalSystemManager<*, *, *, *, *> ->
+        val systemId = manager.systemId
+        val linkedProjectsSettings = manager.settingsProvider.`fun`(this).linkedProjectsSettings
+        for (settings in linkedProjectsSettings)
+        {
+            val externalProjectPath = settings.externalProjectPath ?: continue
+            list.add(ExternalSystemProjectId(systemId, externalProjectPath))
         }
     }
-
-    // We save all documents because there is a possible case that there is an external system config file changed inside the ide.
-    FileDocumentManager.getInstance().saveAllDocuments()
-    // derived from looking at RefreshAllExternalProjectsAction, specifically when it calls ExternalSystemUtil.refreshProject
-    ExternalSystemUtil.refreshProjects(ImportSpecBuilder(this, GradleConstants.SYSTEM_ID)
-                                           .use(executionMode)
-                                           .callback(ourCallback)
-                                      )
-
-    // The ExternalSystemProjectTracker is newer, and is what the new small popup square (when you edit a build file) uses.
-    // But it lacks a callback option
-    //    val projectTracker = ExternalSystemProjectTracker.getInstance(this)
-    //    projectTracker.scheduleProjectRefresh()
+    return list
 }
+
+/** Reimports the Gradle project by scheduling it via the internal ProjectTracker */
+fun Project.scheduleGradleReimport() = this.markGradleProjectAsNeedingReimport(scheduleForAutoReimport = true)

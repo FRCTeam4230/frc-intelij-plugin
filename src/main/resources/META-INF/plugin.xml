@@ -403,6 +403,8 @@
                 class="net.javaru.iip.frc.actions.tools.internal.CreateRunConfigurationsFrcInternalAction"/>
             <action id="FRC.tools.internal.CheckIncludeDesktopSupportSetting"
                     class="net.javaru.iip.frc.actions.tools.internal.CheckIncludeDesktopSupportSetting" />
+            <action id="FRC.tools.internal.MarkGradleProjectDirty" 
+                    class="net.javaru.iip.frc.actions.tools.internal.MarkGradleProjectDirtyInternalAction" />
         </group>
 
         <group id="FRC.FrcInternalNotificationsActionsGroup"

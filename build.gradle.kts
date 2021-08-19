@@ -261,6 +261,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven("https://plugins.gradle.org/m2/")
+    flatDir { dirs("lib") }
     maven {
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
         mavenContent {
@@ -271,7 +272,6 @@ repositories {
 
 
 dependencies {
-    val jacksonVersion = "2.11.2"
 
     // For Kotlin dependencies, you can use shorthand for a dependency on a Kotlin module, for example, kotlin("test-junit5") for "org.jetbrains.kotlin:kotlin-test-junit5".
     implementation(kotlin("stdlib-jdk8"))
@@ -283,18 +283,19 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("org.apache.commons:commons-text:1.9")
     implementation("com.jcraft:jsch:0.1.54")
-    // Klaxon is a library to parse JSON in Kotlin.  https://github.com/cbeust/klaxon   Available in jcenter bintray: https://jcenter.bintray.com/com/beust/klaxon/   Help available in the #klaxon channel of the Kotlin Slack Workspace
-    //implementation("com.beust:klaxon:5.0.9")
+    // Klaxon is a library to parse JSON in Kotlin.  https://github.com/cbeust/klaxon  Help available in the #klaxon channel of the Kotlin Slack Workspace
+    implementation("com.beust:klaxon:5.5")
     implementation(platform("com.google.guava:guava-bom:29.0-jre"))
     implementation("com.google.guava:guava")
-
-
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatypes-collections:$jacksonVersion")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava:$jacksonVersion")
+    // jsemver: Is in the project 'lib' dir as it is not published to any public repos. Plus we are using a tweaked version that removes is use of logback
+    implementation("com.asarkar:jsemver:0.6.2.1")
+    implementation(platform("com.fasterxml.jackson:jackson-bom:2.12.4"))
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatypes-collections")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava")
     implementation("org.freemarker:freemarker:2.3.30")
 
-    testImplementation(platform("org.junit:junit-bom:5.7.1"))
+    testImplementation(platform("org.junit:junit-bom:5.7.2"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")

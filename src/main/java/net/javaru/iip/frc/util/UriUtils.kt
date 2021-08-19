@@ -27,27 +27,31 @@ private object UriUtils
 private val LOG = logger<UriUtils>()
 
 /**
- * Creates a `URI` from ` `URL` throwing a Runtime based `IllegalArgumentException` in the event the URI
- * cannot be created.
+ * Creates a `URI` from a String representation, throwing a Runtime based `IllegalArgumentException` in the event the URI
+ * cannot be created. For an option that returns `null` instead of throwing an exception, see [createUriSafely].
+ *
+ * @see [createUriSafely]
  */
 @Throws(IllegalArgumentException::class)
-fun createUri(url: String): URI
+fun createUri(uri: String): URI
 {
     return try
     {
-        URI(url)
+        URI(uri)
     }
     catch (e: Exception)
     {
-        val baseMsg = "Could not create a URI object from the URL path '$url' due to the exception: $e"
+        val baseMsg = "Could not create a URI object from the URL path '$uri' due to the exception: $e"
         LOG.warn("[FRC] $baseMsg")
         throw IllegalArgumentException(baseMsg, e)
     }
 }
 
 /**
- * Creates a `URL` from ` `URL` throwing a Runtime based `IllegalArgumentException` in the event the URL
- * cannot be created.
+ * Creates a `URL` from  a String representation, throwing a Runtime based `IllegalArgumentException` in the event the URL
+ * cannot be created. For an option that returns `null` instead of throwing an exception, see [createUrlSafely].
+ *
+ * @see [createUrlSafely]
  */
 @Throws(IllegalArgumentException::class)
 fun createUrl(url: String): URL
@@ -64,6 +68,64 @@ fun createUrl(url: String): URL
     }
 }
 
+/**
+ * Safely creates a `URI` from a String representation, returning `null` in the event the URI cannot be created.
+ * For an option that throws an exception and never returns `null`, see [createUri].
+ *
+ * @see [createUri]
+ */
+fun createUriSafely(uri: String?):URI?
+{
+    return if (uri == null) null
+    else
+    {
+        return try
+        {
+            URI(uri)
+        } catch (e: Exception)
+        {
+            LOG.warn("[FRC] Could not create a URI object from the URI path '$uri' due to the exception: $e")
+            null
+        }
+    }
+}
+
+/**
+ * Safely creates a `URL` from a String representation, returning `null` in the event the URL cannot be created.
+ * For an option that throws an exception and never returns `null`, see [createUrl]
+ *
+ * @see [createUrl]
+ */
+fun createUrlSafely(uri: String?):URL?
+{
+    return if (uri == null) null
+    else
+    {
+        return try
+        {
+            URL(uri)
+        } catch (e: Exception)
+        {
+            LOG.warn("[FRC] Could not create a URL object from the URL path '$uri' due to the exception: $e")
+            null
+        }
+    }
+}
+
+// ALSO SEE UTILS & EXTENSIONS IN IDEA com.intellij.util.Urls.kt
+
+fun java.net.URI.toIdeaUrl(): com.intellij.util.Url?
+{
+    return try
+    {
+        com.intellij.util.Urls.parse(this.toString(), false)
+    }
+    catch (e: Exception)
+    {
+        LOG.warn("[FRC] Could not convert java.net.URI '$this' to com.intellij.util.Url. Cause Summary: $e", e)
+        null
+    }
+}
 /**
  * Resolves a sibling URI, paying attention to whether a relative or absolute siblingResource is passed in.
  * For example given a `receiver` URI of `https://example.com/data/foo.txt`:

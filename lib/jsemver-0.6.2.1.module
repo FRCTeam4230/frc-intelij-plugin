@@ -1,0 +1,97 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.asarkar",
+    "module": "jsemver",
+    "version": "0.6.2.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "6.5.1",
+      "buildId": "64uaxmvq6vh7ve2u3u2chhf374"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.localToProject": "public",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.4.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "jsemver-0.6.2.1.jar",
+          "url": "jsemver-0.6.2.1.jar",
+          "size": 70120,
+          "sha512": "b1a1accb16fe3b6b7e6927e6301b33f4d601950625a9e0734a236c517c71c0c6d4bafdd69e9730c7eb0f5b6702590948af5c257a0243c4bad4aa48116fda071a",
+          "sha256": "54db97326dfe9534488a0069396d1fd3268bd71daad9562bc2f33574e9164025",
+          "sha1": "2320b1d5fd48642ab7fcd5b39e064a9978fc4ca8",
+          "md5": "5e371e3c7068d80741181b85fd6b15be"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.localToProject": "public",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.antlr",
+          "module": "antlr4-runtime",
+          "version": {
+            "requires": "4.8"
+          }
+        },
+        {
+          "group": "org.slf4j",
+          "module": "slf4j-api",
+          "version": {
+            "requires": "1.7.30"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.4.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "jsemver-0.6.2.1.jar",
+          "url": "jsemver-0.6.2.1.jar",
+          "size": 70120,
+          "sha512": "b1a1accb16fe3b6b7e6927e6301b33f4d601950625a9e0734a236c517c71c0c6d4bafdd69e9730c7eb0f5b6702590948af5c257a0243c4bad4aa48116fda071a",
+          "sha256": "54db97326dfe9534488a0069396d1fd3268bd71daad9562bc2f33574e9164025",
+          "sha1": "2320b1d5fd48642ab7fcd5b39e064a9978fc4ca8",
+          "md5": "5e371e3c7068d80741181b85fd6b15be"
+        }
+      ]
+    }
+  ]
+}

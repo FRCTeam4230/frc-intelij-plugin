@@ -128,7 +128,7 @@ public class FrcApplicationSettingsForm implements TeamNumberFormChangeListener
         internalFrcApplicationSettings = FrcApplicationSettings.clone(frcApplicationSettings);
         if (iconsOptionHasChanged)
         {
-            FrcProjectExtsKt.refreshFrcProjectViews();
+            FrcProjectExtsKt.refreshProjectViewsForAllFrcProjects();
         }
         // ** NO CODE BELOW THIS **
     }

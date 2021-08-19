@@ -141,23 +141,44 @@ fun getAllOpenProjects(): Array<out Project>
         .toTypedArray()
 }
 
-fun refreshFrcProjectViews()
+/**
+ * Refreshes the [ProjectView] (i.e. the Project tool window ) **for all open FRC projects**.
+ * @see refreshProjectView
+ */
+fun refreshProjectViewsForAllFrcProjects()
 {
     try
     {
         val openProjects: Array<out Project> = getAllOpenProjects()
         for (project in openProjects)
         {
-            val view = ProjectView.getInstance(project)
-            if (view != null)
-            {
-                view.refresh()
-                view.currentProjectViewPane.updateFromRoot(true)
-            }
+            project.refreshProjectView()
         }
-    } catch (e: Throwable)
+    }
+    catch (e: Throwable)
     {
         LOG.warn("[FRC] An exception occurred when attempting to refresh project views for FRC open projects. Cause summary: $e", e)
+    }
+}
+
+/**
+ * Refreshes the [ProjectView] (i.e. the Project tool window ) for the receiver project.
+ * @see refreshProjectViewsForAllFrcProjects
+ */
+fun Project.refreshProjectView()
+{
+    try
+    {
+        val view = ProjectView.getInstance(this)
+        if (view != null)
+        {
+            view.refresh()
+            view.currentProjectViewPane.updateFromRoot(true)
+        }
+    }
+    catch (e: Throwable)
+    {
+        LOG.warn("[FRC] An exception occurred when attempting to refresh project view for project '${this}' Cause summary: $e", e)
     }
 }
 

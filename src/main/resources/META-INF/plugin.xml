@@ -244,8 +244,8 @@
         <projectService id="FRC.FrcProjectSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcProjectGeneralSettings" />
         <projectService id="FRC.FrcRoboRioSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcRoboRioSettings" />
         <projectService id="FRC.FrcSshSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcSshSettings" />
-        <projectService id ="FRC.VendordepsFileListener" serviceImplementation="net.javaru.iip.frc.services.VendordepsFileListener" />
-        <backgroundPostStartupActivity id="FRC.VendordepsFileListenerStartupActivity" implementation="net.javaru.iip.frc.services.VendordepsFileListenerStartupActivity" />
+        <projectService id ="FRC.VendordepsFileListener" serviceImplementation="net.javaru.iip.frc.wpilib.vendordeps.VendordepsFileListener" />
+        <backgroundPostStartupActivity id="FRC.VendordepsFileListenerStartupActivity" implementation="net.javaru.iip.frc.wpilib.vendordeps.VendordepsFileListenerStartupActivity" />
         <postStartupActivity id="FRC.FrcPluginVersionManagerStartupActivity" implementation="net.javaru.iip.frc.plugin.FrcPluginVersionManagerStartupActivity" />
         <projectService id="FRC.WpiLibUpdateCheckingService" serviceImplementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionService" />
         <postStartupActivity implementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionStartupActivity" />

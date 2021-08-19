@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.services
+package net.javaru.iip.frc.wpilib.vendordeps
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.debug
@@ -32,6 +32,7 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiTreeChangeEvent
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.psi.FrcGeneralChangePsiTreeChangeListenerAdapter
+import net.javaru.iip.frc.services.FrcApplicationDisposableService
 import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
 import org.jetbrains.annotations.Contract
 

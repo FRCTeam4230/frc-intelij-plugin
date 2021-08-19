@@ -25,6 +25,7 @@ import com.jetbrains.jsonSchema.extension.JsonSchemaProviderFactory
 import com.jetbrains.jsonSchema.extension.SchemaType
 import com.jetbrains.jsonSchema.impl.JsonSchemaVersion
 import net.javaru.iip.frc.FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE
+import net.javaru.iip.frc.wpilib.vendordeps.isVendordepsJsonFile
 import net.javaru.iip.frc.wpilib.wpiLibPreferencesFileName
 import java.net.URL
 

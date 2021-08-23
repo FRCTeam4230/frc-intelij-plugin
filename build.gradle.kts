@@ -140,6 +140,7 @@ tasks {
     }
     
     runIde {
+        jvmArgs = listOf("-Xms512m", "-Xmx1g")
         systemProperties = mapOf(
             //"key" to "value",
             //systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, ".sandbox", "log.xml")),

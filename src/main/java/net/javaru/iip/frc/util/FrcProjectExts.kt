@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.util
 
+import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
@@ -143,7 +144,46 @@ fun getAllOpenProjects(): Array<out Project>
         .toTypedArray()
 }
 
+/**
+ * Refreshes the [ProjectView] (i.e. the Project tool window ) **for all open FRC projects**.
+ * @see refreshProjectView
+ */
+fun refreshProjectViewsForAllFrcProjects()
+{
+    try
+    {
+        val openProjects: Array<out Project> = getAllOpenProjects()
+        for (project in openProjects)
+        {
+            project.refreshProjectView()
+        }
+    }
+    catch (e: Throwable)
+    {
+        LOG.warn("[FRC] An exception occurred when attempting to refresh project views for FRC open projects. Cause summary: $e", e)
+    }
+}
 
+/**
+ * Refreshes the [ProjectView] (i.e. the Project tool window ) for the receiver project.
+ * @see refreshProjectViewsForAllFrcProjects
+ */
+fun Project.refreshProjectView()
+{
+    try
+    {
+        val view = ProjectView.getInstance(this)
+        if (view != null)
+        {
+            view.refresh()
+            view.currentProjectViewPane.updateFromRoot(true)
+        }
+    }
+    catch (e: Throwable)
+    {
+        LOG.warn("[FRC] An exception occurred when attempting to refresh project view for project '${this}' Cause summary: $e", e)
+    }
+}
 
 /**
  * Finds a project to be used for tasks that require a Project. It will favor projects in this order:

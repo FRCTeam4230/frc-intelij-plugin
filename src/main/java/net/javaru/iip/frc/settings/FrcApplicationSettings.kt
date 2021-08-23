@@ -81,7 +81,8 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                   var debuggingPort: Int = DEFAULT_DEBUG_PORT,
                                   var checkWpiLibStatusOnProjectStartup: Boolean = true,
                                   var checkWpiLibStatusPeriodically: Boolean = true,
-                                  var checkWpiLibStatusInterval: TemporalAmount = Duration.ofHours(4)
+                                  var checkWpiLibStatusInterval: TemporalAmount = Duration.ofHours(4),
+                                  var provideCustomFileIcons: Boolean = true,
                                  ) : PersistentStateComponent<FrcApplicationSettings>
 {
     companion object Settings

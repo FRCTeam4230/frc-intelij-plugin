@@ -39,7 +39,10 @@ import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllOpenProjects
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.services.FrcGradleService
 import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
+import net.javaru.iip.frc.util.runWhenSmart
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
+import net.javaru.iip.frc.wpilib.vendordeps.VendordepsListing
+import net.javaru.iip.frc.wpilib.vendordeps.VendordepsService
 import javax.swing.Icon
 
 abstract class AbstractFrcInternalAction : AnAction
@@ -174,7 +177,7 @@ class RunKotlinCodeForTestingAndDebuggingFrcInternalAction : AbstractFrcInternal
         }
         catch (t: Throwable)
         {
-            // We log as an error so we can more easily grab the stacktrace from the exception reporter
+            // We log as an error so that we can more easily grab the stacktrace from the exception reporter
             logger.error("[FRC] Exception: $t", t)
         }
 
@@ -270,5 +273,37 @@ class MarkGradleProjectDirtyInternalAction: AbstractFrcInternalAction()
     {
         val project = e.getData(CommonDataKeys.PROJECT)
         project?.markGradleProjectAsNeedingReimport()
+    }
+}
+
+class FindVendordepsDirFrcInternalAction: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent) {
+        executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
+            it.runWhenSmart {
+                val dir = VendordepsService.getInstance(it).findVendorDepsDir()
+                FrcNotifications.notifyInfoBalloon("Vendordeps dir = ${dir?.virtualFile?.path ?: "NOT FOUND"}")
+            }
+        }
+    }
+}
+
+class GetVendordepsListingFrcInternalAction: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent) {
+        executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
+            it.runWhenSmart {
+                VendordepsService.getInstance(it).getAndUseVendordeps(notifyOnDuplicates = true) { listing: VendordepsListing ->
+                    val sb = StringBuilder()
+                    sb.append("<html><h3>Vendordeps:</h3><ol>")
+                    listing.vendordepsFileList.forEach { item ->
+                        sb.append("<li>$item</li>")
+                    }
+                    sb.append("</ol></html>")
+
+                    FrcNotifications.notifyInfoBalloon(sb.toString())
+                }
+            }
+        }
     }
 }

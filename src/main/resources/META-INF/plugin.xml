@@ -244,8 +244,9 @@
         <projectService id="FRC.FrcProjectSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcProjectGeneralSettings" />
         <projectService id="FRC.FrcRoboRioSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcRoboRioSettings" />
         <projectService id="FRC.FrcSshSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcSshSettings" />
-        <projectService id ="FRC.VendordepsFileListener" serviceImplementation="net.javaru.iip.frc.wpilib.vendordeps.VendordepsFileListener" />
-        <backgroundPostStartupActivity id="FRC.VendordepsFileListenerStartupActivity" implementation="net.javaru.iip.frc.wpilib.vendordeps.VendordepsFileListenerStartupActivity" />
+        <projectService id="FRC.FrcVendordepsService" serviceImplementation="net.javaru.iip.frc.wpilib.vendordeps.VendordepsService" />
+        <projectService id="FRC.VendordepsFileListener" serviceImplementation="net.javaru.iip.frc.wpilib.vendordeps.VendordepsFileListener" />
+        <backgroundPostStartupActivity id="FRC.VendordepsServicesStartupActivity" implementation="net.javaru.iip.frc.wpilib.vendordeps.VendordepsServicesStartupActivity" />
         <postStartupActivity id="FRC.FrcPluginVersionManagerStartupActivity" implementation="net.javaru.iip.frc.plugin.FrcPluginVersionManagerStartupActivity" />
         <projectService id="FRC.WpiLibUpdateCheckingService" serviceImplementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionService" />
         <postStartupActivity implementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionStartupActivity" />
@@ -405,6 +406,10 @@
                     class="net.javaru.iip.frc.actions.tools.internal.CheckIncludeDesktopSupportSetting" />
             <action id="FRC.tools.internal.MarkGradleProjectDirty" 
                     class="net.javaru.iip.frc.actions.tools.internal.MarkGradleProjectDirtyInternalAction" />
+            <action id="FRC.tools.internal.FindVendordepsDirFrcInternalAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.FindVendordepsDirFrcInternalAction"/>
+            <action id="FRC.tools.internal.GetVendordepsFrcInternalAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.GetVendordepsListingFrcInternalAction"/>
         </group>
 
         <group id="FRC.FrcInternalNotificationsActionsGroup"

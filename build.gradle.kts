@@ -288,10 +288,16 @@ dependencies {
     implementation(platform("com.google.guava:guava-bom:29.0-jre"))
     implementation("com.google.guava:guava")
     // jsemver: Is in the project 'lib' dir as it is not published to any public repos. Plus we are using a tweaked version that removes is use of logback
-    implementation("com.asarkar:jsemver:0.6.2.1")
+    implementation("com.asarkar:jsemver:0.6.2.1") {
+        // We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+    implementation("org.antlr:antlr4:4.8") {
+        // We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
     implementation(platform("com.fasterxml.jackson:jackson-bom:2.12.4"))
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatypes-collections")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava")
     implementation("org.freemarker:freemarker:2.3.30")
 

@@ -23,11 +23,13 @@ import com.intellij.openapi.progress.PerformInBackgroundOption
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.util.Computable
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import org.jetbrains.plugins.gradle.settings.GradleSettings
 
@@ -36,15 +38,6 @@ import org.jetbrains.plugins.gradle.settings.GradleSettings
 
 private val LOG = Logger.getInstance("#net.javaru.iip.frc.util.ProjectExts")
 
-fun Project?.isAntBasedFrcProject(): Boolean
-{
-    return if (this == null)
-        false
-    else
-        // TODO: This works for now since there are only two possibilities: Legacy Ant or GradleRIO. But that may change some day
-        //       We should probably check if there is an build file present. But that is super low priority for now.
-        !this.isGradleProject()
-}
 
 fun Project?.isGradleProject(): Boolean
 {
@@ -63,17 +56,27 @@ fun Project?.isGradleProject(): Boolean
     }
 }
 
+/** Convenience Extension function for [DumbService.runWhenSmart]. */
+fun Project.runWhenSmart(action:() -> Unit) = DumbService.getInstance(this).runWhenSmart{action()}
+
+/** Convenience Extension function for [DumbService.runReadActionInSmartMode]. */
+fun Project.runReadActionInSmartMode(action:() -> Unit) = DumbService.getInstance(this).runReadActionInSmartMode{action()}
+
+/** Convenience Extension function for [DumbService.runReadActionInSmartMode]. */
+fun <T> Project.runReadActionInSmartMode(computable: Computable<T>): T = DumbService.getInstance(this).runReadActionInSmartMode(computable)
+
 /**
- * Convenience function for running a progress in the background. Per the [SDK Guide](https://plugins.jetbrains.com/docs/intellij/general-threading-rules.html#background-processes-and-processcanceledexception)
+ * Convenience function for running a process in the background. Per the [SDK Guide](https://plugins.jetbrains.com/docs/intellij/general-threading-rules.html#background-processes-and-processcanceledexception)
  * callers should be prepared to catch and rethrow a `ProcessCanceledException`. "**This exception should never be logged**, it 
  * should be rethrown, and it’ll be handled in the infrastructure that started the process." 
+ * 
  */
 fun Project.runBackgroundTask(
-        name: String,
-        indeterminate: Boolean = true,
-        cancellable: Boolean = false,
-        background: PerformInBackgroundOption = PerformInBackgroundOption.ALWAYS_BACKGROUND,
-        callback: (indicator: ProgressIndicator) -> Unit
+    name: String,
+    indeterminate: Boolean = true,
+    cancellable: Boolean = false,
+    background: PerformInBackgroundOption = PerformInBackgroundOption.ALWAYS_BACKGROUND,
+    action: (indicator: ProgressIndicator) -> Unit
                           )
 {
     ProgressManager.getInstance().run(object : Task.Backgroundable(this, name, cancellable, background)
@@ -81,7 +84,7 @@ fun Project.runBackgroundTask(
                                           override fun run(indicator: ProgressIndicator)
                                           {
                                               if (indeterminate) indicator.isIndeterminate = true
-                                              callback(indicator)
+                                              action(indicator)
                                           }
                                       })
 }

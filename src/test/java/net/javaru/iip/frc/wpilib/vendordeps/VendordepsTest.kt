@@ -22,6 +22,8 @@ import com.asarkar.semver.NormalVersion
 import com.asarkar.semver.SemVer
 import net.javaru.iip.frc.getResourceStream
 import net.javaru.iip.frc.util.createUri
+import net.javaru.iip.frc.wpilib.vendordeps.Vendordeps.Companion.dmc60cRemappedUuid
+import net.javaru.iip.frc.wpilib.vendordeps.Vendordeps.Companion.libCuRemappedUuid
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.params.ParameterizedTest
@@ -69,6 +71,10 @@ internal class VendordepsTest
                 /* The ADIS lib changed is version format in 2020. in 2019 it used a dash "2019-r2" but in 2020 a dot "2020.r3" */
                 Arguments.of("vendordeps/ADIS16448-2019-r3.json", adis16488_2019_r3),
                 Arguments.of("vendordeps/ADIS16448-2020.r3.json", adis16488_2020_r3),
+                /* Test lib using another libs UUIDs */
+                Arguments.of("vendordeps/DMC60C-1.0.13.json", dmc60C_1_0_13),
+                /* Test lib using a non-conformant UUID */
+                Arguments.of("vendordeps/LibCu.json", libCu_2020_2_1),
 
                 )
         }
@@ -259,7 +265,31 @@ internal class VendordepsTest
             LibVersion.fromSemVer(SemVer(NormalVersion(2020, 0, 0))),
             "WPILibOldCommands.json",
             null,
-            emptyList()
-                                                     )
+            emptyList())
+
+        /**
+         * A problematic file as it uses the navX UUID as its UUID.
+         * See https://github.com/Digilent/dmc60c-frc-api/issues/13
+         */
+        private val dmc60C_1_0_13 = Vendordeps(
+            dmc60cRemappedUuid,
+            "Digilent-DMC60C",
+            LibVersion.fromSemVer(SemVer(NormalVersion(1, 0, 13))),
+            "DMC60C.json",
+            createUri("https://s3-us-west-2.amazonaws.com/digilent/Software/DMC60C/test/DMC60C.json"),
+            listOf(createUri("https://s3-us-west-2.amazonaws.com/digilent/Software/DMC60C/test")))
+        
+        /**
+         * A problematic file as it uses a non-conformant UUID.
+         * See https://github.com/Coppersource/LibCu/issues/4
+         */
+        private val libCu_2020_2_1 = Vendordeps(
+            libCuRemappedUuid,
+            "LibCu",
+            LibVersion.fromSemVer(SemVer(NormalVersion(2020, 2, 1))),
+            "LibCu.json",
+            createUri("https://copperforge.cc/files/dev/vendordeps/LibCu-latest.json"),
+            listOf(createUri("https://copperforge.cc/files/dev/maven")))
+        
     }
 }

@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.wpilib.version
 
-import org.apache.commons.lang3.builder.CompareToBuilder
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.apache.commons.lang3.builder.HashCodeBuilder
 import org.apache.commons.lang3.builder.ToStringBuilder
@@ -92,35 +91,31 @@ interface WpiLibVersion : Comparable<WpiLibVersion>
     /** Indicates the version is a release, a beta release, or a release candidate,  **excluding** preview releases such as `2019.1.1-beta-2-pre3`.*/
     fun isReleaseOrBetaOrReleaseCandidate(): Boolean = isBeta() || isReleaseCandidate() || isRelease()
     
-    /** Indicates the version is a alpha release,  **excluding** preview releases such as `2019.0.0-alpha-3-pre1`.*/
+    /** Indicates the version is an alpha release, **excluding** preview releases such as `2019.0.0-alpha-3-pre1`.*/
     fun isAlpha(): Boolean = preReleaseModifier == PreReleaseModifier.alpha && !isPreReleasePreview()
 
-    /** Indicates the version is a alpha release,  **excluding** preview releases such as `2019.0.0-alpha-3-pre1`.*/
+    /** Indicates the version is an alpha release, **excluding** preview releases such as `2019.0.0-alpha-3-pre1`.*/
     fun isAlphaOrAlphaPreview(): Boolean = preReleaseModifier == PreReleaseModifier.alpha
     
     
     override fun compareTo(other: WpiLibVersion): Int
     {
-        return CompareToBuilder()
-                .append(this.generation, other.generation)
-                // For now, since it is the same as the major, we leave out frcYear
-                .append(this.major, other.major)
-                .append(this.minor, other.minor)
-                .append(this.patch, other.patch)
-                .append(if (this.isPreReleaseIncludingPreviews()) this.preReleaseModifier!!.ordinal else Integer.MAX_VALUE,
-                        if (other.isPreReleaseIncludingPreviews()) other.preReleaseModifier!!.ordinal else Integer.MAX_VALUE)
-                .append(if (this.isPreReleaseIncludingPreviews()) this.preReleaseModifierVersion else Integer.MAX_VALUE,
-                        if (other.isPreReleaseIncludingPreviews()) other.preReleaseModifierVersion else Integer.MAX_VALUE)
-                .append(if (this.isPreReleaseIncludingPreviews()) this.preReleaseModifierSubVersion else "",
-                        if (other.isPreReleaseIncludingPreviews()) other.preReleaseModifierSubVersion else "")
-                .append(if (this.isPreReleasePreview()) this.preReleasePreviewVersion else Integer.MAX_VALUE,
-                        if (other.isPreReleasePreview()) other.preReleasePreviewVersion else Integer.MAX_VALUE)
-                .toComparison()
+       return compareValuesBy(this, other,
+                        { it.generation },
+                        { it.frcYear }, 
+                        { it.major },
+                        { it.minor },
+                        { it.patch },
+                        { it.preReleaseModifier?.ordinal ?: Int.MAX_VALUE },
+                        { if(it.isPreReleaseIncludingPreviews()) it.preReleaseModifierVersion else Int.MAX_VALUE },
+                        { if(it.isPreReleaseIncludingPreviews()) it.preReleaseModifierSubVersion else "" },
+                        { if(it.isPreReleasePreview()) it.preReleasePreviewVersion else Int.MAX_VALUE },
+                        )
     }
     
     /** 
      * For a pre-release, this returns the (anticipated) corresponding release version. 
-     * For example, for `2019.1.2-beta-3` it would return `2019.1.2`. For non pre-release
+     * For example, for `2019.1.2-beta-3` it would return `2019.1.2`. For non-pre-release
      * versions, it simply returns itself.
      */
     fun getCorrespondingReleaseVersion(): WpiLibVersion

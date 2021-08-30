@@ -148,8 +148,4 @@ data class KnownVendordepsInfo(
     
 }
 
-class Bar(val uuid:UUID, val a: String, b: String) : Comparable<Bar>
-{
-    override fun compareTo(other: Bar): Int = compareValuesBy(this, other) { it.uuid}
-}
 

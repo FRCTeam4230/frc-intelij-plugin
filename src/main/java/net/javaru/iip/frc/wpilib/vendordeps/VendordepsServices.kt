@@ -181,6 +181,12 @@ class VendordepsService private constructor(val project: Project)
         }
     }
     
+    companion object
+    {
+        @JvmStatic
+        fun getInstance(project: Project) = project.service<VendordepsService>()
+    }
+    
     @Suppress("MemberVisibilityCanBePrivate")
     fun getLastKnownVendordepsListing(): VendordepsListing = vendordepsListing
 
@@ -199,13 +205,6 @@ class VendordepsService private constructor(val project: Project)
             updateVendordepsListing(notifyOnDuplicates)
         }
     }
-
-    companion object
-    {
-        @JvmStatic
-        fun getInstance(project: Project) = project.service<VendordepsService>()
-    }
-
 
     private fun updateVendordepsListing(notifyOnDuplicates: Boolean)
     {

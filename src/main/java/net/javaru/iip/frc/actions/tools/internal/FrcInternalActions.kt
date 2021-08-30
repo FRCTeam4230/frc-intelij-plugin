@@ -38,12 +38,17 @@ import net.javaru.iip.frc.notify.FrcNotifications.notify
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllOpenProjects
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.services.FrcGradleService
+import net.javaru.iip.frc.ui.internal.PlaceholderTextFieldPaddingDemoFormDialogWrapper
 import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
 import net.javaru.iip.frc.util.runWhenSmart
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsListing
+import net.javaru.iip.frc.wpilib.vendordeps.VendordepsManagementDialogWrapper
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsService
 import javax.swing.Icon
+
+
+class FrcInternalVendordepsActionsGroup : FrcInternalActionsGroup()
 
 abstract class AbstractFrcInternalAction : AnAction
 {
@@ -304,6 +309,28 @@ class GetVendordepsListingFrcInternalAction: AbstractFrcInternalAction()
                     FrcNotifications.notifyInfoBalloon(sb.toString())
                 }
             }
+        }
+    }
+}
+
+class ShowPlaceholderTextFieldPaddingDemoDialog: AbstractFrcInternalAction()
+{
+    
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, "Display Placeholder Padding Demo Dialog") {
+            PlaceholderTextFieldPaddingDemoFormDialogWrapper(it).showAndGet()
+        }
+    }
+}
+
+class ShowVendordepsManagementDialog: AbstractFrcInternalAction()
+{
+    
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, "Display Vendordeps Management Dialog") {
+            VendordepsManagementDialogWrapper(it).showAndGet()
         }
     }
 }

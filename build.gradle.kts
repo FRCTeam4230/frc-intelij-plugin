@@ -31,7 +31,7 @@ version = frcPluginVersion
 plugins {
     base
     java
-    kotlin("jvm") version "1.5.21"
+    kotlin("jvm") version "1.5.30"
     // gradle plugin-for writing IntelliJ plugins:  
     //     https://github.com/JetBrains/gradle-intellij-plugin
     //     https://lp.jetbrains.com/gradle-intellij-plugin/
@@ -274,6 +274,7 @@ repositories {
 
 dependencies {
 
+    implementation("io.javaru.iip.common:javaru-iip-common:1.0.0")
     // For Kotlin dependencies, you can use shorthand for a dependency on a Kotlin module, for example, kotlin("test-junit5") for "org.jetbrains.kotlin:kotlin-test-junit5".
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))

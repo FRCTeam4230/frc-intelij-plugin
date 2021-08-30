@@ -409,12 +409,23 @@
                     class="net.javaru.iip.frc.actions.tools.internal.CheckIncludeDesktopSupportSetting" />
             <action id="FRC.tools.internal.MarkGradleProjectDirty" 
                     class="net.javaru.iip.frc.actions.tools.internal.MarkGradleProjectDirtyInternalAction" />
+            <action id="FRC.tools.internal.ShowPlaceholderTextFieldPaddingDemoDialog"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowPlaceholderTextFieldPaddingDemoDialog" />
+        </group>
+
+        <group id="FRC.FrcInternalVendordepsActionsGroup"
+               class="net.javaru.iip.frc.actions.tools.internal.FrcInternalVendordepsActionsGroup"
+               popup="true"
+               icon="AllIcons.Nodes.PpLibFolder">
+            <add-to-group group-id="FRC.FrcInternalActionsGroup" anchor="after" relative-to-action="FRC.tools.internal.ShowPlaceholderTextFieldPaddingDemoDialog" />
             <action id="FRC.tools.internal.FindVendordepsDirFrcInternalAction"
                     class="net.javaru.iip.frc.actions.tools.internal.FindVendordepsDirFrcInternalAction"/>
             <action id="FRC.tools.internal.GetVendordepsFrcInternalAction"
                     class="net.javaru.iip.frc.actions.tools.internal.GetVendordepsListingFrcInternalAction"/>
+            <action id="FRC.tools.internal.ShowVendordepsManagementDialog"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowVendordepsManagementDialog"/>
         </group>
-
+        
         <group id="FRC.FrcInternalNotificationsActionsGroup"
                 class="net.javaru.iip.frc.actions.tools.internal.FrcInternalNotificationsActionsGroup"
                 popup="true"

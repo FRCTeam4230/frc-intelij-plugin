@@ -23,7 +23,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import net.javaru.iip.frc.util.uri
 import net.javaru.iip.frc.util.urisList
-import org.apache.commons.lang3.builder.CompareToBuilder
 import java.io.InputStream
 import java.io.Reader
 import java.io.StringReader
@@ -121,29 +120,36 @@ data class Vendordeps(
         }
     }
 
-    override fun compareTo(other: Vendordeps): Int
-    {
-        return CompareToBuilder()
-            .append(this.uuid, other.uuid)
-            .append(this.version, other.version)
-            .toComparison()
-    }
+    override fun compareTo(other: Vendordeps): Int = compareValuesBy(this, other, {it.uuid}, {it.version})
 
     override fun toString(): String = "$name : $version"
 }
 
 data class VendordepsFile(val psiFile: PsiFile, val vendordeps: Vendordeps) : Comparable<VendordepsFile>
 {
-    override fun compareTo(other: VendordepsFile): Int
-    {
-        return CompareToBuilder()
-            .append(this.vendordeps, other.vendordeps)
-            .append(this.psiFile.name, other.psiFile.name)
-            .toComparison()
-    }
+    override fun compareTo(other: VendordepsFile): Int = compareValuesBy(this, other, {it.vendordeps}, {it.psiFile.name})
 
     override fun toString(): String
     {
         return "$vendordeps [${psiFile.name}]"
     }
 }
+
+data class KnownVendordepsInfo(
+    val uuid:UUID,
+    val name: String,
+    val jsonUrl: URI,
+    
+    
+                               ) : Comparable<KnownVendordepsInfo>
+{
+    override fun compareTo(other: KnownVendordepsInfo): Int = compareValuesBy(this, other, {it.uuid}, {it.name})
+
+    
+}
+
+class Bar(val uuid:UUID, val a: String, b: String) : Comparable<Bar>
+{
+    override fun compareTo(other: Bar): Int = compareValuesBy(this, other) { it.uuid}
+}
+

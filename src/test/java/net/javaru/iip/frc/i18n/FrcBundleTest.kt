@@ -32,6 +32,8 @@ internal class FrcBundleTest
 {
     private val foo = "foo"
     private val bar = "bar"
+    private val sam = "Sam"
+    private val message = "Message"
     private val uuid = UUID.fromString("1234abcd-12ab-34cd-56ef-123456abcdef")
     private val expected0 = "My test message."
     private val expected1 = "My test message with a parameter of «foo»."
@@ -39,6 +41,11 @@ internal class FrcBundleTest
     private val expected2Flipped = "My test message with parameter 1 of «bar» and parameter 0 of «foo»."
     private val expected3 = "My test message with parameter 0 of «foo», parameter 1 of «bar» and parameter 2 of «${uuid}»."
     private val myDefaultMsg = "My Unit Test's Default Message"
+    private val expected4 = "No Escaping Needed test 4: Sam's Message"
+    private val expected5 = "Missing Escaping test 5: Sams Message"
+    private val expected6 = "Missing Escaping test 6: Sams {0}"
+    private val expected7 = "Proper Escaping test 7: Sam's Message"
+    private val expected8 = "Proper Escaping test 8: Sam's Message"
 
 
     @Suppress("unused")
@@ -52,13 +59,17 @@ internal class FrcBundleTest
     @Test
     fun testMessage()
     {
-        println(uuid)
         assertAll(
                 { assertEquals(expected0, message("frc.internal.unitTest.0")) },
                 { assertEquals(expected1, message("frc.internal.unitTest.1", foo)) },
                 { assertEquals(expected2, message("frc.internal.unitTest.2", foo, bar)) },
                 { assertEquals(expected2Flipped, message("frc.internal.unitTest.2.flipped", foo, bar)) },
-                { assertEquals(expected3, message("frc.internal.unitTest.3", foo, bar, uuid)) }
+                { assertEquals(expected3, message("frc.internal.unitTest.3", foo, bar, uuid)) },
+                { assertEquals(expected4, message("frc.internal.unitTest.4")) },
+                { assertEquals(expected5, message("frc.internal.unitTest.5", sam)) },
+                { assertEquals(expected6, message("frc.internal.unitTest.6", message)) },
+                { assertEquals(expected7, message("frc.internal.unitTest.7", sam)) },
+                { assertEquals(expected8, message("frc.internal.unitTest.8", message)) },
                  )
     }
 

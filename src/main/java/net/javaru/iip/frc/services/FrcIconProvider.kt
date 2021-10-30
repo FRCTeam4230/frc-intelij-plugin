@@ -58,11 +58,11 @@ class FrcIconProvider: IconProvider(), FileIconProvider, DumbAware
 
                 return when (vFile.name)
                 {
-                    ".idea" ->  AllIcons.Nodes.IdeaProject // FrcIcons.FileAndDirTypes.Idea
-                    ".run" ->   AllIcons.RunConfigurations.Compound
+                    ".idea" ->  FrcIcons.FileAndDirTypes.IdeaDir
+                    ".run" ->   FrcIcons.FileAndDirTypes.RunDir
                     ".vscode" -> FrcIcons.FileAndDirTypes.VsCodeDir // FrcIcons.FileAndDirTypes.VSCode
                     ".wpilib" -> FrcIcons.FileAndDirTypes.WpiLibDir // FrcIcons.WpiLib.WPI_LIB_16
-                    "vendordeps" -> AllIcons.Nodes.PpLibFolder  //AllIcons.General.ProjectStructure
+                    "vendordeps" ->  FrcIcons.FileAndDirTypes.VendordepsDir// AllIcons.Nodes.PpLibFolder  //AllIcons.General.ProjectStructure
                     else -> null
                 }
             }

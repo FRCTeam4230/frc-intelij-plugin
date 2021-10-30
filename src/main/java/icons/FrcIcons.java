@@ -225,8 +225,11 @@ public final class FrcIcons
     public static class FileAndDirTypes
     {
         public static final Icon Idea = loadIcon("/icons/fileAndDirTypes/idea-ce_16.png");
-        public static final Icon VSCode = loadIcon("/icons/fileAndDirTypes/vscode-16.png");
+        public static final Icon IdeaDir = AllIcons.Nodes.IdeaProject;
         public static final Icon License = loadIcon("/icons/fileAndDirTypes/license.png");
+        public static final Icon RunDir = AllIcons.RunConfigurations.Compound;
+        public static final Icon VendordepsDir = AllIcons.Nodes.PpLibFolder; //AllIcons.General.ProjectStructure
+        public static final Icon VSCode = loadIcon("/icons/fileAndDirTypes/vscode-16.png");
         public static final Icon VsCodeDir = loadIcon("/icons/fileAndDirTypes/vscode-dir.png");
         public static final Icon WpiLibDir = loadIcon("/icons/fileAndDirTypes/wpilib-dir.png");
     }

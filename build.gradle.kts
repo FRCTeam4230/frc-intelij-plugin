@@ -16,7 +16,7 @@
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.gradle.ext.ProjectSettings
-
+import java.nio.file.Path
 
 val frcPluginBaseVersion: String by project
 val ideaMajorVersion: String by project
@@ -188,6 +188,10 @@ tasks {
 }
 
 idea {
+    module {
+        isDownloadJavadoc = true
+        isDownloadSources = true
+    }
     // Configure some IDEA Project settings (i.e. for Intellij IDEA used to code the plugin)
     // https://github.com/JetBrains/gradle-idea-ext-plugin
     // Note: The DSL apparently changed in v0.4 since if I upgrade to it or later, the following breaks.
@@ -366,6 +370,8 @@ fun determineSandboxDir(): String
                 ideaVersion
         }
 
-    return "${project.rootDir.canonicalPath}/.sandboxes/.sandbox-$sandboxSuffix"
+    val sandboxDir = Path.of(project.rootDir.canonicalPath).resolve(".sandboxes").resolve(".sandbox-$sandboxSuffix").toString()
+    logger.info(">>>sandboxDir set to: $sandboxDir")
+    return sandboxDir
 }
 

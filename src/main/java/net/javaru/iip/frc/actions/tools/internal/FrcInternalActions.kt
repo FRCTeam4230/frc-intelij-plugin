@@ -315,7 +315,6 @@ class GetVendordepsListingFrcInternalAction: AbstractFrcInternalAction()
 
 class ShowPlaceholderTextFieldPaddingDemoDialog: AbstractFrcInternalAction()
 {
-    
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
         executeIfProjectNotNull(actionEvent, "Display Placeholder Padding Demo Dialog") {
@@ -326,11 +325,21 @@ class ShowPlaceholderTextFieldPaddingDemoDialog: AbstractFrcInternalAction()
 
 class ShowVendordepsManagementDialog: AbstractFrcInternalAction()
 {
-    
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
         executeIfProjectNotNull(actionEvent, "Display Vendordeps Management Dialog") {
             VendordepsManagementDialogWrapper(it).showAndGet()
         }
+    }
+}
+
+class CreateTempFile: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        val project:Project? = actionEvent.project
+        val tempFile = net.javaru.iip.frc.util.createRandomTempFile(".txt")
+        Messages.showMessageDialog(project, "Temp File: $tempFile", "Temp File Created", null)
+
     }
 }

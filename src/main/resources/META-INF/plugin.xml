@@ -409,6 +409,8 @@
                     class="net.javaru.iip.frc.actions.tools.internal.CheckIncludeDesktopSupportSetting" />
             <action id="FRC.tools.internal.MarkGradleProjectDirty" 
                     class="net.javaru.iip.frc.actions.tools.internal.MarkGradleProjectDirtyInternalAction" />
+            <action id="FRC.tools.internal.CreateTempFile"
+                    class="net.javaru.iip.frc.actions.tools.internal.CreateTempFile" />
             <action id="FRC.tools.internal.ShowPlaceholderTextFieldPaddingDemoDialog"
                     class="net.javaru.iip.frc.actions.tools.internal.ShowPlaceholderTextFieldPaddingDemoDialog" />
         </group>

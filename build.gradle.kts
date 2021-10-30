@@ -31,27 +31,11 @@ version = frcPluginVersion
 plugins {
     base
     java
-    kotlin("jvm") version "1.5.30"
+    kotlin("jvm") version "1.5.31"
     // gradle plugin-for writing IntelliJ plugins:  
     //     https://github.com/JetBrains/gradle-intellij-plugin
     //     https://lp.jetbrains.com/gradle-intellij-plugin/
-    /*
-    TODO: Version 1.1.4.1 is a custom version stored in my local maven repo
-          v1.1.4 fails on windows due an archive extraction issue:
-                  Execution failed for task ':runIde'
-                  A problem occurred starting process 'command 'tar''
-                  when it tries to run:
-                  Starting process 'command 'tar''. Working directory: P:\dev\proj\javaru\intellij-idea-plugins\IntelliFRC\code\FRC Command: tar -xpf C:\Users\Mark\.gradle\caches\modules-2\files-2.1\com.jetbrains\jbre\jbr_jcef-11_0_11-windows-x64-b1504.13\906f1067164b4a0c3396e2ebd875d4f9cdbde853\jbre-jbr_jcef-11_0_11-windows-x64-b1504.13.tar.gz --directory C:\Users\Mark\.gradle\caches\modules-2\files-2.1\com.jetbrains\jbre\jbr_jcef-11_0_11-windows-x64-b1504.13\extracted
-        It is fixed in this PR: https://github.com/JetBrains/gradle-intellij-plugin/pull/747
-        which is "Use FileSystemOperations for extracting tar archives on Windows"
-        It is pending to be included in a release. Once it is, we can migrate to that the new release, likely 1.1.5 or 1.2
-        We set via an if condition so the CI build does not fail
-        *************************************************************************************
-        **  WE CAN THEN ALSO COMMENT OUT THE pluginManagement BLOCK IN settings.gradle.kts **
-        *************************************************************************************
-     */
-    val ver = if (System.getProperty("os.name").contains("windows", true)) "1.1.4.1" else "1.1.4"
-    id("org.jetbrains.intellij") version ver
+    id("org.jetbrains.intellij") version "1.2.1"
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
     //    https://github.com/jetbrains/gradle-idea-ext-plugin

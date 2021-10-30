@@ -15,11 +15,3 @@
  */
 
 rootProject.name = "FRC"
-pluginManagement {
-    repositories {
-        // Look in mavenLocal for (custom/one-off) plugins
-        mavenLocal()
-        //maven(url = "/.m2/repository")
-        gradlePluginPortal()
-    }
-}

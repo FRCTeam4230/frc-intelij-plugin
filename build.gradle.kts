@@ -155,12 +155,13 @@ tasks {
     publishPlugin {
         // See https://plugins.jetbrains.com/docs/intellij/deployment.html  and  https://github.com/JetBrains/intellij-platform-plugin-template/blob/main/build.gradle.kts
         dependsOn("patchChangelog")
-        // For now, we will not use the publish task unless this project property is set. Once we have tested things, we can remove this guard
+        // For now, we will not use the `publish` task unless this project property is set. Once we have tested things, we can remove this guard
         if (projectPropertyBoolean("autoPublish", defaultValue = false))
         {
             project.version = "${project.version}" //-${properties["buildNumber"]}"
 
-            token.set(System.getenv("JETBRAINS_MARKETPLACE_PUBLISH_TOKEN"))
+            // Use JETBRAINS_MARKETPLACE_PUBLISH_TOKEN unless overrriden by the more specific FRC_PLUGIN_JETBRAINS_MARKETPLACE_PUBLISH_TOKEN
+            token.set(System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_PUBLISH_TOKEN") ?: System.getenv("JETBRAINS_MARKETPLACE_PUBLISH_TOKEN"))
             // 
             // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
             // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel

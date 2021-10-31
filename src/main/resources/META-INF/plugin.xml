@@ -55,7 +55,7 @@
         <strong>v1.6.0</strong> <br>
         &nbsp;&nbsp;&bull; Numerous internal refactoring and improvements<br>
         &nbsp;&nbsp;&bull; Complete rewrite of Gradle interaction for improved user experience, and to resolve
-                           <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/894'>issue #94</a>,
+                           <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/94'>issue #94</a>,
                            an occasional thread access issue on gradle re-import.<br>
         &nbsp;&nbsp;&bull; Some preliminary work for vendordeps management actions (to be released in next version)<br>
         &nbsp;&nbsp;&bull; FRC oriented custom icons for some directories in Project tool window. (Can be disabled via

@@ -52,6 +52,19 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v1.6.0</strong> <br>
+        &nbsp;&nbsp;&bull; Numerous internal refactoring and improvements<br>
+        &nbsp;&nbsp;&bull; Complete rewrite of Gradle interaction for improved user experience, and to resolve
+                           <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/894'>issue #94</a>,
+                           an occasional thread access issue on gradle re-import.<br>
+        &nbsp;&nbsp;&bull; Some preliminary work for vendordeps management actions (to be released in next version)<br>
+        &nbsp;&nbsp;&bull; FRC oriented custom icons for some directories in Project tool window. (Can be disabled via
+                           <em>Settings/Preferences &gt; Languages &amp; Frameworks &gt; FRC &gt; &quot;Provide custom icons in project view&quot;</em>) <br>
+        &nbsp;&nbsp;&bull; Removed support for legacy Ant based FRC projects<br>
+        &nbsp;&nbsp;&bull; FRC Project Wizard: Resolved an issue with gradle run configurations still using the old shared run
+                           configurations directory rather than the newer <tt>{projectRoot}/.run</tt> directory.<br>
+        &nbsp;&nbsp;&bull; Added IntelliJ IDEA v2021.3 support.<br>
+        <br>
         <strong>v1.5.1</strong> <br>
         &nbsp;&nbsp;&bull; Miscellaneous internal refactoring and improvements<br>
         &nbsp;&nbsp;&bull; This is the last release for IntelliJ IDEA 2020.2, 2020.3, and 2021.1. IntelliJ IDEA 2021.2 or newer will be required 
@@ -152,7 +165,7 @@
         <br>
 
         <strong>v0.1 - v0.8.1</strong> <br>
-        &nbsp;&nbsp;&bull; Fourteen releases over three years containing numerous features, enhancements, and fixes.
+        &nbsp;&nbsp;&bull; Fourteen early development releases over three years containing numerous features, enhancements, and fixes.
     ]]>
     </change-notes>
 

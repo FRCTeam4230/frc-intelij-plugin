@@ -123,7 +123,7 @@ fun Project.markGradleProjectAsNeedingReimport(scheduleForAutoReimport: Boolean 
             }
             // Note, in the externalProjectsWatcher.markDirty implementation, it also iterates over
             //       contributors. However, the gradle plugin does not implement the ExternalSystemProjectsWatcherImpl.Contributor
-            //       extension point (only8 maven does) so it would be an empyt list
+            //       extension point (only maven does) so it would be an empty list
             if (scheduleForAutoReimport) 
                 projectTracker.scheduleProjectRefresh() 
             else 

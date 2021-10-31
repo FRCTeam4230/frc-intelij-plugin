@@ -23,7 +23,7 @@ An IntelliJ IDEA plugin for FIRST Robotics Competition (FRC) robot development i
 
 .Supported IntelliJ IDEA versions
 [IMPORTANT]
-*IntelliJ IDEA v2019.3 or later is required.* The FRC plugin typically supports the last three major versions of IntelliJ IDEA. While I wish I could support more versions, doing so adds considerable time to the development of the plugin as I have to maintain separate branches for each major version as the Intellij IDEA Plugin API evolves. I would much rather put that time into adding new features. Given that this plugin works fully with the free IntelliJ IDEA Community edition, I do not think asking users to use a major version released within the past year is overly burdensome. Thank you for your understanding.
+*IntelliJ IDEA v2021.2 or later is required.* The FRC plugin typically supports the last three major versions of IntelliJ IDEA. While I wish I could support more versions, doing so adds considerable time to the development of the plugin as I have to maintain separate branches for each major version as the Intellij IDEA Plugin API evolves. I would much rather put that time into adding new features. Given that this plugin works fully with the free IntelliJ IDEA Community edition, I do not think asking users to use a major version released within the past year is overly burdensome. Thank you for your understanding.
 
 
 == Known Issues

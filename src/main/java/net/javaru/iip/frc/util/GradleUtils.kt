@@ -127,7 +127,7 @@ fun Project.markGradleProjectAsNeedingReimport(scheduleForAutoReimport: Boolean 
             if (scheduleForAutoReimport) 
                 projectTracker.scheduleProjectRefresh() 
             else 
-                projectTracker.scheduleProjectNotificationUpdate()
+                projectTracker.scheduleChangeProcessing()
         }, this.disposed)
         
     

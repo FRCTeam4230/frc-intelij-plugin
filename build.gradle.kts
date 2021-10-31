@@ -160,7 +160,7 @@ tasks {
         {
             project.version = "${project.version}" //-${properties["buildNumber"]}"
 
-            // Use JETBRAINS_MARKETPLACE_PUBLISH_TOKEN unless overrriden by the more specific FRC_PLUGIN_JETBRAINS_MARKETPLACE_PUBLISH_TOKEN
+            // Use JETBRAINS_MARKETPLACE_PUBLISH_TOKEN unless overridden by the more specific FRC_PLUGIN_JETBRAINS_MARKETPLACE_PUBLISH_TOKEN
             token.set(System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_PUBLISH_TOKEN") ?: System.getenv("JETBRAINS_MARKETPLACE_PUBLISH_TOKEN"))
             // 
             // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
@@ -181,10 +181,10 @@ idea {
     // https://github.com/JetBrains/gradle-idea-ext-plugin
     // Note: The DSL apparently changed in v0.4 since if I upgrade to it or later, the following breaks.
     //       But I have not had the time to dig into it and see what needs to change
-    //       The DSL spec is documented on the project's wiki, but it is no the most stellar documentation,
-    //       and is only for the Groovy based DSL. When I find some time I can look at modifying.
+    //       The DSL spec is documented on the project's wiki, but it is not the most stellar documentation,
+    //       and is only for the Groovy based DSL. When I find some time, I can look at modifying our settings/configurations.
     //       https://github.com/JetBrains/gradle-idea-ext-plugin/wiki
-    //       This issue has some links to help using with the Kotlin Gradle DSL:  https://github.com/JetBrains/gradle-idea-ext-plugin/issues/44
+    //       This issue has some links to information/help on using with the Kotlin Gradle DSL:  https://github.com/JetBrains/gradle-idea-ext-plugin/issues/44
     project {
         (this as ExtensionAware)
         configure<ProjectSettings> {
@@ -270,27 +270,27 @@ dependencies {
     testImplementation(kotlin("test-junit5"))
 
     implementation("org.jdom:jdom2:2.0.6")
-    implementation("commons-io:commons-io:2.7")
+    implementation("commons-io:commons-io:2.11.0")
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("org.apache.commons:commons-text:1.9")
-    implementation("com.jcraft:jsch:0.1.54")
+    implementation("com.jcraft:jsch:0.1.55")
     // Klaxon is a library to parse JSON in Kotlin.  https://github.com/cbeust/klaxon  Help available in the #klaxon channel of the Kotlin Slack Workspace
     implementation("com.beust:klaxon:5.5")
     implementation(platform("com.google.guava:guava-bom:29.0-jre"))
     implementation("com.google.guava:guava")
     // jsemver: Is in the project 'lib' dir as it is not published to any public repos. Plus we are using a tweaked version that removes is use of logback
     implementation("com.asarkar:jsemver:0.6.2.1") {
-        // We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded
         exclude(group = "org.slf4j", module = "slf4j-api")
+            .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
     }
-    implementation("org.antlr:antlr4:4.8") {
-        // We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded
+    implementation("org.antlr:antlr4:4.9.2") {
         exclude(group = "org.slf4j", module = "slf4j-api")
+            .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
     }
     implementation(platform("com.fasterxml.jackson:jackson-bom:2.12.4"))
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava")
-    implementation("org.freemarker:freemarker:2.3.30")
+    implementation("org.freemarker:freemarker:2.3.31")
 
     testImplementation(platform("org.junit:junit-bom:5.7.2"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")

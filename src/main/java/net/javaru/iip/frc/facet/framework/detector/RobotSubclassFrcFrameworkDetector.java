@@ -52,7 +52,7 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
 {
     private static final Logger LOG = Logger.getInstance(RobotSubclassFrcFrameworkDetector.class);
     
-    // All robot classes extend RobotBase. Thus we are technically fine just checking for that one. 
+    // All robot classes extend RobotBase. Thus, we are technically fine just checking for that one.
     // But we include the others in the event WPI Lib modifies the inheritance hierarchy.
     private static final Set<String> SUPER_CLASSES_FQN = ImmutableSet.of(WpiLibConstants.ROBOT_BASE_FQN,
                                                                          WpiLibConstants.SAMPLE_ROBOT_FQN,
@@ -113,7 +113,7 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
         }
         catch (Exception e)
         {
-            LOG.warn("[FRC] An exception occurred when checking for FRC Framework. Cause Summary: " + e.toString(), e);
+            LOG.warn("[FRC] An exception occurred when checking for FRC Framework. Cause Summary: " + e, e);
             return Collections.emptyList();
         }
     }
@@ -166,7 +166,7 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
         }
         catch (Exception e)
         {
-            LOG.warn("[FRC] An exception occurred when checking if VirtualFile '" + virtualFile.getPath() + " extends Robot'. Cause Summary: " + e.toString());
+            LOG.warn("[FRC] An exception occurred when checking if VirtualFile '" + virtualFile.getPath() + " extends Robot'. Cause Summary: " + e);
             return false;
         }
     }
@@ -187,16 +187,16 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
         catch (Exception e)
         {
             LOG.warn("[FRC] An exception occurred when checking if PsiJavaFile file '" + psiFile + "' ('" + psiFile.getVirtualFile().getPath()
-                     + "') is a robot class. Cause Summary: " + e.toString(), e);
+                     + "') is a robot class. Cause Summary: " + e, e);
             return false;
         }
     }
 
 
     /**
-     * Checks to see if any classes in a group is a sub-class of one of the WPI Lib Robot classes. The code
+     * Checks to see if any classes in a group is a subclass of one of the WPI Lib Robot classes. The code
      * does traverse all the way up the inheritance hierarchy; so a class does not directly have
-     * to extend ne of the Robt classes to be 'discovered'.
+     * to extend one of the Robt classes to be 'discovered'.
      * <b>This will only work if the WpiLib classes are on the classpath (i.e. added as a library).</b>
      *
      * @param classes the classes to check
@@ -217,9 +217,9 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
 
 
     /**
-     * Checks to see if a class is a sub-class of one of the WPI Lib Robot classes. The code
+     * Checks to see if a class is a subclass of one of the WPI Lib Robot classes. The code
      * does traverse all the way up the inheritance hierarchy; so a class does not directly have
-     * to extend ne of the Robt classes to be 'discovered'.
+     * to extend one of the Robt classes to be 'discovered'.
      * <b>This will only work if the WpiLib classes are on the classpath (i.e. added as a library).</b>
      *
      * @param psiClass       the class to check
@@ -246,16 +246,16 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
             }
             else
             {
-                // Issue 16: A Stackoverflow occurred of well over 1000 calls to the below recursive calls... 
-                //           not sure what class caused it. But to prevent the issue, we limit the traversal 
-                //           or super classes to a depth of 33.. way more than is every likely for a robot project 
+                // Issue 16: A Stackoverflow occurred of well over 1000 calls to the below recursive calls.
+                //           Not sure what class caused it. But to prevent the issue, we limit the traversal
+                //           of super classes to a depth of 33, which is way more than is ever likely for a robot project
                 return (++recursionCount <= 32) && hasFrcSuperClass(psiClass.getSuperClass(), recursionCount);
             }
         }
         catch (Exception e)
         {
             LOG.warn("[FRC] An exception occurred when checking for FRC Super Class on psiClass '" + psiClass.getQualifiedName() + "'. Cause Summary: "
-                     + e.toString(), e);
+                     + e, e);
             return false;
         }
     }
@@ -288,6 +288,7 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
      *
      * @return configuration for detected facet
      */
+    @SuppressWarnings("UseOfConcreteClass")
     @Nullable
     @Override
     protected FrcFacetConfiguration createConfiguration(Collection<VirtualFile> files)

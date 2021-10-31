@@ -22,8 +22,6 @@ import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 
-import net.javaru.iip.frc.i18n.FrcBundle;
-
 
 
 public class PlaceholderTextFieldPaddingDemoFormDialogWrapper extends DialogWrapper
@@ -37,7 +35,7 @@ public class PlaceholderTextFieldPaddingDemoFormDialogWrapper extends DialogWrap
     {
         super(project, true);
         form = new PlaceholderTextFieldPaddingDemoForm(project);
-        setTitle(FrcBundle.message("Placeholder Padding Demo"));
+        setTitle("Placeholder Padding Demo");
         init();
     }
     

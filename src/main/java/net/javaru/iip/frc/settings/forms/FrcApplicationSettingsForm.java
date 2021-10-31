@@ -29,6 +29,7 @@ import net.javaru.iip.frc.settings.FrcTeamNumberKt;
 import net.javaru.iip.frc.settings.TeamNumberFormChangeListener;
 import net.javaru.iip.frc.settings.TeamNumberInputVerifier;
 import net.javaru.iip.frc.settings.TeamNumberKeyChangeListener;
+import net.javaru.iip.frc.util.FrcProjectExtsKt;
 
 
 
@@ -46,6 +47,7 @@ public class FrcApplicationSettingsForm implements TeamNumberFormChangeListener
     private JPanel projectWizardSettingsPanel;
     private JBCheckBox enableGradleImportUponNewProjectCreationCheckBox;
     private JBLabel teamNumberAdditionalInfoLabel;
+    private JCheckBox provideCustomIconsCheckBox;
     private TeamNumberKeyChangeListener teamNumberKeyChangeListener;
     
     
@@ -60,7 +62,7 @@ public class FrcApplicationSettingsForm implements TeamNumberFormChangeListener
     private void initForm()
     {
         initTeamNumberField();
-        initProjectWizardSettings();
+        initMiscSelections();
     }
 
 
@@ -101,7 +103,7 @@ public class FrcApplicationSettingsForm implements TeamNumberFormChangeListener
     private void resetAll()
     {
         resetTeamNumberTextFieldValue();
-        resetEnableProgrammaticGradleImport();
+        resetMiscSelections();
     }
     
     public synchronized void applyTo(@NotNull FrcApplicationSettings frcApplicationSettings)
@@ -115,14 +117,19 @@ public class FrcApplicationSettingsForm implements TeamNumberFormChangeListener
         frcApplicationSettings.setTeamNumber(internalFrcApplicationSettings.getTeamNumber());
         frcApplicationSettings.setRioLogUdpPort(internalFrcApplicationSettings.getRioLogUdpPort());
         frcApplicationSettings.setEnableGradleImportUponNewProjectCreation(internalFrcApplicationSettings.getEnableGradleImportUponNewProjectCreation());
-                
+        boolean iconsOptionHasChanged = frcApplicationSettings.getProvideCustomFileIcons() != internalFrcApplicationSettings.getProvideCustomFileIcons();
+        frcApplicationSettings.setProvideCustomFileIcons(internalFrcApplicationSettings.getProvideCustomFileIcons());
+        
         LOG.debug("[FRC] After  applying form frcApplicationSettings of\n" + internalFrcApplicationSettings + "\nto current/previous frcApplicationSettings of\n" + frcApplicationSettings);
         
         // ** NO CHANGES TO SETTINGS OBJECTS BELOW THIS
         
         //Reset the internal state to the updated setting
         internalFrcApplicationSettings = FrcApplicationSettings.clone(frcApplicationSettings);
-        
+        if (iconsOptionHasChanged)
+        {
+            FrcProjectExtsKt.refreshProjectViewsForAllFrcProjects();
+        }
         // ** NO CODE BELOW THIS **
     }
 
@@ -135,9 +142,10 @@ public class FrcApplicationSettingsForm implements TeamNumberFormChangeListener
         setTeamNumberWarningVisibility(teamNumber <= 0);
     }
     
-    private void resetEnableProgrammaticGradleImport()
+    private void resetMiscSelections()
     {
         enableGradleImportUponNewProjectCreationCheckBox.setSelected(internalFrcApplicationSettings.getEnableGradleImportUponNewProjectCreation());
+        provideCustomIconsCheckBox.setSelected(internalFrcApplicationSettings.getProvideCustomFileIcons());
     }
     
     private void initTeamNumberField()
@@ -157,11 +165,13 @@ public class FrcApplicationSettingsForm implements TeamNumberFormChangeListener
         internalFrcApplicationSettings.setTeamNumber(FrcTeamNumberKt.toTeamNumberOrUndefined(text));
     }
     
-    private void initProjectWizardSettings()
+    private void initMiscSelections()
     {
         enableGradleImportUponNewProjectCreationCheckBox.setSelected(internalFrcApplicationSettings.getEnableGradleImportUponNewProjectCreation());
-    
         enableGradleImportUponNewProjectCreationCheckBox.addActionListener(e-> internalFrcApplicationSettings.setEnableGradleImportUponNewProjectCreation(enableGradleImportUponNewProjectCreationCheckBox.isSelected()));
+    
+        provideCustomIconsCheckBox.setSelected(internalFrcApplicationSettings.getProvideCustomFileIcons());
+        provideCustomIconsCheckBox.addActionListener(e -> internalFrcApplicationSettings.setProvideCustomFileIcons(provideCustomIconsCheckBox.isSelected()));
     }
 
 

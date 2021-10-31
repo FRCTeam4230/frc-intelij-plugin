@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2019 the original author or authors
+ * Copyright 2015-2021 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,7 +25,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 
-import net.javaru.iip.frc.actions.ConfigureTeamNumberBasicAction;
 import net.javaru.iip.frc.settings.FrcProjectGeneralSettings;
 import net.javaru.iip.frc.settings.FrcTeamNumberKt;
 import net.javaru.iip.frc.settings.TeamNumberFormChangeListener;
@@ -159,10 +158,9 @@ public class ProjectGeneralSettingsForm implements TeamNumberFormChangeListener
     
         if (teamNumberHasChanged)
         {
-            LOG.info("[FRC] Team number has been changed in settings. Updating the wpilib.properties file");
-            // TODO - MAJOR
-            // Need_to_publish_team_number_change_AndReplaceThisMethod_Need_ToUpdate_the_New_Json_file();
-            ConfigureTeamNumberBasicAction.performTeamNumberChangeUpdates();
+            // TODO - publish the team number change
+            // TODO - Issue #101
+            // prompt user if the team number for any open projects should also be changed, and if so change it in the .wpilib/wpilib_preferences.json file.
         }
         // ** NO CODE BELOW THIS *
     }

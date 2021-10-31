@@ -47,6 +47,9 @@ import java.nio.file.Path
  */
 fun Path.removeBasePath(basePath: Path): Path = this.subpath(basePath.nameCount, this.nameCount)
 
+// ********************************************************
+// For Path to VirtualFile function, see VirtualFilesExts
+// ********************************************************
 
 // TODO: For the closeQuietly function: Need to move JavaDocs examples to @sample tags (and clean them up a bit)
 /**

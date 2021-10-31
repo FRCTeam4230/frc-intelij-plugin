@@ -17,6 +17,7 @@ package net.javaru.iip.frc.actions.tools.internal
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.LangDataKeys
 import com.intellij.openapi.diagnostic.logger
@@ -37,8 +38,17 @@ import net.javaru.iip.frc.notify.FrcNotifications.notify
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllOpenProjects
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.services.FrcGradleService
+import net.javaru.iip.frc.ui.internal.PlaceholderTextFieldPaddingDemoFormDialogWrapper
+import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
+import net.javaru.iip.frc.util.runWhenSmart
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
+import net.javaru.iip.frc.wpilib.vendordeps.VendordepsListing
+import net.javaru.iip.frc.wpilib.vendordeps.VendordepsManagementDialogWrapper
+import net.javaru.iip.frc.wpilib.vendordeps.VendordepsService
 import javax.swing.Icon
+
+
+class FrcInternalVendordepsActionsGroup : FrcInternalActionsGroup()
 
 abstract class AbstractFrcInternalAction : AnAction
 {
@@ -172,7 +182,7 @@ class RunKotlinCodeForTestingAndDebuggingFrcInternalAction : AbstractFrcInternal
         }
         catch (t: Throwable)
         {
-            // We log as an error so we can more easily grab the stacktrace from the exception reporter
+            // We log as an error so that we can more easily grab the stacktrace from the exception reporter
             logger.error("[FRC] Exception: $t", t)
         }
 
@@ -259,5 +269,77 @@ class CreateRunConfigurationsFrcInternalAction: AbstractFrcInternalAction()
             val data = FrcProjectWizardData()
             createAllRunDebugConfigurations(it, data)
         }
+    }
+}
+
+class MarkGradleProjectDirtyInternalAction: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(e: AnActionEvent)
+    {
+        val project = e.getData(CommonDataKeys.PROJECT)
+        project?.markGradleProjectAsNeedingReimport()
+    }
+}
+
+class FindVendordepsDirFrcInternalAction: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent) {
+        executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
+            it.runWhenSmart {
+                val dir = VendordepsService.getInstance(it).findVendorDepsDir()
+                FrcNotifications.notifyInfoBalloon("Vendordeps dir = ${dir?.virtualFile?.path ?: "NOT FOUND"}")
+            }
+        }
+    }
+}
+
+class GetVendordepsListingFrcInternalAction: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent) {
+        executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
+            it.runWhenSmart {
+                VendordepsService.getInstance(it).getAndUseVendordeps(notifyOnDuplicates = true) { listing: VendordepsListing ->
+                    val sb = StringBuilder()
+                    sb.append("<html><h3>Vendordeps:</h3><ol>")
+                    listing.vendordepsFileList.forEach { item ->
+                        sb.append("<li>$item</li>")
+                    }
+                    sb.append("</ol></html>")
+
+                    FrcNotifications.notifyInfoBalloon(sb.toString())
+                }
+            }
+        }
+    }
+}
+
+class ShowPlaceholderTextFieldPaddingDemoDialog: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, "Display Placeholder Padding Demo Dialog") {
+            PlaceholderTextFieldPaddingDemoFormDialogWrapper(it).showAndGet()
+        }
+    }
+}
+
+class ShowVendordepsManagementDialog: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, "Display Vendordeps Management Dialog") {
+            VendordepsManagementDialogWrapper(it).showAndGet()
+        }
+    }
+}
+
+class CreateTempFile: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        val project:Project? = actionEvent.project
+        val tempFile = net.javaru.iip.frc.util.createRandomTempFile(".txt")
+        Messages.showMessageDialog(project, "Temp File: $tempFile", "Temp File Created", null)
+
     }
 }

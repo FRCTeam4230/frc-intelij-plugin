@@ -22,12 +22,15 @@ import net.javaru.iip.frc.FrcPluginGlobals.FRC_IN_UNIT_TEST_MODE_KEY
 import org.apache.commons.io.FilenameUtils
 import org.junit.jupiter.api.Assertions.*
 import java.io.File
+import java.io.InputStream
+import java.net.URL
 import java.nio.file.Path
 
+object FrcTestHelpers
 
 fun setInTestModeSystemProperty()
 {
-    System.setProperty(FRC_IN_UNIT_TEST_MODE_KEY, true.toString());
+    System.setProperty(FRC_IN_UNIT_TEST_MODE_KEY, true.toString())
 }
 
 fun assertPathsEqual(expected: File?, actual: File?, message: String?)
@@ -64,3 +67,6 @@ private fun String.normalizePath(): String = FilenameUtils.separatorsToWindows(t
 fun String.separatorsToWindows(): String = FilenameUtils.separatorsToWindows(this)
 fun String.separatorsToUnix(): String = FilenameUtils.separatorsToUnix(this)
 fun String.separatorsToSystem(): String = FilenameUtils.separatorsToSystem(this)
+
+fun getResourceStream(path: String): InputStream = FrcTestHelpers::class.java.classLoader.getResourceAsStream(path) ?: org.junit.jupiter.api.fail("Could not find classpath resource $path")
+fun getResource(path: String): URL = FrcTestHelpers::class.java.classLoader.getResource(path) ?: org.junit.jupiter.api.fail("Could not find classpath resource $path")

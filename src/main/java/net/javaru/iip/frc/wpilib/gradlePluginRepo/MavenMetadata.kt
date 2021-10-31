@@ -23,7 +23,6 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.xmlb.XmlSerializerUtil
-import net.javaru.iip.frc.net.FrcHttpClient
 import net.javaru.iip.frc.util.fromJson
 import net.javaru.iip.frc.util.lastCheckedDateTimeFormatter
 import net.javaru.iip.frc.util.lastCheckedDateTimeZonedFormatter
@@ -348,7 +347,7 @@ fun fetchLatestMavenMetadata(metadataURI: URI): MavenMetadata?
     return try
     {
         logger.debug {"[FRC] Checking for MavenMetadata update from: $metadataURI"}
-        val mavenMetadataDocument = FrcHttpClient.fetchXmlResourceAsDocument(metadataURI)
+        val mavenMetadataDocument = net.javaru.iip.frc.net.FrcHttpClient.fetchXmlResourceAsDocument(metadataURI)
         parseMavenMetadata(mavenMetadataDocument)
     }
     catch (e: Exception)

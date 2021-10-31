@@ -1,0 +1,42 @@
+= Vendordeps Notes
+v1.0, 2021-34-26
+:homepage: https://gitlab.com/Javaru/frc-intellij-idea-plugin
+:icons: font
+:icon-set: fas
+:sectanchors:
+:sectlinks:
+:toc:
+:toclevels: 3
+:imagesdir: assets
+:basedir: ./
+:javasrcdir: {basedir}/src/main/java
+:source-highlighter: coderay
+ifdef::env-github[]
+:caution-caption: :zap:
+:important-caption: :exclamation:
+:note-caption: :information_source:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+
+
+
+== VS Code install behavior
+
+=== Offline Install
+
+It lists all file located in the `wpilib/{frcyear}/vendordeps` directory. In the event of multiple versions, it lists them all. You can search the list, and select multiple options.
+
+image::vscode-offline-install-screenshot.png[]
+
+The reason version 5.19.0 of CTRE-Phoenix is seperated from the other versions, is that it is sorting by file name, not library name (in the JSON). And in the `wpilib/{frcyear}/vendordeps` directory, v5.19.0 had a different file name:
+
+image::wpilib-vendordeps-dir.png[]
+
+We'll need to make sure we sort by library name.
+
+=== Online Install
+
+It simply asks for the URL to download from:
+
+image::vscode-online-install-screenshot.png[]

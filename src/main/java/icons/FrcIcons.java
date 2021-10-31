@@ -177,7 +177,6 @@ public final class FrcIcons
         
     }
     
-    
     public static class WpiLib
     {
         /** An SVG file of the new (2019+) WpiLib 'official' icon.  */
@@ -223,7 +222,17 @@ public final class FrcIcons
         public static final Icon WPI_LIB_LEGACY_16_ICO = loadIcon("/icons/wpi/wpi-16.ico");
     }
     
-    
+    public static class FileAndDirTypes
+    {
+        public static final Icon Idea = loadIcon("/icons/fileAndDirTypes/idea-ce_16.png");
+        public static final Icon IdeaDir = AllIcons.Nodes.IdeaProject;
+        public static final Icon License = loadIcon("/icons/fileAndDirTypes/license.png");
+        public static final Icon RunDir = AllIcons.RunConfigurations.Compound;
+        public static final Icon VendordepsDir = AllIcons.Nodes.PpLibFolder; //AllIcons.General.ProjectStructure
+        public static final Icon VSCode = loadIcon("/icons/fileAndDirTypes/vscode-16.png");
+        public static final Icon VsCodeDir = loadIcon("/icons/fileAndDirTypes/vscode-dir.png");
+        public static final Icon WpiLibDir = loadIcon("/icons/fileAndDirTypes/wpilib-dir.png");
+    }
     /**
      * Safely uses the IDEA {@link IconLoader} to load an icon from the classpath. In the event
      * the icon can not be found, or an exception occurs during the load, the exception is logged

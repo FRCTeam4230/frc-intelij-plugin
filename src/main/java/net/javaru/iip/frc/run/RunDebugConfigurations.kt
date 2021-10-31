@@ -411,25 +411,27 @@ class ModuleSettingAction(private val remoteConfiguration: RemoteConfiguration, 
 @Suppress("UNUSED_PARAMETER")
 private fun shareRunConfiguration(project: Project, settings: RunnerAndConfigurationSettings)
 {
-    // Continuing to use the deprecated isShared for now until we can figure out the "It's unexpected that the file doesn't exist at this point" issue
-    @Suppress("UnstableApiUsage") // To be removed in 2021.3
-    settings.isShared = true
-//    // Example from:  creating path:  com/intellij/execution/impl/RunConfigurationStorageUi.java:319
-//    //                applying it:    com/intellij/execution/impl/RunConfigurationStorageUi.java:394
-//    // it's the only place I could find setting/using the new .run directory
-//    val baseDir = project.basePath
-//    if (baseDir == null)
-//    {
-//        logger.warn("[FRC] Can't share run configurations because project.basePath was null")
-//    }
-//    else
-//    {
-//        val dirPath = "$baseDir/.run"
-//        val fileName = createRunConfigFileName(settings.name)
-//        val filePath = "$dirPath/$fileName"
-//        logger.debug("[FRC] run config path set to: $filePath")
-//        settings.storeInArbitraryFileInProject(filePath)
-//    }
+    // settings.isShared = true  <==  Old wayy, removed in b2021.3
+    // Example from:  creating path:  com/intellij/execution/impl/RunConfigurationStorageUi.java:319
+    //                applying it:    com/intellij/execution/impl/RunConfigurationStorageUi.java:394
+    // it's the only place I could find setting/using the new .run directory
+    
+    // See comment in FrcModuleBuilder.callCreateRunConfigurations() about intermittent
+    // "It's unexpected that the file doesn't exist at this point" issue
+    
+    val baseDir = project.basePath
+    if (baseDir == null)
+    {
+        logger.warn("[FRC] Can't share run configurations because project.basePath was null")
+    }
+    else
+    {
+        val dirPath = "$baseDir/.run"
+        val fileName = createRunConfigFileName(settings.name)
+        val filePath = "$dirPath/$fileName"
+        logger.debug{"[FRC] run config path set to: $filePath"}
+        settings.storeInArbitraryFileInProject(filePath)
+    }
 }
 
 /** Creates a safe file name for a run config. This is a copy of the private `RunConfigurationStorageUi.getFileNameByRCName` method. */

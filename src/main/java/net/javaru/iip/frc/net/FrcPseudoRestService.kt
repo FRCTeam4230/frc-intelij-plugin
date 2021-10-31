@@ -97,7 +97,7 @@ object FrcPseudoRestService
         {
             val request = HttpRequests.request(urlPath)
             request.readString()
-        }
+        } //TODO: add catch clause to catch HttpRequests.HttpStatusException and handle more specifically
         catch (e: Exception)
         {
             val additionalMsg = if (defaultToBundled) " Will check for resource on classpath." else ""

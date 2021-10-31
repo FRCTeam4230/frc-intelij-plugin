@@ -34,6 +34,7 @@ import org.jdom2.xpath.XPathFactory
 import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.Path
+import java.util.*
 
 
 private val LOG = Logger.getInstance("#net.javaru.iip.frc.util.VirtualFileExts")
@@ -68,10 +69,10 @@ fun VirtualFile.isWpiAntBuildFile(): Boolean
             for (element in elements)
             {
                 val attribute = element.getAttribute("file")
-                var value: String? = attribute.getValue()
+                var value: String? = attribute.value
                 if (value != null)
                 {
-                    value = value.toLowerCase()
+                    value = value.lowercase(Locale.getDefault())
                     if (value.contains("wpilib") || value.contains("wpi-lib"))
                     {
                         result = true

@@ -52,6 +52,19 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v1.6.0</strong> <br>
+        &nbsp;&nbsp;&bull; Numerous internal refactoring and improvements<br>
+        &nbsp;&nbsp;&bull; Complete rewrite of Gradle interaction for improved user experience, and to resolve
+                           <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/894'>issue #94</a>,
+                           an occasional thread access issue on gradle re-import.<br>
+        &nbsp;&nbsp;&bull; Some preliminary work for vendordeps management actions (to be released in next version)<br>
+        &nbsp;&nbsp;&bull; FRC oriented custom icons for some directories in Project tool window. (Can be disabled via
+                           <em>Settings/Preferences &gt; Languages &amp; Frameworks &gt; FRC &gt; &quot;Provide custom icons in project view&quot;</em>) <br>
+        &nbsp;&nbsp;&bull; Removed support for legacy Ant based FRC projects<br>
+        &nbsp;&nbsp;&bull; FRC Project Wizard: Resolved an issue with gradle run configurations still using the old shared run
+                           configurations directory rather than the newer <tt>{projectRoot}/.run</tt> directory.<br>
+        &nbsp;&nbsp;&bull; Added IntelliJ IDEA v2021.3 support.<br>
+        <br>
         <strong>v1.5.1</strong> <br>
         &nbsp;&nbsp;&bull; Miscellaneous internal refactoring and improvements<br>
         &nbsp;&nbsp;&bull; This is the last release for IntelliJ IDEA 2020.2, 2020.3, and 2021.1. IntelliJ IDEA 2021.2 or newer will be required 
@@ -152,7 +165,7 @@
         <br>
 
         <strong>v0.1 - v0.8.1</strong> <br>
-        &nbsp;&nbsp;&bull; Fourteen releases over three years containing numerous features, enhancements, and fixes.
+        &nbsp;&nbsp;&bull; Fourteen early development releases over three years containing numerous features, enhancements, and fixes.
     ]]>
     </change-notes>
 
@@ -201,6 +214,9 @@
     <extensions defaultExtensionNs="com.intellij">
         <facetType id="FRC_FACET" implementation="net.javaru.iip.frc.facet.FrcFacetType" />
 
+        <iconProvider id="FRC.FrcIconProvider" order="first" implementation="net.javaru.iip.frc.services.FrcIconProvider" />
+        <fileIconProvider id="FRC.FrcFIleIconProvider" order="first"  implementation="net.javaru.iip.frc.services.FrcIconProvider" />
+
         <executor id="FrcRioLogToolWindowExecutor" implementation="net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor" />
 
         <spellchecker.bundledDictionaryProvider implementation="net.javaru.iip.frc.spellchecker.FrcBundledDictionaryProvider" />
@@ -244,8 +260,9 @@
         <projectService id="FRC.FrcProjectSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcProjectGeneralSettings" />
         <projectService id="FRC.FrcRoboRioSettings" serviceImplementation="net.javaru.iip.frc.settings.FrcRoboRioSettings" />
         <projectService id="FRC.FrcSshSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcSshSettings" />
-        <projectService id ="FRC.VendordepsFileListener" serviceImplementation="net.javaru.iip.frc.services.VendordepsFileListener" />
-        <backgroundPostStartupActivity id="FRC.VendordepsFileListenerStartupActivity" implementation="net.javaru.iip.frc.services.VendordepsFileListenerStartupActivity" />
+        <projectService id="FRC.FrcVendordepsService" serviceImplementation="net.javaru.iip.frc.wpilib.vendordeps.VendordepsService" />
+        <projectService id="FRC.VendordepsFileListener" serviceImplementation="net.javaru.iip.frc.wpilib.vendordeps.VendordepsFileListener" />
+        <backgroundPostStartupActivity id="FRC.VendordepsServicesStartupActivity" implementation="net.javaru.iip.frc.wpilib.vendordeps.VendordepsServicesStartupActivity" />
         <postStartupActivity id="FRC.FrcPluginVersionManagerStartupActivity" implementation="net.javaru.iip.frc.plugin.FrcPluginVersionManagerStartupActivity" />
         <projectService id="FRC.WpiLibUpdateCheckingService" serviceImplementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionService" />
         <postStartupActivity implementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionStartupActivity" />
@@ -294,7 +311,7 @@
     </extensions>
 
     <extensions defaultExtensionNs="JavaScript.JsonSchema">
-        <ProviderFactory implementation="net.javaru.iip.frc.wpilib.jsonSchema.WpiLibJsonSchemaProviderFactory" />
+        <ProviderFactory id="FrcJsonSchemaProviderFactory" implementation="net.javaru.iip.frc.services.FrcJsonSchemaProviderFactory" />
     </extensions>
 
 
@@ -354,22 +371,9 @@
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
             <add-to-group group-id="ToolsMenu" relative-to-action="IdeScriptingConsole" anchor="after" />
-            <action id="frc.tools.CheckForWpiLibUpdateAction" class="net.javaru.iip.frc.actions.tools.CheckForWpiLibUpdateAction" icon="FrcIcons.WpiLib.WPI_LIB_16" />
-
-            <!-- LEGACY ACTIONS -->
-            <action id="frc.tools.AttachWpilibAction"
-                    class="net.javaru.iip.frc.actions.tools.legacy.AttachLegacyWpilibAction"
-                    icon="AllIcons.Nodes.PpLib" />
-            <!--suppress PluginXmlCapitalization -->
-            <action id="frc.tools.AttachUserLibDirAction"
-                    class="net.javaru.iip.frc.actions.tools.legacy.AttachLegacyUserLibDirAction"
-                    icon="AllIcons.General.User" />
-            <action id="frc.tools.CheckWpiLbVersionStatusAction"
-                    class="net.javaru.iip.frc.actions.tools.legacy.CheckSystemLegacyWpiLbVersionAction"
-                    icon="FrcIcons.WpiLib.WPI_LIB_16"/>
-            <action id="frc.tools.DownloadWpiLibAction"
-                    class="net.javaru.iip.frc.actions.tools.legacy.DownloadLegacyWpiLibAction"
-                    icon="AllIcons.Actions.Download" />
+            <action id="frc.tools.CheckForWpiLibUpdateAction" 
+                    class="net.javaru.iip.frc.actions.tools.CheckForWpiLibUpdateAction" 
+                    icon="FrcIcons.WpiLib.WPI_LIB_16" />
         </group>
 
         <group id="FRC.FrcRioLogActionsGroup"
@@ -416,8 +420,27 @@
                 class="net.javaru.iip.frc.actions.tools.internal.CreateRunConfigurationsFrcInternalAction"/>
             <action id="FRC.tools.internal.CheckIncludeDesktopSupportSetting"
                     class="net.javaru.iip.frc.actions.tools.internal.CheckIncludeDesktopSupportSetting" />
+            <action id="FRC.tools.internal.MarkGradleProjectDirty" 
+                    class="net.javaru.iip.frc.actions.tools.internal.MarkGradleProjectDirtyInternalAction" />
+            <action id="FRC.tools.internal.CreateTempFile"
+                    class="net.javaru.iip.frc.actions.tools.internal.CreateTempFile" />
+            <action id="FRC.tools.internal.ShowPlaceholderTextFieldPaddingDemoDialog"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowPlaceholderTextFieldPaddingDemoDialog" />
         </group>
 
+        <group id="FRC.FrcInternalVendordepsActionsGroup"
+               class="net.javaru.iip.frc.actions.tools.internal.FrcInternalVendordepsActionsGroup"
+               popup="true"
+               icon="AllIcons.Nodes.PpLibFolder">
+            <add-to-group group-id="FRC.FrcInternalActionsGroup" anchor="after" relative-to-action="FRC.tools.internal.ShowPlaceholderTextFieldPaddingDemoDialog" />
+            <action id="FRC.tools.internal.FindVendordepsDirFrcInternalAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.FindVendordepsDirFrcInternalAction"/>
+            <action id="FRC.tools.internal.GetVendordepsFrcInternalAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.GetVendordepsListingFrcInternalAction"/>
+            <action id="FRC.tools.internal.ShowVendordepsManagementDialog"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowVendordepsManagementDialog"/>
+        </group>
+        
         <group id="FRC.FrcInternalNotificationsActionsGroup"
                 class="net.javaru.iip.frc.actions.tools.internal.FrcInternalNotificationsActionsGroup"
                 popup="true"

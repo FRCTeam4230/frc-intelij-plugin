@@ -152,23 +152,57 @@ tasks {
         ideVersions.set(projectPropertyList("verifierIdeVersions")) 
     }
 
+    signPlugin {
+        // signPlugin runs automatically before the publishPlugin if the signPlugin privateKey (or privateKeyFile) and certificateChain (or certificateChainFile) properties are specified
+        // Use JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE unless overridden by the more specific FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE
+        val ourPrivateKeyFileSetting =
+            System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE") ?:
+            System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE")
+        val ourCertChainFileSetting =
+            System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE") ?:
+            System.getenv("JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE")
+
+        doFirst {
+            if (ourPrivateKeyFileSetting == null) {
+                logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE' not set.")
+            }
+            else {
+                logger.lifecycle("Using code signing private key file: $ourPrivateKeyFileSetting")
+            }
+            if (ourCertChainFileSetting == null) {
+                logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE' not set.")
+            }
+            else {
+                logger.lifecycle("Using code signing certificate chain file: $ourPrivateKeyFileSetting")
+            }
+        }
+        if (ourPrivateKeyFileSetting != null)
+        {
+            privateKeyFile.set(Path.of(ourPrivateKeyFileSetting).toFile())
+            certificateChainFile.set(Path.of(ourCertChainFileSetting).toFile())
+            password.set(System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD") ?: System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD"))
+        }
+    }
+
     publishPlugin {
         // See https://plugins.jetbrains.com/docs/intellij/deployment.html  and  https://github.com/JetBrains/intellij-platform-plugin-template/blob/main/build.gradle.kts
-        dependsOn("patchChangelog")
+        // dependsOn("patchChangelog")
         // For now, we will not use the `publish` task unless this project property is set. Once we have tested things, we can remove this guard
-        if (projectPropertyBoolean("autoPublish", defaultValue = false))
-        {
-            project.version = "${project.version}" //-${properties["buildNumber"]}"
-
-            // Use JETBRAINS_MARKETPLACE_PUBLISH_TOKEN unless overridden by the more specific FRC_PLUGIN_JETBRAINS_MARKETPLACE_PUBLISH_TOKEN
-            token.set(System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_PUBLISH_TOKEN") ?: System.getenv("JETBRAINS_MARKETPLACE_PUBLISH_TOKEN"))
-            // 
-            // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
-            // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-            // example of setting programmatically, which assumes pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
-            //   channels.set(listOf(projectProperty("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
-            channels.set(listOf("default" ))
+        onlyIf {
+            projectPropertyBoolean("autoPublish", defaultValue = false)
         }
+
+        project.version = "${project.version}" //-${properties["buildNumber"]}"
+
+        // Use JETBRAINS_MARKETPLACE_PUBLISH_TOKEN unless overridden by the more specific FRC_PLUGIN_JETBRAINS_MARKETPLACE_PUBLISH_TOKEN
+//        token.set(System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_PUBLISH_TOKEN") ?: System.getenv("JETBRAINS_MARKETPLACE_PUBLISH_TOKEN"))
+        token.set("TEMP_DUMMY_TOKEN")
+        //
+        // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
+        // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
+        // example of setting programmatically, which assumes pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
+        //   channels.set(listOf(projectProperty("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
+        channels.set(listOf("default" ))
     }
 }
 

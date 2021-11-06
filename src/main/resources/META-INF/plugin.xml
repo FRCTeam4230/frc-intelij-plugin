@@ -213,7 +213,7 @@
          added to the extension point. -->
     <extensions defaultExtensionNs="com.intellij">
         <facetType id="FRC_FACET" implementation="net.javaru.iip.frc.facet.FrcFacetType" />
-
+        <errorHandler implementation="net.javaru.iip.frc.services.FrcErrorReportSubmitter" />
         <iconProvider id="FRC.FrcIconProvider" order="first" implementation="net.javaru.iip.frc.services.FrcIconProvider" />
         <fileIconProvider id="FRC.FrcFIleIconProvider" order="first"  implementation="net.javaru.iip.frc.services.FrcIconProvider" />
 
@@ -225,6 +225,8 @@
         <notificationGroup id="FRC General Notifications"                 displayType="BALLOON"        bundle="i18n.FrcPluginConfigBundle" key="frc.notifications.group.name.general"    isLogByDefault="true"/>
         <!--suppress PluginXmlCapitalization -->
         <notificationGroup id="FRC Important or Actionable Notifications" displayType="STICKY_BALLOON" bundle="i18n.FrcPluginConfigBundle" key="frc.notifications.group.name.actionable" isLogByDefault="true" />
+        <!--suppress PluginXmlCapitalization -->
+        <notificationGroup id="FRC Error Submitter Notifications" displayType="BALLOON" bundle="i18n.FrcPluginConfigBundle" key="frc.notifications.group.name.error.submitter" isLogByDefault="false" />
         <!-- toolWindowId from BuildContentManager.TOOL_WINDOW_ID -->
         <notificationGroup id="FRC Build Tool Window Notifications" displayType="TOOL_WINDOW" toolWindowId="Build"  />
 
@@ -409,7 +411,11 @@
             <action id="FRC.tools.internal.RunJavaCode"
                     class="net.javaru.iip.frc.actions.tools.internal.RunJavaCodeForTestingAndDebuggingFrcInternalAction" />
             <action id="FRC.tools.internal.CauseAnException"
-                    class="net.javaru.iip.frc.actions.tools.internal.CauseAnExceptionAction" />
+                    class="net.javaru.iip.frc.actions.tools.internal.CauseAnExceptionAction"
+                    icon="AllIcons.Nodes.ExceptionClass"/>
+            <action id="FRC.tools.internal.CauseAnExceptionWithAttachmentsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.CauseAnExceptionWithAttachmentsAction"
+                    icon="AllIcons.Nodes.AbstractException"/>
             <action id="FRC.tools.internal.LogAnErrorAction"
                     class="net.javaru.iip.frc.actions.tools.internal.LogAnErrorAction" />
             <action id="FRC.tools.internal.FetchPredefinedRestResource"
@@ -417,7 +423,7 @@
             <action id="FRC.tools.internal.FetchSpecifiedRestResource"
                     class="net.javaru.iip.frc.actions.tools.internal.FetchSpecifiedRestResource" />
             <action id="FRC.tools.internal.CreateRunConfigurationsFrcInternalAction"
-                class="net.javaru.iip.frc.actions.tools.internal.CreateRunConfigurationsFrcInternalAction"/>
+                    class="net.javaru.iip.frc.actions.tools.internal.CreateRunConfigurationsFrcInternalAction"/>
             <action id="FRC.tools.internal.CheckIncludeDesktopSupportSetting"
                     class="net.javaru.iip.frc.actions.tools.internal.CheckIncludeDesktopSupportSetting" />
             <action id="FRC.tools.internal.MarkGradleProjectDirty" 

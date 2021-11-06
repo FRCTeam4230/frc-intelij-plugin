@@ -76,6 +76,7 @@ enum class FrcNotificationType(val group: NotificationGroup, val notificationTyp
     ACTIONABLE_INFO_WITH_FRC_ICON(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP, NotificationType.INFORMATION, FrcIcons.FRC.FIRST_ICON_MEDIUM_16),
     ACTIONABLE_WARN(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP, NotificationType.WARNING, FrcNotifications.IconWarn),
     ACTIONABLE_ERROR(FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP, NotificationType.ERROR, FrcNotifications.IconError),
+    ERROR_REPORT_SUBMITTER(FrcNotifications.FRC_ERROR_REPORT_NOTIFICATION_GROUP, NotificationType.INFORMATION, FrcIcons.FRC.FIRST_ICON_MEDIUM_16),
     BUILD__INFO(FrcNotifications.FRC_BUILD_TOOL_WINDOW_GROUP, NotificationType.INFORMATION, icon = null),
     BUILD__WARN(FrcNotifications.FRC_BUILD_TOOL_WINDOW_GROUP, NotificationType.WARNING, icon = null),
     BUILD__ERROR(FrcNotifications.FRC_BUILD_TOOL_WINDOW_GROUP, NotificationType.ERROR, icon = null),
@@ -133,6 +134,9 @@ object FrcNotifications
     val FRC_ACTIONABLE_NOTIFICATION_GROUP = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/ "FRC Important or Actionable Notifications")!!
 
     @JvmStatic
+    val FRC_ERROR_REPORT_NOTIFICATION_GROUP = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/ "FRC Error Submitter Notifications")!!
+
+    @JvmStatic
     val FRC_BUILD_TOOL_WINDOW_GROUP = NotificationGroupManager.getInstance().getNotificationGroup("FRC Build Tool Window Notifications")!!
 
     @JvmStatic
@@ -185,7 +189,7 @@ object FrcNotifications
      * Creates and shows -- i.e. calls `notification.notify(project)` -- a notification. The notification is returned in
      * case the caller needs access to the notification for future actions such as calling `notification.expire()`. In the
      * event you want to add a `whenExpired` listener, it is recommended to instead use the corresponding [createNotification]
-     * method, add the when expired listener, and then call `notification.notify(project)`. This is shown in the examples.
+     * method, add the "when expired" listener, and then call `notification.notify(project)`. This is shown in the examples.
      *
      * This version of the `notify` function takes Strings and an (optional) `NotificationListener` instance.
      *

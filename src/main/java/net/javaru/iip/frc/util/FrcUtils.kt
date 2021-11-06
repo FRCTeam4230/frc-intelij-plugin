@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.util
 
-import org.apache.commons.lang3.BooleanUtils
 import java.time.Duration
 import java.time.LocalDate
 
@@ -44,8 +43,6 @@ fun executeQuietly(callable: Runnable)
     {
     }
 }
-
-fun getBooleanSystemProperty(key: String, default: Boolean = false): Boolean = BooleanUtils.toBoolean(System.getProperty(key, default.toString()))
 
 /**
  * Gets the current FRC, adjusted by the specified Duration. For example, with the default adjustment or 30 days,

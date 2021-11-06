@@ -16,16 +16,20 @@
 
 package net.javaru.iip.frc.util
 
+import com.intellij.ide.plugins.IdeaPluginDescriptor
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import icons.FrcIcons
+import net.javaru.iip.frc.FrcPluginGlobals.FRC_PLUGIN_ID_STRING
 import net.javaru.iip.frc.services.FrcApplicationDisposableService
 import net.javaru.iip.frc.services.FrcProjectLifecycleService
 import org.apache.commons.io.FilenameUtils
@@ -35,6 +39,11 @@ import java.nio.file.Path
 
 private object FrcPluginUtils
 private val LOG = logger<FrcPluginUtils>()
+
+val pluginId: PluginId = PluginId.getId(FRC_PLUGIN_ID_STRING)
+val pluginDescriptor: IdeaPluginDescriptor = PluginManagerCore.getPlugin(pluginId)!!
+val frcPluginVersion: String?
+    get() = pluginDescriptor.version
 
 /** For details, see [Application.invokeLater] */
 inline fun invokeLater(crossinline func: () -> Unit)
@@ -156,6 +165,7 @@ fun Path?.asPluginResourceVF(): VirtualFile?
     }
 }
 
+@Suppress("RemoveRedundantQualifierName")
 fun java.net.URL?.toVirtualFile(): VirtualFile?
 {
     return if (this == null)
@@ -259,8 +269,8 @@ inline fun <reified T : Any> applicationService(): T = com.intellij.openapi.comp
  */
 //fun getFrcPluginVersion(): SemVer?
 //{
-//    val pluginId = PluginId.getId(FRC_PLUGIN_ID_STRING)
-//    val pluginDescriptor = PluginManager.getPlugin(pluginId)
+//
+//
 //    val version =  pluginDescriptor?.version
 //    // We're using SemVer from com.asarkar:jsemver but it should be noted IDEA has a built in SemVer in com.intellij.util.text - but it's less robust than the library one
 //    return try

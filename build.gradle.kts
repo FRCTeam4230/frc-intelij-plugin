@@ -16,7 +16,10 @@
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.gradle.ext.ProjectSettings
+import java.io.FileInputStream
 import java.nio.file.Path
+import java.util.*
+
 
 val frcPluginBaseVersion: String by project
 val ideaMajorVersion: String by project
@@ -103,6 +106,32 @@ tasks.clean {
     dependsOn("cleanPluginFromSandbox", "cleanIdeCaches")
 }
 
+tasks.processResources {
+    val replacements = Properties().apply {
+        val isCiBuild = if (project.hasProperty("is.ci.build")) {
+            project.properties["is.ci.build"].toString().toBoolean()
+        }
+        else {
+            false
+        }
+        if (isCiBuild) {
+            put("SENTRY_DSN_TEST_AND_QA", "https://example.com/dummy/value/for/CI/build")
+            put("SENTRY_DSN_PROD", "https://example.com/dummy/value/for/CI/build")
+        }
+        else {
+            // we load some values we do not want to submit to version control from a properties file, the
+            // location of which is defined by the system property: FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE
+            load(FileInputStream(File(System.getenv("FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE"))))
+        }
+    }.asSequence().map {
+        it.key.toString() to it.value
+    }.toMap().toMutableMap()
+
+    filesMatching("services/frc-plugin-tokens.properties") {
+        expand(replacements)
+    }
+}
+
 intellij {
     // The Gradle plugin for writing intellij plugins
     pluginName.set("FRC")
@@ -134,6 +163,7 @@ tasks {
             systemPropertyGetOrDefault("frc.i10n", "false"),
             systemPropertyGetOrDefault("frc.is.internal", "true"),
             systemPropertyGetOrDefault("frc.rest.use.qa", "true"),
+            systemPropertyGetOrDefault("frc.error.report.submitter.use.qa", "true"),
             systemPropertyGetOrDefault("frc.experimental.gradleDslSelection", "true"),
             systemPropertyGetOrDefault("frc.experimental.kotlinTemplates", "true")
             // Legacy Ant based robot project system properties
@@ -164,19 +194,21 @@ tasks {
 
         doFirst {
             if (ourPrivateKeyFileSetting == null) {
+                logger.warn("No code signing private key file configured.")
                 logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE' not set.")
             }
             else {
                 logger.lifecycle("Using code signing private key file: $ourPrivateKeyFileSetting")
             }
             if (ourCertChainFileSetting == null) {
+                logger.warn("No code signing certificate chain file configured.")
                 logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE' not set.")
             }
             else {
                 logger.lifecycle("Using code signing certificate chain file: $ourPrivateKeyFileSetting")
             }
         }
-        if (ourPrivateKeyFileSetting != null)
+        if (ourPrivateKeyFileSetting != null && ourCertChainFileSetting != null)
         {
             privateKeyFile.set(Path.of(ourPrivateKeyFileSetting).toFile())
             certificateChainFile.set(Path.of(ourCertChainFileSetting).toFile())
@@ -313,7 +345,7 @@ dependencies {
     implementation(platform("com.google.guava:guava-bom:29.0-jre"))
     implementation("com.google.guava:guava")
     // jsemver: Is in the project 'lib' dir as it is not published to any public repos. Plus we are using a tweaked version that removes is use of logback
-    implementation("com.asarkar:jsemver:0.6.2.1") {
+    implementation("com.asarkar:jsemver:0.6.2.2") {
         exclude(group = "org.slf4j", module = "slf4j-api")
             .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
     }
@@ -325,6 +357,13 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava")
     implementation("org.freemarker:freemarker:2.3.31")
+
+    implementation(platform ("io.sentry:sentry-bom:5.3.0"))
+    implementation("io.sentry:sentry") {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+            .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
+    }
+    implementation("io.sentry:sentry-kotlin-extensions")
 
     testImplementation(platform("org.junit:junit-bom:5.7.2"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")

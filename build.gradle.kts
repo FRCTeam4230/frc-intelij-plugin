@@ -116,7 +116,7 @@ tasks.processResources {
         }
         if (isCiBuild) {
             put("SENTRY_DSN_TEST_AND_QA", "https://example.com/dummy/value/for/CI/build")
-            put("SENTRY_DSN_PRO", "https://example.com/dummy/value/for/CI/build")
+            put("SENTRY_DSN_PROD", "https://example.com/dummy/value/for/CI/build")
         }
         else {
             // we load some values we do not want to submit to version control from a properties file, the

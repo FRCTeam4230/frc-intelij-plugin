@@ -156,7 +156,7 @@ fun VirtualFile?.isVendordepsJsonFile(project: Project?): Boolean
         else
             project.isFrcFacetedProject() && ProjectFileIndex.getInstance(project).isInContent(this)
     return isWithinProject &&
-        this.parent.name == vendordepsDirName &&
+        this.parent?.name == vendordepsDirName &&
         this.name.endsWith(".json", ignoreCase = true)
 }
 

@@ -16,7 +16,7 @@ before_script:
 
 build:
   stage: build
-  script: gradle --build-cache --stacktrace --info -x buildSearchableOptions clean buildPlugin
+  script: gradle -Pis.ci.build=true --build-cache --stacktrace --info -x buildSearchableOptions clean buildPlugin
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push

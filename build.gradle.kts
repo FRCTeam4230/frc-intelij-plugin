@@ -108,9 +108,21 @@ tasks.clean {
 
 tasks.processResources {
     val replacements = Properties().apply {
-        // we load some values we do not want to submit to version control from a properties file, the
-        // location of which is defined by the system property: FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE
-        load(FileInputStream(File(System.getenv("FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE"))))
+        val isCiBuild = if (project.hasProperty("is.ci.build")) {
+            project.properties["is.ci.build"].toString().toBoolean()
+        }
+        else {
+            false
+        }
+        if (isCiBuild) {
+            put("SENTRY_DSN_TEST_AND_QA", "https://example.com/dummy/value/for/CI/build")
+            put("SENTRY_DSN_PRO", "https://example.com/dummy/value/for/CI/build")
+        }
+        else {
+            // we load some values we do not want to submit to version control from a properties file, the
+            // location of which is defined by the system property: FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE
+            load(FileInputStream(File(System.getenv("FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE"))))
+        }
     }.asSequence().map {
         it.key.toString() to it.value
     }.toMap().toMutableMap()

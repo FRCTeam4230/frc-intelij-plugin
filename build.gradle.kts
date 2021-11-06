@@ -345,7 +345,7 @@ dependencies {
     implementation(platform("com.google.guava:guava-bom:29.0-jre"))
     implementation("com.google.guava:guava")
     // jsemver: Is in the project 'lib' dir as it is not published to any public repos. Plus we are using a tweaked version that removes is use of logback
-    implementation("com.asarkar:jsemver:0.6.2.1") {
+    implementation("com.asarkar:jsemver:0.6.2.2") {
         exclude(group = "org.slf4j", module = "slf4j-api")
             .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
     }

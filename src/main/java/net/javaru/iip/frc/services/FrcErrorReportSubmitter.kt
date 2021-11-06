@@ -56,7 +56,9 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
 
     init
     {
-        val key = if (FrcSystemConfigs.ErrorReportSubmitterUseQa.value) "sentry.dsn.test.and.qa" else "sentry.dsn.prod"
+        val useQA = FrcSystemConfigs.ErrorReportSubmitterUseQa.value
+        val key = if (useQA) "sentry.dsn.test.and.qa" else "sentry.dsn.prod"
+        LOG.debug("Sentry init: useQA: $useQA  DSN property key: $key")
         val sentryDsn = Properties().apply {
             load(getPluginResourceAsStream("services/frc-plugin-tokens.properties"))
         }.getProperty(key, "DSN_NOT_FOUND").also {
@@ -65,7 +67,7 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
                 val msg = "Could not load Sentry DSN from frc-plugin-tokens.properties"
                 if (FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE) LOG.error(msg) else LOG.warn(msg)
             }
-            else
+            else if (FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE)
             {
                 LOG.debug("Sentry DSN set to: $it")
             }
@@ -87,7 +89,7 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
                 // https://docs.sentry.io/platforms/java/configuration/options/#attach-stacktrace
                 isAttachStacktrace = true
                 inAppIncludes.addAll(mutableListOf("net.javaru", "io.javaru", "org.javaru"))
-                setDebug(FrcSystemConfigs.ErrorReportSubmitterUseQa.value)
+                setDebug(useQA)
                 // This applies to performance monitoring, which we are not using at this time
                 //tracesSampleRate = 1.0
 
@@ -153,9 +155,10 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
                                 this.message = additionalInfo
                             }
                         }
-                        val (fullHash, limitedHash) = StacktraceHashes.create(throwable)
+                        val (fullHash, limitedHash, singleLine) = StacktraceHashes.create(throwable)
                         sentryEvent.setTag("ex.hash.full", fullHash)
                         sentryEvent.setTag("ex.hash.limited", limitedHash)
+                        sentryEvent.setTag("ex.hash.single", singleLine)
                         try
                         {
                             // For some reason calling
@@ -201,19 +204,20 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
         return true
     }
 
-    data class StacktraceHashes(val fullHash:String, val limitedHash: String)
+    data class StacktraceHashes(val fullHash:String, val limitedHash: String, val singleHash: String)
     {
         companion object
         {
             fun create(t:Throwable?): StacktraceHashes
             {
                 if (t == null)
-                    return StacktraceHashes("0", "0")
+                    return StacktraceHashes("0", "0", "0")
 
                 val stackTrace = t.stackTrace
                 return StacktraceHashes(
                     Arrays.hashCode(stackTrace).toString(16),
                     stackTrace.take(5).toTypedArray().contentHashCode().toString(16),
+                    stackTrace.take(1).toTypedArray().contentHashCode().toString(16),
                                        )
             }
         }

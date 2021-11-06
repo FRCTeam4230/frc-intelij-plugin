@@ -51,15 +51,11 @@ import net.javaru.iip.frc.wpilib.vendordeps.VendordepsListing
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsManagementDialogWrapper
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsService
 import java.awt.event.ActionEvent
-import java.util.*
 import javax.swing.Icon
 
 
 private const val TEST_LOGGER = "FRC.TEST.LOGGER"
 private const val TEST_MESSAGE = "test exception; please ignore"
-private val random = Random()
-
-private fun randomString() = random.nextLong().toString(16)
 
 class FrcInternalVendordepsActionsGroup : FrcInternalActionsGroup()
 
@@ -154,9 +150,7 @@ class LogAnErrorAction : AbstractFrcInternalAction()
     }
 }
 
-/**
- * An action that will purposefully cause an exception for testing purposes.
- */
+/** An action that will purposefully cause an exception for testing purposes. */
 class CauseAnExceptionAction : AbstractCauseAnExceptionAction("Cause An Exception",
                                                               "Hold down SHIFT for a sequence of exceptions",
                                                               AllIcons.Nodes.ExceptionClass)
@@ -165,9 +159,7 @@ class CauseAnExceptionAction : AbstractCauseAnExceptionAction("Cause An Exceptio
         get() = false
 }
 
-/**
- * An action that will purposefully cause an exception, with attachements, for testing purposes.
- */
+/** An action that will purposefully cause an exception, with attachments, for testing purposes. */
 class CauseAnExceptionWithAttachmentsAction : AbstractCauseAnExceptionAction("Cause an Exception with Attachments",
                                                                              "Cause a sequence of exceptions along with attachments. Hold down SHIFT for a sequence of exceptions",
                                                                              AllIcons.Nodes.AbstractException)
@@ -188,7 +180,11 @@ abstract class AbstractCauseAnExceptionAction(text: String?, description: String
         ApplicationManager.getApplication().executeOnPooledThread {
             for (i in 1..count)
             {
-                val exception = Exception("random exception text ${randomString()}") // We want the stacktrace line numbers to be consistent, so we always create on the same line, 192 if possible
+                // Lines intentionally blank
+                // Lines intentionally blank
+                // Lines intentionally blank to keep exception creation on line 186
+                val exception = TestException.create("random exception text ${randomString()}") // We want the stacktrace line numbers to be consistent, so we always create on the same line, 186 if possible
+
                 if (includeAttachments)
                     Logger.getInstance(TEST_LOGGER).error(TEST_MESSAGE, exception, *attachments)
                 else

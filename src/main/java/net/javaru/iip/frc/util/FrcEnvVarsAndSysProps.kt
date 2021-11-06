@@ -17,6 +17,7 @@
 package net.javaru.iip.frc.util
 
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import org.apache.commons.lang3.BooleanUtils
 
 
@@ -28,7 +29,26 @@ import org.apache.commons.lang3.BooleanUtils
 @Suppress("unused")
 private val LOG = logger<FrcEnvVarsAndSysProps>()
 
-fun getBooleanSystemProperty(key: String, default: Boolean = false): Boolean = BooleanUtils.toBoolean(System.getProperty(key, default.toString()))
+
+fun getBooleanSystemProperty(key: String, default: Boolean = false): Boolean = getSystemProperty(key, default) {
+    BooleanUtils.toBoolean(it)
+}
+
+fun getSystemProperty(key: String, default: String): String = getSystemProperty(key, default) { it }
+
+fun <T> getSystemProperty(key: String, default: T, converter: (value: String) -> T): T
+{
+    val setValue: String? = System.getProperty(key)
+    LOG.debug("[FRC] System Property key '$key' set to: $setValue")
+    return if (setValue == null) {
+        LOG.debug("[FRC] For System Prop key '$key' returning DEFAULT VALUE of: $default ")
+        default
+    } else {
+        val value = converter.invoke(setValue)
+        LOG.debug("[FRC] For System Prop key '$key' returning configured value of: $value ")
+        value
+    }
+}
 
 
 sealed interface FrcSystemConfig<T>
@@ -42,6 +62,11 @@ sealed interface FrcSystemConfig<T>
 
 object FrcSystemConfigs
 {
+    init
+    {
+        LOG.trace{ "[FRC] System Properties: ${System.getProperties()}" }
+    }
+
     object ErrorReportSubmitterUseQa : FrcSystemConfig<Boolean>
     {
         override val key: String = "frc.error.report.submitter.use.qa"

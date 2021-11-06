@@ -52,6 +52,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v1.6.1</strong> <br>
+        &nbsp;&nbsp;&bull; Resolves a potential NPE<br>
+        <br>
         <strong>v1.6.0</strong> <br>
         &nbsp;&nbsp;&bull; Numerous internal refactoring and improvements<br>
         &nbsp;&nbsp;&bull; Complete rewrite of Gradle interaction for improved user experience, and to resolve

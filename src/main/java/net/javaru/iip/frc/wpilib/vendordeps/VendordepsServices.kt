@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.wpilib.vendordeps
 
+import com.intellij.json.psi.JsonFile
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
@@ -140,7 +141,7 @@ class VendordepsPsiTreeChangeListener(private val project: Project) : FrcGeneral
 }
 
 @Contract("null,_ -> false")
-fun PsiFile?.isVendordepsJsonFile(project: Project): Boolean = this?.virtualFile.isVendordepsJsonFile(project)
+fun PsiFile?.isVendordepsJsonFile(project: Project): Boolean = (this is JsonFile) && this.virtualFile.isVendordepsJsonFile(project)
 
 /**
  * Determines if the `VirtualFile` is a `vendordeps.json` file, returning false if the `VirtualFile` is null.
@@ -214,8 +215,8 @@ class VendordepsService private constructor(val project: Project)
         vendordepsDir
             ?.children
             ?.stream()
-            ?.filter { it is PsiFile }
-            ?.map { it as PsiFile }
+            ?.filter { it is JsonFile }
+            ?.map { it as JsonFile }
             ?.filter { it.isVendordepsJsonFile(project) }
             ?.forEach {
                 val vendordeps = Vendordeps.parseSafely(it)
@@ -261,7 +262,7 @@ class VendordepsService private constructor(val project: Project)
                 {
                     msgBuilder.append("&nbsp;&nbsp;&nbsp;&nbsp;\u2022 ${entry.value.first().vendordeps.name}:<br>")
                     entry.value.forEach { 
-                        msgBuilder.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\u2043 version ${it.vendordeps.version} in ${it.psiFile.name}<br>")
+                        msgBuilder.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\u2043 version ${it.vendordeps.version} in ${it.jsonPsiFile.name}<br>")
                     }
                 }
             }

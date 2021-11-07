@@ -357,6 +357,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava")
     implementation("org.freemarker:freemarker:2.3.31")
+    implementation("com.michael-bull.kotlin-result:kotlin-result:1.1.13")
 
     implementation(platform ("io.sentry:sentry-bom:5.3.0"))
     implementation("io.sentry:sentry") {

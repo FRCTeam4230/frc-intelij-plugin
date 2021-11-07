@@ -19,6 +19,7 @@ package net.javaru.iip.frc.wpilib.vendordeps
 
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
+import com.intellij.json.psi.JsonFile
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import net.javaru.iip.frc.util.uri
@@ -85,6 +86,7 @@ data class Vendordeps(
         {
             val uuidString = this.string("uuid")
             // We have to handle some special cases
+            @Suppress("SpellCheckingInspection")
             return when
             {
                 uuidString == null                                     -> nonConformingUuidsMap.computeIfAbsent(name) { UUID.randomUUID() }
@@ -125,16 +127,22 @@ data class Vendordeps(
     override fun toString(): String = "$name : $version"
 }
 
-data class VendordepsFile(val psiFile: PsiFile, val vendordeps: Vendordeps) : Comparable<VendordepsFile>
+/**
+ * A data class to virtually represent a Vendordeps file. It contains the properties:
+ * @param jsonPsiFile the [JsonFile] (sub-interface of [PsiFile]) for the vendordeps file
+ * @param vendordeps a [Vendordeps] data class representing the content of the vendordeps file
+ */
+data class VendordepsFile(val jsonPsiFile: JsonFile, val vendordeps: Vendordeps) : Comparable<VendordepsFile>
 {
-    override fun compareTo(other: VendordepsFile): Int = compareValuesBy(this, other, {it.vendordeps}, {it.psiFile.name})
+    override fun compareTo(other: VendordepsFile): Int = compareValuesBy(this, other, {it.vendordeps}, {it.jsonPsiFile.name})
 
     override fun toString(): String
     {
-        return "$vendordeps [${psiFile.name}]"
+        return "$vendordeps [${jsonPsiFile.name}]"
     }
 }
 
+/** A sata class to represent a known Vendordeps library. */
 data class KnownVendordepsInfo(
     val uuid:UUID,
     val name: String,

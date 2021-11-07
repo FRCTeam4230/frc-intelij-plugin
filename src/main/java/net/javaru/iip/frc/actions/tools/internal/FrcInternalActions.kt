@@ -15,15 +15,11 @@
  */
 package net.javaru.iip.frc.actions.tools.internal
 
-import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.LangDataKeys
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.Attachment
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.progress.ProgressIndicator
@@ -31,7 +27,6 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
-import com.intellij.util.TimeoutUtil
 import icons.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.facet.isFrcFacetedProject
@@ -50,14 +45,15 @@ import net.javaru.iip.frc.wizard.FrcProjectWizardData
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsListing
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsManagementDialogWrapper
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsService
-import java.awt.event.ActionEvent
 import javax.swing.Icon
 
 
-private const val TEST_LOGGER = "FRC.TEST.LOGGER"
-private const val TEST_MESSAGE = "test exception; please ignore"
 
 class FrcInternalVendordepsActionsGroup : FrcInternalActionsGroup()
+
+private object FrcInternalActions
+
+private val logger = logger<FrcInternalActions>()
 
 abstract class AbstractFrcInternalAction : AnAction
 {
@@ -133,70 +129,13 @@ open class FrcInternalActionsGroup : DefaultActionGroup()
     }
 }
 
-/**
- * An action that will purposefully cause an exception for testing purposes.
- */
+/** An action that will purposefully cause an exception for testing purposes. */
 class LogAnErrorAction : AbstractFrcInternalAction()
 {
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
         logger.info("[FRC] logging a simulated error message for testing exception handling")
         logger.error("[FRC] Test Error; Please Ignore. Sample error logging for testing: ${randomString()}")
-    }
-
-    companion object
-    {
-        private val logger = logger<LogAnErrorAction>()
-    }
-}
-
-/** An action that will purposefully cause an exception for testing purposes. */
-class CauseAnExceptionAction : AbstractCauseAnExceptionAction("Cause An Exception",
-                                                              "Hold down SHIFT for a sequence of exceptions",
-                                                              AllIcons.Nodes.ExceptionClass)
-{
-    override val includeAttachments: Boolean
-        get() = false
-}
-
-/** An action that will purposefully cause an exception, with attachments, for testing purposes. */
-class CauseAnExceptionWithAttachmentsAction : AbstractCauseAnExceptionAction("Cause an Exception with Attachments",
-                                                                             "Cause a sequence of exceptions along with attachments. Hold down SHIFT for a sequence of exceptions",
-                                                                             AllIcons.Nodes.AbstractException)
-{
-    override val includeAttachments: Boolean
-        get() = true
-
-}
-abstract class AbstractCauseAnExceptionAction(text: String?, description: String?, icon: Icon?) : AbstractFrcInternalAction(text, description, icon)
-{
-    abstract val includeAttachments:Boolean
-
-    override fun actionPerformed(actionEvent: AnActionEvent)
-    {
-        val count = if (actionEvent.modifiers and ActionEvent.SHIFT_MASK == 0) 1 else 3
-        logger.info("[FRC] Throwing $count simulated complex exception(s) for testing exception handling")
-        val attachments = arrayOf(Attachment("first-.txt", "content"), Attachment("second.txt", "more content"), Attachment("third.txt", "even more content"))
-        ApplicationManager.getApplication().executeOnPooledThread {
-            for (i in 1..count)
-            {
-                // Lines intentionally blank
-                // Lines intentionally blank
-                // Lines intentionally blank to keep exception creation on line 186
-                val exception = TestException.create("random exception text ${randomString()}") // We want the stacktrace line numbers to be consistent, so we always create on the same line, 186 if possible
-
-                if (includeAttachments)
-                    Logger.getInstance(TEST_LOGGER).error(TEST_MESSAGE, exception, *attachments)
-                else
-                    Logger.getInstance(TEST_LOGGER).error(TEST_MESSAGE, exception)
-                if (i != count) TimeoutUtil.sleep(200)
-            }
-        }
-    }
-
-    companion object
-    {
-        private val logger = logger<AbstractCauseAnExceptionAction>()
     }
 }
 
@@ -229,11 +168,6 @@ class RunKotlinCodeForTestingAndDebuggingFrcInternalAction : AbstractFrcInternal
         }
 
         logger.trace {"[FRC] BREAKPOINT"}
-    }
-
-    companion object
-    {
-        private val logger = logger<CauseAnExceptionAction>()
     }
 }
 

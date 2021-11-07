@@ -16,7 +16,16 @@
 
 package net.javaru.iip.frc.actions.tools.internal
 
+import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.Attachment
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.util.TimeoutUtil
+import java.awt.event.ActionEvent
 import java.util.*
+import javax.swing.Icon
 
 
 private val random = Random()
@@ -37,5 +46,64 @@ class TestException @JvmOverloads constructor(message: String = "Test Exception 
         private const val serialVersionUID: Long = -2017461045868952683L
 
     }
+}
 
+
+private const val TEST_LOGGER = "FRC.TEST.LOGGER"
+private const val TEST_MESSAGE = "test exception; please ignore"
+
+abstract class AbstractCauseAnExceptionAction(text: String?, description: String?, icon: Icon?) : AbstractFrcInternalAction(text, description, icon)
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        val count = if (actionEvent.modifiers and ActionEvent.SHIFT_MASK == 0) 1 else 3
+        logger.info("[FRC] Throwing $count simulated complex exception(s) for testing exception handling")
+        val attachments = arrayOf(Attachment("first-.txt", "content"), Attachment("second.txt", "more content"), Attachment("third.txt", "even more content"))
+        ApplicationManager.getApplication().executeOnPooledThread {
+            for (i in 1..count)
+            {
+                // Lines intentionally blank
+                // Lines intentionally blank
+                // Lines intentionally blank
+                // Lines intentionally blank to keep exception creation on line 68
+                val exception =
+                    TestException.create("random exception text ${randomString()}") // We want the stacktrace line numbers to be consistent, so we always create on the same line, 186 if possible
+
+                if (includeAttachments)
+                    Logger.getInstance(TEST_LOGGER).error(TEST_MESSAGE, exception, *attachments)
+                else
+                    Logger.getInstance(TEST_LOGGER).error(TEST_MESSAGE, exception)
+                if (i != count) TimeoutUtil.sleep(200)
+            }
+        }
+    }
+
+    abstract val includeAttachments: Boolean
+
+    companion object
+    {
+        private val logger = logger<AbstractCauseAnExceptionAction>()
+    }
+}
+
+/** An action that will purposefully cause an exception for testing purposes. */
+class CauseAnExceptionAction : AbstractCauseAnExceptionAction(
+    "Cause An Exception",
+    "Hold down SHIFT for a sequence of exceptions",
+    AllIcons.Nodes.ExceptionClass
+                                                             )
+{
+    override val includeAttachments: Boolean
+        get() = false
+}
+
+/** An action that will purposefully cause an exception, with attachments, for testing purposes. */
+class CauseAnExceptionWithAttachmentsAction : AbstractCauseAnExceptionAction(
+    "Cause an Exception with Attachments",
+    "Cause a sequence of exceptions along with attachments. Hold down SHIFT for a sequence of exceptions",
+    AllIcons.Nodes.AbstractException
+                                                                            )
+{
+    override val includeAttachments: Boolean
+        get() = true
 }

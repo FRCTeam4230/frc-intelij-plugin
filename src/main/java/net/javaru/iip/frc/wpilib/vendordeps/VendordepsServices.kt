@@ -326,7 +326,7 @@ class VendordepsService private constructor(val project: Project)
                 return if (psiFsItems[0] is PsiDirectory) psiFsItems[0] as PsiDirectory else null
             }
 
-            // We have multiple found directories... try the obvious solution, the one in the project base dir
+            // We have multiple found directories… try the obvious solution, the one in the project base dir
             // this should handle 99% of the remaining cases
             var foundDir: PsiDirectory? = null
             if (project.basePath != null)

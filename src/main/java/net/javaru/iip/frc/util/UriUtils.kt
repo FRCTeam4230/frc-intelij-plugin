@@ -81,7 +81,7 @@ fun createUriSafely(uri: String?):URI?
     {
         return try
         {
-            URI(uri)
+            URI(uri.trim())
         } catch (e: Exception)
         {
             LOG.warn("[FRC] Could not create a URI object from the URI path '$uri' due to the exception: $e")

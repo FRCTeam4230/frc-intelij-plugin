@@ -15,6 +15,9 @@
  */
 package net.javaru.iip.frc.actions.tools.internal
 
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.onFailure
+import com.github.michaelbull.result.onSuccess
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -26,7 +29,9 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.InputValidator
 import com.intellij.openapi.ui.Messages
+import icons.FrcIcons
 import icons.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.facet.isFrcFacetedProject
@@ -45,6 +50,7 @@ import net.javaru.iip.frc.wizard.FrcProjectWizardData
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsListing
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsManagementDialogWrapper
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsService
+import java.nio.file.Path
 import javax.swing.Icon
 
 
@@ -262,7 +268,7 @@ class FindVendordepsDirFrcInternalAction: AbstractFrcInternalAction()
     override fun actionPerformed(actionEvent: AnActionEvent) {
         executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
             it.runWhenSmart {
-                val dir = VendordepsService.getInstance(it).findVendorDepsDir()
+                val dir = VendordepsService.getInstance(it).findVendordepsDir()
                 FrcNotifications.notifyInfoBalloon("Vendordeps dir = ${dir?.virtualFile?.path ?: "NOT FOUND"}")
             }
         }
@@ -317,5 +323,42 @@ class CreateTempFile: AbstractFrcInternalAction()
         val tempFile = net.javaru.iip.frc.util.createRandomTempFile(".txt")
         Messages.showMessageDialog(project, "Temp File: $tempFile", "Temp File Created", null)
 
+    }
+}
+
+class DownloadVendorDeps: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, "Display Vendordeps Management Dialog") { project: Project ->
+            val url = Messages.showInputDialog(project,
+                                               "Enter Vendordeps URL",
+                                               "Download Vendordeps",
+                                               FrcIcons.FileAndDirTypes.VendordepsDir,
+                                               "https://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json",
+                                               object : InputValidator
+                                               {
+                                                   override fun checkInput(inputString: String?): Boolean = inputString?.isNotBlank() ?: false
+                                                   override fun canClose(inputString: String?): Boolean = inputString?.isNotBlank() ?: false
+                                               })!!
+            VendordepsService.getInstance(project).downloadVendordepToTempFileInBackground(project, url) { result: Result<Path, Exception> ->
+
+                result.onSuccess {
+                    notify(
+                        FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                        "Downloaded to: $it",
+                        project = project
+                          )
+                }.onFailure {
+                    notify(
+                        FrcNotificationType.ACTIONABLE_ERROR,
+                        "Could not download Vendordeps file, Reason: ${it.message}",
+                        project = project
+                          )
+                }
+
+            }
+
+        }
     }
 }

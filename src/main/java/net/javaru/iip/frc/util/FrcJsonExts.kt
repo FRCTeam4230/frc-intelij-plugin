@@ -29,7 +29,7 @@ fun JsonObject.uuid(fieldName: String): UUID = UUID.fromString(this.string(field
 
 fun JsonObject.uri(fieldName: String): URI?
 {
-    val rawUri = this.string(fieldName)
+    val rawUri = this.string(fieldName)?.trim()
     return if (rawUri.isNullOrBlank())
     {
         null
@@ -51,5 +51,5 @@ fun JsonObject.uri(fieldName: String): URI?
 fun JsonObject.urisList(fieldName: String): List<URI>
 {
     val strings = this.array<String>(fieldName)?.toList() ?: emptyList<String>()
-    return strings.mapNotNull { createUriSafely(it) }
+    return strings.mapNotNull { createUriSafely(it.trim()) }
 }

@@ -16,10 +16,17 @@
 
 package net.javaru.iip.frc.wpilib.vendordeps
 
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.onFailure
+import com.github.michaelbull.result.onSuccess
 import com.intellij.json.psi.JsonFile
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.progress.PerformInBackgroundOption
+import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.startup.StartupActivity
@@ -35,6 +42,7 @@ import com.intellij.psi.PsiTreeChangeEvent
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.containers.stream
+import com.intellij.util.io.HttpRequests
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.i18n.FrcMessageKey
 import net.javaru.iip.frc.notify.FrcNotificationType
@@ -42,12 +50,15 @@ import net.javaru.iip.frc.notify.FrcNotifications
 import net.javaru.iip.frc.psi.FrcGeneralChangePsiTreeChangeListenerAdapter
 import net.javaru.iip.frc.services.FrcApplicationDisposableService
 import net.javaru.iip.frc.util.findCommonParentDir
+import net.javaru.iip.frc.util.generateRandomTempPath
 import net.javaru.iip.frc.util.getModules
 import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
 import net.javaru.iip.frc.util.runBackgroundTask
 import net.javaru.iip.frc.util.runReadActionInSmartMode
 import net.javaru.iip.frc.util.toCommonSeparatorPath
 import org.jetbrains.annotations.Contract
+import java.net.URI
+import java.nio.file.Path
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -209,24 +220,20 @@ class VendordepsService private constructor(val project: Project)
 
     private fun updateVendordepsListing(notifyOnDuplicates: Boolean)
     {
-        val vendordepsDir = findVendorDepsDir()
+        val vendordepsDir = findVendordepsDir()
         logger.debug { "[FRC] $vendordepsDirName dir found at: ${vendordepsDir?.virtualFile?.path}" }
         val vendordepsFileList = mutableListOf<VendordepsFile>()
         vendordepsDir
             ?.children
             ?.stream()
-            ?.filter { it is JsonFile }
+            ?.filter { it != null && it is JsonFile }
             ?.map { it as JsonFile }
             ?.filter { it.isVendordepsJsonFile(project) }
-            ?.forEach {
-                val vendordeps = Vendordeps.parseSafely(it)
-                if (vendordeps != null)
-                {
-                    vendordepsFileList.add(VendordepsFile(it, vendordeps))
-                }
-                else
-                {
-                    logger.info("[FRC] Could not parse file as Vendordeps. File: ${it.name}")
+            ?.forEach { jsonFile: JsonFile ->
+                Vendordeps.parse(jsonFile).onSuccess { vendordeps: Vendordeps ->
+                    vendordepsFileList.add(VendordepsFile(jsonFile, vendordeps))
+                }.onFailure { t: Throwable ->
+                    logger.info("[FRC] Could not parse file as Vendordeps. File: ${jsonFile.name} Error: $t")
                 }
             }
         
@@ -276,6 +283,8 @@ class VendordepsService private constructor(val project: Project)
         }
     }
 
+    fun findVendordepsDirAsNioPath(): Path? = findVendordepsDir()?.virtualFile?.toNioPath()
+
 
     /**
      * Finds the vendordeps directory for the project. Should be run only when the project is smart (and thus also
@@ -289,7 +298,7 @@ class VendordepsService private constructor(val project: Project)
      *
      * @return the vendordeps directory as a [PsiDirectory] or `null` if it does not exist, or cannot be found.
      */
-    fun findVendorDepsDir(): PsiDirectory?
+    fun findVendordepsDir(): PsiDirectory?
     {
         // NOTES: The vendordeps directory can be overridden in GradleRIO via the Gradle Property 
         //        'gradlerio.vendordep.folder.path' ← Note the singular 'vendordep'
@@ -370,6 +379,48 @@ class VendordepsService private constructor(val project: Project)
         {
             logger.warn("[FRC] An exception occurred when finding $vendordepsDirName directory. Cause summary: $e", e)
             return null
+        }
+    }
+
+
+    /**
+     * Downloads a vendordeps file from the specified URL to a (system) temp file. It ***does not*** install the file into the
+     * vendordeps directory. Does so in a cancelable background process.
+     */
+    fun downloadVendordepToTempFileInBackground(project: Project, uri: URI, resultProcessor: (Result<Path, Exception>) -> Unit)
+        = downloadVendordepToTempFileInBackground(project, uri.toString(), resultProcessor)
+
+    /**
+     * Downloads a vendordeps file from the specified URL to a (system) temp file. It ***does not*** install the file into the
+     * vendordeps directory.
+     */
+    fun downloadVendordepToTempFileInBackground(project: Project, url: String, resultProcessor: (Result<Path, Exception>) -> Unit)
+    {
+        project.runBackgroundTask(
+            "Download Vendordeps File",
+            cancellable = true,
+            background = PerformInBackgroundOption.ALWAYS_BACKGROUND) { indicator: ProgressIndicator ->
+            val result = downloadVendordepsToTempFile(url, indicator)
+            resultProcessor.invoke(result)
+        }
+    }
+
+    /**
+     * Downloads a vendordeps file from the specified URL to a (system) temp file. It ***does not*** install the file into the
+     * vendordeps directory. This must nor be called from the EDT.
+     */
+    @JvmOverloads
+    fun downloadVendordepsToTempFile(url: String, indicator: ProgressIndicator? = null): Result<Path, Exception>
+    {
+        return try
+        {
+            val outFile = generateRandomTempPath(deleteOnExit = true)
+            HttpRequests.request(url).saveToFile(outFile, indicator)
+            Ok(outFile)
+        }
+        catch (e: Exception)
+        {
+            Err(e)
         }
     }
 }

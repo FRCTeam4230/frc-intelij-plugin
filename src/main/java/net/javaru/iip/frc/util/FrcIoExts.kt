@@ -32,6 +32,7 @@ import java.nio.file.Path
 /*
 
 ==== ALSO SEE: com.intellij.util.io.path.kt (in platform util-ex module) ====
+In particular the Path.copy and Path.move extension functions
 
  */
 

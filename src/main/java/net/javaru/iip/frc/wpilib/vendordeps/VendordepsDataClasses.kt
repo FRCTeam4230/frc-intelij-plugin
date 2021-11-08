@@ -19,7 +19,11 @@ package net.javaru.iip.frc.wpilib.vendordeps
 
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
 import com.intellij.json.psi.JsonFile
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import net.javaru.iip.frc.util.uri
@@ -47,44 +51,46 @@ data class Vendordeps(
     {
         private val nonConformingUuidsMap = mutableMapOf<String, UUID>()
         private val parser: Parser = Parser.default()
+        private val LOG = logger<Vendordeps>()
 
         // @formatter:off
-        fun parse(jsonFile: PsiFile): Vendordeps = transform(parser.parse(jsonFile.virtualFile.inputStream) as JsonObject)
-        fun parse(jsonFile: VirtualFile): Vendordeps = transform(parser.parse(jsonFile.inputStream) as JsonObject)
-        fun parse(jsonFile: Path, charset: Charset = Charsets.UTF_8): Vendordeps = transform(parser.parse(Files.newBufferedReader(jsonFile, charset)) as JsonObject)
-        fun parse(json: InputStream, charset: Charset = Charsets.UTF_8): Vendordeps = transform(parser.parse(json, charset) as JsonObject)
-        fun parse(json: Reader): Vendordeps = transform(parser.parse(json) as JsonObject)
-        fun parse(json: String): Vendordeps = transform(parser.parse(StringReader(json)) as JsonObject)
-
-        fun parseSafely(jsonFile: PsiFile): Vendordeps? = try { parse(jsonFile) } catch (ignore: Exception) { null }
-        fun parseSafely(jsonFile: VirtualFile): Vendordeps? = try { parse(jsonFile) } catch (ignore: Exception) { null }
-        fun parseSafely(jsonFile: Path): Vendordeps? = try { parse(jsonFile) } catch (ignore: Exception) { null }
-        fun parseSafely(json: InputStream): Vendordeps? = try { parse(json) } catch (ignore: Exception) { null }
-        fun parseSafely(json: Reader): Vendordeps? = try { parse(json) } catch (ignore: Exception) { null }
-        fun parseSafely(json: String): Vendordeps? = try { parse(json) } catch (ignore: Exception) { null }
+        fun parse(jsonFile: PsiFile): Result<Vendordeps, Throwable> = transform(parser.parse(jsonFile.virtualFile.inputStream) as JsonObject)
+        fun parse(jsonFile: VirtualFile): Result<Vendordeps, Throwable> = transform(parser.parse(jsonFile.inputStream) as JsonObject)
+        fun parse(jsonFile: Path, charset: Charset = Charsets.UTF_8): Result<Vendordeps, Throwable> = transform(parser.parse(Files.newBufferedReader(jsonFile, charset)) as JsonObject)
+        fun parse(json: InputStream, charset: Charset = Charsets.UTF_8): Result<Vendordeps, Throwable> = transform(parser.parse(json, charset) as JsonObject)
+        fun parse(json: Reader): Result<Vendordeps, Throwable> = transform(parser.parse(json) as JsonObject)
+        fun parse(json: String): Result<Vendordeps, Throwable> = transform(parser.parse(StringReader(json)) as JsonObject)
         // @formatter:on
 
-        fun transform(json: JsonObject): Vendordeps
+        fun transform(json: JsonObject): Result<Vendordeps, Throwable>
         {
-            val name = json.string("name") ?: "unknown-name"
-            val version = LibVersion.parse(json.string("version") ?: "0.0.0")
-            val fileName = json.string("fileName") ?: "unknown.json"
-            val jsonUrl = json.uri("jsonUrl")
-            val mavenUrls = json.urisList("mavenUrls")
-            val uuid = json.parseUuid(name, fileName, jsonUrl)
-                             
+            return try
+            {
+                val name = json.string("name")?.trim() ?: "unknown-name"
+                val version = LibVersion.parse(json.string("version")?.trim() ?: "0.0.0")
+                val fileName = json.string("fileName")?.trim() ?: "unknown.json"
+                val jsonUrl = json.uri("jsonUrl")
+                val mavenUrls = json.urisList("mavenUrls")
+                val uuid = json.parseUuid(name, fileName, jsonUrl)
 
-            return Vendordeps(uuid, name, version, fileName, jsonUrl, mavenUrls)
+                val vendordeps = Vendordeps(uuid, name, version, fileName, jsonUrl, mavenUrls)
+                Ok(vendordeps)
+            }
+            catch (t: Throwable)
+            {
+                LOG.info("[FRC] An exception occurred when parsing Vendordeps JSON: $t")
+                Err(t)
+            }
         }
 
-        val navxUuidString = "cb311d09-36e9-4143-a032-55bb2b94443b"
-        val navxUuid = UUID.fromString(navxUuidString)
-        val dmc60cRemappedUuid = UUID.fromString("d2dafb2b-4b81-40d1-98ff-7e66289fcfb4")
-        val libCuRemappedUuid = UUID.fromString("ba9f250f-1ebc-4897-9782-d3f4517df53b")
+        const val navxUuidString = "cb311d09-36e9-4143-a032-55bb2b94443b"
+        val navxUuid: UUID = UUID.fromString(navxUuidString)
+        val dmc60cRemappedUuid: UUID = UUID.fromString("d2dafb2b-4b81-40d1-98ff-7e66289fcfb4")
+        val libCuRemappedUuid: UUID = UUID.fromString("ba9f250f-1ebc-4897-9782-d3f4517df53b")
 
         private fun JsonObject.parseUuid(name: String, fileName: String, jsonUrl: URI?): UUID
         {
-            val uuidString = this.string("uuid")
+            val uuidString = this.string("uuid")?.trim()
             // We have to handle some special cases
             @Suppress("SpellCheckingInspection")
             return when
@@ -114,8 +120,9 @@ data class Vendordeps(
                 {
                     UUID.fromString(uuidString)
                 }
-                catch (ignore: Exception)
+                catch (e: Exception)
                 {
+                    LOG.warn("UUID string could not be converted to UUID. Reason: $e")
                     nonConformingUuidsMap.computeIfAbsent(name) { UUID.randomUUID() }
                 }
             }
@@ -124,7 +131,8 @@ data class Vendordeps(
 
     override fun compareTo(other: Vendordeps): Int = compareValuesBy(this, other, {it.uuid}, {it.version})
 
-    override fun toString(): String = "$name : $version"
+    /** Returns a Simple String of: $name: $version */
+    fun toStringSimple(): String = "$name : $version"
 }
 
 /**

@@ -16,8 +16,9 @@
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.gradle.ext.ProjectSettings
-import java.io.FileInputStream
 import java.nio.file.Path
+import java.nio.file.Files
+import java.io.FileNotFoundException
 import java.util.*
 
 
@@ -27,6 +28,8 @@ val frcPluginEapDesignator: String by project
 val frcPluginVersion = "$frcPluginBaseVersion-$ideaMajorVersion$frcPluginEapDesignator" // ex: v1.3.0-2019.2,  1.3.1-2020.1-eap.1
 val javaVersion: JavaVersion = JavaVersion.VERSION_11
 val sandboxPath = determineSandboxDir()
+
+val isCiBuild = if (project.hasProperty("is.ci.build")) project.properties["is.ci.build"].toString().toBoolean() else false
 
 group = "net.javaru.iip.frc"
 version = frcPluginVersion 
@@ -107,26 +110,7 @@ tasks.clean {
 }
 
 tasks.processResources {
-    val replacements = Properties().apply {
-        val isCiBuild = if (project.hasProperty("is.ci.build")) {
-            project.properties["is.ci.build"].toString().toBoolean()
-        }
-        else {
-            false
-        }
-        if (isCiBuild) {
-            put("SENTRY_DSN_TEST_AND_QA", "https://example.com/dummy/value/for/CI/build")
-            put("SENTRY_DSN_PROD", "https://example.com/dummy/value/for/CI/build")
-        }
-        else {
-            // we load some values we do not want to submit to version control from a properties file, the
-            // location of which is defined by the system property: FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE
-            load(FileInputStream(File(System.getenv("FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE"))))
-        }
-    }.asSequence().map {
-        it.key.toString() to it.value
-    }.toMap().toMutableMap()
-
+    val replacements = loadTokenReplacements()
     filesMatching("services/frc-plugin-tokens.properties") {
         expand(replacements)
     }
@@ -432,5 +416,58 @@ fun determineSandboxDir(): String
     val sandboxDir = Path.of(project.rootDir.canonicalPath).resolve(".sandboxes").resolve(".sandbox-$sandboxSuffix").toString()
     logger.info(">>>sandboxDir set to: $sandboxDir")
     return sandboxDir
+}
+
+/**
+ * Loads the token replacement values. These are some values that we would prefer not to commit to 
+ * source control. While not secrets per se, they are also not things we want bots to find.
+ * The tokens are loaded from a properties file, the location of which is specified by an environment
+ * variable. In the event the environment variable is not set (such as on the CI server or when being 
+ * built for by contributors or for casual development), stand-in values are used. The tokens primarily 
+ * need to be available when a distribution build is being run, or testing of the ErrorReportSubmitter
+ * is being done.
+ */
+fun loadTokenReplacements():MutableMap<String, Any>
+{
+    // TODO: Since this happens during the configuration phase, we should see if 
+    //       we can determine if the 'buildPlugin' task is set to run, and if so
+    //       require the build tokens to be set.
+    return Properties().apply {
+        val key = "FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE"
+        val envVar: String? = System.getenv(key)
+        if (envVar == null)
+        {
+            if (!isCiBuild)
+            {
+                logger.warn("Environment variable not set for build tokens. Build tokens will not be replaced. This is fine for development builds. " + 
+                                 "But needs to be resolved for distribution builds by setting the env var: $key")
+            }
+        } else
+        {
+            val path = Path.of(envVar)
+            if (Files.exists(path))
+            {
+                load(Files.newBufferedReader(path, Charsets.ISO_8859_1))
+            } else
+            {
+                if (!isCiBuild)
+                {
+                    logger.error("Properties file specified for build tokens not found. Build tokens will not be replaced. his is fine for development builds. " + 
+                                     "But needs to be resolved for distribution builds. Configured path: $key")
+                    throw FileNotFoundException("Properties file specified for token replacements was not found: $path")
+                }
+            }
+
+            if (isEmpty)
+            {
+                logger.info("Using stand-in values for built time token replacements")
+                // For now, we'll just do it here. But if this gets to be more than a few, we'll move out to a file and load it.
+                put("SENTRY_DSN_TEST_AND_QA", "https://example.com/stand-in/value")
+                put("SENTRY_DSN_PROD", "https://example.com/stand-in/value")
+            }
+        }
+    }.asSequence().map {
+        it.key.toString() to it.value
+    }.toMap().toMutableMap()
 }
 

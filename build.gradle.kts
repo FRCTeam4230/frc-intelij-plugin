@@ -441,13 +441,15 @@ fun loadTokenReplacements():MutableMap<String, Any>
                 logger.warn("Environment variable not set for build tokens. Build tokens will not be replaced. This is fine for development builds. " + 
                                  "But needs to be resolved for distribution builds by setting the env var: $key")
             }
-        } else
+        }
+        else
         {
             val path = Path.of(envVar)
             if (Files.exists(path))
             {
                 load(Files.newBufferedReader(path, Charsets.ISO_8859_1))
-            } else
+            }
+            else
             {
                 if (!isCiBuild)
                 {
@@ -456,14 +458,13 @@ fun loadTokenReplacements():MutableMap<String, Any>
                     throw FileNotFoundException("Properties file specified for token replacements was not found: $path")
                 }
             }
-
-            if (isEmpty)
-            {
-                logger.info("Using stand-in values for built time token replacements")
-                // For now, we'll just do it here. But if this gets to be more than a few, we'll move out to a file and load it.
-                put("SENTRY_DSN_TEST_AND_QA", "https://example.com/stand-in/value")
-                put("SENTRY_DSN_PROD", "https://example.com/stand-in/value")
-            }
+        }
+        if (isEmpty)
+        {
+            logger.info("Using stand-in values for built time token replacements")
+            // For now, we'll just do it here. But if this gets to be more than a few, we'll move out to a file and load it.
+            put("SENTRY_DSN_TEST_AND_QA", "https://example.com/stand-in/value")
+            put("SENTRY_DSN_PROD", "https://example.com/stand-in/value")
         }
     }.asSequence().map {
         it.key.toString() to it.value

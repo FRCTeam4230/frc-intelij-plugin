@@ -16,11 +16,16 @@
 
 package net.javaru.iip.frc.util
 
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
 import com.intellij.ide.projectView.ProjectView
+import com.intellij.idea.IdeaLogger
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.PerformInBackgroundOption
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -32,6 +37,8 @@ import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Computable
 import net.javaru.iip.frc.facet.isFrcFacetedProject
+import net.javaru.iip.frc.services.FrcErrorReportSubmitter
+import net.javaru.iip.frc.services.ReportableEvent
 import org.jetbrains.plugins.gradle.settings.GradleSettings
 
 
@@ -70,13 +77,14 @@ fun <T> Project.runReadActionInSmartMode(computable: Computable<T>): T = DumbSer
  * Convenience function for running a process in the background. Per the [SDK Guide](https://plugins.jetbrains.com/docs/intellij/general-threading-rules.html#background-processes-and-processcanceledexception)
  * callers should be prepared to catch and rethrow a `ProcessCanceledException`. "**This exception should never be logged**, it 
  * should be rethrown, and it’ll be handled in the infrastructure that started the process." 
- * 
+ * Keywords: runInBackground, runTaskInBackground
  */
 fun Project.runBackgroundTask(
     name: String,
     indeterminate: Boolean = true,
     cancellable: Boolean = false,
     background: PerformInBackgroundOption = PerformInBackgroundOption.ALWAYS_BACKGROUND,
+    debuggingData: Map<String, String?>? = null,
     action: (indicator: ProgressIndicator) -> Unit
                           )
 {
@@ -85,7 +93,23 @@ fun Project.runBackgroundTask(
                                           override fun run(indicator: ProgressIndicator)
                                           {
                                               if (indeterminate) indicator.isIndeterminate = true
-                                              action(indicator)
+                                              try
+                                              {
+                                                  action(indicator)
+                                              }
+                                              catch (pce: ProcessCanceledException)
+                                              {
+                                                  throw pce
+                                              }
+                                              catch (t: Throwable)
+                                              {
+                                                  FrcErrorReportSubmitter.submitReportableEvent(ReportableEvent(
+                                                      correlationId = "Task: $name",
+                                                      project = this@runBackgroundTask,
+                                                      throwable = t,
+                                                      lastActionId = IdeaLogger.ourLastActionId,
+                                                      additionalData = debuggingData))
+                                              }
                                           }
                                       })
 }
@@ -102,7 +126,47 @@ fun Project.backgroundTask(
                           )
 {
     val backgroundOption = if (background) PerformInBackgroundOption.ALWAYS_BACKGROUND else PerformInBackgroundOption.DEAF
-    this.runBackgroundTask(name, indeterminate, cancellable, backgroundOption, callback)
+    this.runBackgroundTask(name, indeterminate, cancellable, backgroundOption, action = callback)
+}
+
+fun Project?.runSafely(correlationId: String, debuggingData: Map<String, Any?>? = null, action: () -> Unit)
+{
+    try
+    {
+        action.invoke()
+    }
+    catch (t: Throwable)
+    {
+        FrcErrorReportSubmitter.submitReportableEvent(
+            ReportableEvent(
+                correlationId = "Task: $correlationId",
+                project = this,
+                throwable = t,
+                lastActionId = IdeaLogger.ourLastActionId,
+                additionalData = debuggingData
+                           )
+                                                     )
+    }
+}
+
+fun <R> Project?.runSafelyWithResult(correlationId: String, debuggingData: Map<String, String?>? = null, action: () ->R): Result<R, Throwable>
+{
+    return try
+    {
+        Ok(action.invoke())
+    }
+    catch (t: Throwable)
+    {
+        FrcErrorReportSubmitter.submitReportableEvent(
+            ReportableEvent(
+                correlationId = "Task: $correlationId",
+                project = this,
+                throwable = t,
+                lastActionId = IdeaLogger.ourLastActionId,
+                additionalData = debuggingData
+                           ))
+        Err(t)
+    }
 }
 
 /**

@@ -429,14 +429,23 @@
                     class="net.javaru.iip.frc.actions.tools.internal.FetchSpecifiedRestResource" />
             <action id="FRC.tools.internal.CreateRunConfigurationsFrcInternalAction"
                     class="net.javaru.iip.frc.actions.tools.internal.CreateRunConfigurationsFrcInternalAction"/>
-            <action id="FRC.tools.internal.CheckIncludeDesktopSupportSetting"
-                    class="net.javaru.iip.frc.actions.tools.internal.CheckIncludeDesktopSupportSetting" />
-            <action id="FRC.tools.internal.MarkGradleProjectDirty" 
-                    class="net.javaru.iip.frc.actions.tools.internal.MarkGradleProjectDirtyInternalAction" />
             <action id="FRC.tools.internal.CreateTempFile"
                     class="net.javaru.iip.frc.actions.tools.internal.CreateTempFile" />
             <action id="FRC.tools.internal.ShowPlaceholderTextFieldPaddingDemoDialog"
                     class="net.javaru.iip.frc.actions.tools.internal.ShowPlaceholderTextFieldPaddingDemoDialog" />
+        </group>
+
+        <group id="FRC.FrcInternalGradleActionsGroup"
+               class="net.javaru.iip.frc.actions.tools.internal.FrcInternalGradleActionsGroup"
+               popup="true"
+               icon="GradleIcons.Gradle">
+            <add-to-group group-id="FRC.FrcInternalActionsGroup" anchor="after" relative-to-action="FRC.tools.internal.ShowFrcApplicationSettings" />
+            <action id="FRC.tools.internal.ReimportGradleProjectInternalAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ReimportGradleProjectInternalAction" />
+            <action id="FRC.tools.internal.MarkGradleProjectDirty"
+                    class="net.javaru.iip.frc.actions.tools.internal.MarkGradleProjectDirtyInternalAction" />
+            <action id="FRC.tools.internal.CheckIncludeDesktopSupportSetting"
+                    class="net.javaru.iip.frc.actions.tools.internal.CheckIncludeDesktopSupportSetting" />
         </group>
 
         <group id="FRC.FrcInternalVendordepsActionsGroup"

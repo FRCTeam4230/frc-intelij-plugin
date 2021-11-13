@@ -25,12 +25,14 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ApplicationNamesInfo
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent
 import com.intellij.openapi.diagnostic.SubmittedReportInfo
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task.Backgroundable
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.util.Consumer
 import io.sentry.Attachment
@@ -129,6 +131,10 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
         }
     }
 
+    companion object
+    {
+        fun submitReportableEvent(reportableEvent: ReportableEvent) = service<FrcErrorReportSubmitter>().submitReportableEvent(reportableEvent)
+    }
 
     override fun getReportActionText() = "Report to FRC Plugin Author"
 
@@ -148,51 +154,61 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
         {
             override fun run(indicator: ProgressIndicator)
             {
-                for (ideaEvent in events)
+                try
                 {
-                    // Using withScope allows us to send data with one specific event.
-                    // Do not confuse with Sentry.configureScope { scope -> . . . }
-                    // configureScope changes the current active scope, all successive calls to configure-scope will keep the changes.
-                    // withScope however creates a clone of the current scope and will stay isolated until the function call is completed.
-                    // https://docs.sentry.io/platforms/java/enriching-events/scopes/#local-scopes
-                    Sentry.withScope { scope: Scope ->
-                        // Set the last action ID as it might be useful for debugging
-                        scope.setExtraSafely("last.action", lastActionId)
-                        scope.setExtraSafely("plugin.name", IdeErrorsDialog.getPlugin(ideaEvent)?.name)
-                        scope.setExtraSafely("plugin.id", IdeErrorsDialog.getPlugin(ideaEvent)?.pluginId?.idString)
-                        val throwable: Throwable? = if (ideaEvent is IdeaReportingEvent)
-                        {
-                            scope.addThrowableAsAttachment(ideaEvent.throwable, "ideaEvent.throwable.txt")
-                            ideaEvent.data.throwable
-                        }
-                        else
-                        {
-                            ideaEvent.throwable
-                        }
-                        scope.addThrowableAsAttachment(throwable, "the.throwable.txt")
-                        val sentryEvent = SentryEvent(throwable)
-                        sentryEvent.level = SentryLevel.ERROR
-                        sentryEvent.setMessageSafely(scope, ideaEvent, additionalInfo)
-                        sentryEvent.setStacktraceHashes(throwable)
-                        try
-                        {
-                            // For some reason calling
-                            //     if (ideaEventData is LogMessage)
-                            // always returns false, even when it is a LogMessage. So we just do the
-                            // cast, and catch any exception since in most cases it is a LogMessage
-                            val ideaEventData = ideaEvent.data
-                            val attachments = (ideaEventData as LogMessage).allAttachments
-                            for (ideaAttachment in attachments)
+                    for (ideaEvent in events)
+                    {
+                        // Using withScope allows us to send data with one specific event.
+                        // Do not confuse with Sentry.configureScope { scope -> . . . }
+                        // configureScope changes the current active scope, all successive calls to configure-scope will keep the changes.
+                        // withScope however creates a clone of the current scope and will stay isolated until the function call is completed.
+                        // https://docs.sentry.io/platforms/java/enriching-events/scopes/#local-scopes
+                        Sentry.withScope { scope: Scope ->
+                            // Set the last action ID as it might be useful for debugging
+                            scope.setExtraSafely("last.action", lastActionId)
+                            scope.setExtraSafely("plugin.name", IdeErrorsDialog.getPlugin(ideaEvent)?.name)
+                            scope.setExtraSafely("plugin.id", IdeErrorsDialog.getPlugin(ideaEvent)?.pluginId?.idString)
+                            scope.setExtraSafely("event.type", "ErrorReportSubmitter")
+                            val throwable: Throwable? = if (ideaEvent is IdeaReportingEvent)
                             {
-                                scope.addAttachment(Attachment(ideaAttachment.bytes, ideaAttachment.path))
+                                scope.addThrowableAsAttachment(ideaEvent.throwable, "ideaEvent.throwable.txt")
+                                ideaEvent.data.throwable
                             }
+                            else
+                            {
+                                ideaEvent.throwable
+                            }
+                            scope.addThrowableAsAttachment(throwable, "the.throwable.txt")
+                            val sentryEvent = SentryEvent(throwable)
+                            sentryEvent.level = SentryLevel.ERROR
+                            sentryEvent.setMessageSafely(scope, ideaEvent, additionalInfo)
+                            sentryEvent.setStacktraceHashes(throwable)
+                            try
+                            {
+                                // For some reason calling
+                                //     if (ideaEventData is LogMessage)
+                                // always returns false, even when it is a LogMessage. So we just do the
+                                // cast, and catch any exception since in most cases it is a LogMessage
+                                val ideaEventData = ideaEvent.data
+                                val attachments = (ideaEventData as LogMessage).allAttachments
+                                for (ideaAttachment in attachments)
+                                {
+                                    scope.addAttachment(Attachment(ideaAttachment.bytes, ideaAttachment.path))
+                                }
+                            }
+                            catch (e: Exception)
+                            {
+                                LOG.debug("Could not add attachment: $e")
+                            }
+
+                            val sentryId = Sentry.captureEvent(sentryEvent)
+                            logReportSubmission(sentryId)
                         }
-                        catch (e: Exception)
-                        {
-                            LOG.debug("Could not add attachment: $e")
-                        }
-                        logReportSubmission(sentryEvent)
                     }
+                }
+                catch (t: Throwable)
+                {
+                    LOG.info("[FRC] Could not report error. Reason: $t")
                 }
 
                 // We just always say thanks regardless of success
@@ -212,6 +228,40 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
         return true
     }
 
+
+
+    fun submitReportableEvent(event: ReportableEvent)
+    {
+        object : Backgroundable(event.project, "Log issue")
+        {
+            override fun run(indicator: ProgressIndicator)
+            {
+                try
+                {
+                    Sentry.withScope { scope: Scope ->
+                        scope.setExtraSafely("event.type", "ReportableEvent")
+                        scope.setExtraSafely("last.action", event.lastActionId)
+                        scope.setExtraSafely("correlationId", event.correlationId)
+                        event.additionalData?.forEach { scope.setExtraSafely(it.key, it.value) }
+
+                        scope.addThrowableAsAttachment(event.throwable, "the.throwable.txt")
+                        val sentryEvent = SentryEvent(event.throwable)// Is null safe
+                        sentryEvent.setStacktraceHashes(event.throwable)
+                        sentryEvent.level = event.level
+                        sentryEvent.setMessageSafely(scope, event.messageOrAdditionalInfo, event.messageAddendum)
+                        event.attachments?.forEach { scope.addAttachment(it) }
+                        val sentryId = Sentry.captureEvent(sentryEvent)
+                        logReportSubmission(sentryId)
+                    }
+                }
+                catch (t: Throwable)
+                {
+                    LOG.info("[FRC] Could not report ReportableEvent [correlationId: ${event.correlationId}]. Reason: $t")
+                }
+            }
+        }.queue()
+    }
+
     private fun Scope.addThrowableAsAttachment(throwable: Throwable?, attachmentName: String)
     {
         if (throwable != null)
@@ -228,6 +278,11 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
     private fun Scope.setExtraSafely(key: String, value: String?)
     {
         if (value != null) this.setExtra(key, value)
+    }
+
+    private fun Scope.setExtraSafely(key: String, value: Any?)
+    {
+        if (value != null) this.setExtra(key, value.toString())
     }
 
     private data class StacktraceHashes(val fullHash: String, val limitedHash: String, val singleHash: String)
@@ -291,6 +346,22 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
         return this.setMessageSafely(scope, detailedMessage)
     }
 
+    private fun SentryEvent.setMessageSafely(scope: Scope, eventMessage: String?, messageAddendum: Map<String, String?>? = emptyMap()): Message?
+    {
+        if(eventMessage == null && messageAddendum.isNullOrEmpty()) {
+            return null
+        }
+        val sb = StringBuilder()
+        if (eventMessage!= null) sb.append("Event Message:   ").append(eventMessage)
+        if (!messageAddendum.isNullOrEmpty()) {
+            sb.append("Addendum:\n")
+            messageAddendum.forEach {
+                sb.append(it.key).append(": ").append(it.value).append("\n")
+            }
+        }
+        return this.setMessageSafely(scope, sb.toString())
+    }
+
     private fun SentryEvent.setMessageSafely(scope: Scope, messageOrAdditionalInfo: String?) : Message?
     {
         return if (messageOrAdditionalInfo != null)
@@ -310,9 +381,8 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
         }
     }
 
-    private fun logReportSubmission(sentryEvent: SentryEvent)
+    private fun logReportSubmission(sentryId: SentryId)
     {
-        val sentryId = Sentry.captureEvent(sentryEvent)
         val msg = if (sentryId != SentryId.EMPTY_ID)
             "[FRC] Issue report submitted as: $sentryId"
         else
@@ -320,3 +390,26 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
         LOG.info(msg)
     }
 }
+
+/**
+ * @param correlationId An ID that can be used to correlate the reported event to the action of location that caused it
+ * @param project The IntelliJ IDEA project. Used for creating the background task. Is *not* reported.
+ * @param throwable Optional throwable related to the event
+ * @param level The level to report the event as
+ * @param lastActionId The ID of the last action to be invoked, obtain via: `IdeaLogger.ourLastActionId`
+ * @param messageOrAdditionalInfo The message ro information to report with the event
+ * @param messageAddendum An optional map of key:value pairs that may be useful in troubleshooting, such as variable names and values
+ * @param additionalData An optional map of key:value pairs to be added to the Sentry Report as extras.
+ * @param attachments Collection of attachments to add to the report
+ */
+data class ReportableEvent(
+    val correlationId: String? = null,
+    val project: Project? = null,
+    val throwable: Throwable? = null,
+    val level: SentryLevel = SentryLevel.WARNING,
+    val lastActionId: String? = null,
+    val messageOrAdditionalInfo: String? = IdeaLogger.ourLastActionId,
+    val messageAddendum: Map<String, String?>? = emptyMap(),
+    val additionalData: Map<String, Any?>? = emptyMap(),
+    val attachments: Collection<Attachment>? = emptyList()
+                          )

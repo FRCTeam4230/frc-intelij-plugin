@@ -399,7 +399,8 @@ class VendordepsService private constructor(val project: Project)
         project.runBackgroundTask(
             "Download Vendordeps File",
             cancellable = true,
-            background = PerformInBackgroundOption.ALWAYS_BACKGROUND) { indicator: ProgressIndicator ->
+            background = PerformInBackgroundOption.ALWAYS_BACKGROUND
+                                 ) { indicator: ProgressIndicator ->
             val result = downloadVendordepsToTempFile(url, indicator)
             resultProcessor.invoke(result)
         }

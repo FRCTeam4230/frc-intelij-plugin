@@ -13,11 +13,14 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  */
+@file:Suppress("PropertyName")
+
 package net.javaru.iip.frc.actions.tools.internal
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -46,6 +49,7 @@ import net.javaru.iip.frc.services.FrcGradleService
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.ui.internal.PlaceholderTextFieldPaddingDemoFormDialogWrapper
 import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
+import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.runWhenSmart
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsListing
@@ -57,14 +61,16 @@ import javax.swing.Icon
 
 
 class FrcInternalVendordepsActionsGroup : FrcInternalActionsGroup()
+class FrcInternalGradleActionsGroup : FrcInternalActionsGroup()
 
 private object FrcInternalActions
 
+@Suppress("unused")
 private val logger = logger<FrcInternalActions>()
 
 abstract class AbstractFrcInternalAction : AnAction
 {
-    protected val LOG = logger<AbstractFrcInternalAction>()
+    protected val log = logger<AbstractFrcInternalAction>()
 
     protected constructor()
 
@@ -279,6 +285,15 @@ class MarkGradleProjectDirtyInternalAction: AbstractFrcInternalAction()
     }
 }
 
+class ReimportGradleProjectInternalAction: AbstractFrcInternalAction(AllIcons.Actions.Refresh)
+{
+    override fun actionPerformed(e: AnActionEvent)
+    {
+        val project = e.getData(CommonDataKeys.PROJECT)
+        project?.reimportGradleProject()
+    }
+}
+
 class FindVendordepsDirFrcInternalAction: AbstractFrcInternalAction()
 {
     override fun actionPerformed(actionEvent: AnActionEvent) {
@@ -384,7 +399,7 @@ class ShowFrcApplicationSettings : AbstractFrcInternalAction(FRC.FIRST_ICON_MEDI
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
         val settingsString = FrcApplicationSettings.getInstance().toString()
-        LOG.info("[FRC] $settingsString")
+        log.info("[FRC] $settingsString")
         Messages.showMessageDialog(
             actionEvent.project,
             settingsString,

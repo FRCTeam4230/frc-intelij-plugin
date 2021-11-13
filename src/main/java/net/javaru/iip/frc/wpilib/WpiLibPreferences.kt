@@ -199,7 +199,7 @@ fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
 
 fun Project.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask(taskName: String = "Determining configured FRC team number", resultCallback: (teamNumber:Int) -> Unit)
 {
-    this.runBackgroundTask(taskName) {progress ->
+    this.runBackgroundTask(taskName) { progress ->
         progress.text = "Reading team number from wpilib_preferences.json"
         val teamNum = findLikelyWpiLibPreferencesPsiFileAsJsonFile(this)?.getIntPropertyValue(teamNumberPropertyName) ?: FrcApplicationSettings.getInstance().teamNumber
         resultCallback.invoke(teamNum)

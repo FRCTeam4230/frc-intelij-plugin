@@ -43,6 +43,7 @@ import net.javaru.iip.frc.notify.FrcNotifications.notify
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllOpenProjects
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.services.FrcGradleService
+import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.ui.internal.PlaceholderTextFieldPaddingDemoFormDialogWrapper
 import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
 import net.javaru.iip.frc.util.runWhenSmart
@@ -63,7 +64,11 @@ private val logger = logger<FrcInternalActions>()
 
 abstract class AbstractFrcInternalAction : AnAction
 {
+    protected val LOG = logger<AbstractFrcInternalAction>()
+
     protected constructor()
+
+    protected constructor(icon: Icon?): super(icon)
 
     @Suppress("unused")
     protected constructor(text: String?) : super(text)
@@ -143,7 +148,13 @@ class LogAnErrorAction : AbstractFrcInternalAction()
         logger.info("[FRC] logging a simulated error message for testing exception handling")
         logger.error("[FRC] Test Error; Please Ignore. Sample error logging for testing: ${randomString()}")
     }
+
+    companion object
+    {
+        private val logger = logger<LogAnErrorAction>()
+    }
 }
+
 
 class RunKotlinCodeForTestingAndDebuggingFrcInternalAction : AbstractFrcInternalAction()
 {
@@ -174,6 +185,11 @@ class RunKotlinCodeForTestingAndDebuggingFrcInternalAction : AbstractFrcInternal
         }
 
         logger.trace {"[FRC] BREAKPOINT"}
+    }
+
+    companion object
+    {
+        private val logger = logger<CauseAnExceptionAction>()
     }
 }
 
@@ -360,5 +376,20 @@ class DownloadVendorDeps: AbstractFrcInternalAction()
             }
 
         }
+    }
+}
+
+class ShowFrcApplicationSettings : AbstractFrcInternalAction(FRC.FIRST_ICON_MEDIUM_16)
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        val settingsString = FrcApplicationSettings.getInstance().toString()
+        LOG.info("[FRC] $settingsString")
+        Messages.showMessageDialog(
+            actionEvent.project,
+            settingsString,
+            "Frc Application Settings",
+            FRC.FIRST_ICON_MEDIUM_16
+                                  )
     }
 }

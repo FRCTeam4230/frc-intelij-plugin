@@ -67,7 +67,7 @@ abstract class AbstractCauseAnExceptionAction(text: String?, description: String
                 // Lines intentionally blank
                 // Lines intentionally blank to keep exception creation on line 68
                 val exception =
-                    TestException.create("random exception text ${randomString()}") // We want the stacktrace line numbers to be consistent, so we always create on the same line, 186 if possible
+                    TestException.create("random exception text ${randomString()}", TestException("Cause with random text ${randomString()}", TestException("Nested cause with random text ${randomString()}"))) // We want the stacktrace line numbers to be consistent, so we always create on the same line, 186 if possible
 
                 if (includeAttachments)
                     Logger.getInstance(TEST_LOGGER).error(TEST_MESSAGE, exception, *attachments)

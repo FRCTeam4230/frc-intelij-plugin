@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.services
 
+import com.intellij.diagnostic.IdeErrorsDialog
 import com.intellij.diagnostic.IdeaReportingEvent
 import com.intellij.diagnostic.LogMessage
 import com.intellij.ide.DataManager
@@ -39,14 +40,18 @@ import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import io.sentry.protocol.Message
 import io.sentry.protocol.SentryId
+import io.sentry.protocol.User
 import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.i18n.FrcBundle
 import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications
+import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.util.FrcSystemConfigs
 import net.javaru.iip.frc.util.frcPluginVersion
 import net.javaru.iip.frc.util.getPluginResourceAsStream
 import java.awt.Component
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.util.*
 
 
@@ -114,6 +119,13 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
             Sentry.setTag("ide.code", ApplicationInfo.getInstance().build.productCode)
             Sentry.setTag("ide.name", "${ApplicationInfo.getInstance().fullApplicationName} ${ApplicationNamesInfo.getInstance().editionName}")
             Sentry.setTag("os", SystemInfo.getOsNameAndVersion())
+            val frcApplicationSettings = FrcApplicationSettings.getInstance()
+            Sentry.setTag("frc.team", frcApplicationSettings.teamNumber.toString())
+            val niid = frcApplicationSettings.niid
+            Sentry.setTag("niid", niid)
+            Sentry.setUser(User().apply {
+                this.id = niid
+            })
         }
     }
 
@@ -145,20 +157,23 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
                     // https://docs.sentry.io/platforms/java/enriching-events/scopes/#local-scopes
                     Sentry.withScope { scope: Scope ->
                         // Set the last action ID as it might be useful for debugging
-                        scope.setExtra("last.action", lastActionId)
-                        val throwable: Throwable? = if (ideaEvent is IdeaReportingEvent) ideaEvent.data.throwable else ideaEvent.throwable
+                        scope.setExtraSafely("last.action", lastActionId)
+                        scope.setExtraSafely("plugin.name", IdeErrorsDialog.getPlugin(ideaEvent)?.name)
+                        scope.setExtraSafely("plugin.id", IdeErrorsDialog.getPlugin(ideaEvent)?.pluginId?.idString)
+                        val throwable: Throwable? = if (ideaEvent is IdeaReportingEvent)
+                        {
+                            scope.addThrowableAsAttachment(ideaEvent.throwable, "ideaEvent.throwable.txt")
+                            ideaEvent.data.throwable
+                        }
+                        else
+                        {
+                            ideaEvent.throwable
+                        }
+                        scope.addThrowableAsAttachment(throwable, "the.throwable.txt")
                         val sentryEvent = SentryEvent(throwable)
                         sentryEvent.level = SentryLevel.ERROR
-                        if (additionalInfo != null)
-                        {
-                            sentryEvent.message = Message().apply {
-                                this.message = additionalInfo
-                            }
-                        }
-                        val (fullHash, limitedHash, singleLine) = StacktraceHashes.create(throwable)
-                        sentryEvent.setTag("ex.hash.full", fullHash)
-                        sentryEvent.setTag("ex.hash.limited", limitedHash)
-                        sentryEvent.setTag("ex.hash.single", singleLine)
+                        sentryEvent.setMessageSafely(scope, ideaEvent, additionalInfo)
+                        sentryEvent.setStacktraceHashes(throwable)
                         try
                         {
                             // For some reason calling
@@ -176,14 +191,7 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
                         {
                             LOG.debug("Could not add attachment: $e")
                         }
-
-
-                        val sentryId = Sentry.captureEvent(sentryEvent)
-                        val msg = if (sentryId != SentryId.EMPTY_ID)
-                            "[FRC] Error report submitted as: $sentryId"
-                        else
-                            "[FRC] Error report submission failed."
-                        LOG.info(msg)
+                        logReportSubmission(sentryEvent)
                     }
                 }
 
@@ -204,11 +212,29 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
         return true
     }
 
-    data class StacktraceHashes(val fullHash:String, val limitedHash: String, val singleHash: String)
+    private fun Scope.addThrowableAsAttachment(throwable: Throwable?, attachmentName: String)
+    {
+        if (throwable != null)
+        {
+            val sw = StringWriter()
+            PrintWriter(sw).use {
+                throwable.printStackTrace(it)
+                it.flush()
+            }
+            addAttachment(Attachment(sw.toString().toByteArray(), attachmentName))
+        }
+    }
+
+    private fun Scope.setExtraSafely(key: String, value: String?)
+    {
+        if (value != null) this.setExtra(key, value)
+    }
+
+    private data class StacktraceHashes(val fullHash: String, val limitedHash: String, val singleHash: String)
     {
         companion object
         {
-            fun create(t:Throwable?): StacktraceHashes
+            fun create(t: Throwable?): StacktraceHashes
             {
                 if (t == null)
                     return StacktraceHashes("0", "0", "0")
@@ -221,5 +247,76 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
                                        )
             }
         }
+    }
+
+    private fun SentryEvent.setStacktraceHashes(throwable: Throwable?) {
+        if (throwable != null) {
+            val (fullHash, limitedHash, singleLine) = StacktraceHashes.create(throwable)
+            this.setTag("ex.hash.full", fullHash)
+            this.setTag("ex.hash.limited", limitedHash)
+            this.setTag("ex.hash.single", singleLine)
+        }
+    }
+
+    private fun SentryEvent.setMessageSafely(scope: Scope, ideaEvent: IdeaLoggingEvent, additionalInfo: String?): Message?
+    {
+        val additionalInfoClean = additionalInfo ?: "<none entered>"
+
+        var detailedMessage =
+            """Event Message:    ${ideaEvent.message}
+              |Additional Info:  $additionalInfoClean
+              |""".trimMargin()
+
+        if (ideaEvent is IdeaReportingEvent)
+        {
+            if (ideaEvent.message != ideaEvent.originalMessage)
+            {
+                detailedMessage += "Original Message: ${ideaEvent.originalMessage}"
+            }
+
+            scope.addAttachment(Attachment(ideaEvent.originalThrowableText.toByteArray(), "originalCausingThrowableStacktrace.txt"))
+        }
+        return this.setMessageSafely(scope, detailedMessage)
+    }
+
+    private fun SentryEvent.setMessageSafely(scope: Scope, eventMessage: String?, additionalInfo: String?): Message?
+    {
+        if(additionalInfo == null && eventMessage == null) {
+            return null
+        }
+
+        val detailedMessage =
+            """Event Message:   $eventMessage
+              |Additional Info: ${additionalInfo ?: "<none entered>"}""".trimMargin()
+        return this.setMessageSafely(scope, detailedMessage)
+    }
+
+    private fun SentryEvent.setMessageSafely(scope: Scope, messageOrAdditionalInfo: String?) : Message?
+    {
+        return if (messageOrAdditionalInfo != null)
+        {
+            this.message = Message().apply {
+                message = messageOrAdditionalInfo
+            }
+            if (messageOrAdditionalInfo.length > 8192) {
+                // Messages over 8,192 characters are truncated, so we add the full message as an attachment
+                scope.addAttachment(Attachment(messageOrAdditionalInfo.toByteArray(), "non-truncated_message.txt"))
+            }
+            this.message
+        }
+        else
+        {
+            null
+        }
+    }
+
+    private fun logReportSubmission(sentryEvent: SentryEvent)
+    {
+        val sentryId = Sentry.captureEvent(sentryEvent)
+        val msg = if (sentryId != SentryId.EMPTY_ID)
+            "[FRC] Issue report submitted as: $sentryId"
+        else
+            "[FRC] Issue report submission failed."
+        LOG.info(msg)
     }
 }

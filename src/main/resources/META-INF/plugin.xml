@@ -409,6 +409,8 @@
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
             <add-to-group group-id="ToolsMenu" relative-to-action="FRC.FrcToolsActionsGroup" anchor="after" />
+            <action id="FRC.tools.internal.ShowFrcApplicationSettings"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowFrcApplicationSettings" />
             <action id="FRC.tools.internal.RunKotlinCode"
                     class="net.javaru.iip.frc.actions.tools.internal.RunKotlinCodeForTestingAndDebuggingFrcInternalAction" />
             <action id="FRC.tools.internal.RunJavaCode"

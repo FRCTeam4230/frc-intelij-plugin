@@ -16,9 +16,9 @@
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.gradle.ext.ProjectSettings
-import java.nio.file.Path
-import java.nio.file.Files
 import java.io.FileNotFoundException
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.*
 
 
@@ -342,8 +342,9 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava")
     implementation("org.freemarker:freemarker:2.3.31")
     implementation("com.michael-bull.kotlin-result:kotlin-result:1.1.13")
+    implementation("com.michael-bull.kotlin-result:kotlin-result-jvm:1.1.13")
 
-    implementation(platform ("io.sentry:sentry-bom:5.3.0"))
+    implementation(platform ("io.sentry:sentry-bom:5.4.0"))
     implementation("io.sentry:sentry") {
         exclude(group = "org.slf4j", module = "slf4j-api")
             .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")

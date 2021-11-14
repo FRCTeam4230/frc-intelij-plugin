@@ -122,7 +122,7 @@ data class Vendordeps(
                 }
                 catch (e: Exception)
                 {
-                    LOG.warn("UUID string could not be converted to UUID. Reason: $e")
+                    LOG.warn("[FRC] Vendordeps UUID string '$uuidString' could not be converted to UUID. Reason: $e")
                     nonConformingUuidsMap.computeIfAbsent(name) { UUID.randomUUID() }
                 }
             }

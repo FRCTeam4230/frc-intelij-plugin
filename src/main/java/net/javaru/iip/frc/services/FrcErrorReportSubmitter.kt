@@ -82,6 +82,7 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
 
         Sentry.init { options ->
             options.apply {
+                isEnableExternalConfiguration = false // We disable since we don't load any
                 dsn = sentryDsn
                 release = frcPluginVersion ?: "<undetermined>"
                 // short version is basically hte major version, such as 2021.3 for all 2021.3 versions such as 2021.3.3, 2021.3.1, 2021.3, etc.
@@ -90,12 +91,18 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
                 // We don't want to get people's system names (for privacy reasons), and we don't really need it.
                 // But if you do not set it, Sentry sets it automatically
                 isAttachServerName = false
+                isSendDefaultPii = false // whether to send Personal Identifiable Information (PII)
                 // When enabled, stack traces are automatically attached to all messages logged. Stack traces are always
                 // attached to exceptions; however, when this option is set, stack traces are also sent with messages.
                 // This option, for instance, means that stack traces appear next to all log messages.
                 // https://docs.sentry.io/platforms/java/configuration/options/#attach-stacktrace
                 isAttachStacktrace = true
                 inAppIncludes.addAll(mutableListOf("net.javaru", "io.javaru", "org.javaru"))
+                enableUncaughtExceptionHandler = false // when enabled, it catches a lot of noise from the IDE that we can't do anything about
+                isEnableNdk = false // Android Native Development Kit: https://docs.sentry.io/platforms/android/using-ndk/
+                isEnableScopeSync = false // the Java to NDK Scope sync
+                isEnableScopeSync = false // the Java to NDK Scope sync
+                isEnableAutoSessionTracking = false // web sessions; n/a for us; but is on by default
                 setDebug(useQA)
                 // This applies to performance monitoring, which we are not using at this time
                 //tracesSampleRate = 1.0
@@ -190,6 +197,7 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
                                 // always returns false, even when it is a LogMessage. So we just do the
                                 // cast, and catch any exception since in most cases it is a LogMessage
                                 val ideaEventData = ideaEvent.data
+                                // Note: Max attachment size is 20 MB
                                 val attachments = (ideaEventData as LogMessage).allAttachments
                                 for (ideaAttachment in attachments)
                                 {
@@ -400,7 +408,7 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
  * @param messageOrAdditionalInfo The message ro information to report with the event
  * @param messageAddendum An optional map of key:value pairs that may be useful in troubleshooting, such as variable names and values
  * @param additionalData An optional map of key:value pairs to be added to the Sentry Report as extras.
- * @param attachments Collection of attachments to add to the report
+ * @param attachments Collection of attachments to add to the report; note max attachment size is 20MB
  */
 data class ReportableEvent(
     val correlationId: String? = null,

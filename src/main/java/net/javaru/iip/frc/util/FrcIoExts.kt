@@ -18,7 +18,16 @@
 
 package net.javaru.iip.frc.util
 
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.util.io.createDirectories
+import net.javaru.iip.frc.common.FrcPluginFileAlreadyExistsError
+import net.javaru.iip.frc.common.FrcPluginIoError
+import net.javaru.iip.frc.common.FrcPluginSourceFileNotFoundError
 import java.io.Closeable
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -27,7 +36,9 @@ import java.io.Writer
 import java.net.ServerSocket
 import java.net.Socket
 import java.nio.channels.Selector
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 
 /*
 
@@ -35,6 +46,9 @@ import java.nio.file.Path
 In particular the Path.copy and Path.move extension functions
 
  */
+
+private object FrcIoExts
+private val logger = logger<FrcIoExts>()
 
 ///**
 // * Returns the end path by removing the base path from the full path.
@@ -413,5 +427,65 @@ fun ServerSocket?.closeQuietly()
             // ignored
 
         }
+    }
+}
+
+/**
+ * Convenience wrapper for [Files.copy] that creates parent directories before the move
+ * and can set the [StandardCopyOption.REPLACE_EXISTING] option (set by default). If
+ * `replaceExisting` is set to false and the file already exists, a
+ * [java.nio.file.FileAlreadyExistsException] is thrown by the underlying operation
+ * and wrapped in a [FrcPluginFileAlreadyExistsError].
+ *
+ * @return the target file or the Error that prevented completion.
+ */
+fun Path.copyTo(target: Path, replaceExisting: Boolean = true): Result<Path, FrcPluginIoError>
+{
+    return this.modifyOperation(target, createTargetParents = true) { theSource, theTarget ->
+        if (replaceExisting)
+            Files.copy(theSource, theTarget, StandardCopyOption.REPLACE_EXISTING)
+        else
+            Files.copy(theSource, theTarget)
+        target
+    }
+}
+
+/**
+ * Convenience wrapper for [Files.move] that creates parent directories before the move
+ * and can set the [StandardCopyOption.REPLACE_EXISTING] option (set by default). If
+ * `replaceExisting` is set to false and the file already exists, a
+ * [java.nio.file.FileAlreadyExistsException] is thrown by the underlying operation
+ * and wrapped in a [FrcPluginFileAlreadyExistsError].
+ *
+ * @return the target file or the Error that prevented completion.
+ */
+fun Path.moveTo(target: Path, replaceExisting: Boolean = true): Result<Path, FrcPluginIoError>
+{
+    return this.modifyOperation(target, createTargetParents = true) { theSource, theTarget ->
+        if (replaceExisting)
+            Files.move(theSource, theTarget, StandardCopyOption.REPLACE_EXISTING)
+        else
+            Files.move(theSource, theTarget)
+        target
+    }
+}
+
+fun Path.modifyOperation(target: Path, createTargetParents: Boolean = true, operation: (source:Path, target: Path) -> Path): Result<Path, FrcPluginIoError>
+{
+    return try
+    {
+        if (createTargetParents) target.parent?.createDirectories()
+        Ok(operation.invoke(this, target))
+    }
+    catch (t: Throwable)
+    {
+        logger.info("[FRC] Could NOT copy $this to $target. Reason: $t")
+        val error: FrcPluginIoError = when (t)
+        {
+            is FileNotFoundException          -> FrcPluginSourceFileNotFoundError(t)
+            is FileAlreadyExistsException -> FrcPluginFileAlreadyExistsError(t)
+            else                      -> FrcPluginIoError(t)
+        }
+        Err(error)
     }
 }

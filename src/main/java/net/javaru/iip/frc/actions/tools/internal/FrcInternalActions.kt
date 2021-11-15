@@ -52,12 +52,11 @@ import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
 import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.runWhenSmart
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
-import net.javaru.iip.frc.wpilib.vendordeps.VendordepsListing
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsManagementDialogWrapper
+import net.javaru.iip.frc.wpilib.vendordeps.VendordepsProjectListing
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsService
 import java.nio.file.Path
 import javax.swing.Icon
-
 
 
 class FrcInternalVendordepsActionsGroup : FrcInternalActionsGroup()
@@ -311,16 +310,28 @@ class GetVendordepsListingFrcInternalAction: AbstractFrcInternalAction()
     override fun actionPerformed(actionEvent: AnActionEvent) {
         executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
             it.runWhenSmart {
-                VendordepsService.getInstance(it).getAndUseVendordeps(notifyOnDuplicates = true) { listing: VendordepsListing ->
+                VendordepsService.getInstance(it).getAndUseVendordeps(notifyOnDuplicates = true) { listing: VendordepsProjectListing ->
                     val sb = StringBuilder()
                     sb.append("<html><h3>Vendordeps:</h3><ol>")
-                    listing.vendordepsFileList.forEach { item ->
+                    listing.vendordepsProjectFileList.forEach { item ->
                         sb.append("<li>$item</li>")
                     }
                     sb.append("</ol></html>")
 
                     FrcNotifications.notifyInfoBalloon(sb.toString())
                 }
+            }
+        }
+    }
+}
+
+class VendordepsCheckForDuplicatesInternalAction : AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
+            it.runWhenSmart {
+                VendordepsService.getInstance(it).checkForDuplicates(true)
             }
         }
     }

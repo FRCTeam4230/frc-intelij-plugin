@@ -173,9 +173,9 @@ fun VirtualFile?.isVendordepsJsonFile(project: Project?): Boolean
 }
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-class VendordepsListing(val vendordepsFileList: List<VendordepsFile>,
-                        val vendordepsFileMap: Map<UUID, List<VendordepsFile>>,
-                        val duplicateVendordepsMap: Map<UUID, List<VendordepsFile>>)
+class VendordepsProjectListing(val vendordepsProjectFileList: List<VendordepsProjectFile>,
+                               val vendordepsProjectFileMap: Map<UUID, List<VendordepsProjectFile>>,
+                               val duplicateVendordepsMap: Map<UUID, List<VendordepsProjectFile>>)
 {
     fun hasDuplicates(): Boolean = duplicateVendordepsMap.isNotEmpty()
 }
@@ -184,7 +184,7 @@ class VendordepsListing(val vendordepsFileList: List<VendordepsFile>,
 class VendordepsService private constructor(val project: Project)
 {
     private val logger = logger<VendordepsService>()
-    private var vendordepsListing by Delegates.notNull<VendordepsListing>()
+    private var vendordepsProjectListing by Delegates.notNull<VendordepsProjectListing>()
 
     init
     {
@@ -200,14 +200,14 @@ class VendordepsService private constructor(val project: Project)
     }
     
     @Suppress("MemberVisibilityCanBePrivate")
-    fun getLastKnownVendordepsListing(): VendordepsListing = vendordepsListing
+    fun getLastKnownVendordepsListing(): VendordepsProjectListing = vendordepsProjectListing
 
 
-    fun getAndUseVendordeps(notifyOnDuplicates: Boolean = false, callback: (VendordepsListing) -> Unit)
+    fun getAndUseVendordeps(notifyOnDuplicates: Boolean = false, callback: (VendordepsProjectListing) -> Unit)
     {
         project.runReadActionInSmartMode {
             updateVendordepsListing(notifyOnDuplicates)
-            callback.invoke(vendordepsListing)
+            callback.invoke(vendordepsProjectListing)
         }
     }
     
@@ -222,7 +222,7 @@ class VendordepsService private constructor(val project: Project)
     {
         val vendordepsDir = findVendordepsDir()
         logger.debug { "[FRC] $vendordepsDirName dir found at: ${vendordepsDir?.virtualFile?.path}" }
-        val vendordepsFileList = mutableListOf<VendordepsFile>()
+        val vendordepsProjectFileList = mutableListOf<VendordepsProjectFile>()
         vendordepsDir
             ?.children
             ?.stream()
@@ -231,45 +231,45 @@ class VendordepsService private constructor(val project: Project)
             ?.filter { it.isVendordepsJsonFile(project) }
             ?.forEach { jsonFile: JsonFile ->
                 Vendordeps.parse(jsonFile).onSuccess { vendordeps: Vendordeps ->
-                    vendordepsFileList.add(VendordepsFile(jsonFile, vendordeps))
+                    vendordepsProjectFileList.add(VendordepsProjectFile(jsonFile, vendordeps))
                 }.onFailure { t: Throwable ->
                     logger.info("[FRC] Could not parse file as Vendordeps. File: ${jsonFile.name} Error: $t")
                 }
             }
         
-        val vendordepsFileMap =
-            vendordepsFileList.groupBy {
+        val vendordepsProjectFileMap =
+            vendordepsProjectFileList.groupBy {
                 it.vendordeps.uuid
             }
 
-        val duplicateVendordepsMap =  vendordepsFileMap.filterValues {
+        val duplicateVendordepsMap =  vendordepsProjectFileMap.filterValues {
                 it.size > 1
             }.map {
                 it.key to it.value.sorted()
             }.toMap()
 
         
-        vendordepsListing = VendordepsListing(vendordepsFileList, vendordepsFileMap, duplicateVendordepsMap)
+        vendordepsProjectListing = VendordepsProjectListing(vendordepsProjectFileList, vendordepsProjectFileMap, duplicateVendordepsMap)
 
-        if (notifyOnDuplicates && vendordepsListing.hasDuplicates())
+        if (notifyOnDuplicates && vendordepsProjectListing.hasDuplicates())
         {
 
-           notifyAboutDuplicates(vendordepsListing)
+           notifyAboutDuplicates(vendordepsProjectListing)
         }
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    fun notifyAboutDuplicates(vendordepsListing: VendordepsListing)
+    fun notifyAboutDuplicates(vendordepsProjectListing: VendordepsProjectListing)
     {
-        if (vendordepsListing.hasDuplicates())
+        if (vendordepsProjectListing.hasDuplicates())
         {
             val msgBuilder = StringBuilder()
-            vendordepsListing.duplicateVendordepsMap.forEach { entry: Map.Entry<UUID, List<VendordepsFile>> ->
+            vendordepsProjectListing.duplicateVendordepsMap.forEach { entry: Map.Entry<UUID, List<VendordepsProjectFile>> ->
                 if (entry.value.size > 1)
                 {
                     msgBuilder.append("&nbsp;&nbsp;&nbsp;&nbsp;\u2022 ${entry.value.first().vendordeps.name}:<br>")
                     entry.value.forEach { 
-                        msgBuilder.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\u2043 version ${it.vendordeps.version} in ${it.jsonPsiFile.name}<br>")
+                        msgBuilder.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\u2043 ${it.vendordeps.version.asText} in ${it.jsonPsiFile.name}<br>")
                     }
                 }
             }

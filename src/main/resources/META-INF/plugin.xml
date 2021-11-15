@@ -459,6 +459,8 @@
                     class="net.javaru.iip.frc.actions.tools.internal.GetVendordepsListingFrcInternalAction"/>
             <action id="FRC.tools.internal.ShowVendordepsManagementDialog"
                     class="net.javaru.iip.frc.actions.tools.internal.ShowVendordepsManagementDialog"/>
+            <action id="FRC.tools.internal.VendordepsCheckForDuplicatesInternalAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.VendordepsCheckForDuplicatesInternalAction" />
             <action id="FRC.tools.internal.DownloadVendorDeps"
                     class="net.javaru.iip.frc.actions.tools.internal.DownloadVendorDeps"/>
         </group>

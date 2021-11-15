@@ -28,7 +28,7 @@ import kotlin.streams.toList
  * If the text does not represent a valid Semantic Version, the text representation itself is used for
  * comparison, equality, and hashing. This works sufficiently in most cases.
  */
-class LibVersion private constructor(private val asText: String, private val backingSemVer: SemVer? = null) : Comparable<LibVersion>
+class LibVersion private constructor(val asText: String, private val backingSemVer: SemVer? = null) : Comparable<LibVersion>
 {
     override fun compareTo(other: LibVersion): Int
     {

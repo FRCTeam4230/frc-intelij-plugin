@@ -36,6 +36,7 @@ import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
+import kotlin.io.path.name
 
 
 data class Vendordeps(
@@ -134,23 +135,44 @@ data class Vendordeps(
     /** Returns a Simple String of: $name: $version */
     fun toStringSimple(): String = "$name : $version"
 }
+open class VendordepsFile(val file: Path, val vendordeps: Vendordeps): Comparable<VendordepsFile>
+{
+    override fun compareTo(other: VendordepsFile): Int = compareValuesBy(this, other, { it.vendordeps }, { it.file })
+
+
+    override fun equals(other: Any?): Boolean
+    {
+        if (this === other) return true
+        if (other !is VendordepsFile) return false
+
+        if (file != other.file) return false
+        if (vendordeps != other.vendordeps) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int
+    {
+        var result = file.hashCode()
+        result = 31 * result + vendordeps.hashCode()
+        return result
+    }
+
+    override fun toString(): String
+    {
+        return "$vendordeps [${file.name}]"
+    }
+}
+
 
 /**
  * A data class to virtually represent a Vendordeps file. It contains the properties:
  * @param jsonPsiFile the [JsonFile] (sub-interface of [PsiFile]) for the vendordeps file
  * @param vendordeps a [Vendordeps] data class representing the content of the vendordeps file
  */
-data class VendordepsFile(val jsonPsiFile: JsonFile, val vendordeps: Vendordeps) : Comparable<VendordepsFile>
-{
-    override fun compareTo(other: VendordepsFile): Int = compareValuesBy(this, other, {it.vendordeps}, {it.jsonPsiFile.name})
+class VendordepsProjectFile(val jsonPsiFile: JsonFile, vendordeps: Vendordeps) : VendordepsFile(jsonPsiFile.virtualFile.toNioPath(), vendordeps)
 
-    override fun toString(): String
-    {
-        return "$vendordeps [${jsonPsiFile.name}]"
-    }
-}
-
-/** A sata class to represent a known Vendordeps library. */
+/** A data class to represent a known Vendordeps library. */
 data class KnownVendordepsInfo(
     val uuid:UUID,
     val name: String,

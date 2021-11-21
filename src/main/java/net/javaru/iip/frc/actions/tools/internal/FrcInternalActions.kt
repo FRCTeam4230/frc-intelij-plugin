@@ -34,6 +34,7 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.InputValidator
 import com.intellij.openapi.ui.Messages
+import com.intellij.psi.PsiDirectory
 import icons.FrcIcons
 import icons.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals
@@ -53,7 +54,7 @@ import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.runWhenSmart
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsManagementDialogWrapper
-import net.javaru.iip.frc.wpilib.vendordeps.VendordepsProjectListing
+import net.javaru.iip.frc.wpilib.vendordeps.VendordepsProjectFilesListing
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsService
 import java.nio.file.Path
 import javax.swing.Icon
@@ -71,8 +72,10 @@ abstract class AbstractFrcInternalAction : AnAction
 {
     protected val log = logger<AbstractFrcInternalAction>()
 
+    @Suppress("unused")
     protected constructor()
 
+    @Suppress("unused")
     protected constructor(icon: Icon?): super(icon)
 
     @Suppress("unused")
@@ -297,33 +300,73 @@ class FindVendordepsDirFrcInternalAction: AbstractFrcInternalAction()
 {
     override fun actionPerformed(actionEvent: AnActionEvent) {
         executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
-            it.runWhenSmart {
-                val dir = VendordepsService.getInstance(it).findVendordepsDir()
+            VendordepsService.getInstance(it).findVendordepsDirNonBlocking { dir: PsiDirectory? ->
                 FrcNotifications.notifyInfoBalloon("Vendordeps dir = ${dir?.virtualFile?.path ?: "NOT FOUND"}")
             }
         }
     }
 }
 
-class GetVendordepsListingFrcInternalAction: AbstractFrcInternalAction()
+abstract class AbstractDisplayVendordepsListingFrcInternalAction : AbstractFrcInternalAction
 {
-    override fun actionPerformed(actionEvent: AnActionEvent) {
-        executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
-            it.runWhenSmart {
-                VendordepsService.getInstance(it).getAndUseVendordeps(notifyOnDuplicates = true) { listing: VendordepsProjectListing ->
-                    val sb = StringBuilder()
-                    sb.append("<html><h3>Vendordeps:</h3><ol>")
-                    listing.vendordepsProjectFileList.forEach { item ->
-                        sb.append("<li>$item</li>")
-                    }
-                    sb.append("</ol></html>")
+    @Suppress("unused")
+    protected constructor()
 
-                    FrcNotifications.notifyInfoBalloon(sb.toString())
-                }
+    @Suppress("unused")
+    protected constructor(icon: Icon?) : super(icon)
+
+    @Suppress("unused")
+    protected constructor(text: String?) : super(text)
+
+    @Suppress("unused")
+    protected constructor(
+        text: String?,
+        description: String?,
+        icon: Icon?
+                         ) : super(text, description, icon)
+    protected fun runUpdateCheck(project: Project)
+    {
+        VendordepsService.getInstance(project).updateAndUseVendordepsList(
+            notifyOnDuplicates = true,
+            { listing: VendordepsProjectFilesListing ->
+            val sb = StringBuilder()
+            sb.append("<html><h3>Vendordeps:</h3><ol>")
+            listing.vendordepsProjectFileList.forEach { item ->
+                sb.append("<li>$item</li>")
             }
+            sb.append("</ol></html>")
+            sb.toString()
+
+        }) { message, _ ->
+            FrcNotifications.notifyInfoBalloon(message)
         }
     }
 }
+
+class DisplayVendordepsListingFrcInternalAction : AbstractDisplayVendordepsListingFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, "Update Vendordeps Listing") {
+            runUpdateCheck(it)
+        }
+    }
+}
+
+//class DisplayVendordepsListingWrappedInBackgroundTaskFrcInternalAction : AbstractDisplayVendordepsListingFrcInternalAction("List Vendordeps Wrapped in Background Task")
+//{
+//    override fun actionPerformed(actionEvent: AnActionEvent)
+//    {
+//        executeIfProjectNotNull(actionEvent, "Update Vendordeps Listing") {
+//            // THIS CAUSES AN THREADING EXCEPTION:
+//            //    Access is allowed from write thread only.
+//            // Since runUpdateCheck uses runNonBlockingReadActionInSmartMode
+//            it.runBackgroundTask("Display Vendordeps List") { _ ->
+//                runUpdateCheck(it)
+//            }
+//        }
+//    }
+//}
 
 class VendordepsCheckForDuplicatesInternalAction : AbstractFrcInternalAction()
 {
@@ -331,7 +374,7 @@ class VendordepsCheckForDuplicatesInternalAction : AbstractFrcInternalAction()
     {
         executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
             it.runWhenSmart {
-                VendordepsService.getInstance(it).checkForDuplicates(true)
+                VendordepsService.getInstance(it).updateVendordepsListingAndCheckForDuplicates(true)
             }
         }
     }

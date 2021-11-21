@@ -6,7 +6,7 @@
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *     
+ *
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,9 +18,12 @@ package net.javaru.iip.frc.services
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
+import com.intellij.openapi.project.Project
 
 /**
- * An application Service that we can use as an Application level parent disposable.
+ * A Project Service that we can use as a Project level parent disposable.
  *
  * This can easily be obtained via [net.javaru.iip.frc.util.getApplicationParentDisposable] and/or
  * [net.javaru.iip.frc.util.getParentDisposable] in `FrcPluginUtils.kt`.
@@ -29,18 +32,28 @@ import com.intellij.openapi.components.service
  *
  * "For resources required for the entire lifetime of a plugin, use an application or project level service."
  *
- * For a project level disposable service, use [FrcProjectLifecycleService].
+ * For an application level disposable service, use [FrcPluginApplicationDisposable].
  */
-class FrcApplicationDisposableService: Disposable
+class FrcPluginProjectDisposable(val project: Project) : Disposable
 {
-    override fun dispose()
-    {
-        // no op at this time
-    }
+    private val logger = logger<FrcPluginProjectDisposable>()
 
-    companion object Settings
+    var isDisposed = false
+        private set
+
+    companion object
     {
         @JvmStatic
-        fun getInstance(): FrcApplicationDisposableService = service()
+        fun getInstance(project: Project) = project.service<FrcPluginProjectDisposable>()
+    }
+
+    override fun dispose()
+    {
+        try
+        {
+            isDisposed = true
+            logger.trace { "[FRC] FrcPluginProjectDisposable.dispose() called for project '$project'" }
+        }
+        catch (ignore: Exception) { }
     }
 }

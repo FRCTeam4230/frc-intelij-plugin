@@ -19,13 +19,12 @@ package net.javaru.iip.frc.wpilib.vendordeps
 
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.intellij.json.psi.JsonFile
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
+import net.javaru.iip.frc.util.tryIt
 import net.javaru.iip.frc.util.uri
 import net.javaru.iip.frc.util.urisList
 import java.io.InputStream
@@ -44,7 +43,7 @@ data class Vendordeps(
     val name: String,
     val version: LibVersion,
     val fileName: String,
-    val jsonUrl: URI?,
+    val jsonUrl: URI?, // WPILib Command vendordeps have an empty string for the jsonUrl
     val mavenUrls: List<URI>
                      ) : Comparable<Vendordeps>
 {
@@ -55,37 +54,28 @@ data class Vendordeps(
         private val LOG = logger<Vendordeps>()
 
         // @formatter:off
-        fun parse(jsonFile: PsiFile): Result<Vendordeps, Throwable> = transform(parser.parse(jsonFile.virtualFile.inputStream) as JsonObject)
-        fun parse(jsonFile: VirtualFile): Result<Vendordeps, Throwable> = transform(parser.parse(jsonFile.inputStream) as JsonObject)
-        fun parse(jsonFile: Path, charset: Charset = Charsets.UTF_8): Result<Vendordeps, Throwable> = transform(parser.parse(Files.newBufferedReader(jsonFile, charset)) as JsonObject)
-        fun parse(json: InputStream, charset: Charset = Charsets.UTF_8): Result<Vendordeps, Throwable> = transform(parser.parse(json, charset) as JsonObject)
-        fun parse(json: Reader): Result<Vendordeps, Throwable> = transform(parser.parse(json) as JsonObject)
-        fun parse(json: String): Result<Vendordeps, Throwable> = transform(parser.parse(StringReader(json)) as JsonObject)
+        fun parse(jsonFile: PsiFile): Result<Vendordeps, Throwable> = tryIt { transform(parser.parse(jsonFile.virtualFile.inputStream) as JsonObject) }
+        fun parse(jsonFile: VirtualFile): Result<Vendordeps, Throwable> = tryIt { transform(parser.parse(jsonFile.inputStream) as JsonObject) }
+        fun parse(jsonFile: Path, charset: Charset = Charsets.UTF_8): Result<Vendordeps, Throwable> = tryIt { transform(parser.parse(Files.newBufferedReader(jsonFile, charset)) as JsonObject) }
+        fun parse(json: InputStream, charset: Charset = Charsets.UTF_8): Result<Vendordeps, Throwable> = tryIt { transform(parser.parse(json, charset) as JsonObject) }
+        fun parse(json: Reader): Result<Vendordeps, Throwable> = tryIt { transform(parser.parse(json) as JsonObject) }
+        fun parse(json: String): Result<Vendordeps, Throwable> = tryIt { transform(parser.parse(StringReader(json)) as JsonObject) }
         // @formatter:on
 
-        fun transform(json: JsonObject): Result<Vendordeps, Throwable>
+        fun transform(json: JsonObject): Vendordeps
         {
-            return try
-            {
-                val name = json.string("name")?.trim() ?: "unknown-name"
-                val version = LibVersion.parse(json.string("version")?.trim() ?: "0.0.0")
-                val fileName = json.string("fileName")?.trim() ?: "unknown.json"
-                val jsonUrl = json.uri("jsonUrl")
-                val mavenUrls = json.urisList("mavenUrls")
-                val uuid = json.parseUuid(name, fileName, jsonUrl)
+            val name = json.string("name")?.trim() ?: ""
+            val version = LibVersion.parse(json.string("version")?.trim() ?: "0.0.0")
+            val fileName = json.string("fileName")?.trim() ?: ""
+            val jsonUrl = json.uri("jsonUrl")
+            val mavenUrls = json.urisList("mavenUrls")
+            val uuid = json.parseUuid(name, fileName, jsonUrl)
+            return Vendordeps(uuid, name, version, fileName, jsonUrl, mavenUrls)
 
-                val vendordeps = Vendordeps(uuid, name, version, fileName, jsonUrl, mavenUrls)
-                Ok(vendordeps)
-            }
-            catch (t: Throwable)
-            {
-                LOG.info("[FRC] An exception occurred when parsing Vendordeps JSON: $t")
-                Err(t)
-            }
         }
 
-        const val navxUuidString = "cb311d09-36e9-4143-a032-55bb2b94443b"
-        val navxUuid: UUID = UUID.fromString(navxUuidString)
+        private const val navxUuidString = "cb311d09-36e9-4143-a032-55bb2b94443b"
+        private val navxUuid: UUID = UUID.fromString(navxUuidString)
         val dmc60cRemappedUuid: UUID = UUID.fromString("d2dafb2b-4b81-40d1-98ff-7e66289fcfb4")
         val libCuRemappedUuid: UUID = UUID.fromString("ba9f250f-1ebc-4897-9782-d3f4517df53b")
 

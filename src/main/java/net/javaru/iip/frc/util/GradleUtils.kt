@@ -149,7 +149,14 @@ fun Project.markGradleProjectAsNeedingReimport(scheduleForAutoReimport: Boolean 
     }
 
     result.onFailure {
-        FrcErrorReportSubmitter.submitReportableEvent(ReportableEvent("markGradleProjectAsNeedingReimport-Full", project, it))
+        try
+        {
+            FrcErrorReportSubmitter.submitReportableEvent(ReportableEvent("markGradleProjectAsNeedingReimport-Full", project, it))
+        }
+        catch (t: Throwable)
+        {
+            logger.info("[FRC] Could not submit reportable event for markGradleProjectAsNeedingReimport. Cause: $t")
+        }
     }
 }
 

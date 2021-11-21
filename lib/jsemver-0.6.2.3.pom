@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.asarkar</groupId>
   <artifactId>jsemver</artifactId>
-  <version>0.6.2.2</version>
+  <version>0.6.2.3</version>
   <name>com.asarkar:jsemver</name>
   <description>Kotlin/Java implementation of the Semantic Versioning specification</description>
   <url>https://github.com/asarkar/jsemver</url>
@@ -55,13 +55,13 @@
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
-      <version>4.8</version>
+      <version>4.9.3</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.30</version>
+      <version>1.7.32</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

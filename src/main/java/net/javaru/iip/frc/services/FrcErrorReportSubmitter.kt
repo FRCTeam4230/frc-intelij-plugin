@@ -25,7 +25,6 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ApplicationNamesInfo
-import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent
 import com.intellij.openapi.diagnostic.SubmittedReportInfo
@@ -57,7 +56,7 @@ import java.io.StringWriter
 import java.util.*
 
 
-class FrcErrorReportSubmitter: ErrorReportSubmitter()
+object FrcErrorReportSubmitter: ErrorReportSubmitter()
 {
     private val LOG = logger<FrcErrorReportSubmitter>()
 
@@ -98,7 +97,7 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
                 // https://docs.sentry.io/platforms/java/configuration/options/#attach-stacktrace
                 isAttachStacktrace = true
                 inAppIncludes.addAll(mutableListOf("net.javaru", "io.javaru", "org.javaru"))
-                enableUncaughtExceptionHandler = false // when enabled, it catches a lot of noise from the IDE that we can't do anything about
+                enableUncaughtExceptionHandler = false // when enabled, it catches a lot of noise from the IDE and other Plugins that we can't do anything about
                 isEnableNdk = false // Android Native Development Kit: https://docs.sentry.io/platforms/android/using-ndk/
                 isEnableScopeSync = false // the Java to NDK Scope sync
                 isEnableScopeSync = false // the Java to NDK Scope sync
@@ -136,11 +135,6 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
                 this.id = niid
             })
         }
-    }
-
-    companion object
-    {
-        fun submitReportableEvent(reportableEvent: ReportableEvent) = service<FrcErrorReportSubmitter>().submitReportableEvent(reportableEvent)
     }
 
     override fun getReportActionText() = "Report to FRC Plugin Author"
@@ -240,34 +234,41 @@ class FrcErrorReportSubmitter: ErrorReportSubmitter()
 
     fun submitReportableEvent(event: ReportableEvent)
     {
-        object : Backgroundable(event.project, "Log issue")
+        try
         {
-            override fun run(indicator: ProgressIndicator)
+            object : Backgroundable(event.project, "Log issue")
             {
-                try
+                override fun run(indicator: ProgressIndicator)
                 {
-                    Sentry.withScope { scope: Scope ->
-                        scope.setExtraSafely("event.type", "ReportableEvent")
-                        scope.setExtraSafely("last.action", event.lastActionId)
-                        scope.setExtraSafely("correlationId", event.correlationId)
-                        event.additionalData?.forEach { scope.setExtraSafely(it.key, it.value) }
+                    try
+                    {
+                        Sentry.withScope { scope: Scope ->
+                            scope.setExtraSafely("event.type", "ReportableEvent")
+                            scope.setExtraSafely("last.action", event.lastActionId)
+                            scope.setExtraSafely("correlationId", event.correlationId)
+                            event.additionalData?.forEach { scope.setExtraSafely(it.key, it.value) }
 
-                        scope.addThrowableAsAttachment(event.throwable, "the.throwable.txt")
-                        val sentryEvent = SentryEvent(event.throwable)// Is null safe
-                        sentryEvent.setStacktraceHashes(event.throwable)
-                        sentryEvent.level = event.level
-                        sentryEvent.setMessageSafely(scope, event.messageOrAdditionalInfo, event.messageAddendum)
-                        event.attachments?.forEach { scope.addAttachment(it) }
-                        val sentryId = Sentry.captureEvent(sentryEvent)
-                        logReportSubmission(sentryId)
+                            scope.addThrowableAsAttachment(event.throwable, "the.throwable.txt")
+                            val sentryEvent = SentryEvent(event.throwable)// Is null safe
+                            sentryEvent.setStacktraceHashes(event.throwable)
+                            sentryEvent.level = event.level
+                            sentryEvent.setMessageSafely(scope, event.messageOrAdditionalInfo, event.messageAddendum)
+                            event.attachments?.forEach { scope.addAttachment(it) }
+                            val sentryId = Sentry.captureEvent(sentryEvent)
+                            logReportSubmission(sentryId)
+                        }
+                    }
+                    catch (t: Throwable)
+                    {
+                        LOG.info("[FRC] Could not report ReportableEvent [correlationId: ${event.correlationId}]. Reason: $t")
                     }
                 }
-                catch (t: Throwable)
-                {
-                    LOG.info("[FRC] Could not report ReportableEvent [correlationId: ${event.correlationId}]. Reason: $t")
-                }
-            }
-        }.queue()
+            }.queue()
+        }
+        catch (t: Throwable)
+        {
+            LOG.info("[FRC] Could not process ReportableEvent [correlationId: ${event.correlationId}]. Reason: $t")
+        }
     }
 
     private fun Scope.addThrowableAsAttachment(throwable: Throwable?, attachmentName: String)

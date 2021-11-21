@@ -30,8 +30,8 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import icons.FrcIcons
 import net.javaru.iip.frc.FrcPluginGlobals.FRC_PLUGIN_ID_STRING
-import net.javaru.iip.frc.services.FrcApplicationDisposableService
-import net.javaru.iip.frc.services.FrcProjectLifecycleService
+import net.javaru.iip.frc.services.FrcPluginApplicationDisposable
+import net.javaru.iip.frc.services.FrcPluginProjectDisposable
 import org.apache.commons.io.FilenameUtils
 import java.io.InputStream
 import java.net.URL
@@ -228,12 +228,30 @@ fun getPluginResourceAsText(resourcePath: String): String?
     }
 }
 
-fun Project?.getParentDisposable(): Disposable
-{
-    return if (this != null) FrcProjectLifecycleService.getInstance(this) else getApplicationParentDisposable()
-}
+/**
+ * Returns a project level Disposable iff the project receiver is not null.
+ * Otherwise it returns an application level disposable.
+ * @see getProjectParentDisposable
+ * @see getApplicationParentDisposable
+ *
+ */
+fun Project?.getParentDisposable(): Disposable = this?.getProjectParentDisposable() ?: getApplicationParentDisposable()
 
-fun getApplicationParentDisposable(): Disposable = FrcApplicationDisposableService.getInstance()
+/**
+ * Returns an application level disposable.
+ * @see getProjectParentDisposable
+ * @see getParentDisposable
+ *
+ */
+fun getApplicationParentDisposable(): Disposable = FrcPluginApplicationDisposable.getInstance()
+
+/**
+ * Returns a project level disposable.
+ * @see getApplicationParentDisposable
+ * @see getParentDisposable
+ *
+ */
+fun Project.getProjectParentDisposable(): Disposable = FrcPluginProjectDisposable.getInstance(this)
 
 /**
  * DEPRECATED: Just fully qualify the 'application' service version in the Project extension function:

@@ -3,7 +3,7 @@
   "component": {
     "group": "com.asarkar",
     "module": "jsemver",
-    "version": "0.6.2.2",
+    "version": "0.6.2.3",
     "attributes": {
       "org.gradle.status": "release"
     }
@@ -11,7 +11,7 @@
   "createdBy": {
     "gradle": {
       "version": "6.5.1",
-      "buildId": "fptu4j3hkbcobkevonrmi65324"
+      "buildId": "3dfgo6kxnngcjl5zyucsdpmsmm"
     }
   },
   "variants": [
@@ -37,13 +37,13 @@
       ],
       "files": [
         {
-          "name": "jsemver-0.6.2.2.jar",
-          "url": "jsemver-0.6.2.2.jar",
-          "size": 70121,
-          "sha512": "f030bfbbded04ac4c7c763af3bb4260ef1f958488dee404ac7a0c34ab700f941b8272ad0cde076810b243d6b4af317b644379e794b54f5019e5af8aaf0031cfb",
-          "sha256": "3f37f7a80831740e1abbd22686f829383ae481e52c76541001c1855b08a1bf24",
-          "sha1": "2209d015eb7e2af62a8e95a2ae43bab06aae1794",
-          "md5": "b529859145cead76e980bd15b0204f15"
+          "name": "jsemver-0.6.2.3.jar",
+          "url": "jsemver-0.6.2.3.jar",
+          "size": 70127,
+          "sha512": "e23a274cfb2cc19c28cb2ef7fc23fde0e468c8d011c3bed4f792e5ec73d16ebaf3eebb022f52014ff6d44a7a0df01fd3c240a771ea4f93e4e0e42c57ac311ed9",
+          "sha256": "df2c5805ddb496ebf770dd73227b02f13b1368eac53ba587ca7148481e0ccc2f",
+          "sha1": "ef7cf640bb8db41bbd017f36be9538226c8b6f19",
+          "md5": "439ca069cc2d2f03d2bfc2f93bbcaced"
         }
       ]
     },
@@ -63,14 +63,14 @@
           "group": "org.antlr",
           "module": "antlr4-runtime",
           "version": {
-            "requires": "4.8"
+            "requires": "4.9.3"
           }
         },
         {
           "group": "org.slf4j",
           "module": "slf4j-api",
           "version": {
-            "requires": "1.7.30"
+            "requires": "1.7.32"
           }
         },
         {
@@ -83,13 +83,13 @@
       ],
       "files": [
         {
-          "name": "jsemver-0.6.2.2.jar",
-          "url": "jsemver-0.6.2.2.jar",
-          "size": 70121,
-          "sha512": "f030bfbbded04ac4c7c763af3bb4260ef1f958488dee404ac7a0c34ab700f941b8272ad0cde076810b243d6b4af317b644379e794b54f5019e5af8aaf0031cfb",
-          "sha256": "3f37f7a80831740e1abbd22686f829383ae481e52c76541001c1855b08a1bf24",
-          "sha1": "2209d015eb7e2af62a8e95a2ae43bab06aae1794",
-          "md5": "b529859145cead76e980bd15b0204f15"
+          "name": "jsemver-0.6.2.3.jar",
+          "url": "jsemver-0.6.2.3.jar",
+          "size": 70127,
+          "sha512": "e23a274cfb2cc19c28cb2ef7fc23fde0e468c8d011c3bed4f792e5ec73d16ebaf3eebb022f52014ff6d44a7a0df01fd3c240a771ea4f93e4e0e42c57ac311ed9",
+          "sha256": "df2c5805ddb496ebf770dd73227b02f13b1368eac53ba587ca7148481e0ccc2f",
+          "sha1": "ef7cf640bb8db41bbd017f36be9538226c8b6f19",
+          "md5": "439ca069cc2d2f03d2bfc2f93bbcaced"
         }
       ]
     }

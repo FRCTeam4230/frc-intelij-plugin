@@ -234,7 +234,7 @@
         <notificationGroup id="FRC Build Tool Window Notifications" displayType="TOOL_WINDOW" toolWindowId="Build"  />
 
 
-        <applicationService id="FRC.FrcApplicationDisposableService" serviceImplementation="net.javaru.iip.frc.services.FrcApplicationDisposableService" />
+        <applicationService id="FRC.FrcApplicationDisposableService" serviceImplementation="net.javaru.iip.frc.services.FrcPluginApplicationDisposable" />
         <applicationService id="FRC.FrcApplicationSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcApplicationSettings" />
         <applicationService id="FRC.FrcNotificationsSettings"   serviceImplementation="net.javaru.iip.frc.settings.FrcNotificationsSettings" />
         <applicationService id="FRC.RioLogUdpSocketManagerApplicationService" serviceImplementation="net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService" />
@@ -259,6 +259,7 @@
 
         <projectService id="FRC.FrcProjectLifecycleService" serviceImplementation="net.javaru.iip.frc.services.FrcProjectLifecycleService"  />
         <postStartupActivity id="FRC.FrcProjectLifecycleServiceStartupActivity" implementation="net.javaru.iip.frc.services.FrcProjectLifecycleServiceStartupActivity"  />
+        <projectService id="FRC.FrcPluginProjectDisposable" serviceImplementation="net.javaru.iip.frc.services.FrcPluginProjectDisposable"  />
         <projectService id="FRC.FrcGradleService" serviceImplementation="net.javaru.iip.frc.services.FrcGradleService" />
         <projectService id="FRC.TcpRioSocketConnectorProjectService" serviceImplementation="net.javaru.iip.frc.riolog.tcp.TcpRioSocketConnectorProjectService" />
         <projectService id="FRC.FrcProjectTeamNumberService" serviceImplementation="net.javaru.iip.frc.settings.FrcProjectTeamNumberService" />
@@ -455,8 +456,8 @@
             <add-to-group group-id="FRC.FrcInternalActionsGroup" anchor="after" relative-to-action="FRC.tools.internal.ShowPlaceholderTextFieldPaddingDemoDialog" />
             <action id="FRC.tools.internal.FindVendordepsDirFrcInternalAction"
                     class="net.javaru.iip.frc.actions.tools.internal.FindVendordepsDirFrcInternalAction"/>
-            <action id="FRC.tools.internal.GetVendordepsFrcInternalAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.GetVendordepsListingFrcInternalAction"/>
+            <action id="FRC.tools.internal.DisplayVendordepsListingFrcInternalAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.DisplayVendordepsListingFrcInternalAction"/>
             <action id="FRC.tools.internal.ShowVendordepsManagementDialog"
                     class="net.javaru.iip.frc.actions.tools.internal.ShowVendordepsManagementDialog"/>
             <action id="FRC.tools.internal.VendordepsCheckForDuplicatesInternalAction"

@@ -329,11 +329,12 @@ dependencies {
     implementation(platform("com.google.guava:guava-bom:29.0-jre"))
     implementation("com.google.guava:guava")
     // jsemver: Is in the project 'lib' dir as it is not published to any public repos. Plus we are using a tweaked version that removes is use of logback
-    implementation("com.asarkar:jsemver:0.6.2.2") {
+    implementation("com.asarkar:jsemver:0.6.2.3") {
         exclude(group = "org.slf4j", module = "slf4j-api")
             .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
     }
-    implementation("org.antlr:antlr4:4.9.2") {
+    implementation("org.antlr:antlr4:4.9.3") {
+        // Keep in sync with what is used in jsemver to prevent warning about different code generation and runtime versions.
         exclude(group = "org.slf4j", module = "slf4j-api")
             .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
     }

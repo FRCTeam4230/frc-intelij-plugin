@@ -1,0 +1,34 @@
+<!--
+  ~ Copyright 2015-2021 the original author or authors.
+  ~
+  ~     Licensed under the Apache License, Version 2.0 (the "License");
+  ~     you may not use this file except in compliance with the License.
+  ~     You may obtain a copy of the License at
+  ~
+  ~       https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~     Unless required by applicable law or agreed to in writing, software
+  ~     distributed under the License is distributed on an "AS IS" BASIS,
+  ~     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~     See the License for the specific language governing permissions and
+  ~     limitations under the License.
+  -->
+
+<html>
+<body>
+Reports fields (i.e. member variables) whose names use the WPI based
+Hungarian Notation a "m_" prefix.
+<p>Such fields may cause confusion by breaking a common naming convention.
+They also do not teach students proper/standard Java naming conventions.</p>
+<p><b>Example:</b>
+<pre><code>
+  public float m_CurrentSpeed = 0.42;
+</code></pre>
+<p>After the quick-fix is applied:</p>
+<pre><code>
+  public float currentSpeed = 0.42;
+</code></pre>
+<!-- tooltip end -->
+
+</body>
+</html>

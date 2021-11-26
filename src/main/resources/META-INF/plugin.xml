@@ -314,6 +314,34 @@
         <!--<dependencySupport displayName="FRC WPILib"     kind="java" coordinate="edu.wpi.first.wpilibNewCommands:wpilibNewCommands-java" />
         <dependencySupport displayName="FRC WPILib"     kind="java" coordinate="edu.wpi.first.wpilibOldCommands:wpilibOldCommands-java" />-->
         <dependencySupport displayName="FRC GradleRIO"  kind="java" coordinate="edu.wpi.first:GradleRIO" />
+
+        <localInspection id="FRC.HungarianNotationConstantsInspection"
+                         groupPath="FRC"
+                         language="JAVA"
+                         suppressId="HungarianNotationConstants"
+                         shortName="HungarianNotationConstants"
+                         bundle="i18n.FrcInspectionsBundle"
+                         key="frc.inspections.hungarian.notation.k.constants.display.name"
+                         groupKey="frc.inspections.group.path.naming.conventions"
+                         enabledByDefault="true"
+                         level="WEAK WARNING"
+                         cleanupTool="true"
+                         implementationClass="net.javaru.iip.frc.inspections.HungarianNotationConstantsInspection"
+                         />
+        <localInspection id="FRC.HungarianNotationMemberVariablesInspection"
+                         groupPath="FRC"
+                         language="JAVA"
+                         suppressId="HungarianNotationMemberVariables"
+                         shortName="HungarianNotationMemberVariables"
+                         bundle="i18n.FrcInspectionsBundle"
+                         key="frc.inspections.hungarian.notation.member.variables.display.name"
+                         groupKey="frc.inspections.group.path.naming.conventions"
+                         enabledByDefault="true"
+                         level="WEAK WARNING"
+                         cleanupTool="true"
+                         implementationClass="net.javaru.iip.frc.inspections.HungarianNotationMemberVariablesInspection"
+                         />
+
     </extensions>
 
     <extensions defaultExtensionNs="JavaScript.JsonSchema">

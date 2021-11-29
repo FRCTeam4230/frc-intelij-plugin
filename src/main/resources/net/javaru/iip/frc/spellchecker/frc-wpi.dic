@@ -131,8 +131,12 @@ wpilibsuite
 wpiutil
 xaxis
 xbox
+xpeed
 xstick
 yaxis
+yspeed
 ystick
 zaxis
+zrotate
+zspeed
 zstick

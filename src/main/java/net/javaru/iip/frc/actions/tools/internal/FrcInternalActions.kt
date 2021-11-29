@@ -96,10 +96,10 @@ abstract class AbstractFrcInternalAction : AnAction
     }
 
     @Suppress("UNUSED_PARAMETER")
-    protected fun additionalIsVisibleChecks(project: Project, e: AnActionEvent): Boolean = true
+    protected open fun additionalIsVisibleChecks(project: Project, e: AnActionEvent): Boolean = true
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected fun showOnlyForFrcProjects(): Boolean = false
+    protected open fun showOnlyForFrcProjects(): Boolean = false
 
     private fun showForProject(project: Project): Boolean
     {

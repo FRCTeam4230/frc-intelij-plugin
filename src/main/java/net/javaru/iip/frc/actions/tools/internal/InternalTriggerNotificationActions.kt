@@ -37,9 +37,9 @@ class FrcInternalNotificationsActionsGroup : FrcInternalActionsGroup()
 /**
  * An action that will purposefully cause an exception for testing purposes.
  */
-abstract class AbstractTriggerNotificationAction : AbstractFrcInternalAction()
+abstract class AbstractShowNotificationAction : AbstractFrcInternalAction()
 {
-    internal val logger =logger<AbstractTriggerNotificationAction>()
+    internal val logger =logger<AbstractShowNotificationAction>()
 
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
@@ -51,7 +51,7 @@ abstract class AbstractTriggerNotificationAction : AbstractFrcInternalAction()
     abstract fun doNotification(project: Project?)
 }
 
-class TriggerNotificationActionableInfoAction : AbstractTriggerNotificationAction()
+class ShowNotificationActionableInfoAction : AbstractShowNotificationAction()
 {
     override fun doNotification(project: Project?)
     {
@@ -62,7 +62,7 @@ class TriggerNotificationActionableInfoAction : AbstractTriggerNotificationActio
     }
 }
 
-class TriggerNotificationGeneralInfoAction : AbstractTriggerNotificationAction()
+class ShowNotificationGeneralInfoAction : AbstractShowNotificationAction()
 {
     override fun doNotification(project: Project?)
     {
@@ -73,7 +73,7 @@ class TriggerNotificationGeneralInfoAction : AbstractTriggerNotificationAction()
     }
 }
 
-class TriggerNotificationActionableErrorAction : AbstractTriggerNotificationAction()
+class ShowNotificationActionableErrorAction : AbstractShowNotificationAction()
 {
     override fun doNotification(project: Project?)
     {
@@ -84,7 +84,7 @@ class TriggerNotificationActionableErrorAction : AbstractTriggerNotificationActi
     }
 }
 
-class TriggerNotificationActionableErrorImportantAction : AbstractTriggerNotificationAction()
+class ShowNotificationActionableErrorImportantAction : AbstractShowNotificationAction()
 {
     override fun doNotification(project: Project?)
     {
@@ -96,7 +96,7 @@ class TriggerNotificationActionableErrorImportantAction : AbstractTriggerNotific
     }
 }
 
-class TriggerNotificationThatUsesNotificationActionsAction : AbstractTriggerNotificationAction()
+class ShowNotificationThatUsesNotificationActionsAction : AbstractShowNotificationAction()
 {
     override fun doNotification(project: Project?)
     {
@@ -120,7 +120,7 @@ class TriggerNotificationThatUsesNotificationActionsAction : AbstractTriggerNoti
 }
 
 
-class TriggerNotificationBalloonAction : AbstractTriggerNotificationAction()
+class ShowNotificationBalloonAction : AbstractShowNotificationAction()
 {
     override fun doNotification(project: Project?)
     {
@@ -180,7 +180,7 @@ class TriggerNotificationBalloonAction : AbstractTriggerNotificationAction()
 }
 
 
-class TriggerNotificationSmallBalloonAction : AbstractTriggerNotificationAction()
+class ShowNotificationSmallBalloonAction : AbstractShowNotificationAction()
 {
     override fun doNotification(project: Project?)
     {
@@ -198,7 +198,7 @@ class TriggerNotificationSmallBalloonAction : AbstractTriggerNotificationAction(
     }
 }
 
-class TriggerNotificationBalloonWithActionsAction : AbstractTriggerNotificationAction()
+class ShowNotificationBalloonWithActionsAction : AbstractShowNotificationAction()
 {
     override fun doNotification(project: Project?)
     {
@@ -239,7 +239,7 @@ class TriggerNotificationBalloonWithActionsAction : AbstractTriggerNotificationA
 
 
 
-class TriggerNotificationSharedByFrcProjectsAction : AbstractTriggerNotificationAction()
+class ShowNotificationSharedByFrcProjectsAction : AbstractShowNotificationAction()
 {
     override fun doNotification(project: Project?)
     {
@@ -251,7 +251,7 @@ class TriggerNotificationSharedByFrcProjectsAction : AbstractTriggerNotification
 }
 
 
-class TriggerNotificationSharedByALLOpenProjectsAction : AbstractTriggerNotificationAction()
+class ShowNotificationSharedByALLOpenProjectsAction : AbstractShowNotificationAction()
 {
     override fun doNotification(project: Project?)
     {
@@ -264,7 +264,7 @@ class TriggerNotificationSharedByALLOpenProjectsAction : AbstractTriggerNotifica
 
 
 
-class TriggerNotificationBalloonSharedByFrcProjectsAction : AbstractTriggerNotificationAction()
+class ShowNotificationBalloonSharedByFrcProjectsAction : AbstractShowNotificationAction()
 {
     override fun doNotification(project: Project?)
     {
@@ -277,7 +277,7 @@ class TriggerNotificationBalloonSharedByFrcProjectsAction : AbstractTriggerNotif
     }
 }
 
-class TriggerNotificationBalloonSharedByALLOpenProjectsAction : AbstractTriggerNotificationAction()
+class ShowNotificationBalloonSharedByALLOpenProjectsAction : AbstractShowNotificationAction()
 {
     override fun doNotification(project: Project?)
     {

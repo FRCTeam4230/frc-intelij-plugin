@@ -499,30 +499,30 @@
                 popup="true"
                 icon="AllIcons.General.Balloon">
             <add-to-group group-id="FRC.FrcInternalActionsGroup" anchor="last" />
-            <action id="FRC.tools.internal.TriggerNotificationOfTypeActionableAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationActionableInfoAction" />
-            <action id="FRC.tools.internal.TriggerNotificationOfTypeGeneralAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationGeneralInfoAction" />
-            <action id="FRC.tools.internal.TriggerNotificationActionableErrorAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationActionableErrorAction" />
-            <action id="FRC.tools.internal.TriggerNotificationActionableErrorImportantAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationActionableErrorImportantAction" />
-            <action id="FRC.tools.internal.TriggerNotificationThatUsesNotificationActionsAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationThatUsesNotificationActionsAction" />
-            <action id="FRC.tools.internal.TriggerNotificationBalloonAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationBalloonAction" />
-            <action id="FRC.tools.internal.TriggerSmallNotificationBalloonAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationSmallBalloonAction" />
-            <action id="FRC.tools.internal.TriggerNotificationBalloonWithActionsAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationBalloonWithActionsAction" />
-            <action id="FRC.tools.internal.TriggerNotificationSharedByFrcProjectsAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationSharedByFrcProjectsAction" />
-            <action id="FRC.tools.internal.TriggerNotificationBalloonSharedByFrcProjectsAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationBalloonSharedByFrcProjectsAction" />
-            <action id="FRC.tools.internal.TriggerNotificationSharedByAllOpenProjectsAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationSharedByALLOpenProjectsAction" />
-            <action id="FRC.tools.internal.TriggerNotificationBalloonSharedByAllOpenProjectsAction"
-                    class="net.javaru.iip.frc.actions.tools.internal.TriggerNotificationBalloonSharedByALLOpenProjectsAction" />
+            <action id="FRC.tools.internal.ShowNotificationOfTypeActionableAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationActionableInfoAction" />
+            <action id="FRC.tools.internal.ShowNotificationOfTypeGeneralAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationGeneralInfoAction" />
+            <action id="FRC.tools.internal.ShowNotificationActionableErrorAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationActionableErrorAction" />
+            <action id="FRC.tools.internal.ShowNotificationActionableErrorImportantAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationActionableErrorImportantAction" />
+            <action id="FRC.tools.internal.ShowNotificationThatUsesNotificationActionsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationThatUsesNotificationActionsAction" />
+            <action id="FRC.tools.internal.ShowNotificationBalloonAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationBalloonAction" />
+            <action id="FRC.tools.internal.ShowSmallNotificationBalloonAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationSmallBalloonAction" />
+            <action id="FRC.tools.internal.ShowNotificationBalloonWithActionsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationBalloonWithActionsAction" />
+            <action id="FRC.tools.internal.ShowNotificationSharedByFrcProjectsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationSharedByFrcProjectsAction" />
+            <action id="FRC.tools.internal.ShowNotificationBalloonSharedByFrcProjectsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationBalloonSharedByFrcProjectsAction" />
+            <action id="FRC.tools.internal.ShowNotificationSharedByAllOpenProjectsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationSharedByALLOpenProjectsAction" />
+            <action id="FRC.tools.internal.ShowNotificationBalloonSharedByAllOpenProjectsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationBalloonSharedByALLOpenProjectsAction" />
         </group>
 
         <!--suppress PluginXmlCapitalization -->

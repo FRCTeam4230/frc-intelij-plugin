@@ -16,6 +16,10 @@
 
 package net.javaru.iip.frc.wizard
 
+import com.intellij.codeInsight.actions.DirectoryFormattingOptions
+import com.intellij.codeInsight.actions.OptimizeImportsProcessor
+import com.intellij.codeInsight.actions.ReformatCodeAction
+import com.intellij.codeInsight.actions.TextRangeType
 import com.intellij.ide.actions.ImportModuleAction
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder
 import com.intellij.ide.util.projectWizard.ModuleBuilderListener
@@ -25,7 +29,6 @@ import com.intellij.ide.util.projectWizard.SettingsStep
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.runWriteAction
-import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.externalSystem.model.project.ProjectData
@@ -36,6 +39,7 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.module.StdModuleTypes
 import com.intellij.openapi.options.ConfigurationException
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.runWhenProjectOpened
@@ -52,6 +56,10 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.projectImport.ProjectImportProvider
+import com.intellij.psi.PsiDirectory
+import com.intellij.psi.PsiManager
+import com.intellij.psi.impl.source.tree.injected.changesHandler.debug
+import com.intellij.psi.search.SearchScope
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.containers.stream
 import com.intellij.util.io.HttpRequests
@@ -64,8 +72,10 @@ import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.util.asPluginResourceUrl
 import net.javaru.iip.frc.util.asPluginResourceVF
+import net.javaru.iip.frc.util.findVirtualFile
 import net.javaru.iip.frc.util.get
 import net.javaru.iip.frc.util.getPluginResourceAsStream
+import net.javaru.iip.frc.util.invokeLater
 import net.javaru.iip.frc.util.invokeLaterWait
 import net.javaru.iip.frc.util.isValidJavaVersion
 import net.javaru.iip.frc.util.isValidJdk
@@ -73,6 +83,7 @@ import net.javaru.iip.frc.util.reader
 import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.removeBasePath
 import net.javaru.iip.frc.util.runBackgroundTask
+import net.javaru.iip.frc.util.runWhenSmart
 import net.javaru.iip.frc.util.toCommaDelimitedString
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import org.apache.commons.io.FileUtils
@@ -96,7 +107,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     /** 
      * Tracks the configured SDK since the `myJdk` property (in the super class `ModuleBuilder`) and the value in `WizardContext.getProjectJdk()` 
      * is not set until we pass the initial step. 
-     * We need to certain to keep this updated based on activities. A null value indicates not only that an SDK has not been selected,
+     * We need to be certain to keep this updated based on activities. A null value indicates not only that an SDK has not been selected,
      * but more likely a valid one (Type * Version) is not available in the listing.
      */
     var selectedSdk: Sdk? = null
@@ -126,8 +137,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     @Suppress("MemberVisibilityCanBePrivate")
     class TemplatePaths(val version: WpiLibVersion)
     {
-        /** The base templates directory. For example `frc-wizard-templates/2020` for FRC year 2020.
-         * In the event the directory of a year is not present, it will fallback to the latest year available. */
+        /** The base 'templates' directory. For example `frc-wizard-templates/2020` for FRC year 2020.
+         * In the event the directory of a year is not present, it will fall back to the latest year available. */
         val frcWizardTemplatesBaseDirPath: Path
 
         /** The `frc-wizard-templates` base templates directory as identified as  by the constant [frcWizardTemplatesDirName]. */
@@ -227,7 +238,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
      * Higher numbers appear at the top, lower numbers at the bottom.
      * The items in IntelliJ IDEA Community are from top to bottom `Java`, `JavaFX`, `Android`, `IntelliJ Platform Plugin` 
      * The items in IntelliJ IDEA Ultimate are from top to bottom: (Dependent upon plugins installed) `Java`, `flexmark-java extension`, `Java Enterprise`, `JBoss`, `Spring`, JavaFX`, `Android`, `IntelliJ Platform Plugin`
-     * We'll use 0 and get placed aty the bottom which I think is more consistent in the long run.
+     * We'll use 0 and get placed at the bottom, which I think is more consistent in the long run.
      */
     override fun getWeight(): Int = 0
     override fun getModuleType(): ModuleType<*>? = StdModuleTypes.JAVA
@@ -276,7 +287,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     {
         logger.trace {"[FRC] scheduling run configuration creation to runWhenProjectOpened."}
         /*
-          To prevent the below logged warning (from  RCInArbitraryFileManager.loadChangedRunConfigsFromFile() (~line 97)
+          To prevent the below logged warning from RCInArbitraryFileManager.loadChangedRunConfigsFromFile() (~line 97)
                 "It's unexpected that the file doesn't exist at this point ($filePath)"
           We need wait until the project is opened, AND is not indexing
           Unfortunately it does still seem to happen intermittently on rare occasion
@@ -286,8 +297,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
           From some debugging, the issue happens when the project is initially importing
           A race condition occurs (if we do not wait)
           So we need to wait until the initial import is complete. But there does not
-          appear to be a way to register a callback with the ImportModuleAction,createFromWizard()
-          So we use the below coded construct which seems to work fine.
+          appear to be a way to register a callback with the ImportModuleAction.createFromWizard()
+          So we use the below coded construct, which seems to work fine.
           High level call stack (some intermediary methods not listed)
                RCInArbitraryFileManager.loadChangedRunConfigsFromFile()
                RunManagerImpl.deleteRunConfigsFromArbitraryFilesNotWithinProjectContent()
@@ -343,10 +354,78 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 importGradleProject(modelContentRootDir, project)
             }
 
+            // For now, we will only optimize imports and not reformat code style
+//            if (FrcApplicationSettings.getInstance().isTeam3838() || dataModel.teamNumber == 3838)
+                runImportOptimizationOnly(project)
+//            else
+//                runReformatCode(project)
+
             progress.text = "Done."
         }
 
         logger.trace {"[FRC] FrcModuleBuilder.setupRootModel() completed"}
+    }
+
+    private fun runImportOptimizationOnly(project: Project)
+    {
+        project.runWhenSmart {
+            invokeLater {
+                try
+                {
+                    logger.debug("[FRC] Optimizing Imports (only) for new project $project")
+                    val psiDirectory = getSrcMainJavaPsiDirectory(project)
+                    val optimizer = OptimizeImportsProcessor(project, psiDirectory, true, false)
+                    optimizer.run()
+                }
+                catch (e: ProcessCanceledException)
+                {
+                    throw e
+                }
+                catch (e: Throwable)
+                {
+                    logger.debug { "[FRC] Could not optimize imports (only) for project $project. Cause Summary: $e" }
+                }
+            }
+        }
+    }
+
+    @Suppress("unused")
+    private fun runReformatCode(project: Project)
+    {
+        project.runWhenSmart {
+            invokeLater {
+                try
+                {
+                    logger.debug("[FRC] Reformatting code for new project $project")
+                    val psiDirectory = getSrcMainJavaPsiDirectory(project)
+                    ReformatCodeAction.reformatDirectory(project, psiDirectory, object : DirectoryFormattingOptions
+                    {
+                        override fun isOptimizeImports(): Boolean = true
+                        override fun isRearrangeCode(): Boolean = false
+                        override fun getTextRangeType(): TextRangeType = TextRangeType.WHOLE_FILE
+                        override fun getFileTypeMask(): String? = null
+                        override fun getSearchScope(): SearchScope? = null
+                        override fun isIncludeSubdirectories(): Boolean = true
+                    })
+                    logger.debug("[FRC] Reformat code completed for project $project")
+                }
+                catch (e: ProcessCanceledException)
+                {
+                    throw e
+                }
+                catch (e: Throwable)
+                {
+                    logger.debug { "[FRC] Could not reformat code and optimize imports for project $project. Cause Summary: $e" }
+                }
+            }
+        }
+    }
+
+    private fun getSrcMainJavaPsiDirectory(project: Project): PsiDirectory
+    {
+        val dirForReformatAction = rootProjectPath?.resolve("src/main/java") ?: throw IllegalStateException("rootProjectPath is null")
+        val vf = dirForReformatAction.findVirtualFile(true) ?: throw IllegalStateException("could not find Virtual File for $dirForReformatAction")
+        return PsiManager.getInstance(project).findDirectory(vf) ?: throw IllegalStateException("could not find PsiDirectory for $vf (from $dirForReformatAction)")
     }
 
 
@@ -362,7 +441,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     private fun copyTemplateFilesToProject(modelContentRootDir: VirtualFile)
     {
         /*
-            We need to setup the following:
+            We need to set up the following:
             A) The following are typically identical between templates
                 1) Gradle
                     - nice to have would be to add dependencies such as logging
@@ -392,7 +471,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                     - Same across all projects
                 2) Main.java
                     - typically does not change per project
-                    - A future nice to have would be to allow for a different "Robot" class name which would require this to be
+                    - A future nice to have would be to allow for a different "Robot" class name
                 3) Robot.java
                     - differs per template
                 4) Other Java classes and packages
@@ -507,7 +586,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                     .forEach {
                     val resourceRelativePath = Paths.get(it.toString().removePrefix("$srcFqBaseDir")).removeBasePath(Paths.get("/"))
                     // We refresh to resolve an issue where the source file is cached by IntelliJ IDEA, even after a restart, and we get the old content
-                    // We probably only need to do this when testing since a new plugin release would have a new jar file name... and IntelliJ *should*
+                    // We probably only need to do this when testing since a new plugin release would have a new jar file name… and IntelliJ *should*
                     // see that as a new file as its full path would be different. But since this is in the new project wizard, and thus is only used
                     // occasionally, the slight performance hit is worth the complete assurance of using the most recent file
                     it.refresh(false, true)
@@ -778,18 +857,18 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
      */
     override fun getCustomOptionsStep(context: WizardContext, parentDisposable: Disposable): ModuleWizardStep
     {
-        // This *normally* determines the potential frameworks  that can be selected (like kotlin, groovy, Thymeleaf, Ruby, etc., etc., etc.
+        // This *normally* determines the potential frameworks  that can be selected (like kotlin, groovy, Thymeleaf, Ruby, etc., etc., etc.)
         //     Notice that when setProviders is called  "java" is set for the "preselected" parameter    In IDEA project: service/project/wizard/GradleFrameworksWizardStep.java:99 as well as  service/project/wizard/GradleFrameworksWizardStep.java:91 for the Kotlin DSL
         //     Others are dynamically loaded via extension point definitions as far as I can tell.
         // Normally this is where we would put the option to select Kotlin
-        //     But since for us we are just adding something to build.gradle.ftl template and not anything more sophisticated (i.e. having to set things),
+        //     But since we are just adding something to build.gradle.ftl template and not anything more sophisticated (i.e. having to set things),
         //     and we want to auto add Kotlin if a Kotlin template is selected, we will do this in a later step via a simple check box
         //   
         // It looks like typically  these can be defined/configured via an extension is the plugin.xml
         //     For example with Gradle, there is:
         //           <frameworkSupport implementation="org.jetbrains.plugins.gradle.frameworkSupport.GradleGroovyFrameworkSupportProvider"/>
         //     in the gradle-groovy-integration.xml file.
-        //     in turn that file is defined as an optional depends in the gradle-java-integration.xml file when defining "org.intellij.groovy" as an (optional) dependency
+        //     in turn that file is defined as an optional depends on the gradle-java-integration.xml file when defining "org.intellij.groovy" as an (optional) dependency
         //     this would allow other plugins to add frameworks for a project type. Note something we need to worry about
         // So..... with all that said, we are not going to do a traditional "FrameworksWizardStep" or even an "options step",
         //     but rather a fairly simple "show some information" step

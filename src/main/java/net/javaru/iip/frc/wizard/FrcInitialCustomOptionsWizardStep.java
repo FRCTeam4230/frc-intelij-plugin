@@ -156,7 +156,7 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
     {
         //TODO: We need to 
         // ✔a) filter the list to remove the alphas, etc. 
-        //  b) have UI option to only show the latest version fpr each year (on by default) (com/intellij/find/impl/FindPopupPanel.java:1625)
+        //  b) have UI option to only show the latest version for each year (on by default) (com/intellij/find/impl/FindPopupPanel.java:1625)
         //  c) have a UI option to show/hide betas (off by default)
         // ✔d) make modifications so that the FrcProjectWizardData.wpilibVersion defaults to the latest and then that the selected item (below) matches
         

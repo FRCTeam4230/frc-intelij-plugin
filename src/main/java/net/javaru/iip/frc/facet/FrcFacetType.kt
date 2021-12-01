@@ -35,12 +35,9 @@ class FrcFacetType : FacetType<FrcFacet, FrcFacetConfiguration>(FrcFacet.FACET_T
     
     companion object
     {
-        val instance: FrcFacetType
-            get() = findInstance(FrcFacetType::class.java)
-            // get() =  FacetTypeRegistry.getInstance().findFacetType(FrcFacet.FACET_TYPE_ID) as FrcFacetType  // an alternative methodology I found in the Kotlin Plugin: org/jetbrains/kotlin/idea/facet/KotlinFacetType.kt:25
-        
-        val INSTANCE2
-            get() = FacetTypeRegistry.getInstance().findFacetType(FrcFacet.FACET_TYPE_ID) as FrcFacetType
+        val INSTANCE: FrcFacetType
+            //get() = findInstance(FrcFacetType::class.java) // This seems to be the older methodology
+            get() =  FacetTypeRegistry.getInstance().findFacetType(FrcFacet.FACET_TYPE_ID) as FrcFacetType  // an alternative methodology I found in the Kotlin Plugin: org/jetbrains/kotlin/idea/facet/KotlinFacetType.kt:25 It is alos used by a number of other JetBrains writen plugins
     }
     
     override fun createDefaultConfiguration(): FrcFacetConfiguration

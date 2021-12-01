@@ -28,7 +28,6 @@ import com.intellij.ide.util.projectWizard.SdkSettingsStep
 import com.intellij.ide.util.projectWizard.SettingsStep
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.externalSystem.model.project.ProjectData
@@ -283,6 +282,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
     }
 
+    @Suppress("GrazieInspection")
     private fun callCreateRunConfigurations(project: Project)
     {
         logger.trace {"[FRC] scheduling run configuration creation to runWhenProjectOpened."}
@@ -311,11 +311,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
          */
 
         runWhenProjectOpened(project) {
-            DumbService.getInstance(it).runWhenSmart {
-                runWriteAction {
+            DumbService.getInstance(it).smartInvokeLater {
+                // I've tried 'runWriteAction' and 'invokeLater' here, both outside and inside 'runWhenSmart'.
+                // But the issue persisted. I think the smartInvokeLater has resolved it.
                     createAllRunDebugConfigurations(it, dataModel)
                     it.reimportGradleProject()
-                }
             }
         }
     }

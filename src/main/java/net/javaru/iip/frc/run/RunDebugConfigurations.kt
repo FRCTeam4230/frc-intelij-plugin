@@ -58,9 +58,10 @@ private val logger = logger<RunDebugConfigurations>()
 
 fun createAllRunDebugConfigurations(project: Project, dataModel: FrcProjectWizardData)
 {
+    logger.debug("[FRC] Running createAllRunDebugConfigurations")
     FileDocumentManager.getInstance().saveAllDocuments()
     SaveAndSyncHandler.getInstance().scheduleProjectSave(project)
-    val isRomiTemplate = dataModel.isRomiRobotTemplate
+    val isRomiTemplate = dataModel.isRomiTemplate
     if (!isRomiTemplate)
     {
         createGradleRoboRioBuildRunConfigurations(project)
@@ -74,16 +75,15 @@ fun createAllRunDebugConfigurations(project: Project, dataModel: FrcProjectWizar
         {
             createTailSimulateJavaLogShellScriptRunConfiguration(project, isRomiTemplate)
         }
-        // For now we will create both. A future enhancement can make this selectable in the wizard
+        // For now, we will create both. A future enhancement can make this selectable in the wizard
         createLaunchShuffleboardRunConfiguration(project, dataModel.wpilibVersion)
         createLaunchSmartDashboardRunConfiguration(project, dataModel.wpilibVersion)
     }
 
     // We need to do a Save here or the run config files are not created, which then causes all sorts of issues (to say the least)
     FileDocumentManager.getInstance().saveAllDocuments()
-    //TODO: Look at using SaveAndSyncHandler.getInstance().scheduleSave(task: SaveTask, forceExecuteImmediately: Boolean)
-    //      once it is no longer marked Experimental. See SaveAllAction for use example. Any advantages to using it?
     SaveAndSyncHandler.getInstance().scheduleProjectSave(project)
+    logger.debug("[FRC] Completed createAllRunDebugConfigurations")
 }
 
 

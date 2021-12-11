@@ -14,6 +14,8 @@
  *     limitations under the License.
  */
 
+@file:Suppress("unused")
+
 package net.javaru.iip.frc.wpilib.version
 
 import org.apache.commons.lang3.BooleanUtils
@@ -49,7 +51,7 @@ fun Iterable<WpiLibVersion>.filterOutVersions(filter: WpiLibVersionFilter): List
 }
 
 /**
- *  Returns a Stream with elements matching the given [WpiLibVersionFilter] removed..
+ *  Returns a Stream with elements matching the given [WpiLibVersionFilter] removed.
  */
 fun Stream<WpiLibVersion>.filterOutVersions(filter: WpiLibVersionFilter): Stream<WpiLibVersion>
 {
@@ -58,9 +60,9 @@ fun Stream<WpiLibVersion>.filterOutVersions(filter: WpiLibVersionFilter): Stream
 
 /**
  * For the given year, filters out ALL but the latest version for that year, in essence returning
- * a list of a sinfge element, or an empty list if no versions for the year are present in the initial 
+ * a list of a single element, or an empty list if no versions for the year are present in the initial
  * list (or no non-pre-release versions)
- * If [excludePreReleases] is set to true, pre-releases (betas, release candidates, etc) are
+ * If [excludePreReleases] is set to true, pre-releases (betas, release candidates, etc.) are
  * excluded so that the latest "full" release is returned.
  */
 @JvmOverloads
@@ -79,7 +81,7 @@ fun Iterable<WpiLibVersion>.filterToLatestForYear(year: Int, excludePreReleases:
  * out the transitional `2018.06.21` version. Finally, it sorts the list in descending order' so the latest version is
  * first.
  *
- * For now we will not show betas because there may be peculiarities with betas. For example, during the beta program of 2020,
+ * For now, we will not show betas because there may be peculiarities with betas. For example, during the beta program of 2020,
  * the `projectYear` in the wpilib_preferences.json file was "Beta2020-2" and not 2020. But I could find no mapping of
  * the WpiLib Version to this value. It was basically a hard coded value in the code checking for it.
  *
@@ -93,7 +95,7 @@ fun Iterable<WpiLibVersion>.filterToDefaultListing(): List<WpiLibVersion>
 
     return if (versionList.isNotEmpty() && !filteredList.contains(versionList[0]) && versionList[0].isReleaseCandidate())
     {
-        // the latest version is not included, and is a release candidate and we want to show it.
+        // the latest version is not included, and is a release candidate, and we want to show it.
         val mutableList = filteredList.toMutableList()
         mutableList.add(versionList[0])
         mutableList.sortDescending()
@@ -118,7 +120,7 @@ interface WpiLibVersionFilter
 
     /** Returns an AND filter that "ands" this filter with the inverse of the supplied filter. For example
      * `IsPreReleaseFilter.andNot(IsAlphaFilter)` would return a filter that returns all prerelease versions
-     * that are not alpha release. Thus it would return only release candidates and betas.*/
+     * that are not alpha release. Thus, it would return only release candidates and betas .*/
     fun andNot(filter: WpiLibVersionFilter): WpiLibVersionFilter = Filters.and(this, filter.not())
 
     /** Returns the inverse of this boolean. For example, for the IsBetaFilter, it effectually returns an IsNotBetaFilter. */
@@ -207,7 +209,7 @@ object IsNotPreReleasePreviewFilter : WpiLibVersionFilter
 
 /**
  * Filters a list so that it contains just the values for a particular year. By default, it will filter out pre-releases. Note that NO
- * sorting takes place. the items are returned in the same order as they were in the original list.
+ * sorting takes place. The items original list's order is maintained in the returned value.
  */
 open class YearFilter @JvmOverloads constructor(private val year: Int, private val excludePreReleases: Boolean = true) : WpiLibVersionFilter
 {

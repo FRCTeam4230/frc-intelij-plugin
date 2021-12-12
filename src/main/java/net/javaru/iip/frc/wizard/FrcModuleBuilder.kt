@@ -196,6 +196,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         val configsResourceBasePath: Path = defaultFilesResourceBasePath.resolve(configsSubPath)
         val extrasResourceBasePath: Path = defaultFilesResourceBasePath.resolve(extrasSubPath)
         val vsCodeConfigsResourceBasePath: Path = extrasResourceBasePath.resolve(vsCodeConfigsSubPath)
+        val projectAutoGenReadMeResourceBasePath: Path = extrasResourceBasePath.resolve(projectAutoGenReadMeSubPath)
         val commonCodeResourceBasePath: Path = defaultFilesResourceBasePath.resolve(commonCodeSubPath)
         val javaCodeResourceBasePath: Path = defaultFilesResourceBasePath.resolve(javaCodeSubPath)
         val kotlinCodeResourceBasePath: Path = defaultFilesResourceBasePath.resolve(kotlinCodeSubPath)
@@ -211,6 +212,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             val configsSubPath: Path = Paths.get("configs")
             val extrasSubPath: Path = Paths.get("extras")
             val vsCodeConfigsSubPath: Path = Paths.get("vs-code-configs")
+            val projectAutoGenReadMeSubPath: Path = Paths.get("project-auto-gen-readme")
             val commonCodeSubPath: Path = Paths.get("code/common-code")
             val javaCodeSubPath: Path = Paths.get("code/java-code")
             val kotlinCodeSubPath: Path = Paths.get("code/kotlin-code")
@@ -511,6 +513,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         if (dataModel.includeVsCodeConfigs)
         {
             copyAllResourcesToModuleRoot(modelContentRootDir, paths.vsCodeConfigsResourceBasePath)
+        }
+
+        if (dataModel.frcWizardTemplateDefinition.includeAutoGenReadMe)
+        {
+            copyAllResourcesToModuleRoot(modelContentRootDir, paths.projectAutoGenReadMeResourceBasePath)
         }
 
         if (dataModel.gitIgnoreConfiguration.includeGitIgnoreFile)

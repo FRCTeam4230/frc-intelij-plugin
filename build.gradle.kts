@@ -345,6 +345,7 @@ dependencies {
     implementation("org.freemarker:freemarker:2.3.31")
     implementation("com.michael-bull.kotlin-result:kotlin-result:1.1.13")
     implementation("com.michael-bull.kotlin-result:kotlin-result-jvm:1.1.13")
+    implementation("io.github.furstenheim:copy_down:1.0") // HTML to MD
 
     implementation(platform ("io.sentry:sentry-bom:5.4.0"))
     implementation("io.sentry:sentry") {

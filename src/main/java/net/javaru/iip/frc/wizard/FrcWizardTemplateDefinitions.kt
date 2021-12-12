@@ -18,9 +18,11 @@
 
 package net.javaru.iip.frc.wizard
 
+import io.github.furstenheim.CopyDown
 import net.javaru.iip.frc.util.decapitalize2
 import net.javaru.iip.frc.wizard.TemplateLanguageOption.Companion.templateLanguageOptionListJavaAndKotlin
 import net.javaru.iip.frc.wizard.TemplateLanguageOption.Companion.templateLanguageOptionListJavaOnly
+import net.javaru.iip.frc.wpilib.gradlePluginRepo.logger
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import org.intellij.lang.annotations.Language
 
@@ -65,11 +67,15 @@ interface FrcWizardTemplateDefinition
      */
     val commandVersion: Int
 
-    val isRomiBot:Boolean
+    val isRomiBot: Boolean
+
+    val isExample: Boolean
 
     val availableTemplateLanguages: List<TemplateLanguageOption>
         get() = templateLanguageOptionListJavaOnly
 
+    /** If a README.md file should be auto-generated using the template's description. This is primarily meant for example templates. */
+    val includeAutoGenReadMe: Boolean
 
     /** The base name of the template's resource directory. It is highly recommended that this value not include any spaces. */
     fun templateResourcesDirName(): String
@@ -83,7 +89,17 @@ interface FrcWizardTemplateDefinition
     fun id(): String = "${templateResourcesDirName()}--$displayName"
 
     fun supportsLanguageOption(templateLanguageOption: TemplateLanguageOption) = availableTemplateLanguages.contains(templateLanguageOption)
+
     fun supportsMultipleLanguageOption() = availableTemplateLanguages.size > 1
+
+    /** Returns the template description in Markdown rather than HTML format. */
+    fun templateDescriptionInMarkdownFormat(): String
+    {
+        // https://github.com/furstenheim/copy-down
+        // If needed, we can modify options such as emDelimiter to '*' rather than '_'
+        val converter = CopyDown()
+        return converter.convert(description)
+    }
 }
 
 enum class TemplateLanguageOption
@@ -92,8 +108,8 @@ enum class TemplateLanguageOption
 
     companion object
     {
-        @JvmStatic
-        val templateLanguageOptionListKotlinOnly = listOf(Kotlin)
+//        @JvmStatic
+//        val templateLanguageOptionListKotlinOnly = listOf(Kotlin)
 
         @JvmStatic
         val templateLanguageOptionListJavaOnly = listOf(Java)
@@ -154,7 +170,9 @@ enum class FrcWizard2019ProjectTemplateDefinition(
         override val isDeprecated: Boolean = false,
         override val deprecationAlternative: String? = null,
         override val commandVersion: Int = 0,
-        override val isRomiBot: Boolean = false
+        override val isRomiBot: Boolean = false,
+        override val isExample: Boolean = false,
+        override val includeAutoGenReadMe: Boolean = false,
                                              ) : FrcWizardTemplateDefinition
 {
     CommandBased("Command Based Robot", "A robot project that allows robots to be implemented using the command based model to allow complex functionality to be developed from simpler functionality."),
@@ -185,7 +203,9 @@ enum class FrcWizard2019ExampleTemplateDefinition(
         override val isDeprecated: Boolean = false,
         override val deprecationAlternative: String? = null,
         override val commandVersion: Int = 0,
-        override val isRomiBot: Boolean = false
+        override val isRomiBot: Boolean = false,
+        override val isExample: Boolean = true,
+        override val includeAutoGenReadMe: Boolean = true,
                                                  ) : FrcWizardTemplateDefinition
 {
     GettingStarted("Getting Started", "An example project which demonstrates the simplest autonomous and teleoperated routines."),
@@ -229,7 +249,9 @@ enum class FrcWizard2020ProjectTemplateDefinition(
         override val isDeprecated: Boolean = false,
         override val deprecationAlternative: String? = null,
         override val commandVersion: Int = 1,
-        override val isRomiBot: Boolean = false
+        override val isRomiBot: Boolean = false,
+        override val isExample: Boolean = false,
+        override val includeAutoGenReadMe: Boolean = false,
                                                  ) : FrcWizardTemplateDefinition
 {
     // Old Command Based docs: https://docs.wpilib.org/en/latest/docs/software/old-commandbased/index.html
@@ -282,7 +304,9 @@ enum class FrcWizard2020ExampleTemplateDefinition(
         override val isDeprecated: Boolean = false,
         override val deprecationAlternative: String? = null,
         override val commandVersion: Int = 1,
-        override val isRomiBot: Boolean = false
+        override val isRomiBot: Boolean = false,
+        override val isExample: Boolean = true,
+        override val includeAutoGenReadMe: Boolean = true,
                                                  ) : FrcWizardTemplateDefinition
 {
     GettingStarted("Getting Started", "An example project which demonstrates the simplest autonomous and teleoperated routines."),
@@ -354,6 +378,8 @@ enum class FrcWizard2021ProjectTemplateDefinition(
     override val deprecationAlternative: String? = null,
     override val commandVersion: Int = 1,
     override val isRomiBot: Boolean = false,
+    override val isExample: Boolean = false,
+    override val includeAutoGenReadMe: Boolean = false,
     override val availableTemplateLanguages: List<TemplateLanguageOption> = templateLanguageOptionListJavaOnly,
     private val _templateResourcesDirName: String? = null,
                                                  ) : FrcWizardTemplateDefinition
@@ -427,6 +453,8 @@ enum class FrcWizard2021ExampleTemplateDefinition(
     override val deprecationAlternative: String? = null,
     override val commandVersion: Int = 1,
     override val isRomiBot: Boolean = false,
+    override val isExample: Boolean = true,
+    override val includeAutoGenReadMe: Boolean = true,
     private val _templateResourcesDirName: String? = null,
                                                  ) : FrcWizardTemplateDefinition
 {
@@ -544,6 +572,8 @@ enum class FrcWizard2022ProjectTemplateDefinition(
     override val deprecationAlternative: String? = null,
     override val commandVersion: Int = 2,
     override val isRomiBot: Boolean = false,
+    override val isExample: Boolean = false,
+    override val includeAutoGenReadMe: Boolean = false,
     override val availableTemplateLanguages: List<TemplateLanguageOption> = templateLanguageOptionListJavaOnly,
     private val _templateResourcesDirName: String? = null,
                                                  ) : FrcWizardTemplateDefinition
@@ -586,11 +616,11 @@ enum class FrcWizard2022ProjectTemplateDefinition(
              ),
     Educational(
         "Educational Robot",
-        """Educational Robot that 
-            |is <b><em>not</em> for competition use.<b> Creates a simple robot for teaching purposes. 
+        """Educational Robot that is <b><em>not</em> for competition use,</b> but instead is a simple robot to be used for teaching purposes. 
             |""".trimMargin(),
         commandVersion = 2,
-        availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
+        availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin,
+        includeAutoGenReadMe = true
                 ),
     ;
 
@@ -617,6 +647,8 @@ enum class FrcWizard2022ExampleTemplateDefinition(
     override val deprecationAlternative: String? = null,
     override val commandVersion: Int = 2,
     override val isRomiBot: Boolean = false,
+    override val isExample: Boolean = true,
+    override val includeAutoGenReadMe: Boolean = true,
     private val _templateResourcesDirName: String? = null,
                                                  ) : FrcWizardTemplateDefinition
 {
@@ -659,7 +691,7 @@ enum class FrcWizard2022ExampleTemplateDefinition(
         "'Inlined' Hatchbot",
         "A fully-functional command-based hatch bot for the 2019 game using the command framework/API.  Written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
                    _templateResourcesDirName = "hatchBotInlined"),
-    SelectCommand("Select Command Example", "An example showing how to use the SelectCommand class from the command framework/API.",),
+    SelectCommand("Select Command Example", "An example showing how to use the SelectCommand class from the command framework/API."),
     SchedulerEventLogging(
         "Scheduler Event Logging",
         "An example showing how to use Shuffleboard to log Command events from the CommandScheduler in the command framework/API.",

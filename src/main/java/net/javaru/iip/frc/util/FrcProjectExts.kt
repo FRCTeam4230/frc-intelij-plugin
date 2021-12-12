@@ -23,6 +23,7 @@ import com.intellij.ide.projectView.ProjectView
 import com.intellij.idea.IdeaLogger
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager

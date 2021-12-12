@@ -11,5 +11,9 @@
 ** There's a json file, for example  `templates.json` [.small]#(allwpilib/wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/templates/templates.json)#, `examples.json`, and commands.jso that list each template/example. This has the name and description in it.
 ** There is then a directory for each particular example
 
+=== Updating/Creating Templates for new Season
+
+See in *Updating/Creating Templates for new Season* in `src/main/resources/frc-wizard-templates/README-frc-wizard-templates.adoc`
+
 == Gradle Templates
 * The gradle templates are in the https://github.com/wpilibsuite/vscode-wpilib[vscode-wpilib] project

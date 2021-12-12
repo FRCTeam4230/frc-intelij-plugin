@@ -282,14 +282,6 @@
 
         <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
 
-        <!-- LEGACY PROJECT WIZARD (i.e. ant based pre 2019 season)-->
-        <!--<moduleType id="FrcLegacyModuleType" implementationClass="net.javaru.iip.frc.module.legacy.FrcLegacyModuleType" />-->
-        <!--<moduleBuilder id="FrcLegacyModuleBuilder" builderClass="net.javaru.iip.frc.module.legacy.FrcLegacyModuleBuilder" order="first" />-->
-        <!--<projectTemplate projectType="FRC_Legacy_Module" templatePath="projectTemplates/legacy/robots/FRC_Command_Based_Robot.zip" />-->
-        <!--<projectTemplate projectType="FRC_Legacy_Module" templatePath="projectTemplates/legacy/robots/FRC_Iterative_Robot.zip" />-->
-        <!--<projectTemplate projectType="FRC_Legacy_Module" templatePath="projectTemplates/legacy/robots/FRC_Timed_Robot.zip" />-->
-        <!--<projectTemplate projectType="FRC_Legacy_Module" templatePath="projectTemplates/legacy/robots/FRC_Sample_Robot.zip" />-->
-
         <!--
             While  the custom FrcModuleType is deprecated, we need to leave it in to prevent errors when projects that were created using it are opened.
             It's use was limited to a few weeks in Nov 2019 in v0.8.0 & v0.8.1, and was removed in the next release later in November.

@@ -576,10 +576,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             val srcFqBaseDir = VfsUtil.findFileByURL(pluginResourceDirUrl)
             if (srcFqBaseDir == null)
             {
-                logger.debug {"[FRC] Could not convert URL '$pluginResourceDirUrl' to a VirtualFile for 'copy all wizard template files' operation."}
+                logger.warn("[FRC] Could not convert URL '$pluginResourceDirUrl' to a VirtualFile for 'copy all wizard template files' operation.")
             }
             else
             {
+                srcFqBaseDir.refresh(false, true)
                 VfsUtil.collectChildrenRecursively(srcFqBaseDir)
                     .filter { !it.isDirectory }
                     .filter { keepFilter.invoke(it) }

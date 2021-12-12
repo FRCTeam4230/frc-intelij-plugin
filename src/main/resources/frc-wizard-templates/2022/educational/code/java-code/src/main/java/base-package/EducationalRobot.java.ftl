@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 
 
 
-/** Educational robot base class. */
+/** Educational robot base class. Do NOT use for competions. This is a simple robot used for teaching purposes. */
 public class EducationalRobot extends RobotBase
 {
     public void robotInit() {}

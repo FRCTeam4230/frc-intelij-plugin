@@ -587,7 +587,7 @@ enum class FrcWizard2022ProjectTemplateDefinition(
     Educational(
         "Educational Robot",
         """Educational Robot that 
-            |is <b><em>not</em> for competition use.<b> Creates a simple robots for teaching purposes. 
+            |is <b><em>not</em> for competition use.<b> Creates a simple robot for teaching purposes. 
             |""".trimMargin(),
         commandVersion = 2,
         availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin

@@ -493,6 +493,17 @@
             <action id="FRC.tools.internal.DownloadVendorDeps"
                     class="net.javaru.iip.frc.actions.tools.internal.DownloadVendorDeps"/>
         </group>
+
+        <group id="FRC.FrcInternalWpiLibActionsGroup"
+               class="net.javaru.iip.frc.actions.tools.internal.FrcInternalWpiLibActionsGroup"
+               popup="true"
+               icon="FrcIcons.WpiLib.WPI_LIB_16">
+        <add-to-group group-id="FRC.FrcInternalActionsGroup" anchor="after" relative-to-action="FRC.FrcInternalVendordepsActionsGroup" />
+            <action id="FRC.tools.internal.ConvertInternalWpiLibXmlMetadataToJsonAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ConvertInternalWpiLibXmlMetadataToJsonAction" />
+            <action id="FRC.tools.internal.GetAndConvertLatestWpiLibXmlMetadataToJsonAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.GetAndConvertLatestWpiLibXmlMetadataToJsonAction" />
+        </group>
         
         <group id="FRC.FrcInternalNotificationsActionsGroup"
                 class="net.javaru.iip.frc.actions.tools.internal.FrcInternalNotificationsActionsGroup"

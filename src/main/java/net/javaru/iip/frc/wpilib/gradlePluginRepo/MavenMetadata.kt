@@ -58,7 +58,7 @@ val wpiLibGradlePluginMavenMetadataURI = URI("https://plugins.gradle.org/m2/edu/
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 @State(name = "GradleRioMavenMetadata", storages = [(Storage("frc.xml"))])
 data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: String = defaultMavenMetadataJson,
-                                       var lastChecked: String = "20210203180000") :
+                                       var lastChecked: String = "20211210180000") :
         PersistentStateComponent<GradleRioMavenMetadataState>
 {
     val lastCheckedDateTime: LocalDateTime
@@ -357,25 +357,105 @@ fun fetchLatestMavenMetadata(metadataURI: URI): MavenMetadata?
     }
 }
 
+fun internalConvertXmlToJson(): String
+{
+    val json = parseMavenMetadata(xmlMetaDataForConversion)?.toJson(prettyPrinted = true) ?: "<WAS NULL>"
+    println(json)
+    return json
+}
 
 @Language("JSON")
-val defaultMavenMetadataJson = """{"groupId":"edu.wpi.first.GradleRIO","artifactId":"edu.wpi.first.GradleRIO.gradle.plugin","version":"2021.2.2","latest":"2021.2.2","release":"2021.2.2","versions":["2018.06.21","2019.0.0-alpha-1","2019.0.0-alpha-2","2019.0.0-alpha-3","2019.0.0-beta0-pre1","2019.0.0-beta0-pre3","2019.0.0-beta0-pre4","2019.0.0-beta0-pre5","2019.0.0-beta0-pre6","2019.1.1-beta-1","2019.1.1-beta-2a","2019.1.1-beta-3","2019.1.1-beta-3a","2019.1.1-beta-3-p-2","2019.1.1-beta-3-pre3","2019.1.1-beta-3-pre4","2019.1.1-beta-3-pre5","2019.1.1-beta-3-pre6","2019.1.1-beta-3-pre7","2019.1.1-beta-3-pre8","2019.1.1-beta-3-pre9","2019.1.1-beta-4","2019.1.1-beta-4a","2019.1.1-beta-4b","2019.1.1-beta-4c","2019.1.1-beta-4-pre1","2019.1.1-beta-4-pre2","2019.1.1-beta-4-pre4","2019.1.1-rc-1","2019.1.1","2019.2.1","2019.3.1","2019.3.2","2019.4.1","2020.1.1-beta-1","2020.1.1-beta-2","2020.1.1-beta-3","2020.1.1-beta-3a","2020.1.1-beta-4","2020.1.1-beta-5","2020.1.1","2020.1.2","2020.2.1","2020.2.2","2020.3.1","2020.3.2","2021.1.1-alpha-1","2021.1.1-beta-1","2021.1.1-beta-2","2021.1.1-beta-3","2021.1.1-beta-4","2021.1.1-beta-5","2021.1.2","2021.2.1","2021.2.2"],"lastUpdated":"20210130053329"}"""
-
-
-@Suppress("unused")
-@Language("JSON")
-val defaultMavenMetadataJsonPretty =
+val defaultMavenMetadataJson =
         """
-            {
-              "groupId" : "edu.wpi.first.GradleRIO",
-              "artifactId" : "edu.wpi.first.GradleRIO.gradle.plugin",
-              "version" : "2021.2.2",
-              "latest" : "2021.2.2",
-              "release" : "2021.2.2",
-              "versions" : [ "2018.06.21", "2019.0.0-alpha-1", "2019.0.0-alpha-2", "2019.0.0-alpha-3", "2019.0.0-beta0-pre1", "2019.0.0-beta0-pre3", "2019.0.0-beta0-pre4", "2019.0.0-beta0-pre5", "2019.0.0-beta0-pre6", "2019.1.1-beta-1", "2019.1.1-beta-2a", "2019.1.1-beta-3", "2019.1.1-beta-3a", "2019.1.1-beta-3-p-2", "2019.1.1-beta-3-pre3", "2019.1.1-beta-3-pre4", "2019.1.1-beta-3-pre5", "2019.1.1-beta-3-pre6", "2019.1.1-beta-3-pre7", "2019.1.1-beta-3-pre8", "2019.1.1-beta-3-pre9", "2019.1.1-beta-4", "2019.1.1-beta-4a", "2019.1.1-beta-4b", "2019.1.1-beta-4c", "2019.1.1-beta-4-pre1", "2019.1.1-beta-4-pre2", "2019.1.1-beta-4-pre4", "2019.1.1-rc-1", "2019.1.1", "2019.2.1", "2019.3.1", "2019.3.2", "2019.4.1", "2020.1.1-beta-1", "2020.1.1-beta-2", "2020.1.1-beta-3", "2020.1.1-beta-3a", "2020.1.1-beta-4", "2020.1.1-beta-5", "2020.1.1", "2020.1.2", "2020.2.1", "2020.2.2", "2020.3.1", "2020.3.2", "2021.1.1-alpha-1", "2021.1.1-beta-1", "2021.1.1-beta-2", "2021.1.1-beta-3", "2021.1.1-beta-4", "2021.1.1-beta-5", "2021.1.2", "2021.2.1", "2021.2.2" ],
-              "lastUpdated" : "20210130053329"
-             }
+        {
+          "groupId" : "edu.wpi.first.GradleRIO",
+          "artifactId" : "edu.wpi.first.GradleRIO.gradle.plugin",
+          "version" : "2022.1.1-beta-3",
+          "latest" : "2022.1.1-beta-3",
+          "release" : "2022.1.1-beta-3",
+          "versions" : [ "2018.06.21", "2019.0.0-alpha-1", "2019.0.0-alpha-2", "2019.0.0-alpha-3", "2019.0.0-beta0-pre1", "2019.0.0-beta0-pre3", "2019.0.0-beta0-pre4", "2019.0.0-beta0-pre5", "2019.0.0-beta0-pre6", "2019.1.1-beta-1", "2019.1.1-beta-2a", "2019.1.1-beta-3", "2019.1.1-beta-3a", "2019.1.1-beta-3-p-2", "2019.1.1-beta-3-pre3", "2019.1.1-beta-3-pre4", "2019.1.1-beta-3-pre5", "2019.1.1-beta-3-pre6", "2019.1.1-beta-3-pre7", "2019.1.1-beta-3-pre8", "2019.1.1-beta-3-pre9", "2019.1.1-beta-4", "2019.1.1-beta-4a", "2019.1.1-beta-4b", "2019.1.1-beta-4c", "2019.1.1-beta-4-pre1", "2019.1.1-beta-4-pre2", "2019.1.1-beta-4-pre4", "2019.1.1-rc-1", "2019.1.1", "2019.2.1", "2019.3.1", "2019.3.2", "2019.4.1", "2020.1.1-beta-1", "2020.1.1-beta-2", "2020.1.1-beta-3", "2020.1.1-beta-3a", "2020.1.1-beta-4", "2020.1.1-beta-5", "2020.1.1", "2020.1.2", "2020.2.1", "2020.2.2", "2020.3.1", "2020.3.2", "2021.1.1-alpha-1", "2021.1.1-beta-1", "2021.1.1-beta-2", "2021.1.1-beta-3", "2021.1.1-beta-4", "2021.1.1-beta-5", "2021.1.2", "2021.2.1", "2021.2.2", "2021.3.1", "2022.0.0-alpha-2", "2022.1.1-alpha-1", "2022.1.1-alpha-2", "2022.1.1-alpha-3", "2022.1.1-beta-1", "2022.1.1-beta-2", "2022.1.1-beta-3" ],
+          "lastUpdated" : "20211128080453"
+        }
         """.trimIndent()
+@Language("XML")
+private val xmlMetaDataForConversion =
+    """
+<metadata>
+    <groupId>edu.wpi.first.GradleRIO</groupId>
+    <artifactId>edu.wpi.first.GradleRIO.gradle.plugin</artifactId>
+    <version>2022.1.1-beta-3</version>
+    <versioning>
+        <latest>2022.1.1-beta-3</latest>
+        <release>2022.1.1-beta-3</release>
+        <versions>
+            <version>2018.06.21</version>
+            <version>2019.0.0-alpha-1</version>
+            <version>2019.0.0-alpha-2</version>
+            <version>2019.0.0-alpha-3</version>
+            <version>2019.0.0-beta0-pre1</version>
+            <version>2019.0.0-beta0-pre3</version>
+            <version>2019.0.0-beta0-pre4</version>
+            <version>2019.0.0-beta0-pre5</version>
+            <version>2019.0.0-beta0-pre6</version>
+            <version>2019.1.1-beta-1</version>
+            <version>2019.1.1-beta-2a</version>
+            <version>2019.1.1-beta-3</version>
+            <version>2019.1.1-beta-3a</version>
+            <version>2019.1.1-beta-3-p-2</version>
+            <version>2019.1.1-beta-3-pre3</version>
+            <version>2019.1.1-beta-3-pre4</version>
+            <version>2019.1.1-beta-3-pre5</version>
+            <version>2019.1.1-beta-3-pre6</version>
+            <version>2019.1.1-beta-3-pre7</version>
+            <version>2019.1.1-beta-3-pre8</version>
+            <version>2019.1.1-beta-3-pre9</version>
+            <version>2019.1.1-beta-4</version>
+            <version>2019.1.1-beta-4a</version>
+            <version>2019.1.1-beta-4b</version>
+            <version>2019.1.1-beta-4c</version>
+            <version>2019.1.1-beta-4-pre1</version>
+            <version>2019.1.1-beta-4-pre2</version>
+            <version>2019.1.1-beta-4-pre4</version>
+            <version>2019.1.1-rc-1</version>
+            <version>2019.1.1</version>
+            <version>2019.2.1</version>
+            <version>2019.3.1</version>
+            <version>2019.3.2</version>
+            <version>2019.4.1</version>
+            <version>2020.1.1-beta-1</version>
+            <version>2020.1.1-beta-2</version>
+            <version>2020.1.1-beta-3</version>
+            <version>2020.1.1-beta-3a</version>
+            <version>2020.1.1-beta-4</version>
+            <version>2020.1.1-beta-5</version>
+            <version>2020.1.1</version>
+            <version>2020.1.2</version>
+            <version>2020.2.1</version>
+            <version>2020.2.2</version>
+            <version>2020.3.1</version>
+            <version>2020.3.2</version>
+            <version>2021.1.1-alpha-1</version>
+            <version>2021.1.1-beta-1</version>
+            <version>2021.1.1-beta-2</version>
+            <version>2021.1.1-beta-3</version>
+            <version>2021.1.1-beta-4</version>
+            <version>2021.1.1-beta-5</version>
+            <version>2021.1.2</version>
+            <version>2021.2.1</version>
+            <version>2021.2.2</version>
+            <version>2021.3.1</version>
+            <version>2022.0.0-alpha-2</version>
+            <version>2022.1.1-alpha-1</version>
+            <version>2022.1.1-alpha-2</version>
+            <version>2022.1.1-alpha-3</version>
+            <version>2022.1.1-beta-1</version>
+            <version>2022.1.1-beta-2</version>
+            <version>2022.1.1-beta-3</version>
+        </versions>
+        <lastUpdated>20211128080453</lastUpdated>
+    </versioning>
+</metadata>
+    """.trimIndent()
 
 /*
 <?xml version='1.0' encoding='US-ASCII'?>

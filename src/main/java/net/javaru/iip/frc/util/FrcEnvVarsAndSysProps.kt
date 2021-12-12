@@ -73,4 +73,11 @@ object FrcSystemConfigs
         override val default: Boolean = false
         override val value: Boolean = getBooleanSystemProperty(key, default)
     }
+
+    object WiazrdAlwaysUpdateWpilibVersions: FrcSystemConfig<Boolean>
+    {
+        override val key: String = "frc.wizard.always.update.wpilib.versions"
+        override val default: Boolean = false
+        override val value: Boolean = getBooleanSystemProperty(key, default)
+    }
 }

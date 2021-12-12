@@ -24,6 +24,7 @@ import com.intellij.openapi.project.Project
 import net.javaru.iip.frc.run.createLaunchShuffleboardRunConfiguration
 import net.javaru.iip.frc.run.createLaunchSmartDashboardRunConfiguration
 import net.javaru.iip.frc.wpilib.getAttachedWpiLibVersion
+import net.javaru.iip.frc.wpilib.getWpiLibToolsPath
 
 abstract class AbstractCreateRunConfigurationAction(): AnAction()
 {
@@ -45,10 +46,9 @@ class CreateLaunchShuffleboardRunConfigurationAction() : AbstractCreateRunConfig
 {
     override fun doCreation(project: Project, e: AnActionEvent)
     {
-        val wpilibVersion = project.getAttachedWpiLibVersion()
-        if (wpilibVersion != null)
-        {
-            createLaunchShuffleboardRunConfiguration(project, wpilibVersion, setAsSelected = true)
+        project.getAttachedWpiLibVersion()?.also {
+            val wpiLibToosDir = getWpiLibToolsPath(it, project)
+            createLaunchShuffleboardRunConfiguration (project, wpiLibToosDir, setAsSelected = true)
         }
     }
 }
@@ -57,10 +57,9 @@ class CreateLaunchSmartDashboardRunConfigurationAction() : AbstractCreateRunConf
 {
     override fun doCreation(project: Project, e: AnActionEvent)
     {
-        val wpilibVersion = project.getAttachedWpiLibVersion()
-        if (wpilibVersion != null)
-        {
-            createLaunchSmartDashboardRunConfiguration(project, wpilibVersion, setAsSelected = true)
+        project.getAttachedWpiLibVersion()?.also {
+            val wpiLibToosDir = getWpiLibToolsPath(it, project)
+            createLaunchSmartDashboardRunConfiguration(project, wpiLibToosDir, setAsSelected = true)
         }
     }
 }

@@ -46,6 +46,7 @@ import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
 import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.Duration
 import java.time.LocalDateTime
@@ -76,8 +77,9 @@ fun createAllRunDebugConfigurations(project: Project, dataModel: FrcProjectWizar
             createTailSimulateJavaLogShellScriptRunConfiguration(project, isRomiTemplate)
         }
         // For now, we will create both. A future enhancement can make this selectable in the wizard
-        createLaunchShuffleboardRunConfiguration(project, dataModel.wpilibVersion)
-        createLaunchSmartDashboardRunConfiguration(project, dataModel.wpilibVersion)
+        val wpiLibToosDir = getWpiLibToolsPath(dataModel.wpilibVersion, project)
+        createLaunchShuffleboardRunConfiguration(project, wpiLibToosDir)
+        createLaunchSmartDashboardRunConfiguration(project, wpiLibToosDir)
     }
 
     // We need to do a Save here or the run config files are not created, which then causes all sorts of issues (to say the least)
@@ -220,24 +222,24 @@ fun createTailSimulateJavaLogShellScriptRunConfiguration(project: Project, isRom
 
 @JvmOverloads
 fun createLaunchShuffleboardRunConfiguration(project: Project,
-                                             wpiLibVersion: WpiLibVersion,
+                                             wpiLibToolsDir: Path,
                                              activateToolWindow: Boolean = false,
                                              setAsShared: Boolean = true,
                                              setAsSelected: Boolean = false)
 {
-    val jarPath = getWpiLibToolsPath(wpiLibVersion).resolve("shuffleboard.jar").toAbsolutePath().toString()
+    val jarPath = wpiLibToolsDir.resolve("shuffleboard.jar").toAbsolutePath().toString()
     createJarApplicationRunConfiguration(project, "Launch Shuffleboard", jarPath, activateToolWindow, setAsShared, setAsSelected)
 }
 
 @JvmOverloads
 fun createLaunchSmartDashboardRunConfiguration(project: Project,
-                                               wpiLibVersion: WpiLibVersion,
+                                               wpiLibToolsDir: Path,
                                                activateToolWindow:
                                                Boolean = false,
                                                setAsShared: Boolean = true,
                                                setAsSelected: Boolean = false)
 {
-    val jarPath = getWpiLibToolsPath(wpiLibVersion).resolve("SmartDashboard.jar").toAbsolutePath().toString()
+    val jarPath = wpiLibToolsDir.resolve("SmartDashboard.jar").toAbsolutePath().toString()
     createJarApplicationRunConfiguration(project, "Launch SmartDashboard", jarPath, activateToolWindow, setAsShared, setAsSelected)
 }
 

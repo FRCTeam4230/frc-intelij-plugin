@@ -45,10 +45,10 @@ internal class WpiLibHelpersKtTest
     fun getWpiLibRootTest()
     {
         assumingThat(SystemUtils.IS_OS_WINDOWS) {
-            assertAll({ assertPathsEqual(Paths.get("C:\\Users\\Public\\frc2019"), getWpiLibRootPath(2019)) },
-                      { assertPathsEqual(Paths.get("C:\\Users\\Public\\wpilib\\2020"), getWpiLibRootPath(2020)) },
-                      { assertPathsEqual(Paths.get("C:\\Users\\Public\\wpilib\\2021"), getWpiLibRootPath(2021)) },
-                      { assertPathsEqual(Paths.get("C:\\Users\\Public\\wpilib\\2020"), getWpiLibRootPath(WpiLibVersionImpl.parse("2020.1.2"))) })
+            assertAll({ assertPathsEqual(Paths.get("C:\\Users\\Public\\frc2019"), getWpiLibRootPath(2019, project = null)) },
+                      { assertPathsEqual(Paths.get("C:\\Users\\Public\\wpilib\\2020"), getWpiLibRootPath(2020, project = null)) },
+                      { assertPathsEqual(Paths.get("C:\\Users\\Public\\wpilib\\2021"), getWpiLibRootPath(2021, project = null)) },
+                      { assertPathsEqual(Paths.get("C:\\Users\\Public\\wpilib\\2020"), getWpiLibRootPath(WpiLibVersionImpl.parse("2020.1.2"), project = null)) })
         }
 // Disabling for now as it fails on CI/CD as it tries to display the Notification (and fails) despite setting "frc.testing.inUnitTestMode"
 // Tried setting it in build script as well, and it still did not work. Will investigate later when time allows

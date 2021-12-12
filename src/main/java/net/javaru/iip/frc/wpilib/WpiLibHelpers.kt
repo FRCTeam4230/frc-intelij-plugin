@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.wpilib
 
+import com.intellij.notification.NotificationListener
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
@@ -26,7 +27,7 @@ import com.intellij.util.io.exists
 import com.intellij.util.io.isFile
 import com.intellij.util.lang.JavaVersion
 import net.javaru.iip.frc.FrcPluginGlobals
-import net.javaru.iip.frc.i18n.FrcMessageKey
+import net.javaru.iip.frc.i18n.FrcBundle.message
 import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications
 import net.javaru.iip.frc.util.findClass
@@ -68,15 +69,15 @@ fun determineProjectYearStringForVersion(version: WpiLibVersion): String = if (v
  * Path is still returned.
  * @param forWpiLibVersion The WpiLibVersion to get the root path for
  */
-fun getWpiLibRootPath(forWpiLibVersion: WpiLibVersion): Path = getWpiLibRootPath(forWpiLibVersion.frcYear)
+fun getWpiLibRootPath(forWpiLibVersion: WpiLibVersion, project: Project? = null): Path = getWpiLibRootPath(forWpiLibVersion.frcYear, project)
 
 /**
  * Returns the root path for the WPI Lib installation. It does check if the directory exists, and if not its
- * missing is logged and the user is notified with a warn notification, but no other action is taken and the
+ * missing is logged and the user is notified with a "warn" notification, but no other action is taken and the
  * Path is still returned.
  * @param year The FRC season year
  */
-fun getWpiLibRootPath(year: Int): Path
+fun getWpiLibRootPath(year: Int, project:Project? = null): Path
 {
     // TODO: let's provide for user overriding of the install location See Issue #85: https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues/85
     val wpiLibRootPath = getDefaultWpiLibRootPath(year)
@@ -85,7 +86,14 @@ fun getWpiLibRootPath(year: Int): Path
     {
         // TODO: when we implement above ability for user to override, prompt the user for the location here and set it
         logger.warn("[FRC] The WPI Lib root was not found at its expected location of: $wpiLibRootPath")
-        FrcNotifications.notify(FrcNotificationType.ACTIONABLE_WARN, FrcMessageKey.of("frc.wpilib.root.path.not.found.user.notification", wpiLibRootPath))
+        FrcNotifications.notify(
+            type = FrcNotificationType.ACTIONABLE_WARN,
+            content = message("frc.wpilib.root.path.not.found.user.notification.content", wpiLibRootPath),
+            subTitle = message("frc.wpilib.root.path.not.found.user.notification.subtitle", year.toString()),
+            project = project,
+            listener = NotificationListener.URL_OPENING_LISTENER
+                               )
+
     }
     return wpiLibRootPath
 }
@@ -151,17 +159,17 @@ fun getDefaultWpiLibRootPath(year: Int): Path
 /**
  * Returns the standard path for the wpilib JDK installation, **but does not check if it exists**.
  */
-fun getWpiLibJdkHomePath(year: Int): Path = getWpiLibRootPath(year).resolve("jdk")
+fun getWpiLibJdkHomePath(year: Int, project: Project? = null): Path = getWpiLibRootPath(year, project).resolve("jdk")
 
 /**
  * Returns the standard path for the wpilib 'tools' directory, **but does not check if it exists**.
  */
-fun getWpiLibToolsPath(year: Int): Path = getWpiLibRootPath(year).resolve("tools")
+fun getWpiLibToolsPath(year: Int, project: Project? = null): Path = getWpiLibRootPath(year, project).resolve("tools")
 
 /**
  * Returns the standard path for the wpilib 'tools' directory, **but does not check if it exists**.
  */
-fun getWpiLibToolsPath(forWpiLibVersion: WpiLibVersion): Path = getWpiLibRootPath(forWpiLibVersion).resolve("tools")
+fun getWpiLibToolsPath(forWpiLibVersion: WpiLibVersion, project: Project? = null): Path = getWpiLibRootPath(forWpiLibVersion, project).resolve("tools")
 
 /**
  * Returns the standard path for the Java `RELEASE` file for the wpilib JDK installation, **but does not check if it exists**.
@@ -200,7 +208,7 @@ fun getWpiLibToolsPath(forWpiLibVersion: WpiLibVersion): Path = getWpiLibRootPat
  * SOURCE=""
  * ```
  */
-fun getWpiLibJdkReleaseFile(year: Int): Path = getWpiLibJdkHomePath(year).resolve("RELEASE")
+fun getWpiLibJdkReleaseFile(year: Int, project: Project? = null): Path = getWpiLibJdkHomePath(year, project).resolve("RELEASE")
 
 /**
  * Returns the value of the `JAVA_VERSION` property of the JDK `RELEASE` file, or null if the file
@@ -211,9 +219,9 @@ fun getWpiLibJdkReleaseFile(year: Int): Path = getWpiLibJdkHomePath(year).resolv
  *  - 1.8.0_222
  *  - `null`
  */
-fun getWpiLibJdkReleaseJavaVersionString(year: Int): String?
+fun getWpiLibJdkReleaseJavaVersionString(year: Int, project: Project? = null): String?
 {
-    val releaseFile = getWpiLibJdkReleaseFile(year)
+    val releaseFile = getWpiLibJdkReleaseFile(year, project)
     return if (releaseFile.isFile())
     {
         val properties = Properties()
@@ -228,8 +236,8 @@ fun getWpiLibJdkReleaseJavaVersionString(year: Int): String?
     }
 }
 
-fun getWpiLibJdkReleaseJavaVersion(year: Int): JavaVersion? = JavaVersion.tryParse(getWpiLibJdkReleaseJavaVersionString(year))
-fun getWpiLibJdkReleaseJavaFeatureVersion(year: Int): Int? = JavaVersion.tryParse(getWpiLibJdkReleaseJavaVersionString(year))?.feature
+fun getWpiLibJdkReleaseJavaVersion(year: Int, project: Project? = null): JavaVersion? = JavaVersion.tryParse(getWpiLibJdkReleaseJavaVersionString(year, project))
+fun getWpiLibJdkReleaseJavaFeatureVersion(year: Int, project: Project? = null): Int? = JavaVersion.tryParse(getWpiLibJdkReleaseJavaVersionString(year, project))?.feature
 
 
 /**

@@ -153,7 +153,7 @@ fun copyJavaFile(currentWpiTemplateName: String, wpiTemplateGroupName: String, s
                     }
                     else if (line.contains("Educational robot base class."))
                     {
-                        line.replace("Educational robot base class.", "Educational robot base class. Do NOT use for competions. This is a simple robot used for teaching purposes.")
+                        line.replace("Educational robot base class.", "Educational robot base class. Do NOT use for competitions. This is a simple robot used for teaching purposes.")
                     }
                     else if(line.contains("function"))
                     {

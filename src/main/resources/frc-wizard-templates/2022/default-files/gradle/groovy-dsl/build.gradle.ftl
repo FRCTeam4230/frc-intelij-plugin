@@ -13,11 +13,15 @@ import edu.wpi.first.gradlerio.deploy.roborio.RoboRIO
 </#if>
 plugins {
     id "java"
+<#if data.getIncludeKotlinSupport()>
+    id "org.jetbrains.kotlin.jvm" version "${data.kotlinVersion}"
+</#if>
     id "edu.wpi.first.GradleRIO" version "${data.wpilibVersion.versionString}"
 }
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+def javaVersion = JavaVersion.VERSION_11
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
 
 def ROBOT_MAIN_CLASS = "${data.mainClassFQ}"
 
@@ -60,6 +64,14 @@ wpi.java.debugJni = false
 // Set this to true to enable desktop support.
 def includeDesktopSupport = ${data.getIncludeDesktopSupportGradleSetting()}
 
+<#if data.getIncludeKotlinSupport()>
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = javaVersion.toString()
+    }
+}
+</#if>
 <#if data.junitUseJUnitPlatform()>
 
 test {
@@ -113,7 +125,6 @@ dependencies {
     testImplementation "junit:junit:${data.junit4Version}"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine"
 </#if>
-
 }
 
 // Simulation configuration (e.g. environment variables).

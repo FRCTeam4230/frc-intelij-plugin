@@ -52,6 +52,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v2.0.0</strong> <br>
+        &nbsp;&nbsp;&bull; Initial support for 2022 season, including project templates<br>
+        &nbsp;&nbsp;&bull; New Project Wizard: Added option to include Kotlin support in projects<br>
+        <br>
         <strong>v1.6.1</strong> <br>
         &nbsp;&nbsp;&bull; Resolves a potential NPE<br>
         <br>

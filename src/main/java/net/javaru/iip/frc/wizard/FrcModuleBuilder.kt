@@ -66,7 +66,10 @@ import freemarker.template.Template
 import icons.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION
 import net.javaru.iip.frc.freemarker.FM_TEMPLATE_EXT_WITH_DOT
+import net.javaru.iip.frc.freemarker.KOTLIN_FM_TEMPLATE_FILE_EXT
+import net.javaru.iip.frc.freemarker.KOTLIN_SCRIPT_FM_TEMPLATE_FILE_EXT
 import net.javaru.iip.frc.freemarker.freemarkerConfiguration
+import net.javaru.iip.frc.freemarker.freemarkerConfigurationForKotlinTemplates
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.util.asPluginResourceUrl
@@ -102,8 +105,9 @@ import javax.swing.Icon
 class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 {
     private val mySdkChangedListeners: MutableList<Runnable> = ContainerUtil.createLockFreeCopyOnWriteList()
-    private val fmConfiguration = freemarkerConfiguration(this, "/")
-    /** 
+    private val fmStdConfiguration = freemarkerConfiguration(this, "/")
+    private val fmKotConfiguration = freemarkerConfigurationForKotlinTemplates(this, "/")
+    /**
      * Tracks the configured SDK since the `myJdk` property (in the super class `ModuleBuilder`) and the value in `WizardContext.getProjectJdk()` 
      * is not set until we pass the initial step. 
      * We need to be certain to keep this updated based on activities. A null value indicates not only that an SDK has not been selected,
@@ -486,10 +490,10 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         paths.frcWizardTemplatesBaseDirPath.asPluginResourceVF()?.refresh(false, true)
         when(dataModel.gradleDslOption)
         {
-            FrcProjectWizardData.GradleDslOption.GroovyDSL -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleGroovyDslResourceBasePath)
-            FrcProjectWizardData.GradleDslOption.KotlinDSL -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleKotlinDslResourceBasePath)
+            FrcProjectWizardData.GradleDslOption.GroovyDSL -> copyAllResourcesToModuleRoot("grade - groovy DSL", modelContentRootDir, paths.gradleGroovyDslResourceBasePath)
+            FrcProjectWizardData.GradleDslOption.KotlinDSL -> copyAllResourcesToModuleRoot("grade - kotlin DSL", modelContentRootDir, paths.gradleKotlinDslResourceBasePath)
         }
-        copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleWrapperResourceBasePath)
+        copyAllResourcesToModuleRoot("gradle wrapper", modelContentRootDir, paths.gradleWrapperResourceBasePath)
 
 
         val wpilibCommandsJsonFilter: (VirtualFile) -> Boolean =
@@ -500,24 +504,26 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 else -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") && !virtualFile.name.contains("WPILibOldCommands") } // reject both
             }
 
-        copyAllResourcesToModuleRoot(modelContentRootDir, paths.configsResourceBasePath, wpilibCommandsJsonFilter)
-        copyAllResourcesToModuleRoot(modelContentRootDir, paths.commonCodeResourceBasePath)
+        copyAllResourcesToModuleRoot("configs", modelContentRootDir, paths.configsResourceBasePath, wpilibCommandsJsonFilter)
+        copyAllResourcesToModuleRoot("common code", modelContentRootDir, paths.commonCodeResourceBasePath)
 
-        logger.trace {"[FRC] templateLanguageOption: ${dataModel.templateLanguageOption}"}
-        when(dataModel.templateLanguageOption)
+
+        val codeResourceBasePath = when(dataModel.templateLanguageOption)
         {
-           TemplateLanguageOption.Java -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.javaCodeResourceBasePath)
-           TemplateLanguageOption.Kotlin -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.kotlinCodeResourceBasePath)
+           TemplateLanguageOption.Java -> paths.javaCodeResourceBasePath
+           TemplateLanguageOption.Kotlin -> paths.kotlinCodeResourceBasePath
         }
+        logger.trace { "[FRC] templateLanguageOption: ${dataModel.templateLanguageOption} Using codeResourceBasePath: $codeResourceBasePath" }
+        copyAllResourcesToModuleRoot("code : ${codeResourceBasePath.fileName}", modelContentRootDir, codeResourceBasePath)
 
         if (dataModel.includeVsCodeConfigs)
         {
-            copyAllResourcesToModuleRoot(modelContentRootDir, paths.vsCodeConfigsResourceBasePath)
+            copyAllResourcesToModuleRoot("vs-code-configs", modelContentRootDir, paths.vsCodeConfigsResourceBasePath)
         }
 
         if (dataModel.frcWizardTemplateDefinition.includeAutoGenReadMe)
         {
-            copyAllResourcesToModuleRoot(modelContentRootDir, paths.projectAutoGenReadMeResourceBasePath)
+            copyAllResourcesToModuleRoot("auto gen readme", modelContentRootDir, paths.projectAutoGenReadMeResourceBasePath)
         }
 
         if (dataModel.gitIgnoreConfiguration.includeGitIgnoreFile)
@@ -533,8 +539,13 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             }
         }
 
-        val selectedTemplateResourceBase = paths.frcWizardTemplatesBaseDirPath.resolve(dataModel.frcWizardTemplateDefinition.templateResourcesDirName()).resolve(TemplatePaths.javaCodeSubPath)
-        copyAllResourcesToModuleRoot(modelContentRootDir, selectedTemplateResourceBase)
+        val languageSubPath = when(dataModel.templateLanguageOption)
+        {
+            TemplateLanguageOption.Java -> TemplatePaths.javaCodeSubPath
+            TemplateLanguageOption.Kotlin -> TemplatePaths.kotlinCodeSubPath
+        }
+        val selectedTemplateResourceBase = paths.frcWizardTemplatesBaseDirPath.resolve(dataModel.frcWizardTemplateDefinition.templateResourcesDirName()).resolve(languageSubPath)
+        copyAllResourcesToModuleRoot("selected template files - $languageSubPath", modelContentRootDir, selectedTemplateResourceBase)
     }
 
 
@@ -569,10 +580,10 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 
 
 
-    private fun copyAllResourcesToModuleRoot(modelContentRootDir: VirtualFile, resourceDirBase: Path, keepFilter: (VirtualFile) -> Boolean = { true })
+    private fun copyAllResourcesToModuleRoot(resourceDescription: String, modelContentRootDir: VirtualFile, resourceDirBase: Path, keepFilter: (VirtualFile) -> Boolean = { true })
     {
         val pluginResourceDirUrl = resourceDirBase.asPluginResourceUrl()
-        logger.debug {"[FRC] pluginResourceDir URL = $pluginResourceDirUrl"}
+        logger.debug {"[FRC] copyAllResourcesToModuleRoot for: $resourceDescription\n        resourceDirBase = $resourceDirBase\n        pluginResourceDir URL = $pluginResourceDirUrl"}
 
         if (pluginResourceDirUrl == null)
         {
@@ -638,7 +649,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             val target = resolveTargetPath(modelContentRootDir, targetEndPath)
             // name ==> The path of the template file relatively to the (virtual) directory that you use to store the templates
             val name = FilenameUtils.separatorsToUnix(srcEndPath.toString())!!
-            val template = Template(name, srcFqVf.reader(), fmConfiguration)
+            val template =
+                if (fmTemplateName.isKotlinTemplate())
+                    Template(name, srcFqVf.reader(), fmKotConfiguration)
+                else
+                    Template(name, srcFqVf.reader(), fmStdConfiguration)
             processFreemarkerTemplate(template, target)
         }
         catch (e: Exception)
@@ -647,6 +662,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
     }
 
+    private fun String.isKotlinTemplate(): Boolean = this.endsWith(KOTLIN_FM_TEMPLATE_FILE_EXT) || this.endsWith(KOTLIN_SCRIPT_FM_TEMPLATE_FILE_EXT)
     
     private fun processFreemarkerTemplate(fmTemplate: Template, target: Path): VirtualFile?
     {

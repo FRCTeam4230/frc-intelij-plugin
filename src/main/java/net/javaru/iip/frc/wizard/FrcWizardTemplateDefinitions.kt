@@ -22,7 +22,6 @@ import io.github.furstenheim.CopyDown
 import net.javaru.iip.frc.util.decapitalize2
 import net.javaru.iip.frc.wizard.TemplateLanguageOption.Companion.templateLanguageOptionListJavaAndKotlin
 import net.javaru.iip.frc.wizard.TemplateLanguageOption.Companion.templateLanguageOptionListJavaOnly
-import net.javaru.iip.frc.wpilib.gradlePluginRepo.logger
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import org.intellij.lang.annotations.Language
 
@@ -106,10 +105,11 @@ enum class TemplateLanguageOption
 {
     Kotlin, Java;
 
+    @Suppress("unused")
     companion object
     {
-//        @JvmStatic
-//        val templateLanguageOptionListKotlinOnly = listOf(Kotlin)
+        @JvmStatic
+        val templateLanguageOptionListKotlinOnly = listOf(Kotlin)
 
         @JvmStatic
         val templateLanguageOptionListJavaOnly = listOf(Java)
@@ -395,7 +395,7 @@ enum class FrcWizard2021ProjectTemplateDefinition(
             |<a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based Programming</a> 
             |section of the WPI Lib Docs for more information.""".trimMargin(),
         commandVersion = 2,
-        availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
+        availableTemplateLanguages = templateLanguageOptionListJavaOnly
                 ),
     CommandBasedOld(
         "Command Based v1 Robot (aka Old Command)",
@@ -619,7 +619,7 @@ enum class FrcWizard2022ProjectTemplateDefinition(
         """Educational Robot that is <b><em>not</em> for competition use,</b> but instead is a simple robot that can be used for teaching purposes. 
             |""".trimMargin(),
         commandVersion = 2,
-        availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin,
+        availableTemplateLanguages = templateLanguageOptionListJavaOnly,
         includeAutoGenReadMe = true
                 ),
     ;

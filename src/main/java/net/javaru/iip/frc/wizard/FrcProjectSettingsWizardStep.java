@@ -496,7 +496,20 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     
     private void updateIncludeKotlinSupportOptionVisibility()
     {
-        kotlinOptionOutterPanel.setVisible(myBuilder.getDataModel().getFrcYear() >= 2022);
+        final FrcProjectWizardData dataModel = myBuilder.getDataModel();
+        
+        final boolean isKotlinTemplate = dataModel.getTemplateLanguageOption() == TemplateLanguageOption.Kotlin;
+        if (isKotlinTemplate)
+        {
+            kotlinOptionOutterPanel.setVisible(false);
+            // TODO need to make it so option goes "back" to user's previous selection
+            includeKotlinSupportCheckBox.setSelected(true);
+        }
+        else
+        {
+            kotlinOptionOutterPanel.setVisible(dataModel.getFrcYear() >= 2022);
+        }
+        
     }
     
     /** Commits data from UI into ModuleBuilder and WizardContext */

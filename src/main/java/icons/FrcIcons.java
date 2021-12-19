@@ -128,53 +128,53 @@ public final class FrcIcons
     
     public static class Tech
     {
-        /** A 16x16 PNG Icon for Git. */
-        public static final String GIT_PNG_PATH = "/icons/technologies/git.png";
-        /** A 16x16 PNG Icon for Git. */
-        public static final Icon GIT_PNG = loadIcon(GIT_PNG_PATH); // 16x16
-        /** A 16x16 SVG Icon for Git. */
-        public static final String GIT_SVG_PATH = "/icons/technologies/git.svg";
-        /** A 16x16 SVG Icon for Git. */
-        public static final Icon GIT_SVG = loadIcon(GIT_SVG_PATH); // 16x16
-        
-        /** A 16x16 PNG Icon for Kotlin. */
-        public static final String KOTLIN_PNG_PATH = "/icons/technologies/kotlin.png";
-        /** A 16x16 PNG Icon for Kotlin. */
-        public static final Icon KOTLIN_PNG = loadIcon(KOTLIN_PNG_PATH); // 16x16
-        /** A 16x16 SVG Icon for Kotlin. */
-        public static final String KOTLIN_SVG_PATH = "/icons/technologies/kotlin.svg";
-        /** A 16x16 SVG Icon for Kotlin. */
-        public static final Icon KOTLIN_SVG = loadIcon(KOTLIN_SVG_PATH); // 16x16
-       
-        /** A 13x13 PNG Icon for Kotlin. */
-        public static final String KOTLIN_13_PNG_PATH = "/icons/technologies/kotlin13.png";
-        /** A 13x13 PNG Icon for Kotlin. */
-        public static final Icon KOTLIN_13_PNG = loadIcon(KOTLIN_13_PNG_PATH); // 13x13
-        /** A 13x13 SVG Icon for Kotlin. */
-        public static final String KOTLIN_13_SVG_PATH = "/icons/technologies/kotlin13.svg";
-        /** A 13x13 SVG Icon for Kotlin. */
-        public static final Icon KOTLIN_13_SVG = loadIcon(KOTLIN_13_SVG_PATH); // 13x13
+        public static class Git
+        {
+            /** A 16x16 PNG Icon for Git. */
+            public static final String GIT_PNG_PATH = "/icons/technologies/git.png";
+            /** A 16x16 PNG Icon for Git. */
+            public static final Icon GIT_PNG = loadIcon(GIT_PNG_PATH); // 16x16
+            /** A 16x16 SVG Icon for Git. */
+            public static final String GIT_SVG_PATH = "/icons/technologies/git.svg";
+            /** A 16x16 SVG Icon for Git. */
+            public static final Icon GIT_SVG = loadIcon(GIT_SVG_PATH); // 16x16
+        }
     
-        /** A 16x16 SVG Icon for Kotlin File. */
-        public static final String KOTLIN_FILE_SVG_PATH = "/icons/technologies/kotlin_file.svg";
-        /** A 16x16 SVG Icon for Kotlin FIle. */
-        public static final Icon KOTLIN_FILE_SVG = loadIcon(KOTLIN_FILE_SVG_PATH); // 16x16
-    
-        /** A 16x16 SVG Icon for Kotlin Gradle Script. */
-        public static final String KOTLIN_GRADLE_SCRIPT_SVG_PATH = "/icons/technologies/kotlin.svg";
-        /** A 16x16 SVG Icon for Kotlin Gradle Script. */
-        public static final Icon KOTLIN_GRADLE_SCRIPT_SVG = loadIcon(KOTLIN_GRADLE_SCRIPT_SVG_PATH); // 16x16
-    
-        /** A 16x16 SVG Icon for Kotlin launch configuration. */
-        public static final String KOTLIN_LAUNCH_CONFIGURATION_SVG_PATH = "/icons/technologies/kotlin.svg";
-        /** A 16x16 SVG Icon for Kotlin launch configuration. */
-        public static final Icon KOTLIN_LAUNCH_CONFIGURATION_SVG = loadIcon(KOTLIN_LAUNCH_CONFIGURATION_SVG_PATH); // 16x16
-    
-        /** A 16x16 SVG Icon for Kotlin Script. */
-        public static final String KOTLIN_SCRIPT_SVG_PATH = "/icons/technologies/kotlin.svg";
-        /** A 16x16 SVG Icon for Kotlin Script. */
-        public static final Icon KOTLIN_SCRIPT_SVG = loadIcon(KOTLIN_SCRIPT_SVG_PATH); // 16x16
-        
+        public static class Kotlin
+        {
+            /** A 16x16 PNG Icon for Kotlin. */
+            public static final String KOTLIN_PNG_PATH = "/icons/technologies/kotlin.png";
+            /** A 16x16 PNG Icon for Kotlin. */
+            public static final Icon KOTLIN_PNG = loadIcon(KOTLIN_PNG_PATH); // 16x16
+            /** A 16x16 SVG Icon for Kotlin. */
+            public static final String KOTLIN_SVG_PATH = "/icons/technologies/kotlin.svg";
+            /** A 16x16 SVG Icon for Kotlin Script. */
+            public static final String KOTLIN_SCRIPT_SVG_PATH = KOTLIN_SVG_PATH;
+            /** A 16x16 SVG Icon for Kotlin Script. */
+            public static final Icon KOTLIN_SCRIPT_SVG = loadIcon(KOTLIN_SCRIPT_SVG_PATH); // 16x16
+            /** A 16x16 SVG Icon for Kotlin launch configuration. */
+            public static final String KOTLIN_LAUNCH_CONFIGURATION_SVG_PATH = KOTLIN_SVG_PATH;
+            /** A 16x16 SVG Icon for Kotlin launch configuration. */
+            public static final Icon KOTLIN_LAUNCH_CONFIGURATION_SVG = loadIcon(KOTLIN_LAUNCH_CONFIGURATION_SVG_PATH); // 16x16
+            /** A 16x16 SVG Icon for Kotlin Gradle Script. */
+            public static final String KOTLIN_GRADLE_SCRIPT_SVG_PATH = KOTLIN_SVG_PATH;
+            /** A 16x16 SVG Icon for Kotlin Gradle Script. */
+            public static final Icon KOTLIN_GRADLE_SCRIPT_SVG = loadIcon(KOTLIN_GRADLE_SCRIPT_SVG_PATH); // 16x16
+            /** A 16x16 SVG Icon for Kotlin. */
+            public static final Icon KOTLIN_SVG = loadIcon(KOTLIN_SVG_PATH); // 16x16
+            /** A 13x13 PNG Icon for Kotlin. */
+            public static final String KOTLIN_13_PNG_PATH = "/icons/technologies/kotlin13.png";
+            /** A 13x13 PNG Icon for Kotlin. */
+            public static final Icon KOTLIN_13_PNG = loadIcon(KOTLIN_13_PNG_PATH); // 13x13
+            /** A 13x13 SVG Icon for Kotlin. */
+            public static final String KOTLIN_13_SVG_PATH = "/icons/technologies/kotlin13.svg";
+            /** A 13x13 SVG Icon for Kotlin. */
+            public static final Icon KOTLIN_13_SVG = loadIcon(KOTLIN_13_SVG_PATH); // 13x13
+            /** A 16x16 SVG Icon for Kotlin File. */
+            public static final String KOTLIN_FILE_SVG_PATH = "/icons/technologies/kotlin_file.svg";
+            /** A 16x16 SVG Icon for Kotlin FIle. */
+            public static final Icon KOTLIN_FILE_SVG = loadIcon(KOTLIN_FILE_SVG_PATH); // 16x16
+        }
     }
     
     public static class WpiLib

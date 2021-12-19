@@ -127,6 +127,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     private JBCheckBox includeKotlinSupportCheckBox;
     private JBLabel includeKotlinSupportCheckBoxLabel;
     private ContextHelpLabel includeKotlinSupportContextHelpLabel;
+    private JBLabel kotlinRequiredForTemplateLabel;
     
     
     private ButtonAndLabelSynchronizer<JBCheckBox> enableDesktopSupportOption;
@@ -247,6 +248,14 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         };
         groovyDslRadioButton.addItemListener(gradleDslOptionChangeListener);
         kotlinDslRadioButton.addItemListener(gradleDslOptionChangeListener);
+    
+    
+        includeKotlinSupportCheckBox.addChangeListener(e -> {
+            final boolean isKotlinTemplate = dataModel.getTemplateLanguageOption() == TemplateLanguageOption.Kotlin;
+            if (isKotlinTemplate && !includeKotlinSupportCheckBox.isSelected()) {
+                includeKotlinSupportCheckBox.setSelected(true);
+            }
+        });
         
         
         // REMOVE ONCE NO LONGER IN DEVELOPMENT/EXPERIMENTAL
@@ -497,19 +506,15 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     private void updateIncludeKotlinSupportOptionVisibility()
     {
         final FrcProjectWizardData dataModel = myBuilder.getDataModel();
-        
         final boolean isKotlinTemplate = dataModel.getTemplateLanguageOption() == TemplateLanguageOption.Kotlin;
-        if (isKotlinTemplate)
-        {
-            kotlinOptionOutterPanel.setVisible(false);
-            // TODO need to make it so option goes "back" to user's previous selection
-            includeKotlinSupportCheckBox.setSelected(true);
-        }
-        else
-        {
-            kotlinOptionOutterPanel.setVisible(dataModel.getFrcYear() >= 2022);
-        }
-        
+        kotlinOptionOutterPanel.setVisible(dataModel.getFrcYear() >= 2022);
+        // TODO need to make it so option goes "back" to user's previous selection
+        includeKotlinSupportCheckBox.setSelected(includeKotlinSupportCheckBox.isSelected() || isKotlinTemplate);
+        // We have a change listener that does not allow the option to de deselected if it is a Kotlin Template
+        // For now we'll leave the option enabled as it looks strange to be disabled
+        // Ideally we need to enhance the ButtonAndLabelSynchronizer to allow for disabling the checkbox only
+        //includeKotlinSupportCheckBox.setEnabled(!isKotlinTemplate);
+        kotlinRequiredForTemplateLabel.setVisible(isKotlinTemplate);
     }
     
     /** Commits data from UI into ModuleBuilder and WizardContext */

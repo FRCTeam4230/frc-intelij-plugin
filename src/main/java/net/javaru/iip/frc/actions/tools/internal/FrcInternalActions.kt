@@ -32,9 +32,11 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.DialogBuilder
 import com.intellij.openapi.ui.InputValidator
 import com.intellij.openapi.ui.Messages
 import com.intellij.psi.PsiDirectory
+import com.intellij.ui.components.JBScrollPane
 import icons.FrcIcons
 import icons.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals
@@ -56,10 +58,30 @@ import net.javaru.iip.frc.wizard.FrcProjectWizardData
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsManagementDialogWrapper
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsProjectFilesListing
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsService
+import java.awt.Component
+import java.awt.Dimension
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
+import java.lang.reflect.Modifier
 import java.nio.file.Path
 import javax.swing.Icon
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.SwingConstants
+import kotlin.math.max
 
+open class FrcInternalActionsGroup : DefaultActionGroup()
+{
+    override fun update(e: AnActionEvent)
+    {
+        val project = e.project
+        e.presentation.isVisible = project != null &&
+            !project.isDisposed &&
+            FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE
+    }
+}
 
+class FrcInternalFrcPluginRelatedActionsGroup : FrcInternalActionsGroup()
 class FrcInternalVendordepsActionsGroup : FrcInternalActionsGroup()
 class FrcInternalGradleActionsGroup : FrcInternalActionsGroup()
 
@@ -136,17 +158,6 @@ private fun createFailedActionDueToNullProjectNotification(actionName: String = 
     subTitle = "$actionName Action Failed".trim()
                                                                                                         )
 
-
-open class FrcInternalActionsGroup : DefaultActionGroup()
-{
-    override fun update(e: AnActionEvent)
-    {
-        val project = e.project
-        e.presentation.isVisible = project != null &&
-                                   !project.isDisposed &&
-                                   FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE
-    }
-}
 
 /** An action that will purposefully cause an exception for testing purposes. */
 class LogAnErrorAction : AbstractFrcInternalAction()
@@ -461,4 +472,65 @@ class ShowFrcApplicationSettings : AbstractFrcInternalAction(FRC.FIRST_ICON_MEDI
             FRC.FIRST_ICON_MEDIUM_16
                                   )
     }
+}
+
+class LoadAllIconsInternalAction: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        logger.info("[FRC] Loading all icons...")
+        val loadedIcons = mutableListOf<Component>()
+        processClass(FrcIcons::class.java, loadedIcons)
+
+
+        val outer = JPanel(GridBagLayout())
+        val inner = JPanel(GridBagLayout())
+        val scroll = JBScrollPane(inner)
+        outer.add(scroll, GridBagConstraints())
+
+        val gc = GridBagConstraints()
+        loadedIcons.forEach {
+            gc.gridx++
+            if (gc.gridx % 3 == 0)
+            {
+                gc.gridy++
+                gc.gridx = 0
+            }
+            inner.add(it, gc)
+        }
+        val builder = DialogBuilder(actionEvent.project)
+        builder.setTitle("Loaded FRC Icons")
+        builder.setCenterPanel(outer)
+        builder.show()
+    }
+
+    private fun processClass(clazz: Class<*>, loadedIcons: MutableList<Component>)
+    {
+        logger.info("[FRC] Checking Class: ${clazz.name}")
+        clazz.declaredFields.forEach {
+            if (Modifier.isStatic(it.modifiers) && javax.swing.Icon::class.java.isAssignableFrom(it.type) && it.name != "NOT_FOUND_ICON")
+            {
+                logger.info("[FRC] Loading ${it.name}")
+                val icon = it.get(null) as Icon
+                if (icon.iconHeight <= 24 && icon.iconWidth <= 24 && !it.name.contains("_ICO_"))
+                {
+                    val label = JLabel("${clazz.name}.${it.name}", icon, SwingConstants.LEFT)
+                    val size = Dimension(400, max(18, icon.iconHeight + 4))
+                    label.minimumSize = size
+                    label.preferredSize = size
+                    loadedIcons.add(label)
+                }
+                logger.info("[FRC] ${it.name} loaded")
+            }
+            else
+            {
+                logger.info("[FRC] Ignoring ${it.name}")
+            }
+        }
+        logger.info("[FRC] Completed Class: ${clazz.name}")
+        clazz.classes.forEach {
+           processClass(it, loadedIcons)
+        }
+    }
+
 }

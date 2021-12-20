@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 /**
- * This class represents the onboard IO of the Romi reference robot. This includes the pushbuttons
+ * This class represents the onboard IO of the Romi reference robot. This includes the push buttons
  * and LEDs.
  *
  * <p>DIO 0 - Button A (input only) DIO 1 - Button B (input) or Green LED (output) DIO 2 - Button C

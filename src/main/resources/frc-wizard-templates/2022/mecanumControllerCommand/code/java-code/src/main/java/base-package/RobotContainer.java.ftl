@@ -120,7 +120,7 @@ public class RobotContainer
                         DriveConstants.FEEDFORWARD,
                         DriveConstants.DRIVE_KINEMATICS,
                         
-                        // Position contollers
+                        // Position controllers
                         new PIDController(AutoConstants.PX_CONTROLLER, 0, 0),
                         new PIDController(AutoConstants.PY_CONTROLLER, 0, 0),
                         new ProfiledPIDController(
@@ -129,7 +129,7 @@ public class RobotContainer
                         // Needed for normalizing wheel speeds
                         AutoConstants.MAX_SPEED_METERS_PER_SECOND,
                         
-                        // Velocity PID's
+                        // Velocity PIDs
                         new PIDController(DriveConstants.P_FRONT_LEFT_VEL, 0, 0),
                         new PIDController(DriveConstants.P_REAR_LEFT_VEL, 0, 0),
                         new PIDController(DriveConstants.P_FRONT_RIGHT_VEL, 0, 0),

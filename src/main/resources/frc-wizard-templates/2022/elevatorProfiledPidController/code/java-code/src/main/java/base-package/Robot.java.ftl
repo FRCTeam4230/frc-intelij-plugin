@@ -30,7 +30,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     private final Encoder encoder = new Encoder(1, 2);
     private final MotorController motor = new PWMSparkMax(1);
     
-    // Create a PID controller whose setpoint's change is subject to maximum
+    // Create a PID controller whose setpoint change is subject to maximum
     // velocity and acceleration constraints.
     private final TrapezoidProfile.Constraints constraints =
             new TrapezoidProfile.Constraints(1.75, 0.75);

@@ -103,7 +103,7 @@ public class DriveSubsystem extends SubsystemBase
                             DriveConstants.DRIVETRAIN_PLANT,
                             DriveConstants.DRIVE_GEARBOX,
                             DriveConstants.DRIVE_GEARING,
-                            DriveConstants.TRACKWIDTH_METERS,
+                            DriveConstants.TRACK_WIDTH_METERS,
                             DriveConstants.WHEEL_DIAMETER_METERS / 2.0,
                             VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
             

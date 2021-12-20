@@ -45,7 +45,7 @@ public class ArmSubsystem extends TrapezoidProfileSubsystem
     @Override
     public void useState(TrapezoidProfile.State setpoint)
     {
-        // Calculate the feedforward from the sepoint
+        // Calculate the feedforward from the setpoint
         double feedforward = this.feedforward.calculate(setpoint.position, setpoint.velocity);
         // Add the feedforward to the PID output to get the motor output
         motor.setSetpoint(

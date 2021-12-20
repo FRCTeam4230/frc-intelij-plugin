@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 /**
  * This is a sample program that uses mecanum drive with a gyro sensor to maintain rotation
- * vectorsin relation to the starting orientation of the robot (field-oriented controls).
+ * vectors in relation to the starting orientation of the robot (field-oriented controls).
  */
 public class ${data.robotClassSimpleName} extends TimedRobot
 {

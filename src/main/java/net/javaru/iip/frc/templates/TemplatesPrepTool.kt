@@ -139,7 +139,7 @@ fun copyJavaFile(currentWpiTemplateName: String, wpiTemplateGroupName: String, s
                 haveSeenPackageLine = trimmedLine.startsWith("package ")
                 if (pastHeader)
                 {
-                    val newLine = if (trimmedLine.startsWith("import "))
+                    var newLine = if (trimmedLine.startsWith("import "))
                     {
                         line.replace("edu.wpi.first.wpilibj.$wpiTemplateGroupName.$currentWpiTemplateName", "${'$'}{data.basePackage}")
                     }
@@ -206,12 +206,33 @@ fun copyJavaFile(currentWpiTemplateName: String, wpiTemplateGroupName: String, s
                         line
                     }
 
+                    newLine = fixSpellingTypos(newLine)
                     pw.println(newLine)
                 }
             }
         }
     }
+}
 
+@Suppress("SpellCheckingInspection")
+private fun fixSpellingTypos(theLine: String) : String
+{
+    var line = theLine
+    line = line.replace("channnel", "channel")
+    line = line.replace("from the sepoint", "from the setpoint")
+    line = line.replace("whose setpoint's change", "whose setpoint change")
+    line = line.replace("next timestep", "next timestep")
+    line = line.replace("motion profilied robot", "motion profiled robot")
+    line = line.replace("This includes the pushbuttons", "This includes the push buttons")
+    line = line.replace("propotional turning", "proportional turning")
+    line = line.replace("vectorsin relation", "vectors in relation")
+    line = line.replace("// qelms", "// QELMs")
+    line = line.replace("// relms", "// RELMs")
+    line = line.replace("selectcommand.", "SelectCommand")
+    line = line.replace("Position contollers", "Position controllers")
+    line = line.replace("TRACKWIDTH_METERS", "TRACK_WIDTH_METERS")
+    line = line.replace("// Velocity PID's", "// Velocity PIDs")
+    return line
 }
 
 private fun checkForMappingIssues(

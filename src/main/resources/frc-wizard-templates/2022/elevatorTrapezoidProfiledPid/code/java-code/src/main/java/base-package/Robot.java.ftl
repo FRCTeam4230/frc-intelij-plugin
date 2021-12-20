@@ -59,7 +59,7 @@ public class ${data.robotClassSimpleName} extends TimedRobot
         // current setpoint.
         var profile = new TrapezoidProfile(constraints, goal, setpoint);
         
-        // Retrieve the profiled setpoint for the next timestep. This setpoint moves
+        // Retrieve the profiled setpoint for the next time-step. This setpoint moves
         // toward the goal while obeying the constraints.
         setpoint = profile.calculate(kDt);
         

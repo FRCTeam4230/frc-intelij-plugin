@@ -39,7 +39,7 @@ public class RobotContainer
     }
     
     
-    // An example selector method for the selectcommand.  Returns the selector that will select
+    // An example selector method for the SelectCommand.  Returns the selector that will select
     // which command to run.  Can base this choice on logical conditions evaluated at runtime.
     private CommandSelector select()
     {
@@ -47,8 +47,8 @@ public class RobotContainer
     }
     
     
-    // An example selectcommand.  Will select from the three commands based on the value returned
-    // by the selector method at runtime.  Note that selectcommand works on Object(), so the
+    // An example SelectCommand.  Will select from the three commands based on the value returned
+    // by the selector method at runtime.  Note that SelectCommand works on Object(), so the
     // selector does not have to be an enum; it could be any desired type (string, integer,
     // boolean, double...)
     private final Command exampleSelectCommand =

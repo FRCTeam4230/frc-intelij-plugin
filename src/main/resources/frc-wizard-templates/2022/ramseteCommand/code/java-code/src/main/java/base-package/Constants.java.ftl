@@ -38,9 +38,9 @@ public final class Constants
         public static final boolean LEFT_ENCODER_REVERSED = false;
         public static final boolean RIGHT_ENCODER_REVERSED = true;
         
-        public static final double TRACKWIDTH_METERS = 0.69;
+        public static final double TRACK_WIDTH_METERS = 0.69;
         public static final DifferentialDriveKinematics DRIVE_KINEMATICS =
-                new DifferentialDriveKinematics(TRACKWIDTH_METERS);
+                new DifferentialDriveKinematics(TRACK_WIDTH_METERS);
         
         public static final int ENCODER_CPR = 1024;
         public static final double WHEEL_DIAMETER_METERS = 0.15;

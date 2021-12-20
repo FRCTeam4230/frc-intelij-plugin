@@ -1,5 +1,5 @@
 <#ftl output_format="plainText" encoding="UTF-8">
-<#--noinspection WrongPackageStatement-->
+<#--noinspection WrongPackageStatement,MainFunctionReturnUnit-->
 <#compress>
 <#-- @ftlvariable name="data" type="net.javaru.iip.frc.wizard.FrcProjectWizardData" -->
 <#--
@@ -18,6 +18,7 @@
 -->
 <#--  To DEBUG templates, set system property 'frc.freemarker.debug' to true when launching the testing instance of IntelliJ IDEA -->
 </#compress>
+@file:JvmName("Main") // set the compiled Java class name to "Main" rather than "MainKt"
 package [=data.basePackage]
 
 import edu.wpi.first.wpilibj.RobotBase
@@ -25,10 +26,17 @@ import edu.wpi.first.wpilibj.RobotBase
 /**
  * Main initialization function. Do not perform any initialization here
  * other than calling `RobotBase.startRobot`. Do not modify this file
- * except to change the class passed to the `startRobot` call.
+ * except to change the object passed to the `startRobot` call.
  *
- * If you change your main Robot class (name), change the parameter type.
- * (If you use the IDE's Rename Refactor when renaming the class, it will
- * get changed everywhere.)
+ * If you change the package of this file, you must also update the
+ * `ROBOT_MAIN_CLASS` variable in the gradle build file. Note that
+ * this file has a `@file:JvmName` annotation so that its compiled
+ * Java class name is "Main" rather than "MainKt". This is to prevent
+ * any issues/confusion if this file is ever replaced with a Java class.
+ *
+ * If you change your main Robot object (name), change the parameter of the
+ * `RobotBase.startRobot` call to the new name. (If you use the IDE's Rename
+ * Refactoring when renaming the object, it will get changed everywhere
+ * including here.)
  */
-fun main() = RobotBase.startRobot { Robot() }
+fun main() = RobotBase.startRobot { [=data.robotClassSimpleName] }

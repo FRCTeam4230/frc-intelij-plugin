@@ -45,7 +45,7 @@ class FrcProjectWizardData(
         // TODO Issue #80 have these dynamically updated in the wizard
         var junit4Version: String = "4.13.2", // https://search.maven.org/artifact/junit/junit
         var junit5Version: String = "5.8.2",  // https://search.maven.org/artifact/org.junit/junit-bom
-        var kotlinVersion: String = "1.6.0",
+        var kotlinVersion: String = "1.6.10",
         var gradleDslOption: GradleDslOption = GradleDslOption.GroovyDSL,
         var templateLanguageOption: TemplateLanguageOption = TemplateLanguageOption.Java
                           )

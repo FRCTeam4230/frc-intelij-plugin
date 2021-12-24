@@ -86,6 +86,8 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                   var checkWpiLibStatusPeriodically: Boolean = true,
                                   var checkWpiLibStatusInterval: TemporalAmount = Duration.ofHours(4),
                                   var provideCustomFileIcons: Boolean = true,
+                                  // TODO: Add to settings dialog
+                                  var useGradleAllDistributionDefault: Boolean = false,
                                   /** A non-identifying ID (NIID) for cases where a knowing what particular installation of the plugin is needed. */
                                   var niid: String = NOT_SET
                                  ) : PersistentStateComponent<FrcApplicationSettings>

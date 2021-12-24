@@ -27,28 +27,31 @@ const val DEFAULT_BASE_PACKAGE = "frc.robot"
 const val DEFAULT_ROBOT_CLASS_NAME = "Robot"
 
 class FrcProjectWizardData(
-        var teamNumber: Int = FrcApplicationSettings.getInstance().teamNumber,
-        /** The simple name of the Main class (not to be confused with the (primary) Robot class). This is the simple class that has the `main()` method.*/
-        var mainClassSimpleName: String = "Main",
-        /** The simple name of the primary Robot class (not to be confused with the Main class). This is the class that extends one of the WPILib `RobotBase` classes.*/
-        var robotClassSimpleName: String = DEFAULT_ROBOT_CLASS_NAME,  // if/whn we make settable, we need to change the template copying to rename the file!
-        var basePackage: String = DEFAULT_BASE_PACKAGE,
-        var wpilibVersion: WpiLibVersion = GradleRioMavenMetadataState.getInstance().wpiLibMavenMetadata.releaseAsWpiLibVersion,
-        // We just need to set some non-null value here. It does NOT need to be updated each year as it is set in net/javaru/iip/frc/wizard/FrcTemplateSelectionWizardStep#updateDataModel
-        var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizard2019ProjectTemplateDefinition.CommandBased,
-        var includeVsCodeConfigs: Boolean = true,
-        var includeKotlinSupport: Boolean = false,
-        var enableDesktopSupport: Boolean = false,
-        var gitIgnoreConfiguration: GitIgnoreConfiguration = GitIgnoreConfiguration(true, generateFromSite = true),
-        var includeJUnitSupport:Boolean = true,
-        var junitOption: JUnitOption = JUnitOption.JUnit5,
-        // TODO Issue #80 have these dynamically updated in the wizard
-        var junit4Version: String = "4.13.2", // https://search.maven.org/artifact/junit/junit
-        var junit5Version: String = "5.8.2",  // https://search.maven.org/artifact/org.junit/junit-bom
-        var kotlinVersion: String = "1.6.10",
-        var gradleDslOption: GradleDslOption = GradleDslOption.GroovyDSL,
-        var templateLanguageOption: TemplateLanguageOption = TemplateLanguageOption.Java
-                          )
+    var teamNumber: Int = FrcApplicationSettings.getInstance().teamNumber,
+    /** The simple name of the Main class (not to be confused with the (primary) Robot class). This is the simple class that has the `main()` method.*/
+    var mainClassSimpleName: String = "Main",
+    /** The simple name of the primary Robot class (not to be confused with the Main class). This is the class that extends one of the WPILib `RobotBase` classes.*/
+    var robotClassSimpleName: String = DEFAULT_ROBOT_CLASS_NAME,  // if/whn we make settable, we need to change the template copying to rename the file!
+    var basePackage: String = DEFAULT_BASE_PACKAGE,
+    var wpilibVersion: WpiLibVersion = GradleRioMavenMetadataState.getInstance().wpiLibMavenMetadata.releaseAsWpiLibVersion,
+    // We just need to set some non-null value here. It does NOT need to be updated each year as it is set in net/javaru/iip/frc/wizard/FrcTemplateSelectionWizardStep#updateDataModel
+    var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizard2019ProjectTemplateDefinition.CommandBased,
+    var includeVsCodeConfigs: Boolean = true,
+    var includeKotlinSupport: Boolean = false,
+    var enableDesktopSupport: Boolean = false,
+    var gitIgnoreConfiguration: GitIgnoreConfiguration = GitIgnoreConfiguration(true, generateFromSite = true),
+    var includeJUnitSupport:Boolean = true,
+    var junitOption: JUnitOption = JUnitOption.JUnit5,
+    // TODO Issue #80 have these dynamically updated in the wizard
+    var junit4Version: String = "4.13.2", // https://search.maven.org/artifact/junit/junit
+    var junit5Version: String = "5.8.2",  // https://search.maven.org/artifact/org.junit/junit-bom
+    var kotlinVersion: String = "1.6.10",
+    var gradleDslOption: GradleDslOption = GradleDslOption.GroovyDSL,
+    var templateLanguageOption: TemplateLanguageOption = TemplateLanguageOption.Java,
+    // TODO: Add selection option to new project wizard
+    var useGradleAllDistribution: Boolean = FrcApplicationSettings.getInstance().useGradleAllDistributionDefault,
+
+    )
 {
 
     /**
@@ -108,7 +111,7 @@ class FrcProjectWizardData(
 
     val gradleDistributionUrl: String
         get() {
-            return when (wpilibVersion.frcYear)
+            val retval= when (wpilibVersion.frcYear)
             {
                 // To check for latest, look in vscode-wpilib project (NOT allwpilib where the templates are)
                 //      vscode-wpilib/resources/gradle/shared/
@@ -117,9 +120,13 @@ class FrcProjectWizardData(
                 2019 -> """https\://services.gradle.org/distributions/gradle-5.0-bin.zip"""
                 2020 -> """https\://services.gradle.org/distributions/gradle-6.0.1-bin.zip"""
                 2021 -> """https\://services.gradle.org/distributions/gradle-6.0.1-bin.zip"""
-                2022 -> """https\://services.gradle.org/distributions/gradle-7.2-bin.zip"""
-                else -> """https\://services.gradle.org/distributions/gradle-7.2-bin.zip"""
+                2022 -> """https\://services.gradle.org/distributions/gradle-7.3.2-bin.zip"""
+                else -> """https\://services.gradle.org/distributions/gradle-7.3.2-bin.zip"""
             }
+            return if (useGradleAllDistribution || FrcApplicationSettings.getInstance().isTeam3838())
+                retval.replace("-bin", "-all")
+            else
+                retval
         }
 
     val copyright: String

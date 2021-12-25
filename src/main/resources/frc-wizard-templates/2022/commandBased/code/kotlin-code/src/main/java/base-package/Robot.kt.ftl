@@ -21,11 +21,14 @@
 package [=data.basePackage]
 
 import edu.wpi.first.wpilibj.TimedRobot
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 
 /**
  * The VM is configured to automatically run this object (which basically function as a singleton class),
  * and to call the functions corresponding to each mode, as described in the TimedRobot documentation.
+ * This is written as an object rather than a class since there should only ever be a single instance, and
+ * it cannot take any constructor arguments. This makes it a natural fit to be an object in Kotlin.
  *
  * If you change the name of this object or the package after creating this project, you must also update
  * the `Main.kt` file in the project. (If you use the IDE's Rename or Move refactorings when renaming the
@@ -33,19 +36,22 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler
  */
 object [=data.robotClassSimpleName] : TimedRobot()
 {
+    /** The autonomous command to run. It is set in [autonomousInit]. */
+    private var autonomousCommand: Command?  = null
+
     /**
      * This method is run when the robot is first started up and should be used for any
      * initialization code.
      */
     override fun robotInit()
     {
-
+        // Access the RobotContainer object so that it is initialized
+        RobotContainer
     }
 
     /**
      * This method is called every robot packet, no matter the mode. Use this for items like
      * diagnostics that you want ran during disabled, autonomous, teleoperated and test.
-     *
      *
      * This runs after the mode specific periodic methods, but before LiveWindow and
      * SmartDashboard integrated updating.
@@ -73,8 +79,10 @@ object [=data.robotClassSimpleName] : TimedRobot()
     /** This autonomous runs the autonomous command selected by your [RobotContainer] class.  */
     override fun autonomousInit()
     {
-        // schedule the autonomous command (example)
-        RobotContainer.autonomousCommand.schedule()
+        // We store the command as a Robot property in the rare event that the selector on the dashboard
+        // is modified while the command is running since we need to access it again in teleopInit()
+        autonomousCommand = RobotContainer.selectedAutonomousCommand
+        autonomousCommand?.schedule()
     }
 
     /** This method is called periodically during autonomous.  */
@@ -84,11 +92,9 @@ object [=data.robotClassSimpleName] : TimedRobot()
 
     override fun teleopInit()
     {
-        // This makes sure that the autonomous stops running when
-        // teleop starts running. If you want the autonomous to
-        // continue until interrupted by another command, remove
-        // this line or comment it out.
-        RobotContainer.autonomousCommand.cancel()
+        // This makes sure that the autonomous stops running when teleop starts running. If you want the
+        // autonomous to continue until interrupted by another command, remove this line or comment it out.
+        autonomousCommand?.cancel()
     }
 
     /** This method is called periodically during operator control.  */

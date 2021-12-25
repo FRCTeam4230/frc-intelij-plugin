@@ -23,11 +23,12 @@ package [=data.basePackage]
 import edu.wpi.first.wpilibj.TimedRobot
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
-import [=data.basePackage].[=data.robotClassSimpleName].AutoMode.*
 
 /**
  * The VM is configured to automatically run this object (which basically function as a singleton class),
  * and to call the functions corresponding to each mode, as described in the TimedRobot documentation.
+ * This is written as an object rather than a class since there should only ever be a single instance, and
+ * it cannot take any constructor arguments. This makes it a natural fit to be an object in Kotlin.
  *
  * If you change the name of this object or the package after creating this project, you must also update
  * the `Main.kt` file in the project. (If you use the IDE's Rename or Move refactorings when renaming the
@@ -35,14 +36,31 @@ import [=data.basePackage].[=data.robotClassSimpleName].AutoMode.*
  */
 object [=data.robotClassSimpleName] : TimedRobot()
 {
-    private var autoSelected = DEFAULT_AUTO
-    private val chooser = SendableChooser<AutoMode>()
+    private var selectedAutoMode = AutoMode.default
+    private val autoModeChooser = SendableChooser<AutoMode>().also { chooser ->
+        AutoMode.values().forEach { chooser.addOption(it.optionName, it) }
+        chooser.setDefaultOption(AutoMode.default.optionName, AutoMode.default)
+    }
 
-    private enum class AutoMode(val description: String, val isDefault: Boolean = false)
+    /**
+     * A enumeration of the available autonomous modes.
+     *
+     * @param optionName The name for the [autoModeChooser] option.
+     * @param periodicFunction The function that is called in the [autonomousPeriodic] function each time it is called.
+     * @param autoInitFunction An optional function that is called in the [autonomousInit] function.
+     */
+    private enum class AutoMode(val optionName: String,
+                                val periodicFunction: () -> Unit,
+                                val autoInitFunction: () -> Unit = { /* No op by default */ } )
     {
-        DEFAULT_AUTO("Default Auto Mode", isDefault = true),
-        CUSTOM_AUTO_1("Custom Auto Mode 1"),
-        CUSTOM_AUTO_2("Custom Auto Mode 2"),
+        CUSTOM_AUTO_1("Custom Auto Mode 1", ::autoMode1),
+        CUSTOM_AUTO_2("Custom Auto Mode 2", ::autoMode2),
+        ;
+        companion object
+        {
+            /** The default auto mode. */
+            val default = CUSTOM_AUTO_1
+        }
     }
 
     /**
@@ -51,24 +69,12 @@ object [=data.robotClassSimpleName] : TimedRobot()
      */
     override fun robotInit()
     {
-        initAutoChooser()
-    }
-
-    private fun initAutoChooser()
-    {
-        AutoMode.values().forEach {
-            if (it.isDefault)
-                chooser.setDefaultOption(it.description, it)
-            else
-                chooser.addOption(it.description, it)
-        }
-        SmartDashboard.putData("Auto choices", chooser)
+        SmartDashboard.putData("Auto choices", autoModeChooser)
     }
 
     /**
      * This method is called every robot packet, no matter the mode. Use this for items like
      * diagnostics that you want ran during disabled, autonomous, teleoperated and test.
-     *
      *
      * This runs after the mode specific periodic methods, but before LiveWindow and
      * SmartDashboard integrated updating.
@@ -81,26 +87,15 @@ object [=data.robotClassSimpleName] : TimedRobot()
         SmartDashboard. You can add additional auto modes by adding additional options to the AutoMode enum
         and then adding them to the `when` statement in the [autonomousPeriodic] function.
 
-        If you prefer the LabVIEW Dashboard, remove all the chooser code and uncomment the alternate line: */
-        // autoSelected = AutoMode.valueOf(SmartDashboard.getString("Auto Selector", DEFAULT_AUTO.name))
-        autoSelected = chooser.selected
-        println("Auto selected: ${autoSelected.description}")
+        If you prefer the LabVIEW Dashboard, remove all the chooser code and uncomment the following line: */
+        //selectedAutoMode = AutoMode.valueOf(SmartDashboard.getString("Auto Selector", AutoMode.default.name))
+        selectedAutoMode = autoModeChooser.selected ?: AutoMode.default
+        println("Selected auto mode: ${selectedAutoMode.optionName}")
+        selectedAutoMode.autoInitFunction.invoke()
     }
 
     /** This method is called periodically during autonomous.  */
-    override fun autonomousPeriodic()
-    {
-        when (autoSelected) {
-            CUSTOM_AUTO_1 -> autoMode1()
-            CUSTOM_AUTO_2 -> autoMode2()
-            DEFAULT_AUTO -> defaultAutoMode()
-        }
-    }
-
-    private fun defaultAutoMode()
-    {
-        TODO("Write default auto mode")
-    }
+    override fun autonomousPeriodic() = selectedAutoMode.periodicFunction.invoke()
 
     private fun autoMode1()
     {

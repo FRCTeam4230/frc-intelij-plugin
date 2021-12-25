@@ -20,7 +20,10 @@
 </#compress>
 package [=data.basePackage]
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.PrintCommand
 import [=data.basePackage].commands.ExampleCommand
 
 /**
@@ -31,22 +34,39 @@ import [=data.basePackage].commands.ExampleCommand
  */
 object RobotContainer
 {
+    private val autoModeChooser = SendableChooser<AutoMode>().apply {
+        AutoMode.values().forEach { addOption(it.optionName, it) }
+        setDefaultOption(AutoMode.default.optionName, AutoMode.default)
+    }
+
     /**
-     * Use this to get the autonomous command in the main [Robot] class.
+     * A enumeration of the available autonomous modes.
      *
-     * @return the command to run in autonomous
+     * @param optionName The name for the [autoModeChooser] option.
+     * @param command The [Command] to run for this mode.
      */
-    val autonomousCommand: Command
-        get()
+    private enum class AutoMode(val optionName: String, val command: Command)
+    {
+        // TODO: Replace with real auto modes and their corresponding commands
+        CUSTOM_AUTO_1("Custom Auto Mode 1", ExampleCommand()),
+        CUSTOM_AUTO_2("Custom Auto Mode 2", PrintCommand("Auto Mode 2")),
+        ;
+
+        companion object
         {
-            // You could add logic here to select between multiple autonomous commands
-            return ExampleCommand()
+            /** The default auto mode. */
+            val default = CUSTOM_AUTO_1
         }
+    }
+
+    /** The command to run in autonomous. */
+    val selectedAutonomousCommand: Command
+       get() = autoModeChooser.selected?.command ?: AutoMode.default.command
 
     init
     {
-        // Configure the button bindings
         configureButtonBindings()
+        SmartDashboard.putData("Auto choices", autoModeChooser)
     }
 
     /**

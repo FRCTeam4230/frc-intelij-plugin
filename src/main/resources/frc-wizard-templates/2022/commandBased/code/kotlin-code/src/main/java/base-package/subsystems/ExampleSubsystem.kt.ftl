@@ -18,7 +18,7 @@
 -->
 <#--  To DEBUG templates, set system property 'frc.freemarker.debug' to true when launching the testing instance of IntelliJ IDEA -->
 </#compress>
-package [=data.basePackage]
+package [=data.basePackage].subsystems
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 

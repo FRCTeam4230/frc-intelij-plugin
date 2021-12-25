@@ -27,6 +27,7 @@ import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.components.JBTextField;
 
 import kotlin.Unit;
+import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.util.FrcCollectionExtsKt;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
 
@@ -46,19 +47,23 @@ public class GitIgnoreOptionsDialogWrapper extends DialogWrapper
     private JBRadioButton vscodeShareRadioButton;
     private JBRadioButton vscodeIgnoreRadioButton;
     private JBRadioButton vscodeNoEntryRadioButton;
+    private JBCheckBox eclipseCheckBox;
+    private JBCheckBox netbeansCheckBox;
     private JBCheckBox gradleCheckBox;
     private JBCheckBox javaCheckBox;
     private JBCheckBox linuxCheckBox;
     private JBCheckBox macCheckBox;
     private JBCheckBox winCheckBox;
     private JBCheckBox cppCheckBox;
+    private JBCheckBox wpilibCheckBox;
     private JLabel advancedLabel;
     private JBLabel additionalGitignoreTemplatesLabel;
     private JBTextField additionalGitignoreTemplatesTextField;
     private JButton defaultButton;
     private JBCheckBox generateFromSiteCheckBox;
+
     
-    private GitIgnoreConfiguration configuration;
+    private final GitIgnoreConfiguration configuration;
     
     public GitIgnoreOptionsDialogWrapper(JComponent parent, GitIgnoreConfiguration gitIgnoreConfiguration)
     {
@@ -66,8 +71,7 @@ public class GitIgnoreOptionsDialogWrapper extends DialogWrapper
         super(parent, true);
         this.configuration = gitIgnoreConfiguration;
         init();
-        //noinspection DialogTitleCapitalization
-        setTitle("Configure .gitignore Options"); // TODO move to messages bundle
+        setTitle(FrcBundle.message("frc.ui.wizard.projectSettingsStep.gitignore.optionsDialog.title"));
         initComponents();
     }
     
@@ -108,12 +112,17 @@ public class GitIgnoreOptionsDialogWrapper extends DialogWrapper
 //            return Unit.INSTANCE;
 //        });
     
+        //For now, we are using boolean checkboxes for Eclipse and NetBeans rather than selecting as an IdeConfigOption
+        
+        eclipseCheckBox.addActionListener(e -> configuration.setEclipse(IdeConfigOption.Companion.fromBoolean(eclipseCheckBox.isSelected())));
+        netbeansCheckBox.addActionListener(e -> configuration.setNetbeans(IdeConfigOption.Companion.fromBoolean(netbeansCheckBox.isSelected())));
         gradleCheckBox.addActionListener(e -> configuration.setGradle(gradleCheckBox.isSelected()));
         javaCheckBox.addActionListener(e -> configuration.setJava(javaCheckBox.isSelected()));
         linuxCheckBox.addActionListener(e -> configuration.setLinux(linuxCheckBox.isSelected()));
         macCheckBox.addActionListener(e -> configuration.setMacOS(macCheckBox.isSelected()));
         winCheckBox.addActionListener(e -> configuration.setWindows(winCheckBox.isSelected()));
         cppCheckBox.addActionListener(e -> configuration.setCpp(cppCheckBox.isSelected()));
+        wpilibCheckBox.addActionListener(e -> configuration.setWpilib(wpilibCheckBox.isSelected()));
     
         FrcUiUtilsKt.addTextChangedListener(additionalGitignoreTemplatesTextField, text -> {
             configuration.setAdditionalGitignoreTemplates(FrcCollectionExtsKt.commaDelimitedToList(additionalGitignoreTemplatesTextField.getText()));
@@ -201,12 +210,15 @@ public class GitIgnoreOptionsDialogWrapper extends DialogWrapper
 //                netBeansNoEntryRadioButton.setSelected(true);
 //        }
     
+        eclipseCheckBox.setSelected(configuration.getEclipse().asBoolean());
+        netbeansCheckBox.setSelected(configuration.getNetbeans().asBoolean());
         gradleCheckBox.setSelected(configuration.getGradle());
         javaCheckBox.setSelected(configuration.getJava());
         linuxCheckBox.setSelected(configuration.getLinux());
         macCheckBox.setSelected(configuration.getMacOS());
         winCheckBox.setSelected(configuration.getWindows());
         cppCheckBox.setSelected(configuration.getCpp());
+        wpilibCheckBox.setSelected(configuration.getWpilib());
         generateFromSiteCheckBox.setSelected(configuration.getGenerateFromSite());
         additionalGitignoreTemplatesTextField.setText(FrcCollectionExtsKt.toCommaDelimitedString(configuration.getAdditionalGitignoreTemplates()));
     }

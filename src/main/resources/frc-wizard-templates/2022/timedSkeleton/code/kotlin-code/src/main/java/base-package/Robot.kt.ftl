@@ -23,7 +23,7 @@ package [=data.basePackage]
 import edu.wpi.first.wpilibj.TimedRobot
 
 /**
- * The VM is configured to automatically run this object (which basically function as a singleton class),
+ * The VM is configured to automatically run this object (which basically functions as a singleton class),
  * and to call the functions corresponding to each mode, as described in the TimedRobot documentation.
  * This is written as an object rather than a class since there should only ever be a single instance, and
  * it cannot take any constructor arguments. This makes it a natural fit to be an object in Kotlin.

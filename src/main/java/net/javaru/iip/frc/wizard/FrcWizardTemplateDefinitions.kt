@@ -595,7 +595,10 @@ enum class FrcWizard2022ProjectTemplateDefinition(
           "A robot project that allows robots to be implemented in an iterative manner synced to a timer.",
           availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
          ),
-    TimedSkeleton("Timed Skeleton (Advanced)", "A skeleton (stub) Timed Robot project for advanced programmers."),
+    TimedSkeleton("Timed Skeleton (Advanced)",
+                  "A skeleton (stub) Timed Robot project for advanced programmers.",
+                  availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
+                 ),
     RobotBaseSkeleton(
         "RobotBase Skeleton (Advanced)",
         "A skeleton (stub) for RobotBase, intended for <strong>highly advanced/experienced</strong> programmers, that provides more complete control over program flow."

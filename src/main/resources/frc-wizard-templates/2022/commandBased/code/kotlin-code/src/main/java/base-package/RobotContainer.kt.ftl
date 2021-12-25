@@ -77,6 +77,7 @@ object RobotContainer
      */
     private fun configureButtonBindings()
     {
-        // TODO: Add button to command mappings here
+        // TODO: Add button to command mappings here.
+        //       See https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html
     }
 }

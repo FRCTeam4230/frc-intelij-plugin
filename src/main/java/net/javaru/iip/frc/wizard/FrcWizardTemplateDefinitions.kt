@@ -600,8 +600,9 @@ enum class FrcWizard2022ProjectTemplateDefinition(
                   availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
                  ),
     RobotBaseSkeleton(
-        "RobotBase Skeleton (Advanced)",
-        "A skeleton (stub) for RobotBase, intended for <strong>highly advanced/experienced</strong> programmers, that provides more complete control over program flow."
+        "RobotBase Skeleton (Highly Advanced)",
+        "A skeleton (stub) for RobotBase, intended for <strong>highly advanced/experienced</strong> programmers, that provides more complete control over program flow.",
+        availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
                      ),
     RomiCommand(
         "Romi - Command Robot",

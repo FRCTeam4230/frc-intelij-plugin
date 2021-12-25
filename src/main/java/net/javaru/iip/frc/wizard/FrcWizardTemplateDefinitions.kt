@@ -622,7 +622,9 @@ enum class FrcWizard2022ProjectTemplateDefinition(
         """Romi Robot using TimedRobot as the base class, allowing robots to be implemented in an iterative manner 
                   |synced to a timer. See the 
                   |<a href="https://docs.wpilib.org/en/stable/docs/romi-robot/index.html">Romi Robot</a> section of 
-                  |the WPI Lib Docs for more information.""".trimMargin(), isRomiBot = true
+                  |the WPI Lib Docs for more information.""".trimMargin(),
+        isRomiBot = true,
+        availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
              ),
     Educational(
         "Educational Robot",

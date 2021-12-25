@@ -608,7 +608,8 @@ enum class FrcWizard2022ProjectTemplateDefinition(
                     |<a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based Programming</a>
                     |sections of the WPI Lib Docs for more information.""".trimMargin(),
         commandVersion = 2,
-        isRomiBot = true
+        isRomiBot = true,
+        availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
                ),
     RomiTimed(
         "Romi - Timed Robot",

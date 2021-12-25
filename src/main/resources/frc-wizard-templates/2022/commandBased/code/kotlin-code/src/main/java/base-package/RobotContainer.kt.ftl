@@ -61,7 +61,7 @@ object RobotContainer
 
     /** The command to run in autonomous. */
     val selectedAutonomousCommand: Command
-       get() = autoModeChooser.selected?.command ?: AutoMode.default.command
+        get() = autoModeChooser.selected?.command ?: AutoMode.default.command
 
     init
     {

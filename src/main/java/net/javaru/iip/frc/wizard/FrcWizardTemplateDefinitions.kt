@@ -458,6 +458,14 @@ enum class FrcWizard2021ExampleTemplateDefinition(
     private val _templateResourcesDirName: String? = null,
                                                  ) : FrcWizardTemplateDefinition
 {
+    RomiReference(
+        "Romi Reference",
+        """An example command-based robot program that can be used with the Romi reference robot design.
+                      |See the <a href="https://docs.wpilib.org/en/stable/docs/romi-robot/index.html">Romi Robot</a> and
+                      |<a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based Programming</a>
+                      |sections of the WPI Lib Docs for more information.""".trimMargin(),
+        commandVersion = 2, isRomiBot = true
+                 ),
     GettingStarted("Getting Started", "An example project which demonstrates the simplest autonomous and teleoperated routines."),
     TankDrive("Tank Drive", "Demonstrates the use of the RobotDrive class doing teleop driving with tank steering (i.e. two joysticks)."),
     ArcadeDrive("Arcade Drive", "Demonstrates the use of the DifferentialDrive class to drive a robot with arcade drive/steering (i.e. single joystick).."),
@@ -542,12 +550,6 @@ enum class FrcWizard2021ExampleTemplateDefinition(
                          ),
     MecanumControllerCommand("MecanumControllerCommand", "An example command-based robot demonstrating the use of a MecanumControllerCommand to follow a pregenerated trajectory.", commandVersion = 2),
     SwerveControllerCommand("SwerveControllerCommand", "An example command-based robot demonstrating the use of a SwerveControllerCommand to follow a pregenerated trajectory.", commandVersion = 2),
-    RomiReference("Romi Reference",
-                  """An example command-based robot program that can be used with the Romi reference robot design.
-                      |See the <a href="https://docs.wpilib.org/en/stable/docs/romi-robot/index.html">Romi Robot</a> and
-                      |<a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based Programming</a>
-                      |sections of the WPI Lib Docs for more information.""".trimMargin(),
-                  commandVersion = 2, isRomiBot = true),
     ;
 
 
@@ -660,6 +662,14 @@ enum class FrcWizard2022ExampleTemplateDefinition(
     private val _templateResourcesDirName: String? = null,
                                                  ) : FrcWizardTemplateDefinition
 {
+    RomiReference(
+        "Romi Reference",
+        """An example command-based robot program that can be used with the Romi reference robot design.
+                      |See the <a href="https://docs.wpilib.org/en/stable/docs/romi-robot/index.html">Romi Robot</a> and
+                      |<a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based Programming</a>
+                      |sections of the WPI Lib Docs for more information.""".trimMargin(),
+        isRomiBot = true
+                 ),
     GettingStarted("Getting Started", "An example project which demonstrates the simplest autonomous and teleoperated routines."),
     TankDrive("Tank Drive", "Demonstrates the use of the RobotDrive class doing teleop driving with tank steering (i.e. two joysticks)."),
     ArcadeDrive("Arcade Drive", "Demonstrates the use of the DifferentialDrive class to drive a robot with arcade drive/steering (i.e. single joystick).."),
@@ -740,14 +750,6 @@ enum class FrcWizard2022ExampleTemplateDefinition(
     SimpleDifferentialDriveSimulation("SimpleDifferentialDriveSimulation", "An example of a minimal drivetrain simulation project without the command-based library."),
     MecanumDrivePoseEstimator("MecanumDrivePoseEstimator", "Demonstrates the use of the MecanumDrivePoseEstimator as a replacement for mecanum drive odometry."),
     SwerveDrivePoseEstimator("SwerveDrivePoseEstimator", "Demonstrates the use of the SwerveDrivePoseEstimator as a replacement for swerve drive odometry."),
-    RomiReference(
-        "Romi Reference",
-        """An example command-based robot program that can be used with the Romi reference robot design.
-                      |See the <a href="https://docs.wpilib.org/en/stable/docs/romi-robot/index.html">Romi Robot</a> and
-                      |<a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based Programming</a>
-                      |sections of the WPI Lib Docs for more information.""".trimMargin(),
-        isRomiBot = true
-                 ),
     ;
 
 

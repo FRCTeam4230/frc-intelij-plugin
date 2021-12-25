@@ -123,7 +123,7 @@ class FrcProjectWizardData(
                 2022 -> """https\://services.gradle.org/distributions/gradle-7.3.2-bin.zip"""
                 else -> """https\://services.gradle.org/distributions/gradle-7.3.2-bin.zip"""
             }
-            return if (useGradleAllDistribution || FrcApplicationSettings.getInstance().isTeam3838())
+            return if (useGradleAllDistribution || FrcApplicationSettings.getInstance().isTeam3838() || teamNumber == 3838)
                 retval.replace("-bin", "-all")
             else
                 retval

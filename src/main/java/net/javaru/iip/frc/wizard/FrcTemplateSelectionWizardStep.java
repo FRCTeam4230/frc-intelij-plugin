@@ -636,6 +636,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     private void createUIComponents()
     {
         templateLangSelectContextHelpLabel = ContextHelpLabel.create(message("frc.ui.wizard.templateSelectionStep.languageOption.helpContext.title"),
-                                                                     message("frc.ui.wizard.templateSelectionStep.languageOption.helpContext.text"));
+                                                                     message("frc.ui.wizard.templateSelectionStep.languageOption.helpContext.text",
+                                                                             message("frc.new.project.wizard.kotlin.disclaimer")));
     }
 }

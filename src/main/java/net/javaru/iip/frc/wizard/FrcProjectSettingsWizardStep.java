@@ -626,6 +626,6 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
             message("frc.ui.wizard.projectSettingsStep.includeVsCodeConfigs.contextHelpLabel.text"));
         
         includeKotlinSupportContextHelpLabel = ContextHelpLabel.create(
-        message("frc.ui.wizard.projectSettingsStep.includeKotlin.contextHelpLabel.text"));
+        message("frc.ui.wizard.projectSettingsStep.includeKotlin.contextHelpLabel.text", message("frc.new.project.wizard.kotlin.disclaimer")));
     }
 }

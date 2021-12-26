@@ -124,24 +124,63 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     @Deprecated
     private JPanel templateLanguageInnerPanel;
     /**
-     * An outer panel that holds template option. At this time, this is just the
-     * {@link #templateLangSelectOuterPanel}. But it also holds a vertical spacer,
-     * so that when the {@code templateLangSelectOuterPanel} is hidden, the other
-     * content in the step does not jump/move.
+     * An outer panel that holds template options. At this time, the only template
+     * option is the {@link #templateLangSelectOuterPanel}. It also holds a vertical
+     * spacer, so that when the {@code templateLangSelectOuterPanel} is hidden, the
+     * other content in the step does not jump/move. Generally speaking, this panel
+     * should *NOT* be disabled or hidden.
      */
     private JPanel templateOptionsPanel2;
     /**
-     * The outer panel for template language selection. This panel is hidden
-     * or show based on whether the experimental Kotlin templates feature flag is
-     * enabled or not.
+     * The outer panel for template (programming) language selection. This panel is
+     * hidden or shown based on whether the experimental Kotlin templates feature
+     * flag is enabled or not. It is *NOT* hidden when only one language option
+     * is available. The {@link #templateLangSelectInnerPanel} is what is hidden
+     * or shown based on available languages for the selected template.
+     *
+     *
+     * <pre>
+     * ┏━━━━━━━templateOptionsPanel━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+     * ┃    ┏━━━━templateLangSelectOuterPanel (1)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┃
+     * ┃    ┃    ┏━━━templateLangSelectInnerPanel (2)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┃┃
+     * ┃    ┃    ┃   ┏━templateLangSelectContexHelpPanel━━┓┏━templateLangSelectJavaOptionPanel (3)━━━━━━━━━━━━━━━━━━━━━━┓┏━templateLangSelectKotlinOptionPanel (3)━━━━━━━━━━━━━━━━━━━━━┓       ╱(4) ┃┃┃
+     * ┃    ┃    ┃   ┃                                    ┃┃                                                            ┃┃                                                             ┃       ╲    ┃┃┃
+     * ┃    ┃    ┃   ┃                                    ┃┃                                                            ┃┃                                                             ┃       ╱    ┃┃┃
+     * ┃    ┃    ┃   ┃                                    ┃┃                                                            ┃┃                                                             ┃       ╲    ┃┃┃
+     * ┃    ┃    ┃   ┃                                    ┃┃                                                            ┃┃                                                             ┃       ╱    ┃┃┃
+     * ┃    ┃    ┃   ┃                                    ┃┃                                                            ┃┃                                                             ┃       ╲    ┃┃┃
+     *
+     * (1) Hidden/Shown based on the "frc.experimental.kotlinTemplates" feature flag
+     * (2) Hidden/Shown based on the number of available for the selected template: shown when >1; hidden when <=1
+     * (3) These language specific panels hold the Radio Button and Label for use (along with the panel) with a ButtonAndLabelSynchronizer
+     * (4) a vertical spacer with a min & preferred height so panel does not shrink when inner panel is hidden. (We also set a min height on the outer panel)
+     * </pre>
      */
     private JPanel templateLangSelectOuterPanel;
+    /**
+     * The inner panel for template (programming) language selection. This panel is
+     * hidden or shown based on the number of available for the selected template:
+     * shown when >1; hidden when <=1.
+     */
     private JPanel templateLangSelectInnerPanel;
+    /**
+     * Panel to hold the {@link  #templateLangSelectContextHelpLabel}.
+     */
     private JPanel templateLangSelectContexHelpPanel;
     private ContextHelpLabel templateLangSelectContextHelpLabel;
+    /**
+     * Panel to hold the 'Java' language option. It holds the
+     * Radio Button and Label fo the option. The three items
+     * (panel, button label) are used to create a 'ButtonAndLabelSynchronizer'.
+     */
     private JPanel templateLangSelectJavaOptionPanel;
     private JBRadioButton templateLangSelectJavaOptionRadioButton;
     private JBLabel templateLangSelectJavaOptionLabel;
+    /**
+     * Panel to hold the 'Kotlin' language option. It holds the
+     * Radio Button and Label fo the option. The three items
+     * (panel, button label) are used to create a 'ButtonAndLabelSynchronizer'.
+     */
     private JPanel templateLangSelectKotlinOptionPanel;
     private JBRadioButton templateLangSelectKotlinOptionRadioButton;
     private JBLabel templateLangSelectKotlinOptionLabel;

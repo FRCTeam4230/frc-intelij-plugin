@@ -150,6 +150,18 @@ public final class FrcIcons
             /** A 16x16 SVG Icon for Kotlin Gradle Script. */
             public static final Icon GRADLE_DSL_KOTLIN_SVG = loadIcon(GRADLE_DSL_KOTLIN_SVG_PATH); // 16x16
         }
+    
+        public static class Java
+        {
+            /** A 16x16 PNG Icon for Java. */
+            public static final String JAVA_PNG_PATH = "icons/technologies/java/java.png";
+            /** A 16x16 PNG Icon for Java. */
+            public static final Icon JAVA_PNG = loadIcon(JAVA_PNG_PATH); // 16x16
+            /** A 16x16 SVG Icon for Java. */
+            public static final String JAVA_SVG_PATH = "icons/technologies/java/java.svg";
+            /** A 16x16 SVG Icon for Java. */
+            public static final Icon JAVA_SVG = loadIcon(JAVA_SVG_PATH); // 16x16
+        }
         
         public static class Kotlin
         {

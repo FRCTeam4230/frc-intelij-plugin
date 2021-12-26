@@ -40,7 +40,7 @@ import com.intellij.util.ui.AsyncProcessIcon;
 
 import net.javaru.iip.frc.FrcPluginGlobals;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
-import net.javaru.iip.frc.util.FrcSystemConfigs.WiazrdAlwaysUpdateWpilibVersions;
+import net.javaru.iip.frc.util.FrcSystemConfigs.WizardAlwaysUpdateWpilibVersions;
 import net.javaru.iip.frc.util.TitleMessagePair;
 import net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
@@ -208,7 +208,7 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
         final LocalDate now = LocalDate.now();
         
         // We want to update regularly during the initial build kickoff time period
-        if (WiazrdAlwaysUpdateWpilibVersions.INSTANCE.getValue() ||
+        if (WizardAlwaysUpdateWpilibVersions.INSTANCE.getValue() ||
             (now.getMonth() == Month.DECEMBER && now.getDayOfMonth() > 20) ||
             (now.getMonth() == Month.JANUARY && now.getDayOfMonth() >= 16))
         {

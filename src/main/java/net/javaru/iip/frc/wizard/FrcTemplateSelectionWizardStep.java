@@ -48,6 +48,7 @@ import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.i18n.FrcMessageKey;
 import net.javaru.iip.frc.ui.ButtonAndLabelSynchronizer;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
+import net.javaru.iip.frc.util.FrcSystemConfigs.FeatureFlagKotlinTemplates;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
@@ -108,7 +109,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
      * ┃    ┃    ┃   ┃                                    ┃┃                                                            ┃┃                                                             ┃       ╱    ┃┃┃
      * ┃    ┃    ┃   ┃                                    ┃┃                                                            ┃┃                                                             ┃       ╲    ┃┃┃
      *
-     * (1) Hidden/Shown based on the "frc.experimental.kotlinTemplates" feature flag
+     * (1) Hidden/Shown based on the FrcSystemConfigs.FeatureFlagKotlinTemplates
      * (2) Hidden/Shown based on the number of available for the selected template: shown when >1; hidden when <=1
      * (3) These language specific panels hold the Radio Button and Label for use (along with the panel) with a ButtonAndLabelSynchronizer
      * (4) a vertical spacer with a min & preferred height so panel does not shrink when inner panel is hidden. (We also set a min height on the outer panel)
@@ -441,7 +442,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         // This is the primary options panel, which for now just jas the one option: the templateLangSelectionOuterPanel
         templateOptionsPanel2.setVisible(true);
         templateOptionsPanel2.setEnabled(true);
-        final boolean isKotlinTemplatesFeatureEnabled = BooleanUtils.toBoolean(System.getProperty("frc.experimental.kotlinTemplates", "false"));
+        final boolean isKotlinTemplatesFeatureEnabled = BooleanUtils.toBoolean(FeatureFlagKotlinTemplates.INSTANCE.getValue());
         templateLangSelectOuterPanel.setVisible(isKotlinTemplatesFeatureEnabled);
         // We initialize to non-visible, so it does not show until a template that supports multiple languages is selected
         templateLangSelectInnerPanel.setVisible(false);

@@ -149,7 +149,6 @@ tasks {
             systemPropertyGetOrDefault("frc.rest.use.qa", "true"),
             systemPropertyGetOrDefault("frc.error.report.submitter.use.qa", "true"),
             systemPropertyGetOrDefault("frc.experimental.gradleDslSelection", "true"),
-            systemPropertyGetOrDefault("frc.experimental.kotlinTemplates", "true"),
             systemPropertyGetOrDefault("frc.wizard.always.update.wpilib.versions", "true"),
             // Legacy Ant based robot project system properties
             //systemPropertyGetOrDefault("frc.simulated.log.service.enabled", "false"),

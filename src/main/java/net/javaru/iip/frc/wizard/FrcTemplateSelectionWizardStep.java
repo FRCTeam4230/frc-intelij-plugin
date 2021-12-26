@@ -82,48 +82,6 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     private JScrollPane projectExamplesScrollPane;
     private JBList<FrcWizardTemplateDefinition> exampleTemplatesJBList;
     /**
-     * The outer most panel that fully contains all the template language options. Only need to
-     * access would be is if we want to set `visible` to false to completely hide all language
-     * options. If a template does not support language options, the {@link #templateLangSelectInnerPanel}
-     * should be hidden, NOT this panel.
-     */
-    @Deprecated
-    private JPanel templateLanguageInnerMainPanel;
-    /**
-     * The left inner template language option panel that contains the Context Help icon.
-     * Generally speaking, this panel does not need to nbe accessed at all.
-     */
-    @Deprecated
-    private JPanel templateLanguageLeftHelpPanel;
-    /**
-     * The Context Help Label -- i.e. the (?) icon -- that we want to
-     * always be enabled.
-     */
-    @Deprecated
-    private ContextHelpLabel languageOptionsContextHelpLabel;
-    /**
-     * The right inner template language option that contains the
-     * {@code #templateOptionsPanel}. Right now this panel is
-     * present to make future changes easier if needed.
-     */
-    @Deprecated
-    private JPanel templateLanguageRightSelectionPanel;
-    /**
-     * A panel within the {@code #templateLanguageRightSelectionPanel} that groups the
-     * the selection button group. This is what should be enabled and disabled as needed.
-     * For example disable if the selected template only supports a single language.
-     */
-    @Deprecated
-    private JPanel templateOptionsPanel;
-    @Deprecated
-    private JBLabel templateLanguageLabel;
-    @Deprecated
-    private JBRadioButton javaLanguageOptionRadioButton;
-    @Deprecated
-    private JBRadioButton kotlinLanguageOptionRadioButton;
-    @Deprecated
-    private JPanel templateLanguageInnerPanel;
-    /**
      * An outer panel that holds template options. At this time, the only template
      * option is the {@link #templateLangSelectOuterPanel}. It also holds a vertical
      * spacer, so that when the {@code templateLangSelectOuterPanel} is hidden, the
@@ -676,10 +634,6 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     
     private void createUIComponents()
     {
-        // TODO:  Delete this field and this init
-        languageOptionsContextHelpLabel = ContextHelpLabel.create(message("frc.ui.wizard.templateSelectionStep.languageOption.helpContext.title"),
-                                                                  message("frc.ui.wizard.templateSelectionStep.languageOption.helpContext.text"));
-    
         templateLangSelectContextHelpLabel = ContextHelpLabel.create(message("frc.ui.wizard.templateSelectionStep.languageOption.helpContext.title"),
                                                                      message("frc.ui.wizard.templateSelectionStep.languageOption.helpContext.text"));
     }

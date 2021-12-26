@@ -53,7 +53,8 @@
 
     <change-notes><![CDATA[
         <strong>v2.0.0</strong> <br>
-        &nbsp;&nbsp;&bull; Initial support for 2022 season, including project templates<br>
+        &nbsp;&nbsp;&bull; Support for 2022 season, including project templates<br>
+        &nbsp;&nbsp;&bull; New Project Wizard: Added Kotlin based new project templates<br>
         &nbsp;&nbsp;&bull; New Project Wizard: Added option to include Kotlin support in projects<br>
         <br>
         <strong>v1.6.1</strong> <br>
@@ -64,7 +65,6 @@
         &nbsp;&nbsp;&bull; Complete rewrite of Gradle interaction for improved user experience, and to resolve
                            <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/94'>issue #94</a>,
                            an occasional thread access issue on gradle re-import.<br>
-        &nbsp;&nbsp;&bull; Some preliminary work for vendordeps management actions (to be released in next version)<br>
         &nbsp;&nbsp;&bull; FRC oriented custom icons for some directories in Project tool window. (Can be disabled via
                            <em>Settings/Preferences &gt; Languages &amp; Frameworks &gt; FRC &gt; &quot;Provide custom icons in project view&quot;</em>) <br>
         &nbsp;&nbsp;&bull; Removed support for legacy Ant based FRC projects<br>

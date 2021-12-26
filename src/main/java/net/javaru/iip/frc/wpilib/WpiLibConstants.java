@@ -65,6 +65,11 @@ public class WpiLibConstants
     
     public static final String VERSION_CLASS_FQN = "edu.wpi.first.wpilibj.util.WPILibVersion";
     public static final String VERSION_FIELD_NAME = "Version";
-
+    
+    public static final String TRIGGER_V1_BASE_FQN = "edu.wpi.first.wpilibj.buttons.Trigger";
+    //public static final String TRIGGER_V2_INTERFACE_FQN =  // THERE IS NONE
+    public static final String TRIGGER_V2_BASE_FQN = "edu.wpi.first.wpilibj2.command.button.Trigger";
+    
+    
     public static final Pattern EXTENDS_A_ROBOT_REGEX = Pattern.compile("extends\\s+(edu\\.wpi\\.first\\.wpilibj\\.)?(IterativeRobot|RobotBase)");
 }

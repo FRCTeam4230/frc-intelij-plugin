@@ -43,6 +43,7 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
     public static final FileTemplateDescriptor TRIGGER2 = new FileTemplateDescriptor("FRC v2 Trigger.java", FrcIcons.Components.BUTTON);
     
     // GENERAL FRC/WPI
+    /** Legacy Trigger… the action for it is not included in the popup at this time. We keep it around for reference at this time. */
     public static final FileTemplateDescriptor TRIGGER = new FileTemplateDescriptor("FRC Trigger.java", FrcIcons.Components.BUTTON);
     
     private static final FileTemplateGroupDescriptor FILE_TEMPLATE_GROUP_DESCRIPTOR =

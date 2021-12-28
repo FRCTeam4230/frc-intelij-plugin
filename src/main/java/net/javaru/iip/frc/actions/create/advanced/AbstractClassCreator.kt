@@ -33,7 +33,7 @@ import com.intellij.util.ExceptionUtil
 import java.lang.Exception
 import java.util.concurrent.Callable
 
-abstract class AbstractClassCreator<T : PsiElement?> protected constructor(
+abstract class AbstractClassCreator<T : PsiElement> protected constructor(
     module: Module,
     dataProvider: FrcComponentCreationDataProvider
                                                                           ) : ClassCreator<T>

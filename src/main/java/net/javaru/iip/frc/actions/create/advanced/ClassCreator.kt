@@ -18,7 +18,7 @@ package net.javaru.iip.frc.actions.create.advanced
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiDirectory
 
-interface ClassCreator<T : PsiElement?>
+interface ClassCreator<T : PsiElement>
 {
     val createdClasses: List<T>
 

@@ -1,0 +1,136 @@
+<!--
+  ~ Copyright 2015-2021 the original author or authors.
+  ~
+  ~     Licensed under the Apache License, Version 2.0 (the "License");
+  ~     you may not use this file except in compliance with the License.
+  ~     You may obtain a copy of the License at
+  ~
+  ~       https://www.apache.org/licenses/LICENSE-2.0
+  ~     
+  ~     Unless required by applicable law or agreed to in writing, software
+  ~     distributed under the License is distributed on an "AS IS" BASIS,
+  ~     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~     See the License for the specific language governing permissions and
+  ~     limitations under the License.
+  -->
+
+<html>
+<body>
+<table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+    <tr>
+        <td><span style="font-family: verdana,sans-serif; font-size: smaller; ">
+            This is an FRC Plugin provided template you can use to create <em>Trigger</em> (i.e. a simple Button) classes. 
+            To use, in either the <em>Project</em> tool window or the Navigation Bar (View > Navigation Bar or Alt + Home),
+            select the desired package, then open the context menu (i.e. right click) and select <em>New > FRC > FRC Trigger</em>.
+            This template mirrors the template provided by &quot;Official&quot; WPI Eclipse Plugin.
+            <br><br>
+            The template is editable. After editing, if desired, you can restore the default template by using the
+            "Restore to Default" button on the top left tool bar of this dialog.     
+            <br><br>
+            <b>Editing:</b> Along with Java expressions and comments, you can also use predefined variables
+            (listed below) that will then be expanded like macros into the corresponding values.<br>
+            It is also possible to specify an arbitrary number of custom variables in the format
+            <b>${&lt;VARIABLE_NAME&gt;}</b>. In this case, before the new
+            file is created, you will be prompted with a dialog where you can define particular values for all
+            custom variables.<br>
+            Using the <b>#parse</b> directive, you can include templates from the <i>Includes</i>
+            tab, by specifying the full name of the desired template as a parameter in quotation marks.
+            For example:<br> 
+             <b>#parse("File Header.java")</b>
+        </span></td>
+    </tr>
+</table>
+<table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+    <tr>
+        <td colspan="3"><span style="font-family: verdana,sans-serif; font-size: smaller; ">Predefined variables will take the following values:</span></td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <nobr><span style="font-family: verdana,sans-serif; font-size: 70%; "><b>${PACKAGE_NAME}</b></span></nobr>
+        </td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><span style="font-family: verdana,sans-serif; font-size: smaller; ">name of the package in which the new package-info.java file is created</span>
+        </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <nobr><span style="font-family: verdana,sans-serif; font-size: 70%; "><b>${USER}</b></span></nobr>
+        </td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><span style="font-family: verdana,sans-serif; font-size: smaller; ">current user system login name</span></td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <nobr><span style="font-family: verdana,sans-serif; font-size: 70%; "><b>${DATE}</b></span></nobr>
+        </td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><span style="font-family: verdana,sans-serif; font-size: smaller; ">current system date</span></td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <nobr><span style="font-family: verdana,sans-serif; font-size: 70%; "><b>${TIME}</b></span></nobr>
+        </td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><span style="font-family: verdana,sans-serif; font-size: smaller; ">current system time</span></td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <nobr><span style="font-family: verdana,sans-serif; font-size: 70%; "><b>${YEAR}</b></span></nobr>
+        </td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><span style="font-family: verdana,sans-serif; font-size: smaller; ">current year</span></td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <nobr><span style="font-family: verdana,sans-serif; font-size: 70%; "><b>${MONTH}</b></span></nobr>
+        </td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><span style="font-family: verdana,sans-serif; font-size: smaller; ">current month</span></td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <nobr><span style="font-family: verdana,sans-serif; font-size: 70%; "><b>${MONTH_NAME_SHORT}</b></span></nobr>
+        </td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><span style="font-family: verdana,sans-serif; font-size: smaller; ">first 3 letters of the current month name. Example: Jan, Feb, etc.</span>
+        </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <nobr><span style="font-family: verdana,sans-serif; font-size: 70%; "><b>${MONTH_NAME_FULL}</b></span></nobr>
+        </td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><span
+                style="font-family: verdana,sans-serif; font-size: smaller; ">full name of the current month. Example: January, February, etc.</span></td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <nobr><span style="font-family: verdana,sans-serif; font-size: 70%; "><b>${DAY}</b></span></nobr>
+        </td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><span style="font-family: verdana,sans-serif; font-size: smaller; ">current day of the month</span></td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <nobr><span style="font-family: verdana,sans-serif; font-size: 70%; "><b>${HOUR}</b></span></nobr>
+        </td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><span style="font-family: verdana,sans-serif; font-size: smaller; ">current hour</span></td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <nobr><span style="font-family: verdana,sans-serif; font-size: 70%; "><b>${MINUTE}</b></span></nobr>
+        </td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><span style="font-family: verdana,sans-serif; font-size: smaller; ">current minute</span></td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <nobr><span style="font-family: verdana,sans-serif; font-size: 70%; "><b>${PROJECT_NAME}</b></span></nobr>
+        </td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><span style="font-family: verdana,sans-serif; font-size: smaller; ">the name of the current project</span></td>
+    </tr>
+</table>
+</body>
+</html>

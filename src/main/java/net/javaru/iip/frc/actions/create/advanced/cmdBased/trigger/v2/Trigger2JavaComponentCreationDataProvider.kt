@@ -6,7 +6,7 @@
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *
+ *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,15 +14,13 @@
  *     limitations under the License.
  */
 
-package net.javaru.iip.frc.actions.create.advanced
+package net.javaru.iip.frc.actions.create.advanced.cmdBased.trigger.v2
 
-import com.intellij.openapi.module.Module
-import com.intellij.psi.PsiClass
+import com.intellij.ide.fileTemplates.FileTemplateDescriptor
+import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory
 
 
-abstract class AbstractFrcJavaComponentCreationAction
-    protected constructor(dataProvider: FrcComponentCreationDataProvider):
-    AbstractFrcComponentCreationAction<PsiClass>(dataProvider)
+object Trigger2JavaComponentCreationDataProvider : AbstractTrigger2ComponentCreationDataProvider()
 {
-    override fun constructClassCreatorInstance(module: Module): ClassCreator<PsiClass> = JavaClassCreator(module, dataProvider)
+    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.TRIGGER2
 }

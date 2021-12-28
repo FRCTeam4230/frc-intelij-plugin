@@ -17,12 +17,12 @@
 package net.javaru.iip.frc.actions.create.advanced
 
 import com.intellij.openapi.module.Module
-import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 
 
-abstract class AbstractFrcJavaComponentCreationAction
+abstract class AbstractFrcKotlinComponentCreationAction
     protected constructor(dataProvider: FrcComponentCreationDataProvider):
-    AbstractFrcComponentCreationAction<PsiClass>(dataProvider)
+    AbstractFrcComponentCreationAction<PsiElement>(dataProvider)
 {
-    override fun constructClassCreatorInstance(module: Module): ClassCreator<PsiClass> = JavaClassCreator(module, dataProvider)
+    override fun constructClassCreatorInstance(module: Module): ClassCreator<PsiElement> = KotlinClassCreator(module, dataProvider)
 }

@@ -19,12 +19,12 @@ import com.intellij.openapi.module.Module
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractCmdBaseV2ComponentCreationAction
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractJavaCmdBaseV2ComponentCreationAction
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.SubsystemComponentCreationDialog
 
 class ProfiledPidSubsystem2ComponentCreationAction :
-    AbstractCmdBaseV2ComponentCreationAction(ProfiledPidSubsystem2ComponentCreationDataProvider)
+    AbstractJavaCmdBaseV2ComponentCreationAction(ProfiledPidSubsystem2ComponentCreationDataProvider)
 {
     override fun constructCreateFrcComponentDialogInstance(module: Module, classCreator: ClassCreator<PsiClass>, directory: PsiDirectory): FrcComponentCreationDialog
     {

@@ -17,14 +17,12 @@
 package net.javaru.iip.frc.actions.create.advanced.cmdBased.trigger.v2
 
 import com.google.common.collect.ImmutableList
-import com.intellij.ide.fileTemplates.FileTemplateDescriptor
 import net.javaru.iip.frc.actions.create.advanced.BaseType
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.trigger.TriggerCreationDataProvider
-import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory
 import net.javaru.iip.frc.wpilib.WpiLibConstants
 
 
-object Trigger2ComponentCreationDataProvider : TriggerCreationDataProvider()
+abstract class AbstractTrigger2ComponentCreationDataProvider : TriggerCreationDataProvider()
 {
     override val componentVersion: Int = 2
     override val componentTypeSimpleName: String = "Trigger"
@@ -32,5 +30,4 @@ object Trigger2ComponentCreationDataProvider : TriggerCreationDataProvider()
     override val baseType: BaseType = BaseType.BaseClassOnly
     override val topLevelClassFqName: String = ""
     override val typicalBaseClassFqName: String = WpiLibConstants.TRIGGER_V2_BASE_FQN
-    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.TRIGGER2
 }

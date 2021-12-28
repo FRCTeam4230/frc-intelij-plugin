@@ -572,8 +572,10 @@
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v2.PidSubsystem2ComponentCreationAction" />
             <action id="frc.action.new.profiledPidSubsystem2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.profiledPidSubsystem.v2.ProfiledPidSubsystem2ComponentCreationAction" />
-            <action id="frc.action.new.trigger2"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.trigger.v2.Trigger2ComponentCreationAction" />
+            <action id="frc.action.new.trigger2.java"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.trigger.v2.Trigger2JavaComponentCreationAction" />
+            <action id="frc.action.new.trigger2.kotlin"
+                                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.trigger.v2.Trigger2KotlinComponentCreationAction" />
 
             <!--<action id="frc.action.new.build.file" class="net.javaru.iip.frc.actions.create.build.NewFrcAntBuildFileAction" text="FRC New Ant Build File" />-->
         </group>

@@ -41,6 +41,7 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
     public static final FileTemplateDescriptor PID_SUBSYSTEM2 = new FileTemplateDescriptor("FRC v2 PIDSubsystem.java", FrcIcons.Components.PID_SUBSYSTEM);
     public static final FileTemplateDescriptor PROFILED_PID_SUBSYSTEM2 = new FileTemplateDescriptor("FRC v2 ProfiledPIDSubsystem.java", FrcIcons.Components.PID_SUBSYSTEM);
     public static final FileTemplateDescriptor TRIGGER2 = new FileTemplateDescriptor("FRC v2 Trigger.java", FrcIcons.Components.BUTTON);
+    public static final FileTemplateDescriptor TRIGGER2_KOT = new FileTemplateDescriptor("FRC v2 Trigger.kt", FrcIcons.Components.BUTTON);
     
     // GENERAL FRC/WPI
     /** Legacy Trigger… the action for it is not included in the popup at this time. We keep it around for reference at this time. */
@@ -59,7 +60,8 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
                                         TRAPEZOID_PROFILED_SUBSYSTEM2,
                                         PID_SUBSYSTEM2,
                                         PROFILED_PID_SUBSYSTEM2,
-                                        TRIGGER2
+                                        TRIGGER2,
+                                        TRIGGER2_KOT 
                                         );
 
 

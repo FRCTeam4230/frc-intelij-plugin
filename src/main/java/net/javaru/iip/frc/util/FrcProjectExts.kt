@@ -19,11 +19,11 @@ package net.javaru.iip.frc.util
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.intellij.facet.FacetManager
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.idea.IdeaLogger
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.ReadAction
-import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
@@ -46,6 +46,7 @@ import net.javaru.iip.frc.isUnitTestMode
 import net.javaru.iip.frc.services.FrcErrorReportSubmitter
 import net.javaru.iip.frc.services.FrcPluginProjectDisposable
 import net.javaru.iip.frc.services.ReportableEvent
+import org.jetbrains.annotations.Contract
 import org.jetbrains.plugins.gradle.settings.GradleSettings
 import java.util.concurrent.Callable
 
@@ -401,9 +402,6 @@ fun findProjectWithFocus(mustBeFrcProject: Boolean = true): Project?
     }
 }
 
-
-
-
 /** Returns the project with focus, or null is no project has focus, or there are no open projects. */
 private fun Array<out Project>?.findProjectWithFocus(): Project?
 {
@@ -414,4 +412,41 @@ private fun Array<out Project>?.findProjectWithFocus(): Project?
         }
     }
     return null
+}
+
+@Contract("null -> false")
+fun Module?.isKotlinFacetedModule(): Boolean
+{
+    if (this == null || this.isDisposed)
+    {
+        return false
+    }
+    // We would need to add Kotlin as a dependency to access the KotlinFacet or KotlinFacetType
+    // For now, we don't want to do that.
+//    val kotlinFacet = FacetManager.getInstance(this).getFacetByType(KotlinFacetType.TYPE_ID)
+
+    // Kotlin Facet Name = "Kotlin"
+    //              ID =   "kotlin-language"
+    val kotlinFacet = FacetManager
+        .getInstance(this)
+        .allFacets
+        .asSequence().firstOrNull { it.name == "Kotlin" }
+    return kotlinFacet != null
+}
+
+@Contract("null -> false")
+fun Project?.iKotlinFacetedProject(): Boolean
+{
+    if (this != null && !this.isDisposed)
+    {
+        val modules = ModuleManager.getInstance(this).modules
+        for (module in modules)
+        {
+            if (module.isKotlinFacetedModule())
+            {
+                return true
+            }
+        }
+    }
+    return false
 }

@@ -13,21 +13,19 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  */
-package net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v2
+package net.javaru.iip.frc.actions.create.advanced.cmdBased.trigger.v2
 
 import com.intellij.openapi.module.Module
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
+import com.intellij.psi.PsiElement
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractJavaCmdBaseV2ComponentCreationAction
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractKotlinCmdBaseV2ComponentCreationAction
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.SubsystemComponentCreationDialog
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.trigger.TriggerComponentCreationDialog
 
-class PidSubsystem2ComponentCreationAction :
-    AbstractJavaCmdBaseV2ComponentCreationAction(PidSubsystem2ComponentCreationDataProvider)
+class Trigger2KotlinComponentCreationAction :
+    AbstractKotlinCmdBaseV2ComponentCreationAction(Trigger2KotlinComponentCreationDataProvider)
 {
-    override fun constructCreateFrcComponentDialogInstance(module: Module, classCreator: ClassCreator<PsiClass>, directory: PsiDirectory): FrcComponentCreationDialog
-    {
-        return SubsystemComponentCreationDialog(module, classCreator, directory, dataProvider)
-    }
+    override fun constructCreateFrcComponentDialogInstance(module: Module, classCreator: ClassCreator<PsiElement>, directory: PsiDirectory): FrcComponentCreationDialog =
+        TriggerComponentCreationDialog(module, classCreator, directory, dataProvider)
 }

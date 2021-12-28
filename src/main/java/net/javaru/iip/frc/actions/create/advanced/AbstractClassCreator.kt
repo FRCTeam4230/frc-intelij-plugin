@@ -132,8 +132,7 @@ abstract class AbstractClassCreator<T : PsiElement?> protected constructor(
         return createSingleClass(name, classTemplateName, directory, emptyMap())
     }
 
-    override fun createSingleClass(name: String, classTemplateName: String, directory: PsiDirectory, additionalProperties: Map<String, String>
-                                  ): T?
+    override fun createSingleClass(name: String, classTemplateName: String, directory: PsiDirectory, additionalProperties: Map<String, String>): T?
     {
         var normalizedName = name
         var normalizedirectory = directory

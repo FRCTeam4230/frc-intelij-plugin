@@ -13,33 +13,15 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  */
+package net.javaru.iip.frc.actions.create.advanced
 
-package net.javaru.iip.frc.actions.create.advanced;
+import com.intellij.openapi.module.Module
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiDirectory
+import com.intellij.psi.JavaDirectoryService
 
-import java.util.Map;
-
-import org.jetbrains.annotations.NotNull;
-import com.intellij.openapi.module.Module;
-import com.intellij.psi.JavaDirectoryService;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiDirectory;
-
-
-
-public class JavaClassCreator extends AbstractClassCreator<PsiClass>
+class JavaClassCreator(module: Module, dataProvider: FrcComponentCreationDataProvider) : AbstractClassCreator<PsiClass>(module, dataProvider)
 {
-    public JavaClassCreator(@NotNull Module module, @NotNull FrcComponentCreationDataProvider dataProvider)
-    {
-        super(module, dataProvider);
-    }
-    
-    
-    @Override
-    protected PsiClass createSingleClassImpl(@NotNull String name,
-                                             @NotNull String classTemplateName,
-                                             @NotNull PsiDirectory directory,
-                                             @NotNull Map<String, String> additionalProperties)
-    {
-        return JavaDirectoryService.getInstance().createClass(directory, name, classTemplateName, false, additionalProperties);
-    }
+    override fun createSingleClassImpl(name: String, classTemplateName: String, directory: PsiDirectory, additionalProperties: Map<String, String>): PsiClass? =
+        JavaDirectoryService.getInstance().createClass(directory, name, classTemplateName, false, additionalProperties)
 }

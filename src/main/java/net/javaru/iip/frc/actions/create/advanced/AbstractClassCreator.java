@@ -155,16 +155,16 @@ public abstract class AbstractClassCreator<T extends PsiElement> implements Clas
     
     
     @Override
-    public T createSingleClass(@NotNull String name,
-                                      @NotNull String classTemplateName,
-                                      @NotNull PsiDirectory directory)
+    public @Nullable T createSingleClass(@NotNull String name,
+                               @NotNull String classTemplateName,
+                               @NotNull PsiDirectory directory)
     {
         return createSingleClass(name, classTemplateName, directory, Collections.emptyMap());
     }
     
     
     @Override
-    public T createSingleClass(@NotNull String name,
+    public @Nullable T createSingleClass(@NotNull String name,
                                @NotNull String classTemplateName,
                                @NotNull PsiDirectory directory,
                                @NotNull Map<String, String> additionalProperties)
@@ -182,8 +182,7 @@ public abstract class AbstractClassCreator<T extends PsiElement> implements Clas
         return createSingleClassImpl(name, classTemplateName, directory, additionalProperties);
     }
     
-    
-    protected abstract T createSingleClassImpl(@NotNull String name,
+    protected abstract @Nullable T createSingleClassImpl(@NotNull String name,
                                                @NotNull String classTemplateName,
                                                @NotNull PsiDirectory directory,
                                                @NotNull Map<String, String> additionalProperties);

@@ -31,6 +31,7 @@ import com.google.common.collect.ImmutableMap.Builder;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
@@ -61,7 +62,7 @@ public class CommandComponentCreationDialog extends FrcComponentCreationDialog
     
     
     public CommandComponentCreationDialog(@NotNull Module module,
-                                          @NotNull ClassCreator classCreator,
+                                          @NotNull ClassCreator<? extends PsiElement> classCreator,
                                           @NotNull PsiDirectory directory,
                                           @NotNull FrcComponentCreationDataProvider dataProvider)
     {

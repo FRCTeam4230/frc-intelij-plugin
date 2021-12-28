@@ -39,6 +39,7 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.psi.JavaDirectoryService;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameHelper;
 import com.intellij.psi.PsiPackage;
 import com.intellij.ui.components.JBCheckBox;
@@ -74,7 +75,7 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
     @NotNull
     protected final Module myModule;
     @NotNull
-    protected final ClassCreator myClassCreator;
+    protected final ClassCreator<? extends PsiElement> myClassCreator;
     @NotNull
     protected final PsiDirectory myDirectory;
     @NotNull
@@ -94,11 +95,11 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
     
     
     private Map<PsiClass, JBRadioButton> myTopLevelComponentClassesMap;
-    private ButtonGroup mySuperButtonGroup = new ButtonGroup();
+    private final ButtonGroup mySuperButtonGroup = new ButtonGroup();
     
     
     protected FrcComponentCreationDialog(@NotNull Module module,
-                                         @NotNull ClassCreator classCreator,
+                                         @NotNull ClassCreator<? extends PsiElement> classCreator,
                                          @NotNull PsiDirectory directory,
                                          @NotNull FrcComponentCreationDataProvider dataProvider)
     {
@@ -322,7 +323,7 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
         }
         catch (Exception e)
         {
-            LOG.warn("[FRC] An exception occurred when creating a new class from a file template. Please consider reporting at https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues  Cause: " + e.toString(), e);
+            LOG.warn("[FRC] An exception occurred when creating a new class from a file template. Please consider reporting at https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues  Cause: " + e, e);
             FrcUiUtilsKt.displayExceptionDialog(e, myTopPanel);
             close(CANCEL_EXIT_CODE);
         }

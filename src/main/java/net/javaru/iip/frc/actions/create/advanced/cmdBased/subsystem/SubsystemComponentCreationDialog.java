@@ -26,6 +26,7 @@ import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.ui.ContextHelpLabel;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBRadioButton;
@@ -66,7 +67,7 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
     public enum  SingletonMethodology { NON_SINGLETON, EAGER, LAZY, DOUBLE_CHECKED_LOCKING}
     
     public SubsystemComponentCreationDialog(@NotNull Module module,
-                                            @NotNull ClassCreator classCreator,
+                                            @NotNull ClassCreator<? extends PsiElement> classCreator,
                                             @NotNull PsiDirectory directory,
                                             @NotNull FrcComponentCreationDataProvider dataProvider)
     {

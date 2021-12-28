@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableMap.Builder;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider;
@@ -34,7 +35,7 @@ import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationD
 public class TriggerComponentCreationDialog extends FrcComponentCreationDialog
 {
     public TriggerComponentCreationDialog(@NotNull Module module,
-                                          @NotNull ClassCreator classCreator,
+                                          @NotNull ClassCreator<? extends PsiElement> classCreator,
                                           @NotNull PsiDirectory directory,
                                           @NotNull FrcComponentCreationDataProvider dataProvider)
     {

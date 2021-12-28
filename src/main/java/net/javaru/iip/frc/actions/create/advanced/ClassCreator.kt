@@ -13,35 +13,20 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  */
+package net.javaru.iip.frc.actions.create.advanced
 
-package net.javaru.iip.frc.actions.create.advanced;
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiDirectory
 
-import java.util.List;
-import java.util.Map;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiElement;
-
-
-
-public interface ClassCreator<T extends PsiElement>
+interface ClassCreator<T : PsiElement?>
 {
-    List<T> getCreatedClasses();
-    
-    boolean createClass(@NotNull String name,
-                        @NotNull PsiDirectory directory,
-                        @NotNull Map<String, String> additionalProperties);
-    
-    @Nullable String checkCanCreateClass(PsiDirectory directory, String name, String classTypeSimpleName);
-    
-    T createSingleClass(@NotNull String name,
-                               @NotNull String classTemplateName,
-                               @NotNull PsiDirectory directory);
-    
-    T createSingleClass(@NotNull String name,
-                               @NotNull String classTemplateName,
-                               @NotNull PsiDirectory directory,
-                               @NotNull Map<String, String> additionalProperties);
+    val createdClasses: List<T>
+
+    fun createClass(name: String, directory: PsiDirectory, additionalProperties: Map<String, String>): Boolean
+
+    fun checkCanCreateClass(directory: PsiDirectory, name: String, classTypeSimpleName: String): String?
+
+    fun createSingleClass(name: String, classTemplateName: String, directory: PsiDirectory): T?
+
+    fun createSingleClass(name: String, classTemplateName: String, directory: PsiDirectory, additionalProperties: Map<String, String>): T?
 }

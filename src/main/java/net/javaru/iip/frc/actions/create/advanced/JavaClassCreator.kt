@@ -22,6 +22,6 @@ import com.intellij.psi.JavaDirectoryService
 
 class JavaClassCreator(module: Module, dataProvider: FrcComponentCreationDataProvider) : AbstractClassCreator<PsiClass>(module, dataProvider)
 {
-    override fun createSingleClassImpl(name: String, classTemplateName: String, directory: PsiDirectory, additionalProperties: Map<String, String>): PsiClass? =
-        JavaDirectoryService.getInstance().createClass(directory, name, classTemplateName, false, additionalProperties)
+    override fun createSingleClassImpl(normalizedName: String, classTemplateName: String, normalizedDirectory: PsiDirectory, additionalProperties: Map<String, String>): PsiClass? =
+        JavaDirectoryService.getInstance().createClass(normalizedDirectory, normalizedName, classTemplateName, false, additionalProperties)
 }

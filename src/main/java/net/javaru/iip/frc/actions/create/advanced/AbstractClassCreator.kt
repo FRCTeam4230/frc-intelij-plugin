@@ -13,177 +13,150 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  */
+package net.javaru.iip.frc.actions.create.advanced
 
-package net.javaru.iip.frc.actions.create.advanced;
+import net.javaru.iip.frc.i18n.FrcBundle.message
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiDirectory
+import com.intellij.openapi.command.WriteCommandAction
+import com.intellij.openapi.command.UndoConfirmationPolicy
+import com.intellij.ide.actions.ElementCreator
+import com.intellij.psi.JavaDirectoryService
+import com.intellij.util.IncorrectOperationException
+import com.intellij.ide.actions.CreateFileAction
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.util.text.StringUtil
+import com.intellij.util.ExceptionUtil
+import java.lang.Exception
+import java.util.concurrent.Callable
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import com.intellij.ide.actions.CreateFileAction;
-import com.intellij.ide.actions.ElementCreator;
-import com.intellij.openapi.command.UndoConfirmationPolicy;
-import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.JavaDirectoryService;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiElement;
-import com.intellij.util.ExceptionUtil;
-import com.intellij.util.IncorrectOperationException;
-
-import static net.javaru.iip.frc.i18n.FrcBundle.message;
-
-
-
-public abstract class AbstractClassCreator<T extends PsiElement> implements ClassCreator<T>
+abstract class AbstractClassCreator<T : PsiElement?> protected constructor(
+    module: Module,
+    dataProvider: FrcComponentCreationDataProvider
+                                                                          ) : ClassCreator<T>
 {
-    private static final Logger LOG = Logger.getInstance(AbstractClassCreator.class);
-    @NotNull
-    protected final Project myProject;
-    @SuppressWarnings("FieldCanBeLocal")
-    @NotNull
-    protected final Module myModule;
-    @NotNull
-    protected final FrcComponentCreationDataProvider dataProvider;
-    protected List<T> createdClasses = Collections.emptyList();
-    
-    
-    protected AbstractClassCreator(@NotNull Module module,
-                                   @NotNull FrcComponentCreationDataProvider dataProvider)
+    protected val myProject: Project
+    protected val myModule: Module
+    protected val dataProvider: FrcComponentCreationDataProvider
+    protected var createdClassesInternal = emptyList<T>()
+
+    override val createdClasses: List<T>
+        get() = createdClassesInternal
+
+    init
     {
-        this.myProject = module.getProject();
-        this.myModule = module;
-        this.dataProvider = dataProvider;
+        myProject = module.project
+        myModule = module
+        this.dataProvider = dataProvider
     }
-    
-    
-    @Override
-    public List<T> getCreatedClasses()
+
+    override fun createClass(name: String, directory: PsiDirectory, additionalProperties: Map<String, String>): Boolean
     {
-        return createdClasses;
-    }
-    
-    
-    @Override
-    public boolean createClass(@NotNull String name,
-                               @NotNull PsiDirectory directory,
-                               @NotNull Map<String, String> additionalProperties)
-    {
-        return doCreateClass(() -> {
-            final T psiClass = createSingleClass(name,
-                                                        dataProvider.getFileTemplateName(),
-                                                        directory,
-                                                        additionalProperties);
+        return doCreateClass {
+            val psiClass = createSingleClass(
+                name,
+                dataProvider.fileTemplateName,
+                directory,
+                additionalProperties
+                                            )
             // A null class really should only happen in extreme cases, such as an exception occurring somewhere along the line
-            createdClasses = (psiClass != null) ? Collections.singletonList(psiClass) : Collections.emptyList();
-            return true;
-        });
-        
-        
+            createdClassesInternal = psiClass?.let { listOf(it) } ?: emptyList()
+            true
+        }
     }
-    
-    
+
     /**
      * Executes the creation process in a WriteActionCommand. The supplied action should set the createdClasses field.
      *
      * @return whether the class was created (which indicates whether the FrcComponentCreationDialog can be closed).
      */
-    protected boolean doCreateClass(Callable<Boolean> action)
+    protected fun doCreateClass(action: Callable<Boolean>): Boolean
     {
-        try
+        return try
         {
-            return WriteCommandAction.writeCommandAction(myProject)
-                                     .withName(message("frc.new.class.adv.action.name"))
-                                     .withUndoConfirmationPolicy(UndoConfirmationPolicy.REQUEST_CONFIRMATION)
-                                     .compute(action::call);
+            WriteCommandAction.writeCommandAction(myProject)
+                .withName(message("frc.new.class.adv.action.name"))
+                .withUndoConfirmationPolicy(UndoConfirmationPolicy.REQUEST_CONFIRMATION)
+                .compute<Boolean, Exception> { action.call() }
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            handleException(e);
-            return false;
+            handleException(e)
+            false
         }
     }
-    
-    
-    protected void handleException(Throwable t)
+
+    protected fun handleException(t: Throwable)
     {
-        LOG.info("[FRC] Exception when creating new class: " + t.toString(), t);
-        String errorMessage = ElementCreator.getErrorMessage(t);
+        LOG.info("[FRC] Exception when creating new class: $t", t)
+        val errorMessage = ElementCreator.getErrorMessage(t)
         Messages.showMessageDialog(
-            myProject, errorMessage, message("frc.new.class.adv.action.error.title"), Messages.getErrorIcon());
+            myProject, errorMessage, message("frc.new.class.adv.action.error.title"), Messages.getErrorIcon()
+                                  )
     }
-    
-    
-    @Override
-    @Nullable
-    public String checkCanCreateClass(PsiDirectory directory, String name, String classTypeSimpleName)
+
+    override fun checkCanCreateClass(directory: PsiDirectory, name: String, classTypeSimpleName: String): String?
     {
-        PsiDirectory currentDir = directory;
-        String packageName = StringUtil.getPackageName(name);
+        var currentDir = directory
+        val packageName = StringUtil.getPackageName(name)
         if (!packageName.isEmpty())
         {
-            for (String dir : packageName.split("\\."))
+            for (dir in packageName.split("\\.").toTypedArray())
             {
-                PsiDirectory childDir = currentDir.findSubdirectory(dir);
-                if (childDir == null)
-                {
-                    return null;
-                }
-                currentDir = childDir;
+                val childDir = currentDir.findSubdirectory(dir) ?: return null
+                currentDir = childDir
             }
         }
-        try
+        return try
         {
-            JavaDirectoryService.getInstance().checkCreateClass(currentDir, StringUtil.getShortName(name));
-            return null;
+            JavaDirectoryService.getInstance().checkCreateClass(currentDir, StringUtil.getShortName(name))
+            null
         }
-        catch (IncorrectOperationException e)
+        catch (e: IncorrectOperationException)
         {
-            String exceptionMessage = ExceptionUtil.getMessage(e);
-            return exceptionMessage != null
-                   ? message("frc.new.class.adv.validation.cantCreate.detailed", classTypeSimpleName, exceptionMessage)
-                   : message("frc.new.class.adv.validation.cantCreate.short", classTypeSimpleName);
+            val exceptionMessage = ExceptionUtil.getMessage(e)
+            if (exceptionMessage != null) message(
+                "frc.new.class.adv.validation.cantCreate.detailed",
+                classTypeSimpleName,
+                exceptionMessage
+                                                 )
+            else message("frc.new.class.adv.validation.cantCreate.short", classTypeSimpleName)
         }
     }
-    
-    
-    @Override
-    public @Nullable T createSingleClass(@NotNull String name,
-                               @NotNull String classTemplateName,
-                               @NotNull PsiDirectory directory)
+
+    override fun createSingleClass(
+        name: String,
+        classTemplateName: String,
+        directory: PsiDirectory
+                                  ): T?
     {
-        return createSingleClass(name, classTemplateName, directory, Collections.emptyMap());
+        return createSingleClass(name, classTemplateName, directory, emptyMap())
     }
-    
-    
-    @Override
-    public @Nullable T createSingleClass(@NotNull String name,
-                               @NotNull String classTemplateName,
-                               @NotNull PsiDirectory directory,
-                               @NotNull Map<String, String> additionalProperties)
+
+    override fun createSingleClass(name: String, classTemplateName: String, directory: PsiDirectory, additionalProperties: Map<String, String>
+                                  ): T?
     {
-        if (name.contains("."))
+        var normalizedName = name
+        var normalizedirectory = directory
+        if (normalizedName.contains("."))
         {
-            String[] names = name.split("\\.");
-            for (int i = 0; i < names.length - 1; i++)
+            val names = normalizedName.split("\\.").toTypedArray()
+            for (i in 0 until names.size - 1)
             {
-                directory = CreateFileAction.findOrCreateSubdirectory(directory, names[i]);
+                normalizedirectory = CreateFileAction.findOrCreateSubdirectory(normalizedirectory, names[i])
             }
-            name = names[names.length - 1];
+            normalizedName = names[names.size - 1]
         }
-    
-        return createSingleClassImpl(name, classTemplateName, directory, additionalProperties);
+        return createSingleClassImpl(normalizedName, classTemplateName, normalizedirectory, additionalProperties)
     }
-    
-    protected abstract @Nullable T createSingleClassImpl(@NotNull String name,
-                                               @NotNull String classTemplateName,
-                                               @NotNull PsiDirectory directory,
-                                               @NotNull Map<String, String> additionalProperties);
+
+    protected abstract fun createSingleClassImpl(normalizedName: String, classTemplateName: String, normalizedDirectory: PsiDirectory, additionalProperties: Map<String, String>): T?
+
+    companion object
+    {
+        protected val LOG = Logger.getInstance(AbstractClassCreator::class.java)
+    }
 }

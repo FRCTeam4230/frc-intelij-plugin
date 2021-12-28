@@ -6,27 +6,28 @@
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *     
+ *
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  */
-package net.javaru.iip.frc.actions.create.advanced.cmdBased
 
-import com.intellij.openapi.actionSystem.AnActionEvent
+package net.javaru.iip.frc.actions.create.advanced
+
 import com.intellij.openapi.module.Module
-import net.javaru.iip.frc.actions.create.advanced.AbstractFrcJavaComponentCreationAction
-import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider
-import net.javaru.iip.frc.wpilib.isVersion1CommandBaseLibAttached
+import com.intellij.psi.PsiClass
 
-abstract class AbstractCmdBaseV1ComponentCreationAction
-    protected constructor(dataProvider: FrcComponentCreationDataProvider?) :
-    AbstractFrcJavaComponentCreationAction(dataProvider!!)
+
+abstract class AbstractFrcJavaComponentCreationAction
+    protected constructor(dataProvider: FrcComponentCreationDataProvider):
+    AbstractFrcComponentCreationAction<PsiClass>(dataProvider)
 {
-    override fun shouldBeEnabledAdditionalCriteria(module: Module, e: AnActionEvent): Boolean
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    override fun constructClassCreatorInstance(module: Module): ClassCreator<PsiClass>
     {
-        return isVersion1CommandBaseLibAttached(module)
+        return JavaClassCreator(module, dataProvider)
     }
 }

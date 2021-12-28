@@ -59,7 +59,8 @@ private final Set<Subsystem> subsystems;
     #if ($needsGetRequirementsImpl == "true")
         this.subsystems = Set.of(#foreach($subSystemVar in $requiredSubsystemsVarsArray)this.$subSystemVar#if($foreach.hasNext), #end#end);
     #else
-        // each subsystem used by the command must be passed into the addRequirements() method (which takes a vararg of Subsystem)
+        // each subsystem used by the command must be passed into the
+        // addRequirements() method (which takes a vararg of Subsystem)
         addRequirements(#foreach($subSystemVar in $requiredSubsystemsVarsArray)this.$subSystemVar#if($foreach.hasNext), #end#end);
     #end
     }

@@ -454,9 +454,9 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
         
         boolean nameIsValid = isProposedClassNameValid();
         @Nullable
-        String createClassErrorMessage = ClassCreator.checkCanCreateClass(myDirectory,
-                                                                          getNewClassNameField().getText(),
-                                                                          myDataProvider.getComponentTypeSimpleName());
+        String createClassErrorMessage = myClassCreator.checkCanCreateClass(myDirectory,
+                                                                              getNewClassNameField().getText(),
+                                                                              myDataProvider.getComponentTypeSimpleName());
         
         if (!nameIsValid)
         {

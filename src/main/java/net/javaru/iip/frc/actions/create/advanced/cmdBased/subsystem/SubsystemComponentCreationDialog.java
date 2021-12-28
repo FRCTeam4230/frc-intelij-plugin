@@ -152,7 +152,10 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
                                                buttonsEnabled);
         
         final ContextHelpLabel doubleCheckedLockSingletonContextHelp =
-            ContextHelpLabel.create(SubsystemOptionsHelpKt.getDoubleCheckedLockingInitializationHelp());
+            ContextHelpLabel.createWithLink(null,
+                SubsystemOptionsHelpKt.getDoubleCheckedLockingInitializationHelp(),
+                                            message("frc.ui.common.learnMore.link.text"),
+                                            () -> {BrowserUtil.browse("https://www.geeksforgeeks.org/singleton-design-pattern");});
     
         
         lazySingletonRadioButton =
@@ -162,7 +165,10 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
                                                buttonsEnabled);
     
         final ContextHelpLabel lazySingletonContextHelp =
-            ContextHelpLabel.create(SubsystemOptionsHelpKt.getClassicLazyInitializationHelp());
+            ContextHelpLabel.createWithLink(null,
+                                            SubsystemOptionsHelpKt.getClassicLazyInitializationHelp(),
+                                            message("frc.ui.common.learnMore.link.text"),
+                                            () -> {BrowserUtil.browse("https://www.geeksforgeeks.org/singleton-design-pattern");});
     
         
         eagerSingletonRadioButton =
@@ -172,7 +178,10 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
                                                buttonsEnabled);
     
         final ContextHelpLabel eagerSingletonContextHelp =
-            ContextHelpLabel.create(SubsystemOptionsHelpKt.getEagerInitializationHelp());
+            ContextHelpLabel.createWithLink(null,
+                                            SubsystemOptionsHelpKt.getEagerInitializationHelp(),
+                                    message("frc.ui.common.learnMore.link.text"),
+                                    () -> {BrowserUtil.browse("https://www.geeksforgeeks.org/singleton-design-pattern");});;
     
         
         // Disable the make Singleton option is the name contains "abstract"

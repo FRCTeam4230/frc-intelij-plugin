@@ -21,8 +21,8 @@ import com.intellij.openapi.actionSystem.LangDataKeys
 import com.intellij.openapi.application.WriteActionAware
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
+import com.intellij.psi.PsiElement
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog
 import net.javaru.iip.frc.facet.isFrcFacetedModule
 
@@ -30,21 +30,17 @@ import net.javaru.iip.frc.facet.isFrcFacetedModule
 /**
  * Base class for creating a new Class with a custom dialog for getting necessary information for creation of the class.
  */
-abstract class AbstractFrcComponentCreationAction protected constructor(
+abstract class AbstractFrcComponentCreationAction<T: PsiElement> protected constructor(
     protected val dataProvider: FrcComponentCreationDataProvider) :
     CreateInDirectoryActionBase(null as String?, null as String?, dataProvider.icon), WriteActionAware
 {
     protected abstract fun constructCreateFrcComponentDialogInstance(
         module: Module,
-        classCreator: ClassCreator,
+        classCreator: ClassCreator<T>,
         directory: PsiDirectory
                                                                     ): FrcComponentCreationDialog
 
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected fun constructClassCreatorInstance(module: Module): ClassCreator
-    {
-        return ClassCreator(module, dataProvider)
-    }
+    protected abstract fun constructClassCreatorInstance(module: Module): ClassCreator<T>
 
     override fun update(e: AnActionEvent)
     {
@@ -74,7 +70,7 @@ abstract class AbstractFrcComponentCreationAction protected constructor(
         }
     }
 
-    private fun invokeDialog(module: Module, classCreator: ClassCreator, dir: PsiDirectory): Array<PsiClass>
+    private fun invokeDialog(module: Module, classCreator: ClassCreator<T>, dir: PsiDirectory): List<T>
     {
         val dialog: DialogWrapper = constructCreateFrcComponentDialogInstance(module, classCreator, dir)
         dialog.show()

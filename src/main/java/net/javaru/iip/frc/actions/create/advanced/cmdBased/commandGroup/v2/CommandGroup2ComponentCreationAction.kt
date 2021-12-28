@@ -16,6 +16,7 @@
 package net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v2
 
 import com.intellij.openapi.module.Module
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractCmdBaseV2ComponentCreationAction
@@ -25,7 +26,7 @@ import net.javaru.iip.frc.actions.create.advanced.cmdBased.command.CommandCompon
 class CommandGroup2ComponentCreationAction :
     AbstractCmdBaseV2ComponentCreationAction(CommandGroup2ComponentCreationDataProvider)
 {
-    override fun constructCreateFrcComponentDialogInstance(module: Module, classCreator: ClassCreator, directory: PsiDirectory): FrcComponentCreationDialog
+    override fun constructCreateFrcComponentDialogInstance(module: Module, classCreator: ClassCreator<PsiClass>, directory: PsiDirectory): FrcComponentCreationDialog
     {
         return CommandComponentCreationDialog(module, classCreator, directory, dataProvider)
     }

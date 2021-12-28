@@ -19,7 +19,6 @@ package net.javaru.iip.frc.actions.create.advanced;
 import java.util.Map;
 
 import org.jetbrains.annotations.NotNull;
-import com.intellij.ide.actions.CreateFileAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.JavaDirectoryService;
 import com.intellij.psi.PsiClass;
@@ -36,21 +35,11 @@ public class JavaClassCreator extends AbstractClassCreator<PsiClass>
     
     
     @Override
-    public PsiClass createSingleClass(@NotNull String name,
-                                      @NotNull String classTemplateName,
-                                      @NotNull PsiDirectory directory,
-                                      @NotNull Map<String, String> additionalProperties)
+    protected PsiClass createSingleClassImpl(@NotNull String name,
+                                             @NotNull String classTemplateName,
+                                             @NotNull PsiDirectory directory,
+                                             @NotNull Map<String, String> additionalProperties)
     {
-        if (name.contains("."))
-        {
-            String[] names = name.split("\\.");
-            for (int i = 0; i < names.length - 1; i++)
-            {
-                directory = CreateFileAction.findOrCreateSubdirectory(directory, names[i]);
-            }
-            name = names[names.length - 1];
-        }
-    
         return JavaDirectoryService.getInstance().createClass(directory, name, classTemplateName, false, additionalProperties);
     }
 }

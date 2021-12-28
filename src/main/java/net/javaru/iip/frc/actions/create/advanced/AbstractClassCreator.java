@@ -23,6 +23,7 @@ import java.util.concurrent.Callable;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import com.intellij.ide.actions.CreateFileAction;
 import com.intellij.ide.actions.ElementCreator;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -163,7 +164,26 @@ public abstract class AbstractClassCreator<T extends PsiElement> implements Clas
     
     
     @Override
-    public abstract T createSingleClass(@NotNull String name,
+    public T createSingleClass(@NotNull String name,
+                               @NotNull String classTemplateName,
+                               @NotNull PsiDirectory directory,
+                               @NotNull Map<String, String> additionalProperties)
+    {
+        if (name.contains("."))
+        {
+            String[] names = name.split("\\.");
+            for (int i = 0; i < names.length - 1; i++)
+            {
+                directory = CreateFileAction.findOrCreateSubdirectory(directory, names[i]);
+            }
+            name = names[names.length - 1];
+        }
+    
+        return createSingleClassImpl(name, classTemplateName, directory, additionalProperties);
+    }
+    
+    
+    protected abstract T createSingleClassImpl(@NotNull String name,
                                                @NotNull String classTemplateName,
                                                @NotNull PsiDirectory directory,
                                                @NotNull Map<String, String> additionalProperties);

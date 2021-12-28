@@ -127,11 +127,7 @@ abstract class AbstractClassCreator<T : PsiElement?> protected constructor(
         }
     }
 
-    override fun createSingleClass(
-        name: String,
-        classTemplateName: String,
-        directory: PsiDirectory
-                                  ): T?
+    override fun createSingleClass(name: String, classTemplateName: String, directory: PsiDirectory): T?
     {
         return createSingleClass(name, classTemplateName, directory, emptyMap())
     }

@@ -23,8 +23,8 @@ import net.javaru.iip.frc.util.isKotlinFacetedModule
 import net.javaru.iip.frc.wpilib.isVersion2CommandBaseLibAttached
 
 abstract class AbstractKotlinCmdBaseV2ComponentCreationAction
-    protected constructor(dataProvider: FrcComponentCreationDataProvider?) :
-    AbstractFrcKotlinComponentCreationAction(dataProvider!!)
+    protected constructor(dataProvider: FrcComponentCreationDataProvider) :
+    AbstractFrcKotlinComponentCreationAction(dataProvider)
 {
     override fun shouldBeEnabledAdditionalCriteria(module: Module, e: AnActionEvent): Boolean =
         isVersion2CommandBaseLibAttached(module) && module.isKotlinFacetedModule()

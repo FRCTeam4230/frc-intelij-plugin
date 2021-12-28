@@ -20,8 +20,7 @@ import com.intellij.openapi.module.Module
 import com.intellij.psi.PsiClass
 
 
-abstract class AbstractFrcJavaComponentCreationAction
-    protected constructor(dataProvider: FrcComponentCreationDataProvider):
+abstract class AbstractFrcJavaComponentCreationAction protected constructor(dataProvider: FrcComponentCreationDataProvider):
     AbstractFrcComponentCreationAction<PsiClass>(dataProvider)
 {
     override fun constructClassCreatorInstance(module: Module): ClassCreator<PsiClass> = JavaClassCreator(module, dataProvider)

@@ -22,8 +22,8 @@ import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvid
 import net.javaru.iip.frc.wpilib.isVersion2CommandBaseLibAttached
 
 abstract class AbstractJavaCmdBaseV2ComponentCreationAction
-    protected constructor(dataProvider: FrcComponentCreationDataProvider?) :
-    AbstractFrcJavaComponentCreationAction(dataProvider!!)
+    protected constructor(dataProvider: FrcComponentCreationDataProvider) :
+    AbstractFrcJavaComponentCreationAction(dataProvider)
 {
     override fun shouldBeEnabledAdditionalCriteria(module: Module, e: AnActionEvent): Boolean = isVersion2CommandBaseLibAttached(module)
 }

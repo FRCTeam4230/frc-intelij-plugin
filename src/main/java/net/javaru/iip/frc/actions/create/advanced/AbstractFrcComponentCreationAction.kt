@@ -30,8 +30,7 @@ import net.javaru.iip.frc.facet.isFrcFacetedModule
 /**
  * Base class for creating a new Class with a custom dialog for getting necessary information for creation of the class.
  */
-abstract class AbstractFrcComponentCreationAction<T: PsiElement> protected constructor(
-    protected val dataProvider: FrcComponentCreationDataProvider) :
+abstract class AbstractFrcComponentCreationAction<T: PsiElement> protected constructor(protected val dataProvider: FrcComponentCreationDataProvider) :
     CreateInDirectoryActionBase(null as String?, null as String?, dataProvider.icon), WriteActionAware
 {
     protected abstract fun constructCreateFrcComponentDialogInstance(

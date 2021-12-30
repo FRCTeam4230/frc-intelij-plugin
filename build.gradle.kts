@@ -169,27 +169,31 @@ tasks {
     signPlugin {
         // signPlugin runs automatically before the publishPlugin if the signPlugin privateKey (or privateKeyFile) and certificateChain (or certificateChainFile) properties are specified
         // Use JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE unless overridden by the more specific FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE
-        val ourPrivateKeyFileSetting =
-            System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE") ?:
-            System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE")
         val ourCertChainFileSetting =
             System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE") ?:
             System.getenv("JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE")
+        val ourPrivateKeyFileSetting =
+            System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE") ?:
+            System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE")
 
         doFirst {
-            if (ourPrivateKeyFileSetting == null) {
-                logger.warn("No code signing private key file configured.")
-                logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE' not set.")
-            }
-            else {
-                logger.lifecycle("Using code signing private key file: $ourPrivateKeyFileSetting")
-            }
             if (ourCertChainFileSetting == null) {
                 logger.warn("No code signing certificate chain file configured.")
                 logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE' not set.")
             }
             else {
                 logger.lifecycle("Using code signing certificate chain file: $ourPrivateKeyFileSetting")
+            }
+            if (ourPrivateKeyFileSetting == null) {
+                logger.warn("No code signing private key file configured.")
+                logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE' not set.")
+            }
+            else {
+                logger.lifecycle("Using code signing private key file: $ourPrivateKeyFileSetting")
+                if ((System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD") ?: System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD")) == null) {
+                    logger.warn("Code signing password is not configured.")
+                    logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD' not set.")
+                }
             }
         }
         if (ourPrivateKeyFileSetting != null && ourCertChainFileSetting != null)
@@ -199,6 +203,7 @@ tasks {
             password.set(System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD") ?: System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD"))
         }
     }
+
 
     publishPlugin {
         // See https://plugins.jetbrains.com/docs/intellij/deployment.html  and  https://github.com/JetBrains/intellij-platform-plugin-template/blob/main/build.gradle.kts

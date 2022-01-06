@@ -45,6 +45,6 @@ public class ${data.robotClassSimpleName} extends TimedRobot
         // Drive with split arcade drive.
         // That means that the Y axis of the left stick moves forward
         // and backward, and the X of the right stick turns left and right.
-        robotDrive.arcadeDrive(driverController.getLeftY(), driverController.getRightX());
+        robotDrive.arcadeDrive(-driverController.getLeftY(), driverController.getRightX());
     }
 }

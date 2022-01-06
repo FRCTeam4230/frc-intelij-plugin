@@ -57,7 +57,7 @@ public class RobotContainer
                 new RunCommand(
                         () ->
                                 robotDrive.arcadeDrive(
-                                        -driverController.getLeftY(), -driverController.getRightX()),
+                                        -driverController.getLeftY(), driverController.getRightX()),
                         robotDrive));
     }
     

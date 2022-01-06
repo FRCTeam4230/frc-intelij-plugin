@@ -82,7 +82,7 @@ public class RobotContainer
                 new RunCommand(
                         () ->
                                 robotDrive.arcadeDrive(
-                                        driverController.getLeftY(), driverController.getRightX()),
+                                        -driverController.getLeftY(), driverController.getRightX()),
                         robotDrive));
         
         // Add commands to the autonomous command chooser

@@ -67,6 +67,6 @@ public class ${data.robotClassSimpleName} extends TimedRobot
         double turningValue = (ANGLE_SETPOINT - gyro.getAngle()) * P;
         // Invert the direction of the turn if we are going backwards
         turningValue = Math.copySign(turningValue, joystick.getY());
-        myRobot.arcadeDrive(joystick.getY(), turningValue);
+        myRobot.arcadeDrive(-joystick.getY(), turningValue);
     }
 }

@@ -145,7 +145,7 @@ public class DriveSubsystem extends SubsystemBase
     public void tankDriveVolts(double leftVolts, double rightVolts)
     {
         leftMotors.setVoltage(leftVolts);
-        rightMotors.setVoltage(-rightVolts);
+        rightMotors.setVoltage(rightVolts);
         drive.feed();
     }
     

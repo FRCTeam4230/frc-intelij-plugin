@@ -140,7 +140,7 @@ public class DriveSubsystem extends SubsystemBase
         // move forward.
         drivetrainSimulator.setInputs(
                 leftMotors.get() * RobotController.getBatteryVoltage(),
-                -rightMotors.get() * RobotController.getBatteryVoltage());
+                rightMotors.get() * RobotController.getBatteryVoltage());
         drivetrainSimulator.update(0.020);
         
         leftEncoderSim.setDistance(drivetrainSimulator.getLeftPositionMeters());
@@ -225,7 +225,7 @@ public class DriveSubsystem extends SubsystemBase
             rightVolts *= batteryVoltage / 12.0;
         }
         leftMotors.setVoltage(leftVolts);
-        rightMotors.setVoltage(-rightVolts);
+        rightMotors.setVoltage(rightVolts);
         drive.feed();
     }
     

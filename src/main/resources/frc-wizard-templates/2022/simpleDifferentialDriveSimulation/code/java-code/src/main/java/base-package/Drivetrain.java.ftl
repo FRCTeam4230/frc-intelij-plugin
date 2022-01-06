@@ -170,7 +170,7 @@ public class Drivetrain
         // voltages make the right side move forward.
         drivetrainSimulator.setInputs(
                 leftLeader.get() * RobotController.getInputVoltage(),
-                -rightLeader.get() * RobotController.getInputVoltage());
+                rightLeader.get() * RobotController.getInputVoltage());
         drivetrainSimulator.update(0.02);
         
         leftEncoderSim.setDistance(drivetrainSimulator.getLeftPositionMeters());

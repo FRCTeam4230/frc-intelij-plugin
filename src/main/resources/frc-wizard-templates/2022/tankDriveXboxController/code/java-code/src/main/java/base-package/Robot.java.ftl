@@ -48,6 +48,6 @@ public class ${data.robotClassSimpleName} extends TimedRobot
         // That means that the Y axis of the left stick moves the left side
         // of the robot forward and backward, and the Y axis of the right stick
         // moves the right side of the robot forward and backward.
-        robotDrive.tankDrive(driverController.getLeftY(), driverController.getRightY());
+        robotDrive.tankDrive(-driverController.getLeftY(), -driverController.getRightY());
     }
 }

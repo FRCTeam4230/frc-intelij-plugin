@@ -28,8 +28,9 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
  */
 public class ${data.robotClassSimpleName} extends TimedRobot
 {
-    private final DifferentialDrive robotDrive =
-            new DifferentialDrive(new PWMSparkMax(0), new PWMSparkMax(1));
+    private final PWMSparkMax leftDrive = new PWMSparkMax(0);
+    private final PWMSparkMax rightDrive = new PWMSparkMax(1);
+    private final DifferentialDrive robotDrive = new DifferentialDriveleftDrive, rightDrive);
     private final Joystick stick = new Joystick(0);
     private final Timer timer = new Timer();
     
@@ -39,7 +40,13 @@ public class ${data.robotClassSimpleName} extends TimedRobot
      * initialization code.
      */
     @Override
-    public void robotInit() {}
+    public void robotInit()
+    {
+        // We need to invert one side of the drivetrain so that positive voltages
+        // result in both sides moving forward. Depending on how your robot's
+        // gearbox is constructed, you might have to invert the left side instead.
+        rightMotor.setInverted(true);
+    }
     
     
     /** This method is run once each time the robot enters autonomous mode. */

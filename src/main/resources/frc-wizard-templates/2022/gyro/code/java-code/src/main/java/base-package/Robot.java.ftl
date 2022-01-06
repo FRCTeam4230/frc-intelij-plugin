@@ -39,8 +39,9 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     private static final int GYRO_PORT = 0;
     private static final int JOYSTICK_PORT = 0;
     
-    private final DifferentialDrive myRobot =
-            new DifferentialDrive(new PWMSparkMax(LEFT_MOTOR_PORT), new PWMSparkMax(RIGHT_MOTOR_PORT));
+    private final PWMSparkMax leftDrive = new PWMSparkMax(0);
+    private final PWMSparkMax rightDrive = new PWMSparkMax(1);
+    private final DifferentialDrive robotDrive = new DifferentialDriveleftDrive, rightDrive);
     private final AnalogGyro gyro = new AnalogGyro(GYRO_PORT);
     private final Joystick joystick = new Joystick(JOYSTICK_PORT);
     
@@ -49,6 +50,10 @@ public class ${data.robotClassSimpleName} extends TimedRobot
     public void robotInit()
     {
         gyro.setSensitivity(VOLTS_PER_DEGREE_PER_SECOND);
+        // We need to invert one side of the drivetrain so that positive voltages
+        // result in both sides moving forward. Depending on how your robot's
+        // gearbox is constructed, you might have to invert the left side instead.
+        rightMotor.setInverted(true);
     }
     
     

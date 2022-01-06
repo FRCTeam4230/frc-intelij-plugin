@@ -41,10 +41,10 @@ public class ${data.robotClassSimpleName} extends TimedRobot
         PWMSparkMax frontRight = new PWMSparkMax(FRONT_RIGHT_CHANNEL);
         PWMSparkMax rearRight = new PWMSparkMax(REAR_RIGHT_CHANNEL);
         
-        // Invert the left side motors.
+        // Invert the right side motors.
         // You may need to change or remove this to match your robot.
-        frontLeft.setInverted(true);
-        rearLeft.setInverted(true);
+        frontRight.setInverted(true);
+        rearRight.setInverted(true);
         
         robotDrive = new MecanumDrive(frontLeft, rearLeft, frontRight, rearRight);
         

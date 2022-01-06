@@ -16,17 +16,17 @@
 package net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2
 
 import com.intellij.openapi.module.Module
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
+import com.intellij.psi.PsiElement
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator
-import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractJavaCmdBaseV2ComponentCreationAction
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractKotlinCmdBaseV2ComponentCreationAction
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.SubsystemComponentCreationDialog
 
-open class Subsystem2ComponentCreationAction :
-    AbstractJavaCmdBaseV2ComponentCreationAction(Subsystem2ComponentCreationDataProvider)
+open class Subsystem2KotlinComponentCreationAction :
+    AbstractKotlinCmdBaseV2ComponentCreationAction(Subsystem2KotlinComponentCreationDataProvider)
 {
-    override fun constructCreateFrcComponentDialogInstance(module: Module, classCreator: ClassCreator<PsiClass>, directory: PsiDirectory): FrcComponentCreationDialog
+    override fun constructCreateFrcComponentDialogInstance(module: Module, classCreator: ClassCreator<PsiElement>, directory: PsiDirectory): FrcComponentCreationDialog
     {
         return SubsystemComponentCreationDialog(module, classCreator, directory, dataProvider)
     }

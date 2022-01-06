@@ -566,8 +566,10 @@
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.Command2KotlinComponentCreationAction" />
             <action id="frc.action.new.commandGroup2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v2.CommandGroup2ComponentCreationAction" />
-            <action id="frc.action.new.subsystem2"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2.Subsystem2ComponentCreationAction" />
+            <action id="frc.action.new.subsystem2.java"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2.Subsystem2JavaComponentCreationAction" />
+            <action id="frc.action.new.subsystem2.kotlin"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2.Subsystem2KotlinComponentCreationAction" />
             <action id="frc.action.new.trapezoidProfileSubsystem2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.trapezoidProfileSubsystem.v2.TrapezoidProfileSubsystem2ComponentCreationAction" />
             <action id="frc.action.new.pidSubsystem2"

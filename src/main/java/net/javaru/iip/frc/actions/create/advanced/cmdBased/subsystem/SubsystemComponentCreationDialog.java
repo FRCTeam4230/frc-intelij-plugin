@@ -109,6 +109,11 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
     @Override
     protected void initMinorOptionsPanel(JPanel topPanel, JPanel optionsPanel)
     {
+        if (myDataProvider.isKotlinTemplate())
+        {
+            return;
+        }
+        
         makeSingletonCheckbox = new JBCheckBox(message("frc.templates.options.singletonSubsystems.checkbox.text.one"));
         makeSingletonCheckbox.setSelected(sharedState.getBooleanOption(STATE_KEY_SUBSYSTEMS_MAKE_SINGLETON, true));
     

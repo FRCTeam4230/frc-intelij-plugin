@@ -24,9 +24,7 @@ import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory
 import net.javaru.iip.frc.wpilib.WpiLibConstants
 
 
-
-
-object Subsystem2ComponentCreationDataProvider : FrcComponentCreationDataProvider()
+abstract class AbstractSubsystem2ComponentCreationDataProvider : FrcComponentCreationDataProvider()
 {
     override val componentVersion: Int = 2
     override val componentTypeSimpleName: String = "Subsystem"
@@ -34,7 +32,15 @@ object Subsystem2ComponentCreationDataProvider : FrcComponentCreationDataProvide
     override val baseType: BaseType = BaseType.InterfaceAndBaseClass
     override val topLevelClassFqName: String = WpiLibConstants.SUBSYSTEM_V2_INTERFACE_FQN
     override val typicalBaseClassFqName: String = WpiLibConstants.SUBSYSTEM_V2_BASE_FQN
-    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.SUBSYSTEM2
-    
     override val showJavaDocForOverridesOption: Boolean = false
+}
+
+object Subsystem2JavaComponentCreationDataProvider : AbstractSubsystem2ComponentCreationDataProvider()
+{
+    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.SUBSYSTEM2
+}
+
+object Subsystem2KotlinComponentCreationDataProvider : AbstractSubsystem2ComponentCreationDataProvider()
+{
+    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.SUBSYSTEM2_KOT
 }

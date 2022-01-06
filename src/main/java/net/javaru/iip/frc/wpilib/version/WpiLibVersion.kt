@@ -98,20 +98,7 @@ interface WpiLibVersion : Comparable<WpiLibVersion>
     fun isAlphaOrAlphaPreview(): Boolean = preReleaseModifier == PreReleaseModifier.alpha
     
     
-    override fun compareTo(other: WpiLibVersion): Int
-    {
-       return compareValuesBy(this, other,
-                        { it.generation },
-                        { it.frcYear }, 
-                        { it.major },
-                        { it.minor },
-                        { it.patch },
-                        { it.preReleaseModifier?.ordinal ?: Int.MAX_VALUE },
-                        { if(it.isPreReleaseIncludingPreviews()) it.preReleaseModifierVersion else Int.MAX_VALUE },
-                        { if(it.isPreReleaseIncludingPreviews()) it.preReleaseModifierSubVersion else "" },
-                        { if(it.isPreReleasePreview()) it.preReleasePreviewVersion else Int.MAX_VALUE },
-                        )
-    }
+    override fun compareTo(other: WpiLibVersion): Int = comparator.compare(this, other)
     
     /** 
      * For a pre-release, this returns the (anticipated) corresponding release version. 
@@ -153,6 +140,21 @@ interface WpiLibVersion : Comparable<WpiLibVersion>
     }
 
     fun cloneIt(): WpiLibVersion
+
+    companion object
+    {
+        val comparator = compareBy<WpiLibVersion>(
+            { it.generation },
+            { it.frcYear },
+            { it.major },
+            { it.minor },
+            { it.patch },
+            { it.preReleaseModifier?.ordinal ?: Int.MAX_VALUE },
+            { if (it.isPreReleaseIncludingPreviews()) it.preReleaseModifierVersion else Int.MAX_VALUE },
+            { if (it.isPreReleaseIncludingPreviews()) it.preReleaseModifierSubVersion else "" },
+            { if (it.isPreReleasePreview()) it.preReleasePreviewVersion else Int.MAX_VALUE },
+                                                 )
+    }
 
 }
 

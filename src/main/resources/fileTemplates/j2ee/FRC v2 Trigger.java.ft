@@ -1,0 +1,22 @@
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};
+#end
+
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+
+#parse("File Header.java")
+public class ${NAME} extends Trigger
+{
+#if($includeJavaDocsForOverrides == "true")
+    /**
+     * Returns whether the trigger is active. This method will be called
+     * repeatedly by a command that is linked to the Trigger.
+     *
+     * @return whether the trigger condition is active.
+     */
+#end
+    public boolean get()
+    {
+        return false;
+    }
+}

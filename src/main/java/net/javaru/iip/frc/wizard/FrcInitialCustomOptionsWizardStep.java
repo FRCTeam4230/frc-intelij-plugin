@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.wizard;
 
+import java.awt.*;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
@@ -35,9 +36,11 @@ import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.lang.JavaVersion;
+import com.intellij.util.ui.AsyncProcessIcon;
 
 import net.javaru.iip.frc.FrcPluginGlobals;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
+import net.javaru.iip.frc.util.FrcSystemConfigs.WizardAlwaysUpdateWpilibVersions;
 import net.javaru.iip.frc.util.TitleMessagePair;
 import net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
@@ -57,6 +60,10 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
     private JPanel wpiLibVersionPanel;
     private JBLabel wpilibVersionSelectionLabel;
     private JComboBox<WpiLibVersion> wpilibVersionComboBox;
+    private JPanel topCardPanel;
+    private JPanel spinnerPanel;
+    private AsyncProcessIcon asyncProcessIcon;
+    private JBLabel spinnerLabel;
     @NotNull
     private final FrcModuleBuilder myBuilder;
     @NotNull
@@ -64,6 +71,7 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
     @Nullable
     private final Project myProjectOrNull;
     
+    // NOTE: See org.jetbrains.idea.maven.wizards.MavenArchetypesStep for example of using the "loading spinner"
     public FrcInitialCustomOptionsWizardStep(@NotNull FrcModuleBuilder builder,
                                              @NotNull WizardContext context)
     {
@@ -80,6 +88,7 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
     {
         updateInvalidSdkLabelVisibility();
         myBuilder.addSdkChangedListener(this::updateInvalidSdkLabelVisibility);
+        initCardPanel();
         initWpiLibVersionComboBox();
     }
     
@@ -156,28 +165,42 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
     {
         //TODO: We need to 
         // ✔a) filter the list to remove the alphas, etc. 
-        //  b) have UI option to only show the latest version fpr each year (on by default) (com/intellij/find/impl/FindPopupPanel.java:1625)
+        //  b) have UI option to only show the latest version for each year (on by default) (com/intellij/find/impl/FindPopupPanel.java:1625)
         //  c) have a UI option to show/hide betas (off by default)
         // ✔d) make modifications so that the FrcProjectWizardData.wpilibVersion defaults to the latest and then that the selected item (below) matches
-        
-        final Duration maxAge = calcMaxAgeDurationToUse();
-        final List<WpiLibVersion> versionList = GradleRioMavenMetadataState.getInstance(maxAge).getWpiLibMavenMetadata().getWpiLibVersionsDescending();
-        // Filter the list to include only releases, and the latest one if it is a release candidate or beta (for an unreleased version)
-        final List<WpiLibVersion> filteredList = WpiLibVersionFiltersKt.filterToDefaultListing(versionList);
-        final WpiLibVersion[] versions = filteredList.toArray(new WpiLibVersion[0]);
-        wpilibVersionComboBox.setModel(new DefaultComboBoxModel<>(versions));
-        int index = 0; // default to the first item in the list
-        if (filteredList.isEmpty())
-        {
-            index = -1; // if by some rare chance the list is empty, we set to the -1 flag to say don't select anything.
-        }
-        else if (filteredList.size() >= 2 && filteredList.get(0).isPreRelease() && !filteredList.get(1).isPreRelease())
-        {
-            index = 1; // if the first item is a beta or RC we select the second item, i.e. the latest non beta/RC
-        }
-        wpilibVersionComboBox.setSelectedIndex(index);
+    
+        SwingUtilities.invokeLater(() -> {
+        // IMPORTANT: No PSI or VirtualFile work should be done inside the SwingUtilities.invokeLater block. It MUST be limited to UI work
+        //            ApplicationManager.getApplication().invokeLater does not work here as it apparently waits until the wizard dialog is closed
+        //            See the ModalityState class documentation for more information about using SwingUtilities.invokeLater
+            LOG.debug("[FRC] initWpiLibVersionComboBox invokeLater block is running");
+            final Duration maxAge = calcMaxAgeDurationToUse();
+            final List<WpiLibVersion> versionList = GradleRioMavenMetadataState.getInstance(maxAge).getWpiLibMavenMetadata().getWpiLibVersionsDescending();
+            // Filter the list to include only releases, and the latest one if it is a release candidate or beta (for an unreleased version)
+            final List<WpiLibVersion> filteredList = WpiLibVersionFiltersKt.filterToDefaultListing(versionList);
+            final WpiLibVersion[] versions = filteredList.toArray(new WpiLibVersion[0]);
+            wpilibVersionComboBox.setModel(new DefaultComboBoxModel<>(versions));
+            int index = 0; // default to the first item in the list
+            if (filteredList.isEmpty())
+            {
+                index = -1; // if by some rare chance the list is empty, we set to the -1 flag to say don't select anything.
+            }
+            else if (filteredList.size() >= 2 && filteredList.get(0).isPreRelease() && !filteredList.get(1).isPreRelease())
+            {
+                index = 1; // if the first item is a beta or RC we select the second item, i.e. the latest non beta/RC
+            }
+            wpilibVersionComboBox.setSelectedIndex(index);
+            final CardLayout cardLayout = (CardLayout) topCardPanel.getLayout();
+            cardLayout.show(topCardPanel, "wpilibVersionSelectionPanelCard");
+            LOG.debug("[FRC] initWpiLibVersionComboBox invokeLater block has completed");
+        });
     }
     
+    private void initCardPanel()
+    {
+        final CardLayout cardLayout = (CardLayout) topCardPanel.getLayout();
+        cardLayout.show(topCardPanel, "spinnerPanelCard");
+    }
     
     private Duration calcMaxAgeDurationToUse()
     {
@@ -185,7 +208,8 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
         final LocalDate now = LocalDate.now();
         
         // We want to update regularly during the initial build kickoff time period
-        if ((now.getMonth() == Month.DECEMBER && now.getDayOfMonth() > 20) || 
+        if (WizardAlwaysUpdateWpilibVersions.INSTANCE.getValue() ||
+            (now.getMonth() == Month.DECEMBER && now.getDayOfMonth() > 20) ||
             (now.getMonth() == Month.JANUARY && now.getDayOfMonth() >= 16))
         {
             return Duration.ZERO;
@@ -195,5 +219,11 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
             return Duration.ofMinutes(15);
         }
     }
-        
+    
+    
+    private void createUIComponents()
+    {
+        //asyncProcessIcon = new AsyncProcessIcon.Big(getClass() + ".loading");
+        asyncProcessIcon = new AsyncProcessIcon.BigCentered(getClass() + ".loading");
+    }
 }

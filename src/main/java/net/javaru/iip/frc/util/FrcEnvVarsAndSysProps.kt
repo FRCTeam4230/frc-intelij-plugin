@@ -73,4 +73,18 @@ object FrcSystemConfigs
         override val default: Boolean = false
         override val value: Boolean = getBooleanSystemProperty(key, default)
     }
+
+    object WizardAlwaysUpdateWpilibVersions: FrcSystemConfig<Boolean>
+    {
+        override val key: String = "frc.wizard.always.update.wpilib.versions"
+        override val default: Boolean = false
+        override val value: Boolean = getBooleanSystemProperty(key, default)
+    }
+
+    object FeatureFlagKotlinTemplates: FrcSystemConfig<Boolean>
+    {
+        override val key: String = "frc.experimental.kotlinTemplates"
+        override val default: Boolean = true
+        override val value: Boolean = getBooleanSystemProperty(key, default)
+    }
 }

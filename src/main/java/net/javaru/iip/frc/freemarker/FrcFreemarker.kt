@@ -28,6 +28,8 @@ val DEBUG_MODE = BooleanUtils.toBoolean(System.getProperty("frc.freemarker.debug
 
 const val FM_TEMPLATE_EXT_NO_DOT = "ftl"
 const val FM_TEMPLATE_EXT_WITH_DOT = ".$FM_TEMPLATE_EXT_NO_DOT"
+const val KOTLIN_FM_TEMPLATE_FILE_EXT = ".kt$FM_TEMPLATE_EXT_WITH_DOT"
+const val KOTLIN_SCRIPT_FM_TEMPLATE_FILE_EXT = ".kts$FM_TEMPLATE_EXT_WITH_DOT"
 
 /**
  * @param resourceLoaderClass a class to be used for resource loading. This basically just needs to be any class within the plugin.
@@ -55,7 +57,7 @@ fun freemarkerConfiguration(resourceLoaderClass:  Any, basePackagePath: String =
 @JvmOverloads
 fun freemarkerConfiguration(basePackagePath: String = "/", resourceLoaderClass: Class<*> = FrcIcons::class.java): Configuration
 {
-    val cfg = Configuration(Configuration.VERSION_2_3_30)
+    val cfg = Configuration(Configuration.VERSION_2_3_31)
     // we just need a class on our classpath, so we use FrcIcons as a convenient class
     cfg.setClassForTemplateLoading(resourceLoaderClass, basePackagePath)
     cfg.defaultEncoding = "UTF-8"
@@ -75,3 +77,47 @@ fun freemarkerConfiguration(basePackagePath: String = "/", resourceLoaderClass: 
 
     return cfg
 }
+
+/**
+ * Creates a Freemarker [Configuration] with interpolation syntax set to Square bracket syntax.
+ * This allows us to use `[=data.robotClassSimpleName]` rather than `${data.robotClassSimpleName}`,
+ * and thus not conflict with Kotlin String template syntax. Note that this only affects interpolation
+ * syntax, and *NOT* Tag syntax. So we will still use `<#if isSuchAndSuch>` and not `[#if isSuchAndSuch]`.
+ * Tag syntax can be changed if desired, but we are not.
+ *
+ * @param resourceLoaderClass a class to be used for resource loading. This basically just needs to be any class within the plugin.
+ *                            We may have to rethink this when we implement templates via extension points
+ *
+ * @param basePackagePath the base package for loading of templates. Separate steps with `/` `.` and note that it matters if this starts with
+ *            `/` or not: f it doesn't start with a / then it's relative to the path (package) of the resourceLoaderClass class. If it starts
+ *            with / then it's relative to the root of the package hierarchy. Note that path components should be separated by forward slashes
+ *            independently of the separator character used by the underlying operating system.
+ */
+@JvmOverloads
+fun freemarkerConfigurationForKotlinTemplates(resourceLoaderClass: Any, basePackagePath: String = "/"): Configuration =
+    freemarkerConfigurationForKotlinTemplates(basePackagePath, resourceLoaderClass::class.java)
+
+
+/**
+ * Creates a Freemarker [Configuration] with interpolation syntax set to Square bracket syntax.
+ * This allows us to use `[=data.robotClassSimpleName]` rather than `${data.robotClassSimpleName}`,
+ * and thus not conflict with Kotlin String template syntax. Note that this only affects interpolation
+ * syntax, and *NOT* Tag syntax. So we will still use `<#if isSuchAndSuch>` and not `[#if isSuchAndSuch]`.
+ * Tag syntax can be changed if desired, but we are not.
+ *
+ * @param resourceLoaderClass a class to be used for resource loading. This basically just needs to be any class within the plugin.
+ *                            We may have to rethink this when we implement templates via extension points
+ *
+ * @param basePackagePath the base package for loading of templates. Separate steps with `/` `.` and note that it matters if this starts with
+ *            `/` or not: f it doesn't start with a / then it's relative to the path (package) of the resourceLoaderClass class. If it starts
+ *            with / then it's relative to the root of the package hierarchy. Note that path components should be separated by forward slashes
+ *            independently of the separator character used by the underlying operating system.
+ */
+@JvmOverloads
+fun freemarkerConfigurationForKotlinTemplates(basePackagePath: String = "/", resourceLoaderClass: Class<*> = FrcIcons::class.java): Configuration
+{
+    val cfg = freemarkerConfiguration(basePackagePath, resourceLoaderClass)
+    cfg.setInterpolationSyntax(Configuration.SQUARE_BRACKET_INTERPOLATION_SYNTAX)
+    return cfg
+}
+

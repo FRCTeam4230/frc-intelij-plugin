@@ -1,0 +1,17 @@
+#set( $H = '#' )
+#if(${PACKAGE_NAME})
+#if (${PACKAGE_NAME} != "")
+package ${PACKAGE_NAME}
+#end
+#end
+
+
+#if($baseClassNeedsImporting == "true")
+import ${baseClassFqName};
+#end
+
+#parse("File Header.java")
+#if($makeAbstract == "true")abstract class #else object #end ${NAME} ${baseClassExtendsClause}#if($baseIsInterface == "false")()#end
+{
+
+}

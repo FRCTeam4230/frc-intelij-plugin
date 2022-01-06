@@ -16,6 +16,10 @@
 
 package net.javaru.iip.frc.util
 
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.binding
+import com.github.michaelbull.result.get
+import com.github.michaelbull.result.onFailure
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
@@ -29,6 +33,8 @@ import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
+import net.javaru.iip.frc.services.FrcErrorReportSubmitter
+import net.javaru.iip.frc.services.ReportableEvent
 import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataCache
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import java.io.File
@@ -49,12 +55,15 @@ private val logger = logger<GradleUtils>()
 fun Project.getGradleBuildIoFile(): File?
 {
     if (this.basePath == null) return null
-    val cache = ExternalProjectDataCache.getInstance(this)
-    val rootExternalProject = cache.getRootExternalProject(this.basePath!!)
-    return rootExternalProject?.buildFile
+    val result = this.runSafelyWithResult("getGradleBuildIoFile") {
+        val cache = ExternalProjectDataCache.getInstance(this)
+        val rootExternalProject = cache.getRootExternalProject(this.basePath!!)
+        rootExternalProject?.buildFile
+    }
+    return result.get()
 }
 
-fun Project.getGradleBuildNIoPath(): Path? = this.getGradleBuildIoFile()?.toPath()
+fun Project.getGradleBuildNioPath(): Path? = this.getGradleBuildIoFile()?.toPath()
 
 fun Project.getGradleBuildVirtualFile(): VirtualFile? = this.getGradleBuildIoFile()?.findVirtualFile(true)
 
@@ -98,40 +107,57 @@ fun Project.reimportGradleProject(callback: ExternalProjectRefreshCallback? = nu
     //ImportModuleAction.doImport(this)
 
     // derived from looking at RefreshAllExternalProjectsAction, specifically when it calls ExternalSystemUtil.refreshProjects
-    ExternalSystemUtil.refreshProjects(
-        ImportSpecBuilder(this, GradleConstants.SYSTEM_ID)
-            .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
-            .callback(callback))
+    this.runSafely("reimportGradleProject()") {
+        ExternalSystemUtil.refreshProjects(
+            ImportSpecBuilder(this, GradleConstants.SYSTEM_ID)
+                .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
+                .callback(callback))
+    }
 }
+
+/** Reimports the Gradle project by scheduling it via the internal ProjectTracker */
+fun Project.scheduleGradleReimport() = this.markGradleProjectAsNeedingReimport(scheduleForAutoReimport = true)
 
 fun Project.markGradleProjectAsNeedingReimport(scheduleForAutoReimport: Boolean = false)
 {
-    val projectTracker = ExternalSystemProjectTracker.getInstance(this)
-    val projectSettings = this.findAllProjectSettings()
-    logger.trace{"[FRC] Marking Gradle for project '${this.name}' as dirty. scheduleForAutoReimport = $scheduleForAutoReimport"}
-    
-    // The externalProjectsWatcher.markDirty method auto imports, which we don't want. So we basically duplicate its functionality here
-    //val externalProjectsManager = ExternalProjectsManagerImpl.getInstance(this)
-    //projectSettings.forEach {
-    //    externalProjectsManager.externalProjectsWatcher.markDirty(it.externalProjectPath)
-    //}
-    
-    ApplicationManager.getApplication().invokeLater(
-        {
-            projectSettings.forEach {
-                projectTracker.markDirty(it)
-            }
-            // Note, in the externalProjectsWatcher.markDirty implementation, it also iterates over
-            //       contributors. However, the gradle plugin does not implement the ExternalSystemProjectsWatcherImpl.Contributor
-            //       extension point (only maven does) so it would be an empty list
-            if (scheduleForAutoReimport) 
-                projectTracker.scheduleProjectRefresh() 
-            else 
-                projectTracker.scheduleChangeProcessing()
-        }, this.disposed)
-        
-    
+    val project = this
+    val result: Result<Unit, Throwable> = binding{
+        val projectTracker = tryIt { ExternalSystemProjectTracker.getInstance(project) }.bind()
+        val projectSettings = tryIt { project.findAllProjectSettings() }.bind()
+        logger.trace { "[FRC] Marking Gradle for project '${project.name}' as dirty. scheduleForAutoReimport = $scheduleForAutoReimport" }
+        // The externalProjectsWatcher.markDirty method auto imports, which we don't want. So we basically duplicate its functionality here
+        //val externalProjectsManager = ExternalProjectsManagerImpl.getInstance(this)
+        //projectSettings.forEach {
+        //    externalProjectsManager.externalProjectsWatcher.markDirty(it.externalProjectPath)
+        //}
 
+        ApplicationManager.getApplication().invokeLater(
+            {
+                project.runSafely("markGradleProjectAsNeedingReimport-Inner", mapOf("gradleProjectSettings" to projectSettings)) {
+                    projectSettings.forEach {
+                        projectTracker.markDirty(it)
+                    }
+                    // Note, in the externalProjectsWatcher.markDirty implementation, it also iterates over
+                    //       contributors. However, the gradle plugin does not implement the ExternalSystemProjectsWatcherImpl.Contributor
+                    //       extension point (only maven does) so it would be an empty list
+                    if (scheduleForAutoReimport)
+                        projectTracker.scheduleProjectRefresh()
+                    else
+                        projectTracker.scheduleProjectNotificationUpdate()
+                }
+            }, project.disposed)
+    }
+
+    result.onFailure {
+        try
+        {
+            FrcErrorReportSubmitter.submitReportableEvent(ReportableEvent("markGradleProjectAsNeedingReimport-Full", project, it))
+        }
+        catch (t: Throwable)
+        {
+            logger.info("[FRC] Could not submit reportable event for markGradleProjectAsNeedingReimport. Cause: $t")
+        }
+    }
 }
 
 private fun Project.findAllProjectSettings(): List<ExternalSystemProjectId>

@@ -46,7 +46,9 @@ import com.intellij.ui.components.JBTabbedPane;
 import icons.FrcIcons.FRC;
 import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.i18n.FrcMessageKey;
+import net.javaru.iip.frc.ui.ButtonAndLabelSynchronizer;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
+import net.javaru.iip.frc.util.FrcSystemConfigs.FeatureFlagKotlinTemplates;
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
@@ -81,39 +83,75 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     private JScrollPane projectExamplesScrollPane;
     private JBList<FrcWizardTemplateDefinition> exampleTemplatesJBList;
     /**
-     * The outer most panel that fully contains all the template language options. Only need to
-     * access would be is if we want to set `visible` to false to completely hide all language
-     * options. If a template does not support language options, the {@link #templateLanguageRightSelectionPanel}
-     * should be disabled, NOT this panel. That way the Context Help icon remains enabled.
+     * An outer panel that holds template options. At this time, the only template
+     * option is the {@link #templateLangSelectOuterPanel}. It also holds a vertical
+     * spacer, so that when the {@code templateLangSelectOuterPanel} is hidden, the
+     * other content in the step does not jump/move. Generally speaking, this panel
+     * should *NOT* be disabled or hidden.
      */
-    private JPanel templateLanguageOuterMainPanel;
+    private JPanel templateOptionsPanel2;
     /**
-     * The left inner template language option panel that contains the Context Help icon.
-     * Generally speaking, this panel does not need to nbe accessed at all.
+     * The outer panel for template (programming) language selection. This panel is
+     * hidden or shown based on whether the experimental Kotlin templates feature
+     * flag is enabled or not. It is *NOT* hidden when only one language option
+     * is available. The {@link #templateLangSelectInnerPanel} is what is hidden
+     * or shown based on available languages for the selected template.
+     *
+     *
+     * <pre>
+     * ┏━━━━━━━templateOptionsPanel━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+     * ┃    ┏━━━━templateLangSelectOuterPanel (1)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┃
+     * ┃    ┃    ┏━━━templateLangSelectInnerPanel (2)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┃┃
+     * ┃    ┃    ┃   ┏━templateLangSelectContexHelpPanel━━┓┏━templateLangSelectJavaOptionPanel (3)━━━━━━━━━━━━━━━━━━━━━━┓┏━templateLangSelectKotlinOptionPanel (3)━━━━━━━━━━━━━━━━━━━━━┓       ╱(4) ┃┃┃
+     * ┃    ┃    ┃   ┃                                    ┃┃                                                            ┃┃                                                             ┃       ╲    ┃┃┃
+     * ┃    ┃    ┃   ┃                                    ┃┃                                                            ┃┃                                                             ┃       ╱    ┃┃┃
+     * ┃    ┃    ┃   ┃                                    ┃┃                                                            ┃┃                                                             ┃       ╲    ┃┃┃
+     * ┃    ┃    ┃   ┃                                    ┃┃                                                            ┃┃                                                             ┃       ╱    ┃┃┃
+     * ┃    ┃    ┃   ┃                                    ┃┃                                                            ┃┃                                                             ┃       ╲    ┃┃┃
+     *
+     * (1) Hidden/Shown based on the FrcSystemConfigs.FeatureFlagKotlinTemplates
+     * (2) Hidden/Shown based on the number of available for the selected template: shown when >1; hidden when <=1
+     * (3) These language specific panels hold the Radio Button and Label for use (along with the panel) with a ButtonAndLabelSynchronizer
+     * (4) a vertical spacer with a min & preferred height so panel does not shrink when inner panel is hidden. (We also set a min height on the outer panel)
+     * </pre>
      */
-    private JPanel templateLanguageLeftHelpPanel;
+    private JPanel templateLangSelectOuterPanel;
     /**
-     * The Context Help Label -- i.e. the (?) icon -- that we want to
-     * always be enabled.
+     * The inner panel for template (programming) language selection. This panel is
+     * hidden or shown based on the number of available for the selected template:
+     * shown when >1; hidden when <=1.
      */
-    private ContextHelpLabel languageOptionsContextHelpLabel;
+    private JPanel templateLangSelectInnerPanel;
     /**
-     * The right inner template language option that contains the
-     * {@code #templateOptionsPanel}. Right now this panel is
-     * present to make future changes easier if needed.
+     * Panel to hold the {@link  #templateLangSelectContextHelpLabel}.
      */
-    private JPanel templateLanguageRightSelectionPanel;
+    private JPanel templateLangSelectContexHelpPanel;
+    private ContextHelpLabel templateLangSelectContextHelpLabel;
     /**
-     * A panel within the {@code #templateLanguageRightSelectionPanel} that groups the
-     * the selection button group. This is what should be enabled and disabled as needed.
-     * For example disable if the selected template only supports a single language.
+     * Panel to hold the 'Java' language option. It holds the
+     * Radio Button and Label fo the option. The three items
+     * (panel, button label) are used to create a 'ButtonAndLabelSynchronizer'.
      */
-    private JPanel templateOptionsPanel;
-    private JBLabel templateLanguageLabel;
-    private JBRadioButton javaLanguageOptionRadioButton;
-    private JBRadioButton kotlinLanguageOptionRadioButton;
+    private JPanel templateLangSelectJavaOptionPanel;
+    private JBRadioButton templateLangSelectJavaOptionRadioButton;
+    private JBLabel templateLangSelectJavaOptionLabel;
+    /**
+     * Panel to hold the 'Kotlin' language option. It holds the
+     * Radio Button and Label fo the option. The three items
+     * (panel, button label) are used to create a 'ButtonAndLabelSynchronizer'.
+     */
+    private JPanel templateLangSelectKotlinOptionPanel;
+    private JBRadioButton templateLangSelectKotlinOptionRadioButton;
+    private JBLabel templateLangSelectKotlinOptionLabel;
+    private JPanel templateLangSelectLanguageLabelPanel;
+    private JBLabel templateLangSelectLanguageLabel;
+    private JPanel templateDescriptionPanel;
     private ButtonGroup langOptionButtonGroup;
     
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
+    private ButtonAndLabelSynchronizer<JBRadioButton> javaLangOptionSynchronizer;
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
+    private ButtonAndLabelSynchronizer<JBRadioButton> kotlinLangOptionSynchronizer;
     private final Map<FrcWizardTemplateDefinition, TemplateLanguageOption> lastSelectedLanguage = new HashMap<>();
     
     public FrcTemplateSelectionWizardStep(@NotNull FrcModuleBuilder builder,
@@ -143,8 +181,16 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         initTabPane();
         initTemplatesLists();
         initTemplateLanguageOption();
+        initOptionSynchronizers();
         lastSelectedLanguage.clear();
         LOG.trace("[FRC] Exiting FrcTemplateSelectionWizardStep.initComponents()");
+    }
+    
+    
+    private void initOptionSynchronizers()
+    {
+        javaLangOptionSynchronizer = new ButtonAndLabelSynchronizer<>(templateLangSelectJavaOptionPanel, templateLangSelectJavaOptionRadioButton, templateLangSelectJavaOptionLabel);
+        kotlinLangOptionSynchronizer = new ButtonAndLabelSynchronizer<>(templateLangSelectKotlinOptionPanel, templateLangSelectKotlinOptionRadioButton, templateLangSelectKotlinOptionLabel);
     }
     
     
@@ -167,12 +213,12 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     private void saveSettings()
     {
         /*
-        JPanel templateLanguageOuterMainPanel;
+        JPanel templateLanguageInnerMainPanel;
             JPanel templateLanguageLeftHelpPanel;
             JPanel templateLanguageRightSelectionPanel;
                 JPanel templateOptionsPanel;
                     JBLabel templateLanguageLabel;
-                    JBRadioButton javaLanguageOptionRadioButton;
+                    JBRadioButton templateLangSelectJavaOptionRadioButton;
                     JBRadioButton kotlinLanguageOptionRadioButton;
          */
         
@@ -215,7 +261,6 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     @Override
     public JComponent getComponent()
     {
-        // return new JLabel("A placeholder. New Project Form will go here :)");
         return myRootPanel;
     }
     
@@ -393,12 +438,16 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     
     private void initTemplateLanguageOption()
     {
-        templateLanguageOuterMainPanel.setVisible(BooleanUtils.toBoolean(System.getProperty("frc.experimental.kotlinTemplates", "false")));
-        javaLanguageOptionRadioButton.setSelected(true);
-        // We default to disabled, and enable as need when a template is selected
-        templateOptionsPanel.setEnabled(false);
-        javaLanguageOptionRadioButton.setActionCommand(TemplateLanguageOption.Java.name());
-        kotlinLanguageOptionRadioButton.setActionCommand(TemplateLanguageOption.Kotlin.name());
+        templateLangSelectJavaOptionRadioButton.setSelected(true);
+        // This is the primary options panel, which for now just jas the one option: the templateLangSelectionOuterPanel
+        templateOptionsPanel2.setVisible(true);
+        templateOptionsPanel2.setEnabled(true);
+        final boolean isKotlinTemplatesFeatureEnabled = BooleanUtils.toBoolean(FeatureFlagKotlinTemplates.INSTANCE.getValue());
+        templateLangSelectOuterPanel.setVisible(isKotlinTemplatesFeatureEnabled);
+        // We initialize to non-visible, so it does not show until a template that supports multiple languages is selected
+        templateLangSelectInnerPanel.setVisible(false);
+        templateLangSelectJavaOptionRadioButton.setActionCommand(TemplateLanguageOption.Java.name());
+        templateLangSelectKotlinOptionRadioButton.setActionCommand(TemplateLanguageOption.Kotlin.name());
     
         ItemListener languageOptionChangeListener = e -> {
             final AbstractButton button = (AbstractButton) e.getSource();
@@ -411,9 +460,9 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
                 lastSelectedLanguage.put(selectedTemplate, languageOption);
             }
         };
-       
-        kotlinLanguageOptionRadioButton.addItemListener(languageOptionChangeListener);
-        javaLanguageOptionRadioButton.addItemListener(languageOptionChangeListener);
+    
+        templateLangSelectKotlinOptionRadioButton.addItemListener(languageOptionChangeListener);
+        templateLangSelectJavaOptionRadioButton.addItemListener(languageOptionChangeListener);
     }
     
     
@@ -544,8 +593,8 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
             TemplateLanguageOption lastLanguageOption =
                 lastSelectedLanguage.computeIfAbsent(selectedTemplate, frcWizardTemplateDefinition -> selectedTemplate.getAvailableTemplateLanguages().get(0));
             setSelectedTemplateLanguageOptionButton(lastLanguageOption);
-                
-            
+            // Hide the language option panel if the template does not support more than 1 language
+            templateLangSelectInnerPanel.setVisible(selectedTemplate.getAvailableTemplateLanguages().size() > 1);
             // Disable buttons for unsupported languages
             final Enumeration<AbstractButton> buttons = langOptionButtonGroup.getElements();
             while (buttons.hasMoreElements())
@@ -560,7 +609,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         else
         {
             LOG.debug("[FRC] selectedTemplate was null. Disabling Template Language Option.");
-            templateOptionsPanel.setEnabled(false);
+            templateLangSelectInnerPanel.setVisible(false);
         }
     }
 
@@ -571,14 +620,14 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         switch (languageOption)
         {
             case Kotlin:
-                kotlinLanguageOptionRadioButton.setSelected(true);
+                templateLangSelectKotlinOptionRadioButton.setSelected(true);
                 break;
             case Java:
-                javaLanguageOptionRadioButton.setSelected(true);
+                templateLangSelectJavaOptionRadioButton.setSelected(true);
                 break;
             default:
                 LOG.warn("Unknown TemplateLanguageOption of " + languageOption + " in setSelectedTemplateLanguageOptionButton()");
-                javaLanguageOptionRadioButton.setSelected(true);
+                templateLangSelectJavaOptionRadioButton.setSelected(true);
                 break;
         }
     }
@@ -586,7 +635,8 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     
     private void createUIComponents()
     {
-        languageOptionsContextHelpLabel = ContextHelpLabel.create(message("frc.ui.wizard.templateSelectionStep.languageOption.helpContext.title"),
-                                                                  message("frc.ui.wizard.templateSelectionStep.languageOption.helpContext.text"));
+        templateLangSelectContextHelpLabel = ContextHelpLabel.create(message("frc.ui.wizard.templateSelectionStep.languageOption.helpContext.title"),
+                                                                     message("frc.ui.wizard.templateSelectionStep.languageOption.helpContext.text",
+                                                                             message("frc.new.project.wizard.kotlin.disclaimer")));
     }
 }

@@ -30,7 +30,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.roots.ExternalProjectSystemRegistry
 import com.intellij.util.containers.stream
-import net.javaru.iip.frc.facet.FrcFacet.Companion.FACET_NAME
 import net.javaru.iip.frc.facet.FrcFacet.Companion.FACET_TYPE_ID
 import org.jetbrains.annotations.Contract
 import kotlin.streams.toList
@@ -56,27 +55,55 @@ class FrcFacet(facetType: FacetType<FrcFacet, FrcFacetConfiguration>,
     }
 }
 
-fun Module.getOrAddFrcFacet(externalSystemId: String? = null, commitModel: Boolean = true): FrcFacet
+fun Module.getOrAddFrcFacet(externalSystemId: String? = null, commitModel: Boolean = true): FrcFacet = this.getOrAddFrcFacetImpl(externalSystemId, commitModel)
+
+private fun Module.getOrAddFrcFacetImpl(externalSystemId: String? = null, commitModel: Boolean = true, isReattempt: Boolean = false): FrcFacet
 {
-    // Based on Kotlin Plugin:  org.jetbrains.kotlin.idea.facet.FacetUtilsKt#getOrCreateFacet 
+    // Based on Kotlin Plugin:  org.jetbrains.kotlin.idea.facet.FacetUtilsKt#getOrCreateFacet
+    // But I've added the try/catch block after a reported issue.
     val modelsProvider = IdeModifiableModelsProviderImpl(this.project)
     val facetModel = modelsProvider.getModifiableFacetModel(this)
-    val facet = facetModel.findFacet(FACET_TYPE_ID, FACET_NAME) ?: with(FrcFacetType.instance) {
-        createFacet(this@getOrAddFrcFacet, FACET_NAME, createDefaultConfiguration(), null)
-    }.apply {
-        val externalSource = externalSystemId?.let{ ExternalProjectSystemRegistry.getInstance().getSourceById(it) }
-        facetModel.addFacet(this, externalSource)
-    }
-
-    if (commitModel)
+    try
     {
-        ApplicationManager.getApplication().invokeLater{
-            runWriteAction {
-                facetModel.commit()
+        val facet = facetModel.findFacet(FACET_TYPE_ID, FrcFacetType.INSTANCE.defaultFacetName) ?: with(FrcFacetType.INSTANCE) {
+            createFacet(this@getOrAddFrcFacetImpl, defaultFacetName, createDefaultConfiguration(), null)
+        }.apply {
+            val externalSource = externalSystemId?.let{ ExternalProjectSystemRegistry.getInstance().getSourceById(it) }
+            facetModel.addFacet(this, externalSource)
+        }
+
+        if (commitModel)
+        {
+            ApplicationManager.getApplication().invokeLater{
+                runWriteAction {
+                    facetModel.commit()
+                }
             }
         }
+        return facet
     }
-    return facet
+    catch (e: com.intellij.workspaceModel.storage.impl.exceptions.PersistentIdAlreadyExistsException)
+    {
+        // Gets thrown by facetModel.addFacet()
+        // Was reported via the ErrorSubmitter once. I'm thinking it's a race condition of some type
+        // So we first just recheck for the facet...
+        return facetModel.findFacet(FACET_TYPE_ID, FrcFacetType.INSTANCE.defaultFacetName)?.also {
+            if (commitModel)
+            {
+                ApplicationManager.getApplication().invokeLater {
+                    runWriteAction {
+                        facetModel.commit()
+                    }
+                }
+            }
+        }
+            ?: if (!isReattempt) {
+                // if we still don't have it, we retry the create and add one more time
+                this.getOrAddFrcFacetImpl(externalSystemId, commitModel, isReattempt = true)
+            } else {
+                throw e
+            }
+    }
 }
 
 val allFrcFacetsForAllOpenProjects: ImmutableList<FrcFacet>

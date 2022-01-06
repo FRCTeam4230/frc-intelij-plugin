@@ -13,25 +13,31 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  */
+@file:Suppress("PropertyName")
+
 package net.javaru.iip.frc.actions.tools.internal
 
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.onFailure
+import com.github.michaelbull.result.onSuccess
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.LangDataKeys
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.Attachment
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.DialogBuilder
+import com.intellij.openapi.ui.InputValidator
 import com.intellij.openapi.ui.Messages
-import com.intellij.util.TimeoutUtil
+import com.intellij.psi.PsiDirectory
+import com.intellij.ui.components.JBScrollPane
+import icons.FrcIcons
 import icons.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.facet.isFrcFacetedProject
@@ -43,25 +49,56 @@ import net.javaru.iip.frc.notify.FrcNotifications.notify
 import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllOpenProjects
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.services.FrcGradleService
+import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.ui.internal.PlaceholderTextFieldPaddingDemoFormDialogWrapper
 import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
+import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.runWhenSmart
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
-import net.javaru.iip.frc.wpilib.vendordeps.VendordepsListing
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsManagementDialogWrapper
+import net.javaru.iip.frc.wpilib.vendordeps.VendordepsProjectFilesListing
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsService
-import java.awt.event.ActionEvent
+import java.awt.Component
+import java.awt.Dimension
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
+import java.lang.reflect.Modifier
+import java.nio.file.Path
 import javax.swing.Icon
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.SwingConstants
+import kotlin.math.max
 
+open class FrcInternalActionsGroup : DefaultActionGroup()
+{
+    override fun update(e: AnActionEvent)
+    {
+        val project = e.project
+        e.presentation.isVisible = project != null &&
+            !project.isDisposed &&
+            FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE
+    }
+}
 
-private const val TEST_LOGGER = "FRC.TEST.LOGGER"
-private const val TEST_MESSAGE = "test exception; please ignore"
-
+class FrcInternalFrcPluginRelatedActionsGroup : FrcInternalActionsGroup()
 class FrcInternalVendordepsActionsGroup : FrcInternalActionsGroup()
+class FrcInternalGradleActionsGroup : FrcInternalActionsGroup()
+
+private object FrcInternalActions
+
+@Suppress("unused")
+private val logger = logger<FrcInternalActions>()
 
 abstract class AbstractFrcInternalAction : AnAction
 {
+    protected val log = logger<AbstractFrcInternalAction>()
+
+    @Suppress("unused")
     protected constructor()
+
+    @Suppress("unused")
+    protected constructor(icon: Icon?): super(icon)
 
     @Suppress("unused")
     protected constructor(text: String?) : super(text)
@@ -81,10 +118,10 @@ abstract class AbstractFrcInternalAction : AnAction
     }
 
     @Suppress("UNUSED_PARAMETER")
-    protected fun additionalIsVisibleChecks(project: Project, e: AnActionEvent): Boolean = true
+    protected open fun additionalIsVisibleChecks(project: Project, e: AnActionEvent): Boolean = true
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected fun showOnlyForFrcProjects(): Boolean = false
+    protected open fun showOnlyForFrcProjects(): Boolean = false
 
     private fun showForProject(project: Project): Boolean
     {
@@ -122,20 +159,7 @@ private fun createFailedActionDueToNullProjectNotification(actionName: String = 
                                                                                                         )
 
 
-open class FrcInternalActionsGroup : DefaultActionGroup()
-{
-    override fun update(e: AnActionEvent)
-    {
-        val project = e.project
-        e.presentation.isVisible = project != null &&
-                                   !project.isDisposed &&
-                                   FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE
-    }
-}
-
-/**
- * An action that will purposefully cause an exception for testing purposes.
- */
+/** An action that will purposefully cause an exception for testing purposes. */
 class LogAnErrorAction : AbstractFrcInternalAction()
 {
     override fun actionPerformed(actionEvent: AnActionEvent)
@@ -150,55 +174,6 @@ class LogAnErrorAction : AbstractFrcInternalAction()
     }
 }
 
-/** An action that will purposefully cause an exception for testing purposes. */
-class CauseAnExceptionAction : AbstractCauseAnExceptionAction("Cause An Exception",
-                                                              "Hold down SHIFT for a sequence of exceptions",
-                                                              AllIcons.Nodes.ExceptionClass)
-{
-    override val includeAttachments: Boolean
-        get() = false
-}
-
-/** An action that will purposefully cause an exception, with attachments, for testing purposes. */
-class CauseAnExceptionWithAttachmentsAction : AbstractCauseAnExceptionAction("Cause an Exception with Attachments",
-                                                                             "Cause a sequence of exceptions along with attachments. Hold down SHIFT for a sequence of exceptions",
-                                                                             AllIcons.Nodes.AbstractException)
-{
-    override val includeAttachments: Boolean
-        get() = true
-
-}
-abstract class AbstractCauseAnExceptionAction(text: String?, description: String?, icon: Icon?) : AbstractFrcInternalAction(text, description, icon)
-{
-    abstract val includeAttachments:Boolean
-
-    override fun actionPerformed(actionEvent: AnActionEvent)
-    {
-        val count = if (actionEvent.modifiers and ActionEvent.SHIFT_MASK == 0) 1 else 3
-        logger.info("[FRC] Throwing $count simulated complex exception(s) for testing exception handling")
-        val attachments = arrayOf(Attachment("first-.txt", "content"), Attachment("second.txt", "more content"), Attachment("third.txt", "even more content"))
-        ApplicationManager.getApplication().executeOnPooledThread {
-            for (i in 1..count)
-            {
-                // Lines intentionally blank
-                // Lines intentionally blank
-                // Lines intentionally blank to keep exception creation on line 186
-                val exception = TestException.create("random exception text ${randomString()}") // We want the stacktrace line numbers to be consistent, so we always create on the same line, 186 if possible
-
-                if (includeAttachments)
-                    Logger.getInstance(TEST_LOGGER).error(TEST_MESSAGE, exception, *attachments)
-                else
-                    Logger.getInstance(TEST_LOGGER).error(TEST_MESSAGE, exception)
-                if (i != count) TimeoutUtil.sleep(200)
-            }
-        }
-    }
-
-    companion object
-    {
-        private val logger = logger<AbstractCauseAnExceptionAction>()
-    }
-}
 
 class RunKotlinCodeForTestingAndDebuggingFrcInternalAction : AbstractFrcInternalAction()
 {
@@ -323,33 +298,94 @@ class MarkGradleProjectDirtyInternalAction: AbstractFrcInternalAction()
     }
 }
 
+class ReimportGradleProjectInternalAction: AbstractFrcInternalAction(AllIcons.Actions.Refresh)
+{
+    override fun actionPerformed(e: AnActionEvent)
+    {
+        val project = e.getData(CommonDataKeys.PROJECT)
+        project?.reimportGradleProject()
+    }
+}
+
 class FindVendordepsDirFrcInternalAction: AbstractFrcInternalAction()
 {
     override fun actionPerformed(actionEvent: AnActionEvent) {
         executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
-            it.runWhenSmart {
-                val dir = VendordepsService.getInstance(it).findVendorDepsDir()
+            VendordepsService.getInstance(it).findVendordepsDirNonBlocking { dir: PsiDirectory? ->
                 FrcNotifications.notifyInfoBalloon("Vendordeps dir = ${dir?.virtualFile?.path ?: "NOT FOUND"}")
             }
         }
     }
 }
 
-class GetVendordepsListingFrcInternalAction: AbstractFrcInternalAction()
+abstract class AbstractDisplayVendordepsListingFrcInternalAction : AbstractFrcInternalAction
 {
-    override fun actionPerformed(actionEvent: AnActionEvent) {
+    @Suppress("unused")
+    protected constructor()
+
+    @Suppress("unused")
+    protected constructor(icon: Icon?) : super(icon)
+
+    @Suppress("unused")
+    protected constructor(text: String?) : super(text)
+
+    @Suppress("unused")
+    protected constructor(
+        text: String?,
+        description: String?,
+        icon: Icon?
+                         ) : super(text, description, icon)
+    protected fun runUpdateCheck(project: Project)
+    {
+        VendordepsService.getInstance(project).updateAndUseVendordepsList(
+            notifyOnDuplicates = true,
+            { listing: VendordepsProjectFilesListing ->
+            val sb = StringBuilder()
+            sb.append("<html><h3>Vendordeps:</h3><ol>")
+            listing.vendordepsProjectFileList.forEach { item ->
+                sb.append("<li>$item</li>")
+            }
+            sb.append("</ol></html>")
+            sb.toString()
+
+        }) { message, _ ->
+            FrcNotifications.notifyInfoBalloon(message)
+        }
+    }
+}
+
+class DisplayVendordepsListingFrcInternalAction : AbstractDisplayVendordepsListingFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, "Update Vendordeps Listing") {
+            runUpdateCheck(it)
+        }
+    }
+}
+
+//class DisplayVendordepsListingWrappedInBackgroundTaskFrcInternalAction : AbstractDisplayVendordepsListingFrcInternalAction("List Vendordeps Wrapped in Background Task")
+//{
+//    override fun actionPerformed(actionEvent: AnActionEvent)
+//    {
+//        executeIfProjectNotNull(actionEvent, "Update Vendordeps Listing") {
+//            // THIS CAUSES AN THREADING EXCEPTION:
+//            //    Access is allowed from write thread only.
+//            // Since runUpdateCheck uses runNonBlockingReadActionInSmartMode
+//            it.runBackgroundTask("Display Vendordeps List") { _ ->
+//                runUpdateCheck(it)
+//            }
+//        }
+//    }
+//}
+
+class VendordepsCheckForDuplicatesInternalAction : AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
         executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
             it.runWhenSmart {
-                VendordepsService.getInstance(it).getAndUseVendordeps(notifyOnDuplicates = true) { listing: VendordepsListing ->
-                    val sb = StringBuilder()
-                    sb.append("<html><h3>Vendordeps:</h3><ol>")
-                    listing.vendordepsFileList.forEach { item ->
-                        sb.append("<li>$item</li>")
-                    }
-                    sb.append("</ol></html>")
-
-                    FrcNotifications.notifyInfoBalloon(sb.toString())
-                }
+                VendordepsService.getInstance(it).updateVendordepsListingAndCheckForDuplicates(true)
             }
         }
     }
@@ -384,4 +420,117 @@ class CreateTempFile: AbstractFrcInternalAction()
         Messages.showMessageDialog(project, "Temp File: $tempFile", "Temp File Created", null)
 
     }
+}
+
+class DownloadVendorDeps: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, "Display Vendordeps Management Dialog") { project: Project ->
+            val url = Messages.showInputDialog(project,
+                                               "Enter Vendordeps URL",
+                                               "Download Vendordeps",
+                                               FrcIcons.FileAndDirTypes.VendordepsDir,
+                                               "https://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json",
+                                               object : InputValidator
+                                               {
+                                                   override fun checkInput(inputString: String?): Boolean = inputString?.isNotBlank() ?: false
+                                                   override fun canClose(inputString: String?): Boolean = inputString?.isNotBlank() ?: false
+                                               })!!
+            VendordepsService.getInstance(project).downloadVendordepToTempFileInBackground(project, url) { result: Result<Path, Exception> ->
+
+                result.onSuccess {
+                    notify(
+                        FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
+                        "Downloaded to: $it",
+                        project = project
+                          )
+                }.onFailure {
+                    notify(
+                        FrcNotificationType.ACTIONABLE_ERROR,
+                        "Could not download Vendordeps file, Reason: ${it.message}",
+                        project = project
+                          )
+                }
+
+            }
+
+        }
+    }
+}
+
+class ShowFrcApplicationSettings : AbstractFrcInternalAction(FRC.FIRST_ICON_MEDIUM_16)
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        val settingsString = FrcApplicationSettings.getInstance().toString()
+        log.info("[FRC] $settingsString")
+        Messages.showMessageDialog(
+            actionEvent.project,
+            settingsString,
+            "Frc Application Settings",
+            FRC.FIRST_ICON_MEDIUM_16
+                                  )
+    }
+}
+
+class LoadAllIconsInternalAction: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        logger.info("[FRC] Loading all icons...")
+        val loadedIcons = mutableListOf<Component>()
+        processClass(FrcIcons::class.java, loadedIcons)
+
+
+        val outer = JPanel(GridBagLayout())
+        val inner = JPanel(GridBagLayout())
+        val scroll = JBScrollPane(inner)
+        outer.add(scroll, GridBagConstraints())
+
+        val gc = GridBagConstraints()
+        loadedIcons.forEach {
+            gc.gridx++
+            if (gc.gridx % 3 == 0)
+            {
+                gc.gridy++
+                gc.gridx = 0
+            }
+            inner.add(it, gc)
+        }
+        val builder = DialogBuilder(actionEvent.project)
+        builder.setTitle("Loaded FRC Icons")
+        builder.setCenterPanel(outer)
+        builder.show()
+    }
+
+    private fun processClass(clazz: Class<*>, loadedIcons: MutableList<Component>)
+    {
+        logger.info("[FRC] Checking Class: ${clazz.name}")
+        clazz.declaredFields.forEach {
+            if (Modifier.isStatic(it.modifiers) && javax.swing.Icon::class.java.isAssignableFrom(it.type) && it.name != "NOT_FOUND_ICON")
+            {
+                logger.info("[FRC] Loading ${it.name}")
+                val icon = it.get(null) as Icon
+                if (icon.iconHeight <= 24 && icon.iconWidth <= 24 && !it.name.contains("_ICO_"))
+                {
+                    val label = JLabel("${clazz.name}.${it.name}", icon, SwingConstants.LEFT)
+                    val size = Dimension(400, max(18, icon.iconHeight + 4))
+                    label.minimumSize = size
+                    label.preferredSize = size
+                    loadedIcons.add(label)
+                }
+                logger.info("[FRC] ${it.name} loaded")
+            }
+            else
+            {
+                logger.info("[FRC] Ignoring ${it.name}")
+            }
+        }
+        logger.info("[FRC] Completed Class: ${clazz.name}")
+        clazz.classes.forEach {
+           processClass(it, loadedIcons)
+        }
+    }
+
 }

@@ -3,12 +3,12 @@
   <grid id="27dc6" binding="rootPanel" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="500" height="530"/>
+      <xy x="20" y="20" width="500" height="633"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
-      <grid id="f835" layout-manager="GridLayoutManager" row-count="19" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="f835" layout-manager="GridLayoutManager" row-count="22" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -90,7 +90,7 @@
           </component>
           <component id="3fc79" class="com.intellij.ui.components.JBCheckBox" binding="gradleCheckBox">
             <constraints>
-              <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.gradle.checkBox.text"/>
@@ -99,7 +99,7 @@
           </component>
           <component id="d195f" class="com.intellij.ui.components.JBCheckBox" binding="javaCheckBox">
             <constraints>
-              <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.java.checkBox.text"/>
@@ -108,7 +108,7 @@
           </component>
           <component id="e1c2" class="com.intellij.ui.components.JBCheckBox" binding="linuxCheckBox">
             <constraints>
-              <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="13" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.linux.checkBox.text"/>
@@ -117,7 +117,7 @@
           </component>
           <component id="add54" class="com.intellij.ui.components.JBCheckBox" binding="macCheckBox">
             <constraints>
-              <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="14" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.macos.checkBox.text"/>
@@ -126,7 +126,7 @@
           </component>
           <component id="5e70c" class="com.intellij.ui.components.JBCheckBox" binding="winCheckBox">
             <constraints>
-              <grid row="13" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="15" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.win.checkBox.text"/>
@@ -135,7 +135,7 @@
           </component>
           <component id="c462" class="com.intellij.ui.components.JBCheckBox" binding="cppCheckBox">
             <constraints>
-              <grid row="14" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="16" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.cpp.checkBox.text"/>
@@ -144,7 +144,7 @@
           </component>
           <component id="9cb7f" class="javax.swing.JLabel" binding="advancedLabel">
             <constraints>
-              <grid row="15" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="18" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text resource-bundle="i18n/FrcBundle" key="frc.ui.common.advanced.label.text"/>
@@ -152,7 +152,7 @@
           </component>
           <component id="a4b39" class="com.intellij.ui.components.JBLabel" binding="additionalGitignoreTemplatesLabel">
             <constraints>
-              <grid row="16" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="2" use-parent-layout="false"/>
+              <grid row="19" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="2" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitIgnoreSelection.additional.templates.label.text"/>
@@ -161,7 +161,7 @@
           </component>
           <component id="17026" class="com.intellij.ui.components.JBTextField" binding="additionalGitignoreTemplatesTextField">
             <constraints>
-              <grid row="17" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="4" anchor="0" fill="1" indent="2" use-parent-layout="false"/>
+              <grid row="20" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="4" anchor="0" fill="1" indent="2" use-parent-layout="false"/>
             </constraints>
             <properties>
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitIgnoreSelection.additional.templates.label.tooltip"/>
@@ -169,7 +169,7 @@
           </component>
           <component id="65ae5" class="javax.swing.JButton" binding="defaultButton">
             <constraints>
-              <grid row="18" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="1" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="21" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="1" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitIgnoreSelection.restoreDefaults.button.text"/>
@@ -183,6 +183,33 @@
             <properties>
               <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitIgnoreSelection.generateFromSite.checkBox.text"/>
               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitIgnoreSelection.generateFromSite.checkBox.tooltip"/>
+            </properties>
+          </component>
+          <component id="6d4ea" class="com.intellij.ui.components.JBCheckBox" binding="wpilibCheckBox">
+            <constraints>
+              <grid row="17" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.wpilib.checkBox.text"/>
+              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.wpilib.checkBox.tooltip"/>
+            </properties>
+          </component>
+          <component id="57655" class="com.intellij.ui.components.JBCheckBox" binding="eclipseCheckBox">
+            <constraints>
+              <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.eclipse.checkBox.text"/>
+              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.eclipse.checkBox.tooltip"/>
+            </properties>
+          </component>
+          <component id="4ca28" class="com.intellij.ui.components.JBCheckBox" binding="netbeansCheckBox">
+            <constraints>
+              <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.netbeans.checkBox.text"/>
+              <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.gitignoreSelection.netbeans.checkBox.tooltip"/>
             </properties>
           </component>
         </children>

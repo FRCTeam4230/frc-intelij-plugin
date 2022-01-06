@@ -1,0 +1,41 @@
+{
+  "fileName": " needsTrimming.json ",
+  "name": " needsTrimming ",
+  "version": "1.3.2 ",
+  "uuid": " 03880f9b-e0e6-4cd3-baa5-4039fa38316b ",
+  "mavenUrls": [
+    " https://maven.example.org/repository/internal ",
+    " https://maven.example.org/repository/snapshots "
+  ],
+  "jsonUrl": " https://maven.example.org/repository/internal/org/example/needsTrimming-json/1.0/needsTrimming-json-1.0.json ",
+  "jniDependencies": [],
+  "cppDependencies": [
+    {
+      "groupId": "org.example",
+      "artifactId": "needsTrimming-cpp",
+      "version": "1.3.2",
+      "libName": "Trim",
+      "headerClassifier": "headers",
+      "sharedLibrary": true,
+      "skipInvalidPlatforms": true,
+      "binaryPlatforms": [
+        "windowsx86-64",
+        "linuxathena",
+        "linuxx86-64",
+        "osxx86-64"
+      ]
+    }
+  ],
+  "javaDependencies": [
+    {
+      "groupId": "org.example",
+      "artifactId": "needsTrimming-java",
+      "version": "1.3.2"
+    },
+    {
+      "groupId": "org.example",
+      "artifactId": "TrimTargeting-java",
+      "version": "1.3.2"
+    }
+  ]
+}

@@ -18,6 +18,7 @@ package net.javaru.iip.frc.actions.create.advanced.cmdBased;
 
 import java.awt.*;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,8 +30,6 @@ import javax.swing.text.JTextComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -39,6 +38,7 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.psi.JavaDirectoryService;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameHelper;
 import com.intellij.psi.PsiPackage;
 import com.intellij.ui.components.JBCheckBox;
@@ -62,19 +62,20 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 public abstract class FrcComponentCreationDialog extends DialogWrapper
 {
-    private static final String BASE_CLASS_FQ_NAME = "baseClassFqName";
-    private static final String BASE_CLASS_NEEDS_IMPORTING = "baseClassNeedsImporting";
-    private static final String BASE_CLASS_EXTENDS_CLAUSE = "baseClassExtendsClause";
-    private static final String NEEDS_GET_REQUIREMENTS = "needsGetRequirementsImpl";
-    private static final String INCLUDE_JAVADOC_FOR_OVERRIDES = "includeJavaDocsForOverrides";
-    private static final String MAKE_ABSTRACT = "makeAbstract";
+    protected static final String BASE_CLASS_FQ_NAME = "baseClassFqName";
+    protected static final String BASE_CLASS_NEEDS_IMPORTING = "baseClassNeedsImporting";
+    protected static final String BASE_CLASS_IS_INTERFACE = "baseIsInterface";
+    protected static final String BASE_CLASS_EXTENDS_CLAUSE = "baseClassExtendsClause";
+    protected static final String NEEDS_GET_REQUIREMENTS = "needsGetRequirementsImpl";
+    protected static final String INCLUDE_JAVADOC_FOR_OVERRIDES = "includeJavaDocsForOverrides";
+    protected static final String MAKE_ABSTRACT = "makeAbstract";
     
     @NotNull
     protected final Project myProject;
     @NotNull
     protected final Module myModule;
     @NotNull
-    protected final ClassCreator myClassCreator;
+    protected final ClassCreator<? extends PsiElement> myClassCreator;
     @NotNull
     protected final PsiDirectory myDirectory;
     @NotNull
@@ -94,11 +95,11 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
     
     
     private Map<PsiClass, JBRadioButton> myTopLevelComponentClassesMap;
-    private ButtonGroup mySuperButtonGroup = new ButtonGroup();
+    private final ButtonGroup mySuperButtonGroup = new ButtonGroup();
     
     
     protected FrcComponentCreationDialog(@NotNull Module module,
-                                         @NotNull ClassCreator classCreator,
+                                         @NotNull ClassCreator<? extends PsiElement> classCreator,
                                          @NotNull PsiDirectory directory,
                                          @NotNull FrcComponentCreationDataProvider dataProvider)
     {
@@ -310,7 +311,8 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
             }
         
             Map<String, String> additionalProperties = getAdditionalProperties(pkgName.toString(), newClassName);
-        
+            if (LOG.isTraceEnabled()) LOG.trace("[FRC] additional properties: " + additionalProperties);
+            
             saveState();
             
             if (myClassCreator.createClass(newClassName,
@@ -322,7 +324,7 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
         }
         catch (Exception e)
         {
-            LOG.warn("[FRC] An exception occurred when creating a new class from a file template. Please consider reporting at https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues  Cause: " + e.toString(), e);
+            LOG.warn("[FRC] An exception occurred when creating a new class from a file template. Please consider reporting at https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues  Cause: " + e, e);
             FrcUiUtilsKt.displayExceptionDialog(e, myTopPanel);
             close(CANCEL_EXIT_CODE);
         }
@@ -365,7 +367,7 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
      */
     protected Map<String, String> getAdditionalProperties(@NotNull String targetPackageName, @NotNull String newClassName)
     {
-        ImmutableMap.Builder<String, String> props = ImmutableMap.builder();
+        Map<String, String> props = new HashMap<>();
         addGeneralProperties(props);
         
         PsiClass baseClass = null;
@@ -375,17 +377,17 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
         }
         
         addComponentSpecificProperties(props, baseClass, targetPackageName, newClassName);
-        return props.build();
+        return props; // note: these are logged after the call to this method in doOKAction()
     }
     
-    protected void addGeneralProperties(@NotNull ImmutableMap.Builder<String, String> props)
+    protected void addGeneralProperties(@NotNull Map<String, String> props)
     {
         props.put(INCLUDE_JAVADOC_FOR_OVERRIDES, Boolean.toString(myIncludeJavaDocCheckBox.isSelected()));
     }
     
     
     @NotNull
-    protected PsiClass addBaseClassProperties(@NotNull Builder<String, String> props, @NotNull String targetPackageName, @NotNull String newClassName)
+    protected PsiClass addBaseClassProperties(@NotNull Map<String, String> props, @NotNull String targetPackageName, @NotNull String newClassName)
     {
         PsiClass base = null;
         for (Entry<PsiClass, JBRadioButton> entry : myTopLevelComponentClassesMap.entrySet())
@@ -419,24 +421,29 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
         final boolean baseClassNeedsImporting = !baseFqName.contains(".") || !baseFqName.substring(0, baseFqName.lastIndexOf('.')).equals(targetPackageName);
         props.put(BASE_CLASS_NEEDS_IMPORTING, Boolean.toString(baseClassNeedsImporting));
         final String baseName = base.getName() != null ? base.getName() : myDataProvider.getTypicalBaseClassFqName().substring(myDataProvider.getTypicalBaseClassFqName().lastIndexOf('.') + 1);
-        final String extendsClause = base.isInterface() ? "implements " + baseName : "extends " + baseName;
+        final boolean baseIsInterface = base.isInterface();
+        props.put(BASE_CLASS_IS_INTERFACE, Boolean.toString(baseIsInterface));
+        final String extendsClause = myDataProvider.isKotlinTemplate()
+                                     //? baseIsInterface ? "() : " + baseName : " : " + baseName + "()"
+                                     ? ": " + baseName
+                                     : (baseIsInterface ? "implements " + baseName : "extends " + baseName);
         props.put(BASE_CLASS_EXTENDS_CLAUSE, extendsClause);
         props.put(MAKE_ABSTRACT, Boolean.toString(newClassName.contains("Abstract")));
         // TODO it'd be nice to make this more sophisticated (to handle the event of a custom interface that has the getRequirements as a default
-        props.put(NEEDS_GET_REQUIREMENTS, Boolean.toString(base.isInterface()));
+        props.put(NEEDS_GET_REQUIREMENTS, Boolean.toString(baseIsInterface));
         return base;
     }
     
     
     /**
-     * @param props the map builder to add the properties to
-     * @param baseClass the baseClass being extended/implemented; may be nullif the template does not use a base class 
+     * @param props the map to add the properties to
+     * @param baseClass the baseClass being extended/implemented; may be nullif the template does not use a base class
      *                  (i.e. it does not extend a class or implement an interface)
-     * @param targetPackageName the FQ package the class will be created in 
+     * @param targetPackageName the FQ package the class will be created in
      * @param newClassName the name of the class to be created
      */
-    protected abstract void addComponentSpecificProperties(@NotNull Builder<String, String> props,
-                                                           @Nullable PsiClass baseClass, 
+    protected abstract void addComponentSpecificProperties(@NotNull Map<String, String> props,
+                                                           @Nullable PsiClass baseClass,
                                                            @NotNull String targetPackageName,
                                                            @NotNull String newClassName);
     
@@ -454,9 +461,9 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
         
         boolean nameIsValid = isProposedClassNameValid();
         @Nullable
-        String createClassErrorMessage = ClassCreator.checkCanCreateClass(myDirectory,
-                                                                          getNewClassNameField().getText(),
-                                                                          myDataProvider.getComponentTypeSimpleName());
+        String createClassErrorMessage = myClassCreator.checkCanCreateClass(myDirectory,
+                                                                              getNewClassNameField().getText(),
+                                                                              myDataProvider.getComponentTypeSimpleName());
         
         if (!nameIsValid)
         {

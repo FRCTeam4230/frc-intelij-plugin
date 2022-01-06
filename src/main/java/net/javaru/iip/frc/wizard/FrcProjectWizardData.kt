@@ -27,24 +27,31 @@ const val DEFAULT_BASE_PACKAGE = "frc.robot"
 const val DEFAULT_ROBOT_CLASS_NAME = "Robot"
 
 class FrcProjectWizardData(
-        var teamNumber: Int = FrcApplicationSettings.getInstance().teamNumber,
-        /** The simple name of the Main class (not to be confused with the (primary) Robot class). This is the simple class that has the `main()` method.*/
-        var mainClassSimpleName: String = "Main",
-        /** The simple name of the primary Robot class (not to be confused with the Main class). This is the class that extends one of the WPILib `RobotBase` classes.*/
-        var robotClassSimpleName: String = DEFAULT_ROBOT_CLASS_NAME,  // if/whn we make settable, we need to change the template copying to rename the file!
-        var basePackage: String = DEFAULT_BASE_PACKAGE,
-        var wpilibVersion: WpiLibVersion = GradleRioMavenMetadataState.getInstance().wpiLibMavenMetadata.releaseAsWpiLibVersion,
-        var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizard2019ProjectTemplateDefinition.CommandBased,
-        var includeVsCodeConfigs: Boolean = true,
-        var enableDesktopSupport: Boolean = false,
-        var gitIgnoreConfiguration: GitIgnoreConfiguration = GitIgnoreConfiguration(true, generateFromSite = true),
-        var includeJUnitSupport:Boolean = true,
-        var junitOption: JUnitOption = JUnitOption.JUnit5,
-        var junit4Version: String = "4.13.2",
-        var junit5Version: String = "5.7.2",
-        var gradleDslOption: GradleDslOption = GradleDslOption.GroovyDSL,
-        var templateLanguageOption: TemplateLanguageOption = TemplateLanguageOption.Java
-                          )
+    var teamNumber: Int = FrcApplicationSettings.getInstance().teamNumber,
+    /** The simple name of the Main class (not to be confused with the (primary) Robot class). This is the simple class that has the `main()` method.*/
+    var mainClassSimpleName: String = "Main",
+    /** The simple name of the primary Robot class (not to be confused with the Main class). This is the class that extends one of the WPILib `RobotBase` classes.*/
+    var robotClassSimpleName: String = DEFAULT_ROBOT_CLASS_NAME,  // if/whn we make settable, we need to change the template copying to rename the file!
+    var basePackage: String = DEFAULT_BASE_PACKAGE,
+    var wpilibVersion: WpiLibVersion = GradleRioMavenMetadataState.getInstance().wpiLibMavenMetadata.releaseAsWpiLibVersion,
+    // We just need to set some non-null value here. It does NOT need to be updated each year as it is set in net/javaru/iip/frc/wizard/FrcTemplateSelectionWizardStep#updateDataModel
+    var frcWizardTemplateDefinition: FrcWizardTemplateDefinition = FrcWizard2019ProjectTemplateDefinition.CommandBased,
+    var includeVsCodeConfigs: Boolean = true,
+    var includeKotlinSupport: Boolean = false,
+    var enableDesktopSupport: Boolean = false,
+    var gitIgnoreConfiguration: GitIgnoreConfiguration = GitIgnoreConfiguration(true, generateFromSite = true),
+    var includeJUnitSupport:Boolean = true,
+    var junitOption: JUnitOption = JUnitOption.JUnit5,
+    // TODO Issue #80 have these dynamically updated in the wizard
+    var junit4Version: String = "4.13.2", // https://search.maven.org/artifact/junit/junit
+    var junit5Version: String = "5.8.2",  // https://search.maven.org/artifact/org.junit/junit-bom
+    var kotlinVersion: String = "1.6.10",
+    var gradleDslOption: GradleDslOption = GradleDslOption.GroovyDSL,
+    var templateLanguageOption: TemplateLanguageOption = TemplateLanguageOption.Java,
+    // TODO: Add selection option to new project wizard
+    var useGradleAllDistribution: Boolean = FrcApplicationSettings.getInstance().useGradleAllDistributionDefault,
+
+    )
 {
 
     /**
@@ -57,8 +64,13 @@ class FrcProjectWizardData(
         get() = determineProjectYearStringForVersion(wpilibVersion)
                 
     /** The project year, such as `2019` or `2020`, as a String. */
-    val frcYear: String
+    val frcYearString: String
         get() = wpilibVersion.frcYear.toString()
+
+    /** Convenience property for the `wpilibVersion.frcYear` property, indicating the project year such as `2019` or `2020`. */
+    val frcYear: Int
+        get() = wpilibVersion.frcYear
+
     /** Returns the reamNumber as a String, which can be 0 if not set. @see teamNumberOrEmptyString */
     val teamNumberAsString: String
         get() = teamNumber.toString()
@@ -76,13 +88,16 @@ class FrcProjectWizardData(
         get()
         {
             // We now honor the enableDesktopSupport option as it is automatically selected when a romi template is selected.
-            // We'll add a warning to the wizard to warn user if the option is not selected and a Romi template is in use.
-            val result = enableDesktopSupport //|| isRomiRobotTemplate
+            // We have a warning in the wizard that warns the user if the option is not selected and a Romi template is in use.
+            val result = enableDesktopSupport
             return result.toString()
         }
 
-    val isRomiRobotTemplate
+    val isRomiTemplate
         get() = frcWizardTemplateDefinition.isRomiBot
+
+    val isRoboRioRobotTemplate
+        get() = !frcWizardTemplateDefinition.isRomiBot
 
     val basePackageAsDirPath: Path
         get() = Paths.get(basePackageAsDirString)
@@ -96,21 +111,31 @@ class FrcProjectWizardData(
 
     val gradleDistributionUrl: String
         get() {
-            return when (wpilibVersion.frcYear)
+            val retval= when (wpilibVersion.frcYear)
             {
+                // To check for latest, look in vscode-wpilib project (NOT allwpilib where the templates are)
+                //      vscode-wpilib/resources/gradle/shared/
+                //      vscode-wpilib/resources/gradle/shared/gradle/wrapper/gradle-wrapper.properties
+                // Do NOT confuse with the project's build itself.
                 2019 -> """https\://services.gradle.org/distributions/gradle-5.0-bin.zip"""
                 2020 -> """https\://services.gradle.org/distributions/gradle-6.0.1-bin.zip"""
-                else -> """https\://services.gradle.org/distributions/gradle-6.0.1-bin.zip"""
+                2021 -> """https\://services.gradle.org/distributions/gradle-6.0.1-bin.zip"""
+                2022 -> """https\://services.gradle.org/distributions/gradle-7.3.2-bin.zip"""
+                else -> """https\://services.gradle.org/distributions/gradle-7.3.2-bin.zip"""
             }
+            return if (useGradleAllDistribution || FrcApplicationSettings.getInstance().isTeam3838() || teamNumber == 3838)
+                retval.replace("-bin", "-all")
+            else
+                retval
         }
 
     val copyright: String
         get(){
             return when (wpilibVersion.frcYear)
             {
-                /* Added in 2021. Did not backport to older version as in older one the year was in the stae,emnt and it varied from class to class */
-                2021 -> copyright2021
-                else -> copyright2021
+                /* Added in 2021. Did not backport to older version as in older one the year was in the statement, and it varied from class to class */
+                2021 -> copyright2021AndLater
+                else -> copyright2021AndLater
             }
         }
     
@@ -126,7 +151,7 @@ class FrcProjectWizardData(
     enum class JUnitOption() {JUnit5, JUnit5withVintage, JUnit4}
     enum class GradleDslOption() {GroovyDSL, KotlinDSL}
     
-    private val copyright2021 = """
+    private val copyright2021AndLater = """
         |// Copyright (c) FIRST and other WPILib contributors.
         |
         |// Open Source Software; you can modify and/or share it under the terms of
@@ -138,8 +163,8 @@ data class GitIgnoreConfiguration(
         var includeGitIgnoreFile: Boolean = true,
         var intellij: IdeConfigOption = IdeConfigOption.Ignore,
         var vscode: IdeConfigOption = IdeConfigOption.Share,
-        var eclipse: IdeConfigOption = IdeConfigOption.Share,
-        var netbeans: IdeConfigOption = IdeConfigOption.Share,
+        var eclipse: IdeConfigOption = IdeConfigOption.Ignore,
+        var netbeans: IdeConfigOption = IdeConfigOption.Ignore,
         var java: Boolean = true,
         var gradle: Boolean = true,
         var linux: Boolean = true,
@@ -147,6 +172,7 @@ data class GitIgnoreConfiguration(
         var windows: Boolean = true,
         /** The `.gitignore` file generated by wpilib has C++ in it. But that is more a case (I believe) that they use the same file for both Java and C++ based projects. So we default to `false` for this. */
         var cpp: Boolean = false,
+        var wpilib: Boolean = true,
         /** Additional templates names from the gitignore API site. See https://www.toptal.com/developers/gitignore/api/list (and/or https://www.toptal.com/developers/gitignore?templates) */
         var additionalGitignoreTemplates: MutableList<String> = mutableListOf(),
         var generateFromSite: Boolean = true
@@ -163,4 +189,25 @@ data class GitIgnoreConfiguration(
     }
 }
 
-enum class IdeConfigOption { Share, Ignore, NoEntry}
+enum class IdeConfigOption
+{
+    Share, Ignore, NoEntry;
+
+    fun asBoolean(): Boolean = Companion.asBoolean(this)
+
+
+    companion object
+    {
+        fun asBoolean(ideConfigOption: IdeConfigOption): Boolean
+        {
+            return when (ideConfigOption)
+            {
+                Ignore -> true
+                NoEntry -> false
+                Share -> false
+            }
+        }
+
+        fun fromBoolean(value: Boolean): IdeConfigOption = if (value) Ignore else NoEntry
+    }
+}

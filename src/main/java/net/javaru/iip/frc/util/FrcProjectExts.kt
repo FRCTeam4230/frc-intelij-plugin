@@ -16,11 +16,19 @@
 
 package net.javaru.iip.frc.util
 
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
+import com.intellij.facet.FacetManager
 import com.intellij.ide.projectView.ProjectView
+import com.intellij.idea.IdeaLogger
+import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.PerformInBackgroundOption
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -31,8 +39,16 @@ import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Computable
+import com.intellij.psi.impl.source.tree.injected.changesHandler.debug
+import com.intellij.util.concurrency.AppExecutorUtil
 import net.javaru.iip.frc.facet.isFrcFacetedProject
+import net.javaru.iip.frc.isUnitTestMode
+import net.javaru.iip.frc.services.FrcErrorReportSubmitter
+import net.javaru.iip.frc.services.FrcPluginProjectDisposable
+import net.javaru.iip.frc.services.ReportableEvent
+import org.jetbrains.annotations.Contract
 import org.jetbrains.plugins.gradle.settings.GradleSettings
+import java.util.concurrent.Callable
 
 
 // Note: There are also some Project Extension functions in FrcFacet.kt
@@ -58,25 +74,100 @@ fun Project?.isGradleProject(): Boolean
 }
 
 /** Convenience Extension function for [DumbService.runWhenSmart]. */
-fun Project.runWhenSmart(action:() -> Unit) = DumbService.getInstance(this).runWhenSmart{action()}
+fun Project.runWhenSmart(action:() -> Unit)
+{
+    if (isUnitTestMode()) {
+        action()
+    }
+    else if (!this.isDisposed) {
+        DumbService.getInstance(this).runWhenSmart {
+            if (this.isDisposed)
+                LOG.debug { "[FRC] action will not run as project is disposed." }
+            else
+                action()
+        }
+    }
+}
 
 /** Convenience Extension function for [DumbService.runReadActionInSmartMode]. */
-fun Project.runReadActionInSmartMode(action:() -> Unit) = DumbService.getInstance(this).runReadActionInSmartMode{action()}
+fun Project.runReadActionInSmartMode(action:() -> Unit)
+{
+    if (isUnitTestMode())
+    {
+       action()
+    }
+    else if (!this.isDisposed) {
+        DumbService.getInstance(this).runReadActionInSmartMode {
+            if (this.isDisposed)
+                LOG.debug { "[FRC] read action will not run as project is disposed." }
+            else
+                action()
+        }
+    }
+}
 
 /** Convenience Extension function for [DumbService.runReadActionInSmartMode]. */
 fun <T> Project.runReadActionInSmartMode(computable: Computable<T>): T = DumbService.getInstance(this).runReadActionInSmartMode(computable)
+
+
+inline fun <R> Project.runNonBlockingReadActionInSmartMode(crossinline action: () -> R, crossinline uiContinuation: (R) -> Unit)
+{
+    // Based on org/jetbrains/kotlin/idea/util/nonblocking.kt:12
+    if (isUnitTestMode()) {
+        val result = action()
+        uiContinuation(result)
+    }
+    else {
+        val disposable = FrcPluginProjectDisposable.getInstance(this)
+        ReadAction.nonBlocking(Callable { action() })
+            .inSmartMode(this)
+            .expireWith(disposable)
+            .finishOnUiThread(ModalityState.current()) { result ->
+                uiContinuation(result)
+            }
+            // Common Executor examples are
+            //      com.intellij.util.concurrency.NonUrgentExecutor.getInstance()
+            //      AppExecutorUtil.getAppExecutorService()
+            //      com.intellij.util.concurrency.BoundedTaskExecutor
+            .submit(AppExecutorUtil.getAppExecutorService())
+//            .submit(AppExecutorUtil.createBoundedApplicationPoolExecutor("Read Action", AppExecutorUtil.getAppExecutorService(), 1, disposable))
+    }
+}
+
+// ExecutorService executor = AppExecutorUtil.createBoundedApplicationPoolExecutor("Document Commit Pool", AppExecutorUtil.getAppExecutorService(), 1, this);
+// ExecutorService executor = SequentialTaskExecutor.createSequentialApplicationPoolExecutor("Json Vfs Updater Executor");
+
+inline fun Project.runNonBlockingReadActionInSmartMode(crossinline action: () -> Unit)
+{
+    if (isUnitTestMode()) {
+        action()
+    }
+    else {
+        val disposable = FrcPluginProjectDisposable.getInstance(this)
+        ReadAction.nonBlocking(Callable { action() })
+            .inSmartMode(this)
+            .expireWith(disposable)
+            // Common Executor examples are
+            //      com.intellij.util.concurrency.NonUrgentExecutor.getInstance()
+            //      AppExecutorUtil.getAppExecutorService()
+            //      com.intellij.util.concurrency.BoundedTaskExecutor
+            .submit(AppExecutorUtil.getAppExecutorService())
+//            .submit(AppExecutorUtil.createBoundedApplicationPoolExecutor("Read Action", AppExecutorUtil.getAppExecutorService(), 1, disposable))
+    }
+}
 
 /**
  * Convenience function for running a process in the background. Per the [SDK Guide](https://plugins.jetbrains.com/docs/intellij/general-threading-rules.html#background-processes-and-processcanceledexception)
  * callers should be prepared to catch and rethrow a `ProcessCanceledException`. "**This exception should never be logged**, it 
  * should be rethrown, and it’ll be handled in the infrastructure that started the process." 
- * 
+ * Keywords: runInBackground, runTaskInBackground
  */
 fun Project.runBackgroundTask(
     name: String,
     indeterminate: Boolean = true,
     cancellable: Boolean = false,
     background: PerformInBackgroundOption = PerformInBackgroundOption.ALWAYS_BACKGROUND,
+    debuggingData: Map<String, String?>? = null,
     action: (indicator: ProgressIndicator) -> Unit
                           )
 {
@@ -85,7 +176,30 @@ fun Project.runBackgroundTask(
                                           override fun run(indicator: ProgressIndicator)
                                           {
                                               if (indeterminate) indicator.isIndeterminate = true
-                                              action(indicator)
+                                              try
+                                              {
+                                                  action(indicator)
+                                              }
+                                              catch (pce: ProcessCanceledException)
+                                              {
+                                                  throw pce
+                                              }
+                                              catch (t: Throwable)
+                                              {
+                                                  try
+                                                  {
+                                                      FrcErrorReportSubmitter.submitReportableEvent(ReportableEvent(
+                                                          correlationId = "Task: $name",
+                                                          project = this@runBackgroundTask,
+                                                          throwable = t,
+                                                          lastActionId = IdeaLogger.ourLastActionId,
+                                                          additionalData = debuggingData))
+                                                  }
+                                                  catch (t: Throwable)
+                                                  {
+                                                      LOG.info("[FRC] Could not submit reportable event for runBackgroundTask. Cause: $t")
+                                                  }
+                                              }
                                           }
                                       })
 }
@@ -102,7 +216,61 @@ fun Project.backgroundTask(
                           )
 {
     val backgroundOption = if (background) PerformInBackgroundOption.ALWAYS_BACKGROUND else PerformInBackgroundOption.DEAF
-    this.runBackgroundTask(name, indeterminate, cancellable, backgroundOption, callback)
+    this.runBackgroundTask(name, indeterminate, cancellable, backgroundOption, action = callback)
+}
+
+fun Project?.runSafely(correlationId: String, debuggingData: Map<String, Any?>? = null, action: () -> Unit)
+{
+    try
+    {
+        action.invoke()
+    }
+    catch (t: Throwable)
+    {
+        try
+        {
+            FrcErrorReportSubmitter.submitReportableEvent(
+                ReportableEvent(
+                    correlationId = "Task: $correlationId",
+                    project = this,
+                    throwable = t,
+                    lastActionId = IdeaLogger.ourLastActionId,
+                    additionalData = debuggingData
+                               )
+                                                             )
+        }
+        catch (t: Throwable)
+        {
+            LOG.info("[FRC] Could not submit reportable event for runSafely. Cause: $t")
+        }
+    }
+}
+
+fun <R> Project?.runSafelyWithResult(correlationId: String, debuggingData: Map<String, String?>? = null, action: () ->R): Result<R, Throwable>
+{
+    return try
+    {
+        Ok(action.invoke())
+    }
+    catch (t: Throwable)
+    {
+        try
+        {
+            FrcErrorReportSubmitter.submitReportableEvent(
+                ReportableEvent(
+                    correlationId = "Task: $correlationId",
+                    project = this,
+                    throwable = t,
+                    lastActionId = IdeaLogger.ourLastActionId,
+                    additionalData = debuggingData
+                               ))
+        }
+        catch (t: Throwable)
+        {
+            LOG.info("[FRC] Could not submit reportable event for runSafelyWithResult. Cause: $t")
+        }
+        Err(t)
+    }
 }
 
 /**
@@ -234,9 +402,6 @@ fun findProjectWithFocus(mustBeFrcProject: Boolean = true): Project?
     }
 }
 
-
-
-
 /** Returns the project with focus, or null is no project has focus, or there are no open projects. */
 private fun Array<out Project>?.findProjectWithFocus(): Project?
 {
@@ -247,4 +412,41 @@ private fun Array<out Project>?.findProjectWithFocus(): Project?
         }
     }
     return null
+}
+
+@Contract("null -> false")
+fun Module?.isKotlinFacetedModule(): Boolean
+{
+    if (this == null || this.isDisposed)
+    {
+        return false
+    }
+    // We would need to add Kotlin as a dependency to access the KotlinFacet or KotlinFacetType
+    // For now, we don't want to do that.
+//    val kotlinFacet = FacetManager.getInstance(this).getFacetByType(KotlinFacetType.TYPE_ID)
+
+    // Kotlin Facet Name = "Kotlin"
+    //              ID =   "kotlin-language"
+    val kotlinFacet = FacetManager
+        .getInstance(this)
+        .allFacets
+        .asSequence().firstOrNull { it.name == "Kotlin" }
+    return kotlinFacet != null
+}
+
+@Contract("null -> false")
+fun Project?.iKotlinFacetedProject(): Boolean
+{
+    if (this != null && !this.isDisposed)
+    {
+        val modules = ModuleManager.getInstance(this).modules
+        for (module in modules)
+        {
+            if (module.isKotlinFacetedModule())
+            {
+                return true
+            }
+        }
+    }
+    return false
 }

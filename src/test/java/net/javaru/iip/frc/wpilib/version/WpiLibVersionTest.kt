@@ -704,6 +704,7 @@ internal class WpiLibVersionTest
     */
 }
 
+@Suppress("MemberVisibilityCanBePrivate")
 object GradleRioVersionsForTesting
 {
     val v2018_06_21 = WpiLibVersionImpl.parse("2018.06.21")
@@ -761,6 +762,26 @@ object GradleRioVersionsForTesting
     val v2020_1_2_rc_1_pre1 = WpiLibVersionImpl.parse("2020.1.2-rc-1-pre1")
     val v2020_1_2_rc_1 = WpiLibVersionImpl.parse("2020.1.2-rc-1")
     val v2020_1_2 = WpiLibVersionImpl.parse("2020.1.2")
+    val v2020_2_1 = WpiLibVersionImpl.parse("2020.2.1")
+    val v2020_2_2 = WpiLibVersionImpl.parse("2020.2.2")
+    val v2020_3_1 = WpiLibVersionImpl.parse("2020.3.1")
+    val v2021_1_1_alpha_1 = WpiLibVersionImpl.parse("2021.1.1-alpha-1")
+    val v2021_1_1_beta_1 = WpiLibVersionImpl.parse("2021.1.1-beta-1")
+    val v2021_1_1_beta_2 = WpiLibVersionImpl.parse("2021.1.1-beta-2")
+    val v2021_1_1_beta_3 = WpiLibVersionImpl.parse("2021.1.1-beta-3")
+    val v2021_1_1_beta_4 = WpiLibVersionImpl.parse("2021.1.1-beta-4")
+    val v2021_1_1_beta_5 = WpiLibVersionImpl.parse("2021.1.1-beta-5")
+    val v2021_1_2 = WpiLibVersionImpl.parse("2021.1.2")
+    val v2021_2_1 = WpiLibVersionImpl.parse("2021.2.1")
+    val v2021_2_2 = WpiLibVersionImpl.parse("2021.2.2")
+    val v2021_3_1 = WpiLibVersionImpl.parse("2021.3.1")
+    val v2022_0_0_alpha_2 = WpiLibVersionImpl.parse("2022.0.0-alpha-2")
+    val v2022_1_1_alpha_1 = WpiLibVersionImpl.parse("2022.1.1-alpha-1")
+    val v2022_1_1_alpha_2 = WpiLibVersionImpl.parse("2022.1.1-alpha-2")
+    val v2022_1_1_alpha_3 = WpiLibVersionImpl.parse("2022.1.1-alpha-3")
+    val v2022_1_1_beta_1 = WpiLibVersionImpl.parse("2022.1.1-beta-1")
+    val v2022_1_1_beta_2 = WpiLibVersionImpl.parse("2022.1.1-beta-2")
+    val v2022_1_1_beta_3 = WpiLibVersionImpl.parse("2022.1.1-beta-3")
 
     @JvmStatic
     val versions by lazy {
@@ -820,6 +841,26 @@ object GradleRioVersionsForTesting
         builder.add(v2020_1_2_rc_1_pre1)
         builder.add(v2020_1_2_rc_1)
         builder.add(v2020_1_2)
+        builder.add(v2020_2_1)
+        builder.add(v2020_2_2)
+        builder.add(v2020_3_1)
+        builder.add(v2021_1_1_alpha_1)
+        builder.add(v2021_1_1_beta_1)
+        builder.add(v2021_1_1_beta_2)
+        builder.add(v2021_1_1_beta_3)
+        builder.add(v2021_1_1_beta_4)
+        builder.add(v2021_1_1_beta_5)
+        builder.add(v2021_1_2)
+        builder.add(v2021_2_1)
+        builder.add(v2021_2_2)
+        builder.add(v2021_3_1)
+        builder.add(v2022_0_0_alpha_2)
+        builder.add(v2022_1_1_alpha_1)
+        builder.add(v2022_1_1_alpha_2)
+        builder.add(v2022_1_1_alpha_3)
+        builder.add(v2022_1_1_beta_1)
+        builder.add(v2022_1_1_beta_2)
+        builder.add(v2022_1_1_beta_3)
 
         builder.build()
     }
@@ -833,16 +874,23 @@ object GradleRioVersionsForTesting
     @JvmStatic
     val releases by lazy {
         val builder = ImmutableList.builder<WpiLibVersion>()
-        builder.add(GRV.v2018_06_21)
-        builder.add(GRV.v2019_0_1)
-        builder.add(GRV.v2019_1_1)
-        builder.add(GRV.v2019_1_2)
-        builder.add(GRV.v2019_2_1)
-        builder.add(GRV.v2019_3_1)
-        builder.add(GRV.v2019_3_2)
-        builder.add(GRV.v2019_4_1)
-        builder.add(GRV.v2020_1_1)
-        builder.add(GRV.v2020_1_2)
+        builder.add(v2018_06_21)
+        builder.add(v2019_0_1)
+        builder.add(v2019_1_1)
+        builder.add(v2019_1_2)
+        builder.add(v2019_2_1)
+        builder.add(v2019_3_1)
+        builder.add(v2019_3_2)
+        builder.add(v2019_4_1)
+        builder.add(v2020_1_1)
+        builder.add(v2020_1_2)
+        builder.add(v2020_2_1)
+        builder.add(v2020_2_2)
+        builder.add(v2020_3_1)
+        builder.add(v2021_1_2)
+        builder.add(v2021_2_1)
+        builder.add(v2021_2_2)
+        builder.add(v2021_3_1)
 
         builder.build()
     }
@@ -915,7 +963,14 @@ object GradleRioVersionsForTesting
         builder.add(v2020_1_2_rc_1_pre1)
         builder.add(v2020_1_2_rc_1)
         builder.add(v2020_1_2)
-        
+        builder.add(v2020_2_1)
+        builder.add(v2020_2_2)
+        builder.add(v2020_3_1)
+        builder.add(v2021_1_2)
+        builder.add(v2021_2_1)
+        builder.add(v2021_2_2)
+        builder.add(v2021_3_1)
+
         builder.build()
     }
 
@@ -945,7 +1000,14 @@ object GradleRioVersionsForTesting
         builder.add(v2020_1_1)
         builder.add(v2020_1_2_rc_1)
         builder.add(v2020_1_2)
-        
+        builder.add(v2020_2_1)
+        builder.add(v2020_2_2)
+        builder.add(v2020_3_1)
+        builder.add(v2021_1_2)
+        builder.add(v2021_2_1)
+        builder.add(v2021_2_2)
+        builder.add(v2021_3_1)
+
         builder.build()
     }
 
@@ -989,7 +1051,14 @@ object GradleRioVersionsForTesting
         builder.add(v2020_1_1_beta_2)
         builder.add(v2020_1_1_beta_3)
         builder.add(v2020_1_1_beta_3a)
-
+        builder.add(v2021_1_1_beta_1)
+        builder.add(v2021_1_1_beta_2)
+        builder.add(v2021_1_1_beta_3)
+        builder.add(v2021_1_1_beta_4)
+        builder.add(v2021_1_1_beta_5)
+        builder.add(v2022_1_1_beta_1)
+        builder.add(v2022_1_1_beta_2)
+        builder.add(v2022_1_1_beta_3)
         builder.build()
     }
 
@@ -1015,6 +1084,14 @@ object GradleRioVersionsForTesting
         builder.add(v2020_1_1_beta_2)
         builder.add(v2020_1_1_beta_3)
         builder.add(v2020_1_1_beta_3a)
+        builder.add(v2021_1_1_beta_1)
+        builder.add(v2021_1_1_beta_2)
+        builder.add(v2021_1_1_beta_3)
+        builder.add(v2021_1_1_beta_4)
+        builder.add(v2021_1_1_beta_5)
+        builder.add(v2022_1_1_beta_1)
+        builder.add(v2022_1_1_beta_2)
+        builder.add(v2022_1_1_beta_3)
 
         builder.build()
     }
@@ -1031,6 +1108,11 @@ object GradleRioVersionsForTesting
         builder.add(v2019_0_0_alpha_2_pre1)
         builder.add(v2019_0_0_alpha_2)
         builder.add(v2019_0_0_alpha_3)
+        builder.add(v2021_1_1_alpha_1)
+        builder.add(v2022_0_0_alpha_2)
+        builder.add(v2022_1_1_alpha_1)
+        builder.add(v2022_1_1_alpha_2)
+        builder.add(v2022_1_1_alpha_3)
         builder.build()
     }
 
@@ -1045,6 +1127,11 @@ object GradleRioVersionsForTesting
         builder.add(v2019_0_0_alpha_1)
         builder.add(v2019_0_0_alpha_2)
         builder.add(v2019_0_0_alpha_3)
+        builder.add(v2021_1_1_alpha_1)
+        builder.add(v2022_0_0_alpha_2)
+        builder.add(v2022_1_1_alpha_1)
+        builder.add(v2022_1_1_alpha_2)
+        builder.add(v2022_1_1_alpha_3)
         builder.build()
     }
 
@@ -1111,7 +1198,26 @@ object GradleRioVersionsForTesting
         builder.add(v2020_1_2_rc_1_pre1)
         builder.add(v2020_1_2_rc_1)
         builder.add(v2020_1_2)
-        
+        builder.add(v2020_2_1)
+        builder.add(v2020_2_2)
+        builder.add(v2020_3_1)
+        builder.add(v2021_1_1_alpha_1)
+        builder.add(v2021_1_1_beta_1)
+        builder.add(v2021_1_1_beta_2)
+        builder.add(v2021_1_1_beta_3)
+        builder.add(v2021_1_1_beta_4)
+        builder.add(v2021_1_1_beta_5)
+        builder.add(v2021_1_2)
+        builder.add(v2021_2_1)
+        builder.add(v2021_2_2)
+        builder.add(v2021_3_1)
+        builder.add(v2022_0_0_alpha_2)
+        builder.add(v2022_1_1_alpha_1)
+        builder.add(v2022_1_1_alpha_2)
+        builder.add(v2022_1_1_alpha_3)
+        builder.add(v2022_1_1_beta_1)
+        builder.add(v2022_1_1_beta_2)
+        builder.add(v2022_1_1_beta_3)
 
         builder.build()
     }

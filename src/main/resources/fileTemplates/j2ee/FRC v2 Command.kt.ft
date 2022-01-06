@@ -1,0 +1,170 @@
+## A hack, so we can have a hash character in JavaDocs for {@link} entries
+#set( $H = '#' )
+## Array of fully qualified names of the required subsystems. For example: [frc.team9999.ArmSubsystem, frc.team9999.BallSubsystem]
+#set($requiredSubsystemsFqnArray=$requiredSubsystemsFqnCommaDelimitedString.split(","))
+## The split method when called on an empty string will result in an array of one empty string token, so we need to handle that *#
+#if($requiredSubsystemsFqnArray.size() == 1 && $requiredSubsystemsFqnArray[0] == "")
+    #set($requiredSubsystemsFqnArray = [])
+#end
+## Array of simple names of the required subsystems. For example: [ArmSubsystem, BallSubsystem]
+#set($requiredSubsystemsNamesArray=$requiredSubsystemsNamesCommaDelimitedString.split(","))
+#if($requiredSubsystemsNamesArray.size() == 1 && $requiredSubsystemsNamesArray[0] == "")
+    #set($requiredSubsystemsNamesArray = [])
+#end
+## Array of variable names for the required subsystems. For example: [armSubsystem, ballSubsystem] for the [ArmSubsystem, BallSubsystem]
+#set($requiredSubsystemsVarsArray=$requiredSubsystemsVarsCommaDelimitedString.split(","))
+#if($requiredSubsystemsVarsArray.size() == 1 && $requiredSubsystemsVarsArray[0] == "")
+    #set($requiredSubsystemsVarsArray = [])
+#end
+## List of singleton calls for subsystems that are singletons. Non-singletons have a <NULL> placeholder. For example:
+## 'JavaSubsystem.getInstance(),KotlinSubsystem.INSTANCE,<NULL>,<NULL>' (with two non-singleton subsystems as part of the listing).
+#set($requiredSubsystemsSingletonCallsArray=$requiredSubsystemsSingletonCallsCommaDelimitedString.split(","))
+#if($requiredSubsystemsSingletonCallsArray.size() == 1 && $requiredSubsystemsSingletonCallsArray[0] == "")
+    #set($requiredSubsystemsSingletonCallsArray = [])
+#end
+
+
+
+
+## Array of fully qualified names of the singleton subsystems. For example: [frc.team9999.ArmSubsystem, frc.team9999.BallSubsystem]
+#set($singletonSubsystemsFqnArray=$singletonSubsystemsFqnCommaDelimitedString.split(","))
+## The split method when called on an empty string will result in an array of one empty string token, so we need to handle that *#
+#if($singletonSubsystemsFqnArray.size() == 1 && $singletonSubsystemsFqnArray[0] == "")
+    #set($singletonSubsystemsFqnArray = [])
+#end
+## Array of simple names of the singleton subsystems. For example: [ArmSubsystem, BallSubsystem]
+#set($singletonSubsystemsNamesArray=$singletonSubsystemsNamesCommaDelimitedString.split(","))
+#if($singletonSubsystemsNamesArray.size() == 1 && $singletonSubsystemsNamesArray[0] == "")
+    #set($singletonSubsystemsNamesArray = [])
+#end
+## Array of variable names for the singleton subsystems. For example: [armSubsystem, ballSubsystem] for the [ArmSubsystem, BallSubsystem]
+#set($singletonSubsystemsVarsArray=$singletonSubsystemsVarsCommaDelimitedString.split(","))
+#if($singletonSubsystemsVarsArray.size() == 1 && $singletonSubsystemsVarsArray[0] == "")
+    #set($singletonSubsystemsVarsArray = [])
+#end
+## List of singleton calls for subsystems that are singletons. Non-singletons have a <NULL> placeholder. For example:
+## 'JavaSubsystem.getInstance(),KotlinSubsystem.INSTANCE,<NULL>,<NULL>' (with two non-singleton subsystems as part of the listing).
+#set($singletonSubsystemsSingletonCallsArray=$singletonSubsystemsSingletonCallsCommaDelimitedString.split(","))
+#if($singletonSubsystemsSingletonCallsArray.size() == 1 && $singletonSubsystemsSingletonCallsArray[0] == "")
+    #set($singletonSubsystemsSingletonCallsArray = [])
+#end
+
+
+
+## Array of full qualified names of the nonSingleton subsystems. For example: [frc.team9999.ArmSubsystem, frc.team9999.BallSubsystem]
+#set($nonSingletonSubsystemsFqnArray=$nonSingletonSubsystemsFqnCommaDelimitedString.split(","))
+## The split method when called on an empty string will result in an array of one empty string token, so we need to handle that *#
+#if($nonSingletonSubsystemsFqnArray.size() == 1 && $nonSingletonSubsystemsFqnArray[0] == "")
+    #set($nonSingletonSubsystemsFqnArray = [])
+#end
+## Array of simple names of the nonSingleton subsystems. For example: [ArmSubsystem, BallSubsystem]
+#set($nonSingletonSubsystemsNamesArray=$nonSingletonSubsystemsNamesCommaDelimitedString.split(","))
+#if($nonSingletonSubsystemsNamesArray.size() == 1 && $nonSingletonSubsystemsNamesArray[0] == "")
+    #set($nonSingletonSubsystemsNamesArray = [])
+#end
+## Array of variable names for the nonSingleton subsystems. For example: [armSubsystem, ballSubsystem] for the [ArmSubsystem, BallSubsystem]
+#set($nonSingletonSubsystemsVarsArray=$nonSingletonSubsystemsVarsCommaDelimitedString.split(","))
+#if($nonSingletonSubsystemsVarsArray.size() == 1 && $nonSingletonSubsystemsVarsArray[0] == "")
+    #set($nonSingletonSubsystemsVarsArray = [])
+#end
+
+
+
+
+#if(${PACKAGE_NAME})
+#if (${PACKAGE_NAME} != "")
+package ${PACKAGE_NAME}
+#end
+#end
+
+#if($baseClassNeedsImporting == "true")
+import ${baseClassFqName}
+#end
+#if ($needsGetRequirementsImpl == "true")
+import edu.wpi.first.wpilibj2.command.Subsystem
+#end
+#foreach($fqn in $requiredSubsystemsFqnArray)
+import $fqn
+#end
+
+#parse("File Header.java")
+#if($makeAbstract == "true")abstract#end class ${NAME}${kotlinPrimaryConstructor}${baseClassExtendsClause}${kotlinBaseClassConstructor}
+{
+    #foreach($subSystemVar in $singletonSubsystemsVarsArray)
+        private val $subSystemVar = $singletonSubsystemsSingletonCallsArray[$foreach.index]
+    #end
+
+    #if ($needsGetRequirementsImpl == "true")
+        private val subsystems:MutableSet<Subsystem> = mutableSetOf(#foreach($subSystemVar in $requiredSubsystemsVarsArray)$subSystemVar#if($foreach.hasNext), #end#end)
+    #else
+
+    init
+    {
+        // each subsystem used by the command must be passed into the addRequirements() method
+        addRequirements(#foreach($subSystemVar in $requiredSubsystemsVarsArray)$subSystemVar#if($foreach.hasNext), #end#end)
+    }
+    #end
+
+#if($includeJavaDocsForOverrides == "true")
+    /**
+    * The initial subroutine of a command.  Called once when the command is initially scheduled.
+    */
+#end
+    override fun initialize() {}
+
+#if($includeJavaDocsForOverrides == "true")
+    /**
+     * The main body of a command.  Called repeatedly while the command is scheduled.
+     * (That is, it is called repeatedly until [isFinished] returns true.)
+     */
+#end
+    override fun execute() {}
+    
+#if($includeJavaDocsForOverrides == "true")
+    /**
+     * Returns whether this command has finished. Once a command finishes -- indicated by
+     * this method returning true -- the scheduler will call its [end] method.
+     *
+     * Returning false will result in the command never ending automatically. It may still be
+     * cancelled manually or interrupted by another command. Hard coding this command to always
+     * return true will result in the command executing once and finishing immediately. It is
+     * recommended to use [InstantCommand][edu.wpi.first.wpilibj2.command.InstantCommand]
+     * for such an operation.
+     *
+     * @return whether this command has finished.
+     */
+#end
+    override fun isFinished(): Boolean {
+        // TODO: Make this return true when this Command no longer needs to run execute()
+        return false
+    }
+
+#if($includeJavaDocsForOverrides == "true")
+    /**
+     * The action to take when the command ends. Called when either the command
+     * finishes normally -- that is, it is called when [isFinished] returns
+     * true -- or when  it is interrupted/canceled. This is where you may want to
+     * wrap up loose ends, like shutting off a motor that was being used in the command.
+     *
+     * @param interrupted whether the command was interrupted/canceled
+     */
+#end
+    override fun end(interrupted: Boolean) {}
+#if ($needsGetRequirementsImpl == "true")
+
+#if($includeJavaDocsForOverrides == "true")
+    /**
+     * Specifies the set of subsystems used by this command.  Two commands cannot use the same
+     * subsystem at the same time.  If the command is scheduled as interruptible and another
+     * command is scheduled that shares a requirement, the command will be interrupted.  Else,
+     * the command will not be scheduled. If no subsystems are required, return an empty set.
+     *
+     * Note: it is recommended that user implementations contain the requirements as a field,
+     * and return that field here, rather than allocating a new set every time this is called.
+     *
+     * @return the set of subsystems that are required
+     */
+#end
+    override fun getRequirements(): MutableSet<Subsystem> = subsystems
+#end
+}

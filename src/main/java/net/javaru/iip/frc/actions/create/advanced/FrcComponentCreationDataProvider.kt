@@ -97,7 +97,12 @@ abstract class FrcComponentCreationDataProvider
     
     open val icon: Icon? by lazy { fileTemplateDescriptor.icon }
     
-    open val fileTemplateName: String by lazy { fileTemplateDescriptor.fileName } }
+    open val fileTemplateName: String by lazy { fileTemplateDescriptor.fileName }
+
+    open val isKotlinTemplate: Boolean by lazy { fileTemplateDescriptor.fileName.contains(".kt") }
+}
+
+
 
 /**
  * Indicates the base type of the template.

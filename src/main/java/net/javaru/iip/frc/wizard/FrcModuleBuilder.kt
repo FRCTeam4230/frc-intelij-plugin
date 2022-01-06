@@ -16,6 +16,10 @@
 
 package net.javaru.iip.frc.wizard
 
+import com.intellij.codeInsight.actions.DirectoryFormattingOptions
+import com.intellij.codeInsight.actions.OptimizeImportsProcessor
+import com.intellij.codeInsight.actions.ReformatCodeAction
+import com.intellij.codeInsight.actions.TextRangeType
 import com.intellij.ide.actions.ImportModuleAction
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder
 import com.intellij.ide.util.projectWizard.ModuleBuilderListener
@@ -24,8 +28,6 @@ import com.intellij.ide.util.projectWizard.SdkSettingsStep
 import com.intellij.ide.util.projectWizard.SettingsStep
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.runWriteAction
-import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.externalSystem.model.project.ProjectData
@@ -36,6 +38,7 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.module.StdModuleTypes
 import com.intellij.openapi.options.ConfigurationException
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.runWhenProjectOpened
@@ -52,6 +55,10 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.projectImport.ProjectImportProvider
+import com.intellij.psi.PsiDirectory
+import com.intellij.psi.PsiManager
+import com.intellij.psi.impl.source.tree.injected.changesHandler.debug
+import com.intellij.psi.search.SearchScope
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.containers.stream
 import com.intellij.util.io.HttpRequests
@@ -59,13 +66,18 @@ import freemarker.template.Template
 import icons.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION
 import net.javaru.iip.frc.freemarker.FM_TEMPLATE_EXT_WITH_DOT
+import net.javaru.iip.frc.freemarker.KOTLIN_FM_TEMPLATE_FILE_EXT
+import net.javaru.iip.frc.freemarker.KOTLIN_SCRIPT_FM_TEMPLATE_FILE_EXT
 import net.javaru.iip.frc.freemarker.freemarkerConfiguration
+import net.javaru.iip.frc.freemarker.freemarkerConfigurationForKotlinTemplates
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.util.asPluginResourceUrl
 import net.javaru.iip.frc.util.asPluginResourceVF
+import net.javaru.iip.frc.util.findVirtualFile
 import net.javaru.iip.frc.util.get
 import net.javaru.iip.frc.util.getPluginResourceAsStream
+import net.javaru.iip.frc.util.invokeLater
 import net.javaru.iip.frc.util.invokeLaterWait
 import net.javaru.iip.frc.util.isValidJavaVersion
 import net.javaru.iip.frc.util.isValidJdk
@@ -73,6 +85,7 @@ import net.javaru.iip.frc.util.reader
 import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.removeBasePath
 import net.javaru.iip.frc.util.runBackgroundTask
+import net.javaru.iip.frc.util.runWhenSmart
 import net.javaru.iip.frc.util.toCommaDelimitedString
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import org.apache.commons.io.FileUtils
@@ -89,14 +102,18 @@ import java.time.ZonedDateTime
 import java.util.*
 import javax.swing.Icon
 
+private const val gitignoreIoUrl = "https://www.toptal.com/developers/gitignore"
+private const val frcWizardGitignoreDirName = "frc-wizard-gitignore"
+
 class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 {
     private val mySdkChangedListeners: MutableList<Runnable> = ContainerUtil.createLockFreeCopyOnWriteList()
-    private val fmConfiguration = freemarkerConfiguration(this, "/")
-    /** 
+    private val fmStdConfiguration = freemarkerConfiguration(this, "/")
+    private val fmKotConfiguration = freemarkerConfigurationForKotlinTemplates(this, "/")
+    /**
      * Tracks the configured SDK since the `myJdk` property (in the super class `ModuleBuilder`) and the value in `WizardContext.getProjectJdk()` 
      * is not set until we pass the initial step. 
-     * We need to certain to keep this updated based on activities. A null value indicates not only that an SDK has not been selected,
+     * We need to be certain to keep this updated based on activities. A null value indicates not only that an SDK has not been selected,
      * but more likely a valid one (Type * Version) is not available in the listing.
      */
     var selectedSdk: Sdk? = null
@@ -126,8 +143,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     @Suppress("MemberVisibilityCanBePrivate")
     class TemplatePaths(val version: WpiLibVersion)
     {
-        /** The base templates directory. For example `frc-wizard-templates/2020` for FRC year 2020.
-         * In the event the directory of a year is not present, it will fallback to the latest year available. */
+        /** The base 'templates' directory. For example `frc-wizard-templates/2020` for FRC year 2020.
+         * In the event the directory of a year is not present, it will fall back to the latest year available. */
         val frcWizardTemplatesBaseDirPath: Path
 
         /** The `frc-wizard-templates` base templates directory as identified as  by the constant [frcWizardTemplatesDirName]. */
@@ -186,6 +203,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         val configsResourceBasePath: Path = defaultFilesResourceBasePath.resolve(configsSubPath)
         val extrasResourceBasePath: Path = defaultFilesResourceBasePath.resolve(extrasSubPath)
         val vsCodeConfigsResourceBasePath: Path = extrasResourceBasePath.resolve(vsCodeConfigsSubPath)
+        val projectAutoGenReadMeResourceBasePath: Path = extrasResourceBasePath.resolve(projectAutoGenReadMeSubPath)
         val commonCodeResourceBasePath: Path = defaultFilesResourceBasePath.resolve(commonCodeSubPath)
         val javaCodeResourceBasePath: Path = defaultFilesResourceBasePath.resolve(javaCodeSubPath)
         val kotlinCodeResourceBasePath: Path = defaultFilesResourceBasePath.resolve(kotlinCodeSubPath)
@@ -201,6 +219,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             val configsSubPath: Path = Paths.get("configs")
             val extrasSubPath: Path = Paths.get("extras")
             val vsCodeConfigsSubPath: Path = Paths.get("vs-code-configs")
+            val projectAutoGenReadMeSubPath: Path = Paths.get("project-auto-gen-readme")
             val commonCodeSubPath: Path = Paths.get("code/common-code")
             val javaCodeSubPath: Path = Paths.get("code/java-code")
             val kotlinCodeSubPath: Path = Paths.get("code/kotlin-code")
@@ -227,7 +246,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
      * Higher numbers appear at the top, lower numbers at the bottom.
      * The items in IntelliJ IDEA Community are from top to bottom `Java`, `JavaFX`, `Android`, `IntelliJ Platform Plugin` 
      * The items in IntelliJ IDEA Ultimate are from top to bottom: (Dependent upon plugins installed) `Java`, `flexmark-java extension`, `Java Enterprise`, `JBoss`, `Spring`, JavaFX`, `Android`, `IntelliJ Platform Plugin`
-     * We'll use 0 and get placed aty the bottom which I think is more consistent in the long run.
+     * We'll use 0 and get placed at the bottom, which I think is more consistent in the long run.
      */
     override fun getWeight(): Int = 0
     override fun getModuleType(): ModuleType<*>? = StdModuleTypes.JAVA
@@ -272,11 +291,12 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
     }
 
+    @Suppress("GrazieInspection")
     private fun callCreateRunConfigurations(project: Project)
     {
         logger.trace {"[FRC] scheduling run configuration creation to runWhenProjectOpened."}
         /*
-          To prevent the below logged warning (from  RCInArbitraryFileManager.loadChangedRunConfigsFromFile() (~line 97)
+          To prevent the below logged warning from RCInArbitraryFileManager.loadChangedRunConfigsFromFile() (~line 97)
                 "It's unexpected that the file doesn't exist at this point ($filePath)"
           We need wait until the project is opened, AND is not indexing
           Unfortunately it does still seem to happen intermittently on rare occasion
@@ -286,8 +306,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
           From some debugging, the issue happens when the project is initially importing
           A race condition occurs (if we do not wait)
           So we need to wait until the initial import is complete. But there does not
-          appear to be a way to register a callback with the ImportModuleAction,createFromWizard()
-          So we use the below coded construct which seems to work fine.
+          appear to be a way to register a callback with the ImportModuleAction.createFromWizard()
+          So we use the below coded construct, which seems to work fine.
           High level call stack (some intermediary methods not listed)
                RCInArbitraryFileManager.loadChangedRunConfigsFromFile()
                RunManagerImpl.deleteRunConfigsFromArbitraryFilesNotWithinProjectContent()
@@ -300,11 +320,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
          */
 
         runWhenProjectOpened(project) {
-            DumbService.getInstance(it).runWhenSmart {
-                runWriteAction {
+            DumbService.getInstance(it).smartInvokeLater {
+                // I've tried 'runWriteAction' and 'invokeLater' here, both outside and inside 'runWhenSmart'.
+                // But the issue persisted. I think the smartInvokeLater has resolved it.
                     createAllRunDebugConfigurations(it, dataModel)
                     it.reimportGradleProject()
-                }
             }
         }
     }
@@ -343,10 +363,78 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 importGradleProject(modelContentRootDir, project)
             }
 
+            // For now, we will only optimize imports and not reformat code style
+//            if (FrcApplicationSettings.getInstance().isTeam3838() || dataModel.teamNumber == 3838)
+                runImportOptimizationOnly(project)
+//            else
+//                runReformatCode(project)
+
             progress.text = "Done."
         }
 
         logger.trace {"[FRC] FrcModuleBuilder.setupRootModel() completed"}
+    }
+
+    private fun runImportOptimizationOnly(project: Project)
+    {
+        project.runWhenSmart {
+            invokeLater {
+                try
+                {
+                    logger.debug("[FRC] Optimizing Imports (only) for new project $project")
+                    val psiDirectory = getSrcMainJavaPsiDirectory(project)
+                    val optimizer = OptimizeImportsProcessor(project, psiDirectory, true, false)
+                    optimizer.run()
+                }
+                catch (e: ProcessCanceledException)
+                {
+                    throw e
+                }
+                catch (e: Throwable)
+                {
+                    logger.debug { "[FRC] Could not optimize imports (only) for project $project. Cause Summary: $e" }
+                }
+            }
+        }
+    }
+
+    @Suppress("unused")
+    private fun runReformatCode(project: Project)
+    {
+        project.runWhenSmart {
+            invokeLater {
+                try
+                {
+                    logger.debug("[FRC] Reformatting code for new project $project")
+                    val psiDirectory = getSrcMainJavaPsiDirectory(project)
+                    ReformatCodeAction.reformatDirectory(project, psiDirectory, object : DirectoryFormattingOptions
+                    {
+                        override fun isOptimizeImports(): Boolean = true
+                        override fun isRearrangeCode(): Boolean = false
+                        override fun getTextRangeType(): TextRangeType = TextRangeType.WHOLE_FILE
+                        override fun getFileTypeMask(): String? = null
+                        override fun getSearchScope(): SearchScope? = null
+                        override fun isIncludeSubdirectories(): Boolean = true
+                    })
+                    logger.debug("[FRC] Reformat code completed for project $project")
+                }
+                catch (e: ProcessCanceledException)
+                {
+                    throw e
+                }
+                catch (e: Throwable)
+                {
+                    logger.debug { "[FRC] Could not reformat code and optimize imports for project $project. Cause Summary: $e" }
+                }
+            }
+        }
+    }
+
+    private fun getSrcMainJavaPsiDirectory(project: Project): PsiDirectory
+    {
+        val dirForReformatAction = rootProjectPath?.resolve("src/main/java") ?: throw IllegalStateException("rootProjectPath is null")
+        val vf = dirForReformatAction.findVirtualFile(true) ?: throw IllegalStateException("could not find Virtual File for $dirForReformatAction")
+        return PsiManager.getInstance(project).findDirectory(vf) ?: throw IllegalStateException("could not find PsiDirectory for $vf (from $dirForReformatAction)")
     }
 
 
@@ -362,7 +450,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     private fun copyTemplateFilesToProject(modelContentRootDir: VirtualFile)
     {
         /*
-            We need to setup the following:
+            We need to set up the following:
             A) The following are typically identical between templates
                 1) Gradle
                     - nice to have would be to add dependencies such as logging
@@ -392,7 +480,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                     - Same across all projects
                 2) Main.java
                     - typically does not change per project
-                    - A future nice to have would be to allow for a different "Robot" class name which would require this to be
+                    - A future nice to have would be to allow for a different "Robot" class name
                 3) Robot.java
                     - differs per template
                 4) Other Java classes and packages
@@ -405,10 +493,10 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         paths.frcWizardTemplatesBaseDirPath.asPluginResourceVF()?.refresh(false, true)
         when(dataModel.gradleDslOption)
         {
-            FrcProjectWizardData.GradleDslOption.GroovyDSL -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleGroovyDslResourceBasePath)
-            FrcProjectWizardData.GradleDslOption.KotlinDSL -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleKotlinDslResourceBasePath)
+            FrcProjectWizardData.GradleDslOption.GroovyDSL -> copyAllResourcesToModuleRoot("grade - groovy DSL", modelContentRootDir, paths.gradleGroovyDslResourceBasePath)
+            FrcProjectWizardData.GradleDslOption.KotlinDSL -> copyAllResourcesToModuleRoot("grade - kotlin DSL", modelContentRootDir, paths.gradleKotlinDslResourceBasePath)
         }
-        copyAllResourcesToModuleRoot(modelContentRootDir, paths.gradleWrapperResourceBasePath)
+        copyAllResourcesToModuleRoot("gradle wrapper", modelContentRootDir, paths.gradleWrapperResourceBasePath)
 
 
         val wpilibCommandsJsonFilter: (VirtualFile) -> Boolean =
@@ -419,19 +507,26 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 else -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") && !virtualFile.name.contains("WPILibOldCommands") } // reject both
             }
 
-        copyAllResourcesToModuleRoot(modelContentRootDir, paths.configsResourceBasePath, wpilibCommandsJsonFilter)
-        copyAllResourcesToModuleRoot(modelContentRootDir, paths.commonCodeResourceBasePath)
+        copyAllResourcesToModuleRoot("configs", modelContentRootDir, paths.configsResourceBasePath, wpilibCommandsJsonFilter)
+        copyAllResourcesToModuleRoot("common code", modelContentRootDir, paths.commonCodeResourceBasePath)
 
-        logger.trace {"[FRC] templateLanguageOption: ${dataModel.templateLanguageOption}"}
-        when(dataModel.templateLanguageOption)
+
+        val codeResourceBasePath = when(dataModel.templateLanguageOption)
         {
-           TemplateLanguageOption.Java -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.javaCodeResourceBasePath)
-           TemplateLanguageOption.Kotlin -> copyAllResourcesToModuleRoot(modelContentRootDir, paths.kotlinCodeResourceBasePath)
+           TemplateLanguageOption.Java -> paths.javaCodeResourceBasePath
+           TemplateLanguageOption.Kotlin -> paths.kotlinCodeResourceBasePath
         }
+        logger.trace { "[FRC] templateLanguageOption: ${dataModel.templateLanguageOption} Using codeResourceBasePath: $codeResourceBasePath" }
+        copyAllResourcesToModuleRoot("code : ${codeResourceBasePath.fileName}", modelContentRootDir, codeResourceBasePath)
 
         if (dataModel.includeVsCodeConfigs)
         {
-            copyAllResourcesToModuleRoot(modelContentRootDir, paths.vsCodeConfigsResourceBasePath)
+            copyAllResourcesToModuleRoot("vs-code-configs", modelContentRootDir, paths.vsCodeConfigsResourceBasePath)
+        }
+
+        if (dataModel.frcWizardTemplateDefinition.includeAutoGenReadMe)
+        {
+            copyAllResourcesToModuleRoot("auto gen readme", modelContentRootDir, paths.projectAutoGenReadMeResourceBasePath)
         }
 
         if (dataModel.gitIgnoreConfiguration.includeGitIgnoreFile)
@@ -447,8 +542,13 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             }
         }
 
-        val selectedTemplateResourceBase = paths.frcWizardTemplatesBaseDirPath.resolve(dataModel.frcWizardTemplateDefinition.templateResourcesDirName()).resolve(TemplatePaths.javaCodeSubPath)
-        copyAllResourcesToModuleRoot(modelContentRootDir, selectedTemplateResourceBase)
+        val languageSubPath = when(dataModel.templateLanguageOption)
+        {
+            TemplateLanguageOption.Java -> TemplatePaths.javaCodeSubPath
+            TemplateLanguageOption.Kotlin -> TemplatePaths.kotlinCodeSubPath
+        }
+        val selectedTemplateResourceBase = paths.frcWizardTemplatesBaseDirPath.resolve(dataModel.frcWizardTemplateDefinition.templateResourcesDirName()).resolve(languageSubPath)
+        copyAllResourcesToModuleRoot("selected template files - $languageSubPath", modelContentRootDir, selectedTemplateResourceBase)
     }
 
 
@@ -483,10 +583,10 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 
 
 
-    private fun copyAllResourcesToModuleRoot(modelContentRootDir: VirtualFile, resourceDirBase: Path, keepFilter: (VirtualFile) -> Boolean = { true })
+    private fun copyAllResourcesToModuleRoot(resourceDescription: String, modelContentRootDir: VirtualFile, resourceDirBase: Path, keepFilter: (VirtualFile) -> Boolean = { true })
     {
         val pluginResourceDirUrl = resourceDirBase.asPluginResourceUrl()
-        logger.debug {"[FRC] pluginResourceDir URL = $pluginResourceDirUrl"}
+        logger.debug {"[FRC] copyAllResourcesToModuleRoot for: $resourceDescription\n        resourceDirBase = $resourceDirBase\n        pluginResourceDir URL = $pluginResourceDirUrl"}
 
         if (pluginResourceDirUrl == null)
         {
@@ -497,17 +597,18 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             val srcFqBaseDir = VfsUtil.findFileByURL(pluginResourceDirUrl)
             if (srcFqBaseDir == null)
             {
-                logger.debug {"[FRC] Could not convert URL '$pluginResourceDirUrl' to a VirtualFile for 'copy all wizard template files' operation."}
+                logger.warn("[FRC] Could not convert URL '$pluginResourceDirUrl' to a VirtualFile for 'copy all wizard template files' operation.")
             }
             else
             {
+                srcFqBaseDir.refresh(false, true)
                 VfsUtil.collectChildrenRecursively(srcFqBaseDir)
                     .filter { !it.isDirectory }
                     .filter { keepFilter.invoke(it) }
                     .forEach {
                     val resourceRelativePath = Paths.get(it.toString().removePrefix("$srcFqBaseDir")).removeBasePath(Paths.get("/"))
                     // We refresh to resolve an issue where the source file is cached by IntelliJ IDEA, even after a restart, and we get the old content
-                    // We probably only need to do this when testing since a new plugin release would have a new jar file name... and IntelliJ *should*
+                    // We probably only need to do this when testing since a new plugin release would have a new jar file name… and IntelliJ *should*
                     // see that as a new file as its full path would be different. But since this is in the new project wizard, and thus is only used
                     // occasionally, the slight performance hit is worth the complete assurance of using the most recent file
                     it.refresh(false, true)
@@ -551,7 +652,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             val target = resolveTargetPath(modelContentRootDir, targetEndPath)
             // name ==> The path of the template file relatively to the (virtual) directory that you use to store the templates
             val name = FilenameUtils.separatorsToUnix(srcEndPath.toString())!!
-            val template = Template(name, srcFqVf.reader(), fmConfiguration)
+            val template =
+                if (fmTemplateName.isKotlinTemplate())
+                    Template(name, srcFqVf.reader(), fmKotConfiguration)
+                else
+                    Template(name, srcFqVf.reader(), fmStdConfiguration)
             processFreemarkerTemplate(template, target)
         }
         catch (e: Exception)
@@ -560,6 +665,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
     }
 
+    private fun String.isKotlinTemplate(): Boolean = this.endsWith(KOTLIN_FM_TEMPLATE_FILE_EXT) || this.endsWith(KOTLIN_SCRIPT_FM_TEMPLATE_FILE_EXT)
     
     private fun processFreemarkerTemplate(fmTemplate: Template, target: Path): VirtualFile?
     {
@@ -623,10 +729,10 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 
     private fun generateGitIgnoreFileContent(config: GitIgnoreConfiguration): String
     {
-        val (templates: MutableList<String>, manualEntries: StringBuilder) = extractGitIgnoreTemplates(config)
+        val (toptalTemplates: MutableList<String>, wpilibTemplates: MutableList<String>, manualEntries: StringBuilder) = extractGitIgnoreTemplates(config)
         val content = StringBuilder()
         
-        if(templates.isNotEmpty())
+        if(toptalTemplates.isNotEmpty())
         {
             var createFromCache = !config.generateFromSite
             if (!createFromCache)
@@ -634,23 +740,25 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 try
                 {
                     //val url = "https://gitignore.io/api/${templates.toCommaDelimitedString(false)}"
-                    val url = "https://www.toptal.com/developers/gitignore/api/${templates.toCommaDelimitedString(false)}"
+                    val url = "$gitignoreIoUrl/api/${toptalTemplates.toCommaDelimitedString(false)}"
                     val request1 = HttpRequests.request(url)
                     val responseBody = request1.readString()
-                    content.appendLine("# Dynamically generated by IntelliJ IDEA FRC Plugin on ${java.time.format.DateTimeFormatter.ofPattern("EEEE MMMM d, yyyy h:mm:ss a zzz").format(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))} using https://www.toptal.com/developers/gitignore/api")
+                    content.appendLine("# Dynamically generated by IntelliJ IDEA FRC Plugin on ${java.time.format.DateTimeFormatter.ofPattern("EEEE MMMM d, yyyy h:mm:ss a zzz").format(ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault()))}")
+                    content.appendLine("# using $gitignoreIoUrl/api (See https://docs.gitignore.io)")
                     content.appendLine(responseBody)
                 }
                 catch (e: Exception)
                 {
                     // TODO: we need to notify the user that the gitignore was not generated from the site and therefore may be out of date: https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues/72
-                    logger.warn("[FRC] An exception occurred when attempting to dynamically create .gitignore file from gitignore APT at https://www.toptal.com/developers/gitignore/api. Will generate from cache. Cause Summary: $e", e)
+                    logger.warn("[FRC] An exception occurred when attempting to dynamically create .gitignore file from gitignore APT at $gitignoreIoUrl/api. Will generate from cache. Cause Summary: $e", e)
                     createFromCache = true
                 }
             }
 
             if (createFromCache)
             {
-                content.appendLine(generateGitIgnoreSiteContentFromCachedFiles(templates, config.additionalGitignoreTemplates))
+                content.clear()
+                content.appendLine(generateGitIgnoreSiteContentFromCachedFiles(toptalTemplates, config.additionalGitignoreTemplates))
             }
         }
         
@@ -662,6 +770,17 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             content.appendLine()
             content.appendLine()
             content.appendLine("# End entries from IntelliJ IDEA FRC Plugin")
+            content.appendLine()
+        }
+
+        if (config.wpilib && wpilibTemplates.isNotEmpty())
+        {
+            content.appendLine("# === Entries from WPI Lib team ===")
+            content.appendLine("# The following gitignore entries have been specially created by the WPI Lib development team.")
+            content.appendLine("# If you remove items from this file, intellisense might break.")
+            content.appendLine()
+            wpilibTemplates.processTemplateList(content)
+            content.appendLine("# End entries from WPI Lib team")
             content.appendLine()
         }
         
@@ -676,72 +795,100 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         val content = StringBuilder()
 
         content.appendLine()
-        content.appendLine("# Created by https://www.toptal.com/developers/gitignore/api/$templatesString")
-        content.appendLine("# Edit at https://www.toptal.com/developers/gitignore?templates=$templatesString")
+        content.appendLine("# Created by $gitignoreIoUrl/api/$templatesString")
+        content.appendLine("# Edit at    $gitignoreIoUrl?templates=$templatesString")
         content.appendLine()
-        filteredTemplates.sorted().forEach { templateName ->
-            val path = "frc-wizard-gitignore/$templateName.txt"
-            val inputStream = getPluginResourceAsStream(path)
-            if (inputStream == null) {
-                logger.warn("[FRC] could not find gitignore cached template '$path' in plugin resources")
-            }
-            else {
-                inputStream.use { innerStream ->
-                    val reader = BufferedReader(InputStreamReader(innerStream, Charsets.UTF_8))
-                    reader.lines().forEach { line: String? ->
-                        content.appendLine(line)
-                    }
-                }
-                content.appendLine()
-            }
-        }
+        filteredTemplates.sorted().processTemplateList(content)
         content.appendLine()
-        content.appendLine("# End of https://www.toptal.com/developers/gitignore/api/$templatesString")
+        content.appendLine("# End of $gitignoreIoUrl/api/$templatesString")
         content.appendLine()
         content.appendLine()
         
         return content.toString()
     }
-    
-    
-    private fun extractGitIgnoreTemplates(config: GitIgnoreConfiguration): Pair<MutableList<String>, StringBuilder>
+
+    private fun List<String>.processTemplateList(content: StringBuilder)
+    {
+        forEach { templateName ->
+            val path = "$frcWizardGitignoreDirName/$templateName.txt"
+            path.writeTemplateToContentBuilder(content)
+        }
+    }
+
+    private fun String.writeTemplateToContentBuilder(content: StringBuilder)
+    {
+        val inputStream = getPluginResourceAsStream(this)
+        if (inputStream == null)
+        {
+            logger.warn("[FRC] could not find gitignore cached template '${this}' in plugin resources")
+        }
+        else
+        {
+            inputStream.use { innerStream ->
+                val reader = BufferedReader(InputStreamReader(innerStream, Charsets.UTF_8))
+                reader.lines().forEach { line: String? ->
+                    content.appendLine(line)
+                }
+            }
+            content.appendLine()
+        }
+    }
+
+    private data class GitIgnoreTemplates(
+        val toptalGitIgnoreTemplates: MutableList<String>,
+        val wpilibGitIgnoreTemplates: MutableList<String>,
+        val manualEntries: StringBuilder
+    )
+
+    private fun extractGitIgnoreTemplates(config: GitIgnoreConfiguration): GitIgnoreTemplates
     {
         val manualEntries = StringBuilder()
-        val templates = mutableListOf<String>()
+        val toptalTemplates = mutableListOf<String>()
+        val wpilibTemplates = mutableListOf<String>()
 
-        if (config.java) templates.add("java")
-        if (config.gradle) templates.add("gradle")
+        if (config.java) toptalTemplates.add("java") //else if (config.wpilib) wpilibTemplates.add("wpilib-java")
+        if (config.gradle) toptalTemplates.add("gradle") //else if (config.wpilib) wpilibTemplates.add("wpilib-gradle")
 
 
         when (config.intellij)
         {
-            IdeConfigOption.Share   -> templates.add("intellij+iml")
-            IdeConfigOption.Ignore  -> templates.add("intellij+all")
+            IdeConfigOption.Share   -> toptalTemplates.add("intellij+iml")
+            IdeConfigOption.Ignore  -> toptalTemplates.add("intellij+all")
             IdeConfigOption.NoEntry -> { /* Do nothing */ }
         }
 
         @Suppress("SpellCheckingInspection")
         when (config.vscode)
         {
-            IdeConfigOption.Share   -> templates.add("visualstudiocode")
-            IdeConfigOption.Ignore  -> manualEntries.append(
+            IdeConfigOption.Share   -> toptalTemplates.add("visualstudiocode")
+            IdeConfigOption.Ignore  ->
+                manualEntries.append(
                     """
                         ### VisualStudioCode ###
                         # Ignores the whole .vscode folder 
                         .vscode/
                         """.trimIndent())
-            IdeConfigOption.NoEntry -> { /* Do nothing */ }
+            IdeConfigOption.NoEntry -> {
+                //if (config.wpilib) wpilibTemplates.add("wpilib-java")
+            }
         }
 
-        //TODO add Eclipse and NetBeans ?
+        //For now, we are using boolean checkboxes for Eclipse and NetBeans rather than selecting as an IdeConfigOption
+        if (config.eclipse.asBoolean()) toptalTemplates.add("eclipse")
+        if (config.netbeans.asBoolean()) toptalTemplates.add("netbeans")
+        if (config.linux) toptalTemplates.add("linux") //else if (config.wpilib) wpilibTemplates.add("wpilib-linux")
+        if (config.macOS) toptalTemplates.add("macos") //else if (config.wpilib) wpilibTemplates.add("wpilib-macos")
+        if (config.windows) toptalTemplates.add("windows") //else if (config.wpilib) wpilibTemplates.add("wpilib-windows")
+        if (config.cpp) toptalTemplates.add("c++") //else if (config.wpilib) wpilibTemplates.add("wpilib-c++")
 
-        if (config.linux) templates.add("linux")
-        if (config.macOS) templates.add("macos")
-        if (config.windows) templates.add("windows")
-        if (config.cpp) templates.add("c++")
+        if (config.wpilib) {
+            wpilibTemplates.add("wpilib-vscode-additional")
+            wpilibTemplates.add("wpilib-simulation-gui")
+        }
 
-        templates.addAll(config.additionalGitignoreTemplates)
-        return Pair(templates, manualEntries)
+        toptalTemplates.addAll(config.additionalGitignoreTemplates)
+
+        return GitIgnoreTemplates(toptalTemplates, wpilibTemplates, manualEntries)
     }
     
 
@@ -778,18 +925,18 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
      */
     override fun getCustomOptionsStep(context: WizardContext, parentDisposable: Disposable): ModuleWizardStep
     {
-        // This *normally* determines the potential frameworks  that can be selected (like kotlin, groovy, Thymeleaf, Ruby, etc., etc., etc.
+        // This *normally* determines the potential frameworks  that can be selected (like kotlin, groovy, Thymeleaf, Ruby, etc., etc., etc.)
         //     Notice that when setProviders is called  "java" is set for the "preselected" parameter    In IDEA project: service/project/wizard/GradleFrameworksWizardStep.java:99 as well as  service/project/wizard/GradleFrameworksWizardStep.java:91 for the Kotlin DSL
         //     Others are dynamically loaded via extension point definitions as far as I can tell.
         // Normally this is where we would put the option to select Kotlin
-        //     But since for us we are just adding something to build.gradle.ftl template and not anything more sophisticated (i.e. having to set things),
+        //     But since we are just adding something to build.gradle.ftl template and not anything more sophisticated (i.e. having to set things),
         //     and we want to auto add Kotlin if a Kotlin template is selected, we will do this in a later step via a simple check box
         //   
         // It looks like typically  these can be defined/configured via an extension is the plugin.xml
         //     For example with Gradle, there is:
         //           <frameworkSupport implementation="org.jetbrains.plugins.gradle.frameworkSupport.GradleGroovyFrameworkSupportProvider"/>
         //     in the gradle-groovy-integration.xml file.
-        //     in turn that file is defined as an optional depends in the gradle-java-integration.xml file when defining "org.intellij.groovy" as an (optional) dependency
+        //     in turn that file is defined as an optional depends on the gradle-java-integration.xml file when defining "org.intellij.groovy" as an (optional) dependency
         //     this would allow other plugins to add frameworks for a project type. Note something we need to worry about
         // So..... with all that said, we are not going to do a traditional "FrameworksWizardStep" or even an "options step",
         //     but rather a fairly simple "show some information" step

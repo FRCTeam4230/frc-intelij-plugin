@@ -32,6 +32,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.Duration
 import java.time.temporal.TemporalAmount
+import java.util.*
 
 const val DEFAULT_RIO_LOG_UDP_PORT: Int = 6666
 const val DEFAULT_DEBUG_PORT: Int = 8349
@@ -45,6 +46,8 @@ const val WPILIB_BASE_DIR_ENV_VAR: String = "wpilib.base.dir"
 const val ALT_WPILIB_BASE_DIR_SYS_PROP: String = "frc.alt.wpilib.base.dir"
 
 const val USE_WPILIB_BETA_SITE: String = "frc.use.wpilib.beta.site"
+
+private const val NOT_SET = "NOT_SET"
 
 // NOTE: This class is registered as an <applicationService> in the plugin.xml
 @State(name = "FrcPlugin", storages = [(Storage("frc.xml"))])
@@ -83,12 +86,24 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
                                   var checkWpiLibStatusPeriodically: Boolean = true,
                                   var checkWpiLibStatusInterval: TemporalAmount = Duration.ofHours(4),
                                   var provideCustomFileIcons: Boolean = true,
+                                  // TODO: Add to settings dialog
+                                  var useGradleAllDistributionDefault: Boolean = false,
+                                  /** A non-identifying ID (NIID) for cases where a knowing what particular installation of the plugin is needed. */
+                                  var niid: String = NOT_SET
                                  ) : PersistentStateComponent<FrcApplicationSettings>
 {
     companion object Settings
     {
         @JvmStatic
-        fun getInstance(): FrcApplicationSettings = service()
+        fun getInstance(): FrcApplicationSettings
+        {
+            val settings = service<FrcApplicationSettings>()
+
+            if (settings.niid == NOT_SET) {
+                settings.niid = System.getenv("FRC_PLUGIN_NIID") ?: UUID.randomUUID().toString()
+            }
+            return settings
+        }
 
 
         @JvmStatic

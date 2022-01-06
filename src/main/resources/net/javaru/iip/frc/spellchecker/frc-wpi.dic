@@ -11,6 +11,7 @@ cscore
 ctr
 ctre
 cuforge
+deadband
 deployable
 deps
 digilent
@@ -33,6 +34,7 @@ halsim
 halsimws
 hid
 hids
+HID's
 imgcodecs
 imgproc
 intellisense
@@ -77,8 +79,14 @@ osx
 osxx
 playingwithfusion
 pid
+PIDs
+PID's
 pregenerated
+qelm
+qelms
 ramsete
+relm
+relms
 revrobotics
 rio
 riolog
@@ -131,8 +139,12 @@ wpilibsuite
 wpiutil
 xaxis
 xbox
+xpeed
 xstick
 yaxis
+yspeed
 ystick
 zaxis
+zrotate
+zspeed
 zstick

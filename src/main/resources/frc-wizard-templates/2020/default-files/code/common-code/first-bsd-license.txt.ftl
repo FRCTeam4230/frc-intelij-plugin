@@ -2,7 +2,7 @@
 <#-- @ftlvariable name="data" type="net.javaru.iip.frc.wizard.FrcProjectWizardData" -->
 <#--<#assign lastUpdated = .now>
 Copyright (c) 2009-${lastUpdated?string["yyyy"]} FIRST-->
-Copyright (c) 2009-${data.frcYear} FIRST
+Copyright (c) 2009-${data.frcYearString} FIRST
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

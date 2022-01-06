@@ -33,6 +33,8 @@ import com.intellij.framework.detection.FrameworkDetectionContext;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.psi.PsiClass;
@@ -114,6 +116,10 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
              
             return (foundFiles.isEmpty()) ? Collections.emptyList() : context.createDetectedFacetDescriptions(this, foundFiles);
         }
+        catch (ProcessCanceledException e)
+        {
+            throw e;
+        }
         catch (Exception e)
         {
             LOG.warn("[FRC] An exception occurred when checking for FRC Framework. Cause Summary: " + e, e);
@@ -126,14 +132,15 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
     private List<VirtualFile> detectRobotClasses(@NotNull Collection<? extends VirtualFile> newFiles, @NotNull FrameworkDetectionContext context)
     {
         final List<VirtualFile> foundFiles = new ArrayList<>(newFiles.size());
-        if (context.getProject() != null)
+        final Project project = context.getProject();
+        if (project != null)
         {
             for (VirtualFile virtualFile : newFiles)
             {
-                final PsiFile psiFile = PsiManager.getInstance(context.getProject()).findFile(virtualFile);
+                final PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
                 if (psiFile instanceof PsiJavaFile)
                 {
-                    if (checkIfRobotClass((PsiJavaFile) psiFile))
+                    if (checkIfRobotClass((PsiJavaFile) psiFile, project))
                     {
                         foundFiles.add(virtualFile);
                     }
@@ -167,6 +174,10 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
             return matcher.find();
 
         }
+        catch (ProcessCanceledException e)
+        {
+            throw e;
+        }
         catch (Exception e)
         {
             LOG.warn("[FRC] An exception occurred when checking if VirtualFile '" + virtualFile.getPath() + " extends Robot'. Cause Summary: " + e);
@@ -175,17 +186,21 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
     }
 
 
-    private boolean checkIfRobotClass(@Nullable PsiJavaFile psiFile)
+    private boolean checkIfRobotClass(@Nullable PsiJavaFile psiFile, @NotNull Project project)
     {
         try
         {
-            if (psiFile == null)
+            if (psiFile == null || project.isDisposed())
             {
                 return false;
             }
             final PsiClass[] classes = psiFile.getClasses();
             // This will only work if the WpiLib classes are on the classpath (i.e. added as a library)
-            return hasFrcSuperClass(classes);
+            return hasFrcSuperClass(classes, project);
+        }
+        catch (ProcessCanceledException e)
+        {
+            throw e;
         }
         catch (Exception e)
         {
@@ -204,13 +219,18 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
      *
      * @param classes the classes to check
      *
+     * @param project the project
      * @return true if one of the classes extends an FRC robot class
      */
-    private boolean hasFrcSuperClass(@NotNull PsiClass[] classes)
+    private boolean hasFrcSuperClass(@NotNull PsiClass[] classes, @NotNull Project project)
     {
         for (PsiClass psiClass : classes)
         {
-            if (hasFrcSuperClass(psiClass, 0))
+            if (project.isDisposed())
+            {
+                return false;
+            }
+            if (hasFrcSuperClass(psiClass, project, 0))
             {
                 return true;
             }
@@ -226,15 +246,16 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
      * <b>This will only work if the WpiLib classes are on the classpath (i.e. added as a library).</b>
      *
      * @param psiClass       the class to check
+     * @param project        the containing project
      * @param recursionCount the number of times the method has been called. Outside calls should set to zero
      *
      * @return true if the class extends an FRC robot class
      */
-    private boolean hasFrcSuperClass(@Nullable PsiClass psiClass, int recursionCount)
+    private boolean hasFrcSuperClass(@Nullable PsiClass psiClass, Project project, int recursionCount)
     {
         try
         {
-            if (psiClass == null)
+            if (psiClass == null || project.isDisposed())
             {
                 return false;
             }
@@ -252,8 +273,12 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
                 // Issue 16: A Stackoverflow occurred of well over 1000 calls to the below recursive calls.
                 //           Not sure what class caused it. But to prevent the issue, we limit the traversal
                 //           of super classes to a depth of 33, which is way more than is ever likely for a robot project
-                return (++recursionCount <= 32) && hasFrcSuperClass(psiClass.getSuperClass(), recursionCount);
+                return (++recursionCount <= 32) && hasFrcSuperClass(psiClass.getSuperClass(), project, recursionCount);
             }
+        }
+        catch (ProcessCanceledException e)
+        {
+            throw e;
         }
         catch (Exception e)
         {

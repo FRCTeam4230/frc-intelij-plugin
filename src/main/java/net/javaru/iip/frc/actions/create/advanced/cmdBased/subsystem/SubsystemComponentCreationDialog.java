@@ -17,15 +17,16 @@
 package net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem;
 
 import java.awt.*;
+import java.util.Map;
 import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.google.common.collect.ImmutableMap.Builder;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.ui.ContextHelpLabel;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBRadioButton;
@@ -66,7 +67,7 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
     public enum  SingletonMethodology { NON_SINGLETON, EAGER, LAZY, DOUBLE_CHECKED_LOCKING}
     
     public SubsystemComponentCreationDialog(@NotNull Module module,
-                                            @NotNull ClassCreator classCreator,
+                                            @NotNull ClassCreator<? extends PsiElement> classCreator,
                                             @NotNull PsiDirectory directory,
                                             @NotNull FrcComponentCreationDataProvider dataProvider)
     {
@@ -75,7 +76,7 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
     
     
     @Override
-    protected void addComponentSpecificProperties(@NotNull Builder<String, String> props,
+    protected void addComponentSpecificProperties(@NotNull Map<String, String> props,
                                                   @Nullable PsiClass baseClass,
                                                   @NotNull String targetPackageName,
                                                   @NotNull String newClassName)
@@ -108,6 +109,11 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
     @Override
     protected void initMinorOptionsPanel(JPanel topPanel, JPanel optionsPanel)
     {
+        if (myDataProvider.isKotlinTemplate())
+        {
+            return;
+        }
+        
         makeSingletonCheckbox = new JBCheckBox(message("frc.templates.options.singletonSubsystems.checkbox.text.one"));
         makeSingletonCheckbox.setSelected(sharedState.getBooleanOption(STATE_KEY_SUBSYSTEMS_MAKE_SINGLETON, true));
     
@@ -152,7 +158,10 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
                                                buttonsEnabled);
         
         final ContextHelpLabel doubleCheckedLockSingletonContextHelp =
-            ContextHelpLabel.create(SubsystemOptionsHelpKt.getDoubleCheckedLockingInitializationHelp());
+            ContextHelpLabel.createWithLink(null,
+                SubsystemOptionsHelpKt.getDoubleCheckedLockingInitializationHelp(),
+                                            message("frc.ui.common.learnMore.link.text"),
+                                            () -> {BrowserUtil.browse("https://www.geeksforgeeks.org/singleton-design-pattern");});
     
         
         lazySingletonRadioButton =
@@ -162,7 +171,10 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
                                                buttonsEnabled);
     
         final ContextHelpLabel lazySingletonContextHelp =
-            ContextHelpLabel.create(SubsystemOptionsHelpKt.getClassicLazyInitializationHelp());
+            ContextHelpLabel.createWithLink(null,
+                                            SubsystemOptionsHelpKt.getClassicLazyInitializationHelp(),
+                                            message("frc.ui.common.learnMore.link.text"),
+                                            () -> {BrowserUtil.browse("https://www.geeksforgeeks.org/singleton-design-pattern");});
     
         
         eagerSingletonRadioButton =
@@ -172,7 +184,10 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
                                                buttonsEnabled);
     
         final ContextHelpLabel eagerSingletonContextHelp =
-            ContextHelpLabel.create(SubsystemOptionsHelpKt.getEagerInitializationHelp());
+            ContextHelpLabel.createWithLink(null,
+                                            SubsystemOptionsHelpKt.getEagerInitializationHelp(),
+                                    message("frc.ui.common.learnMore.link.text"),
+                                    () -> {BrowserUtil.browse("https://www.geeksforgeeks.org/singleton-design-pattern");});;
     
         
         // Disable the make Singleton option is the name contains "abstract"

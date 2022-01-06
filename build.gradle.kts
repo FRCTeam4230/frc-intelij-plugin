@@ -16,7 +16,8 @@
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.gradle.ext.ProjectSettings
-import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 
@@ -27,6 +28,8 @@ val frcPluginEapDesignator: String by project
 val frcPluginVersion = "$frcPluginBaseVersion-$ideaMajorVersion$frcPluginEapDesignator" // ex: v1.3.0-2019.2,  1.3.1-2020.1-eap.1
 val javaVersion: JavaVersion = JavaVersion.VERSION_11
 val sandboxPath = determineSandboxDir()
+
+val isCiBuild = if (project.hasProperty("is.ci.build")) project.properties["is.ci.build"].toString().toBoolean() else false
 
 group = "net.javaru.iip.frc"
 version = frcPluginVersion 
@@ -107,26 +110,7 @@ tasks.clean {
 }
 
 tasks.processResources {
-    val replacements = Properties().apply {
-        val isCiBuild = if (project.hasProperty("is.ci.build")) {
-            project.properties["is.ci.build"].toString().toBoolean()
-        }
-        else {
-            false
-        }
-        if (isCiBuild) {
-            put("SENTRY_DSN_TEST_AND_QA", "https://example.com/dummy/value/for/CI/build")
-            put("SENTRY_DSN_PROD", "https://example.com/dummy/value/for/CI/build")
-        }
-        else {
-            // we load some values we do not want to submit to version control from a properties file, the
-            // location of which is defined by the system property: FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE
-            load(FileInputStream(File(System.getenv("FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE"))))
-        }
-    }.asSequence().map {
-        it.key.toString() to it.value
-    }.toMap().toMutableMap()
-
+    val replacements = loadTokenReplacements()
     filesMatching("services/frc-plugin-tokens.properties") {
         expand(replacements)
     }
@@ -165,7 +149,7 @@ tasks {
             systemPropertyGetOrDefault("frc.rest.use.qa", "true"),
             systemPropertyGetOrDefault("frc.error.report.submitter.use.qa", "true"),
             systemPropertyGetOrDefault("frc.experimental.gradleDslSelection", "true"),
-            systemPropertyGetOrDefault("frc.experimental.kotlinTemplates", "true")
+            systemPropertyGetOrDefault("frc.wizard.always.update.wpilib.versions", "true"),
             // Legacy Ant based robot project system properties
             //systemPropertyGetOrDefault("frc.simulated.log.service.enabled", "false"),
             //systemPropertyGetOrDefault("frc.simulated.log.service.use.configured.port", "false"),
@@ -185,27 +169,31 @@ tasks {
     signPlugin {
         // signPlugin runs automatically before the publishPlugin if the signPlugin privateKey (or privateKeyFile) and certificateChain (or certificateChainFile) properties are specified
         // Use JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE unless overridden by the more specific FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE
-        val ourPrivateKeyFileSetting =
-            System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE") ?:
-            System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE")
         val ourCertChainFileSetting =
             System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE") ?:
             System.getenv("JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE")
+        val ourPrivateKeyFileSetting =
+            System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE") ?:
+            System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE")
 
         doFirst {
-            if (ourPrivateKeyFileSetting == null) {
-                logger.warn("No code signing private key file configured.")
-                logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE' not set.")
-            }
-            else {
-                logger.lifecycle("Using code signing private key file: $ourPrivateKeyFileSetting")
-            }
             if (ourCertChainFileSetting == null) {
                 logger.warn("No code signing certificate chain file configured.")
                 logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE' not set.")
             }
             else {
                 logger.lifecycle("Using code signing certificate chain file: $ourPrivateKeyFileSetting")
+            }
+            if (ourPrivateKeyFileSetting == null) {
+                logger.warn("No code signing private key file configured.")
+                logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE' not set.")
+            }
+            else {
+                logger.lifecycle("Using code signing private key file: $ourPrivateKeyFileSetting")
+                if ((System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD") ?: System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD")) == null) {
+                    logger.warn("Code signing password is not configured.")
+                    logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD' not set.")
+                }
             }
         }
         if (ourPrivateKeyFileSetting != null && ourCertChainFileSetting != null)
@@ -215,6 +203,7 @@ tasks {
             password.set(System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD") ?: System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD"))
         }
     }
+
 
     publishPlugin {
         // See https://plugins.jetbrains.com/docs/intellij/deployment.html  and  https://github.com/JetBrains/intellij-platform-plugin-template/blob/main/build.gradle.kts
@@ -345,11 +334,12 @@ dependencies {
     implementation(platform("com.google.guava:guava-bom:29.0-jre"))
     implementation("com.google.guava:guava")
     // jsemver: Is in the project 'lib' dir as it is not published to any public repos. Plus we are using a tweaked version that removes is use of logback
-    implementation("com.asarkar:jsemver:0.6.2.2") {
+    implementation("com.asarkar:jsemver:0.6.2.3") {
         exclude(group = "org.slf4j", module = "slf4j-api")
             .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
     }
-    implementation("org.antlr:antlr4:4.9.2") {
+    implementation("org.antlr:antlr4:4.9.3") {
+        // Keep in sync with what is used in jsemver to prevent warning about different code generation and runtime versions.
         exclude(group = "org.slf4j", module = "slf4j-api")
             .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
     }
@@ -357,8 +347,11 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava")
     implementation("org.freemarker:freemarker:2.3.31")
+    implementation("com.michael-bull.kotlin-result:kotlin-result:1.1.13")
+    implementation("com.michael-bull.kotlin-result:kotlin-result-jvm:1.1.13")
+    implementation("io.github.furstenheim:copy_down:1.0") // HTML to MD
 
-    implementation(platform ("io.sentry:sentry-bom:5.3.0"))
+    implementation(platform ("io.sentry:sentry-bom:5.4.0"))
     implementation("io.sentry:sentry") {
         exclude(group = "org.slf4j", module = "slf4j-api")
             .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
@@ -431,5 +424,59 @@ fun determineSandboxDir(): String
     val sandboxDir = Path.of(project.rootDir.canonicalPath).resolve(".sandboxes").resolve(".sandbox-$sandboxSuffix").toString()
     logger.info(">>>sandboxDir set to: $sandboxDir")
     return sandboxDir
+}
+
+/**
+ * Loads the token replacement values. These are some values that we would prefer not to commit to 
+ * source control. While not secrets per se, they are also not things we want bots to find.
+ * The tokens are loaded from a properties file, the location of which is specified by an environment
+ * variable. In the event the environment variable is not set (such as on the CI server or when being 
+ * built for by contributors or for casual development), stand-in values are used. The tokens primarily 
+ * need to be available when a distribution build is being run, or testing of the ErrorReportSubmitter
+ * is being done.
+ */
+fun loadTokenReplacements():MutableMap<String, Any>
+{
+    // TODO: Since this happens during the configuration phase, we should see if 
+    //       we can determine if the 'buildPlugin' task is set to run, and if so
+    //       require the build tokens to be set.
+    return Properties().apply {
+        val key = "FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE"
+        val envVar: String? = System.getenv(key)
+        if (envVar == null)
+        {
+            if (!isCiBuild)
+            {
+                logger.warn("Environment variable not set for build tokens. Build tokens will not be replaced. This is fine for development builds. " + 
+                                 "But needs to be resolved for distribution builds by setting the env var: $key")
+            }
+        }
+        else
+        {
+            val path = Path.of(envVar)
+            if (Files.exists(path))
+            {
+                load(Files.newBufferedReader(path, Charsets.ISO_8859_1))
+            }
+            else
+            {
+                if (!isCiBuild)
+                {
+                    logger.error("Properties file specified for build tokens not found. Build tokens will not be replaced. his is fine for development builds. " + 
+                                     "But needs to be resolved for distribution builds. Configured path: $key")
+                    throw FileNotFoundException("Properties file specified for token replacements was not found: $path")
+                }
+            }
+        }
+        if (isEmpty)
+        {
+            logger.info("Using stand-in values for built time token replacements")
+            // For now, we'll just do it here. But if this gets to be more than a few, we'll move out to a file and load it.
+            put("SENTRY_DSN_TEST_AND_QA", "https://example.com/stand-in/value")
+            put("SENTRY_DSN_PROD", "https://example.com/stand-in/value")
+        }
+    }.asSequence().map {
+        it.key.toString() to it.value
+    }.toMap().toMutableMap()
 }
 

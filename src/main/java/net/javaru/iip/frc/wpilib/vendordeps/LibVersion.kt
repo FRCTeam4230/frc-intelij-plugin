@@ -20,6 +20,7 @@ package net.javaru.iip.frc.wpilib.vendordeps
 import com.asarkar.semver.SemVer
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
+import kotlin.streams.toList
 
 /**
  * A version class for libraries and dependencies that handles not standard version schemes. If the version text
@@ -27,7 +28,7 @@ import com.intellij.openapi.diagnostic.trace
  * If the text does not represent a valid Semantic Version, the text representation itself is used for
  * comparison, equality, and hashing. This works sufficiently in most cases.
  */
-class LibVersion private constructor(private val asText: String, private val backingSemVer: SemVer? = null) : Comparable<LibVersion>
+class LibVersion private constructor(val asText: String, private val backingSemVer: SemVer? = null) : Comparable<LibVersion>
 {
     override fun compareTo(other: LibVersion): Int
     {
@@ -57,27 +58,59 @@ class LibVersion private constructor(private val asText: String, private val bac
 
     override fun hashCode(): Int = backingSemVer?.hashCode() ?: asText.hashCode()
 
-    override fun toString(): String = asText
+    override fun toString(): String = asText + if (backingSemVer != null) " [$backingSemVer]" else ""
 
     companion object
     {
         private val logger = logger<LibVersion>()
+        private val leadingZeroRegex = """^0+(?!${'$'})""".toRegex()
 
         fun parse(text: String): LibVersion
         {
+            val parts = text.removePrefix("v").removePrefix("V")
+                .split('.')
+                .stream()
+                .map {
+                    // remove leading zeros
+                    val modified = it.replace(leadingZeroRegex, "")
+                    if (modified.isEmpty()) "0" else modified
+            }.toList().toMutableList()
+
+            if (parts.size < 3)
+            {
+                val needed = 3 - parts.size
+                for (i in 1 .. needed)
+                {
+                    parts.add("0")
+                }
+            }
+
+            val iterator = parts.iterator()
+            val sb = StringBuilder()
+            while (iterator.hasNext())
+            {
+                sb.append(iterator.next())
+                if (iterator.hasNext())
+                {
+                    sb.append('.')
+                }
+            }
+            val normalized = sb.toString()
             val semVer: SemVer? = try
             {
-                SemVer.parse(text)
+                SemVer.parse(normalized)
             }
             catch (t: Throwable)
             {
-                logger.trace{"[FRC] Could not parse '$text' to a SemVer. Will treat as simple text. Cause: $t"}
+                logger.trace{"[FRC] Could not parse '$text' (normalized to '$normalized' to a SemVer. Will treat as simple text. Cause: $t"}
                 null
             }
             return LibVersion(text, semVer)
         }
 
         fun fromSemVer(semVer: SemVer): LibVersion = LibVersion(semVer.toString(), semVer)
+
+        fun fromSemVerAltText(semVer: SemVer, text: String): LibVersion = LibVersion(text, semVer)
     }
 
 }

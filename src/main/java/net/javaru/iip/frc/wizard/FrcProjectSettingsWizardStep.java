@@ -122,12 +122,19 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     private JBLabel kotlinDslRadioButtonLabel;
     private JPanel groovyDslSupportOptionPanel;
     private JPanel kotlinDslSupportOptionPanel;
+    private JPanel kotlinOptionOutterPanel;
+    private JPanel includeKotlinSupportOptionPanel;
+    private JBCheckBox includeKotlinSupportCheckBox;
+    private JBLabel includeKotlinSupportCheckBoxLabel;
+    private ContextHelpLabel includeKotlinSupportContextHelpLabel;
+    private JBLabel kotlinRequiredForTemplateLabel;
     
     
     private ButtonAndLabelSynchronizer<JBCheckBox> enableDesktopSupportOption;
     private ButtonAndLabelSynchronizer<JBCheckBox> includeVsCodeConfigsOption;
     private ButtonAndLabelSynchronizer<JBCheckBox> includeGitIgnoreFileOption;
     private ButtonAndLabelSynchronizer<JBCheckBox> includeJunitSupportOption;
+    private ButtonAndLabelSynchronizer<JBCheckBox> includeKotlinSupportOption;
     private ButtonAndLabelSynchronizer<JBRadioButton> groovyDslSupportOption;
     private ButtonAndLabelSynchronizer<JBRadioButton> kotlinDslSupportOption;
     
@@ -166,6 +173,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         basePackageDefaultButton.addActionListener(e -> basePackageTextField.setText(FrcProjectWizardDataKt.DEFAULT_BASE_PACKAGE));
         includeVsCodeConfigsCheckBox.setSelected(dataModel.getIncludeVsCodeConfigs());
         enableDesktopSupportCheckBox.setSelected(dataModel.getEnableDesktopSupport());
+        includeKotlinSupportCheckBox.setSelected(dataModel.getIncludeKotlinSupport());
         updateEnableDesktopSupportOptions();
         updateDesktopSupportWarningVisibility();
         // We use an ActionListener and not a ChangeListener as we only want to catch a user initiated change. ChangeListener is fired is we programmatically change the value
@@ -240,6 +248,14 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         };
         groovyDslRadioButton.addItemListener(gradleDslOptionChangeListener);
         kotlinDslRadioButton.addItemListener(gradleDslOptionChangeListener);
+    
+    
+        includeKotlinSupportCheckBox.addChangeListener(e -> {
+            final boolean isKotlinTemplate = dataModel.getTemplateLanguageOption() == TemplateLanguageOption.Kotlin;
+            if (isKotlinTemplate && !includeKotlinSupportCheckBox.isSelected()) {
+                includeKotlinSupportCheckBox.setSelected(true);
+            }
+        });
         
         
         // REMOVE ONCE NO LONGER IN DEVELOPMENT/EXPERIMENTAL
@@ -258,6 +274,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         includeVsCodeConfigsOption = new ButtonAndLabelSynchronizer<>(includeVsCodeConfigsOptionPanel, includeVsCodeConfigsCheckBox, includeVsCodeConfigsCheckBoxLabel);
         includeGitIgnoreFileOption = new ButtonAndLabelSynchronizer<>(includeGitIgnoreFileOptionPanel, includeGitignoreFileCheckBox, includeGitignoreFileCheckBoxLabel);
         includeJunitSupportOption = new ButtonAndLabelSynchronizer<>(includeJunitSupportOptionPanel, includeJunitSupportCheckBox, includeJunitSupportCheckBoxLabel);
+        includeKotlinSupportOption = new ButtonAndLabelSynchronizer<>(includeKotlinSupportOptionPanel, includeKotlinSupportCheckBox, includeKotlinSupportCheckBoxLabel);
         groovyDslSupportOption = new ButtonAndLabelSynchronizer<>(groovyDslSupportOptionPanel, groovyDslRadioButton, groovyDslRadioButtonLabel);
         kotlinDslSupportOption = new ButtonAndLabelSynchronizer<>(kotlinDslSupportOptionPanel, kotlinDslRadioButton, kotlinDslRadioButtonLabel);
     }
@@ -473,16 +490,32 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     @Override
     public void updateStep()
     {
+        // Called whenever the step is shown. Good for updating things that may change by the user going back and them coming forward again
         LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.updateStep()");
 //        ProjectData parentProject = myParentProjectForm.getParentProject();
 //        ProjectId projectId = myBuilder.getProjectId();
         
         FrcUiUtilsKt.setTextIfEmpty(teamNumberTextField, myBuilder.getDataModel().getTeamNumberAsStringOrEmptyString());
+        updateIncludeKotlinSupportOptionVisibility();
         
         updateComponents();
         LOG.trace("[FRC] Exiting FrcProjectSettingsWizardStep.updateStep()");
     }
     
+    
+    private void updateIncludeKotlinSupportOptionVisibility()
+    {
+        final FrcProjectWizardData dataModel = myBuilder.getDataModel();
+        final boolean isKotlinTemplate = dataModel.getTemplateLanguageOption() == TemplateLanguageOption.Kotlin;
+        kotlinOptionOutterPanel.setVisible(dataModel.getFrcYear() >= 2022);
+        // TODO need to make it so option goes "back" to user's previous selection
+        includeKotlinSupportCheckBox.setSelected(includeKotlinSupportCheckBox.isSelected() || isKotlinTemplate);
+        // We have a change listener that does not allow the option to de deselected if it is a Kotlin Template
+        // For now we'll leave the option enabled as it looks strange to be disabled
+        // Ideally we need to enhance the ButtonAndLabelSynchronizer to allow for disabling the checkbox only
+        //includeKotlinSupportCheckBox.setEnabled(!isKotlinTemplate);
+        kotlinRequiredForTemplateLabel.setVisible(isKotlinTemplate);
+    }
     
     /** Commits data from UI into ModuleBuilder and WizardContext */
     @Override
@@ -500,10 +533,11 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         dataModel.setBasePackage(basePackageTextField.getText().trim());
         dataModel.setEnableDesktopSupport(enableDesktopSupportCheckBox.isSelected());
         dataModel.setIncludeVsCodeConfigs(includeVsCodeConfigsCheckBox.isSelected());
+        dataModel.setIncludeKotlinSupport(includeKotlinSupportCheckBox.isSelected());
         
         myBuilder.setProjectId(new ProjectId("frc.team" + configuredTeamNum,
                                              "robot-" + configuredTeamNum,
-                                             dataModel.getFrcYear() + ".0"));
+                                             dataModel.getFrcYearString() + ".0"));
         
         
         if (myBuilder.getProjectId() != null && StringUtils.isNotEmpty(myBuilder.getProjectId().getArtifactId()))
@@ -544,14 +578,14 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         enableDesktopSupportCheckBox.setVisible(dataModel.getWpilibVersion().getFrcYear() >= 2021);
         if (!userHasModifiedDesktopSupport)
         {
-            enableDesktopSupportCheckBox.setSelected(dataModel.isRomiRobotTemplate());
+            enableDesktopSupportCheckBox.setSelected(dataModel.isRomiTemplate());
         }
     }
     
     
     private void updateDesktopSupportWarningVisibility()
     {
-        enableDesktopSupportWarningMessage.setVisible(myBuilder.getDataModel().isRomiRobotTemplate() && !enableDesktopSupportCheckBox.isSelected());
+        enableDesktopSupportWarningMessage.setVisible(myBuilder.getDataModel().isRomiTemplate() && !enableDesktopSupportCheckBox.isSelected());
     }
     
     
@@ -578,7 +612,11 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     
     private void createUIComponents()
     {
-        // WEHen titles are added, the main content shows in a lighter colored font. Since the titles aren't really needed, we are commenting... at least for now
+        // NOTE: when creating text for ContextHelpLabels: you need to have some additional tags inside the
+        //       <html> tags or the text does not wrap on the popup, and instead you get just one super long
+        //        box. As a trick, just wrap an period or comma in <em> tags
+        
+        // When titles are added, the main content shows in a lighter colored font. Since the titles aren't really needed, we are commenting them out… at least for now
         desktopSupportContextHelpLabel = ContextHelpLabel.create(
            /* message("frc.ui.wizard.projectSettingsStep.enableDesktopSupport.contextHelpLabel.title"),*/
             message("frc.ui.wizard.projectSettingsStep.enableDesktopSupport.contextHelpLabel.text"));
@@ -586,5 +624,8 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         includeVsCodeContextHelpLabel = ContextHelpLabel.create(
             /*message("frc.ui.wizard.projectSettingsStep.includeVsCodeConfigs.contextHelpLabel.title"),*/
             message("frc.ui.wizard.projectSettingsStep.includeVsCodeConfigs.contextHelpLabel.text"));
+        
+        includeKotlinSupportContextHelpLabel = ContextHelpLabel.create(
+        message("frc.ui.wizard.projectSettingsStep.includeKotlin.contextHelpLabel.text", message("frc.new.project.wizard.kotlin.disclaimer")));
     }
 }

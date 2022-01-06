@@ -17,20 +17,23 @@
 package net.javaru.iip.frc.actions.create.advanced.cmdBased.command;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import javax.swing.*;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
@@ -52,16 +55,45 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
 public class CommandComponentCreationDialog extends FrcComponentCreationDialog
 {
-    private static final String SUBSYSTEMS_FQN_COMMA_DELIMITED_LIST = "requiredSubsystemsFqnCommaDelimitedString";
-    private static final String SUBSYSTEMS_SIMPLE_NAME_COMMA_DELIMITED_LIST = "requiredSubsystemsNamesCommaDelimitedString";
-    private static final String SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST = "requiredSubsystemsVarsCommaDelimitedString";
-    private static final String SUBSYSTEMS_SINGLETON_CALLS_COMMA_DELIMITED_LIST = "requiredSubsystemsSingletonCallsCommaDelimitedString";
+    private static final Logger logger = LoggerFactory.getLogger(CommandComponentCreationDialog.class);
     
+    /** List of full qualified names of the required subsystems. For example 'frc.team9999.ArmSubsystem, frc.team9999.BallSubsystem'. */
+    private static final String ALL_SUBSYSTEMS_FQN_COMMA_DELIMITED_LIST = "requiredSubsystemsFqnCommaDelimitedString";
+    /** List of simple names of the required subsystems. For example 'ArmSubsystem, BallSubsystem'. */
+    private static final String ALL_SUBSYSTEMS_SIMPLE_NAME_COMMA_DELIMITED_LIST = "requiredSubsystemsNamesCommaDelimitedString";
+    /** List of variable names for the required subsystems. For example 'armSubsystem, ballSubsystem' for the 'ArmSubsystem, BallSubsystem'. */
+    private static final String ALL_SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST = "requiredSubsystemsVarsCommaDelimitedString";
+    /** List of singleton calls for subsystems that are singletons. Non-singletons have a &lt;NULL&gt; placeholder. For example:
+     * 'JavaSubsystem.getInstance(),KotlinSubsystem.INSTANCE,&lt;NULL&gt;,&lt;NULL&gt;' (with two non-singleton subsystems as part of the listing). */
+    private static final String ALL_SUBSYSTEMS_SINGLETON_CALLS_COMMA_DELIMITED_LIST = "requiredSubsystemsSingletonCallsCommaDelimitedString";
+    
+    /** List of full qualified names of the required subsystems. For example 'frc.team9999.ArmSubsystem, frc.team9999.BallSubsystem'. */
+    private static final String SINGLETON_SUBSYSTEMS_FQN_COMMA_DELIMITED_LIST = "singletonSubsystemsFqnCommaDelimitedString";
+    /** List of simple names of the required subsystems. For example 'ArmSubsystem, BallSubsystem'. */
+    private static final String SINGLETON_SUBSYSTEMS_SIMPLE_NAME_COMMA_DELIMITED_LIST = "singletonSubsystemsNamesCommaDelimitedString";
+    /** List of variable names for the required subsystems. For example 'armSubsystem, ballSubsystem' for the 'ArmSubsystem, BallSubsystem'. */
+    private static final String SINGLETON_SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST = "singletonSubsystemsVarsCommaDelimitedString";
+    /** List of singleton calls for subsystems that are singletons. Non-singletons have a &lt;NULL&gt; placeholder. For example:
+     * 'JavaSubsystem.getInstance(),KotlinSubsystem.INSTANCE,&lt;NULL&gt;,&lt;NULL&gt;' (with two non-singleton subsystems as part of the listing). */
+    private static final String SINGLETON_SUBSYSTEMS_SINGLETON_CALLS_COMMA_DELIMITED_LIST = "singletonSubsystemsSingletonCallsCommaDelimitedString";
+    
+    private static final String NON_SINGLETON_SUBSYSTEMS_FQN_COMMA_DELIMITED_LIST = "nonSingletonSubsystemsFqnCommaDelimitedString";
+    /** List of simple names of the required subsystems. For example 'ArmSubsystem, BallSubsystem'. */
+    private static final String NON_SINGLETON_SUBSYSTEMS_SIMPLE_NAME_COMMA_DELIMITED_LIST = "nonSingletonSubsystemsNamesCommaDelimitedString";
+    /** List of variable names for the required subsystems. For example 'armSubsystem, ballSubsystem' for the 'ArmSubsystem, BallSubsystem'. */
+    private static final String NON_SINGLETON_SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST = "nonSingletonSubsystemsVarsCommaDelimitedString";
+    
+    
+    private static final String KOTLIN_PRIMARY_CONSTRUCTOR = "kotlinPrimaryConstructor";
+    private static final String KOTLIN_BASE_CLASS_CONSTRUCTOR = "kotlinBaseClassConstructor";
+    private static final String HAS_ONLY_SINGLETON_SUBSYSTEMS =  "hasOnlySingletonSubsystems";
+    private static final String HAS_SINGLETON_SUBSYSTEMS =       "hasSingletonSubsystems";
+    private static final String NULL_VALUE = "<NULL>";
     private Map<PsiClass, JBCheckBox> mySubsystemsClassesMap;
     
     
     public CommandComponentCreationDialog(@NotNull Module module,
-                                          @NotNull ClassCreator classCreator,
+                                          @NotNull ClassCreator<? extends PsiElement> classCreator,
                                           @NotNull PsiDirectory directory,
                                           @NotNull FrcComponentCreationDataProvider dataProvider)
     {
@@ -123,32 +155,126 @@ public class CommandComponentCreationDialog extends FrcComponentCreationDialog
     }
     
     @Override
-    protected void addComponentSpecificProperties(@NotNull Builder<String, String> props,
+    protected void addComponentSpecificProperties(@NotNull Map<String, String> props,
                                                   @Nullable PsiClass baseClass,
                                                   @NotNull String targetPackageName,
                                                   @NotNull String newClassName)
     {
-        addSubSystemProperties(props);
+        addSubsystemProperties(props);
     }
     
     
-    protected void addSubSystemProperties(@NotNull ImmutableMap.Builder<String, String> props)
+    protected void addSubsystemProperties(@NotNull Map<String, String> props)
     {
         final List<PsiClass> subsystems = getSelectedSubsystems();
+        final List<PsiClass> nonSingletonSubsystems = new ArrayList<>();
+        final List<PsiClass> singletonSubsystems = new ArrayList<>();
+        subsystems.forEach(psiClass -> {
+            if (FrcClassUtils2.isSingleton(psiClass))
+                singletonSubsystems.add(psiClass);
+            else
+                nonSingletonSubsystems.add(psiClass);
+        });
+    
+        final boolean hasSingletonSubsystems = !singletonSubsystems.isEmpty();
+        final boolean hasNonSingletonSubsystems = !nonSingletonSubsystems.isEmpty();
+        final boolean hasOnlySingletonSubsystems = !hasNonSingletonSubsystems;
+        props.put(HAS_ONLY_SINGLETON_SUBSYSTEMS, Boolean.toString(hasOnlySingletonSubsystems));
+        props.put(HAS_SINGLETON_SUBSYSTEMS, Boolean.toString(hasSingletonSubsystems));
+    
+        addSubsystemProperties(props,
+                               subsystems,
+                               ALL_SUBSYSTEMS_FQN_COMMA_DELIMITED_LIST,
+                               ALL_SUBSYSTEMS_SIMPLE_NAME_COMMA_DELIMITED_LIST,
+                               ALL_SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST,
+                               ALL_SUBSYSTEMS_SINGLETON_CALLS_COMMA_DELIMITED_LIST);
+    
+        addSubsystemProperties(props,
+                               singletonSubsystems,
+                               SINGLETON_SUBSYSTEMS_FQN_COMMA_DELIMITED_LIST,
+                               SINGLETON_SUBSYSTEMS_SIMPLE_NAME_COMMA_DELIMITED_LIST,
+                               SINGLETON_SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST,
+                               SINGLETON_SUBSYSTEMS_SINGLETON_CALLS_COMMA_DELIMITED_LIST);
+    
+        addSubsystemProperties(props,
+                               nonSingletonSubsystems,
+                               NON_SINGLETON_SUBSYSTEMS_FQN_COMMA_DELIMITED_LIST,
+                               NON_SINGLETON_SUBSYSTEMS_SIMPLE_NAME_COMMA_DELIMITED_LIST,
+                               NON_SINGLETON_SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST,
+                               null);
+    
+        final boolean isBaseClassAnInterface = BooleanUtils.toBoolean(props.get(BASE_CLASS_IS_INTERFACE));
+        final StringBuilder sb = new StringBuilder();
+        if (myDataProvider.isKotlinTemplate())
+        {
+            // #if($makeAbstract == "true")abstract#end class ${NAME}${kotlinPrimaryConstructor}${baseClassExtendsClause}${kotlinBaseClassConstructor}
+            // in the parent FrcComponentCreationDialog, the baseClassExtendsClause is set to:  ": baseName"
+            //   class FooCommand: CommandBase()
+            //   class FooCommand(private var subsystemOne: SubsystemOne): CommandBase()
+            //   class FooCommand: Command
+            //   class FooCommand(private var subsystemOne: SubsystemOne): Command
+            
+            
+            if (hasNonSingletonSubsystems)
+            {
+                sb.append("(");
+                final Iterator<PsiClass> iterator = nonSingletonSubsystems.iterator();
+                while (iterator.hasNext())
+                {
+                    PsiClass psiClass = iterator.next();
+                    final String className = psiClass.getName();
+                    // TODO: look to see if there is a more sophisticated method in IntelliJ IDEA for suggesting/creating a variable name to handle things like "URLBuilder" to be 'urlBuilder' and not 'uRLBuilder'
+                    final String varName = StringUtils.uncapitalize(className);
+                    sb.append("private val ").append(varName).append(": ").append(className);
+                    if (iterator.hasNext())
+                    {
+                        sb.append(", ");
+                    }
+    
+                }
+                sb.append(")");
+            }
+            props.put(KOTLIN_PRIMARY_CONSTRUCTOR, sb.toString());
+            
+            if (isBaseClassAnInterface)
+            {
+                props.put(KOTLIN_BASE_CLASS_CONSTRUCTOR, "");
+            }
+            else
+            {
+                props.put(KOTLIN_BASE_CLASS_CONSTRUCTOR, "()");
+            }
+        }
+        
+        // note: the properties are logged at trace level in doOKAction() of the parent class
+    }
+    
+    
+    private void addSubsystemProperties(@NotNull Map<String, String> props,
+                                        @NotNull List<PsiClass> subsystems,
+                                        @NotNull String fqnKey,
+                                        @NotNull String simpleNameKey,
+                                        @NotNull String varNameKey,
+                                        @Nullable String singletonCallKey)
+    {
         final String subSystemsFQN = FrcCollectionExtsKt.toCommaDelimitedString(subsystems, false, PsiClass::getQualifiedName);
-        props.put(SUBSYSTEMS_FQN_COMMA_DELIMITED_LIST, subSystemsFQN);
+        props.put(fqnKey, subSystemsFQN);
         
         final String subSystemsSimpleNames = FrcCollectionExtsKt.toCommaDelimitedString(subsystems, false, PsiClass::getName);
-        props.put(SUBSYSTEMS_SIMPLE_NAME_COMMA_DELIMITED_LIST, subSystemsSimpleNames);
+        props.put(simpleNameKey, subSystemsSimpleNames);
         
         final String subSystemsVarNames = FrcCollectionExtsKt.toCommaDelimitedString(subsystems, false, psiClass ->
                 StringUtils.uncapitalize(psiClass.getName()));
-        props.put(SUBSYSTEMS_VAR_NAME_COMMA_DELIMITED_LIST, subSystemsVarNames);
-    
-        final List<String> singletonCalls = createSingletonCalls(subsystems);
-        final String singletonCallsString = FrcCollectionExtsKt.toCommaDelimitedString(singletonCalls, false, String::toString, "<NULL>");
-        props.put(SUBSYSTEMS_SINGLETON_CALLS_COMMA_DELIMITED_LIST, singletonCallsString);
+        props.put(varNameKey, subSystemsVarNames);
+       
+        if (singletonCallKey != null)
+        {
+            final List<String> singletonCalls = createSingletonCalls(subsystems);
+            final String singletonCallsString = FrcCollectionExtsKt.toCommaDelimitedString(singletonCalls, false, String::toString, NULL_VALUE);
+            props.put(singletonCallKey, singletonCallsString);
+        }
     }
+    
     
     @NotNull
     protected List<String> createSingletonCalls(@NotNull List<PsiClass> classes)
@@ -164,7 +290,7 @@ public class CommandComponentCreationDialog extends FrcComponentCreationDialog
     
     
     @Nullable
-    private static String createSingletonCall(PsiClass psiClass)
+    private String createSingletonCall(PsiClass psiClass)
     {
         String result = null;
         if (FrcClassUtils2.isSingleton(psiClass))
@@ -180,11 +306,20 @@ public class CommandComponentCreationDialog extends FrcComponentCreationDialog
                 final PsiField singletonField = FrcClassUtils2.getSingletonField(psiClass);
                 if (singletonField != null && singletonField.hasModifierProperty(PsiModifier.PUBLIC))
                 {
-                    result = psiClass.getName() + "." + singletonField.getName();
+                    result = psiClass.getName();
+                    if (!(myDataProvider.isKotlinTemplate() && isKotlinObjectInstance(singletonField)))
+                    {
+                        result += "." + singletonField.getName();
+                    }
                 }
             }
         }
         return result;
+    }
+    
+    private boolean isKotlinObjectInstance(final PsiField singletonField)
+    {
+        return  ("INSTANCE".equals(singletonField.getName()) && singletonField.getClass().getName().startsWith("org.jetbrains.kotlin"));
     }
     
     

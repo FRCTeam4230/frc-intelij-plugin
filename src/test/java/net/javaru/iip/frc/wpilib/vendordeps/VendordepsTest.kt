@@ -20,6 +20,8 @@ package net.javaru.iip.frc.wpilib.vendordeps
 
 import com.asarkar.semver.NormalVersion
 import com.asarkar.semver.SemVer
+import com.github.michaelbull.result.onFailure
+import com.github.michaelbull.result.onSuccess
 import net.javaru.iip.frc.getResourceStream
 import net.javaru.iip.frc.util.createUri
 import net.javaru.iip.frc.wpilib.vendordeps.Vendordeps.Companion.dmc60cRemappedUuid
@@ -38,7 +40,11 @@ internal class VendordepsTest
     @MethodSource
     fun `correctly parses vendordeps json file`(filePath: String, expected: Vendordeps)
     {
-        assertEquals(expected, Vendordeps.parse(getResourceStream(filePath)))
+        Vendordeps.parse(getResourceStream(filePath)).onSuccess {
+            assertEquals(expected, it)
+        }.onFailure {
+            fail("Parsing failed", it)
+        }
     }
 
     @ParameterizedTest
@@ -75,7 +81,10 @@ internal class VendordepsTest
                 Arguments.of("vendordeps/DMC60C-1.0.13.json", dmc60C_1_0_13),
                 /* Test lib using a non-conformant UUID */
                 Arguments.of("vendordeps/LibCu.json", libCu_2020_2_1),
-
+                /* Test lib that has extra space in the quoted UUID */
+                Arguments.of("vendordeps/PhotonLib-json-1.0.json", photonLib_1_0),
+                Arguments.of("vendordeps/NeedsTrimming.json", needsTrimming),
+                Arguments.of("vendordeps/playingwithfusion2021.json", playingWithFusion_2021_3_22),
                 )
         }
 
@@ -91,181 +100,218 @@ internal class VendordepsTest
         }
 
         private val navX_3_1_405 = Vendordeps(
-            UUID.fromString("cb311d09-36e9-4143-a032-55bb2b94443b"),
-            "KauaiLabs_navX_FRC",
-            LibVersion.fromSemVer(SemVer(NormalVersion(3, 1, 405))),
-            "navx_frc.json",
-            createUri("https://www.kauailabs.com/dist/frc/2020/navx_frc.json"),
-            listOf(createUri("https://repo1.maven.org/maven2/"))
+            uuid = UUID.fromString("cb311d09-36e9-4143-a032-55bb2b94443b"),
+            name = "KauaiLabs_navX_FRC",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(3, 1, 405))),
+            fileName = "navx_frc.json",
+            jsonUrl = createUri("https://www.kauailabs.com/dist/frc/2020/navx_frc.json"),
+            mavenUrls = listOf(createUri("https://repo1.maven.org/maven2/"))
                                              )
 
         private val navX_3_1_409 = Vendordeps(
-            UUID.fromString("cb311d09-36e9-4143-a032-55bb2b94443b"),
-            "KauaiLabs_navX_FRC",
-            LibVersion.fromSemVer(SemVer(NormalVersion(3, 1, 409))),
-            "navx_frc.json",
-            createUri("https://www.kauailabs.com/dist/frc/2020/navx_frc.json"),
-            listOf(createUri("https://repo1.maven.org/maven2/"))
+            uuid = UUID.fromString("cb311d09-36e9-4143-a032-55bb2b94443b"),
+            name = "KauaiLabs_navX_FRC",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(3, 1, 409))),
+            fileName = "navx_frc.json",
+            jsonUrl = createUri("https://www.kauailabs.com/dist/frc/2020/navx_frc.json"),
+            mavenUrls = listOf(createUri("https://repo1.maven.org/maven2/"))
                                              )
 
         private val phoenix_5_17_6 = Vendordeps(
-            UUID.fromString("ab676553-b602-441f-a38d-f1296eff6537"),
-            "CTRE-Phoenix",
-            LibVersion.fromSemVer(SemVer(NormalVersion(5, 17, 6))),
-            "Phoenix.json",
-            createUri("http://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json"),
-            listOf(createUri("http://devsite.ctr-electronics.com/maven/release/"))
+            uuid = UUID.fromString("ab676553-b602-441f-a38d-f1296eff6537"),
+            name = "CTRE-Phoenix",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(5, 17, 6))),
+            fileName = "Phoenix.json",
+            jsonUrl = createUri("http://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json"),
+            mavenUrls = listOf(createUri("http://devsite.ctr-electronics.com/maven/release/"))
                                                )
 
         private val phoenix_5_18_0 = Vendordeps(
-            UUID.fromString("ab676553-b602-441f-a38d-f1296eff6537"),
-            "CTRE-Phoenix",
-            LibVersion.fromSemVer(SemVer(NormalVersion(5, 18, 0))),
-            "Phoenix.json",
-            createUri("http://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json"),
-            listOf(createUri("http://devsite.ctr-electronics.com/maven/release/"))
+            uuid = UUID.fromString("ab676553-b602-441f-a38d-f1296eff6537"),
+            name = "CTRE-Phoenix",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(5, 18, 0))),
+            fileName = "Phoenix.json",
+            jsonUrl = createUri("http://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json"),
+            mavenUrls = listOf(createUri("http://devsite.ctr-electronics.com/maven/release/"))
                                                )
 
         private val phoenix_5_18_1 = Vendordeps(
-            UUID.fromString("ab676553-b602-441f-a38d-f1296eff6537"),
-            "CTRE-Phoenix",
-            LibVersion.fromSemVer(SemVer(NormalVersion(5, 18, 1))),
-            "Phoenix.json",
-            createUri("http://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json"),
-            listOf(createUri("http://devsite.ctr-electronics.com/maven/release/"))
+            uuid = UUID.fromString("ab676553-b602-441f-a38d-f1296eff6537"),
+            name = "CTRE-Phoenix",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(5, 18, 1))),
+            fileName = "Phoenix.json",
+            jsonUrl = createUri("http://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json"),
+            mavenUrls = listOf(createUri("http://devsite.ctr-electronics.com/maven/release/"))
                                                )
 
         private val phoenix_5_18_2 = Vendordeps(
-            UUID.fromString("ab676553-b602-441f-a38d-f1296eff6537"),
-            "CTRE-Phoenix",
-            LibVersion.fromSemVer(SemVer(NormalVersion(5, 18, 2))),
-            "Phoenix.json",
-            createUri("http://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json"),
-            listOf(createUri("http://devsite.ctr-electronics.com/maven/release/"))
+            uuid = UUID.fromString("ab676553-b602-441f-a38d-f1296eff6537"),
+            name = "CTRE-Phoenix",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(5, 18, 2))),
+            fileName = "Phoenix.json",
+            jsonUrl = createUri("http://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json"),
+            mavenUrls = listOf(createUri("http://devsite.ctr-electronics.com/maven/release/"))
                                                )
 
         private val phoenix_5_19_4 = Vendordeps(
-            UUID.fromString("ab676553-b602-441f-a38d-f1296eff6537"),
-            "CTRE-Phoenix",
-            LibVersion.fromSemVer(SemVer(NormalVersion(5, 19, 4))),
-            "Phoenix.json",
-            createUri("https://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json"),
-            listOf(createUri("https://devsite.ctr-electronics.com/maven/release/"))
+            uuid = UUID.fromString("ab676553-b602-441f-a38d-f1296eff6537"),
+            name = "CTRE-Phoenix",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(5, 19, 4))),
+            fileName = "Phoenix.json",
+            jsonUrl = createUri("https://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json"),
+            mavenUrls = listOf(createUri("https://devsite.ctr-electronics.com/maven/release/"))
                                                )
+
+        /** This has a problem in that the UUI String has an extra space in it after the UUID and before the closing quote.
+         *  It is also on of the few to have multiple maven URLs*/
+        @Suppress("SpellCheckingInspection")
+        private val photonLib_1_0 = Vendordeps(
+            uuid = UUID.fromString("515fe07e-bfc6-11fa-b3de-0242ac130004"),
+            name = "photonlib",
+            version = LibVersion.fromSemVerAltText(SemVer(NormalVersion(2021, 1, 7)), "v2021.1.7"),
+            fileName = "photonlib.json",
+            jsonUrl = createUri("https://maven.photonvision.org/repository/internal/org/photonvision/PhotonLib-json/1.0/PhotonLib-json-1.0.json"),
+            mavenUrls = listOf(
+                createUri("https://maven.photonvision.org/repository/internal"),
+                createUri("https://maven.photonvision.org/repository/snapshots"),
+                              )
+                                              )
+
+        @Suppress("SpellCheckingInspection")
+        private val needsTrimming = Vendordeps(
+            uuid = UUID.fromString("03880f9b-e0e6-4cd3-baa5-4039fa38316b"),
+            name = "needsTrimming",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(1, 3, 2))),
+            fileName = "needsTrimming.json",
+            jsonUrl = createUri("https://maven.example.org/repository/internal/org/example/needsTrimming-json/1.0/needsTrimming-json-1.0.json"),
+            mavenUrls = listOf(
+                createUri("https://maven.example.org/repository/internal"),
+                createUri("https://maven.example.org/repository/snapshots"),
+                              )
+                                              )
+
+        private val playingWithFusion_2021_3_22 = Vendordeps(
+            uuid = UUID.fromString("14b8ad04-24df-11ea-978f-2e728ce88125"),
+            name = "PlayingWithFusion",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(2021, 3, 22))),
+            fileName = "playingwithfusion2021.json",
+            jsonUrl = createUri("https://www.playingwithfusion.com/frc/playingwithfusion2021.json"),
+            mavenUrls = listOf(createUri("https://www.playingwithfusion.com/frc/maven/"))
+                                              )
 
 
         // The ADIS lib changed is version format in 2020. in 2019 it used a dash "2019-r2" but in 2020 a dot "2020.r3"
 
         private val adis16488_2019_r1 = Vendordeps(
-            UUID.fromString("38c21ab6-aa8b-44bc-b844-8086c77f09ec"),
-            "ADIS16448-IMU",
-            LibVersion.parse("2019-r1"),
-            "ADIS16448.json",
-            createUri("http://maven.highcurrent.io/vendordeps/ADIS16448.json"),
-            listOf(createUri("http://maven.highcurrent.io/maven"))
+            uuid = UUID.fromString("38c21ab6-aa8b-44bc-b844-8086c77f09ec"),
+            name = "ADIS16448-IMU",
+            version = LibVersion.parse("2019-r1"),
+            fileName = "ADIS16448.json",
+            jsonUrl = createUri("http://maven.highcurrent.io/vendordeps/ADIS16448.json"),
+            mavenUrls = listOf(createUri("http://maven.highcurrent.io/maven"))
                                                   )
 
         private val adis16488_2019_r2 = Vendordeps(
-            UUID.fromString("38c21ab6-aa8b-44bc-b844-8086c77f09ec"),
-            "ADIS16448-IMU",
-            LibVersion.parse("2019-r2"),
-            "ADIS16448.json",
-            createUri("http://maven.highcurrent.io/vendordeps/ADIS16448.json"),
-            listOf(createUri("http://maven.highcurrent.io/maven"))
+            uuid = UUID.fromString("38c21ab6-aa8b-44bc-b844-8086c77f09ec"),
+            name = "ADIS16448-IMU",
+            version = LibVersion.parse("2019-r2"),
+            fileName = "ADIS16448.json",
+            jsonUrl = createUri("http://maven.highcurrent.io/vendordeps/ADIS16448.json"),
+            mavenUrls = listOf(createUri("http://maven.highcurrent.io/maven"))
                                                   )
 
         private val adis16488_2019_r3 = Vendordeps(
-            UUID.fromString("38c21ab6-aa8b-44bc-b844-8086c77f09ec"),
-            "ADIS16448-IMU",
-            LibVersion.parse("2019-r3"),
-            "ADIS16448.json",
-            createUri("http://maven.highcurrent.io/vendordeps/ADIS16448.json"),
-            listOf(createUri("http://maven.highcurrent.io/maven"))
+            uuid = UUID.fromString("38c21ab6-aa8b-44bc-b844-8086c77f09ec"),
+            name = "ADIS16448-IMU",
+            version = LibVersion.parse("2019-r3"),
+            fileName = "ADIS16448.json",
+            jsonUrl = createUri("http://maven.highcurrent.io/vendordeps/ADIS16448.json"),
+            mavenUrls = listOf(createUri("http://maven.highcurrent.io/maven"))
                                                   )
 
         private val adis16488_2020_r1 = Vendordeps(
-            UUID.fromString("38c21ab6-aa8b-44bc-b844-8086c77f09ec"),
-            "ADIS16448-IMU",
-            LibVersion.parse("2020.r1"),
-            "ADIS16448.json",
-            createUri("http://maven.highcurrent.io/vendordeps/ADIS16448.json"),
-            listOf(createUri("http://maven.highcurrent.io/maven"))
+            uuid = UUID.fromString("38c21ab6-aa8b-44bc-b844-8086c77f09ec"),
+            name = "ADIS16448-IMU",
+            version = LibVersion.parse("2020.r1"),
+            fileName = "ADIS16448.json",
+            jsonUrl = createUri("http://maven.highcurrent.io/vendordeps/ADIS16448.json"),
+            mavenUrls = listOf(createUri("http://maven.highcurrent.io/maven"))
                                                   )
 
         private val adis16488_2020_r2 = Vendordeps(
-            UUID.fromString("38c21ab6-aa8b-44bc-b844-8086c77f09ec"),
-            "ADIS16448-IMU",
-            LibVersion.parse("2020.r2"),
-            "ADIS16448.json",
-            createUri("http://maven.highcurrent.io/vendordeps/ADIS16448.json"),
-            listOf(createUri("http://maven.highcurrent.io/maven"))
+            uuid = UUID.fromString("38c21ab6-aa8b-44bc-b844-8086c77f09ec"),
+            name = "ADIS16448-IMU",
+            version = LibVersion.parse("2020.r2"),
+            fileName = "ADIS16448.json",
+            jsonUrl = createUri("http://maven.highcurrent.io/vendordeps/ADIS16448.json"),
+            mavenUrls = listOf(createUri("http://maven.highcurrent.io/maven"))
                                                   )
 
         private val adis16488_2020_r3 = Vendordeps(
-            UUID.fromString("38c21ab6-aa8b-44bc-b844-8086c77f09ec"),
-            "ADIS16448-IMU",
-            LibVersion.parse("2020.r3"),
-            "ADIS16448.json",
-            createUri("http://maven.highcurrent.io/vendordeps/ADIS16448.json"),
-            listOf(createUri("http://maven.highcurrent.io/maven"))
+            uuid = UUID.fromString("38c21ab6-aa8b-44bc-b844-8086c77f09ec"),
+            name = "ADIS16448-IMU",
+            version = LibVersion.parse("2020.r3"),
+            fileName = "ADIS16448.json",
+            jsonUrl = createUri("http://maven.highcurrent.io/vendordeps/ADIS16448.json"),
+            mavenUrls = listOf(createUri("http://maven.highcurrent.io/maven"))
                                                   )
 
         private val commandsNew_2020_0_0 = Vendordeps(
-            UUID.fromString("111e20f7-815e-48f8-9dd6-e675ce75b266"),
-            "WPILib-New-Commands",
-            LibVersion.fromSemVer(SemVer(NormalVersion(2020, 0, 0))),
-            "WPILibNewCommands.json",
-            null,
-            emptyList()
+            uuid = UUID.fromString("111e20f7-815e-48f8-9dd6-e675ce75b266"),
+            name = "WPILib-New-Commands",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(2020, 0, 0))),
+            fileName = "WPILibNewCommands.json",
+            jsonUrl = null,
+            mavenUrls = emptyList()
                                                      )
 
         private val commandsNew_2020_1_2 = Vendordeps(
-            UUID.fromString("111e20f7-815e-48f8-9dd6-e675ce75b266"),
-            "WPILib-New-Commands",
-            LibVersion.fromSemVer(SemVer(NormalVersion(2020, 1, 2))),
-            "WPILibNewCommands.json",
-            null,
-            emptyList())
+            uuid = UUID.fromString("111e20f7-815e-48f8-9dd6-e675ce75b266"),
+            name = "WPILib-New-Commands",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(2020, 1, 2))),
+            fileName = "WPILibNewCommands.json",
+            jsonUrl = null,
+            mavenUrls = emptyList())
         
         private val commandsNew_2020_1_3 = Vendordeps(
-            UUID.fromString("111e20f7-815e-48f8-9dd6-e675ce75b266"),
-            "WPILib-New-Commands",
-            LibVersion.fromSemVer(SemVer(NormalVersion(2020, 1, 3))),
-            "WPILibNewCommands.json",
-            null,
-            emptyList())
+            uuid = UUID.fromString("111e20f7-815e-48f8-9dd6-e675ce75b266"),
+            name = "WPILib-New-Commands",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(2020, 1, 3))),
+            fileName = "WPILibNewCommands.json",
+            jsonUrl = null,
+            mavenUrls = emptyList())
 
         private val commandsNew_2021_1_1 = Vendordeps(
-            UUID.fromString("111e20f7-815e-48f8-9dd6-e675ce75b266"),
-            "WPILib-New-Commands",
-            LibVersion.fromSemVer(SemVer(NormalVersion(2021, 1, 1))),
-            "WPILibNewCommands.json",
-            null,
-            emptyList())
+            uuid = UUID.fromString("111e20f7-815e-48f8-9dd6-e675ce75b266"),
+            name = "WPILib-New-Commands",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(2021, 1, 1))),
+            fileName = "WPILibNewCommands.json",
+            jsonUrl = null,
+            mavenUrls = emptyList())
 
         private val commandsNew_2021_1_2 = Vendordeps(
-            UUID.fromString("111e20f7-815e-48f8-9dd6-e675ce75b266"),
-            "WPILib-New-Commands",
-            LibVersion.fromSemVer(SemVer(NormalVersion(2021, 1, 2))),
-            "WPILibNewCommands.json",
-            null,
-            emptyList())
+            uuid = UUID.fromString("111e20f7-815e-48f8-9dd6-e675ce75b266"),
+            name = "WPILib-New-Commands",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(2021, 1, 2))),
+            fileName = "WPILibNewCommands.json",
+            jsonUrl = null,
+            mavenUrls = emptyList())
 
         private val commandsNew_2021_2_1 = Vendordeps(
-            UUID.fromString("111e20f7-815e-48f8-9dd6-e675ce75b266"),
-            "WPILib-New-Commands",
-            LibVersion.fromSemVer(SemVer(NormalVersion(2021, 2, 1))),
-            "WPILibNewCommands.json",
-            null,
-            emptyList())
+            uuid = UUID.fromString("111e20f7-815e-48f8-9dd6-e675ce75b266"),
+            name = "WPILib-New-Commands",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(2021, 2, 1))),
+            fileName = "WPILibNewCommands.json",
+            jsonUrl = null,
+            mavenUrls = emptyList())
 
         private val commandsOld_2020_0_0 = Vendordeps(
-            UUID.fromString("b066afc2-5c18-43c4-b758-43381fcb275e"),
-            "WPILib-Old-Commands",
-            LibVersion.fromSemVer(SemVer(NormalVersion(2020, 0, 0))),
-            "WPILibOldCommands.json",
-            null,
-            emptyList())
+            uuid = UUID.fromString("b066afc2-5c18-43c4-b758-43381fcb275e"),
+            name = "WPILib-Old-Commands",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(2020, 0, 0))),
+            fileName = "WPILibOldCommands.json",
+            jsonUrl = null,
+            mavenUrls = emptyList())
 
         /**
          * A problematic file as it uses the navX UUID as its UUID.

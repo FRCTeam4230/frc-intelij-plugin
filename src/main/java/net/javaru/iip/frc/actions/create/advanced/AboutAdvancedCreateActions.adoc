@@ -53,9 +53,9 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
 ----
 
 [start=4]
-. Create a Data provider by extending the `FrcComponentCreationDataProvider` abstract class or one of its children such as `Command1ComponentCreationDataProvider` or `Command2ComponentCreationDataProvider`
+. Create a Data provider by extending the `FrcComponentCreationDataProvider` abstract class or one of its children such as `Command1ComponentCreationDataProvider` or `Command2JavaComponentCreationDataProvider`
 **  The `fileTemplateDescriptor` value references the `FileTemplateDescriptor` field you created in the above inside the `FileTemplateGroupDescriptorFactory`. Thus, this is where the template to use dor the action is defined.
-. A Creation Action is defined by extending `AbstractFrcComponentCreationAction` or one of its children such as `AbstractCmdBaseV1ComponentCreationAction` or `AbstractCmdBaseV2ComponentCreationAction`
+. A Creation Action is defined by extending `AbstractFrcComponentCreationAction` or one of its children such as `AbstractCmdBaseV1ComponentCreationAction` or `AbstractJavaCmdBaseV2ComponentCreationAction`
 **  Implement the constructor, using the Data Provider created above, and the `constructCreateFrcComponentDialogInstance` method.
 . Add the Action to an Actions Group in the `plugin.xml`. For example:
 
@@ -64,7 +64,7 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
 <actions>
 <group id="frc.team9999.NewFileTemplates"
            text="FRC"
-           class="net.javaru.iip.frc.actions.FrcCreateComponentsActionGroup"
+           class="net.javaru.iip.frc.actions.FrcJavaBasedProjectsCreateComponentsActionGroup"
            popup="true"
            icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
         <separator />

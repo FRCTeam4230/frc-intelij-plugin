@@ -259,5 +259,8 @@ fun CharSequence.eolTo(eol: EOL = EOL.UNIX): String = this.textToLines().linesTo
 @JvmOverloads
 fun CharSequence?.eolToOrNull(eol: EOL = EOL.UNIX): String? = this?.eolTo(eol)
 
-/** Convenience method for decapitalization since kotlin built-in one was deprecated.  */
+/** Convenience method for decapitalization since kotlin built-in one was deprecated. This implements the suggested replacement   */
 fun String.decapitalize2(): String = this.replaceFirstChar { it.lowercase(Locale.getDefault()) }
+
+/** Convenience method for capitalization since kotlin built-in one was deprecated. This implements the suggested replacement  */
+fun String.capitalize2(): String = this.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }

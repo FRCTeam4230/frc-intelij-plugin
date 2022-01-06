@@ -3,9 +3,9 @@
 <#-- @ftlvariable name="data" type="net.javaru.iip.frc.wizard.FrcProjectWizardData" -->
 <#--    
     Template Language Reference: https://freemarker.apache.org/docs/ref.html
-    Template Author's Guide:    https://freemarker.apache.org/docs/dgui.html
+    Template Author's Guide:     https://freemarker.apache.org/docs/dgui.html
 -->
-<#--  To DEBUG templates, set system property 'frc.freemarker.debug' to true when luanching the testing instance of IntelliJ IDEA -->
+<#--  To DEBUG templates, set system property 'frc.freemarker.debug' to true when launching the testing instance of IntelliJ IDEA -->
 </#compress>
 plugins {
     id "java"
@@ -17,7 +17,7 @@ targetCompatibility = JavaVersion.VERSION_11
 
 def ROBOT_MAIN_CLASS = "${data.mainClassFQ}"
 
-<#if !data.isRomiRobotTemplate()>
+<#if !data.isRomiTemplate()>
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project EmbeddedTools.
 deploy {
@@ -60,20 +60,20 @@ test {
 
 dependencies {
     implementation wpi.deps.wpilib()
-<#if !data.isRomiRobotTemplate()>
+<#if !data.isRomiTemplate()>
     nativeZip wpi.deps.wpilibJni(wpi.platforms.roborio)
 </#if>
     nativeDesktopZip wpi.deps.wpilibJni(wpi.platforms.desktop)
 
 
     implementation wpi.deps.vendor.java()
-<#if !data.isRomiRobotTemplate()>
+<#if !data.isRomiTemplate()>
     nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
 </#if>
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
 
 <#if data.junitIsJUnit4Only()>
-    testImplementation "junit:junit:4.13.1"
+    testImplementation "junit:junit:${data.junit4Version}"
 </#if>
 <#if data.junitUseJUnitPlatform()>
     implementation platform('org.junit:junit-bom:${data.junit5Version}')
@@ -82,7 +82,7 @@ dependencies {
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
 </#if>
 <#if data.junitIncludeVintageSupport()>
-    testImplementation "junit:junit:4.13.1"
+    testImplementation "junit:junit:${data.junit4Version}"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine"
 </#if>
 
@@ -93,10 +93,10 @@ dependencies {
 
     // Websocket extensions require additional configuration.
     // simulation wpi.deps.sim.ws_server(wpi.platforms.desktop, false)
-    <#if !data.isRomiRobotTemplate()>// </#if>simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, false)
+    <#if !data.isRomiTemplate()>// </#if>simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, false)
 }
 
-<#if data.isRomiRobotTemplate()>
+<#if data.isRomiTemplate()>
 // Set the websocket remote host (the Romi IP address).
 sim {
     envVar "HALSIMWS_HOST", "10.0.0.2"

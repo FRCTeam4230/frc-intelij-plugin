@@ -17,16 +17,12 @@ package net.javaru.iip.frc.actions.create.advanced.cmdBased
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.module.Module
-import net.javaru.iip.frc.actions.create.advanced.AbstractFrcComponentCreationAction
+import net.javaru.iip.frc.actions.create.advanced.AbstractFrcJavaComponentCreationAction
 import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider
 import net.javaru.iip.frc.wpilib.isVersion1CommandBaseLibAttached
 
-abstract class AbstractCmdBaseV1ComponentCreationAction
-    protected constructor(dataProvider: FrcComponentCreationDataProvider?) :
-        AbstractFrcComponentCreationAction(dataProvider!!)
+abstract class AbstractCmdBaseV1ComponentCreationAction protected constructor(dataProvider: FrcComponentCreationDataProvider) :
+    AbstractFrcJavaComponentCreationAction(dataProvider)
 {
-    override fun shouldBeEnabledAdditionalCriteria(module: Module, e: AnActionEvent): Boolean
-    {
-        return isVersion1CommandBaseLibAttached(module)
-    }
+    override fun shouldBeEnabledAdditionalCriteria(module: Module, e: AnActionEvent): Boolean = isVersion1CommandBaseLibAttached(module)
 }

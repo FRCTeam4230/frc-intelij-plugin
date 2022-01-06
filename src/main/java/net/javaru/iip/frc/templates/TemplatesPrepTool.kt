@@ -132,7 +132,7 @@ fun copyJavaFile(currentWpiTemplateName: String, wpiTemplateGroupName: String, s
         Files.createDirectories(targetFile.parent)
         Files.createFile(targetFile)
         PrintWriter(Files.newOutputStream(targetFile), true, StandardCharsets.UTF_8).use { pw: PrintWriter ->
-            pw.println(getHeader(relativeSrcPath))
+            pw.printLine(getHeader(relativeSrcPath))
             reader.lines().forEachOrdered { line: String ->
                 val trimmedLine: String = line.trim()
                 pastHeader = pastHeader || haveSeenPackageLine || trimmedLine.startsWith("import ")
@@ -207,11 +207,20 @@ fun copyJavaFile(currentWpiTemplateName: String, wpiTemplateGroupName: String, s
                     }
 
                     newLine = fixSpellingTypos(newLine)
-                    pw.println(newLine)
+                    pw.printLine(newLine)
                 }
             }
+            pw.flush()
         }
     }
+}
+
+/** Prints a line using the specified newline character(s). */
+private fun PrintWriter.printLine(s: String, newline:String = "\n")
+{
+    this.print(s)
+    this.print(newline)
+    this.flush()
 }
 
 @Suppress("SpellCheckingInspection")

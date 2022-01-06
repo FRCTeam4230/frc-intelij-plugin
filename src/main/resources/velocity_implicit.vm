@@ -4,6 +4,7 @@
 #* @vtlvariable name="baseClassExtendsClause" type="java.lang.String" *#
 #* @vtlvariable name="baseClassFqName" type="java.lang.String" *#
 #* @vtlvariable name="baseClassNeedsImporting" type="java.lang.String" *#
+#* @vtlvariable name="baseIsInterface" type="java.lang.String" *#
 #* @vtlvariable name="includeChildMessage" type="java.lang.String" *#
 #* @vtlvariable name="includeJavaDocsForOverrides" type="java.lang.String" *#
 #* @vtlvariable name="makeAbstract" type="java.lang.String" *#
@@ -13,5 +14,17 @@
 #* @vtlvariable name="requiredSubsystemsNamesCommaDelimitedString" type="java.lang.String" *#
 #* @vtlvariable name="requiredSubsystemsSingletonCallsCommaDelimitedString" type="java.lang.String" *#
 #* @vtlvariable name="requiredSubsystemsVarsCommaDelimitedString" type="java.lang.String" *#
+#* @vtlvariable name="singletonSubsystemsFqnCommaDelimitedString" type="java.lang.String" *#
+#* @vtlvariable name="singletonSubsystemsNamesCommaDelimitedString" type="java.lang.String" *#
+#* @vtlvariable name="singletonSubsystemsSingletonCallsCommaDelimitedString" type="java.lang.String" *#
+#* @vtlvariable name="singletonSubsystemsVarsCommaDelimitedString" type="java.lang.String" *#
+#* @vtlvariable name="nonSingletonSubsystemsFqnCommaDelimitedString" type="java.lang.String" *#
+#* @vtlvariable name="nonSingletonSubsystemsNamesCommaDelimitedString" type="java.lang.String" *#
+#* @vtlvariable name="nonSingletonSubsystemsVarsCommaDelimitedString" type="java.lang.String" *#
 #* @vtlvariable name="singletonIncludeJavadoc" type="java.lang.String" *#
 #* @vtlvariable name="singletonInitMethodology" type="java.lang.String" *#
+#* @vtlvariable name="kotlinPrimaryConstructor" type="java.lang.String" *#
+#* @vtlvariable name="kotlinBaseClassConstructor" type="java.lang.String" *#
+#* @vtlvariable name="hasNonSingletonSubsystems" type="java.lang.String" *#
+#* @vtlvariable name="hasOnlySingletonSubsystems" type="java.lang.String" *#
+#* @vtlvariable name="hasSingletonSubsystems" type="java.lang.String" *#

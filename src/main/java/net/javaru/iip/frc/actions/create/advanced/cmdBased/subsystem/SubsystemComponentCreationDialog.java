@@ -17,11 +17,11 @@
 package net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem;
 
 import java.awt.*;
+import java.util.Map;
 import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.google.common.collect.ImmutableMap.Builder;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
@@ -76,7 +76,7 @@ public class SubsystemComponentCreationDialog extends FrcComponentCreationDialog
     
     
     @Override
-    protected void addComponentSpecificProperties(@NotNull Builder<String, String> props,
+    protected void addComponentSpecificProperties(@NotNull Map<String, String> props,
                                                   @Nullable PsiClass baseClass,
                                                   @NotNull String targetPackageName,
                                                   @NotNull String newClassName)

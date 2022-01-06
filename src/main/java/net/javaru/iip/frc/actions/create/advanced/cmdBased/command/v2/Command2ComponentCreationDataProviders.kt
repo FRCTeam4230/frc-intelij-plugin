@@ -23,8 +23,7 @@ import net.javaru.iip.frc.actions.create.advanced.cmdBased.command.CommandCreati
 import net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory
 import net.javaru.iip.frc.wpilib.WpiLibConstants
 
-
-object Command2ComponentCreationDataProvider : CommandCreationDataProvider()
+abstract class AbstractCommand2ComponentCreationDataProvider : CommandCreationDataProvider()
 {
     override val componentVersion: Int = 2
     override val componentTypeSimpleName: String = "Command"
@@ -32,6 +31,15 @@ object Command2ComponentCreationDataProvider : CommandCreationDataProvider()
     override val baseType: BaseType = BaseType.InterfaceAndBaseClass
     override val topLevelClassFqName: String = WpiLibConstants.COMMAND_V2_INTERFACE_FQN
     override val typicalBaseClassFqName: String = WpiLibConstants.COMMAND_V2_BASE_FQN
-    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.COMMAND2
     override val subsystemTopFqName: String = WpiLibConstants.SUBSYSTEM_V2_TOP_FQN
+}
+
+object Command2JavaComponentCreationDataProvider : AbstractCommand2ComponentCreationDataProvider()
+{
+    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.COMMAND2
+}
+
+object Command2KotlinComponentCreationDataProvider : AbstractCommand2ComponentCreationDataProvider()
+{
+    override val fileTemplateDescriptor: FileTemplateDescriptor = FrcFileTemplateGroupDescriptorFactory.COMMAND2_KOT
 }

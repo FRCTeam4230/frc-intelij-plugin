@@ -560,8 +560,10 @@
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v1.PidSubsystem1ComponentCreationAction" />
             <action id="frc.action.new.trigger1"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.trigger.v1.Trigger1ComponentCreationAction" />
-            <action id="frc.action.new.command2"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.Command2ComponentCreationAction" />
+            <action id="frc.action.new.command2.java"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.Command2JavaComponentCreationAction" />
+            <action id="frc.action.new.command2.kotlin"
+                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.Command2KotlinComponentCreationAction" />
             <action id="frc.action.new.commandGroup2"
                     class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v2.CommandGroup2ComponentCreationAction" />
             <action id="frc.action.new.subsystem2"

@@ -23,8 +23,8 @@ import net.javaru.iip.frc.actions.create.advanced.cmdBased.AbstractJavaCmdBaseV2
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.FrcComponentCreationDialog
 import net.javaru.iip.frc.actions.create.advanced.cmdBased.command.CommandComponentCreationDialog
 
-class Command2ComponentCreationAction :
-    AbstractJavaCmdBaseV2ComponentCreationAction(Command2ComponentCreationDataProvider)
+class Command2JavaComponentCreationAction :
+    AbstractJavaCmdBaseV2ComponentCreationAction(Command2JavaComponentCreationDataProvider)
 {
     override fun constructCreateFrcComponentDialogInstance(module: Module, classCreator: ClassCreator<PsiClass>, directory: PsiDirectory): FrcComponentCreationDialog
     {

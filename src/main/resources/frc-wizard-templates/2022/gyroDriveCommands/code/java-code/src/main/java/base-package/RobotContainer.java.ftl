@@ -89,7 +89,7 @@ public class RobotContainer
                                 // Setpoint is 0
                                 0,
                                 // Pipe the output to the turning controls
-                                output -> robotDrive.arcadeDrive(driverController.getLeftY(), output),
+                                output -> robotDrive.arcadeDrive(-driverController.getLeftY(), output),
                                 // Require the robot drive
                                 robotDrive));
         

@@ -142,7 +142,7 @@ public class DriveSubsystem extends SubsystemBase
      */
     public void setModuleStates(SwerveModuleState[] desiredStates)
     {
-        SwerveDriveKinematics.normalizeWheelSpeeds(
+        SwerveDriveKinematics.desaturateWheelSpeeds(
                 desiredStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);

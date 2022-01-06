@@ -634,6 +634,15 @@ enum class FrcWizard2022ProjectTemplateDefinition(
         availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin,
         includeAutoGenReadMe = true
                 ),
+    RomiEducational(
+        "Romi - Educational Robot",
+        """Romi Educational Robot based on a simple robot that can be used for teaching purposes.
+                  |See the <a href="https://docs.wpilib.org/en/stable/docs/romi-robot/index.html">Romi Robot</a> section of 
+                  |the WPI Lib Docs for more information.""".trimMargin(),
+        isRomiBot = true,
+        availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
+             ),
+
     ;
 
 

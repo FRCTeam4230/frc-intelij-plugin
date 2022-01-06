@@ -299,6 +299,7 @@ fun createTemplatesDirMapping() = mapOf(
     "educational" to "educational",
     "robotbaseskeleton" to "robotBaseSkeleton",
     "romicommandbased" to "romiCommand",
+    "romieducational" to "romiEducational",
     "romitimed" to "romiTimed",
     "timed" to "timed",
     "timedskeleton" to "timedSkeleton",

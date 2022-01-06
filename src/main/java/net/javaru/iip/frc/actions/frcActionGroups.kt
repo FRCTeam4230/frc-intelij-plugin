@@ -20,8 +20,10 @@ package net.javaru.iip.frc.actions
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.LangDataKeys
 import com.intellij.openapi.project.Project
 import net.javaru.iip.frc.facet.isFrcFacetedProject
+import net.javaru.iip.frc.util.isKotlinFacetedModule
 
 
 abstract class AbstractFrcActionGroup : DefaultActionGroup()
@@ -31,9 +33,9 @@ abstract class AbstractFrcActionGroup : DefaultActionGroup()
         val project = e.getData(CommonDataKeys.PROJECT)
         e.presentation.isVisible =
             project != null &&
-            !project.isDisposed &&
-            project.isFrcFacetedProject()
-            && additionalVisibilityCriteria(project, e)
+                !project.isDisposed &&
+                project.isFrcFacetedProject() &&
+                additionalVisibilityCriteria(project, e)
     }
 
     /** Override to add additional visibility criteria beyond the project not being null, not disposed, and an FRC project. */
@@ -42,6 +44,24 @@ abstract class AbstractFrcActionGroup : DefaultActionGroup()
 }
 
 class FrcRioLogActionGroup : AbstractFrcActionGroup()
-class FrcCreateComponentsActionGroup : AbstractFrcActionGroup()
 class FrcToolsActionGroup : AbstractFrcActionGroup()
 class FrcRunConfigCreationActionGroup : AbstractFrcActionGroup()
+
+class FrcCreateKotlinComponentsActionGroup : AbstractFrcActionGroup()
+class FrcCreateJavaComponentsActionGroup : AbstractFrcActionGroup()
+class FrcJavaBasedProjectsCreateComponentsActionGroup : AbstractFrcActionGroup()
+{
+    override fun additionalVisibilityCriteria(project: Project, event: AnActionEvent): Boolean
+    {
+        val module = event.getData(LangDataKeys.MODULE)
+        return if (module == null) false else !module.isKotlinFacetedModule()
+    }
+}
+
+class FrcKotlinBasedProjectsCreateComponentsActionGroup : AbstractFrcActionGroup()
+{
+    override fun additionalVisibilityCriteria(project: Project, event: AnActionEvent) = event.getData(LangDataKeys.MODULE)?.isKotlinFacetedModule() ?: false
+
+}
+
+

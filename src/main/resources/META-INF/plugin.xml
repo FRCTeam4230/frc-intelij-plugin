@@ -56,6 +56,9 @@
         &nbsp;&nbsp;&bull; Support for 2022 season, including project templates<br>
         &nbsp;&nbsp;&bull; New Project Wizard: Added Kotlin based new project templates<br>
         &nbsp;&nbsp;&bull; New Project Wizard: Added option to include Kotlin support in projects<br>
+        &nbsp;&nbsp;&bull; Added Kotlin initial class templates<br>
+        &nbsp;&nbsp;&bull; Added additional FRC/WPI domain words to spelling dictionary<br>
+        &nbsp;&nbsp;&bull; Various other internal changes<br>
         <br>
         <strong>v1.6.1</strong> <br>
         &nbsp;&nbsp;&bull; Resolves a potential NPE<br>
@@ -542,47 +545,112 @@
                     class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationBalloonSharedByALLOpenProjectsAction" />
         </group>
 
-        <!--suppress PluginXmlCapitalization -->
-        <group id="frc.NewFileTemplates"
+        <group id="frc.NewFileTemplates.JavaProjects"
                text="FRC"
-               class="net.javaru.iip.frc.actions.FrcCreateComponentsActionGroup"
+               class="net.javaru.iip.frc.actions.FrcJavaBasedProjectsCreateComponentsActionGroup"
                popup="true"
                icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile" />
-            <separator />
-            <action id="frc.action.new.command1"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v1.Command1ComponentCreationAction" />
-            <action id="frc.action.new.commandGroup1"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v1.CommandGroup1ComponentCreationAction" />
-            <action id="frc.action.new.subsystem1"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v1.Subsystem1ComponentCreationAction" />
-            <action id="frc.action.new.pidSubsystem1"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v1.PidSubsystem1ComponentCreationAction" />
-            <action id="frc.action.new.trigger1"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.trigger.v1.Trigger1ComponentCreationAction" />
-            <action id="frc.action.new.command2.java"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.Command2JavaComponentCreationAction" />
-            <action id="frc.action.new.command2.kotlin"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.Command2KotlinComponentCreationAction" />
-            <action id="frc.action.new.commandGroup2"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v2.CommandGroup2ComponentCreationAction" />
-            <action id="frc.action.new.subsystem2.java"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2.Subsystem2JavaComponentCreationAction" />
-            <action id="frc.action.new.subsystem2.kotlin"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2.Subsystem2KotlinComponentCreationAction" />
-            <action id="frc.action.new.trapezoidProfileSubsystem2"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.trapezoidProfileSubsystem.v2.TrapezoidProfileSubsystem2ComponentCreationAction" />
-            <action id="frc.action.new.pidSubsystem2"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v2.PidSubsystem2ComponentCreationAction" />
-            <action id="frc.action.new.profiledPidSubsystem2"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.profiledPidSubsystem.v2.ProfiledPidSubsystem2ComponentCreationAction" />
-            <action id="frc.action.new.trigger2.java"
-                    class="net.javaru.iip.frc.actions.create.advanced.cmdBased.trigger.v2.Trigger2JavaComponentCreationAction" />
-            <action id="frc.action.new.trigger2.kotlin"
-                                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.trigger.v2.Trigger2KotlinComponentCreationAction" />
-
-            <!--<action id="frc.action.new.build.file" class="net.javaru.iip.frc.actions.create.build.NewFrcAntBuildFileAction" text="FRC New Ant Build File" />-->
         </group>
+
+        <!-- region new component action groups -->
+        <group id="frc.NewFileTemplates.KotlinProjects"
+               text="FRC"
+               class="net.javaru.iip.frc.actions.FrcKotlinBasedProjectsCreateComponentsActionGroup"
+               popup="true"
+               icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile" />
+        </group>
+
+        <group id="frc.NewFileTemplates.KotlinTemplates"
+               text="Kotlin"
+               class="net.javaru.iip.frc.actions.FrcCreateKotlinComponentsActionGroup"
+               popup="true"
+               icon="FrcIcons.Tech.Kotlin.KOTLIN_13_SVG">
+            <add-to-group group-id="frc.NewFileTemplates.KotlinProjects" anchor="first" />
+        </group>
+
+        <group id="frc.NewFileTemplates.JavaTemplates"
+               text="Java"
+               class="net.javaru.iip.frc.actions.FrcCreateJavaComponentsActionGroup"
+               popup="true"
+               icon="FrcIcons.Tech.Java.JAVA_SVG">
+            <add-to-group group-id="frc.NewFileTemplates.KotlinProjects" anchor="last" />
+        </group>
+        <!-- endregion new component action groups -->
+
+        <!-- region new component actions -->
+        <action id="frc.action.new.command1"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v1.Command1ComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+        </action>
+        <action id="frc.action.new.commandGroup1"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v1.CommandGroup1ComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+        </action>
+        <action id="frc.action.new.subsystem1"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v1.Subsystem1ComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+        </action>
+        <action id="frc.action.new.pidSubsystem1"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v1.PidSubsystem1ComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+        </action>
+        <action id="frc.action.new.trigger1"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.trigger.v1.Trigger1ComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+        </action>
+        <action id="frc.action.new.command2.java"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.Command2JavaComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+            <add-to-group group-id="frc.NewFileTemplates.JavaTemplates" />
+        </action>
+        <action id="frc.action.new.command2.kotlin"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.Command2KotlinComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+            <add-to-group group-id="frc.NewFileTemplates.KotlinTemplates" />
+        </action>
+        <action id="frc.action.new.commandGroup2"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v2.CommandGroup2ComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+            <add-to-group group-id="frc.NewFileTemplates.JavaTemplates" />
+        </action>
+        <action id="frc.action.new.subsystem2.java"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2.Subsystem2JavaComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+            <add-to-group group-id="frc.NewFileTemplates.JavaTemplates" />
+        </action>
+        <action id="frc.action.new.subsystem2.kotlin"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2.Subsystem2KotlinComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+            <add-to-group group-id="frc.NewFileTemplates.KotlinTemplates" />
+        </action>
+        <action id="frc.action.new.trapezoidProfileSubsystem2"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.trapezoidProfileSubsystem.v2.TrapezoidProfileSubsystem2ComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+            <add-to-group group-id="frc.NewFileTemplates.JavaTemplates" />
+        </action>
+        <action id="frc.action.new.pidSubsystem2"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.pidSubsystem.v2.PidSubsystem2ComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+            <add-to-group group-id="frc.NewFileTemplates.JavaTemplates" />
+        </action>
+        <action id="frc.action.new.profiledPidSubsystem2"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.profiledPidSubsystem.v2.ProfiledPidSubsystem2ComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+            <add-to-group group-id="frc.NewFileTemplates.JavaTemplates" />
+        </action>
+        <action id="frc.action.new.trigger2.java"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.trigger.v2.Trigger2JavaComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+            <add-to-group group-id="frc.NewFileTemplates.JavaTemplates" />
+        </action>
+        <action id="frc.action.new.trigger2.kotlin"
+                            class="net.javaru.iip.frc.actions.create.advanced.cmdBased.trigger.v2.Trigger2KotlinComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+            <add-to-group group-id="frc.NewFileTemplates.KotlinTemplates" />
+        </action>
+        <!-- endregion new component actions -->
 
         <action id="frc.configureTeamNumberBasicAction"
                 class="net.javaru.iip.frc.actions.ConfigureTeamNumberBasicAction"

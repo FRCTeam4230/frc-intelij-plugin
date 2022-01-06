@@ -64,7 +64,7 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
 <actions>
 <group id="frc.team9999.NewFileTemplates"
            text="FRC"
-           class="net.javaru.iip.frc.actions.FrcCreateComponentsActionGroup"
+           class="net.javaru.iip.frc.actions.FrcJavaBasedProjectsCreateComponentsActionGroup"
            popup="true"
            icon="FrcIcons.FRC.FIRST_ICON_MEDIUM_16">
         <separator />

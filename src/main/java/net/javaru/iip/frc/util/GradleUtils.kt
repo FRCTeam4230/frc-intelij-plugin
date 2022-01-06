@@ -143,7 +143,7 @@ fun Project.markGradleProjectAsNeedingReimport(scheduleForAutoReimport: Boolean 
                     if (scheduleForAutoReimport)
                         projectTracker.scheduleProjectRefresh()
                     else
-                        projectTracker.scheduleProjectNotificationUpdate()
+                        projectTracker.scheduleChangeProcessing() // Was .scheduleProjectNotificationUpdate() pre 2021.3
                 }
             }, project.disposed)
     }
@@ -174,6 +174,3 @@ private fun Project.findAllProjectSettings(): List<ExternalSystemProjectId>
     }
     return list
 }
-
-/** Reimports the Gradle project by scheduling it via the internal ProjectTracker */
-fun Project.scheduleGradleReimport() = this.markGradleProjectAsNeedingReimport(scheduleForAutoReimport = true)

@@ -140,7 +140,7 @@ public class Drivetrain
                         fieldRelative
                         ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotation, gyro.getRotation2d())
                         : new ChassisSpeeds(xSpeed, ySpeed, rotation));
-        mecanumDriveWheelSpeeds.normalize(MAX_SPEED);
+        mecanumDriveWheelSpeeds.desaturate(MAX_SPEED);
         setSpeeds(mecanumDriveWheelSpeeds);
     }
     

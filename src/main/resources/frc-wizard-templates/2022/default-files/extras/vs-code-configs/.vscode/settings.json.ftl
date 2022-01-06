@@ -6,7 +6,6 @@
 {
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.server.launchMode": "Standard",
-  "http.systemCertificates": false,
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,

@@ -54,6 +54,8 @@ object RomiDrivetrain : SubsystemBase()
         leftEncoder.distancePerPulse = Math.PI * WHEEL_DIAMETER_INCH / COUNTS_PER_REVOLUTION
         rightEncoder.distancePerPulse = Math.PI * WHEEL_DIAMETER_INCH / COUNTS_PER_REVOLUTION
         resetEncoders()
+        // Invert right side since motor is flipped
+        rightMotor.inverted = true
     }
 
     fun arcadeDrive(xAxisSpeed: Double, zAxisRotate: Double) = diffDrive.arcadeDrive(xAxisSpeed, zAxisRotate)

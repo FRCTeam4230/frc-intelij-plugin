@@ -46,6 +46,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.util.SlowOperations;
 
 import kotlin.Unit;
 import kotlin.collections.CollectionsKt;
@@ -292,35 +293,39 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
             {
                 return;
             }
-        
-            final String newClassName = getNewClassName().trim();
-            final StringBuilder pkgName = new StringBuilder();
-        
-            final PsiPackage pkg = JavaDirectoryService.getInstance().getPackageInSources(myDirectory);
-            if (pkg != null)
-            {
-                pkgName.append(pkg.getQualifiedName());
-                if (newClassName.contains("."))
+            
+            // Issue #109: The work to find classes can cause a "Slow operations are prohibited" exception
+            // Since this is the user opening a dialog, that should be ok
+            SlowOperations.allowSlowOperations( () -> {
+                final String newClassName = getNewClassName().trim();
+                final StringBuilder pkgName = new StringBuilder();
+            
+                final PsiPackage pkg = JavaDirectoryService.getInstance().getPackageInSources(myDirectory);
+                if (pkg != null)
                 {
-                    String[] names = newClassName.split("\\.");
-                    for (int i = 0; i < names.length - 1; i++)
+                    pkgName.append(pkg.getQualifiedName());
+                    if (newClassName.contains("."))
                     {
-                        pkgName.append(".").append(names[i]);
+                        String[] names = newClassName.split("\\.");
+                        for (int i = 0; i < names.length - 1; i++)
+                        {
+                            pkgName.append(".").append(names[i]);
+                        }
                     }
                 }
-            }
-        
-            Map<String, String> additionalProperties = getAdditionalProperties(pkgName.toString(), newClassName);
-            if (LOG.isTraceEnabled()) LOG.trace("[FRC] additional properties: " + additionalProperties);
             
-            saveState();
-            
-            if (myClassCreator.createClass(newClassName,
-                                           myDirectory,
-                                           additionalProperties))
-            {
-                close(OK_EXIT_CODE);
-            }
+                Map<String, String> additionalProperties = getAdditionalProperties(pkgName.toString(), newClassName);
+                if (LOG.isTraceEnabled()) LOG.trace("[FRC] additional properties: " + additionalProperties);
+                
+                saveState();
+                
+                if (myClassCreator.createClass(newClassName,
+                                               myDirectory,
+                                               additionalProperties))
+                {
+                    close(OK_EXIT_CODE);
+                }
+            });
         }
         catch (Exception e)
         {

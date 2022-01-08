@@ -88,7 +88,7 @@ data class GradleRioMavenMetadataState(@Language("JSON") var mavenMetadataJson: 
      * that the returned state won't be stored, as a result previously stored state will be used.
      * @see com.intellij.util.xmlb.XmlSerializer
      */
-    override fun getState(): GradleRioMavenMetadataState? = this
+    override fun getState(): GradleRioMavenMetadataState = this
 
     /**
      * This method is called when new component state is loaded. The method can and will be called several times, if

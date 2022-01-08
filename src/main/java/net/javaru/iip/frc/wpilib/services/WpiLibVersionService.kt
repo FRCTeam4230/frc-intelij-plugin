@@ -428,7 +428,7 @@ class WpiLibVersionService private constructor(private val project: Project) : P
                 val attachedVersion = project.getAttachedWpiLibVersion()
                 if (attachedVersion != null)
                 {
-                    // TODO: we should check for a conflict between project year in the wpi_lib_preferences and the attached library? 
+                    // TODO:  #88 we should check for a conflict between project year in the wpi_lib_preferences and the attached library?
                     //       This should be added as inspection that runs on project startup, and anytime the preferences file changes
                     val projectYear = attachedVersion.frcYear
 

@@ -1,12 +1,12 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="FRC [runIde] (Latest EAP Snapshot - Community)" type="GradleRunConfiguration" factoryName="Gradle">
-      <log_file alias="latest-eap-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-LATEST-EAP-SNAPSHOT/system/log/idea.log" />
-      <log_file alias="idea.log" path="$PROJECT_DIR$/.sandbox/system/log/idea.log" />
+    <log_file alias="latest-eap-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-LATEST-EAP-SNAPSHOT/system/log/idea.log" />
+    <log_file alias="idea.log" path="$PROJECT_DIR$/.sandbox/system/log/idea.log" />
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="-PideaVersion=IC-LATEST-EAP-SNAPSHOT -x buildSearchableOptions " />
+      <option name="scriptParameters" value="-PideaVersion=IC-LATEST-EAP-SNAPSHOT -x buildSearchableOptions" />
       <option name="taskDescriptions">
         <list />
       </option>

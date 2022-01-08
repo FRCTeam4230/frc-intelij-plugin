@@ -26,6 +26,7 @@ import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ApplicationNamesInfo
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter
+import com.intellij.openapi.diagnostic.ExceptionWithAttachments
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent
 import com.intellij.openapi.diagnostic.SubmittedReportInfo
 import com.intellij.openapi.diagnostic.logger
@@ -50,6 +51,7 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.util.FrcSystemConfigs
 import net.javaru.iip.frc.util.frcPluginVersion
 import net.javaru.iip.frc.util.getPluginResourceAsStream
+import net.javaru.iip.frc.util.insertBeforeLast
 import java.awt.Component
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -192,10 +194,8 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
                                 // cast, and catch any exception since in most cases it is a LogMessage
                                 val ideaEventData = ideaEvent.data
                                 // Note: Max attachment size is 20 MB
-                                val attachments = (ideaEventData as LogMessage).allAttachments
-                                for (ideaAttachment in attachments)
-                                {
-                                    scope.addAttachment(Attachment(ideaAttachment.bytes, ideaAttachment.path))
+                                (ideaEventData as LogMessage).allAttachments.forEach{
+                                    scope.addIdeaAttachment(it)
                                 }
                             }
                             catch (e: Exception)
@@ -249,6 +249,12 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
                             event.additionalData?.forEach { scope.setExtraSafely(it.key, it.value) }
 
                             scope.addThrowableAsAttachment(event.throwable, "the.throwable.txt")
+                            if (event.throwable is ExceptionWithAttachments)
+                            {
+                                event.throwable.attachments.forEach {
+                                    scope.addIdeaAttachment(it)
+                                }
+                            }
                             val sentryEvent = SentryEvent(event.throwable)// Is null safe
                             sentryEvent.setStacktraceHashes(event.throwable)
                             sentryEvent.level = event.level
@@ -292,6 +298,16 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
     private fun Scope.setExtraSafely(key: String, value: Any?)
     {
         if (value != null) this.setExtra(key, value.toString())
+    }
+
+    private fun Scope.addIdeaAttachment(ideaAttachment: com.intellij.openapi.diagnostic.Attachment)
+    {
+        this.addAttachment(Attachment(ideaAttachment.bytes, ideaAttachment.path))
+        if (String(ideaAttachment.bytes).trim() != ideaAttachment.displayText.trim())
+        {
+            val path = ideaAttachment.path.insertBeforeLast('.', "-displayText")
+            this.addAttachment(Attachment(ideaAttachment.bytes, path))
+        }
     }
 
     private data class StacktraceHashes(val fullHash: String, val limitedHash: String, val singleHash: String)

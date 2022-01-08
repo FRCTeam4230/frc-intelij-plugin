@@ -264,3 +264,21 @@ fun String.decapitalize2(): String = this.replaceFirstChar { it.lowercase(Locale
 
 /** Convenience method for capitalization since kotlin built-in one was deprecated. This implements the suggested replacement  */
 fun String.capitalize2(): String = this.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+
+/**
+ * Inserts the supplied [value] before the last occurrence of [delimiter]. If the string does not contain the delimiter,
+ * the `value` added to the end of the string. Some examples for a `delimiter` of `.` and an insert value of "-baz":
+ *n
+ * - "foo.txt" ➜ "foo-baz.txt"
+ * - "foo.bar.txt" ➜ "foo.bar-baz.txt"
+ * - "foo" ➜ "foo-baz"
+ * - ".foo" ➜ "-baz.foo"
+ */
+fun String.insertBeforeLast(delimiter: Char, value: String): String
+{
+    val prefix = this.substringBeforeLast(delimiter)
+    val suffix = this.substringAfterLast(delimiter, "").let {
+        if (it.isEmpty()) "" else ".$it"
+    }
+    return "$prefix$value$suffix"
+}

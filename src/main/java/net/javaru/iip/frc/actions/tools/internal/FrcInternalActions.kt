@@ -81,9 +81,14 @@ open class FrcInternalActionsGroup : DefaultActionGroup()
     }
 }
 
+class FrcInternalUiActionsGroup : FrcInternalActionsGroup()
+class FrcInternalRunCodeActionsGroup : FrcInternalActionsGroup()
+class FrcInternalNetAndRestActionsGroup : FrcInternalActionsGroup()
+class FrcInternalIoActionsGroup : FrcInternalActionsGroup()
 class FrcInternalFrcPluginRelatedActionsGroup : FrcInternalActionsGroup()
 class FrcInternalVendordepsActionsGroup : FrcInternalActionsGroup()
 class FrcInternalGradleActionsGroup : FrcInternalActionsGroup()
+class FrcInternalExceptionsActionsGroup : FrcInternalActionsGroup()
 
 private object FrcInternalActions
 
@@ -102,6 +107,9 @@ abstract class AbstractFrcInternalAction : AnAction
 
     @Suppress("unused")
     protected constructor(text: String?) : super(text)
+
+    @Suppress("unused")
+    protected constructor(text: String?, icon: Icon?) : super(text, null, icon)
 
     @Suppress("unused")
     protected constructor(text: String?,

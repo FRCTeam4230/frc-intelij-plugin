@@ -21,8 +21,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Attachment
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.RuntimeExceptionWithAttachments
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.TimeoutUtil
+import net.javaru.iip.frc.util.runSafely
 import java.awt.event.ActionEvent
 import java.util.*
 import javax.swing.Icon
@@ -106,4 +108,27 @@ class CauseAnExceptionWithAttachmentsAction : AbstractCauseAnExceptionAction(
 {
     override val includeAttachments: Boolean
         get() = true
+}
+
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+
+class TestSubmitReportableEventAction: AbstractFrcInternalAction(
+    "Text SubmitReportableEvent",
+    AllIcons.Nodes.AbstractException
+                                                                )
+{
+    override fun actionPerformed(e: AnActionEvent)
+    {
+        e.project.runSafely("FRC Internal Action Test",
+                            mapOf("key-1" to "value-1", "key-2" to Random().nextInt(100))) {
+            val attachments = arrayOf(Attachment("first-.txt", "content"), Attachment("second.txt", "more content"), Attachment("third.txt", "even more content"))
+            throw RuntimeExceptionWithAttachments(TEST_MESSAGE, *attachments)
+        }
+    }
+
 }

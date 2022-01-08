@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.util
 
+import com.sampullara.cli.Argument
 import org.apache.commons.text.TextStringBuilder
 
 import org.junit.jupiter.api.Assertions.*
@@ -26,6 +27,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
+import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
 internal class FrcLangExtsKtTest
@@ -47,6 +49,32 @@ internal class FrcLangExtsKtTest
                   { assertEquals(TextData.winData.text, textData.text.eolTo(EOL.WINDOWS), "Wrong result for WINDOWS for input of ${textData.name}")}
                  )
 
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    fun testInsertBeforeLast(input: String, delimiter: Char, value: String, expected: String)
+    {
+        assertEquals(expected, input.insertBeforeLast(delimiter, value))
+    }
+
+
+    @Suppress("unused")
+    companion object
+    {
+        @JvmStatic
+        fun testInsertBeforeLast(): Stream<Arguments>
+        {
+            return Stream.of(
+                Arguments.of("foo.txt", '.', "-baz", "foo-baz.txt"),
+                Arguments.of("foo.bar.txt", '.', "-baz", "foo.bar-baz.txt"),
+                Arguments.of("foo", '.', "-baz", "foo-baz"),
+                Arguments.of(".foo", '.', "-baz", "-baz.foo"),
+                Arguments.of("SomeFileName.zip", '.', "-baz", "SomeFileName-baz.zip"),
+                Arguments.of("SomeFileName.JAR", '.', "-baz", "SomeFileName-baz.JAR"),
+                Arguments.of("Some.File.Name.pdf", '.', "-baz", "Some.File.Name-baz.pdf"),
+                            )
+        }
     }
 }
 

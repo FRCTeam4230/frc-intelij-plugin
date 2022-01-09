@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.util
 
+import com.intellij.openapi.diagnostic.logger
 import org.intellij.lang.annotations.Language
 import org.jdom2.Document
 import org.jdom2.JDOMException
@@ -27,13 +28,36 @@ import java.io.InputStreamReader
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
-/** Converts a XML String to a JDOM2 [Document]. **/
+private object XmlUtils
+private val logger = logger<XmlUtils>()
+
+/**
+ * Converts a XML String to a JDOM2 [Document]. Will throw a `JDOMException` if the conversion
+ * fails. For a non throwing alternative, see [toXmlDocumentOrNull].
+ */
 @Throws(IOException::class, JDOMException::class)
-@JvmOverloads
-fun @receiver:Language("XML") String.toXmlDocument(charset: Charset = StandardCharsets.UTF_8): Document
+fun @receiver:Language("XML") String.toXmlDocument(): Document
 {
-    return ByteArrayInputStream(this.toByteArray(charset)).use {
-            inputStream -> SAXBuilder().build(inputStream)
+    val charset = determineXmlEncoding(this)
+    return ByteArrayInputStream(this.toByteArray(charset)).use { inputStream ->
+        SAXBuilder().build(inputStream)
+    }
+}
+
+/**
+ * Converts a XML String to a JDOM2 [Document]. Will return `null` if the
+ * conversion fails (or the receiver XML String is null).
+ */
+fun @receiver:Language("XML") String?.toXmlDocumentOrNull(): Document?
+{
+    return try
+    {
+        this?.toXmlDocument()
+    }
+    catch (t: Throwable)
+    {
+        logger.warn("[FRC] Could not convert xml string to a XML Document. Cause: $t")
+        null
     }
 }
 

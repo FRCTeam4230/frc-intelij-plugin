@@ -26,6 +26,7 @@ import com.intellij.util.io.createDirectories
 import net.javaru.iip.frc.common.FrcPluginFileAlreadyExistsError
 import net.javaru.iip.frc.common.FrcPluginIoError
 import net.javaru.iip.frc.common.FrcPluginSourceFileNotFoundError
+import org.intellij.lang.annotations.Language
 import java.io.Closeable
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -36,6 +37,9 @@ import java.io.Writer
 import java.net.ServerSocket
 import java.net.Socket
 import java.nio.channels.Selector
+import java.nio.charset.Charset
+import java.nio.charset.IllegalCharsetNameException
+import java.nio.charset.UnsupportedCharsetException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
@@ -487,5 +491,51 @@ fun Path.modifyOperation(target: Path, createTargetParents: Boolean = true, oper
             else                      -> FrcPluginIoError(t)
         }
         Err(error)
+    }
+}
+
+private val xmlEncodingRegex = """<\?[\s]*xml[^>]*encoding[\s]*=[\s]*['|"](?<encoding>[^'|"]+)['|"][^>]*\?>""".toRegex(RegexOption.IGNORE_CASE)
+fun determineXmlEncoding(@Language("XML") xml: String): Charset
+{
+    return try
+    {
+        val matchResult = xmlEncodingRegex.find(xml)
+        val encoding = matchResult?.groups?.get("encoding")?.value
+        charsetForNameSafe(encoding)
+    }
+    catch (t: Throwable)
+    {
+        logger.info("[FRC] Could not extract charset from xml string. XML String start=>>>${xml.substring(0, 75)}... Cause Summary exception : $t", t)
+        Charsets.UTF_8
+    }
+}
+
+fun charsetForNameSafe(encoding: String?): Charset
+{
+    return if (encoding == null)
+    {
+        Charsets.UTF_8
+    }
+    else
+    {
+        try
+        {
+            Charset.forName(encoding)
+        }
+        catch (e: IllegalCharsetNameException)
+        {
+            logger.warn("[FRC] '$encoding' is an invalid encoding/charset name.", e)
+            Charsets.UTF_8
+        }
+        catch (e: UnsupportedCharsetException)
+        {
+            logger.info("[FRC] '$encoding' is an unsupported encoding/charset name.")
+            Charsets.UTF_8
+        }
+        catch (e: Exception)
+        {
+            logger.warn("[FRC] Unanticipated Exception for converting $encoding' to a charset. Cause Summary: $e", e)
+            Charsets.UTF_8
+        }
     }
 }

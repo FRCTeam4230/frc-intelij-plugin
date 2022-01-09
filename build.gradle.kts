@@ -351,7 +351,7 @@ dependencies {
     implementation("com.michael-bull.kotlin-result:kotlin-result-jvm:1.1.13")
     implementation("io.github.furstenheim:copy_down:1.0") // HTML to MD
 
-    implementation(platform ("io.sentry:sentry-bom:5.4.0"))
+    implementation(platform ("io.sentry:sentry-bom:5.5.2"))
     implementation("io.sentry:sentry") {
         exclude(group = "org.slf4j", module = "slf4j-api")
             .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")

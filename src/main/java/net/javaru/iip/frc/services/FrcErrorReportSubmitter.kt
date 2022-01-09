@@ -26,7 +26,9 @@ import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ApplicationNamesInfo
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter
+import com.intellij.openapi.diagnostic.ExceptionWithAttachments
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent
+import com.intellij.openapi.diagnostic.RuntimeExceptionWithAttachments
 import com.intellij.openapi.diagnostic.SubmittedReportInfo
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProgressIndicator
@@ -50,6 +52,7 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.util.FrcSystemConfigs
 import net.javaru.iip.frc.util.frcPluginVersion
 import net.javaru.iip.frc.util.getPluginResourceAsStream
+import net.javaru.iip.frc.util.insertBeforeLast
 import java.awt.Component
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -179,10 +182,10 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
                             {
                                 ideaEvent.throwable
                             }
-                            scope.addThrowableAsAttachment(throwable, "the.throwable.txt")
+                            scope.addThrowableAsAttachment(throwable)
                             val sentryEvent = SentryEvent(throwable)
                             sentryEvent.level = SentryLevel.ERROR
-                            sentryEvent.setMessageSafely(scope, ideaEvent, additionalInfo)
+                            sentryEvent.setMessageSafely(scope, ideaEvent, throwable, additionalInfo)
                             sentryEvent.setStacktraceHashes(throwable)
                             try
                             {
@@ -192,10 +195,8 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
                                 // cast, and catch any exception since in most cases it is a LogMessage
                                 val ideaEventData = ideaEvent.data
                                 // Note: Max attachment size is 20 MB
-                                val attachments = (ideaEventData as LogMessage).allAttachments
-                                for (ideaAttachment in attachments)
-                                {
-                                    scope.addAttachment(Attachment(ideaAttachment.bytes, ideaAttachment.path))
+                                (ideaEventData as LogMessage).allAttachments.forEach{
+                                    scope.addIdeaAttachment(it, "eventAttachment-")
                                 }
                             }
                             catch (e: Exception)
@@ -203,6 +204,7 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
                                 LOG.debug("Could not add attachment: $e")
                             }
 
+                            scope.addIdeaExceptionAttachments(throwable)
                             val sentryId = Sentry.captureEvent(sentryEvent)
                             logReportSubmission(sentryId)
                         }
@@ -247,12 +249,12 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
                             scope.setExtraSafely("last.action", event.lastActionId)
                             scope.setExtraSafely("correlationId", event.correlationId)
                             event.additionalData?.forEach { scope.setExtraSafely(it.key, it.value) }
-
-                            scope.addThrowableAsAttachment(event.throwable, "the.throwable.txt")
+                            scope.addThrowableAsAttachment(event.throwable)
+                            scope.addIdeaExceptionAttachments(event.throwable)
                             val sentryEvent = SentryEvent(event.throwable)// Is null safe
                             sentryEvent.setStacktraceHashes(event.throwable)
                             sentryEvent.level = event.level
-                            sentryEvent.setMessageSafely(scope, event.messageOrAdditionalInfo, event.messageAddendum)
+                            sentryEvent.setMessageSafely(scope, event.messageOrAdditionalInfo, event.throwable, event.messageAddendum)
                             event.attachments?.forEach { scope.addAttachment(it) }
                             val sentryId = Sentry.captureEvent(sentryEvent)
                             logReportSubmission(sentryId)
@@ -271,7 +273,7 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
         }
     }
 
-    private fun Scope.addThrowableAsAttachment(throwable: Throwable?, attachmentName: String)
+    private fun Scope.addThrowableAsAttachment(throwable: Throwable?, attachmentName: String = "the.throwable.txt")
     {
         if (throwable != null)
         {
@@ -292,6 +294,29 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
     private fun Scope.setExtraSafely(key: String, value: Any?)
     {
         if (value != null) this.setExtra(key, value.toString())
+    }
+
+    private fun Scope.addIdeaExceptionAttachments(throwable: Throwable?)
+    {
+
+        if (throwable is ExceptionWithAttachments)
+        {
+            val prefix = "exceptionAttachment-"
+            throwable.attachments.forEach {
+                this.addIdeaAttachment(it, prefix)
+            }
+        }
+    }
+
+    private fun Scope.addIdeaAttachment(ideaAttachment: com.intellij.openapi.diagnostic.Attachment, prefix: String)
+    {
+        this.addAttachment(Attachment(ideaAttachment.bytes, "$prefix${ideaAttachment.path}"))
+
+        if (String(ideaAttachment.bytes).trim() != ideaAttachment.displayText.trim())
+        {
+            val path = "$prefix${ideaAttachment.path.insertBeforeLast('.', "-displayText")}"
+            this.addAttachment(Attachment(ideaAttachment.bytes, path))
+        }
     }
 
     private data class StacktraceHashes(val fullHash: String, val limitedHash: String, val singleHash: String)
@@ -322,71 +347,75 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
         }
     }
 
-    private fun SentryEvent.setMessageSafely(scope: Scope, ideaEvent: IdeaLoggingEvent, additionalInfo: String?): Message?
+    private fun SentryEvent.setMessageSafely(scope: Scope, ideaEvent: IdeaLoggingEvent, throwable: Throwable?, additionalInfo: String?): Message?
     {
-        val additionalInfoClean = additionalInfo ?: "<none entered>"
+        val additionalInfoClean = additionalInfo ?: "<none>"
 
-        var detailedMessage =
-            """Event Message:    ${ideaEvent.message}
-              |Additional Info:  $additionalInfoClean
-              |""".trimMargin()
+        val sb = StringBuilder()
+        sb.append("\u2022 IDEA Logging Event Message: ${ideaEvent.message}\n")
+        sb.append("\u2022 Additional Info / User Comments:  $additionalInfoClean\n")
 
         if (ideaEvent is IdeaReportingEvent)
         {
             if (ideaEvent.message != ideaEvent.originalMessage)
             {
-                detailedMessage += "Original Message: ${ideaEvent.originalMessage}"
+                sb.append("\u2022 Original Message: ${ideaEvent.originalMessage}\n")
             }
 
             scope.addAttachment(Attachment(ideaEvent.originalThrowableText.toByteArray(), "originalCausingThrowableStacktrace.txt"))
         }
-        return this.setMessageSafely(scope, detailedMessage)
-    }
-
-    private fun SentryEvent.setMessageSafely(scope: Scope, eventMessage: String?, additionalInfo: String?): Message?
-    {
-        if(additionalInfo == null && eventMessage == null) {
-            return null
-        }
-
-        val detailedMessage =
-            """Event Message:   $eventMessage
-              |Additional Info: ${additionalInfo ?: "<none entered>"}""".trimMargin()
-        return this.setMessageSafely(scope, detailedMessage)
-    }
-
-    private fun SentryEvent.setMessageSafely(scope: Scope, eventMessage: String?, messageAddendum: Map<String, String?>? = emptyMap()): Message?
-    {
-        if(eventMessage == null && messageAddendum.isNullOrEmpty()) {
-            return null
-        }
-        val sb = StringBuilder()
-        if (eventMessage!= null) sb.append("Event Message:   ").append(eventMessage)
-        if (!messageAddendum.isNullOrEmpty()) {
-            sb.append("Addendum:\n")
-            messageAddendum.forEach {
-                sb.append(it.key).append(": ").append(it.value).append("\n")
-            }
-        }
+        sb.addThrowableInfo(throwable)
         return this.setMessageSafely(scope, sb.toString())
     }
 
-    private fun SentryEvent.setMessageSafely(scope: Scope, messageOrAdditionalInfo: String?) : Message?
+
+    private fun SentryEvent.setMessageSafely(scope: Scope, eventMessage: String?, throwable: Throwable?, messageAddendum: Map<String, String?>? = emptyMap()): Message?
     {
-        return if (messageOrAdditionalInfo != null)
+        val sb = StringBuilder()
+        if (eventMessage!= null) sb.append("\u2022 Event Message: ").append(eventMessage).append("\n")
+        sb.addThrowableInfo(throwable)
+
+        if (!messageAddendum.isNullOrEmpty()) {
+            sb.append("\u2022 Addendum:\n")
+            messageAddendum.forEach {
+                sb.append("  \u25E6 ").append(it.key).append(": ").append(it.value).append("\n")
+            }
+        }
+        return if (sb.isNotEmpty()) this.setMessageSafely(scope, sb.toString()) else null
+    }
+
+
+    private fun SentryEvent.setMessageSafely(scope: Scope, theMessage: String?) : Message?
+    {
+        return if (theMessage != null && theMessage.isNotBlank())
         {
             this.message = Message().apply {
-                message = messageOrAdditionalInfo
+                message = theMessage
             }
-            if (messageOrAdditionalInfo.length > 8192) {
+            if (theMessage.length > 8192) {
                 // Messages over 8,192 characters are truncated, so we add the full message as an attachment
-                scope.addAttachment(Attachment(messageOrAdditionalInfo.toByteArray(), "non-truncated_message.txt"))
+                scope.addAttachment(Attachment(theMessage.toByteArray(), "non-truncated_message.txt"))
             }
             this.message
         }
         else
         {
             null
+        }
+    }
+
+    private fun StringBuilder.addThrowableInfo(throwable: Throwable?)
+    {
+        if (throwable != null)
+        {
+            if (throwable.message != null)
+            {
+                append("\u2022 Throwable Message: ").append(throwable.message).append("\n")
+            }
+            if (throwable is RuntimeExceptionWithAttachments && throwable.userMessage != null)
+            {
+                append("\u2022 RuntimeExceptionWithAttachments Additional Msg: ").append(throwable.userMessage).append("\n")
+            }
         }
     }
 

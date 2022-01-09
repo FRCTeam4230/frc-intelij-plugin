@@ -3,16 +3,22 @@
     <log_file alias="212-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-212/system/log/idea.log" />
     <log_file alias="idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox/system/log/idea.log" />
     <log_file alias="latest-eap-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-LATEST-EAP-SNAPSHOT/system/log/idea.log" />
+    <log_file alias="213-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-213/system/log/idea.log" />
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="clean test buildPlugin runIde -x buildSearchableOptions " />
+      <option name="scriptParameters" value="-x buildSearchableOptions" />
       <option name="taskDescriptions">
         <list />
       </option>
       <option name="taskNames">
-        <list />
+        <list>
+          <option value="clean" />
+          <option value="test" />
+          <option value="buildPlugin" />
+          <option value="runIde" />
+        </list>
       </option>
       <option name="vmOptions" value="-Dfrc.simulated.log.service.enabled=false -Dfrc.simulated.log.service.use.configured.port=true -Dfrc.use.wpilib.beta.site=false" />
     </ExternalSystemSettings>

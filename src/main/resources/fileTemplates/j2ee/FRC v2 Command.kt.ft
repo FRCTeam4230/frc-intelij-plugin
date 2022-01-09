@@ -22,10 +22,6 @@
 #if($requiredSubsystemsSingletonCallsArray.size() == 1 && $requiredSubsystemsSingletonCallsArray[0] == "")
     #set($requiredSubsystemsSingletonCallsArray = [])
 #end
-
-
-
-
 ## Array of fully qualified names of the singleton subsystems. For example: [frc.team9999.ArmSubsystem, frc.team9999.BallSubsystem]
 #set($singletonSubsystemsFqnArray=$singletonSubsystemsFqnCommaDelimitedString.split(","))
 ## The split method when called on an empty string will result in an array of one empty string token, so we need to handle that *#
@@ -48,9 +44,6 @@
 #if($singletonSubsystemsSingletonCallsArray.size() == 1 && $singletonSubsystemsSingletonCallsArray[0] == "")
     #set($singletonSubsystemsSingletonCallsArray = [])
 #end
-
-
-
 ## Array of full qualified names of the nonSingleton subsystems. For example: [frc.team9999.ArmSubsystem, frc.team9999.BallSubsystem]
 #set($nonSingletonSubsystemsFqnArray=$nonSingletonSubsystemsFqnCommaDelimitedString.split(","))
 ## The split method when called on an empty string will result in an array of one empty string token, so we need to handle that *#
@@ -67,10 +60,6 @@
 #if($nonSingletonSubsystemsVarsArray.size() == 1 && $nonSingletonSubsystemsVarsArray[0] == "")
     #set($nonSingletonSubsystemsVarsArray = [])
 #end
-
-
-
-
 #if(${PACKAGE_NAME})
 #if (${PACKAGE_NAME} != "")
 package ${PACKAGE_NAME}
@@ -88,7 +77,7 @@ import $fqn
 #end
 
 #parse("File Header.java")
-#if($makeAbstract == "true")abstract#end class ${NAME}${kotlinPrimaryConstructor}${baseClassExtendsClause}${kotlinBaseClassConstructor}
+#if($makeAbstract == "true")abstract #{end}class ${NAME}${kotlinPrimaryConstructor}${baseClassExtendsClause}${kotlinBaseClassConstructor}
 {
     #foreach($subSystemVar in $singletonSubsystemsVarsArray)
         private val $subSystemVar = $singletonSubsystemsSingletonCallsArray[$foreach.index]

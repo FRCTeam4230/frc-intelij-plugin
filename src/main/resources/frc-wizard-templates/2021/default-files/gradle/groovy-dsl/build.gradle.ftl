@@ -76,7 +76,7 @@ dependencies {
     testImplementation "junit:junit:${data.junit4Version}"
 </#if>
 <#if data.junitUseJUnitPlatform()>
-    implementation platform('org.junit:junit-bom:${data.junit5Version}')
+    implementation platform("org.junit:junit-bom:${data.junit5Version}")
     testImplementation "org.junit.jupiter:junit-jupiter-api"
     testImplementation "org.junit.jupiter:junit-jupiter-params"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"

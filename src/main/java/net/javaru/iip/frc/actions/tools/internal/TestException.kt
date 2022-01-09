@@ -139,7 +139,7 @@ class CauseAnExceptionWithAttachmentsAction : AbstractCauseAnExceptionAction(
 // Lines intentionally blank
 
 class TestSubmitReportableEventAction: AbstractFrcInternalAction(
-    "Text SubmitReportableEvent",
+    "Test SubmitReportableEvent",
     AllIcons.Nodes.AbstractException
                                                                 )
 {

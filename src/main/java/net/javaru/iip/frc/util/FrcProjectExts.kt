@@ -110,7 +110,7 @@ fun Project.runReadActionInSmartMode(action:() -> Unit)
 fun <T> Project.runReadActionInSmartMode(computable: Computable<T>): T = DumbService.getInstance(this).runReadActionInSmartMode(computable)
 
 
-inline fun <R> Project.runNonBlockingReadActionInSmartMode(crossinline action: () -> R, crossinline uiContinuation: (R) -> Unit)
+inline fun <R> Project.runNonBlockingReadActionInSmartMode(crossinline action: () -> R, crossinline uiContinuation: (R) -> Unit, uiContinuationModalityState: ModalityState = ModalityState.NON_MODAL)
 {
     // Based on org/jetbrains/kotlin/idea/util/nonblocking.kt:12
     if (isUnitTestMode()) {
@@ -122,7 +122,7 @@ inline fun <R> Project.runNonBlockingReadActionInSmartMode(crossinline action: (
         ReadAction.nonBlocking(Callable { action() })
             .inSmartMode(this)
             .expireWith(disposable)
-            .finishOnUiThread(ModalityState.current()) { result ->
+            .finishOnUiThread(uiContinuationModalityState) { result ->
                 uiContinuation(result)
             }
             // Common Executor examples are

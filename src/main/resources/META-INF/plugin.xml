@@ -52,9 +52,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <strong>v2.1.0</strong> <br>
+        <strong>v2.0.1</strong> <br>
         &nbsp;&nbsp;&bull; Fixed an issue with extra blank lines in the creation of Kotlin Command classes.<br>
-        &nbsp;&nbsp;&bull; br>
+        &nbsp;&nbsp;&bull; Fixed an issue with a background write action occurring on a read-only thread.<br>
         <br>
         <strong>v2.0.0</strong> <br>
         &nbsp;&nbsp;&bull; Support for 2022 season, including project templates<br>

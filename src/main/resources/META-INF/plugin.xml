@@ -585,6 +585,9 @@
             <action id="FRC.tools.internal.TestSubmitReportableEventAction"
                     class="net.javaru.iip.frc.actions.tools.internal.TestSubmitReportableEventAction"
                     icon="AllIcons.General.BalloonWarning" />
+            <action id="FRC.tools.internal.CauseAWithAttachmentsExceptionAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.CauseAWithAttachmentsExceptionAction"
+                    icon="AllIcons.Debugger.Db_disabled_exception_breakpoint" />
             <action id="FRC.tools.internal.LogAnErrorAction"
                     class="net.javaru.iip.frc.actions.tools.internal.LogAnErrorAction"
                     icon="AllIcons.FileTypes.Regexp" />

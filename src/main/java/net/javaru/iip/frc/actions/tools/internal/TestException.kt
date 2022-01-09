@@ -26,33 +26,46 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.TimeoutUtil
 import net.javaru.iip.frc.util.runSafely
 import java.awt.event.ActionEvent
+import java.lang.Exception
 import java.util.*
 import javax.swing.Icon
 
 
-private val random = Random()
-
-fun randomString() = random.nextLong().toString(16)
-
-class TestException @JvmOverloads constructor(message: String = "Test Exception (Please Ignore). Random String: ${randomString()}", cause: Throwable? = null) : RuntimeException(message, cause)
+class TestException @JvmOverloads constructor(message: String = createMessage(), cause: Throwable? = createCause()) : RuntimeException(message, cause)
 {
     companion object
     {
         /** Creates a [TestException] with a consistent line number at the top of the stack trace for some fingerprinting testing.  */
         @JvmOverloads
-        fun create(message: String = "Test Exception (Please Ignore). Random String: ${randomString()}", cause: Throwable? = null): TestException = TestException(message, cause)
+        fun create(message: String = createMessage(), cause: Throwable? = createCause()): TestException = TestException(message, cause)
 
-        /** Creates a Test Exception, appending a random string to the end to the supplied [baseMessage]. */
-        @JvmOverloads
-        fun createWithRandom(baseMessage: String, cause: Throwable? = null): TestException = TestException("$baseMessage Random String: ${randomString()}", cause)
         private const val serialVersionUID: Long = -2017461045868952683L
-
     }
 }
 
-
 private const val TEST_LOGGER = "FRC.TEST.LOGGER"
 private const val TEST_MESSAGE = "test exception; please ignore"
+
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank
+// Lines intentionally blank to keep exception creation on line 68
+private fun createTestException() = TestException.create(createMessage(), createCause(IllegalStateException("test subCause exception: ${randomString()}")))
 
 abstract class AbstractCauseAnExceptionAction(text: String?, description: String?, icon: Icon?) : AbstractFrcInternalAction(text, description, icon)
 {
@@ -60,25 +73,29 @@ abstract class AbstractCauseAnExceptionAction(text: String?, description: String
     {
         val count = if (actionEvent.modifiers and ActionEvent.SHIFT_MASK == 0) 1 else 3
         logger.info("[FRC] Throwing $count simulated complex exception(s) for testing exception handling")
-        val attachments = arrayOf(Attachment("first-.txt", "content"), Attachment("second.txt", "more content"), Attachment("third.txt", "even more content"))
         ApplicationManager.getApplication().executeOnPooledThread {
             for (i in 1..count)
             {
                 // Lines intentionally blank
                 // Lines intentionally blank
                 // Lines intentionally blank
-                // Lines intentionally blank to keep exception creation on line 68
-                val exception =
-                    TestException.create("random exception text ${randomString()}", TestException("Cause with random text ${randomString()}", TestException("Nested cause with random text ${randomString()}"))) // We want the stacktrace line numbers to be consistent, so we always create on the same line, 186 if possible
+                // Lines intentionally blank
+                // Lines intentionally blank
+                // Lines intentionally blank
+                // Lines intentionally blank to keep exception creation on line 86
+                val exception = doCreateTestException()
 
                 if (includeAttachments)
-                    Logger.getInstance(TEST_LOGGER).error(TEST_MESSAGE, exception, *attachments)
+                    Logger.getInstance(TEST_LOGGER).error(TEST_MESSAGE, exception, *createAttachments())
                 else
                     Logger.getInstance(TEST_LOGGER).error(TEST_MESSAGE, exception)
                 if (i != count) TimeoutUtil.sleep(200)
             }
         }
     }
+
+    // Keep on Line 98
+    open fun doCreateTestException(): Exception = createTestException()
 
     abstract val includeAttachments: Boolean
 
@@ -87,6 +104,10 @@ abstract class AbstractCauseAnExceptionAction(text: String?, description: String
         private val logger = logger<AbstractCauseAnExceptionAction>()
     }
 }
+
+private val random = Random()
+
+fun randomString() = random.nextLong().toString(16)
 
 /** An action that will purposefully cause an exception for testing purposes. */
 class CauseAnExceptionAction : AbstractCauseAnExceptionAction(
@@ -124,11 +145,64 @@ class TestSubmitReportableEventAction: AbstractFrcInternalAction(
 {
     override fun actionPerformed(e: AnActionEvent)
     {
-        e.project.runSafely("FRC Internal Action Test",
-                            mapOf("key-1" to "value-1", "key-2" to Random().nextInt(100))) {
-            val attachments = arrayOf(Attachment("first-.txt", "content"), Attachment("second.txt", "more content"), Attachment("third.txt", "even more content"))
-            throw RuntimeExceptionWithAttachments(TEST_MESSAGE, *attachments)
+        // Keep the throw clause on Line 150
+        e.project.runSafely("FRC Internal Action Test", mapOf("key-1" to "value-1", "key-2" to Random().nextInt(100), "key-3" to randomString())) {
+            throw RuntimeExceptionWithAttachments(TEST_MESSAGE, *createInternalAttachments())
         }
     }
-
 }
+
+abstract class AbstractCauseAWithAttachmentsExceptionAction(text: String?, description: String?, icon: Icon?): AbstractCauseAnExceptionAction(text, description, icon)
+{
+    override fun doCreateTestException(): Exception = TestExceptionWithAttachments.create()
+}
+
+class TestExceptionWithAttachments @JvmOverloads constructor(
+    userMessage: String = "The RuntimeExceptionWithAttachments 'userMessage' value.",
+    details: String = createMessage(),
+    vararg attachments: Attachment) : RuntimeExceptionWithAttachments(userMessage, details, *attachments)
+{
+    companion object
+    {
+        /** Creates a [TestException] with a consistent line number at the top of the stack trace for some fingerprinting testing.  */
+        @JvmOverloads
+        fun create(
+            userMessage: String = "The RuntimeExceptionWithAttachments 'userMessage' value.",
+            details: String = "Test ExceptionWithAttachments (Please Ignore). Random String: ${randomString()}"
+                  ): Exception
+        {
+            return TestExceptionWithAttachments(userMessage, details, *createInternalAttachments())
+        }
+
+        /** Creates a Test Exception, appending a random string to the end to the supplied [baseMessage]. */
+        @Suppress("unused")
+        @JvmOverloads
+        fun createWithRandom(baseMessage: String, cause: Throwable? = createCause()): TestException = TestException("$baseMessage Random String: ${randomString()}", cause)
+        private const val serialVersionUID: Long = -2017461045868952683L
+    }
+}
+
+class CauseAWithAttachmentsExceptionAction(override val includeAttachments: Boolean = true) : AbstractCauseAWithAttachmentsExceptionAction
+                                                                                                  (
+                                                                                                  "Cause an ExceptionWithAttachments Exception",
+                                                                                                  "Cause an exceptions that is of type RuntimeExceptionWithAttachments 'external' attachments.",
+                                                                                                  AllIcons.Debugger.Db_disabled_exception_breakpoint
+                                                                                                  )
+
+
+
+
+private class SampleCausedByException(subCause: Throwable? = null): RuntimeException("A test 'caused By' exception for testing; please ignore. Random String: ${randomString()}", subCause)
+{
+    companion object
+    {
+        private const val serialVersionUID: Long = -8654523244061272730L
+    }
+}
+
+
+
+private fun createAttachments() = arrayOf(Attachment("first.txt", "content ${randomString()}"), Attachment("second.txt", "more content ${randomString()}"), Attachment("third.txt", "even more content ${randomString()}"))
+private fun createInternalAttachments() = arrayOf(Attachment("first-internal.txt", "internal content ${randomString()}"), Attachment("second-internal.txt", "more internal content ${randomString()}"), Attachment("third-internal.txt ${randomString()}", "even more internal content"))
+private fun createMessage() = "Test Exception (Please Ignore). Random String: ${randomString()}"
+private fun createCause(subCause: Throwable? = null) = SampleCausedByException(subCause) // Keep on line 208

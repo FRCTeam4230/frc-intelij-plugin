@@ -245,7 +245,7 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
                     try
                     {
                         Sentry.withScope { scope: Scope ->
-                            scope.setExtraSafely("event.type", "ReportableEvent")
+                            scope.setExtraSafely("event.type", "FrcReportableEvent")
                             scope.setExtraSafely("last.action", event.lastActionId)
                             scope.setExtraSafely("correlationId", event.correlationId)
                             event.additionalData?.forEach { scope.setExtraSafely(it.key, it.value) }
@@ -255,6 +255,8 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
                             sentryEvent.setStacktraceHashes(event.throwable)
                             sentryEvent.level = event.level
                             sentryEvent.setMessageSafely(scope, event.messageOrAdditionalInfo, event.throwable, event.messageAddendum)
+                            sentryEvent.setTagSafely("last.action", event.lastActionId)
+                            sentryEvent.setTagSafely("correlationId", event.correlationId)
                             event.attachments?.forEach { scope.addAttachment(it) }
                             val sentryId = Sentry.captureEvent(sentryEvent)
                             logReportSubmission(sentryId)
@@ -341,10 +343,15 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
     private fun SentryEvent.setStacktraceHashes(throwable: Throwable?) {
         if (throwable != null) {
             val (fullHash, limitedHash, singleLine) = StacktraceHashes.create(throwable)
-            this.setTag("ex.hash.full", fullHash)
-            this.setTag("ex.hash.limited", limitedHash)
-            this.setTag("ex.hash.single", singleLine)
+            this.setTagSafely("ex.hash.full", fullHash)
+            this.setTagSafely("ex.hash.limited", limitedHash)
+            this.setTagSafely("ex.hash.single", singleLine)
         }
+    }
+
+    private fun SentryEvent.setTagSafely(key:String, value: String?)
+    {
+        if (value != null) this.setTag(key, value)
     }
 
     private fun SentryEvent.setMessageSafely(scope: Scope, ideaEvent: IdeaLoggingEvent, throwable: Throwable?, additionalInfo: String?): Message?

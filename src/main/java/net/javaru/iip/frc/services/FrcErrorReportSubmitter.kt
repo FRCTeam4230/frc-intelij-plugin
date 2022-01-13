@@ -50,6 +50,7 @@ import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.util.FrcSystemConfigs
+import net.javaru.iip.frc.util.frcPluginPrimaryVersion
 import net.javaru.iip.frc.util.frcPluginVersion
 import net.javaru.iip.frc.util.getPluginResourceAsStream
 import net.javaru.iip.frc.util.insertBeforeLast
@@ -86,7 +87,8 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
             options.apply {
                 isEnableExternalConfiguration = false // We disable since we don't load any
                 dsn = sentryDsn
-                release = frcPluginVersion ?: "<undetermined>"
+                // We use just the primary release (i.e. 1.2.3 and not 1.2.3-2020.1) so the sentry tool can track fixed versions, regressions, and such properly
+                release = frcPluginPrimaryVersion ?: "<undetermined>"
                 // short version is basically hte major version, such as 2021.3 for all 2021.3 versions such as 2021.3.3, 2021.3.1, 2021.3, etc.
                 // we use it as the environment since in most cases we simply need to differentiate between major versions
                 environment = ApplicationInfo.getInstance().shortVersion
@@ -125,6 +127,7 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
 
             }
         }.also {
+            Sentry.setTag("release.full", frcPluginVersion ?: "<undetermined>")
             Sentry.setTag("ide.build", ApplicationInfo.getInstance().build.asString())
             Sentry.setTag("ide.version", ApplicationInfo.getInstance().fullVersion)
             Sentry.setTag("ide.code", ApplicationInfo.getInstance().build.productCode)

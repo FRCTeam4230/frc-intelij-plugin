@@ -42,8 +42,12 @@ private val LOG = logger<FrcPluginUtils>()
 
 val pluginId: PluginId = PluginId.getId(FRC_PLUGIN_ID_STRING)
 val pluginDescriptor: IdeaPluginDescriptor = PluginManagerCore.getPlugin(pluginId)!!
-val frcPluginVersion: String?
-    get() = pluginDescriptor.version
+val frcPluginVersion: String? = pluginDescriptor.version
+val frcPluginPrimaryVersion : String? = run {
+    // remove IDEA version and any -eap or - S N A P S H O T  or such designator
+    val index = frcPluginVersion?.indexOf('-') ?: -1
+    if (index == -1) frcPluginVersion else frcPluginVersion?.substring(0, index)
+}
 
 /** For details, see [Application.invokeLater] */
 inline fun invokeLater(crossinline func: () -> Unit)

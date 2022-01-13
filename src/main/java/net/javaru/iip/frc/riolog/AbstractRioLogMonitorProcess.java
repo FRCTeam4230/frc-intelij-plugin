@@ -433,7 +433,7 @@ public abstract class AbstractRioLogMonitorProcess extends Process
 
         protected boolean isRestartNotification(String text)
         {
-            // TODO: It'd be nice if the line is the debugger attachement, it clears for it, but NOT for the next line which is the "Robot program starting" to prevent a flash like effect
+            // TODO: It'd be nice if the line is the debugger attachment, it clears for it, but NOT for the next line which is the "Robot program starting" to prevent a flash like effect
             if (getSettings().getUseRegexForRestartCheck())
             {
                 return restartRegex.matcher(text).find();

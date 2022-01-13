@@ -40,6 +40,7 @@ import net.javaru.iip.frc.riolog.tcp.message.ErrorMessage;
 import net.javaru.iip.frc.riolog.tcp.message.InfoMessage;
 import net.javaru.iip.frc.riolog.tcp.message.Message;
 import net.javaru.iip.frc.riolog.tcp.message.MessageToStringRenderer;
+import net.javaru.iip.frc.settings.FrcProjectTeamNumberService;
 
 
 
@@ -89,8 +90,8 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         @Override
         public void run()
         {
-            //TODO This needs to be modified to check the FrcProjectTeamNumberService
-            if (!getSettings().isTeamNumberConfigured())
+            boolean teamNumberIsSet = FrcProjectTeamNumberService.getInstance(project).getTeamNumber() > 0 || getSettings().isTeamNumberConfigured();
+            if (!teamNumberIsSet)
             {
                 consoleWriter.println();
                 consoleWriter.println("==============================================================================================================");

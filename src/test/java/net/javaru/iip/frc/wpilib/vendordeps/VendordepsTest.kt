@@ -71,6 +71,7 @@ internal class VendordepsTest
                 Arguments.of("vendordeps/navx_frc-3.1.409.json", navX_3_1_409),
                 Arguments.of("vendordeps/Phoenix-5.18.2.json", phoenix_5_18_2),
                 Arguments.of("vendordeps/Phoenix-5.19.4.json", phoenix_5_19_4),
+                Arguments.of("vendordeps/Phoenix-5.20.2.json", phoenix_5_20_2),
                 Arguments.of("vendordeps/WPILibNewCommands-2020.0.0.json", commandsNew_2020_0_0),
                 Arguments.of("vendordeps/WPILibOldCommands.json", commandsOld_2020_0_0),
                 /* Test unusual version numbering scheme */
@@ -161,6 +162,19 @@ internal class VendordepsTest
             jsonUrl = createUri("https://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json"),
             mavenUrls = listOf(createUri("https://devsite.ctr-electronics.com/maven/release/"))
                                                )
+
+        // NOTE: The phoenix 'latest' URL changed for 2022, i.e. v5.20.2 (it was broken in v5.20.1)
+        //       https://store.ctr-electronics.com/content/release-notes/RELEASE_NOTES.txt
+
+        private val phoenix_5_20_2 = Vendordeps(
+            uuid = UUID.fromString("ab676553-b602-441f-a38d-f1296eff6537"),
+            name = "CTRE-Phoenix",
+            version = LibVersion.fromSemVer(SemVer(NormalVersion(5, 20, 2))),
+            fileName = "Phoenix.json",
+            jsonUrl = createUri("https://maven.ctr-electronics.com/release/com/ctre/phoenix/Phoenix-frc2022-latest.json"),
+            mavenUrls = listOf(createUri("https://maven.ctr-electronics.com/release/"))
+                                               )
+
 
         /** This has a problem in that the UUI String has an extra space in it after the UUID and before the closing quote.
          *  It is also on of the few to have multiple maven URLs*/

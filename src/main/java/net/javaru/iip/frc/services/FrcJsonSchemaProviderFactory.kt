@@ -71,23 +71,26 @@ class FrcJsonSchemaProviderFactory : JsonSchemaProviderFactory
 
                             )
     }
-    
+
     private fun getSchemaFileImpl(schemaResourcePath: String): VirtualFile?
     {
         val resourceUrl: URL? = javaClass.getResource(schemaResourcePath)
-        return if (resourceUrl != null)
-            VfsUtil.findFileByURL(resourceUrl)
-        else
+        if (resourceUrl == null)
         {
             // This should be rare, and discovered at development time and via unit tests
             val msg = "[FRC] Could not find schema file as a resource for schemaResourcePath: $schemaResourcePath"
-            if (IS_IN_FRC_INTERNAL_MODE)
-                logger.error(msg)
-            else
-                logger.warn(msg)
-
-            null
+            if (IS_IN_FRC_INTERNAL_MODE) logger.error(msg) else logger.warn(msg)
+            return null
         }
+
+        val virtualFile = VfsUtil.findFileByURL(resourceUrl)
+        if (virtualFile == null)
+        {
+            // This case should be *extremely* rare, and discovered at development time and via unit tests
+            val msg = "[FRC] Could not find schema file as a VirtualFile for schemaResourcePath: $schemaResourcePath"
+            if (IS_IN_FRC_INTERNAL_MODE) logger.error(msg) else logger.warn(msg)
+        }
+        return virtualFile
     }
 
     @Suppress("unused")

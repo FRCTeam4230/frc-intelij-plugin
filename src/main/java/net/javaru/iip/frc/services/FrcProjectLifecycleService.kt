@@ -88,7 +88,7 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
             {
                 invokeLater {
                     // Issue #114 - AlreadyDisposedException was happening when then runnable was invoked.
-                    if (project.isOpen && project.isFrcFacetedProject() && !project.isDisposed) {
+                    if (project.isOpen && !project.isDisposed) {
                         try
                         {
                             val toolWindow = ToolWindowManager.getInstance(project).getToolWindow(FrcRioLogToolWindowExecutor.FRC_RIO_LOG_TOOL_WINDOW_ID)

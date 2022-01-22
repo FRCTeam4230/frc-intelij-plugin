@@ -30,7 +30,6 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import icons.FrcIcons
 import net.javaru.iip.frc.FrcPluginGlobals.FRC_PLUGIN_ID_STRING
-import net.javaru.iip.frc.services.FrcPluginApplicationDisposable
 import net.javaru.iip.frc.services.FrcPluginProjectDisposable
 import org.apache.commons.io.FilenameUtils
 import java.io.InputStream
@@ -234,24 +233,25 @@ fun getPluginResourceAsText(resourcePath: String): String?
 
 /**
  * Returns a project level Disposable iff the project receiver is not null.
- * Otherwise it returns an application level disposable.
+ * Otherwise, it returns an application level disposable.
  * @see getProjectParentDisposable
  * @see getApplicationParentDisposable
  *
  */
-fun Project?.getParentDisposable(): Disposable = this?.getProjectParentDisposable() ?: getApplicationParentDisposable()
+fun Project?.getParentDisposable(): Disposable = this?.getProjectParentDisposable() ?: ApplicationManager.getApplication()
 
 /**
- * Returns an application level disposable.
+ * Returns the Application as an application level disposable. In general,
+ * we should use project based disposables whenever possible.
+ *
  * @see getProjectParentDisposable
  * @see getParentDisposable
  *
  */
-fun getApplicationParentDisposable(): Disposable = FrcPluginApplicationDisposable.getInstance()
+fun getApplicationParentDisposable(): Disposable = ApplicationManager.getApplication()
 
 /**
  * Returns a project level disposable.
- * @see getApplicationParentDisposable
  * @see getParentDisposable
  *
  */

@@ -245,7 +245,6 @@
         <notificationGroup id="FRC Build Tool Window Notifications" displayType="TOOL_WINDOW" toolWindowId="Build"  />
 
 
-        <applicationService id="FRC.FrcApplicationDisposableService" serviceImplementation="net.javaru.iip.frc.services.FrcPluginApplicationDisposable" />
         <applicationService id="FRC.FrcApplicationSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcApplicationSettings" />
         <applicationService id="FRC.FrcNotificationsSettings"   serviceImplementation="net.javaru.iip.frc.settings.FrcNotificationsSettings" />
         <applicationService id="FRC.RioLogUdpSocketManagerApplicationService" serviceImplementation="net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService" />

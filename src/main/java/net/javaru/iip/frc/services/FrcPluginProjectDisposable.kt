@@ -21,6 +21,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 
 /**
  * A Project Service that we can use as a Project level parent disposable.
@@ -32,14 +33,14 @@ import com.intellij.openapi.project.Project
  *
  * "For resources required for the entire lifetime of a plugin, use an application or project level service."
  *
- * For an application level disposable service, use [FrcPluginApplicationDisposable].
+ * Based on `org.jetbrains.kotlin.idea.core.KotlinPluginDisposable`
  */
 class FrcPluginProjectDisposable(val project: Project) : Disposable
 {
     private val logger = logger<FrcPluginProjectDisposable>()
 
-    var isDisposed = false
-        private set
+    val isDisposed
+        get() = Disposer.isDisposed(this)
 
     companion object
     {
@@ -51,7 +52,6 @@ class FrcPluginProjectDisposable(val project: Project) : Disposable
     {
         try
         {
-            isDisposed = true
             logger.trace { "[FRC] FrcPluginProjectDisposable.dispose() called for project '$project'" }
         }
         catch (ignore: Exception) { }

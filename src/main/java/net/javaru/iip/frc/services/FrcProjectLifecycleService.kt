@@ -87,7 +87,21 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
             if (includeDesktopSupport)
             {
                 invokeLater {
-                    ToolWindowManager.getInstance(project).getToolWindow(FrcRioLogToolWindowExecutor.FRC_RIO_LOG_TOOL_WINDOW_ID)?.hide()
+                    // Issue #114 - AlreadyDisposedException was happening when then runnable was invoked.
+                    if (project.isOpen && project.isFrcFacetedProject() && !project.isDisposed) {
+                        try
+                        {
+                            val toolWindow = ToolWindowManager.getInstance(project).getToolWindow(FrcRioLogToolWindowExecutor.FRC_RIO_LOG_TOOL_WINDOW_ID)
+                            if (toolWindow != null && !toolWindow.isDisposed)
+                            {
+                                toolWindow.hide()
+                            }
+                        }
+                        catch (e: com.intellij.serviceContainer.AlreadyDisposedException)
+                        {
+                            logger.warn("[FRC] Cannot access FRC Tool Window as it is already disposed: $e", e)
+                        }
+                    }
                 }
             }
 

@@ -23,6 +23,8 @@ import com.intellij.facet.FacetType
 import com.intellij.facet.FacetTypeId
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.externalSystem.service.project.IdeModelsProvider
+import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProviderImpl
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
@@ -31,6 +33,7 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.roots.ExternalProjectSystemRegistry
 import com.intellij.util.containers.stream
 import net.javaru.iip.frc.facet.FrcFacet.Companion.FACET_TYPE_ID
+import net.javaru.iip.frc.wpilib.gradlePluginRepo.logger
 import org.jetbrains.annotations.Contract
 import kotlin.streams.toList
 
@@ -55,55 +58,71 @@ class FrcFacet(facetType: FacetType<FrcFacet, FrcFacetConfiguration>,
     }
 }
 
-fun Module.getOrAddFrcFacet(externalSystemId: String? = null, commitModel: Boolean = true): FrcFacet = this.getOrAddFrcFacetImpl(externalSystemId, commitModel)
-
-private fun Module.getOrAddFrcFacetImpl(externalSystemId: String? = null, commitModel: Boolean = true, isReattempt: Boolean = false): FrcFacet
+fun Module.getOrAddFrcFacet(externalSystemId: String? = null, commitModel: Boolean = true): FrcFacet
 {
-    // Based on Kotlin Plugin:  org.jetbrains.kotlin.idea.facet.FacetUtilsKt#getOrCreateFacet
-    // But I've added the try/catch block after a reported issue.
-    val modelsProvider = IdeModifiableModelsProviderImpl(this.project)
-    val facetModel = modelsProvider.getModifiableFacetModel(this)
-    try
+    val modifiableModelsProvider = IdeModifiableModelsProviderImpl(this.project)
+    return getOrAddFrcFacetImpl(externalSystemId, modifiableModelsProvider, commitModel)
+}
+
+fun Module.getOrAddFrcFacet(externalSystemId: String? = null, modelsProvider: IdeModelsProvider, commitModel: Boolean = true): FrcFacet
+{
+    return if (modelsProvider is IdeModifiableModelsProvider)
     {
-        val facet = facetModel.findFacet(FACET_TYPE_ID, FrcFacetType.INSTANCE.defaultFacetName) ?: with(FrcFacetType.INSTANCE) {
-            createFacet(this@getOrAddFrcFacetImpl, defaultFacetName, createDefaultConfiguration(), null)
-        }.apply {
-            val externalSource = externalSystemId?.let{ ExternalProjectSystemRegistry.getInstance().getSourceById(it) }
+        getOrAddFrcFacetImpl(externalSystemId, modelsProvider as IdeModifiableModelsProvider, commitModel)
+    }
+    else
+    {
+        val modifiableModelsProvider = IdeModifiableModelsProviderImpl(this.project)
+        getOrAddFrcFacetImpl(externalSystemId, modifiableModelsProvider, commitModel)
+    }
+}
+fun Module.getOrAddFrcFacet(externalSystemId: String? = null, modifiableModelsProvider: IdeModifiableModelsProvider, commitModel: Boolean = true): FrcFacet =
+    getOrAddFrcFacetImpl(externalSystemId, modifiableModelsProvider, commitModel)
+
+private fun Module.getOrAddFrcFacetImpl(externalSystemId: String? = null,
+                                        modelsProvider: IdeModifiableModelsProvider,
+                                        commitModel: Boolean = true,
+                                        isReattempt:Boolean = false
+                                       ): FrcFacet
+{
+    val facetManager = FacetManager.getInstance(this)
+    val frcFacet = facetManager.getFacetByType(FACET_TYPE_ID)
+    if (frcFacet != null)
+    {
+        return frcFacet
+    }
+
+    // Based on Kotlin Plugin:  org.jetbrains.kotlin.idea.facet.FacetUtilsKt#getOrCreateFacet
+    val facetModel = modelsProvider.getModifiableFacetModel(this)
+    val facet = facetModel.findFacet(FACET_TYPE_ID, FrcFacetType.INSTANCE.defaultFacetName) ?: with(FrcFacetType.INSTANCE) {
+        createFacet (this@getOrAddFrcFacetImpl, defaultFacetName, createDefaultConfiguration(), null)
+    }.apply {
+        val externalSource = externalSystemId?.let { ExternalProjectSystemRegistry.getInstance().getSourceById(it) }
+        try
+        {
             facetModel.addFacet(this, externalSource)
         }
-
-        if (commitModel)
+        catch (e: com.intellij.workspaceModel.storage.impl.exceptions.PersistentIdAlreadyExistsException)
         {
-            ApplicationManager.getApplication().invokeLater{
-                runWriteAction {
-                    facetModel.commit()
-                }
-            }
-        }
-        return facet
-    }
-    catch (e: com.intellij.workspaceModel.storage.impl.exceptions.PersistentIdAlreadyExistsException)
-    {
-        // Gets thrown by facetModel.addFacet()
-        // Was reported via the ErrorSubmitter once. I'm thinking it's a race condition of some type
-        // So we first just recheck for the facet...
-        return facetModel.findFacet(FACET_TYPE_ID, FrcFacetType.INSTANCE.defaultFacetName)?.also {
-            if (commitModel)
+            if (!isReattempt)
             {
-                ApplicationManager.getApplication().invokeLater {
-                    runWriteAction {
-                        facetModel.commit()
-                    }
-                }
+                this@getOrAddFrcFacetImpl.getOrAddFrcFacetImpl(externalSystemId, modelsProvider, commitModel, isReattempt = true)
+            }
+            else
+            {
+                logger.warn("[FRC] PersistentIdAlreadyExistsException occurred on second attempt to add FrcFacet.", e)
             }
         }
-            ?: if (!isReattempt) {
-                // if we still don't have it, we retry the create and add one more time
-                this.getOrAddFrcFacetImpl(externalSystemId, commitModel, isReattempt = true)
-            } else {
-                throw e
-            }
     }
+
+    if (commitModel) {
+        runWriteAction {
+            if (!this@getOrAddFrcFacetImpl.isDisposed) {
+                facetModel.commit()
+            }
+        }
+    }
+    return facet
 }
 
 val allFrcFacetsForAllOpenProjects: ImmutableList<FrcFacet>

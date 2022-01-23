@@ -99,7 +99,7 @@ class FrcDependencyDataService : AbstractProjectDataService<LibraryDependencyDat
                     if (module?.name?.contains(".main") == true)
                     {
                         // only add to the main module. In Gradle projects, there is a team123robot.main and team123robot.test module
-                        module.getOrAddFrcFacet(projectData?.owner.toString())
+                        module.getOrAddFrcFacet(projectData?.owner.toString(), modelsProvider)
                     }
                 }
             }

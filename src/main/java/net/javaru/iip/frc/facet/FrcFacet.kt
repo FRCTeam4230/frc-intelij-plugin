@@ -21,7 +21,6 @@ import com.intellij.facet.Facet
 import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetType
 import com.intellij.facet.FacetTypeId
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.externalSystem.service.project.IdeModelsProvider
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider
@@ -48,6 +47,7 @@ class FrcFacet(facetType: FacetType<FrcFacet, FrcFacetConfiguration>,
     {
         //private val LOG = Logger.getInstance(FrcFacet::class.java)
 
+        private const val serialVersionUID: Long = 4400383714328255414L
         const val FACET_TYPE_ID_STRING = "FRC_FACET"
         val FACET_TYPE_ID = FacetTypeId<FrcFacet>(FACET_TYPE_ID_STRING)
         const val FACET_NAME = "FRC"
@@ -58,6 +58,7 @@ class FrcFacet(facetType: FacetType<FrcFacet, FrcFacetConfiguration>,
     }
 }
 
+@Suppress("unused")
 fun Module.getOrAddFrcFacet(externalSystemId: String? = null, commitModel: Boolean = true): FrcFacet
 {
     val modifiableModelsProvider = IdeModifiableModelsProviderImpl(this.project)
@@ -68,7 +69,7 @@ fun Module.getOrAddFrcFacet(externalSystemId: String? = null, modelsProvider: Id
 {
     return if (modelsProvider is IdeModifiableModelsProvider)
     {
-        getOrAddFrcFacetImpl(externalSystemId, modelsProvider as IdeModifiableModelsProvider, commitModel)
+        getOrAddFrcFacetImpl(externalSystemId, modelsProvider, commitModel)
     }
     else
     {
@@ -76,6 +77,8 @@ fun Module.getOrAddFrcFacet(externalSystemId: String? = null, modelsProvider: Id
         getOrAddFrcFacetImpl(externalSystemId, modifiableModelsProvider, commitModel)
     }
 }
+
+@Suppress("unused")
 fun Module.getOrAddFrcFacet(externalSystemId: String? = null, modifiableModelsProvider: IdeModifiableModelsProvider, commitModel: Boolean = true): FrcFacet =
     getOrAddFrcFacetImpl(externalSystemId, modifiableModelsProvider, commitModel)
 
@@ -125,6 +128,7 @@ private fun Module.getOrAddFrcFacetImpl(externalSystemId: String? = null,
     return facet
 }
 
+@Suppress("unused")
 val allFrcFacetsForAllOpenProjects: ImmutableList<FrcFacet>
     get()
     {
@@ -159,7 +163,8 @@ fun Project?.getAllFrcFacetsForProject(): ImmutableList<FrcFacet>
     return listBuilder.build()
 }
 
-/** Returns all the modules in a project that have an `FrcFacet` attached to them. If the project is null, an empty ;list is returned.  */
+/** Returns all the modules in a project that have an `FrcFacet` attached to them. If the project is null, an empty list is returned.  */
+@Suppress("unused")
 fun Project?.getFrcFacetedModules(): List<Module>
 {
     return if (this == null) emptyList()

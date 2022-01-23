@@ -37,6 +37,7 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
     public static final FileTemplateDescriptor COMMAND2 = new FileTemplateDescriptor("FRC v2 Command.java", FrcIcons.Components.COMMAND);
     public static final FileTemplateDescriptor COMMAND2_KOT = new FileTemplateDescriptor("FRC v2 Command.kt", FrcIcons.Components.COMMAND);
     public static final FileTemplateDescriptor COMMAND_GROUP2 = new FileTemplateDescriptor("FRC v2 CommandGroup.java", FrcIcons.Components.COMMAND_GROUP);
+    public static final FileTemplateDescriptor COMMAND_GROUP2_KOT = new FileTemplateDescriptor("FRC v2 CommandGroup.kt", FrcIcons.Components.COMMAND_GROUP);
     public static final FileTemplateDescriptor SUBSYSTEM2 = new FileTemplateDescriptor("FRC v2 Subsystem.java", FrcIcons.Components.SUBSYSTEM);
     public static final FileTemplateDescriptor SUBSYSTEM2_KOT = new FileTemplateDescriptor("FRC v2 Subsystem.kt", FrcIcons.Components.SUBSYSTEM);
     public static final FileTemplateDescriptor TRAPEZOID_PROFILED_SUBSYSTEM2 = new FileTemplateDescriptor("FRC v2 Trapezoid Profile Subsystem.java", FrcIcons.Components.SUBSYSTEM);
@@ -54,6 +55,7 @@ public class FrcFileTemplateGroupDescriptorFactory implements FileTemplateGroupD
                                         COMMAND1,
                                         COMMAND_GROUP1,
                                         COMMAND_GROUP2,
+                                        COMMAND_GROUP2_KOT,
                                         SUBSYSTEM1,
                                         PID_SUBSYSTEM1,
                                         TRIGGER1,

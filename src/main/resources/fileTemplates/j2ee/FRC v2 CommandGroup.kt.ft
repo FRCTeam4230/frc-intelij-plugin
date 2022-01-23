@@ -1,0 +1,21 @@
+#set( $H = '#' )
+#set( $isParallelDeadline = $baseClassFqName.endsWith("ParallelDeadlineGroup"))
+#if(${PACKAGE_NAME})
+#if (${PACKAGE_NAME} != "")
+package ${PACKAGE_NAME}
+#end
+#end
+
+
+#if($baseClassNeedsImporting == "true")
+import ${baseClassFqName}
+#end
+
+#parse("File Header.java")
+// TODO: Add your #if (${isParallelDeadline})deadline and #{end}sequential commands in the super constructor call,
+//       e.g. ${baseClassSimpleName}(#if (${isParallelDeadline})MyDeadlineCmd(), #{end}OpenClawCommand(), MoveArmCommand())
+#if (${isParallelDeadline})
+//       Add the deadline command first. i.e. the command that upon ending
+//       will interrupt all other commands that are still running
+#end
+#if($makeAbstract == "true")abstract #{end}class ${NAME} ${baseClassExtendsClause}(#if (${isParallelDeadline})TODO("Add deadline command")#{end})

@@ -64,6 +64,7 @@ import static net.javaru.iip.frc.i18n.FrcBundle.message;
 public abstract class FrcComponentCreationDialog extends DialogWrapper
 {
     protected static final String BASE_CLASS_FQ_NAME = "baseClassFqName";
+    protected static final String BASE_CLASS_SIMPLE_NAME = "baseClassSimpleName";
     protected static final String BASE_CLASS_NEEDS_IMPORTING = "baseClassNeedsImporting";
     protected static final String BASE_CLASS_IS_INTERFACE = "baseIsInterface";
     protected static final String BASE_CLASS_EXTENDS_CLAUSE = "baseClassExtendsClause";
@@ -426,6 +427,7 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
         final boolean baseClassNeedsImporting = !baseFqName.contains(".") || !baseFqName.substring(0, baseFqName.lastIndexOf('.')).equals(targetPackageName);
         props.put(BASE_CLASS_NEEDS_IMPORTING, Boolean.toString(baseClassNeedsImporting));
         final String baseName = base.getName() != null ? base.getName() : myDataProvider.getTypicalBaseClassFqName().substring(myDataProvider.getTypicalBaseClassFqName().lastIndexOf('.') + 1);
+        props.put(BASE_CLASS_SIMPLE_NAME, baseName);
         final boolean baseIsInterface = base.isInterface();
         props.put(BASE_CLASS_IS_INTERFACE, Boolean.toString(baseIsInterface));
         final String extendsClause = myDataProvider.isKotlinTemplate()

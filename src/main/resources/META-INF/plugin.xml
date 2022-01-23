@@ -52,6 +52,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v2.1.0</strong> <br>
+        &nbsp;&nbsp;&bull; Added some additional Kotlin Command Robot new class templates.<br>
+        &nbsp;&nbsp;&bull; Fixed an issue with an intermittent Plugin API based exception.<br>
+        <br>
         <strong>v2.0.1</strong> <br>
         &nbsp;&nbsp;&bull; Fixed an issue with extra blank lines in the creation of Kotlin Command classes.<br>
         &nbsp;&nbsp;&bull; Fixed an issue with a background write action occurring on a read-only thread.<br>
@@ -245,7 +249,6 @@
         <notificationGroup id="FRC Build Tool Window Notifications" displayType="TOOL_WINDOW" toolWindowId="Build"  />
 
 
-        <applicationService id="FRC.FrcApplicationDisposableService" serviceImplementation="net.javaru.iip.frc.services.FrcPluginApplicationDisposable" />
         <applicationService id="FRC.FrcApplicationSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcApplicationSettings" />
         <applicationService id="FRC.FrcNotificationsSettings"   serviceImplementation="net.javaru.iip.frc.settings.FrcNotificationsSettings" />
         <applicationService id="FRC.RioLogUdpSocketManagerApplicationService" serviceImplementation="net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService" />
@@ -661,9 +664,14 @@
             <add-to-group group-id="frc.NewFileTemplates.KotlinTemplates" />
         </action>
         <action id="frc.action.new.commandGroup2"
-                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v2.CommandGroup2ComponentCreationAction">
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v2.CommandGroup2JavaComponentCreationAction">
             <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
             <add-to-group group-id="frc.NewFileTemplates.JavaTemplates" />
+        </action>
+        <action id="frc.action.new.commandGroup2.kotlin"
+                class="net.javaru.iip.frc.actions.create.advanced.cmdBased.commandGroup.v2.CommandGroup2KotlinComponentCreationAction">
+            <add-to-group group-id="frc.NewFileTemplates.JavaProjects" />
+            <add-to-group group-id="frc.NewFileTemplates.KotlinTemplates" />
         </action>
         <action id="frc.action.new.subsystem2.java"
                 class="net.javaru.iip.frc.actions.create.advanced.cmdBased.subsystem.v2.Subsystem2JavaComponentCreationAction">

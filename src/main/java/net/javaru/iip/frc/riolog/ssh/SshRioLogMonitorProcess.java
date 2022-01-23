@@ -46,6 +46,7 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 
 import net.javaru.iip.frc.riolog.AbstractRioLogMonitorProcess;
+import net.javaru.iip.frc.settings.FrcProjectTeamNumberService;
 import net.javaru.iip.frc.settings.FrcRoboRioSettings;
 import net.javaru.iip.frc.settings.FrcSshSettings;
 
@@ -183,8 +184,8 @@ public class SshRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         @Override
         public void run()
         {
-            //TODO This needs to be modified to check the FrcProjectTeamNumberService
-            if (!getSettings().isTeamNumberConfigured())
+            boolean teamNumberIsSet = FrcProjectTeamNumberService.getInstance(project).getTeamNumber() > 0 || getSettings().isTeamNumberConfigured();
+            if (!teamNumberIsSet)
             {
                 consoleWriter.println();
                 consoleWriter.println("========================================================================================================");

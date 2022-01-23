@@ -16,8 +16,8 @@ public #if($makeAbstract == "true")abstract#end class ${NAME} ${baseClassExtends
 {
     #parse("FRC_constructorSignature.java")()
     {
-        // TODO: Add your sequential commands in the super() call, e.g.
-        //           super(new FooCommand(), new BarCommand());
+        // TODO: Add your #if (${isParallelDeadline})deadline and #{end}sequential commands in the super() call, e.g.
+        //           super(#if (${isParallelDeadline})new MyDeadlineCmd(), #{end}new OpenClawCommand(), new MoveArmCommand());
         #if (${isParallelDeadline})
         //       Add the deadline command first. i.e. the command that upon 
         //       ending will interrupt all other commands that are still running

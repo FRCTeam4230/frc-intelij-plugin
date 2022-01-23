@@ -190,7 +190,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         myProcessHandler.putUserDataIfAbsent(BuildManager.ALLOW_AUTOMAKE, true);
 
         myConsoleView = createConsole(myProject, myProcessHandler);
-        myStopEnabled = () -> !myProcessHandler.isProcessTerminated();
+        // There is the possibility that myProcessHandler is null when the lambda gets called
+        myStopEnabled = () -> myProcessHandler != null && !myProcessHandler.isProcessTerminated();
 
 //        if (myHelpId != null)
 //        {
@@ -500,12 +501,23 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             if (myProcessHandler != null)
             {
                 myProcessHandler.detachProcess();
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.debug("[FRC] An exception occurred when detaching processHandler. Cause Summary: " + e);
+        }
+        
+        try
+        {
+            if (myProcessHandler != null)
+            {
                 myProcessHandler.destroyProcess();
             }
         }
         catch (Exception e)
         {
-            LOG.debug("[FRC] An exception occurred when detaching and destroying processHandler. Cause Summary: " + e.toString());
+            LOG.debug("[FRC] An exception occurred when destroying processHandler. Cause Summary: " + e);
         }
 
 

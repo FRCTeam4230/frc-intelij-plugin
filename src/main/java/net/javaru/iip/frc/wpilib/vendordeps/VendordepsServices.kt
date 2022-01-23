@@ -49,7 +49,6 @@ import net.javaru.iip.frc.i18n.FrcMessageKey
 import net.javaru.iip.frc.notify.FrcNotificationType
 import net.javaru.iip.frc.notify.FrcNotifications
 import net.javaru.iip.frc.psi.FrcGeneralChangePsiTreeChangeListenerAdapter
-import net.javaru.iip.frc.services.FrcPluginApplicationDisposable
 import net.javaru.iip.frc.services.FrcPluginProjectDisposable
 import net.javaru.iip.frc.util.findCommonParentDir
 import net.javaru.iip.frc.util.generateRandomTempPath
@@ -79,7 +78,7 @@ class VendordepsFileListener private constructor(val project: Project)
     {
         logger.debug { "[FRC] Initializing VendordepsFileListener" }
 
-        PsiManager.getInstance(project).addPsiTreeChangeListener(VendordepsPsiTreeChangeListener(project), FrcPluginApplicationDisposable.getInstance())
+        PsiManager.getInstance(project).addPsiTreeChangeListener(VendordepsPsiTreeChangeListener(project), FrcPluginProjectDisposable.getInstance(project))
         //  NOTE: A BulkFileListener is only notified during write actions. So we are not notified 
         //        of the changes until a save or delete occurs, No notification occurs while editing.
         //        The above PsiTreeChangeListener notifies us about edit changes

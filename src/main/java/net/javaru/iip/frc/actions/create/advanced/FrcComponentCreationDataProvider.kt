@@ -59,7 +59,7 @@ abstract class FrcComponentCreationDataProvider
     abstract val typicalBaseClassFqName: String
     
     /** Returns a (potentially empty) list of additional base classes. */
-    open val additionalBaseClassFqNames: List<String> by lazy { ImmutableList.of<String>() }
+    open val additionalBaseClassFqNames: List<String> by lazy { ImmutableList.of() }
     
     /**
      * An immutable Set of base name suffixes for the component. A class ending in one of these

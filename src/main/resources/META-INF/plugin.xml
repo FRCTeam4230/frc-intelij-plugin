@@ -53,9 +53,9 @@
 
     <change-notes><![CDATA[
         <strong>v2.1.1</strong> <br>
-        &nbsp;&nbsp;&bull; Works around bug in IntelliJ IDEA
+        &nbsp;&nbsp;&bull; Works around a bug in IntelliJ IDEA v2022.1
                            (<a href='https://youtrack.jetbrains.com/issue/IDEA-292993/Custom-module-type-from-plugin-not-appearing-in-File-New-Module'>IDEA-292993</a>)
-                           that broke functionality of the FRC Plugin in v2022.1, thus delaying its release.<br>
+                           that broke functionality of the FRC Plugin in v2022.1, thus delaying a 2022.1 compatible release of the FRC Plugin.<br>
         &nbsp;&nbsp;&bull; Compatibility with IntelliJ IDEA v2022.1.x<br>
         <br>
         <strong>v2.1.0</strong> <br>

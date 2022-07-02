@@ -225,11 +225,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             val kotlinCodeSubPath: Path = Paths.get("code/kotlin-code")
         }
     }
-    
-    
 
-    
-    override fun getGroupName(): String = MODULE_BUILDER_GROUP_NAME 
+
+    override fun isAvailable(): Boolean = true
+
+    override fun getGroupName(): String = MODULE_BUILDER_GROUP_NAME
     override fun getParentGroup(): String = JavaModuleType.JAVA_GROUP // This is the top group in the New Project Wizard, and for now it makes sense to be part of it
 
     /**

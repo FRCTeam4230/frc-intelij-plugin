@@ -51,6 +51,8 @@ plugins {
     //    https://plugins.gradle.org/plugin/org.jetbrains.gradle.plugin.idea-ext
     //    v0.10+ requires IDEA 2020.2+   v0.6.1+ requires IntelliJ IDEA 2019.2
     id("org.jetbrains.gradle.plugin.idea-ext") version "0.10"
+    // https://docs.spring.io/dependency-management-plugin/docs/current/reference/html/
+    id("io.spring.dependency-management") version "1.0.11.RELEASE"
 }
 
 java {
@@ -318,50 +320,78 @@ repositories {
     }
 }
 
+dependencyManagement {
+    imports {
+        mavenBom("io.sentry:sentry-bom:5.7.4")
+        mavenBom("com.google.guava:guava-bom:31.1-jre")
+        mavenBom("com.fasterxml.jackson:jackson-bom:2.13.3")
+        mavenBom("org.junit:junit-bom:5.8.2")
+    }
 
+    dependencies {
+        dependency("io.javaru.iip.common:javaru-iip-common:1.0.0")
+        dependency("org.jdom:jdom2:2.0.6.1")
+        dependency("commons-io:commons-io:2.11.0")
+        dependency("org.apache.commons:commons-lang3:3.12.0")
+        dependency("org.apache.commons:commons-text:1.9")
+        dependency("com.jcraft:jsch:0.1.55")
+        dependency("com.beust:klaxon:5.6")
+        dependency("org.freemarker:freemarker:2.3.31")
+        dependency("io.github.furstenheim:copy_down:1.0") // HTML to MD
+        dependency("org.jsoup:jsoup:1.15.1") // version pulled in by copy_down has a vulnerability; while unlikely to affect us, it's best to remove it.
+        // jsemver: Is in the project 'lib' dir as it is not published to any public repos. Plus we are using a tweaked version that removes is use of logback
+        dependency("com.asarkar:jsemver:0.6.2.3") {
+            // We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded."
+            exclude("org.slf4j:slf4j-api")
+        }
+        @Suppress("GradlePackageUpdate") //we want to keep the version in sync with what is used in jsemver to prevent warning about different code generation and runtime versions.
+        dependency("org.antlr:antlr4:4.9.3") {
+            exclude("org.slf4j:slf4j-api")
+        }
+
+        dependencySet("com.michael-bull.kotlin-result:1.1.16") {
+            entry("kotlin-result")
+            entry("kotlin-result-jvm")
+        }
+    }
+}
 dependencies {
-
-    implementation("io.javaru.iip.common:javaru-iip-common:1.0.0")
+    implementation("io.javaru.iip.common:javaru-iip-common")
     // For Kotlin dependencies, you can use shorthand for a dependency on a Kotlin module, for example, kotlin("test-junit5") for "org.jetbrains.kotlin:kotlin-test-junit5".
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
     testImplementation(kotlin("test-junit5"))
 
-    implementation("org.jdom:jdom2:2.0.6")
-    implementation("commons-io:commons-io:2.11.0")
-    implementation("org.apache.commons:commons-lang3:3.12.0")
-    implementation("org.apache.commons:commons-text:1.9")
-    implementation("com.jcraft:jsch:0.1.55")
+    implementation("org.jdom:jdom2")
+    implementation("commons-io:commons-io")
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.apache.commons:commons-text")
+    implementation("com.jcraft:jsch")
     // Klaxon is a library to parse JSON in Kotlin.  https://github.com/cbeust/klaxon  Help available in the #klaxon channel of the Kotlin Slack Workspace
-    implementation("com.beust:klaxon:5.5")
-    implementation(platform("com.google.guava:guava-bom:29.0-jre"))
+    implementation("com.beust:klaxon")
     implementation("com.google.guava:guava")
     // jsemver: Is in the project 'lib' dir as it is not published to any public repos. Plus we are using a tweaked version that removes is use of logback
-    implementation("com.asarkar:jsemver:0.6.2.3") {
+    implementation("com.asarkar:jsemver") {
         exclude(group = "org.slf4j", module = "slf4j-api")
             .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
     }
-    implementation("org.antlr:antlr4:4.9.3") {
-        // Keep in sync with what is used in jsemver to prevent warning about different code generation and runtime versions.
+    implementation("org.antlr:antlr4") {
         exclude(group = "org.slf4j", module = "slf4j-api")
             .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
     }
-    implementation(platform("com.fasterxml.jackson:jackson-bom:2.12.4"))
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava")
-    implementation("org.freemarker:freemarker:2.3.31")
-    implementation("com.michael-bull.kotlin-result:kotlin-result:1.1.13")
-    implementation("com.michael-bull.kotlin-result:kotlin-result-jvm:1.1.13")
-    implementation("io.github.furstenheim:copy_down:1.0") // HTML to MD
+    implementation("org.freemarker:freemarker")
+    implementation("com.michael-bull.kotlin-result:kotlin-result")
+    implementation("com.michael-bull.kotlin-result:kotlin-result-jvm")
+    implementation("io.github.furstenheim:copy_down") // HTML to MD
 
-    implementation(platform ("io.sentry:sentry-bom:5.5.2"))
     implementation("io.sentry:sentry") {
         exclude(group = "org.slf4j", module = "slf4j-api")
             .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
     }
     implementation("io.sentry:sentry-kotlin-extensions")
 
-    testImplementation(platform("org.junit:junit-bom:5.7.2"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")

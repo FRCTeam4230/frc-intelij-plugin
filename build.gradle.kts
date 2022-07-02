@@ -41,7 +41,7 @@ plugins {
     // gradle plugin-for writing IntelliJ plugins:  
     //     https://github.com/JetBrains/gradle-intellij-plugin
     //     https://lp.jetbrains.com/gradle-intellij-plugin/
-    id("org.jetbrains.intellij") version "1.2.1"
+    id("org.jetbrains.intellij") version "1.5.2"
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
     //    https://github.com/jetbrains/gradle-idea-ext-plugin
@@ -141,7 +141,11 @@ tasks {
         systemProperties = mapOf(
             //"key" to "value",
             //systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, ".sandbox", "log.xml")),
-            systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, "idea-sandbox-log4j-config.xml")),
+            // As of v2022.1, changed from using log4j to JUL
+            //    See https://blog.jetbrains.com/platform/2022/02/removing-log4j-from-the-intellij-platform/
+            //        https://docs.oracle.com/en/java/javase/11/docs/api/java.logging/java/util/logging/LogManager.html
+            //systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, "idea-sandbox-log4j-config.xml")),
+            systemPropertyGetOrDefault("idea.log.config.properties.file", resolvePath(project.rootDir.canonicalPath, "idea-sandbox-logging.properties")),
             systemPropertyGetOrDefault("frc.show.betas.in.new.project.wizard", "true"),
             // Turn on frc.i10n to see a notification character appended to all localized messages to aid in testing/debugging of message bundles and localization needs
             systemPropertyGetOrDefault("frc.i10n", "false"),

@@ -34,6 +34,7 @@ fun getBooleanSystemProperty(key: String, default: Boolean = false): Boolean = g
     BooleanUtils.toBoolean(it)
 }
 
+@Suppress("unused")
 fun getSystemProperty(key: String, default: String): String = getSystemProperty(key, default) { it }
 
 fun <T> getSystemProperty(key: String, default: T, converter: (value: String) -> T): T
@@ -85,6 +86,13 @@ object FrcSystemConfigs
     {
         override val key: String = "frc.experimental.kotlinTemplates"
         override val default: Boolean = true
+        override val value: Boolean = getBooleanSystemProperty(key, default)
+    }
+
+    object FreemarkerDebugEnabled: FrcSystemConfig<Boolean>
+    {
+        override val key: String = "frc.freemarker.debug"
+        override val default: Boolean = false
         override val value: Boolean = getBooleanSystemProperty(key, default)
     }
 }

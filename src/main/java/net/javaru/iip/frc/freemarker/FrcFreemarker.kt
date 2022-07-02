@@ -21,10 +21,10 @@ import freemarker.template.Configuration
 import freemarker.template.TemplateExceptionHandler
 import icons.FrcIcons
 import net.javaru.iip.frc.FrcPluginGlobals
-import org.apache.commons.lang3.BooleanUtils
+import net.javaru.iip.frc.util.FrcSystemConfigs
 
 // todoc document this System property
-val DEBUG_MODE = BooleanUtils.toBoolean(System.getProperty("frc.freemarker.debug", "false"))
+val DEBUG_MODE = FrcSystemConfigs.FreemarkerDebugEnabled.value
 
 const val FM_TEMPLATE_EXT_NO_DOT = "ftl"
 const val FM_TEMPLATE_EXT_WITH_DOT = ".$FM_TEMPLATE_EXT_NO_DOT"
@@ -117,7 +117,7 @@ fun freemarkerConfigurationForKotlinTemplates(resourceLoaderClass: Any, basePack
 fun freemarkerConfigurationForKotlinTemplates(basePackagePath: String = "/", resourceLoaderClass: Class<*> = FrcIcons::class.java): Configuration
 {
     val cfg = freemarkerConfiguration(basePackagePath, resourceLoaderClass)
-    cfg.setInterpolationSyntax(Configuration.SQUARE_BRACKET_INTERPOLATION_SYNTAX)
+    cfg.interpolationSyntax = Configuration.SQUARE_BRACKET_INTERPOLATION_SYNTAX
     return cfg
 }
 

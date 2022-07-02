@@ -288,7 +288,7 @@ fun Project.getAttachedWpiLibVersionString(): String?
     val verClasses = findClass(this, WpiLibConstants.VERSION_CLASS_FQN)
     for (psiClass in verClasses)
     {
-        val initializer = psiClass?.findFieldByName("Version", false)?.initializer
+        val initializer = psiClass?.findFieldByName(WpiLibConstants.VERSION_FIELD_NAME, false)?.initializer
         if (initializer is PsiLiteralExpression)
         {
             val value = initializer.value

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -46,8 +46,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.io.HttpRequests
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.i18n.FrcMessageKey
-import net.javaru.iip.frc.notify.FrcNotificationType
-import net.javaru.iip.frc.notify.FrcNotifications
+import net.javaru.iip.frc.notify.FrcNotifyType
 import net.javaru.iip.frc.psi.FrcGeneralChangePsiTreeChangeListenerAdapter
 import net.javaru.iip.frc.services.FrcPluginProjectDisposable
 import net.javaru.iip.frc.util.findCommonParentDir
@@ -362,12 +361,11 @@ class VendordepsService private constructor(val project: Project)
     {
         if (vendordepsProjectFilesListing.hasDuplicates())
         {
-            FrcNotifications.notify(FrcNotificationType.ACTIONABLE_WARN,
-                                    contentKey = FrcMessageKey.of("frc.vendordeps.service.duplicate.content", vendordepsProjectFilesListing.duplicatesBulletedListing),
-                                    subTitleKey = FrcMessageKey.of("frc.vendordeps.service.duplicate.subtitle"),
-                                    project = project,
-                /* TODO ADD ACTION HANDLERS to allow user to fix the issue or ignore*/
-                                   )
+            /* TODO ADD ACTION HANDLERS to allow user to fix the issue or ignore*/
+            FrcNotifyType.ACTIONABLE_ERROR
+                .withContent(FrcMessageKey.of("frc.vendordeps.service.duplicate.content", vendordepsProjectFilesListing.duplicatesBulletedListing))
+                .withFrcPrefixedTitle(FrcMessageKey.of("frc.vendordeps.service.duplicate.subtitle"))
+                .notify(project)
         }
 
     }

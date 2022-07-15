@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package net.javaru.iip.frc.plugin
 
-import com.intellij.notification.NotificationListener
+import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ex.ApplicationInfoEx
 import com.intellij.openapi.application.impl.ApplicationInfoImpl
@@ -34,11 +34,11 @@ import com.intellij.openapi.util.BuildNumber
 import com.intellij.util.xmlb.XmlSerializerUtil
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.net.FrcPseudoRestService
-import net.javaru.iip.frc.notify.FrcNotificationType
-import net.javaru.iip.frc.notify.FrcNotifications
-import net.javaru.iip.frc.notify.FrcNotifications.createNotification
+import net.javaru.iip.frc.notify.FrcNotificationsBuilder
+import net.javaru.iip.frc.notify.FrcNotifyType
 import net.javaru.iip.frc.util.runBackgroundTask
 import org.intellij.lang.annotations.Language
+import org.jetbrains.annotations.VisibleForTesting
 import java.io.StringReader
 import java.util.*
 
@@ -83,65 +83,86 @@ class FrcPluginVersionManagerApplicationService : Disposable
             val properties = Properties()
             properties.load(StringReader(resource))
             val oldestSupportedBaseBuild = properties["oldestSupportedBaseBuild"]?.toString()?.toInt() ?: 202
-            val oldestVersionString = "20${(oldestSupportedBaseBuild / 10)}.${oldestSupportedBaseBuild % 10}"
             
             val appInfo = ApplicationInfoEx.getInstanceEx() as ApplicationInfoImpl
             val build: BuildNumber = appInfo.build
-            val baselineVersion = build.baselineVersion
+            val runningInstanceBaselineVersion = build.baselineVersion
 
-            logger.debug {"[FRC] baseline version: $baselineVersion"}
+            logger.debug {"[FRC] baseline version: $runningInstanceBaselineVersion"}
 
-            if(baselineVersion < oldestSupportedBaseBuild)
-            {
-                @Suppress("HtmlRequiredLangAttribute")
-                @Language("HTML")
-                val eolMessage = """
-                    <html>
-                    <strong><em>FRC Plugin</em> support for IntelliJ IDEA versions older than $oldestVersionString has ended.</strong><br/>
-                    You will need to upgrade to Intellij IDEA $oldestVersionString or later to get the latest FRC Plugin features.
-                    <br/><br/>
-                    While I wish I could support more older IntelliJ IDEA versions, doing so adds considerable time to the
-                    development and maintenance of the plugin as new features often have to be back ported to the older versions
-                    since the Intellij IDEA Plugin API evolves between versions. I would much rather put that
-                    time into adding new features. Given that this plugin works fully with the free
-                    IntelliJ IDEA Community edition (and Education edition), I do not think asking users to use
-                    a fairly recent version is overly burdensome.
-                    Please note that if you use the JetBrains <a href='https://www.jetbrains.com/toolbox-app/'>Toolbox App</a> to
-                    install IntelliJ IDEA, upgrading is super easy, and you can have multiple versions of IntelliJ IDEA installed
-                    simultaneously if needed. 
-                    <br/><br/>
-                    See the <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/blob/master/README.adoc#eol-policy'>FRC Plugin's EOL Policy</a> 
-                    for more detail.
-                    <br/><br/>
-                    Thank you for your understanding.
-                    </html>
-                """.trimIndent()
-                
-                if (project.isFrcFacetedProject())
-                {
-                    FrcNotifications.notifyBalloonAllOpenProjects(notificationUUID, notifyFrcProjectsOnly = true) {
-                        createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON, content = eolMessage, subTitle = null, listener = NotificationListener.URL_OPENING_LISTENER)
-                    }
-                    FrcPluginVersionManagerState.getInstance().eolNotifiedForBuild.add(baselineVersion)
-
-                }
-                else if (!FrcPluginVersionManagerState.getInstance().eolNotifiedForBuild.contains(baselineVersion))
-                {
-                    FrcNotifications.notifyBalloon(
-                        FrcNotificationType.ACTIONABLE_WARN,
-                        eolMessage,
-                        null,
-                        project,
-                        NotificationListener.URL_OPENING_LISTENER)
-                    FrcPluginVersionManagerState.getInstance().eolNotifiedForBuild.add(baselineVersion)
-                }
-            }
+            checkPluginUpdateStatus(project, runningInstanceBaselineVersion, oldestSupportedBaseBuild)
 
         }
         catch (t: Throwable)
         {
             logger.warn("[FRC] could not check Plugin Update status. Cause: $t", t)
         }
+    }
+
+    @VisibleForTesting
+    fun checkPluginUpdateStatus(project: Project?, runningInstanceBaselineVersion: Int, oldestSupportedBaseBuild: Int)
+    {
+        if (runningInstanceBaselineVersion < oldestSupportedBaseBuild)
+        {
+            val oldestVersionString = "20${(oldestSupportedBaseBuild / 10)}.${oldestSupportedBaseBuild % 10}"
+            @Suppress("HtmlRequiredLangAttribute") @Language("HTML")
+            val eolMessage = """
+                         <html>
+                         <h1><strong>FRC Plugin Support</strong></h1>
+                         <span style='font-size: larger'>
+                         <strong>Support for IntelliJ IDEA versions older than $oldestVersionString has ended.</strong><br/>
+                         You will need to upgrade to Intellij IDEA $oldestVersionString or later to get the latest 
+                         <strong>FRC Plugin</strong> features.
+                         <br/><br/>
+                         While I wish I could support more IntelliJ IDEA versions, doing so adds considerable time to the
+                         development and maintenance of the plugin. This is because new features often have to be implemented 
+                         differently (and thus written multiple times) when back ported to older versions since the 
+                         Intellij IDEA Plugin API evolves between versions. I would much rather put that time into adding new 
+                         features. I also think that most users given a choice between more features or support for more versions 
+                         would desire more features.
+                         <br/><br/>
+                         Given that this plugin works fully with the free IntelliJ IDEA Community edition (and Education edition), 
+                         I do not think asking users to use a fairly recent version is overly burdensome. If you use the 
+                         <em>JetBrains Toolbox App</em> to install IntelliJ IDEA, upgrading is super easy, and you can have multiple 
+                         versions and editions of IntelliJ IDEA installed simultaneously if needed. 
+                         <br/><br/>
+                         See the FRC Plugin EOL Policy for more detail.
+                         <br/><br/>
+                         Thank you for your understanding.
+                         </span>
+                         </html>
+                         """.trimIndent()
+
+            if (project.isFrcFacetedProject())
+            {
+                FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON
+                    .createEolNotification(eolMessage)
+                    .notifyAllProjectsViaBalloon(notifyFrcProjectsOnly = true, notificationUUID)
+                FrcPluginVersionManagerState.getInstance().eolNotifiedForBuild.add(runningInstanceBaselineVersion)
+
+            } 
+            else if (!FrcPluginVersionManagerState.getInstance().eolNotifiedForBuild.contains(runningInstanceBaselineVersion))
+            {
+                FrcNotifyType.ACTIONABLE_WARN
+                    .createEolNotification(eolMessage)
+                    .notifyViaBalloon(project)
+                FrcPluginVersionManagerState.getInstance().eolNotifiedForBuild.add(runningInstanceBaselineVersion)
+            }
+        }
+    }
+    
+    @Suppress("UNUSED_ANONYMOUS_PARAMETER")
+    private fun FrcNotifyType.createEolNotification(eolMessage: String): FrcNotificationsBuilder.CompletableStep
+    {
+        return this.withContent(eolMessage)
+            .withNoTitle()
+            //.withListener(NotificationListener.URL_OPENING_LISTENER) 
+            .withAction("FRC Plugin EOL policy", expiring = false) {actionEvent, notification ->  
+                BrowserUtil.browse("https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/blob/master/README.adoc#eol-policy")
+            }.withAction("JetBrains Toolbox app", expiring = false) { actionEvent, notification ->
+                BrowserUtil.browse("https://www.jetbrains.com/toolbox-app")
+            }
+            .noMoreActions()
     }
 
     override fun dispose()

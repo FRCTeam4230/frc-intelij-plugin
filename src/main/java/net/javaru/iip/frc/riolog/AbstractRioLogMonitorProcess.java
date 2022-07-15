@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,8 +43,8 @@ import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.concurrency.Semaphore;
 
-import net.javaru.iip.frc.notify.FrcNotificationType;
-import net.javaru.iip.frc.notify.FrcNotifications;
+import net.javaru.iip.frc.i18n.FrcMessageKey;
+import net.javaru.iip.frc.notify.FrcNotifyType;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
 
 
@@ -149,10 +149,10 @@ public abstract class AbstractRioLogMonitorProcess extends Process
             enabled = false;
             myWaitSemaphore.up();
             LOG.warn("[FRC] Could not initialize riolog monitor. Cause Summary: " + e.toString(), e);
-            FrcNotifications.notify(FrcNotificationType.ACTIONABLE_ERROR,
-                                    "Could not initialize the RioLog socket monitor. See idea.log for more details.",
-                                    "RioLog Initialization Failure",
-                                    project);
+            FrcNotifyType.ACTIONABLE_ERROR
+                .withContent(FrcMessageKey.of("frc.riolog.init.failure.content"))
+                .withFrcPrefixedTitle(FrcMessageKey.of("frc.riolog.init.failure.title"))
+                .notify(project);
         }
 
 
@@ -203,11 +203,10 @@ public abstract class AbstractRioLogMonitorProcess extends Process
         catch (Exception e)
         {
             LOG.info("[FRC] Could not create PrintWriter for writing RiLog to file. Cause Summary: " + e.toString(), e);
-            FrcNotifications.notify(FrcNotificationType.GENERAL_WARN,
-                                     "Could not create writer to log RioLog to file. Cause:" + e.toString(),
-                                    "RioLog File Logging",
-                                    project);
-
+            FrcNotifyType.GENERAL_WARN.withContent(
+                FrcMessageKey.of("frc.riolog.file.writer.init.failure.content", e.toString()))
+                .withFrcPrefixedTitle(FrcMessageKey.of("frc.riolog.file.writer.init.failure.title"))
+                .notify(project);
             return new PrintWriter(NullOutputStream.NULL_OUTPUT_STREAM);
         }
     }

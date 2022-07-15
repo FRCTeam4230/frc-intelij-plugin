@@ -37,7 +37,7 @@ val combinedMappings = templatesDirMapping.toMutableMap().also { it.putAll(examp
 val missingMappings = mutableListOf<String>()
 val outdatedMappings = combinedMappings.keys.toMutableSet()
 val year = determineTemplatesYear()
-val ourTemplatesDir = findOutputDir().resolve(year.toString())
+val ourTemplatesDir: Path = findOutputDir().resolve(year.toString())
 
 // runs without doing the copy. Allows for updating of the template mappings.
 const val IS_DRY_RUN = false
@@ -69,7 +69,7 @@ private fun processAWpiDir(theWpiDir: Path, dirMapping: Map<String, String>)
 {
     println("Processing: $theWpiDir")
     var currentTemplatesDir = ourTemplatesDir.resolve("PLACEHOLDER")
-    var currentTemplateName = ""
+    var currentTemplateName: String
     var currentWpiTemplateName = ""
     var currentWpiTemplateDir = theWpiDir
     theWpiDir
@@ -303,6 +303,7 @@ private fun determineTemplatesYear(): Int
     }
 }
 
+@Suppress("SpellCheckingInspection")
 fun createTemplatesDirMapping() = mapOf(
     "commandbased" to "commandBased",
     "educational" to "educational",
@@ -314,6 +315,7 @@ fun createTemplatesDirMapping() = mapOf(
     "timedskeleton" to "timedSkeleton",
                                        )
 
+@Suppress("SpellCheckingInspection")
 fun createExamplesDirMapping() = mapOf(
     "addressableled" to "addressableLED",
     "arcadedrive" to "arcadeDrive",
@@ -374,7 +376,7 @@ fun createExamplesDirMapping() = mapOf(
     "tankdrivexboxcontroller" to "tankDriveXboxController",
     "ultrasonic" to "ultrasonic",
     "ultrasonicpid" to "ultrasonicPID",
-                              )
+                                      )
 
 
 fun getHeader(relativeSrcPath: Path): String

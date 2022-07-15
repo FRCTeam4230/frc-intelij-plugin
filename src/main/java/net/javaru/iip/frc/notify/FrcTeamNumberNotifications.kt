@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -19,12 +19,14 @@ package net.javaru.iip.frc.notify
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.actions.ConfigureTeamNumberBasicAction
 import net.javaru.iip.frc.facet.isFrcFacetedProject
+import net.javaru.iip.frc.i18n.FrcBundle.message
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 
 
@@ -78,32 +80,32 @@ fun notifyToConfigureTeamNumIfNecessary(project: Project, knownFacetedProject: B
 
 private fun createConfigureTeamNotification(project: Project?, useSticky: Boolean, asWarning: Boolean): Notification
 {
-    val subtitle = if (asWarning) "Team number not set" else "Configuration needed"
-    val contentPrefix = if (asWarning) "Without your FRC team number being set, robot deploys will fail. " else ""
-    val content = contentPrefix + "Please <a href='configure'>configure</a> your FRC Team Number."
-    val icon = if (asWarning) FrcNotifications.IconWarn else FrcNotifications.IconInfo
-    val notificationType = if (asWarning) NotificationType.WARNING else NotificationType.INFORMATION
-
-    val notificationGroup = if (useSticky) FrcNotifications.FRC_ACTIONABLE_NOTIFICATION_GROUP else FrcNotifications.FRC_GENERAL_NOTIFICATION_GROUP
-
-    return Notification(notificationGroup.displayId, FrcNotifications.Title, content, notificationType).apply {
-        this.icon = icon
-        this.subtitle = subtitle
-        setListener{ theNotification, event ->
-            if ("configure" == event.description)
-            {
-                //  final Configurable configurable = FrcApplicationSettingsConfigurable.getInstance();
-                //  IdeFrame ideFrame = WindowManagerEx.getInstanceEx().findFrameFor(project);
-                //  ShowSettingsUtil.getInstance().editConfigurable((JFrame) ideFrame, configurable);
-                ConfigureTeamNumberBasicAction.openConfigureTeamNumberDialog(project)
-            }
-
+    val title = message("frc.team.number.notification.title")
+    val warningClause = if (asWarning) message("frc.team.number.notification.warning.clause") else ""
+    val content = message("frc.wpilib.root.path.not.found.user.notification.content", warningClause)
+    val actionText = message("frc.team.number.notification.action.text")
+    val frcNotifyType = when
+    {
+        asWarning && useSticky -> FrcNotifyType.ACTIONABLE_WARN
+        asWarning && !useSticky -> FrcNotifyType.GENERAL_WARN
+        !asWarning && useSticky -> FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON
+        else -> FrcNotifyType.GENERAL_INFO_WITH_FRC_ICON
+    }
+    
+    return frcNotifyType.builder()
+        .withContent(content)
+        .withFrcPrefixedTitle(title)
+        .withNoSubTitle()
+        .withAction(actionText) {event, notification ->
+            
+            ConfigureTeamNumberBasicAction.openConfigureTeamNumberDialog(event.getData(CommonDataKeys.PROJECT) ?: project)
             if (FrcApplicationSettings.getInstance().isTeamNumberConfigured())
             {
-                theNotification.expire()
+                notification.expire()
             }
         }
-    }
+        .noMoreActions()
+        .build()
 }
 
 fun expireConfigureTeamNumberNotification(project: Project?)

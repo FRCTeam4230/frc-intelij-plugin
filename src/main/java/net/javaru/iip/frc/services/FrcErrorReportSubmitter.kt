@@ -1,12 +1,12 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *
+ *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,8 +46,7 @@ import io.sentry.protocol.SentryId
 import io.sentry.protocol.User
 import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.i18n.FrcBundle
-import net.javaru.iip.frc.notify.FrcNotificationType
-import net.javaru.iip.frc.notify.FrcNotifications
+import net.javaru.iip.frc.notify.FrcNotifyType
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.util.FrcSystemConfigs
 import net.javaru.iip.frc.util.frcPluginPrimaryVersion
@@ -220,11 +219,10 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
 
                 // We just always say thanks regardless of success
                 ApplicationManager.getApplication().invokeLater {
-                    FrcNotifications.createNotification(
-                        FrcNotificationType.ERROR_REPORT_SUBMITTER,
-                        FrcBundle.message("frc.notification.errorReportSubmitter.submitted.text"),
-                        FrcBundle.message("frc.notification.errorReportSubmitter.submitted.title"),
-                                                       )
+                    FrcNotifyType.ERROR_REPORT_SUBMITTER.builder()
+                        .withContent(FrcBundle.message("frc.notification.errorReportSubmitter.submitted.text"))
+                        .withFrcPrefixedTitle(FrcBundle.message("frc.notification.errorReportSubmitter.submitted.title"))
+                        .build()                               
                         .apply {
                             isImportant = false
                         }.notify(project)

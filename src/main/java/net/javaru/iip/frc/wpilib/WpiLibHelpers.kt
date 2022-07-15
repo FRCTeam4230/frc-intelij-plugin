@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package net.javaru.iip.frc.wpilib
 
-import com.intellij.notification.NotificationListener
+import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
@@ -27,9 +27,8 @@ import com.intellij.util.io.exists
 import com.intellij.util.io.isFile
 import com.intellij.util.lang.JavaVersion
 import net.javaru.iip.frc.FrcPluginGlobals
-import net.javaru.iip.frc.i18n.FrcBundle.message
-import net.javaru.iip.frc.notify.FrcNotificationType
-import net.javaru.iip.frc.notify.FrcNotifications
+import net.javaru.iip.frc.i18n.FrcMessageKey
+import net.javaru.iip.frc.notify.FrcNotifyType
 import net.javaru.iip.frc.util.findClass
 import net.javaru.iip.frc.util.warnWhenNotInTestMode
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
@@ -86,14 +85,15 @@ fun getWpiLibRootPath(year: Int, project:Project? = null): Path
     {
         // TODO: when we implement above ability for user to override, prompt the user for the location here and set it
         logger.warn("[FRC] The WPI Lib root was not found at its expected location of: $wpiLibRootPath")
-        FrcNotifications.notify(
-            type = FrcNotificationType.ACTIONABLE_WARN,
-            content = message("frc.wpilib.root.path.not.found.user.notification.content", wpiLibRootPath),
-            subTitle = message("frc.wpilib.root.path.not.found.user.notification.subtitle", year.toString()),
-            project = project,
-            listener = NotificationListener.URL_OPENING_LISTENER
-                               )
-
+        FrcNotifyType.ACTIONABLE_WARN.builder()
+            .withContent(FrcMessageKey.of("frc.wpilib.root.path.not.found.user.notification.content", wpiLibRootPath))
+            .withFrcPrefixedTitle(FrcMessageKey.of("frc.wpilib.root.path.not.found.user.notification.title", year.toString()))
+            .withNoSubTitle()
+            .withActionBasic(FrcMessageKey.of("frc.wpilib.root.path.not.found.user.notification.action.link")) {
+                BrowserUtil.browse("https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/wpilib-setup.html")
+            }
+            .noMoreActions()
+            .notify(project)
     }
     return wpiLibRootPath
 }

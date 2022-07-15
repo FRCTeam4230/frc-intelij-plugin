@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -42,11 +42,7 @@ import icons.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.net.FrcPseudoRestService
-import net.javaru.iip.frc.notify.FrcNotificationType
-import net.javaru.iip.frc.notify.FrcNotifications
-import net.javaru.iip.frc.notify.FrcNotifications.createNotification
-import net.javaru.iip.frc.notify.FrcNotifications.notify
-import net.javaru.iip.frc.notify.FrcNotifications.notifyBalloonAllOpenProjects
+import net.javaru.iip.frc.notify.FrcNotifyType
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.services.FrcGradleService
 import net.javaru.iip.frc.settings.FrcApplicationSettings
@@ -155,16 +151,13 @@ private fun executeIfProjectNotNull(actionEvent: AnActionEvent, actionName: Stri
 
 private fun notifyOfFailureDueToNullProject(actionName: String = "")
 {
-    FrcNotifications.notifyAllOpenProjects(notifyFrcProjectsOnly = false) {
-        createFailedActionDueToNullProjectNotification(actionName)
-    }
+    FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON.builder()
+        .withContent("Cannot run $actionName Action because the project was null on the ActionEvent.")
+        .withFrcPrefixedTitle("$actionName Action Failed".trim())
+        .notifyAllProject(notifyFrcProjectsOnly = false)
 }
 
-private fun createFailedActionDueToNullProjectNotification(actionName: String = "") = createNotification(
-    FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
-    "Cannot run $actionName Action because the project was null on the ActionEvent.",
-    subTitle = "$actionName Action Failed".trim()
-                                                                                                        )
+
 
 
 /** An action that will purposefully cause an exception for testing purposes. */
@@ -230,10 +223,10 @@ class FetchPredefinedRestResource: AbstractFrcInternalAction()
             {
                 val resourcePath = "license.txt"
                 val resource = FrcPseudoRestService.getResource(resourcePath) ?: "Was Null (i.e. not found)"
-                notifyBalloonAllOpenProjects(notifyFrcProjectsOnly = true) {
-                    createNotification(FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
-                                       "<html><h2>The following was retrieved from '$resourcePath'</h2><br/><pre>$resource</pre></html>")
-                }
+                FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON.builder()
+                    .withContent("<html><h2>The following was retrieved from '$resourcePath'</h2><br/><pre>$resource</pre></html>")
+                    .withFrcTitle()
+                    .notifyAllProjectsViaBalloon(notifyFrcProjectsOnly = true)
             }
         }.queue()
     }
@@ -261,12 +254,9 @@ class FetchSpecifiedRestResource: AbstractFrcInternalAction()
                     {
 
                         val resource = FrcPseudoRestService.getResource(resourcePath) ?: "Was Null (i.e. not found)"
-                        notifyBalloonAllOpenProjects(notifyFrcProjectsOnly = true) {
-                            createNotification(
-                                FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
-                                "<html><h2>The following was retrieved from '$resourcePath'</h2><br/><pre>$resource</pre></html>"
-                                              )
-                        }
+                        FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON
+                            .withContent("<html><h2>The following was retrieved from '$resourcePath'</h2><br/><pre>$resource</pre></html>")
+                            .notifyAllProjectsViaBalloon(notifyFrcProjectsOnly = true)
                     }
                 }.queue()
                 true
@@ -281,7 +271,9 @@ class CheckIncludeDesktopSupportSetting : AbstractFrcInternalAction()
     {
         executeIfProjectNotNull(actionEvent, actionName = "Fetch REST Service") { project: Project ->
             val result = FrcGradleService.getInstance(project).isIncludeDesktopSupport()
-            notify(FrcNotificationType.ACTIONABLE_INFO, "includeDesktopSupport: $result")
+            FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON
+                .withContent("includeDesktopSupport: $result")
+                .notify(project)
         }
     }
 }
@@ -320,7 +312,7 @@ class FindVendordepsDirFrcInternalAction: AbstractFrcInternalAction()
     override fun actionPerformed(actionEvent: AnActionEvent) {
         executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
             VendordepsService.getInstance(it).findVendordepsDirNonBlocking { dir: PsiDirectory? ->
-                FrcNotifications.notifyInfoBalloon("Vendordeps dir = ${dir?.virtualFile?.path ?: "NOT FOUND"}")
+                FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON.withContent("Vendordeps dir = ${dir?.virtualFile?.path ?: "NOT FOUND"}").notifyViaBalloon(it)
             }
         }
     }
@@ -357,7 +349,7 @@ abstract class AbstractDisplayVendordepsListingFrcInternalAction : AbstractFrcIn
             sb.toString()
 
         }) { message, _ ->
-            FrcNotifications.notifyInfoBalloon(message)
+            FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON.withContent(message).notifyViaBalloon(project)
         }
     }
 }
@@ -446,21 +438,15 @@ class DownloadVendorDeps: AbstractFrcInternalAction()
                                                    override fun canClose(inputString: String?): Boolean = inputString?.isNotBlank() ?: false
                                                })!!
             VendordepsService.getInstance(project).downloadVendordepToTempFileInBackground(project, url) { result: Result<Path, Exception> ->
-
                 result.onSuccess {
-                    notify(
-                        FrcNotificationType.ACTIONABLE_INFO_WITH_FRC_ICON,
-                        "Downloaded to: $it",
-                        project = project
-                          )
+                    FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON
+                        .withContent("Downloaded to: $it")
+                        .notify(project)
                 }.onFailure {
-                    notify(
-                        FrcNotificationType.ACTIONABLE_ERROR,
-                        "Could not download Vendordeps file, Reason: ${it.message}",
-                        project = project
-                          )
+                    FrcNotifyType.ACTIONABLE_ERROR
+                        .withContent("Could not download Vendordeps file, Reason: ${it.message}")
+                        .notify(project)
                 }
-
             }
 
         }

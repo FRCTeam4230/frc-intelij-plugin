@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -39,8 +39,7 @@ import com.intellij.util.DocumentUtil
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.i18n.FrcBundle.message
 import net.javaru.iip.frc.i18n.FrcMessageKey
-import net.javaru.iip.frc.notify.FrcNotificationType
-import net.javaru.iip.frc.notify.FrcNotifications
+import net.javaru.iip.frc.notify.FrcNotifyType
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.util.asDate
 import net.javaru.iip.frc.util.getGradleBuildPsiFile
@@ -206,7 +205,7 @@ class WpiLibVersionService private constructor(private val project: Project) : P
             val availVerString = versionStatus.latestAvailableForSameYear.versionString
             val currVerString = versionStatus.attachedVersion.versionString
 
-            val subtitle = message("frc.notification.wpiLibVersionStatus.updateAvailable.subtitle", availVerString)
+            val title = message("frc.notification.wpiLibVersionStatus.updateAvailable.subtitle", availVerString)
             val content = message("frc.notification.wpiLibVersionStatus.updateAvailable.content", availVerString, currVerString)
 
             val applyAction = object : NotificationAction(message("frc.notification.wpiLibVersionStatus.updateAvailable.upgrade.action.text")) {
@@ -224,14 +223,13 @@ class WpiLibVersionService private constructor(private val project: Project) : P
                 }
             }
 
-            // TODO We need a doNotAskAgain action - but that adds some work in that we have to track
-
-            return FrcNotifications.notifyWithActions(
-                FrcNotificationType.ACTIONABLE_INFO,
-                content, subtitle,
-                project,
-                applyAction, ignoreAction
-                                          )
+            // TODO We need a doNotAskAgain action - but one that adds uses plugin wide functionality so we do not have to always reimplement
+            return FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON
+                .withContent(content)
+                .withFrcPrefixedTitle(title)
+                .withNoSubTitle()
+                .withActions(applyAction, ignoreAction)
+                .notify(project)
         }
         else
         {
@@ -242,15 +240,13 @@ class WpiLibVersionService private constructor(private val project: Project) : P
 
     private fun notifyUnableToCheckVersionStatus()
     {
-        val content = message("frc.notification.wpiLibVersionStatus.unableToCheck.content")
-        FrcNotifications.notify(FrcNotificationType.ACTIONABLE_INFO, content, project = project)
+        FrcNotifyType.ACTIONABLE_INFO.withContentKey("frc.notification.wpiLibVersionStatus.unableToCheck.content").notify(project)
     }
 
     private fun notifyNoUpdateAvailable(year: Int)
     {
         // we call toString on the year otherwise the resource bundle formats it with a comma: 2,019
-        val content = message("frc.notification.wpiLibVersionStatus.haveTheLatest.content", year.toString())
-        FrcNotifications.notify(FrcNotificationType.GENERAL_INFO, content, project = project)
+        FrcNotifyType.GENERAL_INFO.withContentKey("frc.notification.wpiLibVersionStatus.haveTheLatest.content", year.toString()).notify(project)
     }
 
     /**
@@ -272,10 +268,9 @@ class WpiLibVersionService private constructor(private val project: Project) : P
             if (psiFile == null)
             {
                 logger.warn("[FRC] could not find Gradle Build File to update the WPI Lib / GradleRIO plugin")
-                FrcNotifications.notify(
-                    FrcNotificationType.ACTIONABLE_WARN,
-                    FrcMessageKey.of("frc.notification.wpiLibVersionStatus.gradle.not.able.to.update", version.versionString)
-                                       )
+                FrcNotifyType.ACTIONABLE_WARN
+                    .withContent(FrcMessageKey.of("frc.notification.wpiLibVersionStatus.gradle.not.able.to.update", version.versionString))
+                    .notify(project)
             }
             else
             {
@@ -337,10 +332,9 @@ class WpiLibVersionService private constructor(private val project: Project) : P
                                         if (gradleRioCallExpression == null)
                                         {
                                             logger.warn("[FRC] Could not find GradleRIO plugin Call Expression in order to update the WPI Lib / GradleRIO plugin")
-                                            FrcNotifications.notify(
-                                                FrcNotificationType.ACTIONABLE_WARN,
-                                                FrcMessageKey.of("frc.notification.wpiLibVersionStatus.gradle.not.able.to.update", version.versionString)
-                                                                   )
+                                            FrcNotifyType.ACTIONABLE_WARN
+                                                .withContent(FrcMessageKey.of("frc.notification.wpiLibVersionStatus.gradle.not.able.to.update", version.versionString))
+                                                .notify(project)
                                         }
                                         else
                                         {
@@ -370,19 +364,17 @@ class WpiLibVersionService private constructor(private val project: Project) : P
                 }
                 else if (psiFile.name.endsWith(".kts", ignoreCase = true))
                 {
-                    FrcNotifications.notify(
-                        FrcNotificationType.ACTIONABLE_INFO,
-                        "Auto updated of Kotlin DSL build files is not yet supported by the FRC plugin. You will need to manually " +
-                            "edit the gradle build file and set version for the GradleRio plugin to '${version.versionString}'"
-                                           )
+                    FrcNotifyType.ACTIONABLE_INFO
+                        .withContent(FrcMessageKey.of("frc.notification.wpiLibVersionStatus.gradle.kotlin.dsl.not.supported.yet", version.versionString))
+                        .notify(project)
                 }
                 else
                 {
                     logger.warn("[FRC] Unknown file type for gradle build: ${psiFile.name}")
-                    FrcNotifications.notify(
-                        FrcNotificationType.ACTIONABLE_WARN,
-                        FrcMessageKey.of("frc.notification.wpiLibVersionStatus.gradle.not.able.to.update", version.versionString)
-                                           )
+                    
+                    FrcNotifyType.ACTIONABLE_WARN
+                        .withContent(FrcMessageKey.of("frc.notification.wpiLibVersionStatus.gradle.not.able.to.update", version.versionString))
+                        .notify(project)
                 }
             }
         }
@@ -392,24 +384,21 @@ class WpiLibVersionService private constructor(private val project: Project) : P
     {
         project.reimportGradleProject(callback = object : ExternalProjectRefreshCallback
                                       {
-
                                           override fun onSuccess(externalProject: DataNode<ProjectData>?)
                                           {
-                                              FrcNotifications.notifyNoTitle(
-                                                  FrcNotificationType.BUILD__INFO,
-                                                  FrcMessageKey.of("frc.notification.wpiLibVersionStatus.gradle.reimport.success"),
-                                                  project = project
-                                                                            )
+                                              FrcNotifyType.BUILD__INFO
+                                                  .withContent(FrcMessageKey.of("frc.notification.wpiLibVersionStatus.gradle.reimport.success"))
+                                                  .withNoTitle() // we generally do not want titles with tool window notifications
+                                                  .notify(project)
                                           }
 
                                           override fun onFailure(errorMessage: String, errorDetails: String?)
                                           {
                                               // The build tool window will automatically open
-                                              FrcNotifications.notifyNoTitle(
-                                                  FrcNotificationType.BUILD__ERROR,
-                                                  FrcMessageKey.of("frc.notification.wpiLibVersionStatus.gradle.reimport.failure"),
-                                                  project = project
-                                                                            )
+                                              FrcNotifyType.BUILD__ERROR
+                                                  .withContent(FrcMessageKey.of("frc.notification.wpiLibVersionStatus.gradle.reimport.failure"))
+                                                  .withNoTitle() // we generally do not want titles with tool window notifications
+                                                  .notify(project)
                                           }
                                       })
     }

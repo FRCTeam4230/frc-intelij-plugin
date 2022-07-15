@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2015-2021 the original author or authors.
+  ~ Copyright 2015-2022 the original author or authors.
   ~
   ~     Licensed under the Apache License, Version 2.0 (the "License");
   ~     you may not use this file except in compliance with the License.
@@ -253,6 +253,7 @@
         <notificationGroup id="FRC Error Submitter Notifications" displayType="BALLOON" bundle="i18n.FrcPluginConfigBundle" key="frc.notifications.group.name.error.submitter" isLogByDefault="false" />
         <!-- toolWindowId from BuildContentManager.TOOL_WINDOW_ID -->
         <notificationGroup id="FRC Build Tool Window Notifications" displayType="TOOL_WINDOW" toolWindowId="Build"  />
+        <notificationGroup id="FRC Run Tool Window Notifications" displayType="TOOL_WINDOW" toolWindowId="Run"  />
 
 
         <applicationService id="FRC.FrcApplicationSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcApplicationSettings" />
@@ -555,6 +556,8 @@
                     class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationActionableErrorImportantAction" />
             <action id="FRC.tools.internal.ShowNotificationThatUsesNotificationActionsAction"
                     class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationThatUsesNotificationActionsAction" />
+            <action id="FRC.tools.internal.ShowNotificationThatUsesSeveralNotificationActionsAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationThatUsesSeveralNotificationActionsAction" />
             <action id="FRC.tools.internal.ShowNotificationBalloonAction"
                     class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationBalloonAction" />
             <action id="FRC.tools.internal.ShowSmallNotificationBalloonAction"
@@ -569,6 +572,20 @@
                     class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationSharedByALLOpenProjectsAction" />
             <action id="FRC.tools.internal.ShowNotificationBalloonSharedByAllOpenProjectsAction"
                     class="net.javaru.iip.frc.actions.tools.internal.ShowNotificationBalloonSharedByALLOpenProjectsAction" />
+            <action id="FRC.tools.internal.ShowEndOfLifeMessageAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowEndOfLifeMessageAction" />
+            <action id="FRC.tools.internal.ShowBuildToolWindowNotificationInfo"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowBuildToolWindowNotificationInfo" />
+            <action id="FRC.tools.internal.ShowBuildToolWindowNotificationInfoWithIcon"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowBuildToolWindowNotificationInfoWithIcon" />
+            <action id="FRC.tools.internal.ShowBuildToolWindowNotificationInfoWithFrcIcon"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowBuildToolWindowNotificationInfoWithFrcIcon" />
+            <action id="FRC.tools.internal.ShowRunToolWindowNotificationInfo"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowRunToolWindowNotificationInfo" />
+            <action id="FRC.tools.internal.ShowRunToolWindowNotificationInfoWithIcon"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowRunToolWindowNotificationInfoWithIcon" />
+            <action id="FRC.tools.internal.ShowRunToolWindowNotificationInfoWithFrcIcon"
+                    class="net.javaru.iip.frc.actions.tools.internal.ShowRunToolWindowNotificationInfoWithFrcIcon" />
         </group>
 
         <group id="FRC.FrcInternalUiActionsGroup"

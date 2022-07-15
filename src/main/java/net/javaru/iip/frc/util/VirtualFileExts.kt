@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiFileSystemItem
 import com.intellij.psi.PsiManager
 import org.jdom2.filter.Filters
 import org.jdom2.input.SAXBuilder
@@ -110,7 +112,40 @@ fun VirtualFile.lineSeparator(): String
     return lineSeparator!!
 }
 
+/** 
+ * Finds the `PsiFile` for the receiver `VirtualFile`. If the `VirtualFile` represents a directory, use [findPsiDirectory], 
+ * or [findPsiFileOrDirectory].
+ * 
+ * @see findPsiDirectory
+ * @see findPsiFileOrDirectory
+ */ 
 fun VirtualFile?.findPsiFile(project: Project): PsiFile? = if (this == null) null else PsiManager.getInstance(project).findFile(this)
+
+/**
+ * Finds the `PsiDirectory` for the receiver `VirtualFile`. If the `VirtualFile` represents a file, use [findPsiFile],
+ * or [findPsiFileOrDirectory].
+ *
+ * @see findPsiFile
+ * @see findPsiFileOrDirectory
+ */
+fun VirtualFile?.findPsiDirectory(project: Project): PsiDirectory? = if (this == null) null else PsiManager.getInstance(project).findDirectory(this)
+
+/**
+ * Returns the `PsiFileSystemItem` for the receiver `VirtualFile`. For situations where it is known if the `VirtualFile` represents 
+ * a file or directory, consider using either [findPsiFile] and/or [findPsiDirectory].
+ * 
+ * @see findPsiFile
+ * @see findPsiDirectory
+ */
+fun VirtualFile?.findPsiFileOrDirectory(project: Project): PsiFileSystemItem?
+{
+    return when
+    {
+        this == null -> null
+        this.isDirectory -> this.findPsiDirectory(project)
+        else -> this.findPsiFile(project)
+    }
+}
 
 @JvmOverloads
 fun File?.findVirtualFile(refreshIfNeeded: Boolean = true): VirtualFile? = if (this == null) null else VfsUtil.findFileByIoFile(this, refreshIfNeeded)
@@ -118,19 +153,19 @@ fun File?.findVirtualFile(refreshIfNeeded: Boolean = true): VirtualFile? = if (t
 fun Path?.findVirtualFile(refreshIfNeeded: Boolean = true): VirtualFile? = if (this == null) null else VfsUtil.findFile(this, refreshIfNeeded)
 
 /**
- * @param parent the parent directory to create the file (or sub directories and file) in
+ * @param parent the parent directory to create the file (or subdirectories and file) in
  * @param path the path (or fileName) to create such as `foo.txt` or `src/main/java/App.java`
  */
 private fun getOrCreateVfFile(parent: VirtualFile, path: Path): VirtualFile? = getOrCreateVfFile(parent.path, path.toString())
 
 /**
- * @param parent the parent directory to create the file (or sub directories and file) in
+ * @param parent the parent directory to create the file (or subdirectories and file) in
  * @param path the path (or fileName) to create such as `foo.txt` or `src/main/java/App.java`
  */
 private fun getOrCreateVfFile(parent: VirtualFile, path: String): VirtualFile? = getOrCreateVfFile(parent.path, path)
 
 /**
- * @param parent the parent directory to create the file (or sub directories and file) in
+ * @param parent the parent directory to create the file (or subdirectories and file) in
  * @param path the path (or fileName) to create such as `foo.txt` or `src/main/java/App.java`
  */
 private fun getOrCreateVfFile(parent: String, path: String): VirtualFile?

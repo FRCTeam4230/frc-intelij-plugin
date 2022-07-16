@@ -53,6 +53,10 @@
 
     <change-notes><![CDATA[
         <strong>v2.2.0</strong> <br>
+        &nbsp;&nbsp;&bull; This is the last release for IntelliJ IDEA 2021.2 and 2021.3. IntelliJ IDEA 2022.1 or newer will be required 
+                           for the next FRC Plugin release. Please see the
+                           <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/blob/master/README.adoc#eol-policy'>FRC Plugin's EOL Policy</a> 
+                           for more detail.<br>
         &nbsp;&nbsp;&bull; Migrate off plugin APIs deprecated in IntelliJ IDEA 2022.1<br>
         &nbsp;&nbsp;&bull; Migrate off plugin APIs deprecated in IntelliJ IDEA 2022.2<br>
         &nbsp;&nbsp;&bull; IntelliJ IDEA 2022.1 support added<br>

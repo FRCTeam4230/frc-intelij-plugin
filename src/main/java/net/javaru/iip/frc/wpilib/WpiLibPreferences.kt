@@ -165,12 +165,12 @@ fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
                     if (psiDirectory != null)
                     {
                         val contentRootDirScope = GlobalSearchScopesCore.directoryScope(psiDirectory, false)
-                        val wpiLibDirs = FilenameIndex.getVirtualFilesByName(project, wpiLibDirName, false, contentRootDirScope)
+                        val wpiLibDirs = FilenameIndex.getVirtualFilesByName(wpiLibDirName, false, contentRootDirScope)
                             .filter { it?.isDirectory == true }
                             .mapNotNull { it.findPsiDirectory(project) }
                         wpiLibDirs.forEach { wpiLibDirPsiDir: PsiDirectory ->
                             val wpiLibDirScope = GlobalSearchScopesCore.directoryScope(wpiLibDirPsiDir, false)
-                            val files = FilenameIndex.getVirtualFilesByName(project, wpiLibPreferencesFileName, true, wpiLibDirScope)
+                            val files = FilenameIndex.getVirtualFilesByName(wpiLibPreferencesFileName, true, wpiLibDirScope)
                             if (LOG.isTraceEnabled) files.forEach { LOG.trace { "[FRC] Found: ${it.path}" } }
                             foundFiles.addAll(files.map { it.findPsiFile(project) })
                         }

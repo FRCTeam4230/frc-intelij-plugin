@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class FrcProjectWizardData(
     // TODO Issue #80 have these dynamically updated in the wizard
     var junit4Version: String = "4.13.2", // https://search.maven.org/artifact/junit/junit
     var junit5Version: String = "5.8.2",  // https://search.maven.org/artifact/org.junit/junit-bom
-    var kotlinVersion: String = "1.6.10",
+    var kotlinVersion: String = "1.7.10", // https://search.maven.org/artifact/org.jetbrains.kotlin/kotlin-bom
     var gradleDslOption: GradleDslOption = GradleDslOption.GroovyDSL,
     var templateLanguageOption: TemplateLanguageOption = TemplateLanguageOption.Java,
     // TODO: Add selection option to new project wizard

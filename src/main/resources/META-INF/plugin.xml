@@ -54,6 +54,9 @@
     <change-notes><![CDATA[
         <strong>v2.2.0</strong> <br>
         &nbsp;&nbsp;&bull; Migrate off plugin APIs deprecated in IntelliJ IDEA 2022.1<br>
+        &nbsp;&nbsp;&bull; Migrate off plugin APIs deprecated in IntelliJ IDEA 2022.2<br>
+        &nbsp;&nbsp;&bull; IntelliJ IDEA 2022.1 support added<br>
+        &nbsp;&nbsp;&bull; IntelliJ IDEA 2022.2 support added<br>
         <br>
         <strong>v2.1.1</strong> <br>
         &nbsp;&nbsp;&bull; Works around a bug in IntelliJ IDEA v2022.1

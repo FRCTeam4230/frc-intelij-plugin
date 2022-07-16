@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -28,12 +28,13 @@ import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiFileSystemItem
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScopesCore
 import com.intellij.util.SmartList
 import net.javaru.iip.frc.settings.FrcApplicationSettings
+import net.javaru.iip.frc.util.findPsiDirectory
+import net.javaru.iip.frc.util.findPsiFile
 import net.javaru.iip.frc.util.getIntPropertyValue
 import net.javaru.iip.frc.util.getModules
 import net.javaru.iip.frc.util.getStringPropertyValue
@@ -56,7 +57,7 @@ const val projectYearPropertyName = "projectYear"
 /**
  * This needs to be run via a background task to prevent a `SlowOperations` exceptions.
  * See Javadoc for [com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed]
- * The call(s) to `FilenameIndex.getFilesByName` (called by module based overload function) are slow operations.
+ * The call(s) to `FilenameIndex.getVirtualFilesByName` (called by module based overload function) are slow operations.
  */
 fun findLikelyWpiLibPreferencesPsiFileAsJsonFile(project: Project): JsonFile?
 {
@@ -67,7 +68,7 @@ fun findLikelyWpiLibPreferencesPsiFileAsJsonFile(project: Project): JsonFile?
 /**
  * This needs to be run via a background task to prevent a `SlowOperations` exceptions.
  * See Javadoc for [com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed]
- * The call(s) to `FilenameIndex.getFilesByName` (called by module based overload function) are slow operations.
+ * The call(s) to `FilenameIndex.getVirtualFilesByName` (called by module based overload function) are slow operations.
  */
 fun findLikelyWpiLibPreferencesPsiFile(project: Project): PsiFile?
 {
@@ -92,7 +93,7 @@ fun findLikelyWpiLibPreferencesPsiFile(project: Project): PsiFile?
 /**
  * This needs to be run via a background task to prevent a `SlowOperations` exceptions.
  * See Javadoc for [com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed]
- * The call(s) to `FilenameIndex.getFilesByName` (called by module based overload function) are slow operations.
+ * The call(s) to `FilenameIndex.getVirtualFilesByName` (called by module based overload function) are slow operations.
  */
 fun findWpiLibPreferencesPsiFiles(project: Project, filter: (module: Module) -> Boolean = { _ -> true}): List<PsiFile>
 {
@@ -142,7 +143,7 @@ fun findWpiLibPreferencesPsiFiles(project: Project, filter: (module: Module) -> 
 /**
  * This needs to be run via a background task to prevent a `SlowOperations` exceptions.
  * See Javadoc for [com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed]
- * The call(s) to `FilenameIndex.getFilesByName` are slow operations. 
+ * The call(s) to `FilenameIndex.getVirtualFilesByName` are slow operations. 
  */
 fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
 {
@@ -164,18 +165,14 @@ fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
                     if (psiDirectory != null)
                     {
                         val contentRootDirScope = GlobalSearchScopesCore.directoryScope(psiDirectory, false)
-                        val wpiLibDirs = FilenameIndex.getFilesByName(project, wpiLibDirName, contentRootDirScope, true)
-                        wpiLibDirs.forEach { wpiLibDirPsiFileSysItem: PsiFileSystemItem? ->
-                            if (wpiLibDirPsiFileSysItem != null && wpiLibDirPsiFileSysItem is PsiDirectory)
-                            {
-                                val wpiLibDirScope = GlobalSearchScopesCore.directoryScope(wpiLibDirPsiFileSysItem, false)
-                                val files = FilenameIndex.getFilesByName(project, wpiLibPreferencesFileName, wpiLibDirScope)
-                                if (LOG.isTraceEnabled)
-                                {
-                                    files.forEach { LOG.trace {"[FRC] Found: ${it.virtualFile.path}"} }
-                                }
-                                foundFiles.addAll(files)
-                            }
+                        val wpiLibDirs = FilenameIndex.getVirtualFilesByName(project, wpiLibDirName, false, contentRootDirScope)
+                            .filter { it?.isDirectory == true }
+                            .mapNotNull { it.findPsiDirectory(project) }
+                        wpiLibDirs.forEach { wpiLibDirPsiDir: PsiDirectory ->
+                            val wpiLibDirScope = GlobalSearchScopesCore.directoryScope(wpiLibDirPsiDir, false)
+                            val files = FilenameIndex.getVirtualFilesByName(project, wpiLibPreferencesFileName, true, wpiLibDirScope)
+                            if (LOG.isTraceEnabled) files.forEach { LOG.trace { "[FRC] Found: ${it.path}" } }
+                            foundFiles.addAll(files.map { it.findPsiFile(project) })
                         }
                     }
                 }
@@ -190,7 +187,7 @@ fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
     }
     catch (t: Throwable)
     {
-        // Issue #60: a Throwable can be thrown by FilenameIndex.getFilesByName() during an indexing event
+        // Issue #60: a Throwable can be thrown by FilenameIndex.getFilesByName() (which was later changed to getVirtualFilesByName() See Issue #121) during an indexing event
         LOG.warn("[FRC] An exception occurred when finding $wpiLibPreferencesFileName files for module ${module}. Cause Summary: $t", t)
     }
     
@@ -213,7 +210,7 @@ fun Project.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask(taskN
  * 
  * This function needs to be run via a background task to prevent a `SlowOperations` exceptions.
  * See Javadoc for [com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed].
- * The call(s) to `FilenameIndex.getFilesByName` (called by functions used byt this one) are slow operations.
+ * The call(s) to `FilenameIndex.getVirtualFilesByName` (called by functions used byt this one) are slow operations.
  * Use [getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask] for easy background use.
  * 
  * Returns the configured teamNumber in the `wpilib_preferences.json` file, or the team number configured in the application settings,
@@ -240,7 +237,7 @@ fun Project.getConfiguredProjectYearAsBackgroundTask(taskName: String = "Determi
  * Returns the project year, **which may not be just the year** but may also have character text, e.g. "Beta2020-2".
  * This function needs to be run via a background task to prevent a `SlowOperations` exceptions.
  * See Javadoc for [com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed].
- * The call(s) to `FilenameIndex.getFilesByName` (called by functions used byt this one) are slow operations.
+ * The call(s) to `FilenameIndex.getVirtualFilesByName` (called by functions used byt this one) are slow operations.
  * Use [getConfiguredProjectYearAsBackgroundTask] for easy background use.
  */
 fun Project.getConfiguredProjectYear(): String?

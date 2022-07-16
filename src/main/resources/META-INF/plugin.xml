@@ -526,6 +526,8 @@
                     class="net.javaru.iip.frc.actions.tools.internal.ConvertInternalWpiLibXmlMetadataToJsonAction" />
             <action id="FRC.tools.internal.GetAndConvertLatestWpiLibXmlMetadataToJsonAction"
                     class="net.javaru.iip.frc.actions.tools.internal.GetAndConvertLatestWpiLibXmlMetadataToJsonAction" />
+            <action id="FRC.tools.internal.CallGetTeamNumberConfiguredInWpiLibPreferencesFileAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.CallGetTeamNumberConfiguredInWpiLibPreferencesFileAction" />
         </group>
 
         <group id="FRC.FrcInternalGradleActionsGroup"

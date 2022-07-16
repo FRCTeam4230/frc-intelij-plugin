@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ data class Vendordeps(
         private const val navxUuidString = "cb311d09-36e9-4143-a032-55bb2b94443b"
         private val navxUuid: UUID = UUID.fromString(navxUuidString)
         val dmc60cRemappedUuid: UUID = UUID.fromString("d2dafb2b-4b81-40d1-98ff-7e66289fcfb4")
-        val libCuRemappedUuid: UUID = UUID.fromString("ba9f250f-1ebc-4897-9782-d3f4517df53b")
+        val libCuRemappedUuid: UUID = UUID.fromString("f002471f-3077-469a-8b00-3d5b343e8a68")
 
         private fun JsonObject.parseUuid(name: String, fileName: String, jsonUrl: URI?): UUID
         {
@@ -88,7 +88,7 @@ data class Vendordeps(
             {
                 uuidString == null                                     -> nonConformingUuidsMap.computeIfAbsent(name) { UUID.randomUUID() }
                 // the  Coppersource "LibCu" library has an invalid UUID. I've opened an issue: https://github.com/Coppersource/LibCu/issues/4
-                // for now we just map it to another UUID
+                // For 2022, they resoved the issue, but we still check and map to the new valid UUID 
                 (uuidString == "libcufrc-e6e8-4db6-89f0-copperforge0") -> libCuRemappedUuid
                 // Honor the navX UUID when in the navX file
                 (uuidString == navxUuidString &&

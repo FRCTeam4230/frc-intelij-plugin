@@ -51,6 +51,7 @@ import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
 import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.runWhenSmart
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
+import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsManagementDialogWrapper
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsProjectFilesListing
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsService
@@ -316,6 +317,22 @@ class FindVendordepsDirFrcInternalAction: AbstractFrcInternalAction()
             }
         }
     }
+}
+
+class CallGetTeamNumberConfiguredInWpiLibPreferencesFileAction: AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, "Get Team Number From WpiLib Preferences File") { project: Project ->
+            project.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask() {
+                FrcNotifyType.ACTIONABLE_INFO
+                    .withContent("Team number in wpilib_preferences.json is: $it")
+                    .withFrcPrefixedTitle("Project team number")
+                    .notifyViaBalloon(project)
+            }
+        }
+    }
+
 }
 
 abstract class AbstractDisplayVendordepsListingFrcInternalAction : AbstractFrcInternalAction

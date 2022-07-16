@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ package net.javaru.iip.frc.wpilib.vendordeps
 import com.asarkar.semver.SemVer
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
-import kotlin.streams.toList
 
 /**
  * A version class for libraries and dependencies that handles not standard version schemes. If the version text
@@ -69,7 +68,6 @@ class LibVersion private constructor(val asText: String, private val backingSemV
         {
             val parts = text.removePrefix("v").removePrefix("V")
                 .split('.')
-                .stream()
                 .map {
                     // remove leading zeros
                     val modified = it.replace(leadingZeroRegex, "")

@@ -1,12 +1,12 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *
+ *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Disposer
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * A Project Service that we can use as a Project level parent disposable.
@@ -39,8 +39,10 @@ class FrcPluginProjectDisposable(val project: Project) : Disposable
 {
     private val logger = logger<FrcPluginProjectDisposable>()
 
+    private val disposedFlag = AtomicBoolean(false)
+    
     val isDisposed
-        get() = Disposer.isDisposed(this)
+        get() = disposedFlag.get()
 
     companion object
     {
@@ -53,6 +55,7 @@ class FrcPluginProjectDisposable(val project: Project) : Disposable
         try
         {
             logger.trace { "[FRC] FrcPluginProjectDisposable.dispose() called for project '$project'" }
+            disposedFlag.set(true)
         }
         catch (ignore: Exception) { }
     }

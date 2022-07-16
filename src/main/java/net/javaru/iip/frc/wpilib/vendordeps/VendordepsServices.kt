@@ -50,6 +50,7 @@ import net.javaru.iip.frc.notify.FrcNotifyType
 import net.javaru.iip.frc.psi.FrcGeneralChangePsiTreeChangeListenerAdapter
 import net.javaru.iip.frc.services.FrcPluginProjectDisposable
 import net.javaru.iip.frc.util.findCommonParentDir
+import net.javaru.iip.frc.util.findPsiDirectory
 import net.javaru.iip.frc.util.generateRandomTempPath
 import net.javaru.iip.frc.util.getModules
 import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
@@ -316,7 +317,7 @@ class VendordepsService private constructor(val project: Project)
                 Vendordeps.parse(jsonFile).onSuccess { vendordeps: Vendordeps ->
                     vendordepsProjectFileList.add(VendordepsProjectFile(jsonFile, vendordeps))
                 }.onFailure { t: Throwable ->
-                    logger.info("[FRC] Could not parse file as Vendordeps. File: ${jsonFile.name} Error: $t")
+                    logger.info("[FRC] Could not parse file as Vendordeps. File: ${jsonFile.name} Error: $t", t)
                     invalidVendordepsFileList.add(jsonFile)
                 }
             }
@@ -401,37 +402,27 @@ class VendordepsService private constructor(val project: Project)
         {
             // Ideally, there is only a single vendordeps directory in the project root
             // But we have to allow for the possibility another vendordeps directory exists... perhaps a user accidentally created one elsewhere in the project
-            var psiFsItems =
-                FilenameIndex.getFilesByName(
-                    project,
-                    vendordepsDirName,
-                    GlobalSearchScope.projectScope(project),
-                    true
-                                            )
+            var virtualFiles = FilenameIndex.getVirtualFilesByName(project, vendordepsDirName, true, GlobalSearchScope.projectScope(project)).filter {
+                    it.isDirectory
+                }
 
-            if (psiFsItems.isEmpty()) return null
+            if (virtualFiles.isEmpty()) return null
 
             // 99% use case should be handled here
-            if (psiFsItems.size == 1)
+            if (virtualFiles.size == 1)
             {
-                return if (psiFsItems[0] is PsiDirectory) psiFsItems[0] as PsiDirectory else null
+                return virtualFiles.first().findPsiDirectory(project)
             }
 
             // We have multiple found directories… try the obvious solution, the one in the project base dir
             // this should handle 99% of the remaining cases
-            var foundDir: PsiDirectory? = null
             if (project.basePath != null)
             {
-                psiFsItems.forEach {
-                    if (it is PsiDirectory && project.basePath == it.parent?.virtualFile?.path)
-                    {
-                        foundDir = it
-                        return@forEach
-                    }
-                }
+                val psiDir = virtualFiles.filter { 
+                    it.parent.path == project.basePath
+                }.firstOrNull()?.findPsiDirectory(project)
+                if (psiDir != null) return psiDir
             }
-
-            if (foundDir != null) return foundDir
 
             // Final effort... let's narrow the search results first, and hunt for it.
             // We want to reduce the scope to non-source content
@@ -440,31 +431,21 @@ class VendordepsService private constructor(val project: Project)
             moduleScopes.forEach {
                 finalScope = finalScope.intersectWith(it)
             }
-            psiFsItems =
-                FilenameIndex.getFilesByName(
-                    project,
-                    vendordepsDirName,
-                    finalScope,
-                    true
-                                            )
+            virtualFiles = FilenameIndex.getVirtualFilesByName(project, vendordepsDirName, true, finalScope).filter {
+                it.isDirectory
+            }
 
-            if (psiFsItems.isEmpty()) return null
-            if (psiFsItems.size == 1)
+            if (virtualFiles.isEmpty()) return null
+            if (virtualFiles.size == 1)
             {
-                return if (psiFsItems[0] is PsiDirectory) psiFsItems[0] as PsiDirectory else null
+                return virtualFiles.first().findPsiDirectory(project)
             }
 
-            val psiDirs = psiFsItems.filterIsInstance<PsiDirectory>().toList()
-            val paths = psiDirs.mapNotNull { it.parentDirectory?.virtualFile?.path }
+            val paths = virtualFiles.mapNotNull { it.parent?.path }
             val commonParentDir = findCommonParentDir(paths)
-            psiDirs.forEach {
-                if (it.parentDirectory?.virtualFile?.path?.toCommonSeparatorPath() == commonParentDir)
-                {
-                    foundDir = it
-                    return@forEach
-                }
-            }
-            return foundDir
+            return virtualFiles.filter {
+                it.parent?.path?.toCommonSeparatorPath() == commonParentDir
+            }.firstOrNull() as PsiDirectory?
         }
         catch (e: Throwable)
         {

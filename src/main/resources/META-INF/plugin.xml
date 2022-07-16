@@ -52,6 +52,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v2.2.0</strong> <br>
+        &nbsp;&nbsp;&bull; Migrate off plugin APIs deprecated in IntelliJ IDEA 2022.1<br>
+        <br>
         <strong>v2.1.1</strong> <br>
         &nbsp;&nbsp;&bull; Works around a bug in IntelliJ IDEA v2022.1
                            (<a href='https://youtrack.jetbrains.com/issue/IDEA-292993/Custom-module-type-from-plugin-not-appearing-in-File-New-Module'>IDEA-292993</a>)

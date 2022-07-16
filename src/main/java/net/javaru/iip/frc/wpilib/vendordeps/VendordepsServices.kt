@@ -402,7 +402,8 @@ class VendordepsService private constructor(val project: Project)
         {
             // Ideally, there is only a single vendordeps directory in the project root
             // But we have to allow for the possibility another vendordeps directory exists... perhaps a user accidentally created one elsewhere in the project
-            var virtualFiles = FilenameIndex.getVirtualFilesByName(vendordepsDirName, true, GlobalSearchScope.projectScope(project)).filter {
+            // FYI: Used overload version of getVirtualFilesByName is deprecated in 2022.1, but replacement is not added until 2022.1 (basically the project is no longer provided since the Scope covers that) 
+            var virtualFiles = FilenameIndex.getVirtualFilesByName(project, vendordepsDirName, true, GlobalSearchScope.projectScope(project)).filter {
                     it.isDirectory
                 }
 
@@ -431,7 +432,8 @@ class VendordepsService private constructor(val project: Project)
             moduleScopes.forEach {
                 finalScope = finalScope.intersectWith(it)
             }
-            virtualFiles = FilenameIndex.getVirtualFilesByName(vendordepsDirName, true, finalScope).filter {
+            // FYI: Used overload version of getVirtualFilesByName is deprecated in 2022.1, but replacement is not added until 2022.1 (basically the project is no longer provided since the Scope covers that)
+            virtualFiles = FilenameIndex.getVirtualFilesByName(project, vendordepsDirName, true, finalScope).filter {
                 it.isDirectory
             }
 

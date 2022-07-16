@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import net.javaru.iip.frc.services.FrcErrorReportSubmitter
 import net.javaru.iip.frc.services.ReportableEvent
+import org.jetbrains.plugins.gradle.GradleManager
 import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataCache
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import java.io.File
@@ -164,12 +165,19 @@ private fun Project.findAllProjectSettings(): List<ExternalSystemProjectId>
 {
     val list: MutableList<ExternalSystemProjectId> = ArrayList()
     ExternalSystemManager.EP_NAME.forEachExtensionSafe { manager: ExternalSystemManager<*, *, *, *, *> ->
-        val systemId = manager.systemId
-        val linkedProjectsSettings = manager.settingsProvider.`fun`(this).linkedProjectsSettings
-        for (settings in linkedProjectsSettings)
+        // We smart cast to prevent complications introduced if we have the wild generic types of ExternalSystemManager<*, *, *, *, *>. By casting, we instead have a GradleManager<GradleProjectSettings, GradleSettingsListener, GradleSettings, GradleLocalSettings, GradleExecutionSettings>
+        if (manager is GradleManager)
         {
-            val externalProjectPath = settings.externalProjectPath ?: continue
-            list.add(ExternalSystemProjectId(systemId, externalProjectPath))
+            // @formatter:off
+            val subList: List<ExternalSystemProjectId> = manager
+                .settingsProvider
+                .`fun`(this)
+                .linkedProjectsSettings
+                .filter { it?.externalProjectPath != null }
+                .mapNotNull { ExternalSystemProjectId(manager.systemId, it.externalProjectPath) }
+                .toList()
+            list.addAll(subList)
+            // @formatter:on
         }
     }
     return list

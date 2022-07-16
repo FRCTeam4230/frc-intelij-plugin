@@ -280,11 +280,9 @@ idea {
                 this.encoding = "UTF-8"
                 this.bomPolicy = org.jetbrains.gradle.ext.EncodingConfiguration.BomPolicy.WITH_NO_BOM
                 properties {
-                    encoding = "ISO-8859-1"
-                    transparentNativeToAsciiConversion = false
+                    encoding = "UTF-8"
+                    transparentNativeToAsciiConversion = true
                 }
-                // Haven't gotten this part working, if it is ever needed
-                //mapping = mapOf("../src/main/resources/Foo" to "ISO-8859-1")
             }
 
 

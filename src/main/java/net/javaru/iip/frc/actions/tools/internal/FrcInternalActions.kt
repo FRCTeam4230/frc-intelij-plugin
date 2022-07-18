@@ -402,7 +402,18 @@ class VendordepsCheckForDuplicatesInternalAction : AbstractFrcInternalAction()
     {
         executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
             it.runWhenSmart {
-                VendordepsService.getInstance(it).updateVendordepsListingAndCheckForDuplicates(true)
+                VendordepsService.getInstance(it).updateVendordepsListing(true)
+            }
+        }
+    }
+}
+class VendordepsCheckForDuplicatesNoNotificationInternalAction : AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
+            it.runWhenSmart {
+                VendordepsService.getInstance(it).updateVendordepsListing(false)
             }
         }
     }

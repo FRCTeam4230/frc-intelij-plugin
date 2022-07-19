@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  */
+
+@file:Suppress("unused")
 
 package net.javaru.iip.frc.util
 
@@ -44,37 +46,37 @@ fun <T : Appendable> T.appendIfNonNull(vararg value: CharSequence?): T
 }
 
 /**
- * Appends all non null arguments to the given StringBuilder.
+ * Appends all non-null arguments to the given StringBuilder.
  */
 fun StringBuilder.appendIfNonNull(vararg value: Any?): StringBuilder
 {
     for (item in value)
         if (item != null) this.append(item)
-    return this;
+    return this
 }
 
 /**
- * Appends all non null arguments to the given StringBuilder.
+ * Appends all non-null arguments to the given StringBuilder.
  */
 fun StringBuilder.appendIfNonNull(vararg value: CharSequence?): StringBuilder
 {
     for (item in value)
         if (item != null) this.append(item)
-    return this;
+    return this
 }
 
 /**
- * Appends all non null arguments to the given StringBuilder.
+ * Appends all non-null arguments to the given StringBuilder.
  */
 fun StringBuilder.appendIfNonNull(vararg value: String?): StringBuilder
 {
     for (item in value)
         if (item != null) this.append(item)
-    return this;
+    return this
 }
 
 /**
- * Appends all non null and non blank arguments to the given [Appendable].
+ * Appends all non-null and non-blank arguments to the given [Appendable].
  */
 fun <T : Appendable> T.appendIfNotBlank(vararg value: CharSequence?): T
 {
@@ -84,7 +86,7 @@ fun <T : Appendable> T.appendIfNotBlank(vararg value: CharSequence?): T
 }
 
 /**
- * Appends all non null and non blank arguments to the given StringBuilder.
+ * Appends all non-null and non-blank arguments to the given StringBuilder.
  */
 fun StringBuilder.appendIfNotBlank(vararg value: CharSequence?): StringBuilder
 {
@@ -94,7 +96,7 @@ fun StringBuilder.appendIfNotBlank(vararg value: CharSequence?): StringBuilder
 }
 
 /**
- * Appends all non null and non blank arguments to the given StringBuilder.
+ * Appends all non-null and non-blank arguments to the given StringBuilder.
  */
 fun StringBuilder.appendIfNotBlank(vararg value: String?): StringBuilder
 {
@@ -104,7 +106,7 @@ fun StringBuilder.appendIfNotBlank(vararg value: String?): StringBuilder
 }
 
 /**
- * Appends all non null and non empty arguments to the given [Appendable].
+ * Appends all non-null and non-empty arguments to the given [Appendable].
  */
 fun <T : Appendable> T.appendIfNotEmpty(vararg value: CharSequence?): T
 {
@@ -114,7 +116,7 @@ fun <T : Appendable> T.appendIfNotEmpty(vararg value: CharSequence?): T
 }
 
 /**
- * Appends all non null and non empty arguments to the given StringBuilder.
+ * Appends all non-null and non-empty arguments to the given StringBuilder.
  */
 fun StringBuilder.appendIfNotEmpty(vararg value: CharSequence?): StringBuilder
 {
@@ -124,7 +126,7 @@ fun StringBuilder.appendIfNotEmpty(vararg value: CharSequence?): StringBuilder
 }
 
 /**
- * Appends all non null and non empty arguments to the given StringBuilder.
+ * Appends all non-null and non-empty arguments to the given StringBuilder.
  */
 fun StringBuilder.appendIfNotEmpty(vararg value: String?): StringBuilder
 {
@@ -259,7 +261,7 @@ fun CharSequence.eolTo(eol: EOL = EOL.UNIX): String = this.textToLines().linesTo
 @JvmOverloads
 fun CharSequence?.eolToOrNull(eol: EOL = EOL.UNIX): String? = this?.eolTo(eol)
 
-/** Convenience method for decapitalization since kotlin built-in one was deprecated. This implements the suggested replacement   */
+/** Convenience method for de-capitalization since kotlin built-in one was deprecated. This implements the suggested replacement   */
 fun String.decapitalize2(): String = this.replaceFirstChar { it.lowercase(Locale.getDefault()) }
 
 /** Convenience method for capitalization since kotlin built-in one was deprecated. This implements the suggested replacement  */

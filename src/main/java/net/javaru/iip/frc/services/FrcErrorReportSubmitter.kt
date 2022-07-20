@@ -35,6 +35,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task.Backgroundable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
+import com.intellij.psi.PsiFile
 import com.intellij.util.Consumer
 import io.sentry.Attachment
 import io.sentry.Scope
@@ -53,6 +54,7 @@ import net.javaru.iip.frc.util.frcPluginPrimaryVersion
 import net.javaru.iip.frc.util.frcPluginVersion
 import net.javaru.iip.frc.util.getPluginResourceAsStream
 import net.javaru.iip.frc.util.insertBeforeLast
+import net.javaru.iip.frc.wpilib.vendordeps.VendordepsParsingException
 import java.awt.Component
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -62,83 +64,110 @@ import java.util.*
 object FrcErrorReportSubmitter: ErrorReportSubmitter()
 {
     private val LOG = logger<FrcErrorReportSubmitter>()
+    
+    private var isNotInitialized = true
 
     init
     {
-        val useQA = FrcSystemConfigs.ErrorReportSubmitterUseQa.value
-        val key = if (useQA) "sentry.dsn.test.and.qa" else "sentry.dsn.prod"
-        LOG.debug("Sentry init: useQA: $useQA  DSN property key: $key")
-        val sentryDsn = Properties().apply {
-            load(getPluginResourceAsStream("services/frc-plugin-tokens.properties"))
-        }.getProperty(key, "DSN_NOT_FOUND").also {
-            if (it == "DSN_NOT_FOUND")
-            {
-                val msg = "Could not load Sentry DSN from frc-plugin-tokens.properties"
-                if (FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE) LOG.error(msg) else LOG.warn(msg)
+        try
+        {
+            val useQA = FrcSystemConfigs.ErrorReportSubmitterUseQa.value
+            val key = if (useQA) "sentry.dsn.test.and.qa" else "sentry.dsn.prod"
+            LOG.debug("Sentry init: useQA: $useQA  DSN property key: $key")
+            val sentryDsn = Properties().apply {
+                load(getPluginResourceAsStream("services/frc-plugin-tokens.properties"))
+            }.getProperty(key, "DSN_NOT_FOUND").also {
+                if (it == "DSN_NOT_FOUND")
+                {
+                    val msg = "Could not load Sentry DSN from frc-plugin-tokens.properties"
+                    if (FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE) LOG.error(msg) else LOG.warn(msg)
+                }
+                else if (FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE)
+                {
+                    LOG.debug("Sentry DSN set to: $it")
+                }
             }
-            else if (FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE)
+            
+            if (!sentryDsn.contains("sentry.io"))
             {
-                LOG.debug("Sentry DSN set to: $it")
+                LOG.warn("Sentry DSN is not configured. ${FrcErrorReportSubmitter::class.java.simpleName} will not be initialized and thus will not be available for use.")
+                isNotInitialized = true
+                if (useQA)
+                {
+                    FrcNotifyType.GENERAL_INFO_WITH_FRC_ICON
+                        .builder()
+                        .withContent("FrcErrorReportSubmitter not initialized.")
+                        .withFrcPrefixedTitle("Plugin development")
+                        .notifyAllProject(false)
+                }
+            }
+            else
+            {
+                Sentry.init { options ->
+                    options.apply {
+                        isEnableExternalConfiguration = false // We disable since we don't load any
+                        dsn = sentryDsn
+                        // We use just the primary release (i.e. 1.2.3 and not 1.2.3-2020.1) so the sentry tool can track fixed versions, regressions, and such properly
+                        release = frcPluginPrimaryVersion ?: "<undetermined>"
+                        // short version is basically hte major version, such as 2021.3 for all 2021.3 versions such as 2021.3.3, 2021.3.1, 2021.3, etc.
+                        // we use it as the environment since in most cases we simply need to differentiate between major versions
+                        environment = ApplicationInfo.getInstance().shortVersion
+                        // We don't want to get people's system names (for privacy reasons), and we don't really need it.
+                        // But if you do not set it, Sentry sets it automatically
+                        isAttachServerName = false
+                        isSendDefaultPii = false // whether to send Personal Identifiable Information (PII)
+                        // When enabled, stack traces are automatically attached to all messages logged. Stack traces are always
+                        // attached to exceptions; however, when this option is set, stack traces are also sent with messages.
+                        // This option, for instance, means that stack traces appear next to all log messages.
+                        // https://docs.sentry.io/platforms/java/configuration/options/#attach-stacktrace
+                        isAttachStacktrace = true
+                        inAppIncludes.addAll(mutableListOf("net.javaru", "io.javaru", "org.javaru"))
+                        enableUncaughtExceptionHandler = false // when enabled, it catches a lot of noise from the IDE and other Plugins that we can't do anything about
+                        isEnableNdk = false // Android Native Development Kit: https://docs.sentry.io/platforms/android/using-ndk/
+                        isEnableScopeSync = false // the Java to NDK Scope sync
+                        isEnableScopeSync = false // the Java to NDK Scope sync
+                        isEnableAutoSessionTracking = false // web sessions; n/a for us; but is on by default
+                        setDebug(useQA)
+                        // This applies to performance monitoring, which we are not using at this time
+                        //tracesSampleRate = 1.0
+
+
+                        // AN example of a BeforeSendCallback from the docs
+                        //                beforeSend = BeforeSendCallback { event: SentryEvent, hint: Any? ->
+                        //                    // Drop an event altogether:
+                        //                    if (event.getTag("SomeTag") != null)
+                        //                    {
+                        //                        null
+                        //                    }
+                        //                    else
+                        //                    {
+                        //                        event
+                        //                    }
+                        //                }
+
+                    }
+                }.also {
+                    Sentry.setTag("release.full", frcPluginVersion ?: "<undetermined>")
+                    Sentry.setTag("ide.build", ApplicationInfo.getInstance().build.asString())
+                    Sentry.setTag("ide.version", ApplicationInfo.getInstance().fullVersion)
+                    Sentry.setTag("ide.code", ApplicationInfo.getInstance().build.productCode)
+                    Sentry.setTag("ide.name", "${ApplicationInfo.getInstance().fullApplicationName} ${ApplicationNamesInfo.getInstance().editionName}")
+                    Sentry.setTag("os", SystemInfo.getOsNameAndVersion())
+                    val frcApplicationSettings = FrcApplicationSettings.getInstance()
+                    Sentry.setTag("frc.team", frcApplicationSettings.teamNumber.toString())
+                    val niid = frcApplicationSettings.niid
+                    Sentry.setTag("niid", niid)
+                    Sentry.setUser(User().apply {
+                        this.id = niid
+                    })
+                }
+                isNotInitialized = false
             }
         }
-
-        Sentry.init { options ->
-            options.apply {
-                isEnableExternalConfiguration = false // We disable since we don't load any
-                dsn = sentryDsn
-                // We use just the primary release (i.e. 1.2.3 and not 1.2.3-2020.1) so the sentry tool can track fixed versions, regressions, and such properly
-                release = frcPluginPrimaryVersion ?: "<undetermined>"
-                // short version is basically hte major version, such as 2021.3 for all 2021.3 versions such as 2021.3.3, 2021.3.1, 2021.3, etc.
-                // we use it as the environment since in most cases we simply need to differentiate between major versions
-                environment = ApplicationInfo.getInstance().shortVersion
-                // We don't want to get people's system names (for privacy reasons), and we don't really need it.
-                // But if you do not set it, Sentry sets it automatically
-                isAttachServerName = false
-                isSendDefaultPii = false // whether to send Personal Identifiable Information (PII)
-                // When enabled, stack traces are automatically attached to all messages logged. Stack traces are always
-                // attached to exceptions; however, when this option is set, stack traces are also sent with messages.
-                // This option, for instance, means that stack traces appear next to all log messages.
-                // https://docs.sentry.io/platforms/java/configuration/options/#attach-stacktrace
-                isAttachStacktrace = true
-                inAppIncludes.addAll(mutableListOf("net.javaru", "io.javaru", "org.javaru"))
-                enableUncaughtExceptionHandler = false // when enabled, it catches a lot of noise from the IDE and other Plugins that we can't do anything about
-                isEnableNdk = false // Android Native Development Kit: https://docs.sentry.io/platforms/android/using-ndk/
-                isEnableScopeSync = false // the Java to NDK Scope sync
-                isEnableScopeSync = false // the Java to NDK Scope sync
-                isEnableAutoSessionTracking = false // web sessions; n/a for us; but is on by default
-                setDebug(useQA)
-                // This applies to performance monitoring, which we are not using at this time
-                //tracesSampleRate = 1.0
-
-
-                // AN example of a BeforeSendCallback from the docs
-//                beforeSend = BeforeSendCallback { event: SentryEvent, hint: Any? ->
-//                    // Drop an event altogether:
-//                    if (event.getTag("SomeTag") != null)
-//                    {
-//                        null
-//                    }
-//                    else
-//                    {
-//                        event
-//                    }
-//                }
-
-            }
-        }.also {
-            Sentry.setTag("release.full", frcPluginVersion ?: "<undetermined>")
-            Sentry.setTag("ide.build", ApplicationInfo.getInstance().build.asString())
-            Sentry.setTag("ide.version", ApplicationInfo.getInstance().fullVersion)
-            Sentry.setTag("ide.code", ApplicationInfo.getInstance().build.productCode)
-            Sentry.setTag("ide.name", "${ApplicationInfo.getInstance().fullApplicationName} ${ApplicationNamesInfo.getInstance().editionName}")
-            Sentry.setTag("os", SystemInfo.getOsNameAndVersion())
-            val frcApplicationSettings = FrcApplicationSettings.getInstance()
-            Sentry.setTag("frc.team", frcApplicationSettings.teamNumber.toString())
-            val niid = frcApplicationSettings.niid
-            Sentry.setTag("niid", niid)
-            Sentry.setUser(User().apply {
-                this.id = niid
-            })
+        catch (t: Throwable)
+        {
+            isNotInitialized = true
+            LOG.warn("Could not initialize ${FrcErrorReportSubmitter::class.java.simpleName}. Cause: $t", t)
         }
     }
 
@@ -152,6 +181,7 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
                         parentComponent: Component,
                         consumer: Consumer<in SubmittedReportInfo>): Boolean
     {
+        if (isNotInitialized) return false
         val lastActionId = IdeaLogger.ourLastActionId ?: "<unknown>"
         val context = DataManager.getInstance().getDataContext(parentComponent)
         val project = CommonDataKeys.PROJECT.getData(context)
@@ -239,6 +269,10 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
     {
         try
         {
+            if (isNotInitialized)
+            {
+                LOG.info("[FRC] Could not process ReportableEvent [correlationId: ${event.correlationId}] as the ${FrcErrorReportSubmitter::class.java.simpleName} is not initialized.")
+            }
             object : Backgroundable(event.project, "Log issue")
             {
                 override fun run(indicator: ProgressIndicator)
@@ -273,6 +307,48 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
         catch (t: Throwable)
         {
             LOG.info("[FRC] Could not process ReportableEvent [correlationId: ${event.correlationId}]. Reason: $t")
+        }
+    }
+
+    fun submitVendordepsParsingError(project:Project, exception: VendordepsParsingException)
+    {
+        try
+        {
+            if (isNotInitialized)
+            {
+                LOG.info("[FRC] Could not process vendordeps file parsing error for ${exception.jsonFile.name} as the ${FrcErrorReportSubmitter::class.java.simpleName} is not initialized.")
+                return
+            }
+            
+            object : Backgroundable(project, "Log vendordeps parsing error")
+            {
+                override fun run(indicator: ProgressIndicator)
+                {
+                    try
+                    {
+                        Sentry.withScope { scope: Scope ->
+                            scope.setExtraSafely("event.type", "VendordepsFileParsingError")
+                            scope.addPsiFileAsAttachment(exception.jsonFile)
+                            scope.addThrowableAsAttachment(exception)
+                            scope.addIdeaExceptionAttachments(exception)
+                            val sentryEvent = SentryEvent(exception)// Is null safe
+                            sentryEvent.setStacktraceHashes(exception)
+                            sentryEvent.level = SentryLevel.WARNING
+                            sentryEvent.setMessageSafely(scope, "Could not parse vendordeps file ${exception.jsonFile.name}")
+                            val sentryId = Sentry.captureEvent(sentryEvent)
+                            logReportSubmission(sentryId)
+                        }
+                    }
+                    catch (t: Throwable)
+                    {
+                        LOG.info("[FRC] Could not report vendordeps file parsing error for ${exception.jsonFile.name}. Reason: $t")
+                    }
+                }
+            }.queue()
+        }
+        catch (t: Throwable)
+        {
+            LOG.info("[FRC] Could not process vendordeps file parsing error for ${exception.jsonFile.name}. Reason: $t")
         }
     }
 
@@ -319,6 +395,14 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
         {
             val path = "$prefix${ideaAttachment.path.insertBeforeLast('.', "-displayText")}"
             this.addAttachment(Attachment(ideaAttachment.bytes, path))
+        }
+    }
+    
+    private fun Scope.addPsiFileAsAttachment(psiFile: PsiFile?)
+    {
+        if (psiFile != null)
+        {
+            addAttachment(Attachment(psiFile.text.toByteArray(), psiFile.name))
         }
     }
 

@@ -8,6 +8,9 @@
         "version": {
             "type": "string"
         },
+        "frcYear": {
+            "type": "integer"
+        },
         "uuid": {
             "type": "string"
         },

@@ -54,6 +54,7 @@ import net.javaru.iip.frc.i18n.FrcMessageKey
 import net.javaru.iip.frc.isUnitTestMode
 import net.javaru.iip.frc.notify.FrcNotifyType
 import net.javaru.iip.frc.psi.FrcGeneralChangePsiTreeChangeListenerAdapter
+import net.javaru.iip.frc.services.FrcErrorReportSubmitter
 import net.javaru.iip.frc.services.FrcPluginProjectDisposable
 import net.javaru.iip.frc.util.findCommonParentDir
 import net.javaru.iip.frc.util.findPsiDirectory
@@ -182,7 +183,7 @@ fun VirtualFile?.isVendordepsJsonFile(project: Project?): Boolean
 data class VendordepsProjectFilesListing(val vendordepsProjectFileList: List<VendordepsProjectFile>,
                                     val vendordepsProjectFileMap: Map<UUID, List<VendordepsProjectFile>>,
                                     val duplicateVendordepsMap: Map<UUID, List<VendordepsProjectFile>>,
-                                    val invalidVendordepsFileList: List<JsonFile>)
+                                    val invalidVendordepsFileList: List<InvalidVendordepsProjectFile>)
 {
     fun hasDuplicates(): Boolean = duplicateVendordepsMap.isNotEmpty()
 
@@ -190,7 +191,7 @@ data class VendordepsProjectFilesListing(val vendordepsProjectFileList: List<Ven
 
     val duplicatesBulletedListing:String =  run {
         val msgBuilder = StringBuilder ()
-        val via = message("frc.vendordeps.service.speified.via")
+        val via = message("frc.vendordeps.service.specified.via")
         duplicateVendordepsMap.forEach { entry: Map.Entry<UUID, List<VendordepsProjectFile>> ->
             if (entry.value.size > 1)
             {
@@ -209,6 +210,7 @@ class VendordepsService private constructor(val project: Project): Disposable
 {
     private val logger = logger<VendordepsService>()
     // We initialize to an empty listing, but it gets properly initialized in the init method once the project is in smart mode
+    @Suppress("MemberVisibilityCanBePrivate")
     var vendordepsProjectFilesListing = VendordepsProjectFilesListing(emptyList(), emptyMap(), emptyMap(), emptyList())
         private set
     
@@ -218,7 +220,7 @@ class VendordepsService private constructor(val project: Project): Disposable
     init
     {
         logger.debug{"[FRC] Scheduling VendordepsService initialization for project: $project"}
-        StartupManager.getInstance(project).runWhenProjectIsInitialized() {
+        StartupManager.getInstance(project).runWhenProjectIsInitialized {
             logger.debug { "[FRC] Scheduling VendordepsService read action for project: $project" }
             project.runNonBlockingReadActionInSmartMode {
                 logger.debug { "[FRC] VendordepsService initializing for project: $project" }
@@ -280,7 +282,7 @@ class VendordepsService private constructor(val project: Project): Disposable
                 .nonBlocking(Callable { updateVendordepsListingWork() })
                 .inSmartMode(project)
                 .expireWith(this)
-                .finishOnUiThread(ModalityState.NON_MODAL, ) { result ->
+                .finishOnUiThread(ModalityState.NON_MODAL) { result ->
                     vendordepsProjectFilesListing = result
                     if (notifyOnDuplicates) { notifyAboutDuplicatesIfAny() }
                 }
@@ -305,7 +307,7 @@ class VendordepsService private constructor(val project: Project): Disposable
         if (hasBeenDisposed()) return vendordepsProjectFilesListing
         logger.debug { "[FRC] $vendordepsDirName dir found at: ${vendordepsDir?.virtualFile?.path}" }
         val vendordepsProjectFileList = mutableListOf<VendordepsProjectFile>()
-        val invalidVendordepsFileList = mutableListOf<JsonFile>()
+        val invalidVendordepsFileList = mutableListOf<InvalidVendordepsProjectFile>()
         vendordepsDir
             ?.children
             ?.asSequence()
@@ -318,8 +320,9 @@ class VendordepsService private constructor(val project: Project): Disposable
                 Vendordeps.parse(jsonFile).onSuccess { vendordeps: Vendordeps ->
                     vendordepsProjectFileList.add(VendordepsProjectFile(jsonFile, vendordeps))
                 }.onFailure { t: Throwable ->
+                    FrcErrorReportSubmitter.submitVendordepsParsingError(project, VendordepsParsingException(jsonFile, t))
                     logger.info("[FRC] Could not parse file as Vendordeps. File: ${jsonFile.name} Error: $t", t)
-                    invalidVendordepsFileList.add(jsonFile)
+                    invalidVendordepsFileList.add(InvalidVendordepsProjectFile(jsonFile))
                 }
             }
 
@@ -372,13 +375,13 @@ class VendordepsService private constructor(val project: Project): Disposable
 
     }
 
-
     fun findVendordepsDirNonBlocking(action: (directory: PsiDirectory?) -> Unit) {
         project.runNonBlockingReadActionInSmartMode {
             val dir = findVendordepsDir()
             action(dir)
         }
     }
+    
     /**
      * Finds the vendordeps directory for the project. Should be run only when the project is smart
      * and only as a non-blocking read action.
@@ -420,9 +423,9 @@ class VendordepsService private constructor(val project: Project): Disposable
             // this should handle 99% of the remaining cases
             if (project.basePath != null)
             {
-                val psiDir = virtualFiles.filter { 
+                val psiDir = virtualFiles.firstOrNull {
                     it.parent.path == project.basePath
-                }.firstOrNull()?.findPsiDirectory(project)
+                }?.findPsiDirectory(project)
                 if (psiDir != null) return psiDir
             }
 
@@ -446,9 +449,9 @@ class VendordepsService private constructor(val project: Project): Disposable
 
             val paths = virtualFiles.mapNotNull { it.parent?.path }
             val commonParentDir = findCommonParentDir(paths)
-            return virtualFiles.filter {
+            return virtualFiles.firstOrNull {
                 it.parent?.path?.toCommonSeparatorPath() == commonParentDir
-            }.firstOrNull() as PsiDirectory?
+            } as PsiDirectory?
         }
         catch (e: Throwable)
         {
@@ -457,11 +460,11 @@ class VendordepsService private constructor(val project: Project): Disposable
         }
     }
 
-
     /**
      * Downloads a vendordeps file from the specified URL to a (system) temp file. It ***does not*** install the file into the
      * vendordeps directory. Does so in a cancelable background process.
      */
+    @Suppress("unused")
     fun downloadVendordepToTempFileInBackground(project: Project, uri: URI, resultProcessor: (Result<Path, Exception>) -> Unit)
         = downloadVendordepToTempFileInBackground(project, uri.toString(), resultProcessor)
 
@@ -507,6 +510,14 @@ class VendordepsService private constructor(val project: Project): Disposable
     }
 }
 
+class VendordepsParsingException(val jsonFile: JsonFile, cause: Throwable) : RuntimeException("Could not parse vendordeps file ${jsonFile.name}", cause)
+{
+    companion object
+    {
+        private const val serialVersionUID: Long = -4068721612655173680L
+    }
+
+}
 
 // Pre IJ v2019.3, need to use StartupActivity rather than StartupActivity.Background (and change the plugin.xml element to match)
 class VendordepsServicesStartupActivity : StartupActivity.Background
@@ -517,7 +528,7 @@ class VendordepsServicesStartupActivity : StartupActivity.Background
         if (project.isFrcFacetedProject())
         {
             logger.debug{ "[FRC] Scheduling Vendordeps Services Startup Activities for project: $project" }
-            StartupManager.getInstance(project).runWhenProjectIsInitialized() {
+            StartupManager.getInstance(project).runWhenProjectIsInitialized {
                 logger.debug { "[FRC] Running Vendordeps Services Startup Activities for project: $project" }
                 VendordepsFileListener.getInstance(project)
                 VendordepsService.getInstance(project)

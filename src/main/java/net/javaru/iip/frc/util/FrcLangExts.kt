@@ -35,6 +35,30 @@ enum class EOL(
     SYSTEM(System.lineSeparator())
 }
 
+
+@Deprecated("Use letSafely", ReplaceWith("letSafely(block)") /* We keep around for discovery purposes*/ )
+inline fun <T, R> T?.trySafely(block: (T) -> R): R? = this.letSafely(block)
+
+/**
+ * A safe implementation of the standard [let] scope function that only runs the block if the receiver is non-null, and 
+ * returns `null` in the event an exception occurs in the execution of the provided block. For example: 
+ * `val uuid: UUID? = uuidString.letSafely { UUID.fromString(it) }`
+ * will return `null` in the event `uuidString` is null or is not a valid UUID.
+ * 
+ * @return the result of the block, or `null` if the receiver is `null` or an exception occurs during the execution of the block.
+ */
+inline fun <T, R> T?.letSafely(block: (T) -> R): R?
+{
+    return try
+    {
+       this?.let(block)
+    }
+    catch (ignore: Throwable)
+    {
+        null
+    }
+}
+
 /**
  * Appends all on null arguments to the given [Appendable].
  */

@@ -347,7 +347,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom("io.sentry:sentry-bom:5.7.4")
+        mavenBom("io.sentry:sentry-bom:6.3.0")
         mavenBom("com.google.guava:guava-bom:31.1-jre")
         mavenBom("com.fasterxml.jackson:jackson-bom:2.13.3")
         mavenBom("org.junit:junit-bom:5.8.2")

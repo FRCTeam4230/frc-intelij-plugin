@@ -122,12 +122,12 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
                         // https://docs.sentry.io/platforms/java/configuration/options/#attach-stacktrace
                         isAttachStacktrace = true
                         inAppIncludes.addAll(mutableListOf("net.javaru", "io.javaru", "org.javaru"))
-                        enableUncaughtExceptionHandler = false // when enabled, it catches a lot of noise from the IDE and other Plugins that we can't do anything about
+                        isEnableUncaughtExceptionHandler = false // when enabled (the default), it catches a massive amount of noise from the IDE and other Plugins that we can't do anything about
                         isEnableNdk = false // Android Native Development Kit: https://docs.sentry.io/platforms/android/using-ndk/
                         isEnableScopeSync = false // the Java to NDK Scope sync
                         isEnableScopeSync = false // the Java to NDK Scope sync
                         isEnableAutoSessionTracking = false // web sessions; n/a for us; but is on by default
-                        setDebug(useQA)
+                        isDebug = useQA
                         // This applies to performance monitoring, which we are not using at this time
                         //tracesSampleRate = 1.0
 
@@ -289,7 +289,7 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
                             val sentryEvent = SentryEvent(event.throwable)// Is null safe
                             sentryEvent.setStacktraceHashes(event.throwable)
                             sentryEvent.level = event.level
-                            sentryEvent.setMessageSafely(scope, event.messageOrAdditionalInfo, event.throwable, event.messageAddendum)
+                            sentryEvent.setMessageSafely(scope, event, event.throwable, event.messageAddendum)
                             sentryEvent.setTagSafely("last.action", event.lastActionId)
                             sentryEvent.setTagSafely("correlationId", event.correlationId)
                             event.attachments?.forEach { scope.addAttachment(it) }
@@ -444,6 +444,7 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
         val additionalInfoClean = additionalInfo ?: "<none>"
 
         val sb = StringBuilder()
+        sb.append("Report submission via ${FrcErrorReportSubmitter::class.java.simpleName}.\n")
         sb.append("\u2022 IDEA Logging Event Message: ${ideaEvent.message}\n")
         sb.append("\u2022 Additional Info / User Comments:  $additionalInfoClean\n")
 
@@ -461,10 +462,11 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
     }
 
 
-    private fun SentryEvent.setMessageSafely(scope: Scope, eventMessage: String?, throwable: Throwable?, messageAddendum: Map<String, String?>? = emptyMap()): Message?
+    private fun SentryEvent.setMessageSafely(scope: Scope, event: ReportableEvent, throwable: Throwable?, messageAddendum: Map<String, String?>? = emptyMap()): Message?
     {
         val sb = StringBuilder()
-        if (eventMessage!= null) sb.append("\u2022 Event Message: ").append(eventMessage).append("\n")
+        sb.append("An FRC Plugin ReportableEvent event has occurred.\n")
+        sb.append("\u2022 Event Message: ").append(event.messageOrAdditionalInfo ?: "<no event message>").append("\n")
         sb.addThrowableInfo(throwable)
 
         if (!messageAddendum.isNullOrEmpty()) {

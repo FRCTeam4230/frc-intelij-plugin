@@ -367,7 +367,7 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
 
     private fun Scope.setExtraSafely(key: String, value: String?)
     {
-        if (value != null) this.setExtra(key, value)
+        if (value != null && value.isNotBlank()) this.setExtra(key, value)
     }
 
     private fun Scope.setExtraSafely(key: String, value: Any?)
@@ -436,7 +436,7 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
 
     private fun SentryEvent.setTagSafely(key:String, value: String?)
     {
-        if (value != null) this.setTag(key, value)
+        if (value != null && value.isNotBlank()) this.setTag(key, value)
     }
 
     private fun SentryEvent.setMessageSafely(scope: Scope, ideaEvent: IdeaLoggingEvent, throwable: Throwable?, additionalInfo: String?): Message?

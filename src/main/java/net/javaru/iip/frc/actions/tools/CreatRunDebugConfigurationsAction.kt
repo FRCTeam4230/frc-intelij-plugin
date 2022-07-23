@@ -19,14 +19,18 @@ package net.javaru.iip.frc.actions.tools
 import com.intellij.openapi.actionSystem.AnActionEvent
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
+import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFile
 
 
 class CreatRunDebugConfigurationsAction: AbstractFrcToolsAction()
 {
     override fun actionPerformed(e: AnActionEvent)
     {
-        e.project?.let {
-            createAllRunDebugConfigurations(it, FrcProjectWizardData())
+        e.project?.let { project ->
+            val dataModel = FrcProjectWizardData().apply { 
+                teamNumber = project.getTeamNumberConfiguredInWpiLibPreferencesFile()
+            }
+            createAllRunDebugConfigurations(project, dataModel)
         }
     }
 

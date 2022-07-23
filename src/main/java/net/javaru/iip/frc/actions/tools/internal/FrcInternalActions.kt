@@ -52,6 +52,7 @@ import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
 import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.runWhenSmart
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
+import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFile
 import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsManagementDialogWrapper
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsProjectFilesListing
@@ -284,9 +285,11 @@ class CreateRunConfigurationsFrcInternalAction: AbstractFrcInternalAction()
 {
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
-        executeIfProjectNotNull(actionEvent, "Create Run Configs") {
-            val data = FrcProjectWizardData()
-            createAllRunDebugConfigurations(it, data)
+        executeIfProjectNotNull(actionEvent, "Create Run Configs") { project ->
+            val data = FrcProjectWizardData().apply {
+                teamNumber = project.getTeamNumberConfiguredInWpiLibPreferencesFile()
+            }
+            createAllRunDebugConfigurations(project, data)
         }
     }
 }

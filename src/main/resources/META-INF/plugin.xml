@@ -61,6 +61,8 @@
         &nbsp;&nbsp;&bull; Migrate off plugin APIs deprecated in IntelliJ IDEA 2022.2<br>
         &nbsp;&nbsp;&bull; IntelliJ IDEA 2022.1 support added<br>
         &nbsp;&nbsp;&bull; IntelliJ IDEA 2022.2 support added<br>
+        &nbsp;&nbsp;&bull; Added menu action to (re)create any missing Build &amp; Deploy run/debug configurations.
+                           (Tools | FRC | Create Run/Debug Configurations | Create Build, Deploy, and Debugging Run/Debug Configurations)<br>
         <br>
         <strong>v2.1.1</strong> <br>
         &nbsp;&nbsp;&bull; Works around a bug in IntelliJ IDEA v2022.1
@@ -448,12 +450,18 @@
 
         <group id="FRC.CreateRunConfigsActionGroup"
                class="net.javaru.iip.frc.actions.FrcRunConfigCreationActionGroup"
-               popup="true">
+               popup="true"
+               icon="AllIcons.RunConfigurations.Compound">
             <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="after" relative-to-action="frc.tools.CheckForWpiLibUpdateAction" />
-            <action id="FRC.crate.run.config.LaunchShuffleboard"
-                    class="net.javaru.iip.frc.actions.CreateLaunchShuffleboardRunConfigurationAction" />
-            <action id="FRC.crate.run.config.LaunchSmartDashboard"
-                    class="net.javaru.iip.frc.actions.CreateLaunchSmartDashboardRunConfigurationAction" />
+            <action id="frc.crate.run.config.CreatRunDebugConfigurationsAction"
+                    class="net.javaru.iip.frc.actions.tools.CreatRunDebugConfigurationsAction"
+                    icon="GradleIcons.Gradle" />
+            <action id="frc.crate.run.config.LaunchShuffleboard"
+                    class="net.javaru.iip.frc.actions.CreateLaunchShuffleboardRunConfigurationAction"
+                    icon="AllIcons.Vcs.Changelist" />
+            <action id="frc.crate.run.config.LaunchSmartDashboard"
+                    class="net.javaru.iip.frc.actions.CreateLaunchSmartDashboardRunConfigurationAction"
+                    icon="AllIcons.Vcs.Changelist" />
         </group>
 
         <!-- region FRC Internal Actions -->

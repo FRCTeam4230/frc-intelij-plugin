@@ -96,8 +96,11 @@ class FrcProjectWizardData(
     val isRomiTemplate
         get() = frcWizardTemplateDefinition.isRomiBot
 
+    val isNotRomiTemplate
+        get() = !isRomiTemplate
+
     val isRoboRioRobotTemplate
-        get() = !frcWizardTemplateDefinition.isRomiBot
+        get() = isNotRomiTemplate
 
     val basePackageAsDirPath: Path
         get() = Paths.get(basePackageAsDirString)

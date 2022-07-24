@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import com.intellij.idea.IdeaLogger
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.PerformInBackgroundOption
@@ -39,7 +40,6 @@ import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Computable
-import com.intellij.psi.impl.source.tree.injected.changesHandler.debug
 import com.intellij.util.concurrency.AppExecutorUtil
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.isUnitTestMode

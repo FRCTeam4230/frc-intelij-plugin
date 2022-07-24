@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import com.intellij.ide.util.projectWizard.SdkSettingsStep
 import com.intellij.ide.util.projectWizard.SettingsStep
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.externalSystem.model.project.ProjectData
@@ -57,7 +58,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.projectImport.ProjectImportProvider
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiManager
-import com.intellij.psi.impl.source.tree.injected.changesHandler.debug
 import com.intellij.psi.search.SearchScope
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.containers.stream

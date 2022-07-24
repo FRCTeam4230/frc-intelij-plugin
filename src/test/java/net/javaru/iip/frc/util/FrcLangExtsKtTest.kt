@@ -1,12 +1,12 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,11 +16,11 @@
 
 package net.javaru.iip.frc.util
 
-import com.sampullara.cli.Argument
 import org.apache.commons.text.TextStringBuilder
-
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
@@ -58,6 +58,27 @@ internal class FrcLangExtsKtTest
         assertEquals(expected, input.insertBeforeLast(delimiter, value))
     }
 
+    
+    @Test
+    fun testLetSafely()
+    {
+        assertAll(
+            { 
+                val actual = "123".letSafely { it.toInt() }
+                assertEquals(123, actual) 
+            },
+            {
+                val actual = "xyz".letSafely { it.toInt() }
+                assertNull(actual)
+            },
+            {
+                val s: String? = null
+                val actual = s.letSafely { it.toInt() }
+                assertNull(actual)
+            },
+            
+                 )
+    }
 
     @Suppress("unused")
     companion object

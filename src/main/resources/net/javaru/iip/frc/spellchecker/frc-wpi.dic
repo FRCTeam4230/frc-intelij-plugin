@@ -17,6 +17,7 @@ deps
 digilent
 drivebase
 drivetrain
+driverstation
 euclidian
 endlocal
 errorlevel

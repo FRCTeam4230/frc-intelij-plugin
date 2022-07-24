@@ -24,6 +24,7 @@ import com.intellij.json.psi.JsonFile
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
+import net.javaru.iip.frc.util.letSafely
 import net.javaru.iip.frc.util.tryIt
 import net.javaru.iip.frc.util.uri
 import net.javaru.iip.frc.util.urisList
@@ -35,13 +36,19 @@ import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
-import kotlin.io.path.name
 
-
+/**
+ * A data class representing the content (and thus details/properties) of a vendordeps file.
+ * Also see the [VendordepsProjectFile] which wraps this data class along with the `JsonFile`
+ * for the vendordeps.
+ * 
+ * @see VendordepsProjectFile
+ */
 data class Vendordeps(
     val uuid: UUID,
     val name: String,
     val version: LibVersion,
+    val frcYear: Int?, // Added in 2022. See Issue #111. Although it is not clear if this is an official property (since th official schema is massively out of date) or one added by CTRE 
     val fileName: String,
     val jsonUrl: URI?, // WPILib Command vendordeps have an empty string for the jsonUrl
     val mavenUrls: List<URI>
@@ -66,11 +73,20 @@ data class Vendordeps(
         {
             val name = json.string("name")?.trim() ?: ""
             val version = LibVersion.parse(json.string("version")?.trim() ?: "0.0.0")
+            val frcYear = try
+            {
+                json.int("frcYear")
+            }
+            catch (t: ClassCastException)
+            {
+                // frcYear should be an int. But just in case a vendor enters it as a String, we want to handle it.
+                json.string("frcYear")?.toInt()
+            }
             val fileName = json.string("fileName")?.trim() ?: ""
             val jsonUrl = json.uri("jsonUrl")
             val mavenUrls = json.urisList("mavenUrls")
             val uuid = json.parseUuid(name, fileName, jsonUrl)
-            return Vendordeps(uuid, name, version, fileName, jsonUrl, mavenUrls)
+            return Vendordeps(uuid, name, version, frcYear, fileName, jsonUrl, mavenUrls)
 
         }
 
@@ -123,57 +139,85 @@ data class Vendordeps(
     override fun compareTo(other: Vendordeps): Int = compareValuesBy(this, other, {it.uuid}, {it.version})
 
     /** Returns a Simple String of: $name: $version */
+    @Suppress("unused")
     fun toStringSimple(): String = "$name : $version"
 }
-open class VendordepsFile(val file: Path, val vendordeps: Vendordeps): Comparable<VendordepsFile>
-{
-    override fun compareTo(other: VendordepsFile): Int = compareValuesBy(this, other, { it.vendordeps }, { it.file })
-
-
-    override fun equals(other: Any?): Boolean
-    {
-        if (this === other) return true
-        if (other !is VendordepsFile) return false
-
-        if (file != other.file) return false
-        if (vendordeps != other.vendordeps) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int
-    {
-        var result = file.hashCode()
-        result = 31 * result + vendordeps.hashCode()
-        return result
-    }
-
-    override fun toString(): String
-    {
-        return "$vendordeps [${file.name}]"
-    }
-}
-
 
 /**
  * A data class to virtually represent a Vendordeps file. It contains the properties:
+ * 
  * @param jsonPsiFile the [JsonFile] (sub-interface of [PsiFile]) for the vendordeps file
  * @param vendordeps a [Vendordeps] data class representing the content of the vendordeps file
+ * 
+ * @see Vendordeps
  */
-class VendordepsProjectFile(val jsonPsiFile: JsonFile, vendordeps: Vendordeps) : VendordepsFile(jsonPsiFile.virtualFile.toNioPath(), vendordeps)
+@Suppress("MemberVisibilityCanBePrivate")
+data class VendordepsProjectFile(val jsonPsiFile: JsonFile, val vendordeps: Vendordeps) : Comparable<VendordepsProjectFile>
+{
+    val virtualFile: VirtualFile by lazy { jsonPsiFile.virtualFile }
+    val nioPath: Path by lazy { virtualFile.toNioPath() }
+    override fun compareTo(other: VendordepsProjectFile): Int = 
+        compareValuesBy(this, other, { it.vendordeps }, { it.nioPath })
+}
+
+private val uuidRegex =     """"uuid"\s*:\s*"(?<jsonValue>[^"]+)"""".toRegex() // we allow for invalid UUIDs
+private val fileNameRegex = """"fileName"\s*:\s*"(?<jsonValue>[^"]+)"""".toRegex()
+private val nameRegex =     """"name"\s*:\s*"(?<jsonValue>[^"]+)"""".toRegex()
+private val versionRegex =  """"version"\s*:\s*"(?<jsonValue>[^"]+)"""".toRegex()
+private val frcYearRegex =  """"frcYear"\s*:\s*"?(?<jsonValue>[^",]+)"?,""".toRegex()
+private val jsonUrlRegex =  """"jsonUrl"\s*:\s*"(?<jsonValue>[^"]+)"""".toRegex()
+data class InvalidVendordepsProjectFile(val jsonPsiFile: JsonFile)
+{
+    val virtualFile: VirtualFile by lazy { jsonPsiFile.virtualFile }
+    @Suppress("unused")
+    val nioPath: Path by lazy { virtualFile.toNioPath() }
+    val data = extractVendordepsData(jsonPsiFile.text)
+    data class VendordepsData(
+        val libUuidString: String?,
+        val libUuid: UUID?,
+        val libFileName: String?,
+        val libName: String?,
+        val libVersionString: String?,
+        val libVersion: LibVersion?,
+        val libFrcYearString: String?,
+        val libFrcYear: Int?,
+        val libJsonUrlString: String?,
+        val libJsonUrl: URI?, // WPILib Command vendordeps have an empty string for the jsonUrl
+        //val libMavenUrls: List<URI>, For now, I do not think we need this
+                             )
+    companion object
+    {
+        fun extractVendordepsData(text: String): VendordepsData
+        {
+            fun Regex.findJsonValue(): String? = this.find(text)?.groups?.get("jsonValue")?.value?.trim()
+            val libUuidString = uuidRegex.findJsonValue()
+            val libUuid = libUuidString.letSafely { UUID.fromString(it) }
+            val libFileName = fileNameRegex.findJsonValue()
+            val libName = nameRegex.findJsonValue()
+            val libVersionString = versionRegex.findJsonValue()
+            val libVersion = libVersionString?.let { LibVersion.parse(it) }
+            val libFrcYearString = frcYearRegex.findJsonValue()
+            val libFrcYear = libFrcYearString?.letSafely { it.toInt() }
+            val libJsonUrlString = jsonUrlRegex.findJsonValue()
+            val libJsonUrl = libJsonUrlString.letSafely { URI(it) }
+            
+            return VendordepsData(
+                libUuidString, libUuid, libFileName, libName, libVersionString, libVersion, libFrcYearString, libFrcYear, libJsonUrlString, libJsonUrl,)
+        }
+    }
+}
 
 /** A data class to represent a known Vendordeps library. */
+@Suppress("unused")
 data class KnownVendordepsInfo(
     val uuid:UUID,
     val name: String,
-    val jsonUrl: URI,
-    
-    
-                               ) : Comparable<KnownVendordepsInfo>
+    val jsonUrl: URI, // TODO: Need a way to represent this by year for libs that do such, and not for those that do not
+                      //       It would be nice to represent it as "Before 2022", "2022:, 2023" etc.
+                      //       So an Int to URL pair or map would likely not work         
+                              ) : Comparable<KnownVendordepsInfo>
 {
     override fun compareTo(other: KnownVendordepsInfo): Int = compareValuesBy(this, other, {it.uuid}, {it.name})
-
-    
 }
 
 

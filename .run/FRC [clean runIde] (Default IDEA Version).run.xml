@@ -15,7 +15,7 @@
   -->
 
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="FRC [clean runIde] (Default IDEA Version)" type="GradleRunConfiguration" factoryName="Gradle" singleton="true">
+  <configuration default="false" name="FRC [clean runIde]" type="GradleRunConfiguration" factoryName="Gradle" singleton="true">
     <log_file alias="212-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-212/system/log/idea.log" />
     <log_file alias="idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox/system/log/idea.log" />
     <log_file alias="latest-eap-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-LATEST-EAP-SNAPSHOT/system/log/idea.log" />
@@ -25,7 +25,7 @@
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="-x buildSearchableOptions --stacktrace --info" />
+      <option name="scriptParameters" value="-x buildSearchableOptions --stacktrace" />
       <option name="taskDescriptions">
         <list />
       </option>

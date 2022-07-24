@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import java.nio.file.Files
 import java.nio.file.InvalidPathException
 import java.nio.file.Path
 import java.util.*
-import kotlin.streams.toList
 
 private object FrcFileExts
 
@@ -37,7 +36,7 @@ private val logger = logger<FrcFileExts>()
 
 fun findCommonParentDir(thePaths: Collection<String>): String
 {
-    val paths = thePaths.stream().map { it.toCommonSeparatorPath() }.toList()
+    val paths = thePaths.map { it.toCommonSeparatorPath() }
     val separator = "/"
     if (paths.isEmpty()) return ""
     if (paths.size == 1) return paths[0]

@@ -52,6 +52,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v2.2.1</strong> <br>
+        &nbsp;&nbsp;&bull; Fixed a binary compatibility issue mistakenly introduced by the build in the v2.2.0 release.<br>
+        <br>
         <strong>v2.2.0</strong> <br>
         &nbsp;&nbsp;&bull; This is the last release for IntelliJ IDEA 2021.2 and 2021.3. IntelliJ IDEA 2022.1 or newer will be required 
                            for the next FRC Plugin release. Please see the

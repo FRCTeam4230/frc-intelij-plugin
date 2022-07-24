@@ -43,14 +43,17 @@ import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.net.FrcPseudoRestService
 import net.javaru.iip.frc.notify.FrcNotifyType
+import net.javaru.iip.frc.run.RunDebugConfigsCreationData
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.services.FrcGradleService
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.ui.internal.PlaceholderTextFieldPaddingDemoFormDialogWrapper
+import net.javaru.iip.frc.util.getCurrentFrcYear
 import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
 import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.runWhenSmart
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
+import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFile
 import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsManagementDialogWrapper
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsProjectFilesListing
@@ -270,10 +273,22 @@ class CheckIncludeDesktopSupportSetting : AbstractFrcInternalAction()
 {
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
-        executeIfProjectNotNull(actionEvent, actionName = "Fetch REST Service") { project: Project ->
+        executeIfProjectNotNull(actionEvent, actionName = "Check Include Desktop Support Setting") { project: Project ->
             val result = FrcGradleService.getInstance(project).isIncludeDesktopSupport()
             FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON
                 .withContent("includeDesktopSupport: $result")
+                .notify(project)
+        }
+    }
+}
+class CheckGradleHasRoborioDeployTarget : AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, actionName = "Check Gradle Has Roborio Deploy Target") { project: Project ->
+            val result = FrcGradleService.getInstance(project).hasRoborioDeployTarget()
+            FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON
+                .withContent("CheckGradleHasRoborioDeployTarget: $result")
                 .notify(project)
         }
     }
@@ -283,9 +298,8 @@ class CreateRunConfigurationsFrcInternalAction: AbstractFrcInternalAction()
 {
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
-        executeIfProjectNotNull(actionEvent, "Create Run Configs") {
-            val data = FrcProjectWizardData()
-            createAllRunDebugConfigurations(it, data)
+        executeIfProjectNotNull(actionEvent, "Create Run Configs") { project ->
+            createAllRunDebugConfigurations(RunDebugConfigsCreationData.create(project))
         }
     }
 }
@@ -324,7 +338,7 @@ class CallGetTeamNumberConfiguredInWpiLibPreferencesFileAction: AbstractFrcInter
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
         executeIfProjectNotNull(actionEvent, "Get Team Number From WpiLib Preferences File") { project: Project ->
-            project.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask() {
+            project.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask {
                 FrcNotifyType.ACTIONABLE_INFO
                     .withContent("Team number in wpilib_preferences.json is: $it")
                     .withFrcPrefixedTitle("Project team number")
@@ -332,7 +346,6 @@ class CallGetTeamNumberConfiguredInWpiLibPreferencesFileAction: AbstractFrcInter
             }
         }
     }
-
 }
 
 abstract class AbstractDisplayVendordepsListingFrcInternalAction : AbstractFrcInternalAction
@@ -362,7 +375,16 @@ abstract class AbstractDisplayVendordepsListingFrcInternalAction : AbstractFrcIn
             listing.vendordepsProjectFileList.forEach { item ->
                 sb.append("<li>$item</li>")
             }
-            sb.append("</ol></html>")
+            sb.append("</ol>")
+            if (listing.hasInvalidFiles())
+            {
+                sb.append("<h3>Invalid Files:</h3><ol>")
+                listing.invalidVendordepsFileList.forEach {invalid ->
+                    sb.append("<li>${invalid.jsonPsiFile.name} (Lib name: ${invalid.data.libName})</li>")
+                }
+                sb.append("</ol>")
+            }
+            sb.append("</html>")
             sb.toString()
 
         }) { message, _ ->
@@ -402,7 +424,18 @@ class VendordepsCheckForDuplicatesInternalAction : AbstractFrcInternalAction()
     {
         executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
             it.runWhenSmart {
-                VendordepsService.getInstance(it).updateVendordepsListingAndCheckForDuplicates(true)
+                VendordepsService.getInstance(it).updateVendordepsListing(true)
+            }
+        }
+    }
+}
+class VendordepsCheckForDuplicatesNoNotificationInternalAction : AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, "Find Vendordeps dir") {
+            it.runWhenSmart {
+                VendordepsService.getInstance(it).updateVendordepsListing(false)
             }
         }
     }
@@ -444,11 +477,13 @@ class DownloadVendorDeps: AbstractFrcInternalAction()
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
         executeIfProjectNotNull(actionEvent, "Display Vendordeps Management Dialog") { project: Project ->
+            val year = getCurrentFrcYear()
+            val ctreUrl = if (year >= 2022) "https://maven.ctr-electronics.com/release/com/ctre/phoenix/Phoenix-frc$year-latest.json" else "https://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json" 
             val url = Messages.showInputDialog(project,
                                                "Enter Vendordeps URL",
                                                "Download Vendordeps",
                                                FrcIcons.FileAndDirTypes.VendordepsDir,
-                                               "https://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json",
+                                               ctreUrl, 
                                                object : InputValidator
                                                {
                                                    override fun checkInput(inputString: String?): Boolean = inputString?.isNotBlank() ?: false

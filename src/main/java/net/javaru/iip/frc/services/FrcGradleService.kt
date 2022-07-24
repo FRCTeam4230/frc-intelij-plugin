@@ -1,12 +1,12 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *
+ *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,10 +20,12 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import net.javaru.iip.frc.util.getGradleBuildPsiFile
+import net.javaru.iip.frc.util.runReadActionInSmartMode
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
 import org.jetbrains.plugins.groovy.lang.psi.GroovyPsiElement
 import org.jetbrains.plugins.groovy.lang.psi.GroovyRecursiveElementVisitor
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.GrVariable
+import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrReferenceExpression
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.literals.GrLiteral
 
 
@@ -71,13 +73,10 @@ class FrcGradleService private constructor(val project: Project)
                             })
                     }
                     else -> {
-                        logger.info("[FRC] non groovy gradle files is not yet supported. Unable to determine if includeDesktopSupport setting.")
+                        logger.info("[FRC] non groovy gradle files is not yet supported. Cloud not lookup includeDesktopSupport setting.")
                     }
                 }
             }
-
-
-
         }
         catch (e: Exception)
         {
@@ -85,4 +84,54 @@ class FrcGradleService private constructor(val project: Project)
         }
         return result
     }
+    fun hasRoborioDeployTarget(): Boolean?
+    {
+        var result: Boolean? = null
+        try
+        {
+            val psiFile = project.getGradleBuildPsiFile()
+            if (psiFile == null)
+            {
+                logger.info("[FRC] Could not find gradle project file to look up hasRoborioDeployTarget setting.")
+            }
+            else
+            {
+                when (psiFile)
+                {
+                    is GroovyFile ->
+                    {
+                        result = false
+                        psiFile.accept(
+                            object : GroovyRecursiveElementVisitor()
+                            {
+                                override fun visitReferenceExpression(referenceExpression: GrReferenceExpression)
+                                {
+                                    super.visitReferenceExpression(referenceExpression)
+                                    if (referenceExpression.text == "deploy.targets.roborio")
+                                    {
+                                        result = true
+                                    }
+                                }
+                            }
+                                      )
+                    }
+                    else          ->
+                    {
+                        logger.info("[FRC] non groovy gradle files is not yet supported. Unable to determine if includeDesktopSupport setting.")
+                    }
+                }
+            }
+        }
+        catch (e: Exception)
+        {
+            logger.info("[FRC] an exception occurred when checking includeDesktopSupport setting: $e")
+            result = null
+        }
+        return result
+    }
+
+    @Suppress("unused")
+    fun isRomiProject(): Boolean? = hasRoborioDeployTarget()?.not()
 }
+
+

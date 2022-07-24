@@ -61,6 +61,8 @@
         &nbsp;&nbsp;&bull; Migrate off plugin APIs deprecated in IntelliJ IDEA 2022.2<br>
         &nbsp;&nbsp;&bull; IntelliJ IDEA 2022.1 support added<br>
         &nbsp;&nbsp;&bull; IntelliJ IDEA 2022.2 support added<br>
+        &nbsp;&nbsp;&bull; Added menu action to (re)create any missing Build &amp; Deploy run/debug configurations.
+                           (Tools | FRC | Create Run/Debug Configurations | Create Build, Deploy, and Debugging Run/Debug Configurations)<br>
         <br>
         <strong>v2.1.1</strong> <br>
         &nbsp;&nbsp;&bull; Works around a bug in IntelliJ IDEA v2022.1
@@ -226,7 +228,7 @@
     <!--<helpset file="myHelp.jar" path="/Help.hs" />-->
 
 
-    <!-- Resource bundle from which the text of plugin descriptions, action names and etc. will be loaded -->
+    <!-- Resource bundle from which the text of plugin descriptions, action names, etc. will be loaded -->
     <resource-bundle>i18n.FrcPluginConfigBundle</resource-bundle>
 
 
@@ -314,10 +316,10 @@
         <fileTemplateGroup implementation="net.javaru.iip.frc.templates.FrcFileTemplateGroupDescriptorFactory" />
 
         <!--
-            While  the custom FrcModuleType is deprecated, we need to leave it in to prevent errors when projects that were created using it are opened.
+            While  the custom FrcModuleType is deprecated, we need to leave it in to prevent errors when opening older projects that were created with it.
             It's use was limited to a few weeks in Nov 2019 in v0.8.0 & v0.8.1, and was removed in the next release later in November.
-            Still, let's keep it around until at least May 2023 (i.e. 3 build seasons) to prevent issues.
-            See notes in the FrcModuleType class ans in issue #41: https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/41
+            Still, let's keep it around until at least **May 2023** (i.e. 3 build seasons) to prevent issues.
+            See notes in the FrcModuleType class and in issue #41: https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/41
             Module type ID must match that defined in the FrcModuleType class.
         -->
         <!--suppress DeprecatedClassUsageInspection -->
@@ -376,7 +378,7 @@
         <!--   Ref:  https://plugins.jetbrains.com/docs/intellij/basic-action-system.html  -->
         <!--
             The <action> element defines an action to register.
-                    The mandatory "id" attribute specifies an unique identifier for the action.
+                    The mandatory "id" attribute specifies a unique identifier for the action.
                     The mandatory "class" attribute specifies the full-qualified name of the class implementing the action.
                     The mandatory "text" attribute specifies the text of the action (tooltip for toolbar button or text for menu item).
                     The optional "use-shortcut-of" attribute specifies the ID of the action whose keyboard shortcut this action will use.
@@ -392,7 +394,7 @@
                         the current action is inserted.
 
             The <keyboard-shortcut> node specifies the keyboard shortcut for the action. An action can have several keyboard shortcuts.
-                    The mandatory "first-keystroke" attribute specifies the first keystroke of the action. The key strokes are specified according to the regular Swing rules.
+                    The mandatory "first-keystroke" attribute specifies the first keystroke of the action. The keystroke is specified according to the regular Swing rules.
                     The optional "second-keystroke" attribute specifies the second keystroke of the action.
                     The mandatory "keymap" attribute specifies the keymap for which the action is active. IDs of the standard keymaps are defined as
                         constants in the com.intellij.openapi.keymap.KeymapManager class
@@ -400,12 +402,12 @@
             The <mouse-shortcut> node specifies the mouse shortcut for the action. An action can have several mouse shortcuts.
                     The mandatory "keystroke" attribute specifies the clicks and modifiers for the action. It is defined as a sequence of words separated by spaces:
                         "button1", "button2", "button3" for the mouse buttons; "shift", "control", "meta", "alt", "altGraph" for the modifier keys;
-                        "doubleClick" if the action is activated by a double-click of the button.
+                        "doubleClick" if the action is activated by a double click of the button.
                     The mandatory "keymap" attribute specifies the keymap for which the action is active. IDs of the standard keymaps are defined as
                         constants in the com.intellij.openapi.keymap.KeymapManager class.
 
            The <group> element defines an action group. <action>, <group> and <separator> elements defined within it are automatically included in the group.
-                   The mandatory "id" attribute specifies an unique identifier for the action.
+                   The mandatory "id" attribute specifies a unique identifier for the action.
                    The optional "class" attribute specifies the full-qualified name of the class implementing the group. If not specified,
                         com.intellij.openapi.actionSystem.DefaultActionGroup is used.
                    The optional "text" attribute specifies the text of the group (text for the menu item showing the submenu).
@@ -448,12 +450,18 @@
 
         <group id="FRC.CreateRunConfigsActionGroup"
                class="net.javaru.iip.frc.actions.FrcRunConfigCreationActionGroup"
-               popup="true">
+               popup="true"
+               icon="AllIcons.RunConfigurations.Compound">
             <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="after" relative-to-action="frc.tools.CheckForWpiLibUpdateAction" />
-            <action id="FRC.crate.run.config.LaunchShuffleboard"
-                    class="net.javaru.iip.frc.actions.CreateLaunchShuffleboardRunConfigurationAction" />
-            <action id="FRC.crate.run.config.LaunchSmartDashboard"
-                    class="net.javaru.iip.frc.actions.CreateLaunchSmartDashboardRunConfigurationAction" />
+            <action id="frc.crate.run.config.CreatRunDebugConfigurationsAction"
+                    class="net.javaru.iip.frc.actions.tools.CreatRunDebugConfigurationsAction"
+                    icon="GradleIcons.Gradle" />
+            <action id="frc.crate.run.config.LaunchShuffleboard"
+                    class="net.javaru.iip.frc.actions.CreateLaunchShuffleboardRunConfigurationAction"
+                    icon="AllIcons.Vcs.Changelist" />
+            <action id="frc.crate.run.config.LaunchSmartDashboard"
+                    class="net.javaru.iip.frc.actions.CreateLaunchSmartDashboardRunConfigurationAction"
+                    icon="AllIcons.Vcs.Changelist" />
         </group>
 
         <!-- region FRC Internal Actions -->
@@ -523,6 +531,8 @@
                     class="net.javaru.iip.frc.actions.tools.internal.ShowVendordepsManagementDialog"/>
             <action id="FRC.tools.internal.VendordepsCheckForDuplicatesInternalAction"
                     class="net.javaru.iip.frc.actions.tools.internal.VendordepsCheckForDuplicatesInternalAction" />
+            <action id="FRC.tools.internal.VendordepsCheckForDuplicatesNoNotificationInternalAction"
+                    class="net.javaru.iip.frc.actions.tools.internal.VendordepsCheckForDuplicatesNoNotificationInternalAction" />
             <action id="FRC.tools.internal.DownloadVendorDeps"
                     class="net.javaru.iip.frc.actions.tools.internal.DownloadVendorDeps"/>
         </group>
@@ -536,6 +546,7 @@
                     class="net.javaru.iip.frc.actions.tools.internal.ConvertInternalWpiLibXmlMetadataToJsonAction" />
             <action id="FRC.tools.internal.GetAndConvertLatestWpiLibXmlMetadataToJsonAction"
                     class="net.javaru.iip.frc.actions.tools.internal.GetAndConvertLatestWpiLibXmlMetadataToJsonAction" />
+            <!--suppress PluginXmlCapitalization -->
             <action id="FRC.tools.internal.CallGetTeamNumberConfiguredInWpiLibPreferencesFileAction"
                     class="net.javaru.iip.frc.actions.tools.internal.CallGetTeamNumberConfiguredInWpiLibPreferencesFileAction" />
         </group>
@@ -551,6 +562,8 @@
                     class="net.javaru.iip.frc.actions.tools.internal.MarkGradleProjectDirtyInternalAction" />
             <action id="FRC.tools.internal.CheckIncludeDesktopSupportSetting"
                     class="net.javaru.iip.frc.actions.tools.internal.CheckIncludeDesktopSupportSetting" />
+            <action id="FRC.tools.internal.CheckGradleHasRoborioDeployTarget"
+                    class="net.javaru.iip.frc.actions.tools.internal.CheckGradleHasRoborioDeployTarget" />
         </group>
         
         <group id="FRC.FrcInternalNotificationsActionsGroup"

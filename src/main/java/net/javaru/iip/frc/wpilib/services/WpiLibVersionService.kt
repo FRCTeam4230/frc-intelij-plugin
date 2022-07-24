@@ -76,7 +76,7 @@ class WpiLibVersionStartupActivity : StartupActivity
     {
         if (project.isFrcFacetedProject())
         {
-            StartupManager.getInstance(project).runWhenProjectIsInitialized() {
+            StartupManager.getInstance(project).runWhenProjectIsInitialized {
                 // We need to run as a BackgroundTask as it is a slow operation.
                 // See Javadoc for com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed
                 project.runBackgroundTask("Initializing WPI Lib version service") {
@@ -102,6 +102,8 @@ class WpiLibVersionService private constructor(private val project: Project) : P
     private val timer = Timer("WpiLibVersionService Check for Update Timer")
     private var timerTask: TimerTask? = null
 
+    var versionStatus: WpiLibVersionStatus? = null
+        private set
 
     companion object
     {
@@ -145,20 +147,20 @@ class WpiLibVersionService private constructor(private val project: Project) : P
             return
         }
 
-        val versionStatus = getWpiLibVersionStatus()
+        versionStatus = getWpiLibVersionStatus()
         var updateAvailableNotification: Notification? = null
 
         if (versionStatus != null)
         {
-            if (versionStatus.updateAvailableForAttachedYear())
+            if (versionStatus!!.updateAvailableForAttachedYear())
             {
                 logger.debug {"[FRC] notifying WPI Lib update is available. WpiLibVersionStatus: $versionStatus"}
-                updateAvailableNotification = notifyNewerWpiLibVersionIsAvailable(versionStatus)
+                updateAvailableNotification = notifyNewerWpiLibVersionIsAvailable(versionStatus!!)
             }
             else if (notifyIfNoUpdateAvailable)
             {
                 logger.debug {"[FRC] notifying WPILib update NOT available. WpiLibVersionStatus: $versionStatus"}
-                notifyNoUpdateAvailable(versionStatus.attachedVersion.frcYear)
+                notifyNoUpdateAvailable(versionStatus!!.attachedVersion.frcYear)
             }
         }
         else if (notifyIfNoUpdateAvailable)
@@ -283,7 +285,7 @@ class WpiLibVersionService private constructor(private val project: Project) : P
                             id "edu.wpi.first.GradleRIO" version "2021.2.1"
                         }
 
-                        For now we are not going to support legacy syntax... there are so many variations given that variables can be used and then can be
+                        For now, we are not going to support legacy syntax… there are so many variations given that variables can be used and then can be
                         in turn be used via string concatenation or string replacement/placeholders
                         Legacy syntax:
                                 buildscript {
@@ -312,7 +314,7 @@ class WpiLibVersionService private constructor(private val project: Project) : P
                                 super.visitElement(element)
                                 if (element is GrReferenceExpression && element.qualifiedReferenceName == "plugins")
                                 {
-                                    // We have the plugins block... now let's find the GradleRIO declaration
+                                    // We have the plugins block… now let's find the GradleRIO declaration
                                     var block: PsiElement? = element.nextSibling
                                     while (block != null && block !is GrClosableBlock)
                                     {
@@ -321,7 +323,7 @@ class WpiLibVersionService private constructor(private val project: Project) : P
 
                                     if (block is GrClosableBlock)
                                     {
-                                        val children = block.children ?: emptyArray()
+                                        val children = block.children
                                         // children will include things like PsiWhiteSpace, PsiElement(new line), GrParameterList (likely empty)
                                         // We want the "call expressions" which are the plugin declarations
 
@@ -407,7 +409,7 @@ class WpiLibVersionService private constructor(private val project: Project) : P
     {
         logger.debug {"[FRC] getWpiLibVersionStatus() called. Will perform work in runReadActionInSmartMode"}
         var versionStatus: WpiLibVersionStatus? = null
-        DumbService.getInstance(project).runReadActionInSmartMode() {
+        DumbService.getInstance(project).runReadActionInSmartMode {
             if (!project.isDisposed && project.isFrcFacetedProject())
             {
                 logger.debug {"[FRC] getWpiLibVersionStatus() : runReadActionInSmartMode has started."}

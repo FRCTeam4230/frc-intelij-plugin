@@ -17,6 +17,7 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.gradle.ext.ProjectSettings
 import java.io.FileNotFoundException
+import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
@@ -28,7 +29,7 @@ val frcPluginEapDesignator: String by project
 val frcPluginVersion = "$frcPluginBaseVersion-$ideaMajorVersion$frcPluginEapDesignator" // ex: v1.3.0-2019.2,  1.3.1-2020.1-eap.1
 val javaVersion: JavaVersion = JavaVersion.VERSION_17 // IJ v2022.2+ requires Java 17; IJ v2020.3+ requires Java 11
 val sandboxPath = determineSandboxDir()
-
+val tokenReplacements by lazy { loadTokenReplacements() }
 val isCiBuild = if (project.hasProperty("is.ci.build")) project.properties["is.ci.build"].toString().toBoolean() else false
 
 group = "net.javaru.iip.frc"
@@ -115,9 +116,8 @@ tasks.clean {
 }
 
 tasks.processResources {
-    val replacements = loadTokenReplacements()
     filesMatching("services/frc-plugin-tokens.properties") {
-        expand(replacements)
+        expand(tokenReplacements)
     }
 }
 
@@ -139,6 +139,33 @@ tasks {
         version.set(frcPluginVersion)
         sinceBuild.setViaProjectProperty("ideaSinceBuild")
         untilBuild.setViaProjectProperty("ideaUntilBuild")
+        val ppxTask = this
+        doLast {
+            fun Any?.isNotSet(): Boolean = (this == null || this.toString().contains("example.com/stand-in/value"))
+            if (tokenReplacements["SENTRY_DSN_TEST_AND_QA"].isNotSet() || tokenReplacements["SENTRY_DSN_PROD"].isNotSet())
+            {
+                fun String.willRun(): Boolean = (gradle.taskGraph.hasTask(":$this") || gradle.taskGraph.hasTask(":${project.name}:$this") || gradle.taskGraph.hasTask(this))
+                if (!isCiBuild && ("signPlugin".willRun() || "publishPlugin".willRun() 
+                    || (("buildPlugin".willRun() && !(frcPluginVersion.contains("SNAPSHOT") || frcPluginVersion.contains("-UNOFFICIAL"))))))
+                {
+                    val message = "ErrorSubmitter DSN is not configured for build. This must be set when building the plugin for a release. If this is a non-release build, set the 'frcPluginEapDesignator' property to '-SNAPSHOT' in the gradle.properties file. If it is a personal build, set set the 'frcPluginEapDesignator' property to '-UNOFFICIAL' in the gradle.properties file."
+                    logger.error(message)
+                    error(message)
+                }
+                logger.warn("WARNING: ErrorSubmitter DSN is not configured for build. Commenting out <errorHandler .../> entry in plugin.xml file.")
+                val dir = ppxTask.destinationDir.get()
+                val originalFile = dir.file("plugin.xml").asFile
+                val filteredFile = dir.file("plugin-FILTERED.xml").asFile
+                filteredFile.printWriter().use { pw: PrintWriter ->
+                    originalFile.readLines().forEach {
+                        val line = if (it.contains("<errorHandler")) "<!-- $it -->" else it
+                        pw.println(line)
+                    }
+                }
+                filteredFile.copyTo(originalFile, overwrite = true)
+                filteredFile.delete()
+            }
+        }
     }
     
     runIde {
@@ -324,7 +351,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom("io.sentry:sentry-bom:5.7.4")
+        mavenBom("io.sentry:sentry-bom:6.3.0")
         mavenBom("com.google.guava:guava-bom:31.1-jre")
         mavenBom("com.fasterxml.jackson:jackson-bom:2.13.3")
         mavenBom("org.junit:junit-bom:5.8.2")
@@ -472,9 +499,7 @@ fun determineSandboxDir(): String
  */
 fun loadTokenReplacements():MutableMap<String, Any>
 {
-    // TODO: Since this happens during the configuration phase, we should see if 
-    //       we can determine if the 'buildPlugin' task is set to run, and if so
-    //       require the build tokens to be set.
+    // TODO: Let's document this in the README in a "Developing the Plugin" section
     return Properties().apply {
         val key = "FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE"
         val envVar: String? = System.getenv(key)
@@ -506,7 +531,7 @@ fun loadTokenReplacements():MutableMap<String, Any>
         if (isEmpty)
         {
             logger.info("Using stand-in values for built time token replacements")
-            // For now, we'll just do it here. But if this gets to be more than a few, we'll move out to a file and load it.
+            // If the stand-in value changes at all, be sure to update the filtering code in the patchPluginXml
             put("SENTRY_DSN_TEST_AND_QA", "https://example.com/stand-in/value")
             put("SENTRY_DSN_PROD", "https://example.com/stand-in/value")
         }

@@ -147,6 +147,12 @@ fun findWpiLibPreferencesPsiFiles(project: Project, filter: (module: Module) -> 
  */
 fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
 {
+    // TODO: Can we replace this with
+    //       com.intellij.psi.search.PsiShortNamesCache#getFilesByName
+    //       PsiManager.getInstance(project).getShortNamesCache().
+    //       PsiManager.getInstance(module.project).getShortNamesCache().
+    //       com.intellij.psi.search.PsiShortNamesCache.getInstance(module.project).getFieldsByName(wpiLibPreferencesFileName, GlobalSearchScope.moduleScope(module))
+    //       https://intellij-support.jetbrains.com/hc/en-us/community/posts/206768795-How-to-search-file-by-file-name-in-project-s-root-directory-
     val foundFiles = SmartList<PsiFile>()
     
     val project = module.project

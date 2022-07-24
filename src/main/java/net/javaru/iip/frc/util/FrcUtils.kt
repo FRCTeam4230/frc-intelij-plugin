@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package net.javaru.iip.frc.util
 
-import java.time.Duration
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 private object FrcUtils
 
@@ -45,19 +45,11 @@ fun executeQuietly(callable: Runnable)
 }
 
 /**
- * Gets the current FRC, adjusted by the specified Duration. For example, with the default adjustment or 30 days,
- * the FRC Year, or build year, is considered to run from December 1 to November 31. Thus on December 3, 2019,
+ * Gets the current FRC, adjusted by the specified number of days. For example, with the default adjustment or 30 days,
+ * the FRC Year, or build year, is considered to run from December 1 to November 31. Thus, on December 3, 2019,
  * this would return a value of '2020'.
  */
-fun getCurrentFrcYear(adjustment: Duration = Duration.ofDays(30)): Int = LocalDate.now().plus(adjustment).year
-
-/**
- * Returns the current build year, return the next build year if it is within the duration until that year.
- * For example, if is December 20, 2019, and  14 days is used, this method will return 2020
- * since it is within 14 days until the end of the year.
- */
-@Deprecated("Use getCurrentFrcYear(0 instead", replaceWith = ReplaceWith("getCurrentFrcYear(adjustment)"))
-fun getCurrentBuildYear(adjustment: Duration = Duration.ofDays(30)): Int = getCurrentFrcYear(adjustment)
+fun getCurrentFrcYear(daysAdjustment: Int = 30): Int = LocalDate.now().plus(daysAdjustment.toLong(), ChronoUnit.DAYS).year
 
 
 

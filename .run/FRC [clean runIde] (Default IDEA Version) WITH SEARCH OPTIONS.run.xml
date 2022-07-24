@@ -15,7 +15,7 @@
   -->
 
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="FRC [clean runIde] (Default IDEA Version) WITH SEARCH OPTIONS" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="FRC [clean runIde] WITH SEARCH OPTIONS" type="GradleRunConfiguration" factoryName="Gradle">
     <log_file alias="212-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-212/system/log/idea.log" />
     <log_file alias="idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox/system/log/idea.log" />
     <log_file alias="latest-eap-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-LATEST-EAP-SNAPSHOT/system/log/idea.log" />

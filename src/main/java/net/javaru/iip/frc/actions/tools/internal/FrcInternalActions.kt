@@ -43,6 +43,7 @@ import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.net.FrcPseudoRestService
 import net.javaru.iip.frc.notify.FrcNotifyType
+import net.javaru.iip.frc.run.RunDebugConfigsCreationData
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.services.FrcGradleService
 import net.javaru.iip.frc.settings.FrcApplicationSettings
@@ -298,10 +299,7 @@ class CreateRunConfigurationsFrcInternalAction: AbstractFrcInternalAction()
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
         executeIfProjectNotNull(actionEvent, "Create Run Configs") { project ->
-            val data = FrcProjectWizardData().apply {
-                teamNumber = project.getTeamNumberConfiguredInWpiLibPreferencesFile()
-            }
-            createAllRunDebugConfigurations(project, data)
+            createAllRunDebugConfigurations(RunDebugConfigsCreationData.create(project))
         }
     }
 }

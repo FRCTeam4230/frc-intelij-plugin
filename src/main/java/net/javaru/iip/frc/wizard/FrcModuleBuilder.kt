@@ -70,6 +70,7 @@ import net.javaru.iip.frc.freemarker.KOTLIN_FM_TEMPLATE_FILE_EXT
 import net.javaru.iip.frc.freemarker.KOTLIN_SCRIPT_FM_TEMPLATE_FILE_EXT
 import net.javaru.iip.frc.freemarker.freemarkerConfiguration
 import net.javaru.iip.frc.freemarker.freemarkerConfigurationForKotlinTemplates
+import net.javaru.iip.frc.run.RunDebugConfigsCreationData
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.util.asPluginResourceUrl
@@ -323,7 +324,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             DumbService.getInstance(it).smartInvokeLater {
                 // I've tried 'runWriteAction' and 'invokeLater' here, both outside and inside 'runWhenSmart'.
                 // But the issue persisted. I think the smartInvokeLater has resolved it.
-                    createAllRunDebugConfigurations(it, dataModel)
+                    createAllRunDebugConfigurations(RunDebugConfigsCreationData.create(dataModel, it))
                     it.reimportGradleProject()
             }
         }

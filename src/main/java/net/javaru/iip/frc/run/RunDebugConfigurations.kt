@@ -34,6 +34,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.LocalFileSystem
 import net.javaru.iip.frc.i18n.FrcBundle
+import net.javaru.iip.frc.services.FrcGradleService
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.settings.FrcRoboRioSettings
 import net.javaru.iip.frc.settings.RoboRioAddressType
@@ -42,7 +43,10 @@ import net.javaru.iip.frc.util.asDate
 import net.javaru.iip.frc.util.getMainModule
 import net.javaru.iip.frc.util.getModules
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
+import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFile
 import net.javaru.iip.frc.wpilib.getWpiLibToolsPath
+import net.javaru.iip.frc.wpilib.services.WpiLibVersionService
+import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
 import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
 import java.nio.file.Files
@@ -56,13 +60,48 @@ private object RunDebugConfigurations
 
 private val logger = logger<RunDebugConfigurations>()
 
+data class RunDebugConfigsCreationData (
+    val project: Project,
+    val teamNumber: Int,
+    val wpilibVersion: WpiLibVersion?,
+    val isRomiProject: Boolean,
+    val enableDesktopSupport: Boolean
+                                      )
+{
+    companion object
+    {
+        fun create(project: Project): RunDebugConfigsCreationData
+        {
+            val frcGradleService = FrcGradleService.getInstance(project)
+            return RunDebugConfigsCreationData(
+                project = project,
+                teamNumber = project.getTeamNumberConfiguredInWpiLibPreferencesFile(),
+                wpilibVersion = WpiLibVersionService.getInstance(project).versionStatus?.attachedVersion,
+                isRomiProject = frcGradleService.isRomiProject() ?: false,
+                enableDesktopSupport = frcGradleService.isIncludeDesktopSupport() ?: false
+                                              )
+        }
 
-fun createAllRunDebugConfigurations(project: Project, dataModel: FrcProjectWizardData)
+        fun create(frcProjectWizardData: FrcProjectWizardData, project: Project): RunDebugConfigsCreationData
+        {
+            return RunDebugConfigsCreationData(
+                    project = project,
+                    teamNumber = frcProjectWizardData.teamNumber,
+                    wpilibVersion = frcProjectWizardData.wpilibVersion,
+                    isRomiProject = frcProjectWizardData.isRomiTemplate,
+                    enableDesktopSupport = frcProjectWizardData.enableDesktopSupport
+                                              )
+        }
+    }
+}
+
+fun createAllRunDebugConfigurations(dataModel: RunDebugConfigsCreationData)
 {
     logger.debug("[FRC] Running createAllRunDebugConfigurations")
+    val project = dataModel.project
     FileDocumentManager.getInstance().saveAllDocuments()
     SaveAndSyncHandler.getInstance().scheduleProjectSave(project)
-    val isRomiTemplate = dataModel.isRomiTemplate
+    val isRomiTemplate = dataModel.isRomiProject
     if (!isRomiTemplate)
     {
         createGradleRoboRioBuildRunConfigurations(project)
@@ -77,9 +116,12 @@ fun createAllRunDebugConfigurations(project: Project, dataModel: FrcProjectWizar
             createTailSimulateJavaLogShellScriptRunConfiguration(project, isRomiTemplate)
         }
         // For now, we will create both. A future enhancement can make this selectable in the wizard
-        val wpiLibToosDir = getWpiLibToolsPath(dataModel.wpilibVersion, project)
-        createLaunchShuffleboardRunConfiguration(project, wpiLibToosDir)
-        createLaunchSmartDashboardRunConfiguration(project, wpiLibToosDir)
+        if (dataModel.wpilibVersion != null)
+        {
+            val wpiLibToosDir = getWpiLibToolsPath(dataModel.wpilibVersion, project)
+            createLaunchShuffleboardRunConfiguration(project, wpiLibToosDir)
+            createLaunchSmartDashboardRunConfiguration(project, wpiLibToosDir)
+        }
     }
 
     val runManager = RunManager.getInstance(project)
@@ -342,7 +384,7 @@ fun createDebuggingRunConfiguration(project: Project, teamNumber: Int = project.
             
             // TODO: we should prompt user and ask if they want to create the duplicate, or pass it in as an option
             if (existing.isNotEmpty()) {
-                logger.warn("[FRC] Run/Debug configuration named '$baseName' already exists and will not be recreated.")
+                logger.info("[FRC] Run/Debug configuration named '$baseName' already exists and will not be recreated.")
                 return
             }
             

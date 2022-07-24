@@ -1,12 +1,12 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
  *       https://www.apache.org/licenses/LICENSE-2.0
- *
+ *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,6 +25,7 @@ import org.jetbrains.plugins.groovy.lang.psi.GroovyPsiElement
 import org.jetbrains.plugins.groovy.lang.psi.GroovyRecursiveElementVisitor
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.GrVariable
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.literals.GrLiteral
+import org.jetbrains.plugins.groovy.lang.psi.patterns.GroovyMethodCallPattern
 
 
 // Keep an eye on:  com.intellij.externalSystem.DependencyModifierService
@@ -71,13 +72,10 @@ class FrcGradleService private constructor(val project: Project)
                             })
                     }
                     else -> {
-                        logger.info("[FRC] non groovy gradle files is not yet supported. Unable to determine if includeDesktopSupport setting.")
+                        logger.info("[FRC] non groovy gradle files is not yet supported. Cloud not lookup includeDesktopSupport setting.")
                     }
                 }
             }
-
-
-
         }
         catch (e: Exception)
         {
@@ -85,4 +83,86 @@ class FrcGradleService private constructor(val project: Project)
         }
         return result
     }
+    fun hasRoborioDeployTarget(): Boolean?
+    {
+        var result: Boolean? = null
+        try
+        {
+            val psiFile = project.getGradleBuildPsiFile()
+            
+            
+            if (psiFile == null)
+            {
+                logger.info("[FRC] Could not find gradle project file to look up includeDesktopSupport setting.")
+            }
+            else
+            {
+                when (psiFile)
+                {
+                    is GroovyFile -> {
+                        result = false
+                        
+                        /*psiFile.accept(
+                            object : GroovyRecursiveElementVisitor()
+                            {
+                                override fun visitMethodCall(call: GrMethodCall)
+                                {
+                                    super.visitMethodCall(call)
+                                    val callReference = call.callReference
+                                    val methodName = callReference?.methodName
+                                    logger.debug("[FRC] $methodName")
+                                    
+                                    if (call.callReference?.methodName == "deploy")
+                                    {
+                                        call.acceptChildren(
+                                            object : GroovyRecursiveElementVisitor()
+                                            {
+                                                override fun visitMethodCall(call2: GrMethodCall)
+                                                {
+                                                    super.visitMethodCall(call2)
+                                                    if (call2.callReference?.methodName == "targets")
+                                                    {
+                                                        call2.acceptChildren(object : GroovyRecursiveElementVisitor()
+                                                                            {
+                                                                                override fun visitMethodCall(call3: GrMethodCall)
+                                                                                {
+                                                                                    super.visitMethodCall(call3)
+                                                                                    if (call3.callReference?.methodName == "roborio")
+                                                                                    {
+                                                                                        result = true
+                                                                                    }
+                                                                                }
+                                                                            })
+                                                    }
+                                                }
+                                            }
+                                            
+                                                           )
+                                    }
+                                }
+                            })*/
+                    }
+                    else -> {
+                        logger.info("[FRC] non groovy gradle files is not yet supported. Unable to determine if includeDesktopSupport setting.")
+                    }
+                }
+            }
+        }
+        catch (e: Exception)
+        {
+            logger.info("[FRC] an exception occurred when checking includeDesktopSupport setting: $e")
+            result = null
+        }
+        return result
+    }
+
+    // https://jetbrains-platform.slack.com/archives/C5U8BM1MK/p1638646084261900
+    // https://plugins.jetbrains.com/docs/intellij/element-patterns.html#examples
+    // just need to figure out how to use the pattern based on the above link
+    val pattern = GroovyMethodCallPattern
+        .withMethodName("roborio")
+        .withParent(GroovyMethodCallPattern.withMethodName("targets"))
+        .withSuperParent(2, GroovyMethodCallPattern.withMethodName("deploy"))
 }
+
+

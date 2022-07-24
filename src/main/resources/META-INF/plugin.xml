@@ -562,6 +562,8 @@
                     class="net.javaru.iip.frc.actions.tools.internal.MarkGradleProjectDirtyInternalAction" />
             <action id="FRC.tools.internal.CheckIncludeDesktopSupportSetting"
                     class="net.javaru.iip.frc.actions.tools.internal.CheckIncludeDesktopSupportSetting" />
+            <action id="FRC.tools.internal.CheckGradleHasRoborioDeployTarget"
+                    class="net.javaru.iip.frc.actions.tools.internal.CheckGradleHasRoborioDeployTarget" />
         </group>
         
         <group id="FRC.FrcInternalNotificationsActionsGroup"

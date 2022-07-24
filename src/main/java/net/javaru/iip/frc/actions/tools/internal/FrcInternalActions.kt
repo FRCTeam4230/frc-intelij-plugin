@@ -272,10 +272,22 @@ class CheckIncludeDesktopSupportSetting : AbstractFrcInternalAction()
 {
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
-        executeIfProjectNotNull(actionEvent, actionName = "Fetch REST Service") { project: Project ->
+        executeIfProjectNotNull(actionEvent, actionName = "Check Include Desktop Support Setting") { project: Project ->
             val result = FrcGradleService.getInstance(project).isIncludeDesktopSupport()
             FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON
                 .withContent("includeDesktopSupport: $result")
+                .notify(project)
+        }
+    }
+}
+class CheckGradleHasRoborioDeployTarget : AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, actionName = "Check Gradle Has Roborio Deploy Target") { project: Project ->
+            val result = FrcGradleService.getInstance(project).hasRoborioDeployTarget()
+            FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON
+                .withContent("CheckGradleHasRoborioDeployTarget: $result")
                 .notify(project)
         }
     }

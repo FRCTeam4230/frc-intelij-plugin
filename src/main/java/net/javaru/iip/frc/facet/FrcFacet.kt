@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -30,11 +30,9 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.roots.ExternalProjectSystemRegistry
-import com.intellij.util.containers.stream
 import net.javaru.iip.frc.facet.FrcFacet.Companion.FACET_TYPE_ID
 import net.javaru.iip.frc.wpilib.gradlePluginRepo.logger
 import org.jetbrains.annotations.Contract
-import kotlin.streams.toList
 
 
 class FrcFacet(facetType: FacetType<FrcFacet, FrcFacetConfiguration>,
@@ -168,7 +166,7 @@ fun Project?.getAllFrcFacetsForProject(): ImmutableList<FrcFacet>
 fun Project?.getFrcFacetedModules(): List<Module>
 {
     return if (this == null) emptyList()
-    else ModuleManager.getInstance(this).modules.stream().filter { it?.isFrcFacetedModule() ?: false }.toList()
+    else ModuleManager.getInstance(this).modules.filter { it?.isFrcFacetedModule() ?: false }
 }
 
 fun Facet<*>?.isFrcFacet(): Boolean = this is FrcFacet

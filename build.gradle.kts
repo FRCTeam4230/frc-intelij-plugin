@@ -31,6 +31,7 @@ val javaVersion: JavaVersion = JavaVersion.VERSION_17 // IJ v2022.2+ requires Ja
 val sandboxPath = determineSandboxDir()
 val tokenReplacements by lazy { loadTokenReplacements() }
 val isCiBuild = if (project.hasProperty("is.ci.build")) project.properties["is.ci.build"].toString().toBoolean() else false
+val userHomeDir: Path by lazy { Path.of(System.getProperty("user.home")) }
 
 group = "net.javaru.iip.frc"
 version = frcPluginVersion 
@@ -45,7 +46,7 @@ plugins {
     //           Last version of docs on GitHub before migration: https://github.com/JetBrains/gradle-intellij-plugin/blob/e819958cdc4e593738cd96e230edd5ca66481b3b/README.md
     //     Info: https://lp.jetbrains.com/gradle-intellij-plugin/
     //     Src:  https://github.com/JetBrains/gradle-intellij-plugin
-    id("org.jetbrains.intellij") version "1.7.0"
+    id("org.jetbrains.intellij") version "1.8.0"
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
     //    https://github.com/jetbrains/gradle-idea-ext-plugin
@@ -57,67 +58,9 @@ plugins {
 }
 
 java {
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-}
-
-tasks {
-    withType<JavaCompile> {
-        options.encoding = Charsets.UTF_8.name()
-    }
-    withType<Test> {
-        useJUnitPlatform {
-            excludeTags = setOf("slow", "manual")
-        }
-        systemProperty("file.encoding", Charsets.UTF_8.name())
-        configureEach {
-            testLogging {
-                events("failed")
-                exceptionFormat = TestExceptionFormat.FULL
-            }
-        }
-    }
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        all {
-            kotlinOptions {
-                jvmTarget = javaVersion.toString()
-                javaParameters = true
-                //noReflect = false
-            }
-        }
-    }
-}
-
-tasks.test {
-    // https://docs.gradle.org/current/userguide/java_testing.html#using_junit5
-    useJUnitPlatform {
-        excludeTags("slow")
-    }
-}
-
-tasks.register<Delete>("cleanPluginFromSandbox") {
-    delete(File("$sandboxPath/plugins/${rootProject.name}"))
-}
-
-tasks.register<Delete>("cleanIdeCaches") {
-    dependsOn("cleanPluginFromSandbox")
-    // Delete indexes & cache to resolve issues of new project templates being read from cache
-    delete(
-           File("$sandboxPath/system/caches"),
-           File("$sandboxPath/system/index")
-          )
-//    File("$sandboxPath/plugins/${rootProject.name}").deleteRecursively()
-//    File("$sandboxPath/system/caches").deleteRecursively()
-//    File("$sandboxPath/system/index").deleteRecursively()
-}
-
-tasks.clean {
-    dependsOn("cleanPluginFromSandbox", "cleanIdeCaches")
-}
-
-tasks.processResources {
-    filesMatching("services/frc-plugin-tokens.properties") {
-        expand(tokenReplacements)
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(javaVersion.toString()))
+        vendor.set(determineVendor(JvmVendorSpec.ADOPTOPENJDK))
     }
 }
 
@@ -134,6 +77,7 @@ intellij {
     downloadSources.set(true)
 }
 
+// Section to configure tasks specific to intellij plugin tasks
 tasks {
     patchPluginXml {
         version.set(frcPluginVersion)
@@ -240,7 +184,6 @@ tasks {
         }
     }
 
-
     publishPlugin {
         // See https://plugins.jetbrains.com/docs/intellij/deployment.html  and  https://github.com/JetBrains/intellij-platform-plugin-template/blob/main/build.gradle.kts
         // dependsOn("patchChangelog")
@@ -261,6 +204,160 @@ tasks {
         //   channels.set(listOf(projectProperty("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
         channels.set(listOf("default" ))
     }
+}
+
+tasks {
+    withType<JavaCompile> {
+        options.encoding = Charsets.UTF_8.name()
+    }
+
+    withType<Test> {
+        useJUnitPlatform {
+            excludeTags = setOf("slow", "manual")
+        }
+        systemProperty("file.encoding", Charsets.UTF_8.name())
+        configureEach {
+            testLogging {
+                events("failed")
+                exceptionFormat = TestExceptionFormat.FULL
+            }
+        }
+    }
+
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        all {
+            kotlinOptions {
+                jvmTarget = javaVersion.toString()
+                javaParameters = true
+                //noReflect = false
+            }
+        }
+    }
+
+    test {
+        useJUnitPlatform {
+            excludeTags("slow")
+        }
+    }
+
+    clean {
+        dependsOn("cleanPluginFromSandbox", "cleanIdeCaches")
+    }
+
+    processResources {
+        filesMatching("services/frc-plugin-tokens.properties") {
+            expand(tokenReplacements)
+        }
+    }
+
+    register<Delete>("cleanPluginFromSandbox") {
+        delete(File("$sandboxPath/plugins/${rootProject.name}"))
+    }
+
+    register<Delete>("cleanIdeCaches") {
+        dependsOn("cleanPluginFromSandbox")
+        // Delete indexes & cache to resolve issues of new project templates being read from cache
+        delete(
+            File("$sandboxPath/system/caches"), File("$sandboxPath/system/index")
+              )
+//    File("$sandboxPath/plugins/${rootProject.name}").deleteRecursively()
+//    File("$sandboxPath/system/caches").deleteRecursively()
+//    File("$sandboxPath/system/index").deleteRecursively()
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven("https://plugins.gradle.org/m2/")
+    flatDir { dirs("lib") }
+    maven {
+        url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
+}
+
+@Suppress("SpellCheckingInspection")
+dependencyManagement {
+    imports {
+        mavenBom("io.sentry:sentry-bom:6.3.0")
+        mavenBom("com.google.guava:guava-bom:31.1-jre")
+        mavenBom("com.fasterxml.jackson:jackson-bom:2.13.3")
+        mavenBom("org.junit:junit-bom:5.8.2")
+    }
+
+    dependencies {
+        dependency("io.javaru.iip.common:javaru-iip-common:1.0.0")
+        dependency("org.jdom:jdom2:2.0.6.1")
+        dependency("commons-io:commons-io:2.11.0")
+        dependency("org.apache.commons:commons-lang3:3.12.0")
+        dependency("org.apache.commons:commons-text:1.9")
+        dependency("com.jcraft:jsch:0.1.55")
+        dependency("com.beust:klaxon:5.6")
+        dependency("org.freemarker:freemarker:2.3.31")
+        dependency("io.github.furstenheim:copy_down:1.0") // HTML to MD
+        dependency("org.jsoup:jsoup:1.15.1") // version pulled in by copy_down has a vulnerability; while unlikely to affect us, it's best to remove it.
+        // jsemver: Is in the project 'lib' dir as it is not published to any public repos. Plus we are using a tweaked version that removes is use of logback
+        dependency("com.asarkar:jsemver:0.6.2.3") {
+            // We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.
+            exclude("org.slf4j:slf4j-api")
+        }
+        dependency("org.antlr:antlr4:4.9.3") {
+            exclude("org.slf4j:slf4j-api")
+        }
+
+        dependencySet("com.michael-bull.kotlin-result:1.1.16") {
+            entry("kotlin-result")
+            entry("kotlin-result-jvm")
+        }
+    }
+}
+
+@Suppress("SpellCheckingInspection")
+dependencies {
+    implementation("io.javaru.iip.common:javaru-iip-common")
+    // For Kotlin dependencies, you can use shorthand for a dependency on a Kotlin module, for example, kotlin("test-junit5") for "org.jetbrains.kotlin:kotlin-test-junit5".
+    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("reflect"))
+    testImplementation(kotlin("test-junit5"))
+
+    implementation("org.jdom:jdom2")
+    implementation("commons-io:commons-io")
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.apache.commons:commons-text")
+    implementation("com.jcraft:jsch")
+    // Klaxon is a library to parse JSON in Kotlin.  https://github.com/cbeust/klaxon  Help available in the #klaxon channel of the Kotlin Slack Workspace
+    implementation("com.beust:klaxon")
+    implementation("com.google.guava:guava")
+    // jsemver: Is in the project 'lib' dir as it is not published to any public repos. Plus we are using a tweaked version that removes is use of logback
+    implementation("com.asarkar:jsemver") {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+            .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
+    }
+    implementation("org.antlr:antlr4") {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+            .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
+    }
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava")
+    implementation("org.freemarker:freemarker")
+    implementation("com.michael-bull.kotlin-result:kotlin-result")
+    implementation("com.michael-bull.kotlin-result:kotlin-result-jvm")
+    implementation("io.github.furstenheim:copy_down") // HTML to MD
+
+    implementation("io.sentry:sentry") {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+            .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
+    }
+    implementation("io.sentry:sentry-kotlin-extensions")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
+    testImplementation("com.google.guava:guava-testlib") // version in BOM above
 }
 
 idea {
@@ -306,7 +403,7 @@ idea {
                 }
             }
 
-            configure< org.jetbrains.gradle.ext.EncodingConfiguration> {
+            configure<org.jetbrains.gradle.ext.EncodingConfiguration> {
                 // setting EncodingConfiguration requires IDEA 2019.1+
                 this.encoding = "UTF-8"
                 this.bomPolicy = org.jetbrains.gradle.ext.EncodingConfiguration.BomPolicy.WITH_NO_BOM
@@ -335,101 +432,7 @@ idea {
     }
 }
 
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven("https://plugins.gradle.org/m2/")
-    flatDir { dirs("lib") }
-    maven {
-        url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-        mavenContent {
-            snapshotsOnly()
-        }
-    }
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("io.sentry:sentry-bom:6.3.0")
-        mavenBom("com.google.guava:guava-bom:31.1-jre")
-        mavenBom("com.fasterxml.jackson:jackson-bom:2.13.3")
-        mavenBom("org.junit:junit-bom:5.8.2")
-    }
-
-    dependencies {
-        dependency("io.javaru.iip.common:javaru-iip-common:1.0.0")
-        dependency("org.jdom:jdom2:2.0.6.1")
-        dependency("commons-io:commons-io:2.11.0")
-        dependency("org.apache.commons:commons-lang3:3.12.0")
-        dependency("org.apache.commons:commons-text:1.9")
-        dependency("com.jcraft:jsch:0.1.55")
-        dependency("com.beust:klaxon:5.6")
-        dependency("org.freemarker:freemarker:2.3.31")
-        dependency("io.github.furstenheim:copy_down:1.0") // HTML to MD
-        dependency("org.jsoup:jsoup:1.15.1") // version pulled in by copy_down has a vulnerability; while unlikely to affect us, it's best to remove it.
-        // jsemver: Is in the project 'lib' dir as it is not published to any public repos. Plus we are using a tweaked version that removes is use of logback
-        dependency("com.asarkar:jsemver:0.6.2.3") {
-            // We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded."
-            exclude("org.slf4j:slf4j-api")
-        }
-        @Suppress("GradlePackageUpdate") //we want to keep the version in sync with what is used in jsemver to prevent warning about different code generation and runtime versions.
-        dependency("org.antlr:antlr4:4.9.3") {
-            exclude("org.slf4j:slf4j-api")
-        }
-
-        dependencySet("com.michael-bull.kotlin-result:1.1.16") {
-            entry("kotlin-result")
-            entry("kotlin-result-jvm")
-        }
-    }
-}
-dependencies {
-    implementation("io.javaru.iip.common:javaru-iip-common")
-    // For Kotlin dependencies, you can use shorthand for a dependency on a Kotlin module, for example, kotlin("test-junit5") for "org.jetbrains.kotlin:kotlin-test-junit5".
-    implementation(kotlin("stdlib-jdk8"))
-    implementation(kotlin("reflect"))
-    testImplementation(kotlin("test-junit5"))
-
-    implementation("org.jdom:jdom2")
-    implementation("commons-io:commons-io")
-    implementation("org.apache.commons:commons-lang3")
-    implementation("org.apache.commons:commons-text")
-    implementation("com.jcraft:jsch")
-    // Klaxon is a library to parse JSON in Kotlin.  https://github.com/cbeust/klaxon  Help available in the #klaxon channel of the Kotlin Slack Workspace
-    implementation("com.beust:klaxon")
-    implementation("com.google.guava:guava")
-    // jsemver: Is in the project 'lib' dir as it is not published to any public repos. Plus we are using a tweaked version that removes is use of logback
-    implementation("com.asarkar:jsemver") {
-        exclude(group = "org.slf4j", module = "slf4j-api")
-            .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
-    }
-    implementation("org.antlr:antlr4") {
-        exclude(group = "org.slf4j", module = "slf4j-api")
-            .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
-    }
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava")
-    implementation("org.freemarker:freemarker")
-    implementation("com.michael-bull.kotlin-result:kotlin-result")
-    implementation("com.michael-bull.kotlin-result:kotlin-result-jvm")
-    implementation("io.github.furstenheim:copy_down") // HTML to MD
-
-    implementation("io.sentry:sentry") {
-        exclude(group = "org.slf4j", module = "slf4j-api")
-            .because("We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.")
-    }
-    implementation("io.sentry:sentry-kotlin-extensions")
-
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testImplementation("org.junit.jupiter:junit-jupiter-params")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
-    testImplementation("com.google.guava:guava-testlib") // version in BOM above
-}
-
-
-// --- Utility functions -----------------------------------------------
+// region == Utility functions 
 inline fun <reified T : Task> task(noinline configuration: T.() -> Unit) = tasks.creating(T::class, configuration)
 
 // allows for the standard task syntax after declaring something like:  val publishPlugin: PublishTask by tasks
@@ -488,6 +491,29 @@ fun determineSandboxDir(): String
     return sandboxDir
 }
 
+/** Determines if a JBR JDK is available for use. If so returns a "JetBrains" JvmVendorSpec. Otherwise, returns the provided fallback spec. */
+fun determineVendor(@Suppress("UnstableApiUsage") defaultFallbackSpec: JvmVendorSpec = JvmVendorSpec.ADOPTIUM): JvmVendorSpec
+{
+    // @formatter:off
+    val jdkDirs = if (System.getProperty("os.name").contains("windows", ignoreCase = true))
+        listOf(userHomeDir.resolve(".jdks"))
+    else
+        listOf(userHomeDir.resolve("Library/Java/JavaVirtualMachines/"), Path.of("/Library/Java/JavaVirtualMachines/"))
+
+    val jbrList = jdkDirs
+        .asSequence()
+        .map { (it.toFile().listFiles { file -> file.isDirectory && file.name?.contains("jbr-$javaVersion") ?: false } ?: emptyArray()).asSequence() }
+        .requireNoNulls()
+        .flatten()
+        .toList()
+    logger.debug("Found jbr JDKs:  $jbrList")
+    val spec = if (jbrList.isNotEmpty()) JvmVendorSpec.matching("JetBrains") else defaultFallbackSpec
+    println("Using JvmVendorSpec '$spec' for Gradle Java Toolchain")
+    return spec
+    // @formatter:on
+}
+
+
 /**
  * Loads the token replacement values. These are some values that we would prefer not to commit to 
  * source control. While not secrets per se, they are also not things we want bots to find.
@@ -540,3 +566,4 @@ fun loadTokenReplacements():MutableMap<String, Any>
     }.toMap().toMutableMap()
 }
 
+// endregion == Utility functions 

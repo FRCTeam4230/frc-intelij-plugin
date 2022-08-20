@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -43,7 +43,6 @@ import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
-import kotlin.streams.toList
 import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting as GRV
 
 
@@ -108,7 +107,7 @@ internal class WpiLibVersionTest
     @Test
     fun parseList()
     {
-        val versionStrings = versionList.stream().map { it.versionString }.toList()
+        val versionStrings = versionList.map { it.versionString }.toList()
         // Commenting out the check with t invalid string for now as it is disconcerting to see the exception logged during the build
         //val versionStrings2 = ArrayList(versionStrings)
         //versionStrings2.add("2020.99.99")

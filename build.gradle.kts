@@ -60,7 +60,7 @@ plugins {
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(javaVersion.toString()))
-        vendor.set(determineVendor(JvmVendorSpec.ADOPTOPENJDK))
+        vendor.set(determineJvmVendor(defaultFallbackSpec = JvmVendorSpec.ADOPTOPENJDK))
     }
 }
 
@@ -488,7 +488,7 @@ fun determineSandboxDir(): String
 }
 
 /** Determines if a JBR JDK is available for use. If so returns a "JetBrains" JvmVendorSpec. Otherwise, returns the provided fallback spec. */
-fun determineVendor(@Suppress("UnstableApiUsage") defaultFallbackSpec: JvmVendorSpec = JvmVendorSpec.ADOPTIUM): JvmVendorSpec
+fun determineJvmVendor(@Suppress("UnstableApiUsage") defaultFallbackSpec: JvmVendorSpec = JvmVendorSpec.ADOPTIUM): JvmVendorSpec
 {
     // @formatter:off
     val jdkDirs = if (System.getProperty("os.name").contains("windows", ignoreCase = true))

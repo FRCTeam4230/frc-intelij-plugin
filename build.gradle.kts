@@ -40,7 +40,7 @@ plugins {
     base
     java
     // List of Kotlin versions bundled with the IDE by version: https://plugins.jetbrains.com/docs/intellij/kotlin.html#kotlin-standard-library
-    kotlin("jvm") version "1.7.10"
+    kotlin("jvm") version "1.7.20"
     // gradle plugin-for writing IntelliJ plugins:
     //     Docs: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
     //           Last version of docs on GitHub before migration: https://github.com/JetBrains/gradle-intellij-plugin/blob/e819958cdc4e593738cd96e230edd5ca66481b3b/README.md
@@ -282,10 +282,10 @@ repositories {
 @Suppress("SpellCheckingInspection")
 dependencyManagement {
     imports {
-        mavenBom("io.sentry:sentry-bom:6.4.1")
+        mavenBom("io.sentry:sentry-bom:6.4.3")
         mavenBom("com.google.guava:guava-bom:31.1-jre")
-        mavenBom("com.fasterxml.jackson:jackson-bom:2.13.3")
-        mavenBom("org.junit:junit-bom:5.9.0")
+        mavenBom("com.fasterxml.jackson:jackson-bom:2.13.4")
+        mavenBom("org.junit:junit-bom:5.9.1")
     }
 
     dependencies {

@@ -16,10 +16,13 @@
 
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="FRC [clean runIde]" type="GradleRunConfiguration" factoryName="Gradle" singleton="true">
-    <log_file alias="212-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-212/system/log/idea.log" />
     <log_file alias="idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox/system/log/idea.log" />
-    <log_file alias="latest-eap-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-LATEST-EAP-SNAPSHOT/system/log/idea.log" />
+    <log_file alias="212-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-212/system/log/idea.log" />
     <log_file alias="213-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-213/system/log/idea.log" />
+    <log_file alias="221-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-221/system/log/idea.log" />
+    <log_file alias="222-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-222/system/log/idea.log" />
+    <log_file alias="223-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-223/system/log/idea.log" />
+    <log_file alias="latest-eap-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-LATEST-EAP-SNAPSHOT/system/log/idea.log" />
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />

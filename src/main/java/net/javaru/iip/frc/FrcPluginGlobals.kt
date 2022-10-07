@@ -35,9 +35,6 @@ object FrcPluginGlobals
      */
     const val FRC_PLUGIN_ID_STRING = "net.javaru.idea.frc"
     const val FRC_PLUGIN_NAME = "FRC"
-    const val TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL = 12
-    const val TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT = 8
-    const val MAX_RUN_COUNT_TO_SAVE = 16
     const val FRC_IN_UNIT_TEST_MODE_KEY = "frc.testing.inUnitTestMode"
 
     /** A logger name `#net.javaru.iip.frc` for logging plugin level events. It should be used sparingly. */

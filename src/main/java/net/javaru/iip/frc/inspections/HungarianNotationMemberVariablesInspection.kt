@@ -39,10 +39,6 @@ class HungarianNotationMemberVariablesInspection: BaseInspection(), CleanupLocal
     override fun buildVisitor(): BaseInspectionVisitor
     {
         return object : BaseInspectionVisitor() {
-            override fun visitEnumConstant(enumConstant: PsiEnumConstant?)
-            {
-                super.visitEnumConstant(enumConstant)
-            }
 
             override fun visitField(field: PsiField)
             {

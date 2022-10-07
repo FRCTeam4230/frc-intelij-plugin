@@ -25,7 +25,6 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.Transient
-import net.javaru.iip.frc.FrcPluginGlobals.MAX_RUN_COUNT_TO_SAVE
 import org.apache.commons.lang3.StringUtils
 import java.nio.file.InvalidPathException
 import java.nio.file.Path
@@ -39,13 +38,11 @@ const val DEFAULT_DEBUG_PORT: Int = 8349
 
 const val WPILIB_BASE_DIR_ENV_VAR: String = "wpilib.base.dir"
 /**
- * Alternative base directory for the wpilib directory. By default the `user.dir` directory is used.
+ * Alternative base directory for the wpilib directory. By default, the `user.dir` directory is used.
  * A value set via this will override that default. Thus is this is set to `C:\libs` a wpilib
  * directory of `C:\libs\wpilib` is used for wpi lib directory. 
  */
 const val ALT_WPILIB_BASE_DIR_SYS_PROP: String = "frc.alt.wpilib.base.dir"
-
-const val USE_WPILIB_BETA_SITE: String = "frc.use.wpilib.beta.site"
 
 private const val NOT_SET = "NOT_SET"
 
@@ -53,8 +50,6 @@ private const val NOT_SET = "NOT_SET"
 @State(name = "FrcPlugin", storages = [(Storage("frc.xml"))])
 data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBER,
                                   var rioLogUdpPort: Int = DEFAULT_RIO_LOG_UDP_PORT,
-                                  /* Plugin Run Count (PRC) */
-                                  var prc: Int = 0,
                                   var useFrcToolWindow: Boolean = true,
                                   var clearRioLogOnRobotRestart: Boolean = false,
                                   var logNetConsoleToFile: Boolean = false,
@@ -133,8 +128,6 @@ data class FrcApplicationSettings(var teamNumber: Int = UN_CONFIGURED_TEAM_NUMBE
 
     @Transient
     fun isTeam3838(): Boolean { return teamNumber == 3838 }
-
-    fun incrementRunCount() { if (prc < MAX_RUN_COUNT_TO_SAVE) {prc++} }
 }
 
 

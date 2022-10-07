@@ -36,8 +36,6 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings;
 import net.javaru.iip.frc.settings.FrcTeamNumberKt;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
 
-import static net.javaru.iip.frc.FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL;
-
 
 public class ConfigureTeamNumberBasicAction extends AnAction
 {
@@ -114,6 +112,6 @@ public class ConfigureTeamNumberBasicAction extends AnAction
     protected boolean shouldBeVisible(AnActionEvent e)
     {
         final FrcApplicationSettings settings = FrcApplicationSettings.getInstance();
-        return (!settings.isTeamNumberConfigured() && settings.getPrc() <= TEAM_NUM_NOTIFY_RUN_COUNT_APP_LEVEL);
+        return !settings.isTeamNumberConfigured();
     }
 }

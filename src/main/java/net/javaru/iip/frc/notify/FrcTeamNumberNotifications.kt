@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.notify
 
+import com.intellij.ide.util.RunOnceUtil
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
@@ -28,6 +29,7 @@ import net.javaru.iip.frc.actions.ConfigureTeamNumberBasicAction
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.i18n.FrcBundle.message
 import net.javaru.iip.frc.settings.FrcApplicationSettings
+import net.javaru.iip.frc.util.frcPluginVersion
 
 
 private val logger = logger<FrcNotifications>()
@@ -64,7 +66,7 @@ fun notifyToConfigureTeamNumIfNecessary(project: Project, knownFacetedProject: B
     val shouldNotify =
             !settings.isTeamNumberConfigured()
             &&
-            ((knownFacetedProject || project.isFrcFacetedProject()) || settings.prc <= FrcPluginGlobals.TEAM_NUM_NOTIFY_RUN_COUNT_PROJECT_LEVEL_NON_FRC_PROJECT)
+            ((knownFacetedProject || project.isFrcFacetedProject()))
             &&
             FrcNotificationsTracker.getNotification(project, notificationKey) == null
 
@@ -75,6 +77,14 @@ fun notifyToConfigureTeamNumIfNecessary(project: Project, knownFacetedProject: B
         FrcNotificationsTracker.expireAppNotification(notificationKey)
         val notification = notifyAboutTeamNumberNeedingToBeConfigured(project, useSticky = true, asWarning = false)
         FrcNotificationsTracker.putNotification(project, notificationKey, notification)
+    }
+    else if(!knownFacetedProject && !project.isFrcFacetedProject())
+    {
+        RunOnceUtil.runOnceForApp("configureFrcTeamNumber-$frcPluginVersion") {
+            FrcNotificationsTracker.expireAppNotification(notificationKey)
+            val notification = notifyAboutTeamNumberNeedingToBeConfigured(project, useSticky = true, asWarning = false)
+            FrcNotificationsTracker.putNotification(project, notificationKey, notification)
+        }
     }
 }
 

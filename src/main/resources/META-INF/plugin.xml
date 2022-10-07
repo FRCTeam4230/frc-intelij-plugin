@@ -244,6 +244,9 @@
 
 
 
+    <applicationListeners>
+        <listener class="net.javaru.iip.frc.services.FrcAppLifecycleListener" topic="com.intellij.ide.AppLifecycleListener" />
+    </applicationListeners>
 
     <!-- Extensions which the plugin adds to extension points defined by the IDEA core or by other plugins.
          The "defaultExtensionNs " attribute must be set to the ID of the plugin defining the extension point, or to
@@ -283,9 +286,6 @@
         <applicationConfigurable id="preferences.language.FRC"
                                  instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable"
                                  groupId="language" />
-        
-        <preloadingActivity implementation="net.javaru.iip.frc.plugin.FrcPreloadingActivity" />
-
         <!-- Commenting out for now. Rethinking that these should be at the module/facet level rather than project level. -->
         <!--<projectConfigurable id="preferences.language.FRC.project"
                              instance="net.javaru.iip.frc.settings.FrcProjectSettingsConfigurable"

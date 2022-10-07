@@ -166,7 +166,7 @@ fun Project?.getAllFrcFacetsForProject(): ImmutableList<FrcFacet>
 fun Project?.getFrcFacetedModules(): List<Module>
 {
     return if (this == null) emptyList()
-    else ModuleManager.getInstance(this).modules.filter { it?.isFrcFacetedModule() ?: false }
+    else ModuleManager.getInstance(this).modules.filter { it.isFrcFacetedModule() }
 }
 
 fun Facet<*>?.isFrcFacet(): Boolean = this is FrcFacet

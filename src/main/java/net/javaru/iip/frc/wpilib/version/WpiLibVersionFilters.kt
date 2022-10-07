@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2021 the original author or authors
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -84,9 +84,9 @@ fun Stream<WpiLibVersion>.filterOutVersions(filter: WpiLibVersionFilter): Stream
 fun Iterable<WpiLibVersion>.filterOutAllButLatestForYear(year: Int, preReleaseInclusion: PreReleaseInclusion = PreReleaseInclusion.None): List<WpiLibVersion>
 {
     val allowedForYear = mutableSetOf<WpiLibVersion>()
-    val latestFullRelease = this.filterToLatestForYear(year, true)?.also {
-        allowedForYear.add(it)
-    }
+    //val latestFullRelease = this.filterToLatestForYear(year, true)?.also {
+    //    allowedForYear.add(it)
+    //}
     if (preReleaseInclusion != PreReleaseInclusion.None)
     {
         val latestRelease = this.filterToLatestForYear(year, false)
@@ -114,7 +114,7 @@ fun Iterable<WpiLibVersion>.filterToLatestForYear(year: Int, excludePreReleases:
 
 
 /**
- * Filters the Iterable to includer:
+ * Filters the Iterable to include:
  *   - For current year: All full releases, and if the latest release is an RC, it is included as well.
  *   - For previous years: The latest full version
  * It also filters out the transitional `2018.06.21` version. Finally, it sorts the list

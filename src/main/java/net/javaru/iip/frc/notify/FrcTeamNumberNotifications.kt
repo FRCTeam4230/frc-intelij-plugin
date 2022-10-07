@@ -24,7 +24,6 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
-import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.actions.ConfigureTeamNumberBasicAction
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.i18n.FrcBundle.message

@@ -42,7 +42,6 @@ import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.runWhenProjectOpened
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkTypeId
 import com.intellij.openapi.projectRoots.impl.JavaSdkImpl
@@ -86,6 +85,7 @@ import net.javaru.iip.frc.util.reader
 import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.removeBasePath
 import net.javaru.iip.frc.util.runBackgroundTask
+import net.javaru.iip.frc.util.runWhenProjectOpened
 import net.javaru.iip.frc.util.runWhenSmart
 import net.javaru.iip.frc.util.toCommaDelimitedString
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion

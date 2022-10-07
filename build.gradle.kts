@@ -46,7 +46,7 @@ plugins {
     //           Last version of docs on GitHub before migration: https://github.com/JetBrains/gradle-intellij-plugin/blob/e819958cdc4e593738cd96e230edd5ca66481b3b/README.md
     //     Info: https://lp.jetbrains.com/gradle-intellij-plugin/
     //     Src:  https://github.com/JetBrains/gradle-intellij-plugin
-    id("org.jetbrains.intellij") version "1.8.0"
+    id("org.jetbrains.intellij") version "1.9.0"
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
     //    https://github.com/jetbrains/gradle-idea-ext-plugin
@@ -54,13 +54,13 @@ plugins {
     //    v0.10+ requires IDEA 2020.2+   v0.6.1+ requires IntelliJ IDEA 2019.2
     id("org.jetbrains.gradle.plugin.idea-ext") version "0.10"
     // https://docs.spring.io/dependency-management-plugin/docs/current/reference/html/
-    id("io.spring.dependency-management") version "1.0.11.RELEASE"
+    id("io.spring.dependency-management") version "1.0.13.RELEASE"
 }
 
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(javaVersion.toString()))
-        vendor.set(determineVendor(JvmVendorSpec.ADOPTOPENJDK))
+        vendor.set(determineJvmVendor(defaultFallbackSpec = JvmVendorSpec.ADOPTOPENJDK))
     }
 }
 
@@ -282,10 +282,10 @@ repositories {
 @Suppress("SpellCheckingInspection")
 dependencyManagement {
     imports {
-        mavenBom("io.sentry:sentry-bom:6.3.0")
+        mavenBom("io.sentry:sentry-bom:6.4.1")
         mavenBom("com.google.guava:guava-bom:31.1-jre")
         mavenBom("com.fasterxml.jackson:jackson-bom:2.13.3")
-        mavenBom("org.junit:junit-bom:5.8.2")
+        mavenBom("org.junit:junit-bom:5.9.0")
     }
 
     dependencies {
@@ -297,9 +297,9 @@ dependencyManagement {
         dependency("com.jcraft:jsch:0.1.55")
         dependency("com.beust:klaxon:5.6")
         dependency("org.freemarker:freemarker:2.3.31")
-        dependency("io.github.furstenheim:copy_down:1.0") // HTML to MD
+        dependency("io.github.furstenheim:copy_down:1.1") // HTML to MD
         dependency("org.jsoup:jsoup:1.15.1") // version pulled in by copy_down has a vulnerability; while unlikely to affect us, it's best to remove it.
-        // jsemver: Is in the project 'lib' dir as it is not published to any public repos. Plus we are using a tweaked version that removes is use of logback
+        // jsemver: Is in the project 'lib' dir as it is not published to any public repos. Plus we are using a tweaked version that removes its use of logback
         dependency("com.asarkar:jsemver:0.6.2.3") {
             // We can't have SLF4J in our plugin's lib as it causes Classloader issues due the unique way it is loaded.
             exclude("org.slf4j:slf4j-api")
@@ -492,7 +492,7 @@ fun determineSandboxDir(): String
 }
 
 /** Determines if a JBR JDK is available for use. If so returns a "JetBrains" JvmVendorSpec. Otherwise, returns the provided fallback spec. */
-fun determineVendor(@Suppress("UnstableApiUsage") defaultFallbackSpec: JvmVendorSpec = JvmVendorSpec.ADOPTIUM): JvmVendorSpec
+fun determineJvmVendor(@Suppress("UnstableApiUsage") defaultFallbackSpec: JvmVendorSpec = JvmVendorSpec.ADOPTIUM): JvmVendorSpec
 {
     // @formatter:off
     val jdkDirs = if (System.getProperty("os.name").contains("windows", ignoreCase = true))

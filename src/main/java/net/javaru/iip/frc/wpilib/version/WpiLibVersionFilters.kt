@@ -84,9 +84,9 @@ fun Stream<WpiLibVersion>.filterOutVersions(filter: WpiLibVersionFilter): Stream
 fun Iterable<WpiLibVersion>.filterOutAllButLatestForYear(year: Int, preReleaseInclusion: PreReleaseInclusion = PreReleaseInclusion.None): List<WpiLibVersion>
 {
     val allowedForYear = mutableSetOf<WpiLibVersion>()
-    //val latestFullRelease = this.filterToLatestForYear(year, true)?.also {
-    //    allowedForYear.add(it)
-    //}
+    this.filterToLatestForYear(year, true)?.also {
+        allowedForYear.add(it)
+    }
     if (preReleaseInclusion != PreReleaseInclusion.None)
     {
         val latestRelease = this.filterToLatestForYear(year, false)

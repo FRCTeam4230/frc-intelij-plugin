@@ -75,10 +75,10 @@ fun Stream<WpiLibVersion>.filterOutVersions(filter: WpiLibVersionFilter): Stream
 /**
  * For the given year, filters out ALL but the latest version for that year. Other years are unaffected.
  * If [preReleaseInclusion] is set to:
- *   - [PreReleaseInclusion.None], no pre-releases (betas, release candidates, etc.) are included for the filtered year.
- *   - [PreReleaseInclusion.RcOnly], If the latest version available is an RC, it and the previous full version are included for the filtered year
- *   - [PreReleaseInclusion.RcAndOrBeta], If the latest version available is a beta or an RC, it and the previous full version are included for the filtered year.
- *  - [PreReleaseInclusion.All] If the latest is any sort of pre-release, it and the previous full version are included for the filtered year.
+ *   - [PreReleaseInclusion.None] No pre-releases (betas, release candidates, etc.) are included for the filtered year.
+ *   - [PreReleaseInclusion.RcOnly] If the latest version available is an RC, it and the previous full version are included for the filtered year
+ *   - [PreReleaseInclusion.RcAndOrBeta] If the latest version available is a beta or an RC, it and the previous full version are included for the filtered year.
+ *   - [PreReleaseInclusion.All] If the latest is any sort of pre-release, it and the previous full version are included for the filtered year.
  */
 @JvmOverloads
 fun Iterable<WpiLibVersion>.filterOutAllButLatestForYear(year: Int, preReleaseInclusion: PreReleaseInclusion = PreReleaseInclusion.None): List<WpiLibVersion>

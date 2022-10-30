@@ -311,7 +311,7 @@ class VendordepsService private constructor(val project: Project): Disposable
         vendordepsDir
             ?.children
             ?.asSequence()
-            ?.filter { it != null && it is JsonFile }
+            ?.filter { it is JsonFile }
             ?.map { it as JsonFile }
             ?.filter { it.isVendordepsJsonFile(project) }
             ?.forEach { jsonFile: JsonFile ->

@@ -267,9 +267,7 @@ tasks {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    maven("https://plugins.gradle.org/m2/")
     flatDir { dirs("lib") }
     maven {
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")

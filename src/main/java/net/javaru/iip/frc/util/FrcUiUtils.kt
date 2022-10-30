@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -42,7 +42,6 @@ import java.awt.Dimension
 import javax.swing.AbstractButton
 import javax.swing.ButtonGroup
 import javax.swing.ButtonModel
-import javax.swing.DefaultButtonModel
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -267,7 +266,6 @@ fun findAllUsedMnemonics(component: Component?, mnemonics: MutableSet<Char>, con
         if (component is AbstractButton) mnemonics.add(component.mnemonic.toChar())
         if (component is ButtonModel) mnemonics.add(component.mnemonic.toChar())
         if (component is AbstractColorChooserPanel) mnemonics.add(component.mnemonic.toChar())
-        if (component is DefaultButtonModel) mnemonics.add(component.mnemonic.toChar())
         if (component is JLabel) mnemonics.add(component.displayedMnemonic.toChar())
         if (component is JTabbedPane)
         {

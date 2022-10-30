@@ -76,7 +76,7 @@ class WpiLibVersionStartupActivity : StartupActivity
     {
         if (project.isFrcFacetedProject())
         {
-            StartupManager.getInstance(project).runWhenProjectIsInitialized {
+            StartupManager.getInstance(project).runAfterOpened {
                 // We need to run as a BackgroundTask as it is a slow operation.
                 // See Javadoc for com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed
                 project.runBackgroundTask("Initializing WPI Lib version service") {

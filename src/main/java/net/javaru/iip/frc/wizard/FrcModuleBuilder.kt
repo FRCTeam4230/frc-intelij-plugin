@@ -48,6 +48,7 @@ import com.intellij.openapi.projectRoots.impl.JavaSdkImpl
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider
+import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
@@ -85,7 +86,6 @@ import net.javaru.iip.frc.util.reader
 import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.removeBasePath
 import net.javaru.iip.frc.util.runBackgroundTask
-import net.javaru.iip.frc.util.runWhenProjectOpened
 import net.javaru.iip.frc.util.runWhenSmart
 import net.javaru.iip.frc.util.toCommaDelimitedString
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
@@ -320,12 +320,12 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                FrcModuleBuilder.importGradleProject()
          */
 
-        runWhenProjectOpened(project) {
-            DumbService.getInstance(it).smartInvokeLater {
+        StartupManager.getInstance(project).runAfterOpened {
+            DumbService.getInstance(project).smartInvokeLater {
                 // I've tried 'runWriteAction' and 'invokeLater' here, both outside and inside 'runWhenSmart'.
                 // But the issue persisted. I think the smartInvokeLater has resolved it.
-                    createAllRunDebugConfigurations(RunDebugConfigsCreationData.create(dataModel, it))
-                    it.reimportGradleProject()
+                    createAllRunDebugConfigurations(RunDebugConfigsCreationData.create(dataModel, project))
+                    project.reimportGradleProject()
             }
         }
     }

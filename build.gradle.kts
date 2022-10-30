@@ -16,6 +16,7 @@
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.gradle.ext.ProjectSettings
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import java.io.FileNotFoundException
 import java.io.PrintWriter
 import java.nio.file.Files
@@ -27,6 +28,8 @@ val frcPluginBaseVersion: String by project
 val ideaMajorVersion: String by project
 val frcPluginEapDesignator: String by project
 val frcPluginVersion = "$frcPluginBaseVersion-$ideaMajorVersion$frcPluginEapDesignator" // ex: v1.3.0-2019.2,  1.3.1-2020.1-eap.1
+val javaVersion: JavaVersion = JavaVersion.VERSION_17 // IJ v2022.2+ requires Java 17; IJ v2020.3+ requires Java 11
+val kotlinVersion by extra { project.getKotlinPluginVersion() }
 val javaVersion: JavaVersion = JavaVersion.VERSION_17 // IJ v2022.2+ requires Java 17; IJ v2020.3+ requires Java 11
 val sandboxPath = determineSandboxDir()
 val tokenReplacements by lazy { loadTokenReplacements() }
@@ -288,6 +291,7 @@ dependencyManagement {
         mavenBom("com.google.guava:guava-bom:31.1-jre")
         mavenBom("com.fasterxml.jackson:jackson-bom:2.13.4")
         mavenBom("org.junit:junit-bom:5.9.1")
+        mavenBom("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion")
     }
 
     dependencies {

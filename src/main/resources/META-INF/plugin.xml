@@ -52,6 +52,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v2.3.0</strong> <br>
+        &nbsp;&nbsp;&bull; Migrate off plugin APIs deprecated in IntelliJ IDEA 2022.3<br>
+        &nbsp;&nbsp;&bull; IntelliJ IDEA 2022.3 support added<br>
+        <br>
         <strong>v2.2.1</strong> <br>
         &nbsp;&nbsp;&bull; Fixed a binary compatibility issue mistakenly introduced by the build in the v2.2.0 release.<br>
         <br>

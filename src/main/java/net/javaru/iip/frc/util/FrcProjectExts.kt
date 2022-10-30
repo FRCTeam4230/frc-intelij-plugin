@@ -22,7 +22,6 @@ import com.github.michaelbull.result.Result
 import com.intellij.facet.FacetManager
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.idea.IdeaLogger
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.diagnostic.Logger
@@ -37,7 +36,6 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
-import com.intellij.openapi.project.ProjectManagerListener
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ProjectRootManager
@@ -51,7 +49,6 @@ import net.javaru.iip.frc.services.ReportableEvent
 import org.jetbrains.annotations.Contract
 import org.jetbrains.plugins.gradle.settings.GradleSettings
 import java.util.concurrent.Callable
-import java.util.function.Consumer
 
 
 // Note: There are also some Project Extension functions in FrcFacet.kt
@@ -452,52 +449,4 @@ fun Project?.isKotlinFacetedProject(): Boolean
         }
     }
     return false
-}
-
-/**
- * Add one-time projectOpened listener.
- * Copied from `com.intellij.openapi.project.ProjectUtil` in IJ v2022.2 as it was removed in v 2022.3.
- * [link](https://github.com/JetBrains/intellij-community/blob/idea/222.4345.14/platform/ide-core/src/com/intellij/openapi/project/ProjectUtil.kt#L255)
- */
-@Suppress("unused")
-fun runWhenProjectOpened(project: Project, handler: Runnable)
-{
-    runWhenProjectOpened(project) {
-        handler.run()
-    }
-}
-
-/**
- * Add one-time first projectOpened listener.
- * Copied from `com.intellij.openapi.project.ProjectUtil` in IJ v2022.2 as it was removed in v 2022.3.
- * [link](https://github.com/JetBrains/intellij-community/blob/idea/222.4345.14/platform/ide-core/src/com/intellij/openapi/project/ProjectUtil.kt#L265)
- */
-@Suppress("unused")
-@JvmOverloads
-fun runWhenProjectOpened(project: Project? = null, handler: Consumer<Project>)
-{
-    runWhenProjectOpened(project) {
-        handler.accept(it)
-    }
-}
-
-/**
- * Add one-time projectOpened listener.
- * Copied from `com.intellij.openapi.project.ProjectUtil` in IJ v2022.2 as it was removed in v 2022.3.
- * [link](https://github.com/JetBrains/intellij-community/blob/idea/222.4345.14/platform/ide-core/src/com/intellij/openapi/project/ProjectUtil.kt#L274)
- */
-inline fun runWhenProjectOpened(project: Project? = null, crossinline handler: (project: Project) -> Unit)
-{
-    val connection = (project ?: ApplicationManager.getApplication()).messageBus.simpleConnect()
-    connection.subscribe(ProjectManager.TOPIC, object : ProjectManagerListener
-    {
-        override fun projectOpened(eventProject: Project)
-        {
-            if (project == null || project === eventProject)
-            {
-                connection.disconnect()
-                handler(eventProject)
-            }
-        }
-    })
 }

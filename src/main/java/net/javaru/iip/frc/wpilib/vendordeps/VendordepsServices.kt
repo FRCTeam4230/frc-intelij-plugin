@@ -220,7 +220,7 @@ class VendordepsService private constructor(val project: Project): Disposable
     init
     {
         logger.debug{"[FRC] Scheduling VendordepsService initialization for project: $project"}
-        StartupManager.getInstance(project).runWhenProjectIsInitialized {
+        StartupManager.getInstance(project).runAfterOpened {
             logger.debug { "[FRC] Scheduling VendordepsService read action for project: $project" }
             project.runNonBlockingReadActionInSmartMode {
                 logger.debug { "[FRC] VendordepsService initializing for project: $project" }
@@ -526,7 +526,7 @@ class VendordepsServicesStartupActivity : StartupActivity.Background
         if (project.isFrcFacetedProject())
         {
             logger.debug{ "[FRC] Scheduling Vendordeps Services Startup Activities for project: $project" }
-            StartupManager.getInstance(project).runWhenProjectIsInitialized {
+            StartupManager.getInstance(project).runAfterOpened {
                 logger.debug { "[FRC] Running Vendordeps Services Startup Activities for project: $project" }
                 VendordepsFileListener.getInstance(project)
                 VendordepsService.getInstance(project)

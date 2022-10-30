@@ -103,15 +103,16 @@ private fun Module.getOrAddFrcFacetImpl(externalSystemId: String? = null,
         {
             facetModel.addFacet(this, externalSource)
         }
-        catch (e: com.intellij.workspaceModel.storage.impl.exceptions.PersistentIdAlreadyExistsException)
+        catch (e: com.intellij.workspaceModel.storage.impl.exceptions.SymbolicIdAlreadyExistsException)
         {
+            // This was previously 'PersistentIdAlreadyExistsException', changed in v 2022.3
             if (!isReattempt)
             {
                 this@getOrAddFrcFacetImpl.getOrAddFrcFacetImpl(externalSystemId, modelsProvider, commitModel, isReattempt = true)
             }
             else
             {
-                logger.warn("[FRC] PersistentIdAlreadyExistsException occurred on second attempt to add FrcFacet.", e)
+                logger.warn("[FRC] SymbolicIdAlreadyExistsException occurred on second attempt to add FrcFacet.", e)
             }
         }
     }

@@ -42,7 +42,7 @@ plugins {
     base
     java
     // List of Kotlin versions bundled with the IDE by version: https://plugins.jetbrains.com/docs/intellij/kotlin.html#kotlin-standard-library
-    kotlin("jvm") version "1.7.20"
+    kotlin("jvm") version "1.7.21"
     // gradle plugin-for writing IntelliJ plugins:
     //     Docs: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
     //           Last version of docs on GitHub before migration: https://github.com/JetBrains/gradle-intellij-plugin/blob/e819958cdc4e593738cd96e230edd5ca66481b3b/README.md

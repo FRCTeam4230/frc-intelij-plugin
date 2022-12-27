@@ -36,7 +36,7 @@ List<String> names = new ArrayList<>();
 ----
 It will see the `<String>` as an "Unknown html tag 'String'", It will also have an error at the end of the document for an unclosed element. We can tell IntelliJ IDEA that our `Robot.java.ftl` file is using Java as its Template Data Language and thus all the data in it should be interpreted as producing Java and not HTML. (It is unfortunate that IntelliJ IDEA does not pick up the 'java' in the `.java.ftl` extension and automatically apply "Java" as the Template Data Language.)
 
-We can do this on a per file basis, a per directory basis, as well as changing the default for the project from HTML to Java. Given that most of our templates are Java, it is generally easier to make the default for the project "Java" and then specify specific Data Template Languages for some directories and files. For example the "frc-wizard-templates/default-files/gradle/groovy-dsl" directory can be set to "Groovy" and the "frc-wizard-templates/default-files/gradle/kotlin-dsl" directory to "Kotlin". Note that you will need to do this for each year's templates.
+We can do this on a per file basis, a per directory basis, as well as changing the default for the project from HTML to Java. Given that most of our templates are Java, it is generally easier to make the default for the project "Java" and then specify specific Data Template Languages for some directories and files. For example the "frc-wizard-templates/-DEFAULT-FILES-/gradle/groovy-dsl" directory can be set to "Groovy" and the "frc-wizard-templates/-DEFAULT-FILES-/gradle/kotlin-dsl" directory to "Kotlin". Note that you will need to do this for each year's templates.
 
 You can make these settings in __**File | Settings | Languages & Frameworks | Template Data Languages**__ For an individual file, you can quickly get to this setting by putting your cursor on a highlighted error (such as `<String>` in the above example) and open the Quick Fix window via `Alt+Enter` and selecting the "__Change HTML template data language to…__" option. This will open the "Template Data Language" settings dialog with the path to the file prepopulated. Finally, even when the default Data Language is set to "<None>" in the "Template Data Language" settings, it seems like IntelliJ IDEA still uses HTML as the Data Language.
 
@@ -56,7 +56,12 @@ Because our Java templates place the package statement in an if block and uses a
 . Update `when` clause in `projectTemplateDefinitionsFor(Int)` function in `FrcWizardTemplateDefinitions.kt`
 . Update `when` clause in `exampleTemplateDefinitionsFor(Int)` function in `FrcWizardTemplateDefinitions.kt`
 
-=== Update common `default-files` Freemarker templates and data
+=== Update common `-DEFAULT-FILES-` Freemarker templates and data
+
+.Default Files Directory
+[NOTE]
+The default files directory uses a name of `-DEFAULT-FILES-` so that is stands among the numerous directories, and so that it is sorted to the top of the list of directories. It contains both shared, and default file templates used by all the templates.
+
 * In `FrcProjectWizardData`, update:
 ** `gradleDistributionUrl`
 *** look in `vscode-wpilib/resources/gradle/shared/gradle/wrapper/gradle-wrapper.properties`
@@ -64,7 +69,7 @@ Because our Java templates place the package statement in an if block and uses a
 ** `copyright` if needed
 ** `junit4Version` and `junit5Version` (until Enhancement #80 is implemented)
 * `WPILib-license.md`
-** `resources/frc-wizard-templates/2021/default-files/code/common-code/WPILib-License.md.ftl`
+** `resources/frc-wizard-templates/2021/-DEFAULT-FILES-/code/common-code/WPILib-License.md.ftl`
 ** `vscode-wpilib/resources/gradle/shared/WPILib-License.md`
 *** Note it is in the `vscode-wpilib` and *not* `allwpilib` where the templates are
 * Gradle

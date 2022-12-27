@@ -212,7 +212,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         companion object
         {
             const val frcWizardTemplatesDirName = "frc-wizard-templates"
-            const val defaultFilesDirName = "default-files"
+            /** Directory containing the shared/default files/templates. It's named in a way to stand out, and to be sorted to the top. */
+            const val defaultFilesDirName = "-DEFAULT-FILES-"
 
             val gradleGroovyDslSubPath: Path = Paths.get("gradle/groovy-dsl")
             val gradleKotlinDslSubPath: Path = Paths.get("gradle/kotlin-dsl")

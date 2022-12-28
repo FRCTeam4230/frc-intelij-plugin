@@ -27,10 +27,16 @@ import java.time.LocalDate
 
 val allwpilibProjectRootDir: Path = Path.of("P:\\dev\\proj\\open\\wpi\\allwpilib")
 
-val wpilibjDir: Path = allwpilibProjectRootDir.resolve("wpilibjExamples\\src\\main\\java\\edu\\wpi\\first\\wpilibj")
-val wpiExamplesDir: Path = wpilibjDir.resolve("examples")
-val wpiTemplatesDir: Path = wpilibjDir.resolve("templates")
-val targetInnerPath:Path = Path.of("code/java-code/src/main/java/base-package")
+val wpilibjMainDir: Path = allwpilibProjectRootDir.resolve("wpilibjExamples\\src\\main\\java\\edu\\wpi\\first\\wpilibj")
+val wpiMainExamplesDir: Path = wpilibjMainDir.resolve("examples")
+val wpiMainTemplatesDir: Path = wpilibjMainDir.resolve("templates")
+
+val wpilibjTestDir: Path = allwpilibProjectRootDir.resolve("wpilibjExamples\\src\\test\\java\\edu\\wpi\\first\\wpilibj")
+val wpiTestExamplesDir: Path = wpilibjTestDir.resolve("examples")
+val wpiTestTemplatesDir: Path = wpilibjTestDir.resolve("templates")
+
+val targetMainInnerPath:Path = Path.of("code/java-code/src/main/java/base-package")
+val targetTestInnerPath:Path = Path.of("code/java-code/src/test/java/base-package")
 val templatesDirMapping = createTemplatesDirMapping()
 val examplesDirMapping = createExamplesDirMapping()
 val combinedMappings = templatesDirMapping.toMutableMap().also { it.putAll(examplesDirMapping) }.toMap()
@@ -39,34 +45,34 @@ val outdatedMappings = combinedMappings.keys.toMutableSet()
 val year = determineTemplatesYear()
 val ourTemplatesDir: Path = findOutputDir().resolve(year.toString())
 
+// An object declaration to allow for finding this file via a class search
+private object TemplatesPrepTool
+
 // runs without doing the copy. Allows for updating of the template mappings.
 const val IS_DRY_RUN = false
 
-
-private object TemplatesPrepTool
-
 fun main()
 {
-
-    // TODO: we also need to process the `test directories. For example: wpilibjExamples/src/test/java/edu/wpi/first/wpilibj/examples
     println("Starting. IS_DRY_RUN = $IS_DRY_RUN")
-    if (Files.notExists(wpilibjDir))
+    if (Files.notExists(wpilibjMainDir))
     {
-        println("ERROR: wpilibjDir not found: $wpilibjDir")
+        println("ERROR: wpilibjDir not found: $wpilibjMainDir")
     }
 
-    println("Using template year of $year")
+    println("*** Using template year of $year ***")
     println("yearly templates dir calculated to be:     $ourTemplatesDir")
 
     if (Files.notExists(ourTemplatesDir)) Files.createDirectory(ourTemplatesDir)
 
-    processAWpiDir(wpiExamplesDir, examplesDirMapping)
-    processAWpiDir(wpiTemplatesDir, templatesDirMapping)
+    processAWpiDir(wpiMainExamplesDir,  targetMainInnerPath, examplesDirMapping)
+    processAWpiDir(wpiTestExamplesDir,  targetTestInnerPath, examplesDirMapping)
+    processAWpiDir(wpiMainTemplatesDir, targetMainInnerPath, templatesDirMapping)
+    processAWpiDir(wpiTestTemplatesDir, targetTestInnerPath, templatesDirMapping)
 
     checkForMappingIssues(outdatedMappings, missingMappings)
 }
 
-private fun processAWpiDir(theWpiDir: Path, dirMapping: Map<String, String>)
+private fun processAWpiDir(theWpiDir: Path, targetInnerPath: Path, dirMapping: Map<String, String>)
 {
     println("Processing: $theWpiDir")
     var currentTemplatesDir = ourTemplatesDir.resolve("PLACEHOLDER")

@@ -124,6 +124,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     private JBLabel includeKotlinSupportCheckBoxLabel;
     private ContextHelpLabel includeKotlinSupportContextHelpLabel;
     private JBLabel kotlinRequiredForTemplateLabel;
+    private JBLabel junitRequiredForTemplateLabel;
     
     
     private ButtonAndLabelSynchronizer<JBCheckBox> enableDesktopSupportOption;
@@ -216,6 +217,12 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
             final boolean isKotlinTemplate = dataModel.getTemplateLanguageOption() == TemplateLanguageOption.Kotlin;
             if (isKotlinTemplate && !includeKotlinSupportCheckBox.isSelected()) {
                 includeKotlinSupportCheckBox.setSelected(true);
+            }
+        });
+        
+        includeJunitSupportCheckBox.addChangeListener(e -> {
+            if (dataModel.getTemplateRequiresJUnit() && !includeJunitSupportCheckBox.isSelected()) {
+                includeJunitSupportCheckBox.setSelected(true);
             }
         });
         
@@ -459,11 +466,27 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         
         FrcUiUtilsKt.setTextIfEmpty(teamNumberTextField, myBuilder.getDataModel().getTeamNumberAsStringOrEmptyString());
         updateIncludeKotlinSupportOptionVisibility();
+        updateJUnitOption();
         
         updateComponents();
         LOG.trace("[FRC] Exiting FrcProjectSettingsWizardStep.updateStep()");
     }
     
+    private void updateJUnitOption()
+    {
+        
+        final FrcProjectWizardData dataModel = myBuilder.getDataModel();
+        if (dataModel.getTemplateRequiresJUnit())
+        {
+            includeJunitSupportCheckBox.setSelected(true);
+            junitRequiredForTemplateLabel.setVisible(true);
+            // We do not disable, but rather a change listener is added in initComponents() such that the item cannot be deselected
+        }
+        else
+        {
+            junitRequiredForTemplateLabel.setVisible(false);
+        }
+    }
     
     private void updateIncludeKotlinSupportOptionVisibility()
     {

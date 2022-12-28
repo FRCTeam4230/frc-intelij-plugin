@@ -70,6 +70,9 @@ interface FrcWizardTemplateDefinition
 
     val isExample: Boolean
 
+    val templateRequiresJUnit: Boolean
+        get() = false
+
     val availableTemplateLanguages: List<TemplateLanguageOption>
         get() = templateLanguageOptionListJavaOnly
 
@@ -787,6 +790,7 @@ enum class FrcWizard2023ProjectTemplateDefinition(
     override val commandVersion: Int = 2,
     override val isRomiBot: Boolean = false,
     override val isExample: Boolean = false,
+    override val templateRequiresJUnit: Boolean = false,
     override val includeAutoGenReadMe: Boolean = false,
     override val availableTemplateLanguages: List<TemplateLanguageOption> = templateLanguageOptionListJavaOnly,
     private val _templateResourcesDirName: String? = null,
@@ -881,6 +885,7 @@ enum class FrcWizard2023ExampleTemplateDefinition(
     override val commandVersion: Int = 2,
     override val isRomiBot: Boolean = false,
     override val isExample: Boolean = true,
+    override val templateRequiresJUnit: Boolean = false,
     override val includeAutoGenReadMe: Boolean = true,
     private val _templateResourcesDirName: String? = null,
                                                  ) : FrcWizardTemplateDefinition
@@ -957,7 +962,7 @@ enum class FrcWizard2023ExampleTemplateDefinition(
     TankDriveXboxController("Tank Drive Xbox Controller", "Demonstrates the use of the DifferentialDrive class to drive a robot with Tank Drive and an Xbox Controller"),
     DutyCycleEncoder("Duty Cycle Encoder", "Demonstrates the use of the Duty Cycle Encoder class.",),
     DutyCycleInput("Duty Cycle Input", "Demonstrates the use of the Duty Cycle class.",),
-    AddressableLED("Addressable LED", "Demonstrates the use of the Addressable LED class.",),
+    AddressableLED("Addressable LED", "Demonstrates the use of the Addressable LED class.", templateRequiresJUnit = true),
     DMA("DMA", "Demonstrates the use of the DMA class", _templateResourcesDirName = "DMA"),
     ArmBot("ArmBot", "An example command-based robot demonstrating the use of a ProfiledPIDSubsystem to control an arm.",),
     ArmBotOffboard("ArmBot Offboard", "An example command-based robot demonstrating the use of a TrapezoidProfileSubsystem to control an arm with an offboard PID.",),
@@ -976,7 +981,7 @@ enum class FrcWizard2023ExampleTemplateDefinition(
     I2CCommunication("I2CCommunication", "An example that communicates with external devices (such as an Arduino) using the roboRIO's I2C port"),
     EventLoop("EventLoop", "Demonstrates managing a ball system using EventLoop and BooleanEvent."),
     RapidReactCommandBot("RapidReactCommandBot", "A fully-functional command-based fender bot for the 2022 game using the new command framework."),
-    UnitTesting("UnitTesting", "Demonstrates basic unit testing for a robot project."),
+    UnitTesting("UnitTesting", "Demonstrates basic unit testing for a robot project.", templateRequiresJUnit = true),
 
     ;
 

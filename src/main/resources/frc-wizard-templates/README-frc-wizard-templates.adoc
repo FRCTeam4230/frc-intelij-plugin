@@ -118,6 +118,7 @@ The default files directory uses a name of `-DEFAULT-FILES-` so that is stands a
 .. Once the mappings are resolved, set `IS_DRY_RUN` to `false`
 .. Run `TemplatesPrepTool`
 .. Check the output for any WARN messages and resolve as necessary.
+. In the `allwpilib` project, check `src/test/java` directory. For any templates/examples that include unit tests, set the `templateRequiresJUnit` parameter to true in the corresponding `TemplateDefinition`
 . **Add the new templates to Git** (but do not commit yet)
 . Run some checks on the templates be creating and building them. Some specific ones (due to their complexity and serving as good test cases) to check are:
 ** commandBased

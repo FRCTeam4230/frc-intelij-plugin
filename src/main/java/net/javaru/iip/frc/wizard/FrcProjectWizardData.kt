@@ -94,6 +94,12 @@ class FrcProjectWizardData(
             return result.toString()
         }
 
+    val isExampleTemplate
+        get() = frcWizardTemplateDefinition.isExample
+
+    val templateRequiresJUnit
+        get() = frcWizardTemplateDefinition.templateRequiresJUnit
+
     val isRomiTemplate
         get() = frcWizardTemplateDefinition.isRomiBot
 

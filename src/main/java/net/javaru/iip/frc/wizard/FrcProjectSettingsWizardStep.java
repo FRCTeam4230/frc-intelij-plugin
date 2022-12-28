@@ -57,7 +57,6 @@ import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
 import net.javaru.iip.frc.util.FrcPsiNameHelper;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
 import net.javaru.iip.frc.wizard.FrcProjectWizardData.GradleDslOption;
-import net.javaru.iip.frc.wizard.FrcProjectWizardData.JUnitOption;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
 
@@ -110,9 +109,6 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     private JPanel includeJunitSupportOptionPanel;
     private JBCheckBox includeJunitSupportCheckBox;
     private JBLabel includeJunitSupportCheckBoxLabel;
-    private JBRadioButton junit5RadioButton;
-    private JBRadioButton junit5withVintageRadioButton;
-    private JBRadioButton junit4RadioButton;
     private JPanel gradlePanel;
     private JPanel gradleDslPanel;
     private JBLabel gradleDslLabel;
@@ -186,44 +182,10 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         includeGitignoreFileCheckBox.addChangeListener(e -> configureGitignoreButton.setEnabled(includeGitignoreFileCheckBox.isSelected()));
         configureGitignoreButton.addActionListener(e -> displayGitIgnoreConfigurationDialog());
         
-        junit5RadioButton.setActionCommand(JUnitOption.JUnit5.name());
-        junit5withVintageRadioButton.setActionCommand(JUnitOption.JUnit5withVintage.name());
-        junit4RadioButton.setActionCommand(JUnitOption.JUnit4.name());
-        
         includeJunitSupportCheckBox.setSelected(dataModel.getIncludeJUnitSupport());
-        junit5RadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
-        junit5withVintageRadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
-        junit4RadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
-        
-        switch (dataModel.getJunitOption())
-        {
-            case JUnit5:
-                junit5RadioButton.setSelected(true);
-                break;
-            case JUnit5withVintage:
-                junit5withVintageRadioButton.setSelected(true);
-                break;
-            case JUnit4:
-                junit4RadioButton.setSelected(true);
-                break;
-        }
-    
-        ItemListener junitVersionOptionChangeListener = e -> {
-            final AbstractButton button = (AbstractButton) e.getSource();
-            final ButtonModel model = button.getModel();
-            final String actionCommand = model.getActionCommand();
-            dataModel.setJunitOption(JUnitOption.valueOf(actionCommand));
-        };
-    
-        junit5RadioButton.addItemListener(junitVersionOptionChangeListener);
-        junit5withVintageRadioButton.addItemListener(junitVersionOptionChangeListener);
-        junit4RadioButton.addItemListener(junitVersionOptionChangeListener);
     
         includeJunitSupportCheckBox.addChangeListener(e -> {
             dataModel.setIncludeJUnitSupport(includeJunitSupportCheckBox.isSelected());
-            junit5RadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
-            junit5withVintageRadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
-            junit4RadioButton.setEnabled(dataModel.getIncludeJUnitSupport());
         });
     
     

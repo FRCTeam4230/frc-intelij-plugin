@@ -48,6 +48,7 @@ private object TemplatesPrepTool
 fun main()
 {
 
+    // TODO: we also need to process the `test directories. For example: wpilibjExamples/src/test/java/edu/wpi/first/wpilibj/examples
     println("Starting. IS_DRY_RUN = $IS_DRY_RUN")
     if (Files.notExists(wpilibjDir))
     {
@@ -189,7 +190,7 @@ fun copyJavaFile(currentWpiTemplateName: String, wpiTemplateGroupName: String, s
                             }
                             else
                             {
-                                if (!line.contains("functional"))
+                                if (!(line.contains("functional") || line.contains("java.util.function") ))
                                 {
                                     println("WARN: Potentially missed 'function' use rather than method.\n    line: $line\n    srcFile: $srcFile\n    targetFile: $targetFile")
                                 }
@@ -327,6 +328,7 @@ fun createExamplesDirMapping() = mapOf(
     "canpdp" to "canPDP",
     "differentialdrivebot" to "differentialDriveBot",
     "differentialdriveposeestimator" to "DifferentialDrivePoseEstimator",
+    "digitalcommunication" to "digitalCommunication",
     "dma" to "DMA",
     "drivedistanceoffboard" to "driveDistanceOffboard",
     "dutycycleencoder" to "dutyCycleEncoder",
@@ -335,6 +337,7 @@ fun createExamplesDirMapping() = mapOf(
     "elevatorsimulation" to "elevatorSimulation",
     "elevatortrapezoidprofile" to "elevatorTrapezoidProfiledPid",
     "encoder" to "encoder",
+    "eventloop" to "eventLoop",
     "frisbeebot" to "frisbeeBot",
     "gearsbot" to "gearsBot",
     "gettingstarted" to "gettingStarted",
@@ -344,6 +347,7 @@ fun createExamplesDirMapping() = mapOf(
     "hatchbotinlined" to "hatchBotInlined",
     "hatchbottraditional" to "hatchBotTraditional",
     "hidrumble" to "HIDRumble",
+    "i2ccommunication" to "I2CCommunication",
     "intermediatevision" to "intermediateVision",
     "mechanism2d" to "Mechanism2D",
     "mecanumbot" to "mecanumBot",
@@ -351,12 +355,13 @@ fun createExamplesDirMapping() = mapOf(
     "mecanumdrive" to "mecanumDrive",
     "mecanumdriveposeestimator" to "mecanumDrivePoseEstimator",
     "motorcontrol" to "motorController",
-    "motorcontrolencoder" to "motorControlWithEncoder",
+//    "motorcontrolencoder" to "motorControlWithEncoder",
 //    "pacgoat" to "pacGoat",
     "potentiometerpid" to "potentiometerPID",
     "quickvision" to "quickVision",
     "ramsetecommand" to "ramseteCommand",
     "ramsetecontroller" to "ramseteController",
+    "rapidreactcommandbot" to "RapidReactCommandBot",
     "relay" to "relay",
     "romireference" to "romiReference",
     "schedulereventlogging" to "schedulerEventLogging",
@@ -376,6 +381,7 @@ fun createExamplesDirMapping() = mapOf(
     "tankdrivexboxcontroller" to "tankDriveXboxController",
     "ultrasonic" to "ultrasonic",
     "ultrasonicpid" to "ultrasonicPID",
+    "unittest" to "unitTesting"
                                       )
 
 

@@ -14,7 +14,7 @@
  *     limitations under the License.
  */
 
-@file:Suppress("HtmlRequiredLangAttribute")
+@file:Suppress("HtmlRequiredLangAttribute", "TrailingComma")
 
 package net.javaru.iip.frc.wizard
 
@@ -28,7 +28,7 @@ import org.intellij.lang.annotations.Language
 
 interface FrcWizardTemplateDefinition
 {
-    /** Returns the display name for use in the UI's list of available templates. */
+    /** Returns the display name for use in the list of available templates in the UI. */
     val displayName: String
     
     /* 
@@ -57,12 +57,12 @@ interface FrcWizardTemplateDefinition
     
     /** 
      * The `commandVersion` was introduced in 2020 when they created a new Command Based Robot implementation. A value of `1` 
-     * means it uses the old command classes from the `edu.wpi.first.wpilibj` package in the `wpilibOldCommands-java-2020-x.x.jar` 
-     * library and a value of `2` means it uses the new command classes from the `edu.wpi.first.wpilibj2` package (note the 2) in 
-     * the `wpilibNewCommands-java-2020-x.x.jar` library. There is a JSON file in the `vendordeps` directory that indicates which 
-     * dependency is pulled in (i.e. the wpilibOldCommands or wpilibNewCommands JAR). unfortunately, they also chose to make the 
-     * name of that JSON file different (although ultimately I do not think it matters), so we can't purely handle this in the template.
-     * For now, we are setting 2019 templates to a 0 as it may be useful for filtering in the pending new design.
+     * means it uses the "old" command classes from the `edu.wpi.first.wpilibj` package in the `wpilibOldCommands-java-2020-x.x.jar`
+     * library. A value of `2` means it uses the "new" command classes from the `edu.wpi.first.wpilibj2` package (note the 2 in the
+     * package name) in the `wpilibNewCommands-java-2020-x.x.jar` library. There is a JSON file in the `vendordeps` directory
+     * that determines the dependency that is pulled in (i.e. the wpilibOldCommands or wpilibNewCommands JAR). They also chose to make
+     * the name of that JSON file different, so we can't handle this in the template itself. We are set this value to 0 in the 2019
+     * templates as the name of the command library JSON file was different (in that it did not contain 'old' or 'new' in it).
      */
     val commandVersion: Int
 
@@ -70,6 +70,7 @@ interface FrcWizardTemplateDefinition
 
     val isExample: Boolean
 
+    /** Indicates if the template requires JUnit, usually because the template includes tests or test examples. Defaults to `false`. */
     val templateRequiresJUnit: Boolean
         get() = false
 

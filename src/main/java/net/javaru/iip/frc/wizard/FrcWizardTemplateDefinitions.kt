@@ -799,13 +799,22 @@ enum class FrcWizard2023ProjectTemplateDefinition(
     // New Command Based docs: https://docs.wpilib.org/en/latest/docs/software/commandbased/index.html
     CommandBased(
         "Command Based Robot",
-        """A robot project for coding robots using the Command Based framework/API (version 2 introduced in 2020). 
+        """A robot project for coding robots using the Command Based framework/API. 
             |Command Based robots allow complex functionality to be developed from simpler functionality/components. 
-            |This version uses classes from the <tt>edu.wpi.first.wpilibj<strong>2</strong></tt> 
-            |package. See the 
+            |See the 
             |<a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based Programming</a> 
             |section of the WPI Lib Docs for more information.""".trimMargin(),
-        commandVersion = 2,
+        availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
+                ),
+    CommandBasedSkeleton(
+        "Command Based Robot Skeleton (Intermediate)",
+        """A skeleton robot project for coding robots using the Command Based framework/API. This template
+            |differs from "Command Based Robot" in that this one has no example implementations. It includes
+            |an empty Subsystem and an empty Command to serve as placeholders only.
+            |Command Based robots allow complex functionality to be developed from simpler functionality/components. 
+            |See the 
+            |<a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based Programming</a> 
+            |section of the WPI Lib Docs for more information.""".trimMargin(),
         availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
                 ),
     Timed(
@@ -823,6 +832,13 @@ enum class FrcWizard2023ProjectTemplateDefinition(
         "A skeleton (stub) for RobotBase, intended for <strong>highly advanced/experienced</strong> programmers, that provides more complete control over program flow.",
         availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
                      ),
+    Educational(
+        "Educational Robot",
+        """Educational Robot that is <b><em>not</em> for competition use,</b> but instead is a simple robot that can be used for teaching purposes. 
+            |""".trimMargin(),
+        availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin,
+        includeAutoGenReadMe = true
+               ),
     RomiCommand(
         "Romi - Command Robot",
         """Romi Robot using the Command Based framework/API, which allows complex functionality to be 
@@ -830,7 +846,6 @@ enum class FrcWizard2023ProjectTemplateDefinition(
                     |<a href="https://docs.wpilib.org/en/stable/docs/romi-robot/index.html">Romi Robot</a> and
                     |<a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based Programming</a>
                     |sections of the WPI Lib Docs for more information.""".trimMargin(),
-        commandVersion = 2,
         isRomiBot = true,
         availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
                ),
@@ -843,14 +858,6 @@ enum class FrcWizard2023ProjectTemplateDefinition(
         isRomiBot = true,
         availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin
              ),
-    Educational(
-        "Educational Robot",
-        """Educational Robot that is <b><em>not</em> for competition use,</b> but instead is a simple robot that can be used for teaching purposes. 
-            |""".trimMargin(),
-        commandVersion = 2,
-        availableTemplateLanguages = templateLanguageOptionListJavaAndKotlin,
-        includeAutoGenReadMe = true
-               ),
     RomiEducational(
         "Romi - Educational Robot",
         """Romi Educational Robot based on a simple robot that can be used for teaching purposes.

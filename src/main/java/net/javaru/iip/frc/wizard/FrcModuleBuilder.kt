@@ -82,6 +82,7 @@ import net.javaru.iip.frc.util.invokeLater
 import net.javaru.iip.frc.util.invokeLaterWait
 import net.javaru.iip.frc.util.isValidJavaVersion
 import net.javaru.iip.frc.util.isValidJdk
+import net.javaru.iip.frc.util.letSafely
 import net.javaru.iip.frc.util.reader
 import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.removeBasePath
@@ -212,7 +213,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         companion object
         {
             const val frcWizardTemplatesDirName = "frc-wizard-templates"
-            const val defaultFilesDirName = "default-files"
+            /** Directory containing the shared/default files/templates. It's named in a way to stand out, and to be sorted to the top. */
+            const val defaultFilesDirName = "-DEFAULT-FILES-"
 
             val gradleGroovyDslSubPath: Path = Paths.get("gradle/groovy-dsl")
             val gradleKotlinDslSubPath: Path = Paths.get("gradle/kotlin-dsl")
@@ -490,7 +492,6 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         val wpilibVersion = dataModel.wpilibVersion
         //TODO Need to enhance the calls to the defaults check if the template has overridden any of the default files
         val paths = TemplatePaths(wpilibVersion)
-
         paths.frcWizardTemplatesBaseDirPath.asPluginResourceVF()?.refresh(false, true)
         when(dataModel.gradleDslOption)
         {
@@ -498,7 +499,6 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             FrcProjectWizardData.GradleDslOption.KotlinDSL -> copyAllResourcesToModuleRoot("grade - kotlin DSL", modelContentRootDir, paths.gradleKotlinDslResourceBasePath)
         }
         copyAllResourcesToModuleRoot("gradle wrapper", modelContentRootDir, paths.gradleWrapperResourceBasePath)
-
 
         val wpilibCommandsJsonFilter: (VirtualFile) -> Boolean =
             when (dataModel.frcWizardTemplateDefinition.commandVersion)
@@ -508,28 +508,48 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 else -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") && !virtualFile.name.contains("WPILibOldCommands") } // reject both
             }
 
-        copyAllResourcesToModuleRoot("configs", modelContentRootDir, paths.configsResourceBasePath, wpilibCommandsJsonFilter)
+        copyAllResourcesToModuleRoot("configs", modelContentRootDir, paths.configsResourceBasePath, keepFilter =  wpilibCommandsJsonFilter)
         copyAllResourcesToModuleRoot("common code", modelContentRootDir, paths.commonCodeResourceBasePath)
-
 
         val codeResourceBasePath = when(dataModel.templateLanguageOption)
         {
-           TemplateLanguageOption.Java -> paths.javaCodeResourceBasePath
-           TemplateLanguageOption.Kotlin -> paths.kotlinCodeResourceBasePath
+           TemplateLanguageOption.Java -> paths.javaCodeResourceBasePath     // e.g. frc-wizard-templates/2023/-DEFAULT-FILES-/code/java-code
+           TemplateLanguageOption.Kotlin -> paths.kotlinCodeResourceBasePath // e.g. frc-wizard-templates/2023/-DEFAULT-FILES-/code/kotlin-code
         }
-        logger.trace { "[FRC] templateLanguageOption: ${dataModel.templateLanguageOption} Using codeResourceBasePath: $codeResourceBasePath" }
-        copyAllResourcesToModuleRoot("code : ${codeResourceBasePath.fileName}", modelContentRootDir, codeResourceBasePath)
 
+        val languageSubPath = when (dataModel.templateLanguageOption)
+        {
+            TemplateLanguageOption.Java   -> TemplatePaths.javaCodeSubPath   // e.g. code/java-code
+            TemplateLanguageOption.Kotlin -> TemplatePaths.kotlinCodeSubPath // e.g. code/kotlin-code
+        }
+        val selectedTemplateResourceBase = paths.frcWizardTemplatesBaseDirPath.resolve(dataModel.frcWizardTemplateDefinition.templateResourcesDirName()).resolve(languageSubPath)
+
+        val templateHasUnitTests =  selectedTemplateResourceBase.asPluginResourceUrl().letSafely {
+             VfsUtil.findFileByURL(it)?.findChild("src")?.findChild("test") != null
+        } ?: false
+
+        logger.trace { "[FRC] templateLanguageOption: ${dataModel.templateLanguageOption} Using codeResourceBasePath: $codeResourceBasePath  Using selectedTemplateResourceBase: $selectedTemplateResourceBase " }
+
+        val copyDefaultUnitTestFiles = if (templateHasUnitTests || dataModel.isExampleTemplate) false else dataModel.includeJUnitSupport
+        val copyTemplateUnitTestFiles = if (templateHasUnitTests && dataModel.includeJUnitSupport) true else if (dataModel.isExampleTemplate) false else dataModel.includeJUnitSupport
+
+
+        // COPY THE DEFAULT CODE FILES
+        copyAllResourcesToModuleRoot("code : ${codeResourceBasePath.fileName}", modelContentRootDir, codeResourceBasePath, copyDefaultUnitTestFiles)
+
+        // COPY VS CODE FILES
         if (dataModel.includeVsCodeConfigs)
         {
             copyAllResourcesToModuleRoot("vs-code-configs", modelContentRootDir, paths.vsCodeConfigsResourceBasePath)
         }
 
+        // COPY README
         if (dataModel.frcWizardTemplateDefinition.includeAutoGenReadMe)
         {
             copyAllResourcesToModuleRoot("auto gen readme", modelContentRootDir, paths.projectAutoGenReadMeResourceBasePath)
         }
 
+        // CREATE .gitignore FILE
         if (dataModel.gitIgnoreConfiguration.includeGitIgnoreFile)
         {
             try
@@ -543,13 +563,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             }
         }
 
-        val languageSubPath = when(dataModel.templateLanguageOption)
-        {
-            TemplateLanguageOption.Java -> TemplatePaths.javaCodeSubPath
-            TemplateLanguageOption.Kotlin -> TemplatePaths.kotlinCodeSubPath
-        }
-        val selectedTemplateResourceBase = paths.frcWizardTemplatesBaseDirPath.resolve(dataModel.frcWizardTemplateDefinition.templateResourcesDirName()).resolve(languageSubPath)
-        copyAllResourcesToModuleRoot("selected template files - $languageSubPath", modelContentRootDir, selectedTemplateResourceBase)
+        // COPY THE TEMPLATE FILES
+        copyAllResourcesToModuleRoot("selected template files - $languageSubPath", modelContentRootDir, selectedTemplateResourceBase, copyTemplateUnitTestFiles)
     }
 
 
@@ -583,8 +598,16 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     }
 
 
-
-    private fun copyAllResourcesToModuleRoot(resourceDescription: String, modelContentRootDir: VirtualFile, resourceDirBase: Path, keepFilter: (VirtualFile) -> Boolean = { true })
+    /**
+     * @param copyUnitTestFiles Whether files contained in any `src/test` subdirectory, if present, should be copied.
+     */
+    private fun copyAllResourcesToModuleRoot(
+        resourceDescription: String,
+        modelContentRootDir: VirtualFile,
+        resourceDirBase: Path,
+        copyUnitTestFiles: Boolean = dataModel.includeJUnitSupport,
+        keepFilter: (VirtualFile) -> Boolean = { true }
+                                            )
     {
         val pluginResourceDirUrl = resourceDirBase.asPluginResourceUrl()
         logger.debug {"[FRC] copyAllResourcesToModuleRoot for: $resourceDescription\n        resourceDirBase = $resourceDirBase\n        pluginResourceDir URL = $pluginResourceDirUrl"}
@@ -602,9 +625,12 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             }
             else
             {
+                logger.debug("[FRC] Processing srcFqBaseDir of: ${srcFqBaseDir.path}")
                 srcFqBaseDir.refresh(false, true)
                 VfsUtil.collectChildrenRecursively(srcFqBaseDir)
                     .filter { !it.isDirectory }
+                    // Don't copy test files if junit is not enabled
+                    .filter { if (copyUnitTestFiles) true else !it.path.contains("""src[/\\]test""".toRegex()) }
                     .filter { keepFilter.invoke(it) }
                     .forEach {
                     val resourceRelativePath = Paths.get(it.toString().removePrefix("$srcFqBaseDir")).removeBasePath(Paths.get("/"))
@@ -905,10 +931,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     }
 
 
-    fun setParentProject(parentProject: ProjectData?)
-    {
-        myParentProject = parentProject
-    }
+    fun setParentProject(parentProject: ProjectData?) { myParentProject = parentProject }
 
 
     var projectId: ProjectId?
@@ -948,7 +971,6 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         return step
     }
 
-
     override fun modifyProjectTypeStep(settingsStep: SettingsStep): ModuleWizardStep
     {
         // Implementation based on to the following forum answer:
@@ -956,7 +978,6 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         //     Please see:                   com.jetbrains.python.module.PythonModuleBuilder#modifyProjectTypeStep 
         //     and implement your logic in:  com.intellij.ide.util.projectWizard.SdkSettingsStep#onSdkSelected
 
-        
         // The parent ModuleBuilder class also has the  `boolean isSuitableSdkType(SdkTypeId sdkType)`  method, but that is limited to the type, so no version info
         
         // We apply filters so that only JDKs that meet the required version level show in the "Project SDK" drop down list
@@ -978,7 +999,6 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
     }
 
-    
     fun addSdkChangedListener(runnable: Runnable?)
     {
         if (runnable != null)
@@ -987,11 +1007,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
     }
 
-
     fun isSelectedSdkValid(): Boolean = selectedSdk.isValidJdk()
 
-
-    
     companion object
     {
         private val logger = logger<FrcModuleBuilder>()

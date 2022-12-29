@@ -52,6 +52,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v3.0.0</strong> <br>
+        &nbsp;&nbsp;&bull; Added support for 2023 season, including project templates. (Templates will not show in the Wizard until 2023 WPI Lib is released.)<br>
+        &nbsp;&nbsp;&bull; Removed support for JUnit 4 in the project wizard. JUnit 5 is five years old, and the
+                           official WPI Lib templates have finally migrated to use JUnit 5.
+        <br>
         <strong>v2.3.0</strong> <br>
         &nbsp;&nbsp;&bull; Migrate off plugin APIs deprecated in IntelliJ IDEA 2022.3<br>
         &nbsp;&nbsp;&bull; IntelliJ IDEA 2022.3 support added<br>

@@ -42,13 +42,13 @@ plugins {
     base
     java
     // List of Kotlin versions bundled with the IDE by version: https://plugins.jetbrains.com/docs/intellij/kotlin.html#kotlin-standard-library
-    kotlin("jvm") version "1.7.20"
+    kotlin("jvm") version "1.7.21"
     // gradle plugin-for writing IntelliJ plugins:
     //     Docs: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
     //           Last version of docs on GitHub before migration: https://github.com/JetBrains/gradle-intellij-plugin/blob/e819958cdc4e593738cd96e230edd5ca66481b3b/README.md
     //     Info: https://lp.jetbrains.com/gradle-intellij-plugin/
     //     Src:  https://github.com/JetBrains/gradle-intellij-plugin
-    id("org.jetbrains.intellij") version "1.9.0"
+    id("org.jetbrains.intellij") version "1.11.0"
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
     //    https://github.com/jetbrains/gradle-idea-ext-plugin
@@ -56,7 +56,7 @@ plugins {
     //    v0.10+ requires IDEA 2020.2+   v0.6.1+ requires IntelliJ IDEA 2019.2
     id("org.jetbrains.gradle.plugin.idea-ext") version "0.10"
     // https://docs.spring.io/dependency-management-plugin/docs/current/reference/html/
-    id("io.spring.dependency-management") version "1.0.13.RELEASE"
+    id("io.spring.dependency-management") version "1.1.0"
 }
 
 java {
@@ -505,7 +505,7 @@ fun determineJvmVendor(@Suppress("UnstableApiUsage") defaultFallbackSpec: JvmVen
 
     val jbrList = jdkDirs
         .asSequence()
-        .map { (it.toFile().listFiles { file -> file.isDirectory && file.name?.contains("jbr-$javaVersion") ?: false } ?: emptyArray()).asSequence() }
+        .map { (it.toFile().listFiles { file -> file.isDirectory && file.name.contains("jbr-$javaVersion") } ?: emptyArray()).asSequence() }
         .requireNoNulls()
         .flatten()
         .toList()

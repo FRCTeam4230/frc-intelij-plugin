@@ -121,9 +121,9 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
         service<RioLogUdpSocketManagerApplicationService>().deregister(project)
     }
 
-    override fun moduleAdded(project: Project, module: Module)
+    override fun modulesAdded(project: Project, modules: MutableList<Module>)
     {
-        logger.trace {"[FRC] FrcProjectLifecycleService.moduleAdded() called for module '$module' on project '$project'"}
+        logger.trace {"[FRC] FrcProjectLifecycleService.moduleAdded() called for modules '$modules' on project '$project'"}
         // We only want to update the RioLogConsole if the project is fully opened. In other words, this is a
         // case where the user is adding a module to an open project rather than this moduleAdded() method being
         // called as part of the initial project loading when opening a project. In the latter case, the
@@ -132,9 +132,11 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
         // case where the user is adding a module to an open project rather than this moduleAdded() method being
         // called as part of the initial project loading when opening a project. In the latter case, the
         // RioLogProjectService.update() is called via the ProjectComponent.projectOpened() method
-        if (module.project.isOpen && module.isFrcFacetedModule() && !module.isDisposed && !module.project.isDisposed)
-        {
-            RioLogProjectService.getInstance(module.project).update()
+        modules.forEach {
+            if (it.project.isOpen && it.isFrcFacetedModule() && !it.isDisposed && !it.project.isDisposed)
+            {
+                RioLogProjectService.getInstance(it.project).update()
+            }
         }
     }
 

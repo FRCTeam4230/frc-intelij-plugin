@@ -19,7 +19,9 @@
 package net.javaru.iip.frc.wpilib.version
 
 import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting.versions
+import net.javaru.iip.frc.setInTestModeSystemProperty
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting as GRV
@@ -27,6 +29,16 @@ import net.javaru.iip.frc.wpilib.version.GradleRioVersionsForTesting as GRV
 
 internal class WpiLibVersionFiltersKtTest
 {
+    companion object
+    {
+        @JvmStatic
+        @BeforeAll
+        fun beforeAll()
+        {
+            setInTestModeSystemProperty()
+        }
+    }
+
     @Test
     fun filterVersions()
     {

@@ -67,3 +67,19 @@ fun ifNotInUnitTestMode(action: () -> Unit) {
         action.invoke()
     }
 }
+
+/**
+ * Runs the provided code block, returning its result, if the system is NOT in unit test mode.
+ * If it is in uit test mode, the [whenInUnitTestModeResult] is returned.
+ *
+ * @param whenInUnitTestModeResult The result to return when IN unit test mode
+ */
+fun <R>ifNotInUnitTestModeOrElse(whenInUnitTestModeResult: R, action: () -> R): R {
+    return if(isNotUnitTestMode()) {
+        action.invoke()
+    }
+    else {
+        whenInUnitTestModeResult
+    }
+}
+

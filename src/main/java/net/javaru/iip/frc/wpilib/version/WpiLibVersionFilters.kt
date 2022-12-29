@@ -21,7 +21,10 @@ package net.javaru.iip.frc.wpilib.version
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import org.apache.commons.lang3.BooleanUtils
+import net.javaru.iip.frc.ifNotInUnitTestModeOrElse
+import net.javaru.iip.frc.settings.FrcApplicationSettings
 import java.time.LocalDate
+import java.time.Month
 import java.util.stream.Stream
 
 private object WpiLibVersionFilters
@@ -128,7 +131,7 @@ fun Iterable<WpiLibVersion>.filterToLatestForYear(year: Int, excludePreReleases:
 fun Iterable<WpiLibVersion>.filterToDefaultListing(): List<WpiLibVersion>
 {
     val versionList = this.toList().sortedDescending()
-    val showBetas = BooleanUtils.toBoolean(System.getProperty(SHOW_BETAS_SYS_PROP_KEY, "false"))
+    val showBetas = BooleanUtils.toBoolean(System.getProperty(SHOW_BETAS_SYS_PROP_KEY, "false")) || isTeam3838AndInAllowableTimeWindow()
     val filter = if (showBetas) IsReleaseOrRcOrBetaFilter else IsReleaseFilter
     val initialFilteredList = versionList.filterVersions(filter).filterOutVersions(Is2018TransitionalRelease)
 
@@ -143,6 +146,15 @@ fun Iterable<WpiLibVersion>.filterToDefaultListing(): List<WpiLibVersion>
     }
 
     return addRcBackIfItIsTheLatest(versionList, filteredList)
+}
+
+private fun isTeam3838AndInAllowableTimeWindow(): Boolean
+{
+    return ifNotInUnitTestModeOrElse(whenInUnitTestModeResult = false) {
+        val now = LocalDate.now()
+        FrcApplicationSettings.getInstance().isTeam3838() &&
+            ((now.month == Month.DECEMBER && now.dayOfMonth >= 15) || (now.month == Month.JANUARY && now.dayOfMonth <= 10))
+    }
 }
 
 private fun addRcBackIfItIsTheLatest(fullVersionList: List<WpiLibVersion>, filteredList: List<WpiLibVersion>): List<WpiLibVersion>

@@ -1,0 +1,56 @@
+<#ftl output_format="plainText" encoding="UTF-8">
+<#--noinspection WrongPackageStatement-->
+<#compress>
+<#-- @ftlvariable name="data" type="net.javaru.iip.frc.wizard.FrcProjectWizardData" -->
+<#--
+    Template Language Reference: https://freemarker.apache.org/docs/ref.html
+    Template Author's Guide:     https://freemarker.apache.org/docs/dgui.html
+-->
+<#--  To DEBUG templates, set system property 'frc.freemarker.debug' to true when launching the testing instance of IntelliJ IDEA -->
+</#compress>
+${data.copyright}
+
+package ${data.basePackage};
+
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+
+
+public class ${data.robotClassSimpleName} extends TimedRobot
+{
+    private DutyCycleEncoder dutyCycleEncoder;
+    
+    
+    @Override
+    public void robotInit()
+    {
+        dutyCycleEncoder = new DutyCycleEncoder(0);
+        
+        // Set to 0.5 units per rotation
+        dutyCycleEncoder.setDistancePerRotation(0.5);
+    }
+    
+    
+    @Override
+    public void robotPeriodic()
+    {
+        // Connected can be checked, and uses the frequency of the encoder
+        boolean connected = dutyCycleEncoder.isConnected();
+        
+        // Duty Cycle Frequency in Hz
+        int frequency = dutyCycleEncoder.getFrequency();
+        
+        // Output of encoder
+        double output = dutyCycleEncoder.get();
+        
+        // Output scaled by DistancePerPulse
+        double distance = dutyCycleEncoder.getDistance();
+        
+        SmartDashboard.putBoolean("Connected", connected);
+        SmartDashboard.putNumber("Frequency", frequency);
+        SmartDashboard.putNumber("Output", output);
+        SmartDashboard.putNumber("Distance", distance);
+    }
+}

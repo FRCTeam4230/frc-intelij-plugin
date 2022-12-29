@@ -42,10 +42,11 @@ class FrcProjectWizardData(
     var gitIgnoreConfiguration: GitIgnoreConfiguration = GitIgnoreConfiguration(true, generateFromSite = true),
     var includeJUnitSupport:Boolean = true,
     var junitOption: JUnitOption = JUnitOption.JUnit5,
+    @Deprecated("Deprecated as of 2023 templates (such that 2022 is the last year JUnit 4 support is enabled.)")
+    var junit4Version: String = "4.13.2",
     // TODO Issue #80 have these dynamically updated in the wizard
-    var junit4Version: String = "4.13.2", // https://search.maven.org/artifact/junit/junit
-    var junit5Version: String = "5.8.2",  // https://search.maven.org/artifact/org.junit/junit-bom
-    var kotlinVersion: String = "1.7.10", // https://search.maven.org/artifact/org.jetbrains.kotlin/kotlin-bom
+    var junit5Version: String = "5.8.2",  // With the official 2023 templates switching to JUnit 5, we'll keep this in sync with the version used in the official templates
+    var kotlinVersion: String = "1.8.0",  // https://search.maven.org/artifact/org.jetbrains.kotlin/kotlin-bom
     var gradleDslOption: GradleDslOption = GradleDslOption.GroovyDSL,
     var templateLanguageOption: TemplateLanguageOption = TemplateLanguageOption.Java,
     // TODO: Add selection option to new project wizard
@@ -93,6 +94,12 @@ class FrcProjectWizardData(
             return result.toString()
         }
 
+    val isExampleTemplate
+        get() = frcWizardTemplateDefinition.isExample
+
+    val templateRequiresJUnit
+        get() = frcWizardTemplateDefinition.templateRequiresJUnit
+
     val isRomiTemplate
         get() = frcWizardTemplateDefinition.isRomiBot
 
@@ -124,7 +131,8 @@ class FrcProjectWizardData(
                 2020 -> """https\://services.gradle.org/distributions/gradle-6.0.1-bin.zip"""
                 2021 -> """https\://services.gradle.org/distributions/gradle-6.0.1-bin.zip"""
                 2022 -> """https\://services.gradle.org/distributions/gradle-7.3.2-bin.zip"""
-                else -> """https\://services.gradle.org/distributions/gradle-7.3.2-bin.zip"""
+                2023 -> """https\://services.gradle.org/distributions/gradle-7.5.1-bin.zip"""
+                else -> """https\://services.gradle.org/distributions/gradle-7.5.1-bin.zip"""
             }
             return if (useGradleAllDistribution || FrcApplicationSettings.getInstance().isTeam3838() || teamNumber == 3838)
                 retval.replace("-bin", "-all")

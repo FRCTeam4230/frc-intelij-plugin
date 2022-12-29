@@ -10,14 +10,14 @@
 
 === Developer notes
 * When committing Freemarker Template changes, do not allow IntelliJ IDEA to "Optimize Imports" (via said option in the commit dialog) as it will cause issues with the Freemarker templates with Java as the Template Data Language (reported via https://youtrack.jetbrains.com/issue/IDEA-226072[IDEA-226072])
-* *Changes not picked up:* Sometimes after making a template change, upon testing, the change is not present. The template file did seem to change in both the `build` output and in the `.sandbox\plugins\FRC`, the change nevertheless appeared even after two restarts (i.e. two reruns of `clean build runIde`). Deleting IDEA's cache, by deleting the directory `.sandbox/system` seemed to solve the issue. So it appears IDEA was caching the resource and reusing the old version.
+* *Changes not picked up:* Sometimes after making a template change, upon testing, the change is not present. The template file does seem to change in both the `build` output and in the `.sandbox\plugins\FRC`. Nevertheless, the change does not (always) appear even after two restarts (i.e. two reruns of `clean build runIde`). Deleting IDEA's cache, by deleting the directory `.sandbox/system` seems to solve the issue. So it appears IDEA caches the resource and reuses the old version. More testing is needed to  confirm. And this may be resolved in newer versions of the `org.jetbrains.intellij` gradle plugin.
 
 ==== Location of "official" templates
 
 * The gradle templates are in the https://github.com/wpilibsuite/vscode-wpilib[vscode-wpilib] project
 ** https://github.com/wpilibsuite/vscode-wpilib/tree/main/vscode-wpilib/resources/gradle/java[`build.gradle`] for Java projects
 ** https://github.com/wpilibsuite/vscode-wpilib/tree/main/vscode-wpilib/resources/gradle/javadt[`build.gradle`] for Java Desktop projects
-** https://github.com/wpilibsuite/vscode-wpilib/tree/main/vscode-wpilib/resources/gradle/shared[shared files] such as `gradlew`, `settings.gradle`, etc projects
+** https://github.com/wpilibsuite/vscode-wpilib/tree/main/vscode-wpilib/resources/gradle/shared[shared files] such as `gradlew`, `settings.gradle`, etc. projects
 * https://github.com/wpilibsuite/allwpilib/blob/master/wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/examples/examples.json[Example Details]
 * https://github.com/wpilibsuite/allwpilib/blob/master/wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/templates/templates.json[Project Template Details]
 
@@ -34,9 +34,9 @@ In addition to error checking the Freemarker template, IntelliJ IDEA can error c
 ----
 List<String> names = new ArrayList<>();
 ----
-It will see the `<String>` as an "Unknown html tag 'String'", It will also have an error at the end of the document for an unclosed element. We can tell IntelliJ IDEA that our `Robot.java.ftl` file is using Java as its Template Data Language and thus all the data in it should be interpreted as producing Java and not HTML. (It is unfortunate that IntelliJ IDEA does not pick up the 'java' in the `.java.ftl` extension and automatically apply "Java" as the Template Data Language.)
+It will see the `<String>` as an "Unknown html tag 'String'". It will also have an error at the end of the document for an unclosed element. We can tell IntelliJ IDEA that our `*.java.ftl` files, such as  `Robot.java.ftl`, use Java as their Template Data Language, and thus all the data in it should be interpreted as producing Java and not HTML. (It is unfortunate that IntelliJ IDEA does not pick up the 'java' in the `.java.ftl` extension and automatically apply "Java" as the Template Data Language.)
 
-We can do this on a per file basis, a per directory basis, as well as changing the default for the project from HTML to Java. Given that most of our templates are Java, it is generally easier to make the default for the project "Java" and then specify specific Data Template Languages for some directories and files. For example the "frc-wizard-templates/default-files/gradle/groovy-dsl" directory can be set to "Groovy" and the "frc-wizard-templates/default-files/gradle/kotlin-dsl" directory to "Kotlin". Note that you will need to do this for each year's templates.
+We can do this on a per-file basis, a per-directory basis, as well as changing the default for the project from HTML to Java. Given that most of our templates are Java, it is generally easier to make the default for the project "Java" and then specify specific Data Template Languages for some directories and files. For example the "frc-wizard-templates/-DEFAULT-FILES-/gradle/groovy-dsl" directory can be set to "Groovy" and the "frc-wizard-templates/-DEFAULT-FILES-/gradle/kotlin-dsl" directory to "Kotlin". Note that you will need to do this for each year's templates.
 
 You can make these settings in __**File | Settings | Languages & Frameworks | Template Data Languages**__ For an individual file, you can quickly get to this setting by putting your cursor on a highlighted error (such as `<String>` in the above example) and open the Quick Fix window via `Alt+Enter` and selecting the "__Change HTML template data language to…__" option. This will open the "Template Data Language" settings dialog with the path to the file prepopulated. Finally, even when the default Data Language is set to "<None>" in the "Template Data Language" settings, it seems like IntelliJ IDEA still uses HTML as the Data Language.
 
@@ -50,47 +50,90 @@ Because our Java templates place the package statement in an if block and uses a
 
 == Updating/Creating Templates for new Season
 
-. Create (or copy over and update previous years) templates in `src/main/resources/frc-wizard-templates/YYYY`
-** Be sure to check if gradle version used has been updated in the https://github.com/wpilibsuite/vscode-wpilib/tree/main/vscode-wpilib/resources/gradle/shared[gradle/shared] directory of the WPI `vscode-wpilib` project
-. Create `FrcWizard####ProjectTemplateDefinition`, typically in `FrcWizardTemplateDefinitions.kt`
-. Update `when` clause in `projectTemplateDefinitionsFor(Int)` function in `FrcWizardTemplateDefinitions.kt`
-. Update `when` clause in `exampleTemplateDefinitionsFor(Int)` function in `FrcWizardTemplateDefinitions.kt`
+In the below discussion, `20xx`, and in some cases `YYYY`, is used as a placeholder for the year being configured. For example, when configuring the 2022 templates, replace `20xx` (or `YYYY`) with `2022`.
 
-=== Update common `default-files` Freemarker templates and data
+There are multiple `wpilibsuite` projects we need to reference. The `vscode-wpilib` project contains the gradle and some other shared template files. However, the primary templates and examples are in the `allwpilib` project. There may be occasions that we need to reference the `allwpilib` the `GradleRIO` project.
+
+.Default Files Directory
+[NOTE]
+The default files directory uses a name of `-DEFAULT-FILES-` so that is stands among the numerous directories, and so that it is sorted to the top of the list of directories. It contains both shared, and default file templates used by all the templates.
+
+=== Part 1: Initial Copy
+
+. In this project, update the `develop` branch and then create a `20xx-templates` branch from it.
+. Clone and/or update the `main` branch of the `vscode-wpilib` project.
+. Copy the previous year's templates `20xx` directory to the new year's name. You can use the copy refactoring.
+    ** `src/main/resources/frc-wizard-templates/20xx`
+
+=== Part 2 Update the Gradle templates and other files from the `vscode-wpilib` project
+
+. Update the gradle version used in the templates:
+    ** In the `vscode-wpilib` project, check the `vscode-wpilib/resources/gradle/shared/gradle/wrapper/gradle-wrapper.properties` file for its version, and update the `gradleDistributionUrl` `val` in `FrcProjectWizardData`
+    ** Copy the two gradle wrapper scripts -- `gradlew` and `gradlew.bat` over from `vscode-wpilib/resources/gradle/shared` to `20xx/-DEFAULT-FILES-/gradle/gradle-wrapper/gradle`. This ensures true parity with the official templates, and scripts that will be in use world-wide.
+. In the `vscode-wpilib` project, copy the entire contents of the `vscode-wpilib/resources/gradle/shared/settings.gradle` file to the clipboard. Then open our `src/main/resources/frc-wizard-templates/2023/-DEFAULT-FILES-/gradle/groovy-dsl/settings.gradle.ftl` file, and diff it to the clipboard. Make the necessary updates/changes. (The `frcYear` is set dynamically in our template wizard.) **Also update the `settings.gradle.kts.ftl` file.**
+. In the `FrcWizardTemplateDefinitions.kt` file:
+    ** Copy the previous year's `FrcWizard20xxProjectTemplateDefinition` and `FrcWizard20xxExampleTemplateDefinition` enum classes to ones named for the current year
+    ** Update the `when` clause in `projectTemplateDefinitionsFor(Int)` function to add the current year, and "point" the else clause to the current year
+    ** Update the `when` clause in `exampleTemplateDefinitionsFor(Int)` function to add the current year, and "point" the else clause to the current year
+. The `build.gradle.ftl` and `build.gradle.kts.ftl` templates need to be updated. There is no one "easy" way to do this. The `vscode-wpilib` project uses several  files -- in the `java`, `javadt`, and `javaromi` directories -- whereas out project uses a single template file with `if` conditions and blocks. Ways to check and make updates:
+    ** Look at the commit history for the various `build.gradle` files in the `vscode-wpilib` project.
+    ** Diff sections of the various `build.gradle` files in the `vscode-wpilib` project to the corresponding `if` blocks in our template
+    ** Generate a project via VS Code and the WPI plugin and our project wizard and compare/diff the results.
+. Check the various `wpilib_preferences.json` files in the `vscode-wpilib` project and update our `frc-wizard-templates/20xx/-DEFAULT-FILES-/configs/.wpilib/wpilib_preferences.json.ftl` template file.
+. Check the various `.vscode/settings.json` files in the `vscode-wpilib` project and update our `frc-wizard-templates/20xx/-DEFAULT-FILES-/extras/vs-code-configs/.vscode/settings.json.ftl` template file.
+
+=== Part 3: Update common `-DEFAULT-FILES-` Freemarker templates and data
+
 * In `FrcProjectWizardData`, update:
-** `gradleDistributionUrl`
-*** look in `vscode-wpilib/resources/gradle/shared/gradle/wrapper/gradle-wrapper.properties`
-*** Note it is in the `vscode-wpilib` and *not* `allwpilib` where the templates are
+** `gradleDistributionUrl` if not done in Part 1
 ** `copyright` if needed
-** `junit4Version` and `junit5Version` (until Enhancement #80 is implemented)
-* `WPILib-license.md`
-** `resources/frc-wizard-templates/2021/default-files/code/common-code/WPILib-License.md.ftl`
-** `vscode-wpilib/resources/gradle/shared/WPILib-License.md`
-*** Note it is in the `vscode-wpilib` and *not* `allwpilib` where the templates are
-* Gradle
+** `junit5Version` (until Enhancement #80 is implemented)
+* Update the `WPILib-license.md` file
+** Copy from `vscode-wpilib/resources/gradle/shared/WPILib-License.md`
+** to `resources/frc-wizard-templates/20xx/-DEFAULT-FILES-/code/common-code/WPILib-License.md.ftl`
 
 
-=== Generating the templates:
+=== Part 4: Generate updated templates
 
-. In the `allwpilib` project, in the `wpilibjExamples` module, on the `examples` and `templates` directories in `src/main/java/edu/wpi/first/wpilibj` directory, *for each primary template directory:*
-.. Run the Hungarian Notation Cleanup action using the HNC plugin.
-*** You may need to turn on the action for the project in File | Settings | Tools | Hungarian Notation Cleanup
-.. Run "Reformat Code"
-. In `TemplatesPrepTool`
+. Clone and/or update the `main` branch in the `allwpilib` project.
+*** You may need to turn on the action for the project in: File | Settings | Tools | Hungarian Notation Cleanup
+. In the `allwpilib` project, in the `wpilibjExamples` module/subproject, for both the `templates` and `examples` directories in `wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/templates` directory, *do the following steps for each primary directory separately:*
+.. Select the directory, and from the (right-click) context menu, run the "Hungarian Notation Cleanup" action from the HNC plugin.
+.. After it initially runs -- which may take several minutes -- there will be a large "TODO" balloon pop-up explaining to do the following:
+... In the "Find"Tool window, for each open tab, click the "Do Refactor" button.
+... If presented with a popup about changed files, click the "Rerun search" button, and then click "Do Refactor" in the same tab again. The tab should then close. Sometimes you will need to run "Rerun search" 2 or 3 times for a tab.
+... Repeat for each open tab. There may be numerous ones.
+.. For the directory, from the context menu, run "Reformat Code", and then make sure to select "Include subdirectories" and "Optimize Imports" options.
+.. **Complete the above for both the `templates` and `examples` directories before proceeding.**
+. In `TemplatesPrepTool` (in this project at `src/main/java/net/javaru/iip/frc/templates/TemplatesPrepTool.kt`)
 .. set `IS_DRY_RUN` to `true`
-.. verify the path to the `allwpilib` project
-.. Run the in dry mode
-.. If there are any mapping issues reported, update the `dirMapping` Map and the Examples Template Definition enum as appropriate
+.. verify the `allwpilibProjectRootDir` path to the `allwpilib` project
+.. Run a gradle clean
+.. Run the `TemplatesPrepTool` in dry run mode
+.. If there are any mapping issues reported, update the `dirMapping` Map **and the Template Definition enums** as appropriate.
+... This finds any deleted and/or added templates
+... You can also run a git history on the `templates` and `excamples` directories t confirm any addition and deletions
+... When updating the enums, you can get the description from the `templates.json` and `examples.json` files.
+... For any deleted/removed templates, also delete the corresponding directory
 .. Once the mappings are resolved, set `IS_DRY_RUN` to `false`
-.. Run
-.. Check the output for any WARN messages
-. Add the new templates to Git (but do not commit yet)
+.. Run `TemplatesPrepTool`
+.. Check the output for any WARN messages and resolve as necessary.
+. In the `allwpilib` project, check `src/test/java` directory. For any templates/examples that include unit tests, set the `templateRequiresJUnit` parameter to true in the corresponding `TemplateDefinition`
+. **Add the new templates to Git** (but do not commit yet)
 . Run some checks on the templates be creating and building them. Some specific ones (due to their complexity and serving as good test cases) to check are:
 ** commandBased
 ** hatchBotInlined
 ** hatchBotTraditional
 ** romiReference
 *** Do a Build & Run on this one to see if the simulation window opens correctly
+
+== Part 5: One-off and Miscellaneous changes
+
+* In `frc-wizard-templates/20xx/unitTesting/code/java-code/src/test/java/base-package/subsystems/IntakeTest.java.ftl`, add the comment `// To learn more about how to write unit tests, see the JUnit 5 User Guide at https://junit.org/junit5/docs/current/user-guide/` a line above the `@BeforeEach` method.
+
+=== Part 6: Update Kotlin templates
+
+Since there are no "official" Kotlin templates, we generally need to just see what has changed in the Java templates and apply them to the Kotlin templates. This can be done by doing a diff between the previous year's and the current year's Java templates, and/or by looking at the commit history on the templates in the `allwpilib` project.
 
 == Update IntelliJ IDEA "Template Data Languages" settings
 * File | Settings | Languages & Frameworks | Template Data Languages

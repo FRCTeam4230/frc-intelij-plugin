@@ -27,10 +27,16 @@ import java.time.LocalDate
 
 val allwpilibProjectRootDir: Path = Path.of("P:\\dev\\proj\\open\\wpi\\allwpilib")
 
-val wpilibjDir: Path = allwpilibProjectRootDir.resolve("wpilibjExamples\\src\\main\\java\\edu\\wpi\\first\\wpilibj")
-val wpiExamplesDir: Path = wpilibjDir.resolve("examples")
-val wpiTemplatesDir: Path = wpilibjDir.resolve("templates")
-val targetInnerPath:Path = Path.of("code/java-code/src/main/java/base-package")
+val wpilibjMainDir: Path = allwpilibProjectRootDir.resolve("wpilibjExamples\\src\\main\\java\\edu\\wpi\\first\\wpilibj")
+val wpiMainExamplesDir: Path = wpilibjMainDir.resolve("examples")
+val wpiMainTemplatesDir: Path = wpilibjMainDir.resolve("templates")
+
+val wpilibjTestDir: Path = allwpilibProjectRootDir.resolve("wpilibjExamples\\src\\test\\java\\edu\\wpi\\first\\wpilibj")
+val wpiTestExamplesDir: Path = wpilibjTestDir.resolve("examples")
+val wpiTestTemplatesDir: Path = wpilibjTestDir.resolve("templates")
+
+val targetMainInnerPath:Path = Path.of("code/java-code/src/main/java/base-package")
+val targetTestInnerPath:Path = Path.of("code/java-code/src/test/java/base-package")
 val templatesDirMapping = createTemplatesDirMapping()
 val examplesDirMapping = createExamplesDirMapping()
 val combinedMappings = templatesDirMapping.toMutableMap().also { it.putAll(examplesDirMapping) }.toMap()
@@ -39,33 +45,34 @@ val outdatedMappings = combinedMappings.keys.toMutableSet()
 val year = determineTemplatesYear()
 val ourTemplatesDir: Path = findOutputDir().resolve(year.toString())
 
+// An object declaration to allow for finding this file via a class search
+private object TemplatesPrepTool
+
 // runs without doing the copy. Allows for updating of the template mappings.
 const val IS_DRY_RUN = false
 
-
-private object TemplatesPrepTool
-
 fun main()
 {
-
     println("Starting. IS_DRY_RUN = $IS_DRY_RUN")
-    if (Files.notExists(wpilibjDir))
+    if (Files.notExists(wpilibjMainDir))
     {
-        println("ERROR: wpilibjDir not found: $wpilibjDir")
+        println("ERROR: wpilibjDir not found: $wpilibjMainDir")
     }
 
-    println("Using template year of $year")
+    println("*** Using template year of $year ***")
     println("yearly templates dir calculated to be:     $ourTemplatesDir")
 
     if (Files.notExists(ourTemplatesDir)) Files.createDirectory(ourTemplatesDir)
 
-    processAWpiDir(wpiExamplesDir, examplesDirMapping)
-    processAWpiDir(wpiTemplatesDir, templatesDirMapping)
+    processAWpiDir(wpiMainExamplesDir,  targetMainInnerPath, examplesDirMapping)
+    processAWpiDir(wpiTestExamplesDir,  targetTestInnerPath, examplesDirMapping)
+    processAWpiDir(wpiMainTemplatesDir, targetMainInnerPath, templatesDirMapping)
+    processAWpiDir(wpiTestTemplatesDir, targetTestInnerPath, templatesDirMapping)
 
     checkForMappingIssues(outdatedMappings, missingMappings)
 }
 
-private fun processAWpiDir(theWpiDir: Path, dirMapping: Map<String, String>)
+private fun processAWpiDir(theWpiDir: Path, targetInnerPath: Path, dirMapping: Map<String, String>)
 {
     println("Processing: $theWpiDir")
     var currentTemplatesDir = ourTemplatesDir.resolve("PLACEHOLDER")
@@ -189,7 +196,7 @@ fun copyJavaFile(currentWpiTemplateName: String, wpiTemplateGroupName: String, s
                             }
                             else
                             {
-                                if (!line.contains("functional"))
+                                if (!(line.contains("functional") || line.contains("java.util.function") ))
                                 {
                                     println("WARN: Potentially missed 'function' use rather than method.\n    line: $line\n    srcFile: $srcFile\n    targetFile: $targetFile")
                                 }
@@ -327,6 +334,7 @@ fun createExamplesDirMapping() = mapOf(
     "canpdp" to "canPDP",
     "differentialdrivebot" to "differentialDriveBot",
     "differentialdriveposeestimator" to "DifferentialDrivePoseEstimator",
+    "digitalcommunication" to "digitalCommunication",
     "dma" to "DMA",
     "drivedistanceoffboard" to "driveDistanceOffboard",
     "dutycycleencoder" to "dutyCycleEncoder",
@@ -335,6 +343,7 @@ fun createExamplesDirMapping() = mapOf(
     "elevatorsimulation" to "elevatorSimulation",
     "elevatortrapezoidprofile" to "elevatorTrapezoidProfiledPid",
     "encoder" to "encoder",
+    "eventloop" to "eventLoop",
     "frisbeebot" to "frisbeeBot",
     "gearsbot" to "gearsBot",
     "gettingstarted" to "gettingStarted",
@@ -344,6 +353,7 @@ fun createExamplesDirMapping() = mapOf(
     "hatchbotinlined" to "hatchBotInlined",
     "hatchbottraditional" to "hatchBotTraditional",
     "hidrumble" to "HIDRumble",
+    "i2ccommunication" to "I2CCommunication",
     "intermediatevision" to "intermediateVision",
     "mechanism2d" to "Mechanism2D",
     "mecanumbot" to "mecanumBot",
@@ -351,12 +361,13 @@ fun createExamplesDirMapping() = mapOf(
     "mecanumdrive" to "mecanumDrive",
     "mecanumdriveposeestimator" to "mecanumDrivePoseEstimator",
     "motorcontrol" to "motorController",
-    "motorcontrolencoder" to "motorControlWithEncoder",
+//    "motorcontrolencoder" to "motorControlWithEncoder",
 //    "pacgoat" to "pacGoat",
     "potentiometerpid" to "potentiometerPID",
     "quickvision" to "quickVision",
     "ramsetecommand" to "ramseteCommand",
     "ramsetecontroller" to "ramseteController",
+    "rapidreactcommandbot" to "RapidReactCommandBot",
     "relay" to "relay",
     "romireference" to "romiReference",
     "schedulereventlogging" to "schedulerEventLogging",
@@ -376,6 +387,7 @@ fun createExamplesDirMapping() = mapOf(
     "tankdrivexboxcontroller" to "tankDriveXboxController",
     "ultrasonic" to "ultrasonic",
     "ultrasonicpid" to "ultrasonicPID",
+    "unittest" to "unitTesting"
                                       )
 
 

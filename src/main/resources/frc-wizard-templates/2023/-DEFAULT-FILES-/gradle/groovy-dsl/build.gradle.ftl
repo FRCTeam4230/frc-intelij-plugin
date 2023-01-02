@@ -116,7 +116,7 @@ dependencies {
 <#if data.junitUseJUnitPlatform()>
 test{
     useJUnitPlatform()
-    systemProperty'junit.jupiter.extensions.autodetection.enabled','true'
+    systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
 }
 
 </#if>

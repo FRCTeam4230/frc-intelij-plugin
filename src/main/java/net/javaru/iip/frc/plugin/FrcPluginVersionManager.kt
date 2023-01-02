@@ -55,6 +55,7 @@ class FrcPluginVersionManagerStartupActivity : StartupActivity, DumbAware
 {
     override fun runActivity(project: Project)
     {
+        logger.debug("[FRC] FrcPluginVersionManagerStartupActivity.runActivity() running")
         FrcPluginVersionManagerApplicationService.getInstance().checkPluginUpdateStatusViaBackGroundTask(project)
     }
 }
@@ -102,8 +103,10 @@ class FrcPluginVersionManagerApplicationService : Disposable
     @VisibleForTesting
     fun checkPluginUpdateStatus(project: Project?, runningInstanceBaselineVersion: Int, oldestSupportedBaseBuild: Int)
     {
+        logger.debug("[FRC] Checking plugin update status. running: '$runningInstanceBaselineVersion' oldest supported: '$oldestSupportedBaseBuild'.")
         if (runningInstanceBaselineVersion < oldestSupportedBaseBuild)
         {
+            logger.debug("[FRC] Current version is no longer supported. Notifying user.")
             val oldestVersionString = "20${(oldestSupportedBaseBuild / 10)}.${oldestSupportedBaseBuild % 10}"
             @Suppress("HtmlRequiredLangAttribute") @Language("HTML")
             val eolMessage = """
@@ -148,6 +151,10 @@ class FrcPluginVersionManagerApplicationService : Disposable
                     .notifyViaBalloon(project)
                 FrcPluginVersionManagerState.getInstance().eolNotifiedForBuild.add(runningInstanceBaselineVersion)
             }
+        }
+        else
+        {
+            logger.debug("[FRC] Current IDEA version is still supported.")
         }
     }
     

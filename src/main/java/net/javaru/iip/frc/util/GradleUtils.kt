@@ -144,7 +144,7 @@ fun Project.markGradleProjectAsNeedingReimport(scheduleForAutoReimport: Boolean 
                     if (scheduleForAutoReimport)
                         projectTracker.scheduleProjectRefresh()
                     else
-                        projectTracker.scheduleProjectNotificationUpdate() // Changed to .scheduleChangeProcessing() in 2021.3+
+                        projectTracker.scheduleChangeProcessing() // Was .scheduleProjectNotificationUpdate() pre 2021.3
                 }
             }, project.disposed)
     }

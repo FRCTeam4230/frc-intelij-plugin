@@ -171,14 +171,12 @@ fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
                     if (psiDirectory != null)
                     {
                         val contentRootDirScope = GlobalSearchScopesCore.directoryScope(psiDirectory, false)
-                        // FYI: Used overload version of getVirtualFilesByName is deprecated in 2022.1, but replacement is not added until 2022.1 (basically the project is no longer provided since the Scope covers that)
-                        val wpiLibDirs = FilenameIndex.getVirtualFilesByName(project, wpiLibDirName, false, contentRootDirScope)
+                        val wpiLibDirs = FilenameIndex.getVirtualFilesByName(wpiLibDirName, false, contentRootDirScope)
                             .filter { it?.isDirectory == true }
                             .mapNotNull { it.findPsiDirectory(project) }
                         wpiLibDirs.forEach { wpiLibDirPsiDir: PsiDirectory ->
                             val wpiLibDirScope = GlobalSearchScopesCore.directoryScope(wpiLibDirPsiDir, false)
-                            // FYI: Used overload version of getVirtualFilesByName is deprecated in 2022.1, but replacement is not added until 2022.1 (basically the project is no longer provided since the Scope covers that)
-                            val files = FilenameIndex.getVirtualFilesByName(project, wpiLibPreferencesFileName, true, wpiLibDirScope)
+                            val files = FilenameIndex.getVirtualFilesByName(wpiLibPreferencesFileName, true, wpiLibDirScope)
                             if (LOG.isTraceEnabled) files.forEach { LOG.trace { "[FRC] Found: ${it.path}" } }
                             foundFiles.addAll(files.map { it.findPsiFile(project) })
                         }

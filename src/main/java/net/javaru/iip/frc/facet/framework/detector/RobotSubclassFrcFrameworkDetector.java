@@ -99,8 +99,11 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
 
 
     @Override
-    public List<? extends DetectedFrameworkDescription> detect(@NotNull Collection<VirtualFile> newFiles, @NotNull FrameworkDetectionContext context)
+    public List<? extends DetectedFrameworkDescription> detect(@NotNull Collection<? extends VirtualFile> newFiles, @NotNull FrameworkDetectionContext context)
     {
+        // ≤ 212  public abstract List<? extends DetectedFrameworkDescription> detect(@NotNull Collection<VirtualFile> newFiles, @NotNull FrameworkDetectionContext context);
+        // ≥ 213  public abstract List<? extends DetectedFrameworkDescription> detect(@NotNull Collection<? extends VirtualFile> newFiles, @NotNull FrameworkDetectionContext context);
+    
         // I'd like to look for both robot classes or the FRC ant build
         //   Using two separate detector impls results in two instances of the Facet being added
         //   Because a detector has to declare the FileType in getFileType(), I'm not sure how to get both Java and XML files
@@ -126,7 +129,7 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
 
 
     @NotNull
-    private List<VirtualFile> detectRobotClasses(@NotNull Collection<VirtualFile> newFiles, @NotNull FrameworkDetectionContext context)
+    private List<VirtualFile> detectRobotClasses(@NotNull Collection<? extends VirtualFile> newFiles, @NotNull FrameworkDetectionContext context)
     {
         final List<VirtualFile> foundFiles = new ArrayList<>(newFiles.size());
         final Project project = context.getProject();
@@ -316,8 +319,10 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
     @SuppressWarnings("UseOfConcreteClass")
     @Nullable
     @Override
-    protected FrcFacetConfiguration createConfiguration(Collection<VirtualFile> files)
+    protected FrcFacetConfiguration createConfiguration(Collection<? extends VirtualFile> files)
     {
+        //  ≤ 212  protected C createConfiguration(Collection<VirtualFile> files)
+        //  ≥ 213  protected C createConfiguration(Collection<? extends VirtualFile> files)
         LOG.debug("[FRC] createConfiguration(files) called in RobotSubclassFrcFrameworkDetector");
         return getFacetType().createDefaultConfiguration();
     }

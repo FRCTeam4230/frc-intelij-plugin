@@ -17,6 +17,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm" version "${data.kotlinVersion}"
 </#if>
     id "edu.wpi.first.GradleRIO" version "${data.wpilibVersion.versionString}"
+    id "idea"
 }
 
 def javaVersion = JavaVersion.VERSION_11
@@ -63,15 +64,6 @@ wpi.java.debugJni = false
 
 // Set this to true to enable desktop support.
 def includeDesktopSupport = ${data.getIncludeDesktopSupportGradleSetting()}
-
-<#if data.getIncludeKotlinSupport()>
-
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = javaVersion.toString()
-    }
-}
-</#if>
 
 dependencies {
 <#if data.isRomiTemplate()>
@@ -150,4 +142,24 @@ wpi.java.configureTestTasks(test)
 tasks.withType(JavaCompile) {
     // Configure string concat to always inline compile
     options.compilerArgs.add '-XDstringConcat=inline'
+}
+
+<#if data.getIncludeKotlinSupport()>
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = javaVersion.toString()
+    }
+}
+
+</#if>
+idea {
+    project {
+        // The project.sourceCompatibility setting is not always picked up, so we set explicitly
+        languageLevel = javaVersion
+    }
+    module {
+        // Improve development experience (and IDEA's capabilities) by having source & javadoc attached
+        downloadJavadoc = true
+        downloadSources = true
+    }
 }

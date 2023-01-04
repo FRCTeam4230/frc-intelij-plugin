@@ -64,7 +64,7 @@ java {
         languageVersion.set(JavaLanguageVersion.of(javaVersion.toString()))
         // Temporarily disabling use of JBR due to build exceptions: org.gradle.internal.resolve.ModuleVersionResolveException: Could not resolve com.jetbrains:jbre:jbr_jcef-17.0.4.1-windows-x64-b653.1
         //vendor.set(determineJvmVendor(defaultFallbackSpec = JvmVendorSpec.ADOPTOPENJDK))
-        vendor.set(JvmVendorSpec.ADOPTOPENJDK)
+        vendor.set(JvmVendorSpec.ADOPTIUM)
     }
 }
 

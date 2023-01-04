@@ -54,6 +54,9 @@
     <change-notes><![CDATA[
         <strong>v3.0.0</strong> <br>
         &nbsp;&nbsp;&bull; Added support for 2023 season, including project templates. (Templates will not show in the Wizard until 2023 WPI Lib is released.)<br>
+        &nbsp;&nbsp;&bull; FRC based Run/Debug configurations are not created the first time upon opening a project created outside of IntelliJ IDEA, or adding
+                           The FRC Facet to a project/module. Note you can also (re)create them via the menu action:
+                           Tools | FRC | Create Run/Debug Configurations | Create Build, Deploy, and Debugging Run/Debug Configurations<br>
         &nbsp;&nbsp;&bull; Removed support for JUnit 4 in the project wizard. JUnit 5 is five years old, and the
                            official WPI Lib templates have finally migrated to use JUnit 5.<br>
         &nbsp;&nbsp;&bull; Ended support for IntelliJ IDEA 2021.3 and older. IntelliJ IDEA 2022.1 or later required.  Please see the

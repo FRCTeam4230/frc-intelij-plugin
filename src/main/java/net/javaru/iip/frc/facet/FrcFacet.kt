@@ -22,15 +22,19 @@ import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetType
 import com.intellij.facet.FacetTypeId
 import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.externalSystem.service.project.IdeModelsProvider
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProviderImpl
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.roots.ExternalProjectSystemRegistry
 import net.javaru.iip.frc.facet.FrcFacet.Companion.FACET_TYPE_ID
+import net.javaru.iip.frc.run.RunDebugConfigsCreationData
+import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.wpilib.gradlePluginRepo.logger
 import org.jetbrains.annotations.Contract
 
@@ -43,7 +47,7 @@ class FrcFacet(facetType: FacetType<FrcFacet, FrcFacetConfiguration>,
 {
     companion object
     {
-        //private val LOG = Logger.getInstance(FrcFacet::class.java)
+        internal val LOG = logger<FrcFacet>()
 
         private const val serialVersionUID: Long = 4400383714328255414L
         const val FACET_TYPE_ID_STRING = "FRC_FACET"
@@ -123,6 +127,17 @@ private fun Module.getOrAddFrcFacetImpl(externalSystemId: String? = null,
             }
         }
     }
+
+    try {
+        createAllRunDebugConfigurations(RunDebugConfigsCreationData.create(project))
+    }
+    catch (t: Throwable) {
+        if (t is ProcessCanceledException)
+            throw t
+        else
+            FrcFacet.LOG.info("[FRC] Could not create Run/Debu configurations when adding facet. Cause Summary: $t", t)
+    }
+
     return facet
 }
 

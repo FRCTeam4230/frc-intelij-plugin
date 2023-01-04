@@ -320,7 +320,7 @@ class VendordepsService private constructor(val project: Project): Disposable
                 Vendordeps.parse(jsonFile).onSuccess { vendordeps: Vendordeps ->
                     vendordepsProjectFileList.add(VendordepsProjectFile(jsonFile, vendordeps))
                 }.onFailure { t: Throwable ->
-                    FrcErrorReportSubmitter.submitVendordepsParsingError(project, VendordepsParsingException(jsonFile, t))
+                    //FrcErrorReportSubmitter.submitVendordepsParsingError(project, VendordepsParsingException(jsonFile, t))
                     logger.info("[FRC] Could not parse file as Vendordeps. File: ${jsonFile.name} Error: $t", t)
                     invalidVendordepsFileList.add(InvalidVendordepsProjectFile(jsonFile))
                 }

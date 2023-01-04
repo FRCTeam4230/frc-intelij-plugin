@@ -20,6 +20,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.ide.FileIconProvider
 import com.intellij.ide.IconProvider
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -80,7 +81,10 @@ class FrcIconProvider: IconProvider(), FileIconProvider, DumbAware
         }
         catch (t: Throwable)
         {
-            LOG.info("[FRC] An exception occurred in the FrcIconProvider.getIcon(element: PsiElement, flags: Int) method from IconProvider: $t", t)
+            if (t is ProcessCanceledException)
+                throw t
+            else
+                LOG.info("[FRC] An exception occurred in the FrcIconProvider.getIcon(element: PsiElement, flags: Int) method from IconProvider: $t", t)
         }
 
         return null
@@ -111,7 +115,10 @@ class FrcIconProvider: IconProvider(), FileIconProvider, DumbAware
         }
         catch (t: Throwable)
         {
-            LOG.info("[FRC] An exception occurred in the FrcIconProvider.getIcon(filePath: FilePath, project: Project?) method fromFilePathIconProvider: $t", t)
+            if (t is ProcessCanceledException)
+                throw t
+            else
+                LOG.info("[FRC] An exception occurred in the FrcIconProvider.getIcon(filePath: FilePath, project: Project?) method fromFilePathIconProvider: $t", t)
         }
         return null
     }*/
@@ -140,7 +147,10 @@ class FrcIconProvider: IconProvider(), FileIconProvider, DumbAware
         }
         catch (t: Throwable)
         {
-            LOG.info("[FRC] An exception occurred in the FrcIconProvider.getIcon(file: VirtualFile, flags: Int, project: Project?) method from FileIconProvider: $t", t)
+            if (t is ProcessCanceledException)
+                throw t
+            else
+                LOG.info("[FRC] An exception occurred in the FrcIconProvider.getIcon(file: VirtualFile, flags: Int, project: Project?) method from FileIconProvider: $t", t)
         }
         return null
     }

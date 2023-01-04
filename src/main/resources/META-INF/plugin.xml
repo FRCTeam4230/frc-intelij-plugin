@@ -468,8 +468,8 @@
                popup="true"
                icon="AllIcons.RunConfigurations.Compound">
             <add-to-group group-id="FRC.FrcToolsActionsGroup" anchor="after" relative-to-action="frc.tools.CheckForWpiLibUpdateAction" />
-            <action id="frc.crate.run.config.CreatRunDebugConfigurationsAction"
-                    class="net.javaru.iip.frc.actions.tools.CreatRunDebugConfigurationsAction"
+            <action id="frc.crate.run.config.CreateRunDebugConfigurationsAction"
+                    class="net.javaru.iip.frc.actions.tools.CreateRunDebugConfigurationsAction"
                     icon="GradleIcons.Gradle" />
             <action id="frc.crate.run.config.LaunchShuffleboard"
                     class="net.javaru.iip.frc.actions.CreateLaunchShuffleboardRunConfigurationAction"

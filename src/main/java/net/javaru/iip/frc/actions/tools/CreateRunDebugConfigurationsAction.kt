@@ -19,11 +19,9 @@ package net.javaru.iip.frc.actions.tools
 import com.intellij.openapi.actionSystem.AnActionEvent
 import net.javaru.iip.frc.run.RunDebugConfigsCreationData
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
-import net.javaru.iip.frc.wizard.FrcProjectWizardData
-import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFile
 
 
-class CreatRunDebugConfigurationsAction: AbstractFrcToolsAction()
+class CreateRunDebugConfigurationsAction: AbstractFrcToolsAction()
 {
     override fun actionPerformed(e: AnActionEvent)
     {

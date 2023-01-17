@@ -99,6 +99,24 @@ inline fun invokeLaterWait(crossinline func: () -> Unit)
 //    }
 //}
 
+/**
+ * Returns whether a class is available on the classpath, using [Class.forName].
+ *
+ * @param name the fully qualified name of the class, as returned by [Class.getName]. For example `java.lang.String`
+ */
+fun classIsAvailable(name: String): Boolean
+{
+    return try
+    {
+        Class.forName(name, false, getPluginClassloader())
+        true
+    }
+    catch (ignore: Throwable)
+    {
+        false
+    }
+}
+
 @JvmOverloads
 fun getPluginClassloader(clazz: Class<*> = FrcIcons::class.java): ClassLoader = clazz.classLoader
 

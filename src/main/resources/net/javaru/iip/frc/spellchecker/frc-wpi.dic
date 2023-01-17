@@ -4,6 +4,8 @@ allwpilib
 andymark
 appname
 autonomous
+canbus
+canivore
 canutils
 copperforge
 crio
@@ -69,8 +71,10 @@ mxp
 nasa
 nav
 navx
+nbus
 networktable
 networktables
+nivore
 noninfringement
 objdetect
 odometry

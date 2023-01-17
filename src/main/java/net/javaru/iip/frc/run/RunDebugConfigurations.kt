@@ -39,21 +39,25 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.settings.FrcRoboRioSettings
 import net.javaru.iip.frc.settings.RoboRioAddressType
 import net.javaru.iip.frc.settings.getProjectTeamNumber
+import net.javaru.iip.frc.util.FrcSystemConfigs
 import net.javaru.iip.frc.util.asDate
+import net.javaru.iip.frc.util.classIsAvailable
 import net.javaru.iip.frc.util.getMainModule
 import net.javaru.iip.frc.util.getModules
 import net.javaru.iip.frc.wizard.FrcProjectWizardData
+import net.javaru.iip.frc.wpilib.getAttachedWpiLibVersion
 import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFile
-import net.javaru.iip.frc.wpilib.getWpiLibToolsPath
+import net.javaru.iip.frc.wpilib.getToolsJar
 import net.javaru.iip.frc.wpilib.services.WpiLibVersionService
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
+import net.javaru.iip.frc.wpilib.version.WpiLibVersionImpl
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
 import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.Year
 import java.util.*
 
 private object RunDebugConfigurations 
@@ -111,16 +115,15 @@ fun createAllRunDebugConfigurations(dataModel: RunDebugConfigsCreationData)
     if (isRomiTemplate || dataModel.enableDesktopSupport)
     {
         createGradeSimulateJavaRunConfigurations(project, isRomiTemplate)
-        if (SystemInfo.isMac || SystemInfo.isLinux)
+        if (((dataModel.wpilibVersion?.frcYear ?: Year.now().value) <= 2022) && (SystemInfo.isMac || SystemInfo.isLinux || FrcSystemConfigs.AlwaysCreateRomiTailRunConfig.value))
         {
             createTailSimulateJavaLogShellScriptRunConfiguration(project, isRomiTemplate)
         }
         // For now, we will create both. A future enhancement can make this selectable in the wizard
         if (dataModel.wpilibVersion != null)
         {
-            val wpiLibToosDir = getWpiLibToolsPath(dataModel.wpilibVersion, project)
-            createLaunchShuffleboardRunConfiguration(project, wpiLibToosDir)
-            createLaunchSmartDashboardRunConfiguration(project, wpiLibToosDir)
+            createLaunchShuffleboardRunConfiguration(project, dataModel.wpilibVersion)
+            createLaunchSmartDashboardRunConfiguration(project, dataModel.wpilibVersion)
         }
     }
 
@@ -227,7 +230,7 @@ fun createTailSimulateJavaLogShellScriptRunConfiguration(project: Project, isRom
     val runConfigName = FrcBundle.message("frc.wizard.run.configuration.simulateJava.tail.name", nameSuffix)
     try
     {
-        if (project.basePath != null)
+        if (project.basePath != null && classIsAvailable("com.intellij.sh.run.ShConfigurationType"))
         {
             val runManager = RunManager.getInstance(project)
             val runnerAndConfigurationSettings = runManager.createConfiguration(runConfigName, com.intellij.sh.run.ShConfigurationType::class.java)
@@ -264,7 +267,19 @@ fun createTailSimulateJavaLogShellScriptRunConfiguration(project: Project, isRom
             runManager.addConfiguration(runnerAndConfigurationSettings)
         }
     }
-    catch (e: Exception)
+    catch (e: NoClassDefFoundError)
+    {
+        // We should not get this due to the check in the if block. But just in case, we handle it.
+        if (e.toString().contains("ShConfigurationType"))
+        {
+            logger.debug("[FRC] ShConfigurationType not found. Is 'Shell Script' plugin not enabled? Can not create '$runConfigName' Shell Script Run Configuration for project '${project.name}'.")
+        }
+        else
+        {
+            logger.warn("[FRC] Could not create '$runConfigName' Shell Script Run Configuration for project '${project.name}' due to a NoClassDefFoundError: $e", e)
+        }
+    }
+    catch (e: Throwable)
     {
         logger.warn("[FRC] Could not create '$runConfigName' Shell Script Run Configuration for project '${project.name}' due to an exception: $e", e)
     }
@@ -272,25 +287,34 @@ fun createTailSimulateJavaLogShellScriptRunConfiguration(project: Project, isRom
 
 @JvmOverloads
 fun createLaunchShuffleboardRunConfiguration(project: Project,
-                                             wpiLibToolsDir: Path,
+                                             wpilibVersion: WpiLibVersion?,
                                              activateToolWindow: Boolean = false,
                                              setAsShared: Boolean = true,
                                              setAsSelected: Boolean = false)
 {
-    val jarPath = wpiLibToolsDir.resolve("shuffleboard.jar").toAbsolutePath().toString()
-    createJarApplicationRunConfiguration(project, "Launch Shuffleboard", jarPath, activateToolWindow, setAsShared, setAsSelected)
+    val wpiLibVer = wpilibVersion ?: project.getAttachedWpiLibVersion() ?: WpiLibVersionImpl.parseSafely("${Year.now().value}.1.1")
+    if (wpiLibVer != null)
+    {
+        val jarPath = getToolsJar("Shuffleboard", wpiLibVer, project)
+        createJarApplicationRunConfiguration(project, "Launch Shuffleboard", jarPath.toString(), activateToolWindow, setAsShared, setAsSelected)
+    }
+
 }
 
 @JvmOverloads
 fun createLaunchSmartDashboardRunConfiguration(project: Project,
-                                               wpiLibToolsDir: Path,
+                                               wpilibVersion: WpiLibVersion?,
                                                activateToolWindow:
                                                Boolean = false,
                                                setAsShared: Boolean = true,
                                                setAsSelected: Boolean = false)
 {
-    val jarPath = wpiLibToolsDir.resolve("SmartDashboard.jar").toAbsolutePath().toString()
-    createJarApplicationRunConfiguration(project, "Launch SmartDashboard", jarPath, activateToolWindow, setAsShared, setAsSelected)
+    val wpiLibVer = wpilibVersion ?: project.getAttachedWpiLibVersion() ?: WpiLibVersionImpl.parseSafely("${Year.now().value}.1.1")
+    if (wpiLibVer != null)
+    {
+        val jarPath = getToolsJar("SmartDashboard", wpiLibVer, project)
+        createJarApplicationRunConfiguration(project, "Launch SmartDashboard", jarPath.toString(), activateToolWindow, setAsShared, setAsSelected)
+    }
 }
 
 @JvmOverloads
@@ -476,7 +500,7 @@ class ModuleSettingAction(private val remoteConfiguration: RemoteConfiguration, 
 @Suppress("UNUSED_PARAMETER")
 private fun shareRunConfiguration(project: Project, settings: RunnerAndConfigurationSettings)
 {
-    // settings.isShared = true  <==  Old wayy, removed in b2021.3
+    // settings.isShared = true  <==  Old way, removed in b2021.3
     // Example from:  creating path:  com/intellij/execution/impl/RunConfigurationStorageUi.java:319
     //                applying it:    com/intellij/execution/impl/RunConfigurationStorageUi.java:394
     // it's the only place I could find setting/using the new .run directory
@@ -517,7 +541,7 @@ fun determineNextName(baseName:String, configurationSettingsList: List<RunnerAnd
 
 fun determineNextName(names: List<String>, baseName: String): String
 {
-    val nameRegex = """${baseName}( \(([\d]*)\))?""".toRegex()
+    val nameRegex = """${baseName}( \((\d*)\))?""".toRegex()
     val filteredList = names.filter { it.matches(nameRegex) }
     return if (filteredList.isEmpty())
     {

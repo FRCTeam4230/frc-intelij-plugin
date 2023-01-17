@@ -158,8 +158,10 @@ idea {
         languageLevel = javaVersion
     }
     module {
-        // Improve development experience (and IDEA's capabilities) by having source & javadoc attached
+        // Improve development & (especially) debugging experience (and IDEA's capabilities) by having libraries' source & javadoc attached
         downloadJavadoc = true
         downloadSources = true
+        // Exclude the .vscode directory from indexing and search
+        excludeDirs+=file(".vscode" )
     }
 }

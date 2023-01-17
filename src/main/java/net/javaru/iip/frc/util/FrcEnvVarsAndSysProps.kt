@@ -95,4 +95,11 @@ object FrcSystemConfigs
         override val default: Boolean = false
         override val value: Boolean = getBooleanSystemProperty(key, default)
     }
+
+    object AlwaysCreateRomiTailRunConfig: FrcSystemConfig<Boolean>
+    {
+        override val key: String = "frc.always.create.romi.tail.run.config"
+        override val default: Boolean = false
+        override val value: Boolean = getBooleanSystemProperty(key, default)
+    }
 }

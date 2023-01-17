@@ -47,8 +47,7 @@ class CreateLaunchShuffleboardRunConfigurationAction() : AbstractCreateRunConfig
     override fun doCreation(project: Project, e: AnActionEvent)
     {
         project.getAttachedWpiLibVersion()?.also {
-            val wpiLibToosDir = getWpiLibToolsPath(it, project)
-            createLaunchShuffleboardRunConfiguration (project, wpiLibToosDir, setAsSelected = true)
+            createLaunchShuffleboardRunConfiguration (project, it, setAsSelected = true)
         }
     }
 }
@@ -58,8 +57,7 @@ class CreateLaunchSmartDashboardRunConfigurationAction() : AbstractCreateRunConf
     override fun doCreation(project: Project, e: AnActionEvent)
     {
         project.getAttachedWpiLibVersion()?.also {
-            val wpiLibToosDir = getWpiLibToolsPath(it, project)
-            createLaunchSmartDashboardRunConfiguration(project, wpiLibToosDir, setAsSelected = true)
+            createLaunchSmartDashboardRunConfiguration(project, it, setAsSelected = true)
         }
     }
 }

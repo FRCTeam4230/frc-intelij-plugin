@@ -172,6 +172,59 @@ fun getWpiLibToolsPath(year: Int, project: Project? = null): Path = getWpiLibRoo
 fun getWpiLibToolsPath(forWpiLibVersion: WpiLibVersion, project: Project? = null): Path = getWpiLibRootPath(forWpiLibVersion, project).resolve("tools")
 
 /**
+ * Returns the standard path for the wpilib 'tools' directory that contains the JAR files. For 2021 and earlier,
+ * this is the 'tools' directory itself. For 2022 and later, it is the 'artifacts' subdir within the 'tools' directory.
+ * This method **does not check if the directory exists**.
+ */
+fun getWpiLibToolsJarsPath(forWpiLibVersion: WpiLibVersion, project: Project? = null): Path =
+    getWpiLibToolsPath(forWpiLibVersion, project).let {
+        if (forWpiLibVersion.frcYear <= 2021)
+            it
+        else
+            it.resolve("artifacts")
+    }
+
+/**
+ * Returns the path to the latest JAR file in the tools JAR directory -- 'tools' directory itself for 2021 and earlier, and
+ * tools/artifacts for 2022 and later -- as best as we can determine. Starting in 2022, the JAR fil names contained the
+ * WPI Lib version name, and OS architecture. For example 'Shuffleboard-2023.1.1-winx64.jar`. In the event the file cannot
+ * be found, a stand-in name is created, which may not be accurate.
+ */
+@Suppress("SpellCheckingInspection")
+fun getToolsJar(baseName: String, forWpiLibVersion: WpiLibVersion, project: Project? = null): Path
+{
+    val dir = getWpiLibToolsJarsPath(forWpiLibVersion, project)
+    return if (forWpiLibVersion.frcYear <= 2021)
+    {
+        // 2021 and ealier, it was "shuffleboard.jar", but 2022+ it is "Shuffleboard-2023.1.1-winx64.jar", so "Shuffleboard" should be passed in.
+        val name = if(baseName.equals("shuffleboard", ignoreCase = true)) baseName.lowercase() else baseName
+        dir.resolve("${name}.jar")
+    }
+    else
+    {
+        // we will just get "null" if the dir does not exist
+        dir.toFile()
+            .walk()
+            .filter { it.name.startsWith(baseName, ignoreCase = true) }
+            .sortedBy { it.name }
+            .lastOrNull()?.toPath() ?: run {
+                val os = when {
+                    // based on info here: https://github.com/wpilibsuite/wpilib-tool-plugin/blob/main/src/main/java/edu/wpi/first/tools/NativePlatforms.java
+
+                    SystemInfo.isMac -> if (System.getProperty("os.arch")?.contains("aarch64") == true) "macarm64"  else "macx64"
+                    SystemInfo.isLinux -> "linuxx64"
+                    SystemInfo.isWindows -> if (System.getProperty("os.arch")?.contains("64") == true) "winx64" else "winx32"
+                    else -> "winx64" // we'll default to winx64 as the most common, especially given the low likelihood of this being called
+                }
+                // Example: Shuffleboard-2023.1.1-winx64.jar
+                dir.resolve("${baseName}-${forWpiLibVersion}-${os}.jar") }
+
+        }
+
+
+}
+
+/**
  * Returns the standard path for the Java `RELEASE` file for the wpilib JDK installation, **but does not check if it exists**.
  * Some example content:
  *

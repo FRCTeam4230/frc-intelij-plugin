@@ -217,7 +217,7 @@ fun getToolsJar(baseName: String, forWpiLibVersion: WpiLibVersion, project: Proj
                     else -> "winx64" // we'll default to winx64 as the most common, especially given the low likelihood of this being called
                 }
                 // Example: Shuffleboard-2023.1.1-winx64.jar
-                dir.resolve("${baseName}-${forWpiLibVersion}.jar") }
+                dir.resolve("${baseName}-${forWpiLibVersion}-${os}.jar") }
 
         }
 

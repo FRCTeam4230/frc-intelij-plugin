@@ -49,6 +49,7 @@ import java.nio.file.Path
 // that that is possibly planned:
 // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360010674120-Programatically-Update-Plugin-Version-in-Gradle-Build-File
 
+// See Enhancement 139 for ideas on improving our Gradle interaction:  https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues/139
 private object GradleUtils
 
 private val logger = logger<GradleUtils>()

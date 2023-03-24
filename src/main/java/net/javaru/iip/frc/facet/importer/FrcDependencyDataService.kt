@@ -31,6 +31,7 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.util.containers.ContainerUtil
 import net.javaru.iip.frc.facet.getOrAddFrcFacet
+import net.javaru.iip.frc.util.invokeLater
 
 // https://intellij-support.jetbrains.com/hc/en-us/community/posts/207379795/comments/207661099
 
@@ -98,8 +99,10 @@ class FrcDependencyDataService : AbstractProjectDataService<LibraryDependencyDat
                     val module = modelsProvider.findIdeModule(dataNode.data.ownerModule)
                     if (module?.name?.contains(".main") == true)
                     {
-                        // only add to the main module. In Gradle projects, there is a team123robot.main and team123robot.test module
-                        module.getOrAddFrcFacet(projectData?.owner.toString(), modelsProvider)
+                        invokeLater {
+                            // only add to the main module. In Gradle projects, there is a team123robot.main and team123robot.test module
+                            module.getOrAddFrcFacet(projectData?.owner.toString(), modelsProvider)
+                        }
                     }
                 }
             }

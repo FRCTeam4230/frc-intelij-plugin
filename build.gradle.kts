@@ -48,7 +48,7 @@ plugins {
     //           Last version of docs on GitHub before migration: https://github.com/JetBrains/gradle-intellij-plugin/blob/e819958cdc4e593738cd96e230edd5ca66481b3b/README.md
     //     Info: https://lp.jetbrains.com/gradle-intellij-plugin/
     //     Src:  https://github.com/JetBrains/gradle-intellij-plugin
-    id("org.jetbrains.intellij") version "1.11.0"
+    id("org.jetbrains.intellij") version "1.13.2"
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
     //    https://github.com/jetbrains/gradle-idea-ext-plugin
@@ -125,7 +125,7 @@ tasks {
             //    See https://blog.jetbrains.com/platform/2022/02/removing-log4j-from-the-intellij-platform/
             //        https://docs.oracle.com/en/java/javase/11/docs/api/java.logging/java/util/logging/LogManager.html
             //systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, "idea-sandbox-log4j-config.xml")),
-            systemPropertyGetOrDefault("idea.log.config.properties.file", resolvePath(project.rootDir.canonicalPath, "idea-sandbox-logging.properties")),
+            systemPropertyGetOrDefault("idea.log.config.properties.file", resolvePathFromProjectRootAsString("idea-sandbox-logging.properties")),
             systemPropertyGetOrDefault("frc.show.betas.in.new.project.wizard", "true"),
             // Turn on frc.i10n to see a notification character appended to all localized messages to aid in testing/debugging of message bundles and localization needs
             systemPropertyGetOrDefault("frc.i10n", "false"),
@@ -470,6 +470,18 @@ fun resolvePath(base: String, vararg children: String): String
     var file = File(base)
     children.forEach { file = file.resolve(it) }
     return file.absolutePath.toString()
+}
+
+fun resolvePathFromProjectRootAsString(vararg children: String): String
+{
+    return resolvePathFromProjectRoot(*children).toString()
+}
+
+fun resolvePathFromProjectRoot(vararg children: String): Path
+{
+    var path = Path.of(project.rootDir.canonicalPath)
+    children.forEach { path = path.resolve(it) }
+    return path.toAbsolutePath()
 }
 
 fun determineSandboxDir(): String

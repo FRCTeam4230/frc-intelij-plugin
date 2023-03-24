@@ -29,7 +29,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.util.BuildNumber
 import com.intellij.util.xmlb.XmlSerializerUtil
 import net.javaru.iip.frc.facet.isFrcFacetedProject
@@ -51,9 +51,9 @@ private val logger = logger<FrcPluginVersionManagerApplicationService>()
  * checks if the running version of IntelliJ IDEA is EOL for the FRC plugin and/or if a
  * new version of the FRC plugin is available but requires the user to upgrade Intellij IDEA.
  */
-class FrcPluginVersionManagerStartupActivity : StartupActivity, DumbAware
+class FrcPluginVersionManagerStartupActivity : ProjectActivity, DumbAware
 {
-    override fun runActivity(project: Project)
+    override suspend fun execute(project: Project)
     {
         logger.debug("[FRC] FrcPluginVersionManagerStartupActivity.runActivity() running")
         FrcPluginVersionManagerApplicationService.getInstance().checkPluginUpdateStatusViaBackGroundTask(project)

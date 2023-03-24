@@ -31,7 +31,7 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.ModuleListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootListener
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.util.messages.MessageBusConnection
 import net.javaru.iip.frc.facet.isFrcFacet
@@ -121,7 +121,7 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
         service<RioLogUdpSocketManagerApplicationService>().deregister(project)
     }
 
-    override fun modulesAdded(project: Project, modules: MutableList<Module>)
+    override fun modulesAdded(project: Project, modules: MutableList<out Module>)
     {
         logger.trace {"[FRC] FrcProjectLifecycleService.moduleAdded() called for modules '$modules' on project '$project'"}
         // We only want to update the RioLogConsole if the project is fully opened. In other words, this is a
@@ -195,10 +195,9 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
 
 }
 
-// Do NOT make a StartupActivity.Background since we want indexing to be complete when executed
-class FrcProjectLifecycleServiceStartupActivity : StartupActivity
+class FrcProjectLifecycleServiceStartupActivity : ProjectActivity
 {
-    override fun runActivity(project: Project)
+    override suspend fun execute(project: Project)
     {
         val service = FrcProjectLifecycleService.getInstance(project)
         service.registerListeners()

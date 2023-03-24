@@ -36,7 +36,6 @@ import com.intellij.openapi.progress.Task.Backgroundable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.psi.PsiFile
-import com.intellij.util.Consumer
 import io.sentry.Attachment
 import io.sentry.Scope
 import io.sentry.Sentry
@@ -179,7 +178,8 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
     override fun submit(events: Array<out IdeaLoggingEvent>,
                         additionalInfo: String?,
                         parentComponent: Component,
-                        consumer: Consumer<in SubmittedReportInfo>): Boolean
+                        // Note: we can't replace use of deprecated 'Consumer' until the ErrorReportSubmitter.submit() method changes
+                        consumer: com.intellij.util.Consumer<in SubmittedReportInfo>): Boolean
     {
         if (isNotInitialized) return false
         val lastActionId = IdeaLogger.ourLastActionId ?: "<unknown>"

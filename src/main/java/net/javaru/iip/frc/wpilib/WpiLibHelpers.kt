@@ -23,7 +23,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.psi.PsiLiteralExpression
-import com.intellij.util.io.exists
 import com.intellij.util.io.isFile
 import com.intellij.util.lang.JavaVersion
 import net.javaru.iip.frc.FrcPluginGlobals
@@ -40,6 +39,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
+import kotlin.io.path.exists
 
 object WpiLibHelpers
 private val logger = logger<WpiLibHelpers>()

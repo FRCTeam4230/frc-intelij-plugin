@@ -32,7 +32,7 @@ import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.service.project.ExternalProjectRefreshCallback
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.startup.StartupManager
 import com.intellij.psi.PsiElement
 import com.intellij.util.DocumentUtil
@@ -70,9 +70,9 @@ const val gradleRioId = "edu.wpi.first.GradleRIO"
 // AcceptedLanguageLevelsSettings sows a class tha is both a StartupActivity and an application Service
 
 // NOTE: We CANNOT use StartupActivity.Background for this as per the docs, it "should not be used for any work that requires access to indices", which this does
-class WpiLibVersionStartupActivity : StartupActivity
+class WpiLibVersionStartupActivity : ProjectActivity
 {
-    override fun runActivity(project: Project)
+    override suspend fun execute(project: Project)
     {
         if (project.isFrcFacetedProject())
         {

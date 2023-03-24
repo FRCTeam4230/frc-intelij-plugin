@@ -33,7 +33,7 @@ import com.intellij.openapi.progress.PerformInBackgroundOption
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -518,10 +518,13 @@ class VendordepsParsingException(val jsonFile: JsonFile, cause: Throwable) : Run
 }
 
 // Pre IJ v2019.3, need to use StartupActivity rather than StartupActivity.Background (and change the plugin.xml element to match)
-class VendordepsServicesStartupActivity : StartupActivity.Background
+// StartupActivity.Background was deprecated in v2023.1. It recommends to use 'ProjectActivity' interface (with the <postStartupActivity> element)
+// Also see  com.intellij.openapi.startup.StartupManager and com.intellij.ide.util.RunOnceUtil
+// <postStartupActivity implementation="com.intellij.ide.bookmark.BookmarksStartupActivity"/>
+class VendordepsServicesStartupActivity : ProjectActivity
 {
     private val logger = logger<VendordepsServicesStartupActivity>()
-    override fun runActivity(project: Project)
+    override suspend fun execute(project: Project)
     {
         if (project.isFrcFacetedProject())
         {

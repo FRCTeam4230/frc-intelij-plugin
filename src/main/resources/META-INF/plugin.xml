@@ -52,6 +52,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v3.1.1</strong> <br>
+        &nbsp;&nbsp;&bull; Changes to make compatible with IntelliJ IDEA v2023.1<br>
+        &nbsp;&nbsp;&bull; <strong>Note:</strong> I have not done any work yet to check on compatibility with the new UI. That will be done over the summer.<br>
+        <br>
         <strong>v3.1.0</strong> <br>
         &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/138'>issue #138</a>, making the use of the
                            bundled <em>Shell Script</em> plugin optional.<br>
@@ -327,7 +331,7 @@
         <projectService id="FRC.FrcSshSettings"     serviceImplementation="net.javaru.iip.frc.settings.FrcSshSettings" />
         <projectService id="FRC.FrcVendordepsService" serviceImplementation="net.javaru.iip.frc.wpilib.vendordeps.VendordepsService" />
         <projectService id="FRC.VendordepsFileListener" serviceImplementation="net.javaru.iip.frc.wpilib.vendordeps.VendordepsFileListener" />
-        <backgroundPostStartupActivity id="FRC.VendordepsServicesStartupActivity" implementation="net.javaru.iip.frc.wpilib.vendordeps.VendordepsServicesStartupActivity" />
+        <postStartupActivity id="FRC.VendordepsServicesStartupActivity" implementation="net.javaru.iip.frc.wpilib.vendordeps.VendordepsServicesStartupActivity" />
         <postStartupActivity id="FRC.FrcPluginVersionManagerStartupActivity" implementation="net.javaru.iip.frc.plugin.FrcPluginVersionManagerStartupActivity" />
         <projectService id="FRC.WpiLibUpdateCheckingService" serviceImplementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionService" />
         <postStartupActivity implementation="net.javaru.iip.frc.wpilib.services.WpiLibVersionStartupActivity" />

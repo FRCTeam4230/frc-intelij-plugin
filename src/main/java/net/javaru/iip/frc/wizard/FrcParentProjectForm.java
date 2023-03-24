@@ -17,6 +17,7 @@
 package net.javaru.iip.frc.wizard;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,9 +45,6 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.EditorTextField;
 import com.intellij.util.ArrayUtil;
-import com.intellij.util.Consumer;
-import com.intellij.util.EmptyConsumer;
-import com.intellij.util.NullableConsumer;
 import com.intellij.util.ui.UIUtil;
 
 
@@ -73,11 +71,11 @@ public class FrcParentProjectForm implements Disposable
     private JButton mySelectParent;
     
     
-    public FrcParentProjectForm(@NotNull WizardContext context, @Nullable NullableConsumer<ProjectData> consumer)
+    public FrcParentProjectForm(@NotNull WizardContext context, @Nullable Consumer<ProjectData> consumer)
     {
         myProjectOrNull = context.getProject();
         myContext = context;
-        myConsumer = consumer == null ? EmptyConsumer.getInstance() : consumer;
+        myConsumer = consumer != null ? consumer : projectData -> { /* no-op/empty consumer */ };
         myIsVisible = !context.isCreatingNewProject() && myProjectOrNull != null /*&& isGradleModuleExist(context)*/;
         initComponents();
     }
@@ -90,7 +88,7 @@ public class FrcParentProjectForm implements Disposable
         mySelectParent.setIcon(AllIcons.Nodes.Module);
         mySelectParent.addActionListener(e -> {
             myParent = doSelectProject(myParent);
-            myConsumer.consume(myParent);
+            myConsumer.accept(myParent);
         });
         if (myParent == null)
         {

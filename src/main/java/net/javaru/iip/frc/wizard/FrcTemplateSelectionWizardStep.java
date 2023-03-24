@@ -27,7 +27,6 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.commons.lang3.BooleanUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.esotericsoftware.minlog.Log;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.WizardContext;
@@ -369,7 +368,7 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
         }
         catch (Exception e)
         {
-            Log.warn("[FRC] Exception when determining selected template in new project wizard: " + e.toString(), e);
+            LOG.warn("[FRC] Exception when determining selected template in new project wizard: " + e.toString(), e);
             return null;
         }
     }

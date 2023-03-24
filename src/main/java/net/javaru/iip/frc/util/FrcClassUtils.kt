@@ -15,7 +15,6 @@
  */
 package net.javaru.iip.frc.util
 
-import com.esotericsoftware.minlog.Log
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.module.Module
@@ -298,7 +297,7 @@ fun findImplementationsForScope(project: Project,
     val possibleClasses = facade.findClasses(classFQN, baseClassSearchScope)
     if (possibleClasses.isEmpty())
     {
-        Log.info("[FRC] Could not find base class/interface '" + classFQN + "' in project '" + project.name
+        logger.info("[FRC] Could not find base class/interface '" + classFQN + "' in project '" + project.name
                  + "' and therefore cannot look for implementations/subclasses")
     }
     val result: MutableSet<PsiClass> = HashSet()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2022 the original author or authors.
+ * Copyright 2015-2023 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -54,7 +54,6 @@ import net.javaru.iip.frc.i18n.FrcMessageKey
 import net.javaru.iip.frc.isUnitTestMode
 import net.javaru.iip.frc.notify.FrcNotifyType
 import net.javaru.iip.frc.psi.FrcGeneralChangePsiTreeChangeListenerAdapter
-import net.javaru.iip.frc.services.FrcErrorReportSubmitter
 import net.javaru.iip.frc.services.FrcPluginProjectDisposable
 import net.javaru.iip.frc.util.findCommonParentDir
 import net.javaru.iip.frc.util.findPsiDirectory
@@ -282,7 +281,7 @@ class VendordepsService private constructor(val project: Project): Disposable
                 .nonBlocking(Callable { updateVendordepsListingWork() })
                 .inSmartMode(project)
                 .expireWith(this)
-                .finishOnUiThread(ModalityState.NON_MODAL) { result ->
+                .finishOnUiThread(ModalityState.nonModal()) { result ->
                     vendordepsProjectFilesListing = result
                     if (notifyOnDuplicates) { notifyAboutDuplicatesIfAny() }
                 }

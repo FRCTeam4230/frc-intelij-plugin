@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2023 the original author or authors.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *     
  *     Unless required by applicable law or agreed to in writing, software
  *     distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,18 +16,17 @@
 
 package net.javaru.iip.frc.settings;
 
-import javax.swing.*;
-
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
-
-import net.javaru.iip.frc.i18n.FrcBundle;
+import net.javaru.iip.frc.i18n.FrcPluginConfigBundle;
 import net.javaru.iip.frc.settings.forms.FrcApplicationSettingsForm;
+import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 
 
@@ -52,7 +51,9 @@ public class FrcApplicationSettingsConfigurable implements SearchableConfigurabl
     @Override
     public String getDisplayName()
     {
-        return FrcBundle.message("frc.ui.application.settings.display.name");
+        // Note that this message in the Plugin Config Bundle (not the standard FrcBundle) since it is also used
+        // in the 'key' attribute of the applicationConfigurable (for this class) in the plugin.xml 
+        return FrcPluginConfigBundle.message("frc.application.settings.display.name");
     }
 
 

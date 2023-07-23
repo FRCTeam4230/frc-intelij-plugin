@@ -314,9 +314,10 @@
 
         <applicationConfigurable id="preferences.language.FRC"
                                  instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable"
-                                 groupId="language" 
-                                 displayName="FRC"
-                                 />
+                                 groupId="language"
+                                 key="frc.application.settings.display.name"
+        />
+        
         <!-- Commenting out for now. Rethinking that these should be at the module/facet level rather than project level. -->
         <!--<projectConfigurable id="preferences.language.FRC.project"
                              instance="net.javaru.iip.frc.settings.FrcProjectSettingsConfigurable"

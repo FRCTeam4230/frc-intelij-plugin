@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2015-2022 the original author or authors.
+  ~ Copyright 2015-2023 the original author or authors.
   ~
   ~     Licensed under the Apache License, Version 2.0 (the "License");
   ~     you may not use this file except in compliance with the License.
@@ -311,7 +311,9 @@
 
         <applicationConfigurable id="preferences.language.FRC"
                                  instance="net.javaru.iip.frc.settings.FrcApplicationSettingsConfigurable"
-                                 groupId="language" />
+                                 groupId="language" 
+                                 displayName="FRC"
+                                 />
         <!-- Commenting out for now. Rethinking that these should be at the module/facet level rather than project level. -->
         <!--<projectConfigurable id="preferences.language.FRC.project"
                              instance="net.javaru.iip.frc.settings.FrcProjectSettingsConfigurable"

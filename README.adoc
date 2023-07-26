@@ -19,21 +19,22 @@ endif::[]
 
 == About
 
-An IntelliJ IDEA plugin for FIRST Robotics Competition (FRC) robot development in Java. This plugin works with either the free open-sourced Community Edition or Education Edition, or the licensed Ultimate Edition of IntelliJ IDEA.
-
-.Supported IntelliJ IDEA versions
-[IMPORTANT]
-*IntelliJ IDEA v2021.2 or later is required.* The FRC plugin typically supports the last three major versions of IntelliJ IDEA. While I wish I could support more versions, doing so adds considerable time to the development of the plugin as I have to maintain separate branches for each major version as the Intellij IDEA Plugin API evolves. I would much rather put that time into adding new features. Given that this plugin works fully with the free IntelliJ IDEA Community edition, I do not think asking users to use a major version released within the past year is overly burdensome. Thank you for your understanding.
+An IntelliJ IDEA plugin for *https://www.firstinspires.org/[_FIRST_] Robotics Competition (https://www.firstinspires.org/robotics/frc[FRC])* robot development
+in Java and Kotlin. This plugin works with either the free open-source Community Edition or Education Edition, or the licensed Ultimate Edition of IntelliJ IDEA.
+More information available at the https://plugins.jetbrains.com/plugin/9405-frc[plugin's page] of the JetBrains Marketplace (formerly the JetBrains Plugin Repository.)
 
 
-== Known Issues
+== Issues
 
-Please report any issues via the https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues[Project's Issue Tracker].
+Please report any issues or feature requests via the https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues[Project's Issue Tracker].
 Please note, that I use GitLab to host the project. You can https://gitlab.com/users/sign_in[log into] GiLab using your GitHub, Bitbucket, Twitter, or Google credentials if desired.
+THis project is developed and maintained by an FRC Team mentor, hi 👋. Please do not contact _FIRST_ or the WPI Lib maintainers for support or issues. Submit an
+issue at the above link and I will happily address it. Thanks.
 
-=== Documentation needs updating
+=== Known Issues
+==== Documentation needs updating
 
-The documentation at this project's wiki is very outdated. It has not been updated since the plugin was transition from Ant based projects to the Gradle based projects.
+The documentation at this project's wiki is outdated. It has not been updated since the plugin was transition from Ant based projects to the Gradle based projects.
 I will do my best to get it updated. But for the most part, the plugin's use is fairly intuitive.
 
 [#eol-policy]
@@ -44,7 +45,7 @@ to the latest two major versions, or in very rare cases, only the latest/current
 When there are significant changes in the IntelliJ IDEA plugin APIs, or it becomes otherwise difficult to maintain support for older versions of IntelliJ IDEA,
 I will discontinue support for those older versions, regardless of how many actively supported versions (beyond the current version) remain. This allows me to
 implement new features using the newer plugin APIs, and migrate existing features off of deprecated parts of the plugin APIs. Sometimes these API changes are significant
-and require a lot or refactoring work to bring the plugin up to date.
+and require a lot of refactoring work to bring the plugin up to date.
 
 Trying to maintain support for numerous older versions would take _considerable_ time as the lines of development diverge, and would require me to implement/modify features
 (and test them) multiple times, leveraging different APIs. I would much rather spend that time developing additional new features and additional improvements.
@@ -54,28 +55,34 @@ I would rather do the latter. And I believe most users would prefer that as well
 https://www.jetbrains.com/toolbox-app/[JetBrains Toolbox App] makes updating IntelliJ IDEA super easy, and it allows for multiple versions to easily coexist on your system.
 
 The JetBrains release cycle adds some additional difficulties. The 20xx.3 version is typically released in late November to early December. This is of course just before build season
-when I am busy implmenting new WPILib features in the plugin. I do my best to support the new .3 version as soon as possible. But if incompatibilities exist, support may get delayed
-while I focus on implmenting new WPILib/FRC features required for the new build season. For example, the addition of the Command Based Robot v2 API for the 2020 season took considerable
+when I am busy implementing new WPILib features in the plugin. I do my best to support the new .3 version as soon as possible. But if incompatibilities exist, support may get delayed
+while I focus on implementing new WPILib/FRC features required for the new build season. For example, the addition of the Command Based Robot v2 API for the 2020 season took considerable
 time to implement support for, with that work taking place in December 2019 just as IntelliJ IDEA v2019.3 was released. Despite that, however, I was able to support v2019.3 for the
-2020 competition season. That may not always be the case however.
+2020 competition season. That may not always be the case, however. Adding to the timing complexities, JetBrains typically releases v20xx.1 version in mid-March. Out Teams Regional
+is always mid-March. As such, my duties as the Lead Software Developer, and typically software developer, for our team demand my full attention. This may delay my ability to provide support
+to the 20xx.1 version upon its release.
 
 === Version Support Summary
 In general, my goal *at Build Season Kick Off time* is:
 
-* _Usually_ support the *.3 version* released just prior to kick off
+* _Usually_ support the *.3 version* is released a couple of weeks prior to kick off
 ** For example, the December 2019 release of v2019.3 for the 2020 FRC season
 ** Any issues preventing immediate support will be fixed as soon as possible, but not at the cost of not supporting new primary WPILib/FRC features
 ** Historically, I have always been able to support the .3 version upon its release by JetBrains
 * _Always_ support the *.2 version* released the year prior to kick off
 ** For example, v2019.2 for the 2020 FRC season
 ** The only exception _might_ be if the late implementation of a new WPILib/FRC feature would be best done using a plugin API introduced in the recent .3 version
+* _If possible_, support the *.1 version* released in March during the build season and regional competitions
+** For example, v2020.1 during the 2020 FRC season
+** Since I am focused my mentoring duties, I may not be able to immediately implement an upgrade to support the new version, particularly if there are a large number of API changes
+** It's recommended you check if a compatible version of the plugin is available prior to upgrading to the *.1 version* upon its release in March
 * _If possible_, support the *.1 version* released the year prior to kick off
 ** For example, v2019.1 for the 2020 FRC season
-** If the implmenting of any new WPILib/FRC features require (or is best done) using new Plugin APIs introduced in the .2 version, .1 support will be ended.
+** If the implementing of any new WPILib/FRC features require (or is best done) using new Plugin APIs introduced in the .2 version, .1 support will be ended.
 ** In general, it is more likely that the .1 version will *not* be supported
 ** .1 version support may end at any time during the build/competition season.
-** .1 version will always end the summer after the build/competition season, if not ended previously.
-* _Will not support_ any previous releases. For example, none of the 2018.x versions (or prior) were supported for the 2020 build season.
+** .1 version will (almost) always end the summer after the build/competition season, if not ended previously.
+* _Will most likely not support_ any previous releases. For example, none of the 2018.x versions (or prior) were supported for the 2020 build season.
 
 === Your best option
 Below is the recommended timeframe for upgrades of IntelliJ IDEA
@@ -83,12 +90,21 @@ Below is the recommended timeframe for upgrades of IntelliJ IDEA
 . *FRC pre-season* (i.e. September through December), use the latest .2 version.
 ** You should be fine using the .2 version through the build/competition season. But upgrading to the .3 version when supported is recommended.
 . *Late December*, upgrade to the .3 version once the FRC plugin support for it is available (recommended).
-. *During the build/competition season*, use .3 version if supported (it usually is) or the .2 version (being aware that while unlikely, support for it _may_ end mid-season)
+. *During the build/competition season*, use .3 version if supported (it typically is) or the .2 version (being aware that while unlikely, support for it _may_ end mid-season)
 ** The subsequent .1 version is usually released in March or April. I do my best to support it when it is released. But continued use of the latest .3 version may be necessary.
-. *Post competition season*, continue to either use the latest .3 version, or upgrade to the .1 version if/once supported.
+. *Post competition season*, continue to either use the latest .3 version, or upgrade to the .1 version once supported.
 . *August or September*, before the start of the school year / FRC pre-season, upgrade to the current .2 version to prepare for the next season.
 
 [#plugin-versioning]
 == Plugin Versioning
-The plugin follows a versioning scheme of `{pluginVersion}-{ideaVersion}`. For example, version 1.3.0 of the plugin built for IntelliJ IDEA v2020.1 has a
+The plugin follows a versioning scheme of `[pluginVersion]-[ideaVersion]`. For example, version 1.3.0 of the plugin built for IntelliJ IDEA v2020.1 has a
 version of `1.3.0-2020.1`, and version 1.3.0 of the plugin built for IntelliJ IDEA v2019.3 has a version of `1.3.0-2019.3`.
+
+== Major Version
+As of v2.x, the major version will increase for each FRC build season. Thus:
+
+- version < = 1.x covered build seasons 2017-2021
+- version 2.x was for build season 2022
+- version 3,x for build season 2023
+- version 4.x for build season 2024
+- etc.

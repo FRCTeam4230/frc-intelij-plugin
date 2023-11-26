@@ -200,6 +200,7 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
                         // withScope however creates a clone of the current scope and will stay isolated until the function call is completed.
                         // https://docs.sentry.io/platforms/java/enriching-events/scopes/#local-scopes
                         Sentry.withScope { scope: Scope ->
+                            scope.setExtraSafely("submission.methodology", "User Dialog (i.e. ErrorReportSubmitter)")
                             // Set the last action ID as it might be useful for debugging
                             scope.setExtraSafely("last.action", lastActionId)
                             scope.setExtraSafely("plugin.name", IdeErrorsDialog.getPlugin(ideaEvent)?.name)
@@ -280,6 +281,7 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
                     try
                     {
                         Sentry.withScope { scope: Scope ->
+                            scope.setExtraSafely("submission.methodology", "automated via a FrcReportableEvent")
                             scope.setExtraSafely("event.type", "FrcReportableEvent")
                             scope.setExtraSafely("last.action", event.lastActionId)
                             scope.setExtraSafely("correlationId", event.correlationId)
@@ -327,6 +329,7 @@ object FrcErrorReportSubmitter: ErrorReportSubmitter()
                     try
                     {
                         Sentry.withScope { scope: Scope ->
+                            scope.setExtraSafely("submission.methodology", "automated via a VendordepsFileParsingError")
                             scope.setExtraSafely("event.type", "VendordepsFileParsingError")
                             scope.addPsiFileAsAttachment(exception.jsonFile)
                             scope.addThrowableAsAttachment(exception)

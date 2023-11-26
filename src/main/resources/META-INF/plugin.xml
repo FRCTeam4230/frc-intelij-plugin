@@ -59,6 +59,9 @@
         &nbsp;&nbsp;&bull; IntelliJ IDEA 2023.1 support added, requiring changes to make the plugin compatible with API changes in 2023.1<br>
         <br>
         <strong>v3.1.0</strong> <br>
+        &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/145'>issue #145</a>Write access is allowed inside write-action only during FrcFacet add.<br>
+        <br>
+        <strong>v3.0.1</strong> <br><strong>v3.1.0</strong> <br>
         &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/138'>issue #138</a>, making the use of the
                            bundled <em>Shell Script</em> plugin optional.<br>
         <br>

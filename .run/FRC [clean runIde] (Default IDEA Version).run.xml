@@ -8,6 +8,8 @@
     <log_file alias="223-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-223/system/log/idea.log" />
     <log_file alias="231-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-231/system/log/idea.log" />
     <log_file alias="latest-eap-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-LATEST-EAP-SNAPSHOT/system/log/idea.log" />
+    <log_file alias="232-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-232/system/log/idea.log" />
+    <log_file alias="233-idea.log" path="$PROJECT_DIR$/.sandboxes/.sandbox-233/system/log/idea.log" />
     <ExternalSystemSettings>
       <option name="env">
         <map>

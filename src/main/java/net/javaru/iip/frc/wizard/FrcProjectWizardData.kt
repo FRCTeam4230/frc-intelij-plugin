@@ -132,7 +132,8 @@ class FrcProjectWizardData(
                 2021 -> """https\://services.gradle.org/distributions/gradle-6.0.1-bin.zip"""
                 2022 -> """https\://services.gradle.org/distributions/gradle-7.3.2-bin.zip"""
                 2023 -> """https\://services.gradle.org/distributions/gradle-7.5.1-bin.zip"""
-                else -> """https\://services.gradle.org/distributions/gradle-7.5.1-bin.zip"""
+                2024 -> """https\://services.gradle.org/distributions/gradle-8.4-bin.zip"""
+                else -> """https\://services.gradle.org/distributions/gradle-8.4-bin.zip"""
             }
             return if (useGradleAllDistribution || FrcApplicationSettings.getInstance().isTeam3838() || teamNumber == 3838)
                 retval.replace("-bin", "-all")

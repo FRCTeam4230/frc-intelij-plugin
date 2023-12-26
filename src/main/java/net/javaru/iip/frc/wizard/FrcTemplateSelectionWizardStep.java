@@ -268,19 +268,8 @@ public class FrcTemplateSelectionWizardStep extends ModuleWizardStep
     public boolean validate() throws ConfigurationException
     {
         LOG.trace("[FRC] Entering FrcTemplateSelectionWizardStep.validate()");
-        // TODO : https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/53 
-        //        Get required minimum Java level from selected template, and if none there, then from the 
-        //           JAVA_VERSION key in 
-        //            2019: C:\Users\Public\frc${frcYear}\jdk\release
-        //            2020+ C:\Users\Public\wpilib\${frcYear}\jdk\release 
-        //        From https://docs.wpilib.org/en/latest/docs/getting-started/getting-started-frc-control-system/wpilib-setup.html
-        //        The installation directory has changed for 2020. In 2019 the software was installed to  ~\frcYYYY where ~ is C:\Users\Public on Windows and YYYY is the FRC year. 
-        //        In 2020 and later it is installed to  ~\wpilib\YYYY  This lessens clutter when multiple years software are installed.
-        //        Regardless of whether All Users or Current User is chosen, the software is installed to C:\Users\Public\wpilib\YYYY where YYYY is the current FRC year. 
-        //            If you choose All Users, then shortcuts are installed to all users desktop and start menu and system environment variables are set. 
-        //            If Current User is chosen, then shortcuts and environment variables are set for only the current user.
         FrcJavaLangUtilsKt.validateMinimumJavaVersion(myContext,
-                                                      11,
+                                                      myBuilder.getRequiredJdkVersionForWpiLibVersion(),
                                                       FrcMessageKey.of("frc.ui.wizard.validate.minJavaVersion.additionalMessage.goBack"));
     
         

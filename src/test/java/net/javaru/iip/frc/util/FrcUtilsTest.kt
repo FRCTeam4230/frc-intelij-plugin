@@ -36,12 +36,12 @@ internal class FrcUtilsTest
 //        println("configuredJavaVersion = '${configuredJavaVersion}'")
         assertAll(
                 { 
-                    assertEquals(TitleMessagePair("Invalid JDK Version", "<html><b style=\"font-size:x-large;\">Invalid JDK Version</b><br>The template you've selected requires a version 11.0.1 (feature level 11) or better JDK as the SDK, but the SDK version selected is 1.8.0_221 (feature level 8).</html>"),
+                    assertEquals(TitleMessagePair("Invalid JDK Version", "<html><b style=\"font-size:x-large;\">Invalid JDK Version</b><br>The WPI Lib version you've selected requires a version 11.0.1 (feature level 11) or better JDK as the SDK, but the SDK version selected is 1.8.0_221 (feature level 8).</html>"),
                                  createInvalidJdkTitleMessagePair(requiredMinimumJavaVersion, configuredJavaVersion, null)) 
                 },
 
                 {
-                    assertEquals(TitleMessagePair("Invalid JDK Version", "<html><b style=\"font-size:x-large;\">Invalid JDK Version</b><br>The template you've selected requires a version 11.0.1 (feature level 11) or better JDK as the SDK, but the SDK version selected is 1.8.0_221 (feature level 8). My test message with parameter 0 of «foo» and parameter 1 of «bar».</html>"),
+                    assertEquals(TitleMessagePair("Invalid JDK Version", "<html><b style=\"font-size:x-large;\">Invalid JDK Version</b><br>The WPI Lib version you've selected requires a version 11.0.1 (feature level 11) or better JDK as the SDK, but the SDK version selected is 1.8.0_221 (feature level 8). My test message with parameter 0 of «foo» and parameter 1 of «bar».</html>"),
                                  createInvalidJdkTitleMessagePair(requiredMinimumJavaVersion, configuredJavaVersion, FrcMessageKey.of("frc.internal.unitTest.2", "foo", "bar")))
                 }
                  )

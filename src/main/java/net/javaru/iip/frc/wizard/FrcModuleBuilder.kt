@@ -55,6 +55,7 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.pom.java.LanguageLevel
 import com.intellij.projectImport.ProjectImportProvider
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiManager
@@ -62,6 +63,7 @@ import com.intellij.psi.search.SearchScope
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.containers.stream
 import com.intellij.util.io.HttpRequests
+import com.intellij.util.lang.JavaVersion
 import freemarker.template.Template
 import icons.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION
@@ -1007,7 +1009,16 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
     }
 
-    fun isSelectedSdkValid(): Boolean = selectedSdk.isValidJdk()
+    fun isSelectedSdkValid(): Boolean = selectedSdk.isValidJdk(getRequiredJdkVersionForWpiLibVersion())
+
+    fun getRequiredJdkVersionForWpiLibVersion(): JavaVersion = when
+    {
+        // TODO: Issue #53 - It'd be nice to determine this dynamically. But ultimately there may not be a clean way.
+        //       We could potentially look at the version in the Gradle Te,plate
+        // Also update 'frc.ui.wizard.sdkRequirement.text' message key
+        dataModel.frcYear <= 2023 -> LanguageLevel.JDK_11.toJavaVersion()
+        else                      -> LanguageLevel.JDK_17.toJavaVersion()
+    }
 
     companion object
     {

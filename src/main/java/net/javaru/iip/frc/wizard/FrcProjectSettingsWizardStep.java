@@ -398,9 +398,8 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
             }
         }
         
-        //TODO get required minimum Java level from selected template - and perhaps change the validation message
         FrcJavaLangUtilsKt.validateMinimumJavaVersion(myContext,
-                                                      11,
+                                                      myBuilder.getRequiredJdkVersionForWpiLibVersion(),
                                                       FrcMessageKey.of("frc.ui.wizard.validate.minJavaVersion.additionalMessage.goBack"));
         
         

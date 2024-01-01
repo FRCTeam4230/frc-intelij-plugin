@@ -599,6 +599,8 @@
                     class="net.javaru.iip.frc.actions.tools.internal.ReimportGradleProjectInternalAction" />
             <action id="FRC.tools.internal.MarkGradleProjectDirty"
                     class="net.javaru.iip.frc.actions.tools.internal.MarkGradleProjectDirtyInternalAction" />
+            <action id="FRC.tools.internal.CheckRobotProjectTypeInfo"
+                    class="net.javaru.iip.frc.actions.tools.internal.CheckRobotProjectTypeInfo" />
             <action id="FRC.tools.internal.CheckIncludeDesktopSupportSetting"
                     class="net.javaru.iip.frc.actions.tools.internal.CheckIncludeDesktopSupportSetting" />
             <action id="FRC.tools.internal.CheckGradleHasRoborioDeployTarget"

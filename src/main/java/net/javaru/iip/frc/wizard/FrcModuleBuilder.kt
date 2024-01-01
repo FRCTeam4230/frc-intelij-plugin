@@ -327,7 +327,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         StartupManager.getInstance(project).runAfterOpened {
             DumbService.getInstance(project).smartInvokeLater {
                 // I've tried 'runWriteAction' and 'invokeLater' here, both outside and inside 'runWhenSmart'.
-                // But the issue persisted. I think the smartInvokeLater has resolved it.
+                // But the issue persisted. The smartInvokeLater has reduced its occurrence, but it still occurs occasionally.
                     createAllRunDebugConfigurations(RunDebugConfigsCreationData.create(dataModel, project))
                     project.reimportGradleProject()
             }

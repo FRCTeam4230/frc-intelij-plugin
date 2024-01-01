@@ -52,8 +52,6 @@ import net.javaru.iip.frc.util.getCurrentFrcYear
 import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
 import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.runWhenSmart
-import net.javaru.iip.frc.wizard.FrcProjectWizardData
-import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFile
 import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsManagementDialogWrapper
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsProjectFilesListing
@@ -269,6 +267,20 @@ class FetchSpecifiedRestResource: AbstractFrcInternalAction()
     }
 }
 
+class CheckRobotProjectTypeInfo : AbstractFrcInternalAction()
+{
+    override fun actionPerformed(actionEvent: AnActionEvent)
+    {
+        executeIfProjectNotNull(actionEvent, actionName = "Check RobotProjectTypeInfo") { project: Project ->
+            val result = FrcGradleService.getRobotProjectTypeInfo(project)
+            logger.info("RobotProjectTypeInfo: $result")
+            FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON
+                .withContent("RobotProjectTypeInfo: $result")
+                .notify(project)
+        }
+    }
+}
+
 class CheckIncludeDesktopSupportSetting : AbstractFrcInternalAction()
 {
     override fun actionPerformed(actionEvent: AnActionEvent)
@@ -281,6 +293,7 @@ class CheckIncludeDesktopSupportSetting : AbstractFrcInternalAction()
         }
     }
 }
+
 class CheckGradleHasRoborioDeployTarget : AbstractFrcInternalAction()
 {
     override fun actionPerformed(actionEvent: AnActionEvent)

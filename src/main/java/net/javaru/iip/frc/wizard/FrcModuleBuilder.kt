@@ -104,6 +104,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.swing.Icon
 
 private const val gitignoreIoUrl = "https://www.toptal.com/developers/gitignore"
@@ -332,6 +333,40 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                     project.reimportGradleProject()
             }
         }
+
+        // This a messy hack to resolve the issue of the run/debug configs not always getting created. I *suspect* the proper solution is that we have
+        // to implement code to handle the case of the above creation getting interrupted by indexing starting back up. Need to investigate this.
+        class CreateTimeTask(private val id: Int, private val doReimport: Boolean): TimerTask() {
+            override fun run()
+            {
+                try
+                {
+                    DumbService.getInstance(project).smartInvokeLater {
+                        try
+                        {
+                            logger.info("[FRC] 'Verify run/debug config creation' TimerTask $id firing")
+                            createAllRunDebugConfigurations(RunDebugConfigsCreationData.create(dataModel, project))
+                            if (doReimport) project.reimportGradleProject()
+                        }
+                        catch (e: Exception)
+                        {
+                            logger.warn("[FRC] An exception occurred when smart invoking later the 'Verify run/debug config creation' via TimerTask $id. Cause: $e")
+                            if (e is ProcessCanceledException) throw e
+                        }
+                    }
+                }
+                catch (e: Exception)
+                {
+                    logger.warn("[FRC] Could not run 'Verify run/debug config creation' TimerTask $id. Cause: $e")
+                    if (e is ProcessCanceledException) throw e
+                }
+            }
+        }
+        val timer = Timer("Verify run/debug config creation timer")
+        // The first 2 should almost assuredly work, but we add a third one after a good solid 3 minutes to catch any lingering issues, but do not reimport as the user may be coding by then
+        timer.schedule(CreateTimeTask(1, doReimport = true), TimeUnit.SECONDS.toMillis(30))
+        timer.schedule(CreateTimeTask(2, doReimport = true), TimeUnit.MINUTES.toMillis(1))
+        timer.schedule(CreateTimeTask(3, doReimport = false), TimeUnit.MINUTES.toMillis(3))
     }
 
 

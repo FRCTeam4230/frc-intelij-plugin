@@ -96,6 +96,10 @@ dependencies {
     nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
     simulationRelease wpi.sim.enableRelease()
 </#if>
+<#if data.getIncludeKotlinSupport()>
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+</#if>
 <#if data.junitUseJUnitPlatform()>
 
     testImplementation platform("org.junit:junit-bom:${data.junit5Version}")

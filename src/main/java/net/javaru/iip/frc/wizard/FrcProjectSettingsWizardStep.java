@@ -562,7 +562,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         enableDesktopSupportCheckBox.setVisible(dataModel.getWpilibVersion().getFrcYear() >= 2021);
         if (!userHasModifiedDesktopSupport)
         {
-            enableDesktopSupportCheckBox.setSelected(dataModel.isRomiTemplate());
+            enableDesktopSupportCheckBox.setSelected(dataModel.getRobotType().getIncludeDesktopSupportDefault());
         }
     }
     

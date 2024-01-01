@@ -9,8 +9,18 @@
 == Freemarker Notes
 
 === Developer notes
-* When committing Freemarker Template changes, do not allow IntelliJ IDEA to "Optimize Imports" (via said option in the commit dialog) as it will cause issues with the Freemarker templates with Java as the Template Data Language (reported via https://youtrack.jetbrains.com/issue/IDEA-226072[IDEA-226072])
+* *When committing Freemarker Template changes, do not allow IntelliJ IDEA to "Optimize Imports"* (via said option in the commit dialog) as it will cause issues with the Freemarker templates with Java as the Template Data Language (reported via https://youtrack.jetbrains.com/issue/IDEA-226072[IDEA-226072])
 * *Changes not picked up:* Sometimes after making a template change, upon testing, the change is not present. The template file does seem to change in both the `build` output and in the `.sandbox\plugins\FRC`. Nevertheless, the change does not (always) appear even after two restarts (i.e. two reruns of `clean build runIde`). Deleting IDEA's cache, by deleting the directory `.sandbox/system` seems to solve the issue. So it appears IDEA caches the resource and reuses the old version. More testing is needed to  confirm. And this may be resolved in newer versions of the `org.jetbrains.intellij` gradle plugin.
+
+==== WPI Lib Projects of note
+* `allwpilib` : https://github.com/wpilibsuite/allwpilib
+    - The primary project for the Java and C WPILib libraries.
+    - Contains the primary robot templates and examples.
+* `vscode-wpilib` : https://github.com/wpilibsuite/vscode-wpilib
+    - The VSCode extension (plugin) for WPI Lib.
+    - Contains the gradle template files, as well as some other shared template files.
+* `GradleRIO` :  https://github.com/wpilibsuite/GradleRIO
+    - The GradleRIO project.
 
 ==== Location of "official" templates
 
@@ -38,7 +48,7 @@ It will see the `<String>` as an "Unknown html tag 'String'". It will also have 
 
 We can do this on a per-file basis, a per-directory basis, as well as changing the default for the project from HTML to Java. Given that most of our templates are Java, it is generally easier to make the default for the project "Java" and then specify specific Data Template Languages for some directories and files. For example the "frc-wizard-templates/-DEFAULT-FILES-/gradle/groovy-dsl" directory can be set to "Groovy" and the "frc-wizard-templates/-DEFAULT-FILES-/gradle/kotlin-dsl" directory to "Kotlin". Note that you will need to do this for each year's templates.
 
-You can make these settings in __**File | Settings | Languages & Frameworks | Template Data Languages**__ For an individual file, you can quickly get to this setting by putting your cursor on a highlighted error (such as `<String>` in the above example) and open the Quick Fix window via `Alt+Enter` and selecting the "__Change HTML template data language to…__" option. This will open the "Template Data Language" settings dialog with the path to the file prepopulated. Finally, even when the default Data Language is set to "<None>" in the "Template Data Language" settings, it seems like IntelliJ IDEA still uses HTML as the Data Language.
+You can make these settings in **__File | Settings | Languages & Frameworks | Template Data Languages__** For an individual file, you can quickly get to this setting by putting your cursor on a highlighted error (such as `<String>` in the above example) and open the Quick Fix window via `Alt+Enter` and selecting the "__Change HTML template data language to…__" option. This will open the "Template Data Language" settings dialog with the path to the file prepopulated. Finally, even when the default Data Language is set to "<None>" in the "Template Data Language" settings, it seems like IntelliJ IDEA still uses HTML as the Data Language. **__Alternatively__**, you can edit the `.idea/templateLanguages.xml` file. Copy an existing year's settings, paste, and replace the year in the pasted values.
 
 Because our Java templates place the package statement in an if block and uses a placeholder for the base package, IntelliJ IDEA will highlight an error (on the class name) saying "Missing package statement". We can suppress this for the file with a comment at the very top of the file just after the `<#ftl>` root tag. For example:
 
@@ -52,17 +62,21 @@ Because our Java templates place the package statement in an if block and uses a
 
 In the below discussion, `20xx`, and in some cases `YYYY`, is used as a placeholder for the year being configured. For example, when configuring the 2022 templates, replace `20xx` (or `YYYY`) with `2022`.
 
-There are multiple `wpilibsuite` projects we need to reference. The `vscode-wpilib` project contains the gradle and some other shared template files. However, the primary templates and examples are in the `allwpilib` project. There may be occasions that we need to reference the `allwpilib` the `GradleRIO` project.
+There are multiple `wpilibsuite` projects we need to reference. The `vscode-wpilib` project contains the gradle and some other shared template files. However, the primary templates and examples are in the `allwpilib` project. There may be occasions that we need to reference the `GradleRIO` project.
 
 .Default Files Directory
 [NOTE]
 The default files directory uses a name of `-DEFAULT-FILES-` so that is stands among the numerous directories, and so that it is sorted to the top of the list of directories. It contains both shared, and default file templates used by all the templates.
 
+=== Part 0: Prerequisites
+* In the project's `build.gradle.kts` file, make sure `frc.show.betas.in.new.project.wizard` is set to `true` in the `systemProperties` map in the `runIde` block. This will allow you to run the plugin and create pending year robots while the actual WPI Lib is still in beta.
+* You will likely want to download and install the beta version of the pending year WPI Lib. We primarily want VS Code installed so that we can create projects from the pending templates.
+
 === Part 1: Initial Copy
 
-. In this project, update the `develop` branch and then create a `20xx-templates` branch from it.
 . Clone and/or update the `main` branch of the `vscode-wpilib` project.
-. Copy the previous year's templates `20xx` directory to the new year's name. You can use the copy refactoring.
+. In this project, update the `develop` branch and then create a `20xx-templates` branch from it.
+. In this project, copy the previous year's templates `20xx` directory to the new year's name. You can use the copy refactoring (F5).
     ** `src/main/resources/frc-wizard-templates/20xx`
 
 === Part 2 Update the Gradle templates and other files from the `vscode-wpilib` project
@@ -70,12 +84,16 @@ The default files directory uses a name of `-DEFAULT-FILES-` so that is stands a
 . Update the gradle version used in the templates:
     ** In the `vscode-wpilib` project, check the `vscode-wpilib/resources/gradle/shared/gradle/wrapper/gradle-wrapper.properties` file for its version, and update the `gradleDistributionUrl` `val` in `FrcProjectWizardData`
     ** Copy the two gradle wrapper scripts -- `gradlew` and `gradlew.bat` over from `vscode-wpilib/resources/gradle/shared` to `20xx/-DEFAULT-FILES-/gradle/gradle-wrapper/gradle`. This ensures true parity with the official templates, and scripts that will be in use world-wide.
-. In the `vscode-wpilib` project, copy the entire contents of the `vscode-wpilib/resources/gradle/shared/settings.gradle` file to the clipboard. Then open our `src/main/resources/frc-wizard-templates/2023/-DEFAULT-FILES-/gradle/groovy-dsl/settings.gradle.ftl` file, and diff it to the clipboard. Make the necessary updates/changes. (The `frcYear` is set dynamically in our template wizard.) **Also update the `settings.gradle.kts.ftl` file.**
+. In the `vscode-wpilib` project, copy the entire contents of the `vscode-wpilib/resources/gradle/shared/settings.gradle` file to the clipboard. Then open our `src/main/resources/frc-wizard-templates/20xx/-DEFAULT-FILES-/gradle/groovy-dsl/settings.gradle.ftl` file, and diff it to the clipboard. Make the necessary updates/changes.
+    .. NOTE: In our template, the `frcYear` is set dynamically. So do *not* replace the `${data.frcYearString}`
+    .. Do not replace or remove the Freemarker template header
+. **Also update the `settings.gradle.kts.ftl` file.**
 . In the `FrcWizardTemplateDefinitions.kt` file:
     ** Copy the previous year's `FrcWizard20xxProjectTemplateDefinition` and `FrcWizard20xxExampleTemplateDefinition` enum classes to ones named for the current year
     ** Update the `when` clause in `projectTemplateDefinitionsFor(Int)` function to add the current year, and "point" the else clause to the current year
     ** Update the `when` clause in `exampleTemplateDefinitionsFor(Int)` function to add the current year, and "point" the else clause to the current year
-. The `build.gradle.ftl` and `build.gradle.kts.ftl` templates need to be updated. There is no one "easy" way to do this. The `vscode-wpilib` project uses several  files -- in the `java`, `javadt`, and `javaromi` directories -- whereas out project uses a single template file with `if` conditions and blocks. Ways to check and make updates:
+. The `build.gradle.ftl` and `build.gradle.kts.ftl` templates need to be updated. There is no one "easy" way to do this. The `vscode-wpilib` project uses several  files -- in the `java`, `javadt`, `javaromi`, and `javaxrt` directories -- whereas our project uses a single template file with `if` conditions and blocks. Ways to check and make updates:
+    ** Download the `sources.zip` from https://github.com/wpilibsuite/vscode-wpilib/releases[vscode-wpilib/releases], for the current year beta and the previous year's release (ideally the first official release to catch any minor changes in the previous year). Extract the file and then diff the `build.gradle` files in the `java`, `javadt`, `javaromi`, and `javaxrt` sub-directories of the `vscode-wpilib/resources/gradle` directory.
     ** Look at the commit history for the various `build.gradle` files in the `vscode-wpilib` project.
     ** Diff sections of the various `build.gradle` files in the `vscode-wpilib` project to the corresponding `if` blocks in our template
     ** Generate a project via VS Code and the WPI plugin and our project wizard and compare/diff the results.
@@ -88,37 +106,64 @@ The default files directory uses a name of `-DEFAULT-FILES-` so that is stands a
 ** `gradleDistributionUrl` if not done in Part 1
 ** `copyright` if needed
 ** `junit5Version` (until Enhancement #80 is implemented)
+* Update `WPILibNewCommands.json.ftl` file
+** Diff, from the `allwpilib` project, the `wpilibNewCommands/WPILibNewCommands.json` file to our `frc-wizard-templates/2024/-DEFAULT-FILES-/configs/vendordeps/WPILibNewCommands.json.ftl` file.
 * Update the `WPILib-license.md` file
-** Copy from `vscode-wpilib/resources/gradle/shared/WPILib-License.md`
-** to `resources/frc-wizard-templates/20xx/-DEFAULT-FILES-/code/common-code/WPILib-License.md.ftl`
+** Copy the contents of: `vscode-wpilib/resources/gradle/shared/WPILib-License.md`
+** and diff against:  `resources/frc-wizard-templates/20xx/-DEFAULT-FILES-/code/common-code/WPILib-License.md.ftl`
+** Be sure to not overwrite the Freemarker template header.
+** Note, WPI typically does not update the through year (as in 2009-2023) until he first official release.  But we just use the dynamic frcYear.
 
 
 === Part 4: Generate updated templates
+
+.Tip: Finding Changes
+[TIP]
+From https://github.com/wpilibsuite/vscode-wpilib/releases[vscode-wpilib/releases], download the `examples.zip` and `templates.zip` files for the current year beta (or release) and the previous year's release (ideally the first official release to catch any minor changes made during the previous year's season). Extract them and diff them.
+
+.Note: Hungarian Notation Cleanup Plugin
+[NOTE]
+TODO: Write up info on installing *Hungarian Notation Cleanup* Plugin
+// TODO: Write up info on installing *Hungarian Notation Cleanup* Plugin
+
+*Update Steps*
 
 . Clone and/or update the `main` branch in the `allwpilib` project.
 *** You may need to turn on the action for the project in: File | Settings | Tools | Hungarian Notation Cleanup
 . In the `allwpilib` project, in the `wpilibjExamples` module/subproject, for both the `templates` and `examples` directories in `wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/templates` directory, *do the following steps for each primary directory separately:*
 .. Select the directory, and from the (right-click) context menu, run the "Hungarian Notation Cleanup" action from the HNC plugin.
-.. After it initially runs -- which may take several minutes -- there will be a large "TODO" balloon pop-up explaining to do the following:
-... In the "Find"Tool window, for each open tab, click the "Do Refactor" button.
+.. A large "Hungarian Notation Cleanup is Running Dialog wil open"
+*** Wait for the dialog to be replaced with one with a "TODO" note
+*** It can take up to several minutes to complete (especially for the `example` dir).
+*** Do _not_ interact with any of the "Refactoring Preview" tabs in the "Find" tool window until after the "TODO" window comes up. See steps below.
+*** If a "Rename Parameter" dialog opens, just clok "OK" without selecting any parameters.
+.. After it initially runs -- which may take several minutes -- there will be a large "TODO" balloon pop-up summarizing the following needed actions:
+... In the "Find"Tool window, for each open "Refactoring Preview" tab, click the "Do Refactor" button.
 ... If presented with a popup about changed files, click the "Rerun search" button, and then click "Do Refactor" in the same tab again. The tab should then close. Sometimes you will need to run "Rerun search" 2 or 3 times for a tab.
 ... Repeat for each open tab. There may be numerous ones.
 .. For the directory, from the context menu, run "Reformat Code", and then make sure to select "Include subdirectories" and "Optimize Imports" options.
 .. **Complete the above for both the `templates` and `examples` directories before proceeding.**
 . In `TemplatesPrepTool` (in this project at `src/main/java/net/javaru/iip/frc/templates/TemplatesPrepTool.kt`)
-.. set `IS_DRY_RUN` to `true`
-.. verify the `allwpilibProjectRootDir` path to the `allwpilib` project
+.. Set `IS_DRY_RUN` to `true`
+.. Set/verify the `allwpilibProjectRootDir` path to the `allwpilib` project
 .. Run a gradle clean
 .. Run the `TemplatesPrepTool` in dry run mode
-.. If there are any mapping issues reported, update the `dirMapping` Map **and the Template Definition enums** as appropriate.
-... This finds any deleted and/or added templates
-... You can also run a git history on the `templates` and `excamples` directories t confirm any addition and deletions
-... When updating the enums, you can get the description from the `templates.json` and `examples.json` files.
-... For any deleted/removed templates, also delete the corresponding directory
+.. If there are any mapping issues reported:
+... update the appropriate `dirMapping` Map in the `TemplatesPrepTool` (The tool needs to be improved so this map is not manually maintained)
+... **Update the Template Definition enums** as appropriate
+... Add an empty dir in the `resources/frc-wizard-templates/20xx` dir
+*** This finds any deleted and/or added templates
+*** You can also run a git history on the `templates` and `examples` directories to confirm any addition and deletions
+*** When updating the enums, you can get the description from the `templates.json` and `examples.json` files.
+*** For any deleted/removed templates, also delete the corresponding directory
 .. Once the mappings are resolved, set `IS_DRY_RUN` to `false`
 .. Run `TemplatesPrepTool`
 .. Check the output for any WARN messages and resolve as necessary.
 . In the `allwpilib` project, check `src/test/java` directory. For any templates/examples that include unit tests, set the `templateRequiresJUnit` parameter to true in the corresponding `TemplateDefinition`
+. Diff all Project Templates with previous year to see what's changed. Update the corresponding Kotlin templates to match.
+. Convert any new project templates to Kotlin
+** Remember to include `HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Kotlin, 0, WPILibVersion.Version)` in `robotInit`, and don't forget the 4 imports
+. For all Project Templates, add call to `HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Kotlin, 0, WPILibVersion.Version);` in `robotInit` in an `<#if data.getIncludeKotlinSupport()>` block, as well as the needed 4 imports in two `<#if>` blocks. See 2024 for examples.
 . **Add the new templates to Git** (but do not commit yet)
 . Run some checks on the templates be creating and building them. Some specific ones (due to their complexity and serving as good test cases) to check are:
 ** commandBased
@@ -126,6 +171,7 @@ The default files directory uses a name of `-DEFAULT-FILES-` so that is stands a
 ** hatchBotTraditional
 ** romiReference
 *** Do a Build & Run on this one to see if the simulation window opens correctly
+. Change `IS_DRY_RUN` back to `true` before committing any changes to the `TemplatesPrepTool` file
 
 == Part 5: One-off and Miscellaneous changes
 

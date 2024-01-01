@@ -502,15 +502,19 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
         copyAllResourcesToModuleRoot("gradle wrapper", modelContentRootDir, paths.gradleWrapperResourceBasePath)
 
-        val wpilibCommandsJsonFilter: (VirtualFile) -> Boolean =
-            when (dataModel.frcWizardTemplateDefinition.commandVersion)
+        val vendorDepsConfigsKeepFilter: (VirtualFile) -> Boolean =  {
+            when
             {
-                1    -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") }    // reject New so we keep Old
-                2    -> { virtualFile -> !virtualFile.name.contains("WPILibOldCommands") }     // reject Old so we keep New
-                else -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") && !virtualFile.name.contains("WPILibOldCommands") } // reject both
+                it.name.contains("frc-plugin-notes-README.txt") -> false
+                it.name.contains("WPILibOldCommands") -> dataModel.frcWizardTemplateDefinition.commandVersion == 1
+                it.name.contains("WPILibNewCommands") -> dataModel.frcWizardTemplateDefinition.commandVersion == 2
+                it.name.contains("XRPVendordep")      -> dataModel.isXrpTemplate// include only if this is an XRP robot template
+                // default to including/keeping the file, since this also covers configs/.wpilib/wpilib_preferences.json file, and others
+                else -> true
             }
+        }
 
-        copyAllResourcesToModuleRoot("configs", modelContentRootDir, paths.configsResourceBasePath, keepFilter =  wpilibCommandsJsonFilter)
+        copyAllResourcesToModuleRoot("configs", modelContentRootDir, paths.configsResourceBasePath, keepFilter = vendorDepsConfigsKeepFilter)
         copyAllResourcesToModuleRoot("common code", modelContentRootDir, paths.commonCodeResourceBasePath)
 
         val codeResourceBasePath = when(dataModel.templateLanguageOption)

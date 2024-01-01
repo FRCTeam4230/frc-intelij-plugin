@@ -23,7 +23,6 @@ package [=data.basePackage]
 import edu.wpi.first.wpilibj.Encoder
 import edu.wpi.first.wpilibj.drive.DifferentialDrive
 import edu.wpi.first.wpilibj.motorcontrol.Spark
-import edu.wpi.first.wpilibj2.command.SubsystemBase
 
 // By making the drivetrain an object, we ensure there is only ever one instance of it
 object RomiDrivetrain

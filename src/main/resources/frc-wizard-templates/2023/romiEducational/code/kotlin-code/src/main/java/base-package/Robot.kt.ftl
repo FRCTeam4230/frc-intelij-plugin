@@ -20,6 +20,11 @@
 </#compress>
 package [=data.basePackage]
 
+import edu.wpi.first.hal.FRCNetComm.tInstances
+import edu.wpi.first.hal.FRCNetComm.tResourceType
+import edu.wpi.first.hal.HAL
+import edu.wpi.first.wpilibj.util.WPILibVersion
+
 /**
  * The VM is configured to automatically run this object (which basically function as a singleton class),
  * and to call the [run] function when the robot is enabled. This is written as an object rather than a
@@ -39,7 +44,11 @@ object [=data.robotClassSimpleName] : EducationalRobot()
      * This method is run when the robot is first started up and should be
      * used for any initialization code.
      */
-    override fun robotInit() {}
+    override fun robotInit()
+    {
+        // Report the use of the Kotlin Language for "FRC Usage Report" statistics
+        HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Kotlin, 0, WPILibVersion.Version)
+    }
 
     /** This method is run when the robot is enabled.  */
     override fun run() {}

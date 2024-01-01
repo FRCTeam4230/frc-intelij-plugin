@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.wizard
 
+import com.intellij.openapi.application.ApplicationInfo
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.wpilib.determineProjectYearStringForVersion
 import net.javaru.iip.frc.wpilib.gradlePluginRepo.GradleRioMavenMetadataState
@@ -45,13 +46,12 @@ class FrcProjectWizardData(
     @Deprecated("Deprecated as of 2023 templates (such that 2022 is the last year JUnit 4 support is enabled.)")
     var junit4Version: String = "4.13.2",
     // TODO Issue #80 have these dynamically updated in the wizard
-    var junit5Version: String = "5.8.2",  // With the official 2023 templates switching to JUnit 5, we'll keep this in sync with the version used in the official templates
-    var kotlinVersion: String = "1.8.0",  // https://search.maven.org/artifact/org.jetbrains.kotlin/kotlin-bom
+    var junit5Version: String = "5.10.1",
+    var kotlinVersion: KotlinVersion = defaultKotlinVersion,
     var gradleDslOption: GradleDslOption = GradleDslOption.GroovyDSL,
     var templateLanguageOption: TemplateLanguageOption = TemplateLanguageOption.Java,
     // TODO: Add selection option to new project wizard
     var useGradleAllDistribution: Boolean = FrcApplicationSettings.getInstance().useGradleAllDistributionDefault,
-
     )
 {
 
@@ -101,13 +101,19 @@ class FrcProjectWizardData(
         get() = frcWizardTemplateDefinition.templateRequiresJUnit
 
     val isRomiTemplate
-        get() = frcWizardTemplateDefinition.isRomiBot
+        get() = frcWizardTemplateDefinition.robotType == RobotType.Romi
 
-    val isNotRomiTemplate
-        get() = !isRomiTemplate
+    val isXrpTemplate
+        get() = frcWizardTemplateDefinition.robotType == RobotType.XRP
 
     val isRoboRioRobotTemplate
-        get() = isNotRomiTemplate
+        get() = frcWizardTemplateDefinition.robotType == RobotType.roboRIO
+
+    val robotType: RobotType
+        get() = frcWizardTemplateDefinition.robotType
+
+    val robotTypeAsString: String
+        get() = frcWizardTemplateDefinition.robotType.name
 
     val basePackageAsDirPath: Path
         get() = Paths.get(basePackageAsDirString)
@@ -132,8 +138,8 @@ class FrcProjectWizardData(
                 2021 -> """https\://services.gradle.org/distributions/gradle-6.0.1-bin.zip"""
                 2022 -> """https\://services.gradle.org/distributions/gradle-7.3.2-bin.zip"""
                 2023 -> """https\://services.gradle.org/distributions/gradle-7.5.1-bin.zip"""
-                2024 -> """https\://services.gradle.org/distributions/gradle-8.4-bin.zip"""
-                else -> """https\://services.gradle.org/distributions/gradle-8.4-bin.zip"""
+                2024 -> """https\://services.gradle.org/distributions/gradle-8.5-bin.zip"""
+                else -> """https\://services.gradle.org/distributions/gradle-8.5-bin.zip"""
             }
             return if (useGradleAllDistribution || FrcApplicationSettings.getInstance().isTeam3838() || teamNumber == 3838)
                 retval.replace("-bin", "-all")
@@ -157,7 +163,23 @@ class FrcProjectWizardData(
     
     override fun toString(): String
     {
-        return "FrcProjectWizardData(teamNumber=$teamNumber, mainClassSimpleName='$mainClassSimpleName', robotClassSimpleName='$robotClassSimpleName', basePackage='$basePackage', wpilibVersion=$wpilibVersion, frcWizardTemplateDefinition=$frcWizardTemplateDefinition, enableDesktopSupport=$enableDesktopSupport, includeVsCodeConfigs=$includeVsCodeConfigs, gitIgnoreConfiguration=$gitIgnoreConfiguration, includeJUnitSupport=$includeJUnitSupport, junitOption=$junitOption, junit5Version='$junit5Version')"
+        return "FrcProjectWizardData(" +
+            "teamNumber=$teamNumber, " +
+            "mainClassSimpleName='$mainClassSimpleName', " +
+            "robotClassSimpleName='$robotClassSimpleName', " +
+            "basePackage='$basePackage', " +
+            "wpilibVersion=$wpilibVersion, " +
+            "frcWizardTemplateDefinition=$frcWizardTemplateDefinition, " +
+            "enableDesktopSupport=$enableDesktopSupport, " +
+            "includeVsCodeConfigs=$includeVsCodeConfigs, " +
+            "gitIgnoreConfiguration=$gitIgnoreConfiguration, " +
+            "includeJUnitSupport=$includeJUnitSupport, " +
+            "junitOption=$junitOption, " +
+            "junit5Version='$junit5Version', " +
+            "includeKotlinSupport='$includeKotlinSupport', " +
+            "kotlinVersion='$kotlinVersion', " +
+            "templateLanguageOption='$templateLanguageOption', " +
+            ")"
     }
 
     enum class JUnitOption() {JUnit5, JUnit5withVintage, JUnit4}
@@ -169,6 +191,22 @@ class FrcProjectWizardData(
         |// Open Source Software; you can modify and/or share it under the terms of
         |// the WPILib BSD license file in the root directory of this project.
     """.trimMargin()
+
+    companion object
+    {
+        private val defaultKotlinVersion: KotlinVersion = when (ApplicationInfo.getInstance().build.baselineVersion)
+        {
+            // https://search.maven.org/artifact/org.jetbrains.kotlin/kotlin-bom
+            // https://plugins.jetbrains.com/plugin/6954-kotlin/versions
+            211           -> KotlinVersion(1, 6, 21) // 1.6.21
+            212           -> KotlinVersion(1, 7, 10) // 1.7.10
+            213, 221      -> KotlinVersion(1, 8, 10) // 1.8.10
+            222           -> KotlinVersion(1, 8, 21) // 1.8.21
+            223           -> KotlinVersion(1, 9, 10) // 1.9.10
+            231, 232, 233 -> KotlinVersion(1, 9, 22) // 1.9.22
+            else          -> KotlinVersion(1, 5, 31) // 1.5.31
+        }
+    }
 }
 
 data class GitIgnoreConfiguration(

@@ -27,6 +27,9 @@ import java.time.LocalDate
 
 val allwpilibProjectRootDir: Path = Path.of("P:\\dev\\proj\\open\\wpi\\allwpilib")
 
+val year = determineTemplatesYear()
+val ourYearlyTemplateBaseDir: Path = findOutputDir().resolve(year.toString())
+
 val wpilibjMainDir: Path = allwpilibProjectRootDir.resolve("wpilibjExamples\\src\\main\\java\\edu\\wpi\\first\\wpilibj")
 val wpiMainExamplesDir: Path = wpilibjMainDir.resolve("examples")
 val wpiMainTemplatesDir: Path = wpilibjMainDir.resolve("templates")
@@ -39,17 +42,18 @@ val targetMainInnerPath:Path = Path.of("code/java-code/src/main/java/base-packag
 val targetTestInnerPath:Path = Path.of("code/java-code/src/test/java/base-package")
 val templatesDirMapping = createTemplatesDirMapping()
 val examplesDirMapping = createExamplesDirMapping()
+// A start at improving the tool so that we do not have to maintain manual mappings of the templates in createTemplatesDirMapping and createExamplesDirMapping
+val ourDirMapping = createDirMapping(ourYearlyTemplateBaseDir)
 val combinedMappings = templatesDirMapping.toMutableMap().also { it.putAll(examplesDirMapping) }.toMap()
 val missingMappings = mutableListOf<String>()
 val outdatedMappings = combinedMappings.keys.toMutableSet()
-val year = determineTemplatesYear()
-val ourTemplatesDir: Path = findOutputDir().resolve(year.toString())
+
 
 // An object declaration to allow for finding this file via a class search
 private object TemplatesPrepTool
 
 // runs without doing the copy. Allows for updating of the template mappings.
-const val IS_DRY_RUN = false
+const val IS_DRY_RUN = true
 
 fun main()
 {
@@ -60,9 +64,9 @@ fun main()
     }
 
     println("*** Using template year of $year ***")
-    println("yearly templates dir calculated to be:     $ourTemplatesDir")
+    println("yearly templates dir calculated to be:     $ourYearlyTemplateBaseDir")
 
-    if (Files.notExists(ourTemplatesDir)) Files.createDirectory(ourTemplatesDir)
+    if (Files.notExists(ourYearlyTemplateBaseDir)) Files.createDirectory(ourYearlyTemplateBaseDir)
 
     processAWpiDir(wpiMainExamplesDir,  targetMainInnerPath, examplesDirMapping)
     processAWpiDir(wpiTestExamplesDir,  targetTestInnerPath, examplesDirMapping)
@@ -75,7 +79,7 @@ fun main()
 private fun processAWpiDir(theWpiDir: Path, targetInnerPath: Path, dirMapping: Map<String, String>)
 {
     println("Processing: $theWpiDir")
-    var currentTemplatesDir = ourTemplatesDir.resolve("PLACEHOLDER")
+    var currentTemplatesDir = ourYearlyTemplateBaseDir.resolve("PLACEHOLDER")
     var currentTemplateName: String
     var currentWpiTemplateName = ""
     var currentWpiTemplateDir = theWpiDir
@@ -99,7 +103,7 @@ private fun processAWpiDir(theWpiDir: Path, targetInnerPath: Path, dirMapping: M
                     missingMappings.add(currentWpiTemplateName)
                     "$currentWpiTemplateName-NEEDS_RENAME"
                 }
-                currentTemplatesDir = ourTemplatesDir.resolve(currentTemplateName)
+                currentTemplatesDir = ourYearlyTemplateBaseDir.resolve(currentTemplateName)
                 if (!IS_DRY_RUN) Files.createDirectories(currentTemplatesDir)
             }
             true
@@ -313,6 +317,7 @@ private fun determineTemplatesYear(): Int
 @Suppress("SpellCheckingInspection")
 fun createTemplatesDirMapping() = mapOf(
     "commandbased" to "commandBased",
+    "commandbasedskeleton" to "commandBasedSkeleton",
     "educational" to "educational",
     "robotbaseskeleton" to "robotBaseSkeleton",
     "romicommandbased" to "romiCommand",
@@ -320,11 +325,17 @@ fun createTemplatesDirMapping() = mapOf(
     "romitimed" to "romiTimed",
     "timed" to "timed",
     "timedskeleton" to "timedSkeleton",
+    "timeslice" to "timeSlice",
+    "timesliceskeleton" to "timeSliceSkeleton",
+    "xrpcommandbased" to "xrpCommandBased",
+    "xrpeducational" to "xrpEducational",
+    "xrptimed" to "xrpTimed",
                                        )
 
 @Suppress("SpellCheckingInspection")
 fun createExamplesDirMapping() = mapOf(
     "addressableled" to "addressableLED",
+    "apriltagsvision" to "aprilTagsVision",
     "arcadedrive" to "arcadeDrive",
     "arcadedrivexboxcontroller" to "arcadeDriveXboxController",
     "armbot" to "armBot",
@@ -339,11 +350,14 @@ fun createExamplesDirMapping() = mapOf(
     "drivedistanceoffboard" to "driveDistanceOffboard",
     "dutycycleencoder" to "dutyCycleEncoder",
     "dutycycleinput" to "dutyCycleInput",
+    "elevatorexponentialprofile" to "elevatorExponentialProfile",
+    "elevatorexponentialsimulation" to "elevatorExponentialSimulation",
     "elevatorprofiledpid" to "elevatorProfiledPidController",
     "elevatorsimulation" to "elevatorSimulation",
     "elevatortrapezoidprofile" to "elevatorTrapezoidProfiledPid",
     "encoder" to "encoder",
     "eventloop" to "eventLoop",
+    "flywheelbangbangcontroller" to "flywheelBangBangController",
     "frisbeebot" to "frisbeeBot",
     "gearsbot" to "gearsBot",
     "gettingstarted" to "gettingStarted",
@@ -370,7 +384,7 @@ fun createExamplesDirMapping() = mapOf(
     "rapidreactcommandbot" to "RapidReactCommandBot",
     "relay" to "relay",
     "romireference" to "romiReference",
-    "schedulereventlogging" to "schedulerEventLogging",
+//    "schedulereventlogging" to "schedulerEventLogging", // removed in 2024
     "selectcommand" to "selectCommand",
     "shuffleboard" to "shuffleboardSample",
     "simpledifferentialdrivesimulation" to "simpleDifferentialDriveSimulation",
@@ -387,9 +401,20 @@ fun createExamplesDirMapping() = mapOf(
     "tankdrivexboxcontroller" to "tankDriveXboxController",
     "ultrasonic" to "ultrasonic",
     "ultrasonicpid" to "ultrasonicPID",
-    "unittest" to "unitTesting"
+    "unittest" to "unitTesting",
+    "xrpreference" to "xrpReference",
                                       )
 
+fun createDirMapping(baseDir: Path): Map<String, String>
+{
+    return baseDir
+        .toFile()
+        .walk()
+        .maxDepth(1)
+        .mapNotNull { if (it.isDirectory) it.toPath().fileName.toString() else null }
+        .map { it.lowercase() to it }
+        .toMap()
+}
 
 fun getHeader(relativeSrcPath: Path): String
 {

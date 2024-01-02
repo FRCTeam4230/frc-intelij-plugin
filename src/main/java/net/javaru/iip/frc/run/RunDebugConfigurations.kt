@@ -68,62 +68,72 @@ data class RunDebugConfigsCreationData (
     val project: Project,
     val teamNumber: Int,
     val wpilibVersion: WpiLibVersion?,
-    val isRomiProject: Boolean,
-    val enableDesktopSupport: Boolean
+    val robotProjectTypeInfo: FrcGradleService.RobotProjectTypeInfo,
                                       )
 {
     companion object
     {
+        /**
+         * Creates a `RunDebugConfigsCreationData` from the provided project. **The alternate create
+         * function -- ` create(FrcProjectWizardData, Project)` -- should be favored over this one
+         * when a `FrcProjectWizardData` instance is available as that variant is more performant,
+         * and accurate.**
+         */
         fun create(project: Project): RunDebugConfigsCreationData
         {
-            val frcGradleService = FrcGradleService.getInstance(project)
             return RunDebugConfigsCreationData(
                 project = project,
                 teamNumber = project.getTeamNumberConfiguredInWpiLibPreferencesFile(),
                 wpilibVersion = WpiLibVersionService.getInstance(project).versionStatus?.attachedVersion,
-                isRomiProject = frcGradleService.isRomiProject() ?: false,
-                enableDesktopSupport = frcGradleService.isIncludeDesktopSupport() ?: false
+                robotProjectTypeInfo = FrcGradleService.getRobotProjectTypeInfo(project),
                                               )
         }
 
+        /**
+         * Creates a `RunDebugConfigsCreationData` from the provided FrcProjectWizardData and project.
+         * **This create function should be favored over the one that just takes a project as this
+         * variant is more performant, and accurate.**
+         */
         fun create(frcProjectWizardData: FrcProjectWizardData, project: Project): RunDebugConfigsCreationData
         {
             return RunDebugConfigsCreationData(
-                    project = project,
-                    teamNumber = frcProjectWizardData.teamNumber,
-                    wpilibVersion = frcProjectWizardData.wpilibVersion,
-                    isRomiProject = frcProjectWizardData.isRomiTemplate,
-                    enableDesktopSupport = frcProjectWizardData.enableDesktopSupport
+                project = project,
+                teamNumber = frcProjectWizardData.teamNumber,
+                wpilibVersion = frcProjectWizardData.wpilibVersion,
+                robotProjectTypeInfo = FrcGradleService.getRobotProjectTypeInfo(frcProjectWizardData),
                                               )
         }
     }
 }
 
-fun createAllRunDebugConfigurations(dataModel: RunDebugConfigsCreationData)
+fun createAllRunDebugConfigurations(configsData: RunDebugConfigsCreationData)
 {
     logger.debug("[FRC] Running createAllRunDebugConfigurations")
-    val project = dataModel.project
+    val project = configsData.project
     FileDocumentManager.getInstance().saveAllDocuments()
     SaveAndSyncHandler.getInstance().scheduleProjectSave(project)
-    val isRomiTemplate = dataModel.isRomiProject
-    if (!isRomiTemplate)
+    val isRoboRioTemplate = configsData.robotProjectTypeInfo.isRoboRIOProject ?: true
+    if (isRoboRioTemplate)
     {
         createGradleRoboRioBuildRunConfigurations(project)
-        createRoboRioDebuggingRunConfigurations(project, dataModel.teamNumber)
+        createRoboRioDebuggingRunConfigurations(project, configsData.teamNumber)
     }
-
-    if (isRomiTemplate || dataModel.enableDesktopSupport)
+    val isRomiTemplate = configsData.robotProjectTypeInfo.isRomiProject ?: false
+    val isXrpTemplate = configsData.robotProjectTypeInfo.isXrpProject ?: false
+    val hasDesktopSupport = configsData.robotProjectTypeInfo.hasIncludeDesktopSupport ?: false
+    val isSimulated = isRomiTemplate || isXrpTemplate || hasDesktopSupport
+    if (isSimulated)
     {
-        createGradeSimulateJavaRunConfigurations(project, isRomiTemplate)
-        if (((dataModel.wpilibVersion?.frcYear ?: Year.now().value) <= 2022) && (SystemInfo.isMac || SystemInfo.isLinux || FrcSystemConfigs.AlwaysCreateRomiTailRunConfig.value))
+        createGradeSimulateJavaRunConfigurations(project, isRomiTemplate, isXrpTemplate)
+        if (((configsData.wpilibVersion?.frcYear ?: Year.now().value) <= 2022) && (SystemInfo.isMac || SystemInfo.isLinux || FrcSystemConfigs.AlwaysCreateRomiTailRunConfig.value))
         {
-            createTailSimulateJavaLogShellScriptRunConfiguration(project, isRomiTemplate)
+            createTailSimulateJavaLogShellScriptRunConfiguration(project, isRomiTemplate, isXrpTemplate)
         }
         // For now, we will create both. A future enhancement can make this selectable in the wizard
-        if (dataModel.wpilibVersion != null)
+        if (configsData.wpilibVersion != null)
         {
-            createLaunchShuffleboardRunConfiguration(project, dataModel.wpilibVersion)
-            createLaunchSmartDashboardRunConfiguration(project, dataModel.wpilibVersion)
+            createLaunchShuffleboardRunConfiguration(project, configsData.wpilibVersion)
+            createLaunchSmartDashboardRunConfiguration(project, configsData.wpilibVersion)
         }
     }
 
@@ -210,10 +220,10 @@ fun createGradleRunConfiguration(project: Project,
 
 
 
-private fun createGradeSimulateJavaRunConfigurations(project: Project, isRomi: Boolean, setAsShared: Boolean = true)
+private fun createGradeSimulateJavaRunConfigurations(project: Project, isRomi: Boolean, isXrp: Boolean, setAsShared: Boolean = true)
 {
     logger.trace {"[FRC] Creating Gradle simulateJava run configurations"}
-    val nameSuffix = if (isRomi) "Romi" else "Simulate Java"
+    val nameSuffix = if (isRomi) "Romi via Simulate Java" else if(isXrp) "XRP via Simulate Java" else "Simulate Java"
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.simulateJava.buildAndRun.name", nameSuffix), listOf("simulateJava"), setAsShared = setAsShared, setAsSelected = isRomi)
     createGradleRunConfiguration(project, FrcBundle.message("frc.wizard.run.configuration.simulateJava.cleanBuildAndRun.name", nameSuffix), listOf("clean", "simulateJava"), setAsShared = setAsShared)
     logger.trace {"[FRC] Completed Gradle simulateJava run configurations"}
@@ -221,12 +231,12 @@ private fun createGradeSimulateJavaRunConfigurations(project: Project, isRomi: B
 
 @Suppress("UNUSED_PARAMETER")
 @JvmOverloads
-fun createTailSimulateJavaLogShellScriptRunConfiguration(project: Project, isRomi: Boolean, setAsShared: Boolean = true)
+fun createTailSimulateJavaLogShellScriptRunConfiguration(project: Project, isRomi: Boolean, isXrp: Boolean, setAsShared: Boolean = true)
 {
     // This is not the ideal methodology. But it works in v2020.2+
     // In v2020.3+ we can switch to running in terminal and defining the script as /user/bin/tail
 
-    val nameSuffix = if (isRomi) "Romi" else "Simulate Java"
+    val nameSuffix = if (isRomi) "Romi via Simulate Java" else if (isXrp) "XRP via Simulate Java" else "Simulate Java"
     val runConfigName = FrcBundle.message("frc.wizard.run.configuration.simulateJava.tail.name", nameSuffix)
     try
     {

@@ -25,6 +25,7 @@ endlocal
 errorlevel
 factorypath
 feedforward
+fiducial
 firewire
 firstinspires
 fpga
@@ -127,6 +128,10 @@ teleoperate
 teleoperated
 teleoperator
 teleoperation
+Timeslice
+timeslice
+Timesliced
+timesliced
 toolsuite
 usb
 usfirst

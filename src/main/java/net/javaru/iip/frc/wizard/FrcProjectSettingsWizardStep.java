@@ -398,9 +398,8 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
             }
         }
         
-        //TODO get required minimum Java level from selected template - and perhaps change the validation message
         FrcJavaLangUtilsKt.validateMinimumJavaVersion(myContext,
-                                                      11,
+                                                      myBuilder.getRequiredJdkVersionForWpiLibVersion(),
                                                       FrcMessageKey.of("frc.ui.wizard.validate.minJavaVersion.additionalMessage.goBack"));
         
         
@@ -563,7 +562,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         enableDesktopSupportCheckBox.setVisible(dataModel.getWpilibVersion().getFrcYear() >= 2021);
         if (!userHasModifiedDesktopSupport)
         {
-            enableDesktopSupportCheckBox.setSelected(dataModel.isRomiTemplate());
+            enableDesktopSupportCheckBox.setSelected(dataModel.getRobotType().getIncludeDesktopSupportDefault());
         }
     }
     

@@ -17,7 +17,7 @@ targetCompatibility = JavaVersion.VERSION_11
 
 def ROBOT_MAIN_CLASS = "${data.mainClassFQ}"
 
-<#if data.isNotRomiTemplate()>
+<#if data.isRoboRioRobotTemplate()>
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project EmbeddedTools.
 deploy {
@@ -60,14 +60,14 @@ test {
 
 dependencies {
     implementation wpi.deps.wpilib()
-<#if data.isNotRomiTemplate()>
+<#if data.isRoboRioRobotTemplate()>
     nativeZip wpi.deps.wpilibJni(wpi.platforms.roborio)
 </#if>
     nativeDesktopZip wpi.deps.wpilibJni(wpi.platforms.desktop)
 
 
     implementation wpi.deps.vendor.java()
-<#if data.isNotRomiTemplate()>
+<#if data.isRoboRioRobotTemplate()>
     nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
 </#if>
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
@@ -93,7 +93,7 @@ dependencies {
 
     // Websocket extensions require additional configuration.
     // simulation wpi.deps.sim.ws_server(wpi.platforms.desktop, false)
-    <#if data.isNotRomiTemplate()>// </#if>simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, false)
+    <#if data.isRoboRioRobotTemplate()>// </#if>simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, false)
 }
 
 <#if data.isRomiTemplate()>

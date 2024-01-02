@@ -1,0 +1,68 @@
+<#ftl output_format="plainText" encoding="UTF-8">
+<#--noinspection WrongPackageStatement-->
+<#compress>
+<#-- @ftlvariable name="data" type="net.javaru.iip.frc.wizard.FrcProjectWizardData" -->
+<#--
+    Template Language Reference: https://freemarker.apache.org/docs/ref.html
+    Template Author's Guide:     https://freemarker.apache.org/docs/dgui.html
+-->
+<#--  To DEBUG templates, set system property 'frc.freemarker.debug' to true when launching the testing instance of IntelliJ IDEA -->
+</#compress>
+${data.copyright}
+
+package ${data.basePackage}.commands;
+
+import ${data.basePackage}.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj2.command.Command;
+
+import java.util.function.DoubleSupplier;
+
+
+
+/** Have the robot drive tank style. */
+public class TankDrive extends Command
+{
+    private final Drivetrain drivetrain;
+    private final DoubleSupplier left;
+    private final DoubleSupplier right;
+    
+    
+    /**
+     * Creates a new TankDrive command.
+     *
+     * @param left       The control input for the left side of the drive
+     * @param right      The control input for the right sight of the drive
+     * @param drivetrain The drivetrain subsystem to drive
+     */
+    public TankDrive(DoubleSupplier left, DoubleSupplier right, Drivetrain drivetrain)
+    {
+        this.drivetrain = drivetrain;
+        this.left = left;
+        this.right = right;
+        addRequirements(this.drivetrain);
+    }
+    
+    
+    // Called repeatedly when this Command is scheduled to run
+    @Override
+    public void execute()
+    {
+        drivetrain.drive(left.getAsDouble(), right.getAsDouble());
+    }
+    
+    
+    // Make this return true when this Command no longer needs to run execute()
+    @Override
+    public boolean isFinished()
+    {
+        return false; // Runs until interrupted
+    }
+    
+    
+    // Called once after isFinished returns true
+    @Override
+    public void end(boolean interrupted)
+    {
+        drivetrain.drive(0, 0);
+    }
+}

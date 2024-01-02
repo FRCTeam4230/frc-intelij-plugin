@@ -25,7 +25,6 @@ import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.util.lang.JavaVersion
 import net.javaru.iip.frc.FrcPluginGlobals
-import net.javaru.iip.frc.FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION
 import net.javaru.iip.frc.FrcPluginGlobals.DEFAULT_MIN_REQUIRED_LANGUAGE_LEVEL
 import net.javaru.iip.frc.i18n.FrcBundle
 import net.javaru.iip.frc.i18n.FrcMessageKey
@@ -136,7 +135,7 @@ fun validateMinimumJavaVersion(wizardContext: WizardContext,
  *
  * @param wizardContext              the wizard context
  * @param requiredMinimumJavaVersion the minimum version of java required
- * @param additionalMessageKey       a message key data object to be used to append an additional information to the configuration error message. 
+ * @param additionalMessageKey       a message key data object to be used to append any additional information to the configuration error message.
  *                                   The following parameters are automatically passed into when resolving the message bundle: 
  *                                   0=required Java version;  1=required Java level;  2=configured Java version;  3=configured Java level;
  *                                   Thus those can be used in the additional message. Any parameters used by the additional message must start with 4 in 
@@ -201,8 +200,7 @@ fun ProjectJdkImpl.isValidJavaVersion(requiredMinimumJavaVersionFeatureLevel: In
     return (isValidSdkType && jdkVersion?.isAtLeast(requiredMinimumJavaVersionFeatureLevel) ?: false)
 }
 
-@JvmOverloads
-fun Sdk?.isValidJdk(requiredMinimumJavaVersion: JavaVersion = DEFAULT_MIN_REQUIRED_JAVA_VERSION): Boolean = if (this != null && this is ProjectJdkImpl) this.isValidJavaVersion(requiredMinimumJavaVersion) else false
+fun Sdk?.isValidJdk(requiredMinimumJavaVersion: JavaVersion): Boolean = if (this != null && this is ProjectJdkImpl) this.isValidJavaVersion(requiredMinimumJavaVersion) else false
 
 fun ProjectJdkImpl.isValidJavaVersion(requiredMinimumJavaVersion: JavaVersion): Boolean = isValidJavaVersion(requiredMinimumJavaVersion.feature)
 

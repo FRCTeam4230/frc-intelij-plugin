@@ -20,7 +20,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import net.javaru.iip.frc.util.getGradleBuildPsiFile
-import net.javaru.iip.frc.util.runReadActionInSmartMode
+import net.javaru.iip.frc.wizard.FrcProjectWizardData
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
 import org.jetbrains.plugins.groovy.lang.psi.GroovyPsiElement
 import org.jetbrains.plugins.groovy.lang.psi.GroovyRecursiveElementVisitor
@@ -41,6 +41,21 @@ class FrcGradleService private constructor(val project: Project)
     companion object
     {
         fun getInstance(project: Project): FrcGradleService = project.service()
+
+        fun getRobotProjectTypeInfo(project: Project) = getInstance(project).getRobotProjectTypeInfo()
+
+        fun getRobotProjectTypeInfo(frcProjectWizardData: FrcProjectWizardData) = RobotProjectTypeInfo(frcProjectWizardData)
+    }
+
+    fun getRobotProjectTypeInfo(): RobotProjectTypeInfo
+    {
+        // To reduce the parsing work done, and improve performance, we set these intelligently
+        val gradleService = FrcGradleService.getInstance(project)
+        val rio = gradleService.hasRoborioDeployTarget()
+        val xrp = if (rio == true) false else gradleService.isXrpProject()
+        val romi = if (rio == true || xrp == true) false else gradleService.isRomiProject()
+        val desk = gradleService.isIncludeDesktopSupport()
+        return RobotProjectTypeInfo(rio, romi, xrp, desk)
     }
 
     fun isIncludeDesktopSupport(): Boolean?
@@ -84,7 +99,18 @@ class FrcGradleService private constructor(val project: Project)
         }
         return result
     }
-    fun hasRoborioDeployTarget(): Boolean?
+
+    fun hasRoborioDeployTarget(): Boolean? = gradleFileHasTextReferenceOf("deploy.targets.roborio", useContains = false)
+
+    /** Indicates a project is a non-roboRIO project. That is, it is (likely) either a Romi or XRP project. */
+    @Suppress("unused")
+    fun isNonRoboRioProject(): Boolean? = hasRoborioDeployTarget()?.not()
+
+    fun isXrpProject(): Boolean? = gradleFileHasTextReferenceOf("addXRPClient()", true)
+
+    fun isRomiProject(): Boolean? = gradleFileHasTextReferenceOf("10.0.0.2", true)
+
+    private fun gradleFileHasTextReferenceOf(targetText: String, useContains: Boolean): Boolean?
     {
         var result: Boolean? = null
         try
@@ -107,10 +133,22 @@ class FrcGradleService private constructor(val project: Project)
                                 override fun visitReferenceExpression(referenceExpression: GrReferenceExpression)
                                 {
                                     super.visitReferenceExpression(referenceExpression)
-                                    if (referenceExpression.text == "deploy.targets.roborio")
+
+                                    if (useContains)
                                     {
-                                        result = true
+                                        if (referenceExpression.text.contains(targetText))
+                                        {
+                                            result = true
+                                        }
                                     }
+                                    else
+                                    {
+                                        if (referenceExpression.text == targetText)
+                                        {
+                                            result = true
+                                        }
+                                    }
+
                                 }
                             }
                                       )
@@ -130,8 +168,29 @@ class FrcGradleService private constructor(val project: Project)
         return result
     }
 
-    @Suppress("unused")
-    fun isRomiProject(): Boolean? = hasRoborioDeployTarget()?.not()
+    /**
+     * To get an instance:
+     *  - `FrcGradleService.getRobotProjectTypeInfo(project)`
+     *  - `FrcGradleService.getInstance(project).getRobotProjectTypeInfo()`
+     */
+    data class RobotProjectTypeInfo  constructor(
+        val isRoboRIOProject: Boolean?,
+        val isRomiProject: Boolean?,
+        val isXrpProject: Boolean?,
+        val hasIncludeDesktopSupport: Boolean?
+                                                  )
+    {
+        constructor(frcProjectWizardData: FrcProjectWizardData): this(frcProjectWizardData.isRoboRioRobotTemplate,
+                                                                      frcProjectWizardData.isRomiTemplate,
+                                                                      frcProjectWizardData.isXrpTemplate,
+                                                                      frcProjectWizardData.enableDesktopSupport,
+                                                                     )
+
+        companion object
+        {
+            fun create(frcProjectWizardData: FrcProjectWizardData): RobotProjectTypeInfo = RobotProjectTypeInfo(frcProjectWizardData)
+        }
+    }
 }
 
 

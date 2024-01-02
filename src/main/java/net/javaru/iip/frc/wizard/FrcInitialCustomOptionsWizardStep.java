@@ -38,7 +38,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.lang.JavaVersion;
 import com.intellij.util.ui.AsyncProcessIcon;
 
-import net.javaru.iip.frc.FrcPluginGlobals;
+import net.javaru.iip.frc.i18n.FrcBundle;
 import net.javaru.iip.frc.util.FrcJavaLangUtilsKt;
 import net.javaru.iip.frc.util.FrcSystemConfigs.WizardAlwaysUpdateWpilibVersions;
 import net.javaru.iip.frc.util.TitleMessagePair;
@@ -86,8 +86,12 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
     
     private void initComponents()
     {
-        updateInvalidSdkLabelVisibility();
-        myBuilder.addSdkChangedListener(this::updateInvalidSdkLabelVisibility);
+        updateDataModel();
+        updateInvalidSdkLabel();
+        myBuilder.addSdkChangedListener(() -> {
+            updateDataModel();
+            updateInvalidSdkLabel();
+        });
         initCardPanel();
         initWpiLibVersionComboBox();
     }
@@ -146,7 +150,7 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
                 }
         
                 final TitleMessagePair titleMsgPair =
-                        FrcJavaLangUtilsKt.createInvalidJdkTitleMessagePair(FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION,
+                        FrcJavaLangUtilsKt.createInvalidJdkTitleMessagePair(myBuilder.getRequiredJdkVersionForWpiLibVersion(),
                                                                             configuredJavaVersion,
                                                                             null);
                 throw new ConfigurationException(titleMsgPair.getMessage(), titleMsgPair.getTitle());
@@ -155,8 +159,11 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
         return true;
     }
     
-    protected void updateInvalidSdkLabelVisibility()
+    protected void updateInvalidSdkLabel()
     {
+        invalidSdkSelectedLabel.setText(FrcBundle.message("frc.ui.wizard.sdkRequirement.invalidVersion.text.dynamic",
+                                                          myBuilder.getDataModel().getFrcYearString(),
+                                                          myBuilder.getRequiredJdkVersionForWpiLibVersion()));
         invalidSdkSelectedLabel.setVisible(!myBuilder.isSelectedSdkValid());
     }
     
@@ -192,6 +199,10 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
             wpilibVersionComboBox.setSelectedIndex(index);
             final CardLayout cardLayout = (CardLayout) topCardPanel.getLayout();
             cardLayout.show(topCardPanel, "wpilibVersionSelectionPanelCard");
+            wpilibVersionComboBox.addItemListener(itemEvent -> {
+                updateDataModel();
+                updateInvalidSdkLabel();
+            });
             LOG.debug("[FRC] initWpiLibVersionComboBox invokeLater block has completed");
         });
     }

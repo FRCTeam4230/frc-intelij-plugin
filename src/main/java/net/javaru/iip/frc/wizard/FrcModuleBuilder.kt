@@ -55,6 +55,7 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.pom.java.LanguageLevel
 import com.intellij.projectImport.ProjectImportProvider
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiManager
@@ -62,6 +63,7 @@ import com.intellij.psi.search.SearchScope
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.containers.stream
 import com.intellij.util.io.HttpRequests
+import com.intellij.util.lang.JavaVersion
 import freemarker.template.Template
 import icons.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION
@@ -102,6 +104,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.swing.Icon
 
 private const val gitignoreIoUrl = "https://www.toptal.com/developers/gitignore"
@@ -325,11 +328,45 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         StartupManager.getInstance(project).runAfterOpened {
             DumbService.getInstance(project).smartInvokeLater {
                 // I've tried 'runWriteAction' and 'invokeLater' here, both outside and inside 'runWhenSmart'.
-                // But the issue persisted. I think the smartInvokeLater has resolved it.
+                // But the issue persisted. The smartInvokeLater has reduced its occurrence, but it still occurs occasionally.
                     createAllRunDebugConfigurations(RunDebugConfigsCreationData.create(dataModel, project))
                     project.reimportGradleProject()
             }
         }
+
+        // This a messy hack to resolve the issue of the run/debug configs not always getting created. I *suspect* the proper solution is that we have
+        // to implement code to handle the case of the above creation getting interrupted by indexing starting back up. Need to investigate this.
+        class CreateTimeTask(private val id: Int, private val doReimport: Boolean): TimerTask() {
+            override fun run()
+            {
+                try
+                {
+                    DumbService.getInstance(project).smartInvokeLater {
+                        try
+                        {
+                            logger.info("[FRC] 'Verify run/debug config creation' TimerTask $id firing")
+                            createAllRunDebugConfigurations(RunDebugConfigsCreationData.create(dataModel, project))
+                            if (doReimport) project.reimportGradleProject()
+                        }
+                        catch (e: Exception)
+                        {
+                            logger.warn("[FRC] An exception occurred when smart invoking later the 'Verify run/debug config creation' via TimerTask $id. Cause: $e")
+                            if (e is ProcessCanceledException) throw e
+                        }
+                    }
+                }
+                catch (e: Exception)
+                {
+                    logger.warn("[FRC] Could not run 'Verify run/debug config creation' TimerTask $id. Cause: $e")
+                    if (e is ProcessCanceledException) throw e
+                }
+            }
+        }
+        val timer = Timer("Verify run/debug config creation timer")
+        // The first 2 should almost assuredly work, but we add a third one after a good solid 3 minutes to catch any lingering issues, but do not reimport as the user may be coding by then
+        timer.schedule(CreateTimeTask(1, doReimport = true), TimeUnit.SECONDS.toMillis(30))
+        timer.schedule(CreateTimeTask(2, doReimport = true), TimeUnit.MINUTES.toMillis(1))
+        timer.schedule(CreateTimeTask(3, doReimport = false), TimeUnit.MINUTES.toMillis(3))
     }
 
 
@@ -500,15 +537,19 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
         copyAllResourcesToModuleRoot("gradle wrapper", modelContentRootDir, paths.gradleWrapperResourceBasePath)
 
-        val wpilibCommandsJsonFilter: (VirtualFile) -> Boolean =
-            when (dataModel.frcWizardTemplateDefinition.commandVersion)
+        val vendorDepsConfigsKeepFilter: (VirtualFile) -> Boolean =  {
+            when
             {
-                1    -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") }    // reject New so we keep Old
-                2    -> { virtualFile -> !virtualFile.name.contains("WPILibOldCommands") }     // reject Old so we keep New
-                else -> { virtualFile -> !virtualFile.name.contains("WPILibNewCommands") && !virtualFile.name.contains("WPILibOldCommands") } // reject both
+                it.name.contains("frc-plugin-notes-README.txt") -> false
+                it.name.contains("WPILibOldCommands") -> dataModel.frcWizardTemplateDefinition.commandVersion == 1
+                it.name.contains("WPILibNewCommands") -> dataModel.frcWizardTemplateDefinition.commandVersion == 2
+                it.name.contains("XRPVendordep")      -> dataModel.isXrpTemplate// include only if this is an XRP robot template
+                // default to including/keeping the file, since this also covers configs/.wpilib/wpilib_preferences.json file, and others
+                else -> true
             }
+        }
 
-        copyAllResourcesToModuleRoot("configs", modelContentRootDir, paths.configsResourceBasePath, keepFilter =  wpilibCommandsJsonFilter)
+        copyAllResourcesToModuleRoot("configs", modelContentRootDir, paths.configsResourceBasePath, keepFilter = vendorDepsConfigsKeepFilter)
         copyAllResourcesToModuleRoot("common code", modelContentRootDir, paths.commonCodeResourceBasePath)
 
         val codeResourceBasePath = when(dataModel.templateLanguageOption)
@@ -1007,7 +1048,16 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         }
     }
 
-    fun isSelectedSdkValid(): Boolean = selectedSdk.isValidJdk()
+    fun isSelectedSdkValid(): Boolean = selectedSdk.isValidJdk(getRequiredJdkVersionForWpiLibVersion())
+
+    fun getRequiredJdkVersionForWpiLibVersion(): JavaVersion = when
+    {
+        // TODO: Issue #53 - It'd be nice to determine this dynamically. But ultimately there may not be a clean way.
+        //       We could potentially look at the version in the Gradle Te,plate
+        // Also update 'frc.ui.wizard.sdkRequirement.text' message key
+        dataModel.frcYear <= 2023 -> LanguageLevel.JDK_11.toJavaVersion()
+        else                      -> LanguageLevel.JDK_17.toJavaVersion()
+    }
 
     companion object
     {

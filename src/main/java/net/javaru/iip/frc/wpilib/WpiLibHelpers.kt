@@ -40,6 +40,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
 
 object WpiLibHelpers
 private val logger = logger<WpiLibHelpers>()
@@ -275,7 +276,7 @@ fun getWpiLibJdkReleaseFile(year: Int, project: Project? = null): Path = getWpiL
 fun getWpiLibJdkReleaseJavaVersionString(year: Int, project: Project? = null): String?
 {
     val releaseFile = getWpiLibJdkReleaseFile(year, project)
-    return if (releaseFile.isFile())
+    return if (releaseFile.isRegularFile())
     {
         val properties = Properties()
         properties.load(Files.newBufferedReader(releaseFile))

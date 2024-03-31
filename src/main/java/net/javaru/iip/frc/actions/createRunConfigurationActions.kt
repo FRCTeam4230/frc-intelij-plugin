@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.actions
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -24,7 +25,6 @@ import com.intellij.openapi.project.Project
 import net.javaru.iip.frc.run.createLaunchShuffleboardRunConfiguration
 import net.javaru.iip.frc.run.createLaunchSmartDashboardRunConfiguration
 import net.javaru.iip.frc.wpilib.getAttachedWpiLibVersion
-import net.javaru.iip.frc.wpilib.getWpiLibToolsPath
 
 abstract class AbstractCreateRunConfigurationAction(): AnAction()
 {
@@ -38,6 +38,8 @@ abstract class AbstractCreateRunConfigurationAction(): AnAction()
             }
         }
     }
+
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
     abstract fun doCreation(project: Project, e: AnActionEvent)
 }

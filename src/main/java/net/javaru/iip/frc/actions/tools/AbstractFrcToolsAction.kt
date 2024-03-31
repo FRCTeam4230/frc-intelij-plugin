@@ -15,6 +15,7 @@
  */
 package net.javaru.iip.frc.actions.tools
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -48,4 +49,6 @@ abstract class AbstractFrcToolsAction : AnAction
     {
         return true
     }
+
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 }

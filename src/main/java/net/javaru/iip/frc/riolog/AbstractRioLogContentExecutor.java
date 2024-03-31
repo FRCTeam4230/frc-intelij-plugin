@@ -43,6 +43,7 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -680,6 +681,13 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                 }
             }
         }
+    
+    
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread()
+        {
+            return ActionUpdateThread.BGT;
+        }
     }
 
 
@@ -725,6 +733,13 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             event.getPresentation().setVisible(true);
             event.getPresentation().setEnabled(myStopEnabled != null && myStopEnabled.compute());
         }
+    
+    
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread()
+        {
+            return ActionUpdateThread.BGT;
+        }
     }
 
     private class RioLogRerunAction extends DumbAwareAction
@@ -767,6 +782,13 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                 presentation.setDescription(startDescription);
             }
         }
+    
+    
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread()
+        {
+            return ActionUpdateThread.BGT;
+        }
     }
 
 
@@ -800,6 +822,13 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             }
             e.getPresentation().setEnabled(enabled);
         }
+    
+    
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread()
+        {
+            return ActionUpdateThread.BGT;
+        }
     }
 
 
@@ -831,6 +860,13 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             {
                 LOG.warn("[FRC] An Exception occurred when toggling the AutoClear option. Cause Summary: " + ex.toString(), ex);
             }
+        }
+    
+    
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread()
+        {
+            return ActionUpdateThread.BGT;
         }
     }
 }

@@ -18,9 +18,11 @@ package net.javaru.iip.frc.actions;
 
 import javax.swing.*;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.icons.AllIcons;
 import com.intellij.icons.AllIcons.Actions;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -43,6 +45,12 @@ public class MockAction extends DumbAwareAction
     {
         super(text, "MockAction " + text, icon);
         this.text = text;
+    }
+    
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread()
+    {
+        return ActionUpdateThread.BGT;
     }
 
 

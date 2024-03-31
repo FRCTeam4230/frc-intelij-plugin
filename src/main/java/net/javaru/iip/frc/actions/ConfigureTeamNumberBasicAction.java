@@ -21,6 +21,7 @@ import javax.swing.*;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -113,5 +114,12 @@ public class ConfigureTeamNumberBasicAction extends AnAction
     {
         final FrcApplicationSettings settings = FrcApplicationSettings.getInstance();
         return !settings.isTeamNumberConfigured();
+    }
+    
+    
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread()
+    {
+        return ActionUpdateThread.BGT;
     }
 }

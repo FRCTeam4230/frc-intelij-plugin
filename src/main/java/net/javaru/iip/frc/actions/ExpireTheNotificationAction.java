@@ -16,6 +16,8 @@
 
 package net.javaru.iip.frc.actions;
 
+import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -41,5 +43,12 @@ public class ExpireTheNotificationAction extends AnAction
     public void update(AnActionEvent e)
     {
         super.update(e);
+    }
+    
+    
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread()
+    {
+        return ActionUpdateThread.BGT;
     }
 }

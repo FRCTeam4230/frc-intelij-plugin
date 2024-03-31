@@ -70,7 +70,6 @@ import com.intellij.util.lang.JavaVersion
 import freemarker.template.Template
 import icons.FrcIcons.FRC
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import net.javaru.iip.frc.FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION
 import net.javaru.iip.frc.freemarker.FM_TEMPLATE_EXT_WITH_DOT
 import net.javaru.iip.frc.freemarker.KOTLIN_FM_TEMPLATE_FILE_EXT
@@ -85,7 +84,6 @@ import net.javaru.iip.frc.util.asPluginResourceVF
 import net.javaru.iip.frc.util.findVirtualFile
 import net.javaru.iip.frc.util.get
 import net.javaru.iip.frc.util.getPluginResourceAsStream
-import net.javaru.iip.frc.util.invokeLater
 import net.javaru.iip.frc.util.invokeLaterWait
 import net.javaru.iip.frc.util.isValidJavaVersion
 import net.javaru.iip.frc.util.isValidJdk
@@ -94,7 +92,6 @@ import net.javaru.iip.frc.util.reader
 import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.removeBasePath
 import net.javaru.iip.frc.util.runBackgroundTask
-import net.javaru.iip.frc.util.runWhenSmart
 import net.javaru.iip.frc.util.toCommaDelimitedString
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
 import org.apache.commons.io.FileUtils
@@ -417,9 +414,16 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 
             // For now, we will only optimize imports and not reformat code style
 //            if (FrcApplicationSettings.getInstance().isTeam3838() || dataModel.teamNumber == 3838) {
-                getCoroutineScope(project).launch {
-                    runImportOptimizationOnly(project)
-                }
+
+            // TODO: getSrcMainJavaPsiDirectory is causing intermittent slow operation exceptions: java.lang.Throwable: Slow operations are prohibited on EDT. See SlowOperations.assertSlowOperationsAreAllowed javadoc
+            //       Initial attempts to resolve were unsuccessful. Need to rework the code.
+            //       See Issue #152
+
+//                getCoroutineScope(project).launch {
+//                    runImportOptimizationOnly(project)
+//                }
+
+
 //            }
 //            else {
 //                getCoroutineScope(project).launch {
@@ -490,6 +494,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     {
         val dirForReformatAction = rootProjectPath?.resolve("src/main/java") ?: throw IllegalStateException("rootProjectPath is null")
         val vf = dirForReformatAction.findVirtualFile(true) ?: throw IllegalStateException("could not find Virtual File for $dirForReformatAction")
+        // TODO: This is causing intermittent slow operation exceptions: java.lang.Throwable: Slow operations are prohibited on EDT. See SlowOperations.assertSlowOperationsAreAllowed javadoc
+        //       See Issue #152
         return PsiManager.getInstance(project).findDirectory(vf) ?: throw IllegalStateException("could not find PsiDirectory for $vf (from $dirForReformatAction)")
     }
 

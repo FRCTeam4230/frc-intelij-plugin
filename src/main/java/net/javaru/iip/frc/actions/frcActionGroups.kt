@@ -17,6 +17,7 @@
 package net.javaru.iip.frc.actions
 
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -41,6 +42,7 @@ abstract class AbstractFrcActionGroup : DefaultActionGroup()
     /** Override to add additional visibility criteria beyond the project not being null, not disposed, and an FRC project. */
     open fun additionalVisibilityCriteria(project: Project, event: AnActionEvent): Boolean = true
 
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 }
 
 class FrcRioLogActionGroup : AbstractFrcActionGroup()

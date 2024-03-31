@@ -21,6 +21,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -77,6 +78,8 @@ open class FrcInternalActionsGroup : DefaultActionGroup()
             !project.isDisposed &&
             FrcPluginGlobals.IS_IN_FRC_INTERNAL_MODE
     }
+
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 }
 
 class FrcInternalUiActionsGroup : FrcInternalActionsGroup()
@@ -140,6 +143,8 @@ abstract class AbstractFrcInternalAction : AnAction
             true
         }
     }
+
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 }
 
 private fun executeIfProjectNotNull(actionEvent: AnActionEvent, actionName: String = "", function: (project: Project) -> Unit)

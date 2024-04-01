@@ -18,6 +18,7 @@ package net.javaru.iip.frc.wpilib
 
 import com.intellij.json.psi.JsonFile
 import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.module.Module
@@ -39,6 +40,7 @@ import net.javaru.iip.frc.util.getIntPropertyValue
 import net.javaru.iip.frc.util.getModules
 import net.javaru.iip.frc.util.getStringPropertyValue
 import net.javaru.iip.frc.util.runBackgroundTask
+import net.javaru.iip.frc.wpilib.services.WpiLibVersionService
 
 private object WpiLibPreferencesFunctions
 private val LOG = logger<WpiLibPreferencesFunctions>()
@@ -257,7 +259,9 @@ fun Project.getConfiguredProjectYear(): String?
 private val yearRegex = """20\d\d""".toRegex()
 
 /**
- * Returns just the year, as an Int, for the configured project year. Thus if the project year is configured as "Beta2020-2", this will return the Int `2020`.
+ * Returns just the year, as an Int, for the configured project year. Thus, if the project year is configured as "Beta2020-2", this will return the Int `2020`.
+ * For a null safe version, see `getFrcYearNonNull` in `FrcUtils.kt`
+ * @see net.javaru.iip.frc.util.getFrcYearNonNull
  */
 fun Project.getConfiguredProjectYearJustYear(): Int?
 {

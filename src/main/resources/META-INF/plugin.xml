@@ -52,6 +52,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v4.0.1</strong> <br>
+        &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/150'>issue #150</a> &quot;Command class generation using deprecated (in WpiLib v2024) CommandBase&quot; Thanks to <em>logan hollowood</em> for reporting.<br>
+        &nbsp;&nbsp;&bull; IntelliJ IDEA 2024.1 support added.<br>
+        <br>
         <strong>v4.0.0</strong> <br>
         &nbsp;&nbsp;&bull; Added support for 2024 season, including project templates. The new XRP templates have had minimal testing since I do not have an XRP robot available to fully test. (Templates will not show in the Wizard until 2024 WPI Lib is released.)<br>
         &nbsp;&nbsp;&bull; Implements <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/146'>Feature Request #146</a> &quot;Report Kotlin for usage reporting in Kotlin template&quot; by adding a call to <tt>HAL.report()</tt> in <tt>robotInit()</tt> of Kotlin robots to report the use of Kotlin. Thanks <em>sciencewhiz</em> for the feature request.<br>

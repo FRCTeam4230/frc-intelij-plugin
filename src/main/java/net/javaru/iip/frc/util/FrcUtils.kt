@@ -16,6 +16,10 @@
 
 package net.javaru.iip.frc.util
 
+import com.intellij.openapi.components.service
+import com.intellij.openapi.project.Project
+import net.javaru.iip.frc.wpilib.services.WpiLibVersionService
+import net.javaru.iip.frc.wpilib.getConfiguredProjectYearJustYear
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -49,9 +53,22 @@ fun executeQuietly(callable: Runnable)
  * the FRC Year, or build year, is considered to run from December 1 to November 31. Thus, on December 3, 2019,
  * this would return a value of '2020'.
  */
-fun getCurrentFrcYear(daysAdjustment: Int = 30): Int = LocalDate.now().plus(daysAdjustment.toLong(), ChronoUnit.DAYS).year
+fun getCurrentFrcSeason(daysAdjustment: Int = 30): Int = LocalDate.now().plus(daysAdjustment.toLong(), ChronoUnit.DAYS).year
 
-
+/**
+ * Determines the FRC Year using the following sources in order until a non-null value is found:
+ * 1. The frc year of the attached WpiLib (see [WpiLibVersionService.frcYear])
+ * 2. The `projectYear` as specified in `wpilib_preferences.json` (see [getConfiguredProjectYearJustYear] in `WpiLibPreferences.kt`)
+ * 3. The current Frc Year (based on the current date) as returned by [getCurrentFrcSeason]
+ *
+ *  **Due to the third step, the year returned may not be accurate. But that would indicate a massive misconfiguration of the project.**
+ */
+fun Project.getFrcYearNonNull() : Int
+{
+    return this.runReadActionInSmartModeWithReturn {
+        this.service<WpiLibVersionService>().frcYear ?: this.getConfiguredProjectYearJustYear() ?: getCurrentFrcSeason()
+    }
+}
 
 
 

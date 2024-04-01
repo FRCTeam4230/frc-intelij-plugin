@@ -106,6 +106,13 @@ fun Project.runReadActionInSmartMode(action:() -> Unit)
     }
 }
 
+fun <T> Project.runReadActionInSmartModeWithReturn(action: () -> T): T = runReadActionInSmartMode(object: Computable<T> {
+    override fun compute(): T
+    {
+        return action()
+    }
+})
+
 /** Convenience Extension function for [DumbService.runReadActionInSmartMode]. */
 fun <T> Project.runReadActionInSmartMode(computable: Computable<T>): T = DumbService.getInstance(this).runReadActionInSmartMode(computable)
 

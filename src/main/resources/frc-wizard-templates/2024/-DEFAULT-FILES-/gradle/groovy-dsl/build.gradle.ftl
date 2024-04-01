@@ -18,6 +18,9 @@ plugins {
 }
 
 def javaVersion = JavaVersion.VERSION_17
+<#if data.getIncludeKotlinSupport() && data.kotlinVersion.isAtLeast(1, 8)>
+def kotlinJvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.@Companion.fromTarget(javaVersion.toString())
+</#if>
 
 java {
     sourceCompatibility = javaVersion
@@ -161,7 +164,7 @@ tasks.withType(JavaCompile) {
 <#if data.kotlinVersion.isAtLeast(1, 9)>
 kotlin {
     compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.@Companion.fromTarget(javaVersion.toString()))
+        jvmTarget.set(kotlinJvmTarget)
         // https://kotlinlang.org/docs/gradle-configure-project.html#gradle-java-toolchains-support
         jvmToolchain(Integer.valueOf(javaVersion.toString()))
     }
@@ -169,12 +172,12 @@ kotlin {
 <#elseif data.kotlinVersion.isAtLeast(1, 8)>
 tasks.named("compileKotlin", org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask.class) {
     compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.@Companion.fromTarget(javaVersion.toString()))
+        jvmTarget.set(kotlinJvmTarget)
     }
 }
 tasks.named("compileTestKotlin", org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask.class) {
     compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.@Companion.fromTarget(javaVersion.toString()))
+        jvmTarget.set(kotlinJvmTarget)
     }
 }
 <#else>

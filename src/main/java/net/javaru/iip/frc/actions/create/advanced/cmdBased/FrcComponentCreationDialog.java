@@ -53,8 +53,10 @@ import kotlin.collections.CollectionsKt;
 import net.javaru.iip.frc.actions.create.advanced.ClassCreator;
 import net.javaru.iip.frc.actions.create.advanced.ComponentCreationSharedState;
 import net.javaru.iip.frc.actions.create.advanced.FrcComponentCreationDataProvider;
+import net.javaru.iip.frc.actions.create.advanced.cmdBased.command.v2.AbstractCommand2ComponentCreationDataProvider;
 import net.javaru.iip.frc.util.FrcClassUtilsKt;
 import net.javaru.iip.frc.util.FrcUiUtilsKt;
+import net.javaru.iip.frc.util.FrcUtilsKt;
 import net.javaru.iip.frc.util.PsiClassNameComparator;
 
 import static net.javaru.iip.frc.i18n.FrcBundle.message;
@@ -535,10 +537,16 @@ public abstract class FrcComponentCreationDialog extends DialogWrapper
     
     protected List<PsiClass> getExtendableClasses()
     {
+        final int projectYear = FrcUtilsKt.getFrcYearNonNull(myProject);
         final ImmutableList.Builder<PsiClass> classes = ImmutableList.builder();
         
         final String typicalBaseClassFqName = myDataProvider.getTypicalBaseClassFqName();
-        final String topLevelClassFqName = myDataProvider.getTopLevelClassFqName();
+        final String topLevelClassFqName =
+            // TODO: This is a workaround for Issue #150 as the base name for Command changed in WpiLib v2024.1 from CommandBase back to Command
+            //       We need to implement better so that it is available for all instances and so we can handle changed for all types (Subsystems, Commands, etc)
+            (myDataProvider instanceof AbstractCommand2ComponentCreationDataProvider)
+            ? ((AbstractCommand2ComponentCreationDataProvider) myDataProvider).getTopLevelClassFqName(projectYear)
+            : myDataProvider.getTopLevelClassFqName();
         
         
         final PsiClass[] foundBaseClasses = FrcClassUtilsKt.findClass(myProject, typicalBaseClassFqName);

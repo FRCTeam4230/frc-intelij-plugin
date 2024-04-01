@@ -48,7 +48,7 @@ import net.javaru.iip.frc.run.createAllRunDebugConfigurations
 import net.javaru.iip.frc.services.FrcGradleService
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.ui.internal.PlaceholderTextFieldPaddingDemoFormDialogWrapper
-import net.javaru.iip.frc.util.getCurrentFrcYear
+import net.javaru.iip.frc.util.getCurrentFrcSeason
 import net.javaru.iip.frc.util.markGradleProjectAsNeedingReimport
 import net.javaru.iip.frc.util.reimportGradleProject
 import net.javaru.iip.frc.util.runWhenSmart
@@ -490,7 +490,7 @@ class DownloadVendorDeps: AbstractFrcInternalAction()
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
         executeIfProjectNotNull(actionEvent, "Display Vendordeps Management Dialog") { project: Project ->
-            val year = getCurrentFrcYear()
+            val year = getCurrentFrcSeason()
             val ctreUrl = if (year >= 2022) "https://maven.ctr-electronics.com/release/com/ctre/phoenix/Phoenix-frc$year-latest.json" else "https://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json" 
             val url = Messages.showInputDialog(project,
                                                "Enter Vendordeps URL",

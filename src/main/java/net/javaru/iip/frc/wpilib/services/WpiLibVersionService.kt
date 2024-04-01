@@ -105,6 +105,11 @@ class WpiLibVersionService private constructor(private val project: Project) : P
     var versionStatus: WpiLibVersionStatus? = null
         private set
 
+    /** The FRC year from the attached Wpi Lib Version. May be null if the versionStatus cannot be determined.  */
+    val frcYear: Int?
+        get() = versionStatus?.attachedVersion?.frcYear
+
+
     companion object
     {
         @JvmStatic

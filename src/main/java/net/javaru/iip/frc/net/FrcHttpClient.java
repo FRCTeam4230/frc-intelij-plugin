@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.CookieSpecs;
@@ -42,7 +43,6 @@ import org.jdom2.input.SAXBuilder;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.vcs.log.util.StopWatch;
 
 
 
@@ -74,7 +74,7 @@ public class FrcHttpClient
         final long start = System.currentTimeMillis();
         try (final CloseableHttpResponse httpResponse = httpClient.execute(httpRequest, httpClientContext))
         {
-            final String duration = StopWatch.formatTime(System.currentTimeMillis() - start);
+            final String duration = Duration.ofMillis(System.currentTimeMillis() - start).toString();
             LOG.info("[FRC] http response status line was '" + httpResponse.getStatusLine() + "', taking " + duration + ", for URI '" + uri + '\'');
             final HttpEntity httpEntity = httpResponse.getEntity();
             final String xml = EntityUtils.toString(httpEntity, StandardCharsets.UTF_8);
@@ -150,7 +150,7 @@ public class FrcHttpClient
         final long start = System.currentTimeMillis();
         try (final CloseableHttpResponse httpResponse = httpClient.execute(httpRequest, httpClientContext))
         {
-            final String duration = StopWatch.formatTime(System.currentTimeMillis() - start);
+            final String duration = Duration.ofMillis(System.currentTimeMillis() - start).toString();
             LOG.info("[FRC] http response status line was '" + httpResponse.getStatusLine() + "', taking " + duration + ", for URI '" + uri + '\'');
             final HttpEntity httpEntity = httpResponse.getEntity();
             if (httpEntity == null)

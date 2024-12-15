@@ -108,3 +108,28 @@ As of v2.x, the major version will increase for each FRC build season. Thus:
 - version 3,x for build season 2023
 - version 4.x for build season 2024
 - etc.
+
+== Developing the Plugin
+
+REMINDER: You must restart IntelliJ IDEA after setting or updating any environment variables.
+
+The plugin uses some secrets and keys that can't be committed to source control. These values are loaded from a properties file. To allow for a token file to be 
+shared across multiple project clones and to be optimally placed for security, the file's location is not predefined. Instead, it's location must be defined, as
+a path, in the environment variable `FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE`. This file must contain the keys:
+
+  - `SENTRY_DSN_TEST_AND_QA`
+  - `SENTRY_DSN_PROD`
+
+If you wish to develop the plugin locally for your own use, you can bypass the need to define these keys, and thus the properties file, by setting the 
+`frcPluginEapDesignator` property in the `gradle.properties` file to a value of `-UNOFFICIAL` (or alternatively `-SNAPSHOT`). 
+
+== Code Signing
+
+When building an official distribution, the following environment variables must be set, either on the syst4em.user level, or via the run/debug configuration
+used to build the plugin for a release. The values provided are example values.
+
+  - `JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE` -> C:\Users\USERNAME\AppData\Roaming\gnupg\Code-Signing-Keys\chain-2021-10-31--2022-10-30.crt
+  - `JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE` -> C:\Users\USERNAME\AppData\Roaming\gnupg\Code-Signing-Keys\javaru-signing-private.pem
+  - `JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD`
+
+See https://plugins.jetbrains.com/docs/intellij/plugin-signing.html[Plugin Signing] in the Jetbrains Plugins SDK documentation for more information.

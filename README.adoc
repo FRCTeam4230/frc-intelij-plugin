@@ -58,8 +58,8 @@ The JetBrains release cycle adds some additional difficulties. The 20xx.3 versio
 when I am busy implementing new WPILib features in the plugin. I do my best to support the new .3 version as soon as possible. But if incompatibilities exist, support may get delayed
 while I focus on implementing new WPILib/FRC features required for the new build season. For example, the addition of the Command Based Robot v2 API for the 2020 season took considerable
 time to implement support for, with that work taking place in December 2019 just as IntelliJ IDEA v2019.3 was released. Despite that, however, I was able to support v2019.3 for the
-2020 competition season. That may not always be the case, however. Adding to the timing complexities, JetBrains typically releases v20xx.1 version in mid-March. Out Teams Regional
-is always mid-March. As such, my duties as the Lead Software Developer, and typically software developer, for our team demand my full attention. This may delay my ability to provide support
+2020 competition season. That may not always be the case, however. Adding to the timing complexities, JetBrains typically releases v20xx.1 version in mid-March. Our Team's Regional
+is always mid-March. As such, my duties as the Lead Software Mentor, and typically sole software developer, for our team demand my full attention. This may delay my ability to provide support
 to the 20xx.1 version upon its release.
 
 === Version Support Summary

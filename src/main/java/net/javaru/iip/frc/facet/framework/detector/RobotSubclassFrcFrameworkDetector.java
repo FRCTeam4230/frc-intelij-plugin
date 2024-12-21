@@ -17,6 +17,7 @@
 package net.javaru.iip.frc.facet.framework.detector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -133,6 +134,9 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
     {
         final List<VirtualFile> foundFiles = new ArrayList<>(newFiles.size());
         final Project project = context.getProject();
+        final String projectName = (project == null) ? "<project-is-null>" : project.getName();
+        
+        LOG.info("[FRC] FrameworkDetector checking if project named '" + projectName + "' for FRC Project");
         if (project != null)
         {
             for (VirtualFile virtualFile : newFiles)
@@ -157,6 +161,14 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
                 }
             }
         }
+        
+        if (foundFiles.isEmpty()) {
+            LOG.info("[FRC] FrameworkDetector found no FRC Robot based files for project named '" + projectName +"'.");
+        }
+        else {
+            LOG.info("[FRC] FrameworkDetector found " + foundFiles.size() + " FRC Robot based files for project named '" + projectName +"'. Files: " + foundFiles);
+        }
+        
         return foundFiles;
     }
 
@@ -195,6 +207,10 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
                 return false;
             }
             final PsiClass[] classes = psiFile.getClasses();
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("[FRC] FrameworkDetector checking psiFile '" + psiFile.getName() + "'. Its classes are: " + Arrays.toString( classes));  
+            }
+            
             // This will only work if the WpiLib classes are on the classpath (i.e. added as a library)
             return hasFrcSuperClass(classes, project);
         }
@@ -228,10 +244,16 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
         {
             if (project.isDisposed())
             {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("[FRC] FrameworkDetector psiClass '" + psiClass.getQualifiedName() + "' does NOT have an FRC super class");
+                }
                 return false;
             }
             if (hasFrcSuperClass(psiClass, project, 0))
             {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("[FRC] FrameworkDetector psiClass '" + psiClass.getQualifiedName() + "' DOES have an FRC super class");
+                }
                 return true;
             }
         }
@@ -259,21 +281,37 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
             {
                 return false;
             }
-
+            
             if (SUPER_CLASSES_FQN.contains((psiClass.getQualifiedName())))
             {
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("[FRC] FrameworkDetector psiClass '" + psiClass.getQualifiedName() + "' IS an FRC/WpiLib base robot class. Returning true hasFrcSuperClass().");
+                }
                 return true;
             }
             else if (extendsFrcRobot(psiClass))
             {
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("[FRC] FrameworkDetector psiClass '" + psiClass.getQualifiedName() + "' extends an FRC/WpiLib base robot class. Returning true for hasFrcSuperClass.");
+                }
                 return true;
             }
             else
             {
+                PsiClass superClass = psiClass.getSuperClass();
+                if (superClass == null || "java.lang.Object".equals(superClass.getQualifiedName())) {
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("[FRC] FrameworkDetector psiClass '" + psiClass.getQualifiedName() + "' is not, nor does it extend, an FRC/WpiLib base robot class. It does not have a Superclass (other than java.lang.Object). Returning false for hasFrcSuperClass() for this class." );
+                    }
+                    return false;
+                }
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("[FRC] FrameworkDetector psiClass '" + psiClass.getQualifiedName() + "' is not, nor does it extend, an FRC/WpiLib base robot class. Checking it super class " + superClass);
+                }
                 // Issue 16: A Stackoverflow occurred of well over 1000 calls to the below recursive calls.
                 //           Not sure what class caused it. But to prevent the issue, we limit the traversal
                 //           of super classes to a depth of 33, which is way more than is ever likely for a robot project
-                return (++recursionCount <= 32) && hasFrcSuperClass(psiClass.getSuperClass(), project, recursionCount);
+                return (++recursionCount <= 32) && hasFrcSuperClass(superClass, project, recursionCount);
             }
         }
         catch (ProcessCanceledException e)

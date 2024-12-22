@@ -54,6 +54,7 @@
     <change-notes><![CDATA[
         <strong>vNEXT-VERSION</strong> <br>
         &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/159'>issue #159</a> &quot;'frcYear' in vendordep JSON files can also be a string&quot; Thanks to <em>Noah Andrews</em> for reporting.<br>
+        &nbsp;&nbsp;&bull; Improves FRC Framework detection when opening externally created projects
         <br>
         <strong>v4.0.1</strong> <br>
         &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/150'>issue #150</a> &quot;Command class generation using deprecated (in WpiLib v2024) CommandBase&quot; Thanks to <em>logan hollowood</em> for reporting.<br>
@@ -257,10 +258,12 @@
 
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html on how to target different products -->
     <!-- The unique identifiers of the plugins on which this plugin depends. -->
+    <!-- ALSO UPDATE GRADLE BUILD FILE -->
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
     <depends>com.intellij.gradle</depends>
     <depends>org.intellij.groovy</depends>
+    <depends>org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="shellScriptOptionalPlugin.xml">com.jetbrains.sh</depends>
     <!--<depends>AntSupport</depends>-->
 
@@ -380,7 +383,9 @@
 
         <externalProjectDataService id="FrcDependencyDataService" implementation="net.javaru.iip.frc.facet.importer.FrcDependencyDataService" />
 
-        <framework.detector implementation="net.javaru.iip.frc.facet.framework.detector.RobotSubclassFrcFrameworkDetector" />
+<!--        <framework.detector implementation="net.javaru.iip.frc.facet.framework.detector.RobotSubclassFrcFrameworkDetector" />-->
+        <framework.detector implementation="net.javaru.iip.frc.facet.framework.detector.JavaWpiLibLibraryFrcFrameworkDetector" />
+        <framework.detector implementation="net.javaru.iip.frc.facet.framework.detector.KotlinWpiLibLibraryFrcFrameworkDetector" />
         
         <!-- dependencySupport: Notifies users that a plugin supporting a particular dependency is available and asks if they want to install it -->
         <dependencySupport displayName="FRC WPILib"     kind="java" coordinate="edu.wpi.first.wpilibj:wpilibj-java" />

@@ -46,11 +46,15 @@ import com.intellij.psi.PsiManager;
 import com.intellij.util.indexing.FileContent;
 
 import net.javaru.iip.frc.facet.FrcFacetConfiguration;
+import net.javaru.iip.frc.run.RunDebugConfigsCreationData;
 import net.javaru.iip.frc.wpilib.WpiLibConstants;
+
+import static net.javaru.iip.frc.run.RunDebugConfigurationsKt.createAllRunDebugConfigurations;
 
 
 
 //NOTE: Configured in plugin.xml
+// REPLACED WITH WpiLibLibraryFrcFrameworkDetector which should be faster; will delete this once the new one has proven out
 public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetector
 {
     private static final Logger LOG = Logger.getInstance(RobotSubclassFrcFrameworkDetector.class);
@@ -114,7 +118,7 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
         try
         {
             final List<VirtualFile> foundFiles = detectRobotClasses(newFiles, context);
-             
+            
             return (foundFiles.isEmpty()) ? Collections.emptyList() : context.createDetectedFacetDescriptions(this, foundFiles);
         }
         catch (ProcessCanceledException e)
@@ -167,6 +171,7 @@ public class RobotSubclassFrcFrameworkDetector extends FrcAbstractFrameworkDetec
         }
         else {
             LOG.info("[FRC] FrameworkDetector found " + foundFiles.size() + " FRC Robot based files for project named '" + projectName +"'. Files: " + foundFiles);
+            try { if (project != null) createAllRunDebugConfigurations(RunDebugConfigsCreationData.Companion.create(project));} catch (Throwable ignore) {}
         }
         
         return foundFiles;

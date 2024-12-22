@@ -106,6 +106,12 @@ data class RunDebugConfigsCreationData (
     }
 }
 
+fun createAllRunDebugConfigurations(project: Project?) {
+    if (project != null) {
+        createAllRunDebugConfigurations(RunDebugConfigsCreationData.create(project))
+    }
+}
+
 fun createAllRunDebugConfigurations(configsData: RunDebugConfigsCreationData)
 {
     logger.debug("[FRC] Running createAllRunDebugConfigurations")

@@ -32,6 +32,7 @@ import net.javaru.iip.frc.i18n.FrcBundle
 import org.jetbrains.annotations.Contract
 import java.util.*
 import javax.swing.JComponent
+import kotlin.jvm.Throws
 
 private object FindClassUtils{}
 
@@ -57,6 +58,29 @@ enum class ClassDeduplicationMethodology
 @Contract("null, _ -> !null; !null, null -> !null")
 @JvmOverloads
 fun findClass(project: Project?, fqn: String?, deduplicationMethodology: ClassDeduplicationMethodology = ClassDeduplicationMethodology.Content): Array<PsiClass?>
+{
+    return try
+    {
+        findClassInternal(project, fqn)
+    }
+    catch (e: Exception)
+    {
+        // Issue 158 - the IDE's facade.findClasses threw an IndexOutOfBoundsException 
+        logger.warn("[FRC] An exception occurred when looking for class '$fqn'. Will retry search, Cause Summary: $e", e)
+        try
+        {
+            findClassInternal(project, fqn)
+        }
+        catch (e: Exception)
+        {
+            logger.warn("[FRC] An exception occurred a second time when looking for class '$fqn'. Will return empty array. Cause Summary: $e", e)
+            arrayOfNulls(0)
+        }
+    }
+}
+
+@Throws(Exception::class) // Issue 158 - the IDE's facade.findClasses threw an IndexOutOfBoundsException 
+private fun findClassInternal(project: Project?, fqn: String?, deduplicationMethodology: ClassDeduplicationMethodology = ClassDeduplicationMethodology.Content): Array<PsiClass?>
 {
     if (project == null || fqn == null)
     {

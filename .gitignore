@@ -1,4 +1,7 @@
 syntax: regexp
+# File that holds secrets and keys
+frc-plugin-no-commit-tokens.properties
+
 # Exclude files beginning with "~"
 ([\\/]~|^~)
 

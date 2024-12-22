@@ -156,9 +156,13 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
     {
         ApplicationManager.getApplication().invokeLater(() ->
                                                         {
-                                                            myProcessHandler.destroyProcess();
+                                                            if (myProcessHandler != null) {
+                                                                myProcessHandler.destroyProcess();  
+                                                            }
                                                             invokeClearAll();
-                                                            myProcessHandler.waitFor(2000L);
+                                                            if (myProcessHandler != null) {
+                                                                myProcessHandler.waitFor(2000L);
+                                                            }
                                                             run(false);
                                                             // Commenting out for now as it is causing issues
                                                             //ensureContentIsPinned();

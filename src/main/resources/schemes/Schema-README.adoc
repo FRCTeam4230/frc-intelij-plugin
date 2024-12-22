@@ -1,10 +1,13 @@
 
 
-The schema written by WPI is located at: 
+The schemas written by WPI are located at: 
 
 https://github.com/wpilibsuite/vscode-wpilib/blob/master/vscode-wpilib/resources/wpilibschema.json
+https://github.com/wpilibsuite/vscode-wpilib/blob/main/vscode-wpilib/resources/vendorschema.json
 
-That schema is stored as `wpilibPreferencesDefault.schema.json`. However it is very basic in nature and does not provide any validation rules, descriptions, or default values. Therefore we've implemented the `wpilibPreferencesEnhanced.schema.json` schema with those. 
+That schema is stored as `wpilibPreferencesDefault.schema.json`. However, it is very basic in nature and does not provide any validation rules, descriptions, or default values. Therefore, we've implemented the `wpilibPreferencesEnhanced.schema.json` schema with those.
+
+Similar for the vendordeps schema. Our `vendordeps.modified.schema.json` has improvements in it.
 
 Some links for writing JSON Schemas
 

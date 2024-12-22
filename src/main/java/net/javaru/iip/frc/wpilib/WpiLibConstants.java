@@ -18,6 +18,9 @@ package net.javaru.iip.frc.wpilib;
 
 import java.util.regex.Pattern;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
+
 
 
 public class WpiLibConstants
@@ -74,4 +77,30 @@ public class WpiLibConstants
     
     
     public static final Pattern EXTENDS_A_ROBOT_REGEX = Pattern.compile("extends\\s+(edu\\.wpi\\.first\\.wpilibj\\.)?(IterativeRobot|RobotBase)");
+    
+    public static final String WPILIB_JAVA_MAVEN_COORDINATES = "edu.wpi.first.wpilibj:wpilibj-java";
+    public static final String WPILIB_HAL_JAVA_MAVEN_COORDINATES = "edu.wpi.first.hal:hal-java";
+    public static final String WPILIB_WPIUTIL_JAVA_MAVEN_COORDINATES = "edu.wpi.first.wpiutil:wpiutil-java";
+    public static final String WPILIB_XRP_MAVEN_COORDINATES = "edu.wpi.first.xrpVendordep:xrpVendordep-java";
+    
+    public static final ImmutableSet<String> ROBOT_SUPER_CLASSES_FQN = ImmutableSet.of(
+            ROBOT_BASE_FQN,
+            SAMPLE_ROBOT_FQN,
+            ITERATIVE_ROBOT_BASE_FQN,
+            ITERATIVE_ROBOT_FQN,
+            TIMED_ROBOT_FQN
+    );
+    
+    public static final ImmutableSet<String> ROBOT_SUPER_CLASSES_NAMES = createSuperClassesNameSet();
+    
+    private static ImmutableSet<String> createSuperClassesNameSet()
+    {
+        final Builder<String> setBuilder = ImmutableSet.builder();
+        for (String fqn : ROBOT_SUPER_CLASSES_FQN)
+        {
+            setBuilder.add(fqn);
+            setBuilder.add(fqn.substring(fqn.lastIndexOf('.') + 1));
+        }
+        return setBuilder.build();
+    }
 }

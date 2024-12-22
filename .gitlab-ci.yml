@@ -3,7 +3,7 @@
 
 # Official Gradle Docker Images: https://hub.docker.com/_/gradle?tab=tags&page=1&ordering=last_updated
 # as of gradle 7.3, "hotspot" JDK image (i.e. 7.4.2-jdk11-hotspot) is no longer available, but the "jdk11" version seems nearly identical
-image: gradle:7.4.2-jdk17
+image: gradle:8.7-jdk17
 
 # Disable the Gradle daemon for Continuous Integration servers as correctness
 # is usually a priority over speed in CI environments. Using a fresh

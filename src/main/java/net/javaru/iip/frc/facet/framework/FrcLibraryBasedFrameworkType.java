@@ -26,7 +26,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import net.javaru.iip.frc.facet.FrcFacet;
 
 
-// TODO - need to finish seeing if this is something we want/need to implement/use
+// TODO - need to finish seeing if this is something we want/need to implement/use See Issue 106: https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues/106
 public class FrcLibraryBasedFrameworkType extends LibraryBasedFrameworkType
 {
     private static final Logger LOG = Logger.getInstance(FrcLibraryBasedFrameworkType.class);

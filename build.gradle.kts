@@ -49,7 +49,7 @@ plugins {
     //           Last version of docs on GitHub before migration: https://github.com/JetBrains/gradle-intellij-plugin/blob/e819958cdc4e593738cd96e230edd5ca66481b3b/README.md
     //     Info: https://lp.jetbrains.com/gradle-intellij-plugin/
     //     Src:  https://github.com/JetBrains/gradle-intellij-plugin
-    id("org.jetbrains.intellij") version "1.13.2"
+    id("org.jetbrains.intellij") version "1.17.3"
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
     //    https://github.com/jetbrains/gradle-idea-ext-plugin
@@ -75,7 +75,7 @@ intellij {
     // IntelliJ IDEA dependency
     version.setViaProjectProperty("ideaVersion")
     // Bundled plugin dependencies - comma separated list. Should use 'com.intellij.java' rather than 'java' per https://jetbrains-platform.slack.com/archives/C5U8BM1MK/p1647535621287459?thread_ts=1647509674.185739&cid=C5U8BM1MK
-    plugins.set(listOf("com.intellij.java", "gradle", "Groovy", "com.jetbrains.sh"))  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
+    plugins.set(listOf("com.intellij.java", "gradle", "Groovy", "org.jetbrains.kotlin", "com.jetbrains.sh"))  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
     sandboxDir.set(sandboxPath)
     updateSinceUntilBuild.set(true)
     sameSinceUntilBuild.set(false)

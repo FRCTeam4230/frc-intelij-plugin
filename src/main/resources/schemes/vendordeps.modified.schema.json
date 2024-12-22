@@ -9,7 +9,7 @@
             "type": "string"
         },
         "frcYear": {
-            "type": "integer"
+            "type": ["integer", "string"]
         },
         "uuid": {
             "type": "string"

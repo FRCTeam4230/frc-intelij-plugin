@@ -48,7 +48,7 @@ plugins {
     //           Last version of docs on GitHub before migration: https://github.com/JetBrains/gradle-intellij-plugin/blob/e819958cdc4e593738cd96e230edd5ca66481b3b/README.md
     //     Info: https://lp.jetbrains.com/gradle-intellij-plugin/
     //     Src:  https://github.com/JetBrains/gradle-intellij-plugin
-    id("org.jetbrains.intellij") version "1.13.2"
+    id("org.jetbrains.intellij") version "1.17.3"
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
     //    https://github.com/jetbrains/gradle-idea-ext-plugin

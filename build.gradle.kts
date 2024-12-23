@@ -76,6 +76,13 @@ intellij {
     version.setViaProjectProperty("ideaVersion")
     // Bundled plugin dependencies - comma separated list. Should use 'com.intellij.java' rather than 'java' per https://jetbrains-platform.slack.com/archives/C5U8BM1MK/p1647535621287459?thread_ts=1647509674.185739&cid=C5U8BM1MK
     plugins.set(listOf("com.intellij.java", "gradle", "Groovy", "org.jetbrains.kotlin", "com.jetbrains.sh"))  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
+    plugins.set(listOf(
+        "com.intellij.java", // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
+        "gradle",
+        "Groovy",
+        "org.jetbrains.kotlin",
+        "com.jetbrains.sh",
+                      ))
     sandboxDir.set(sandboxPath)
     updateSinceUntilBuild.set(true)
     sameSinceUntilBuild.set(false)

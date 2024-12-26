@@ -227,12 +227,12 @@ fun getPluginResourceAsStream(path: String?): InputStream?
 }
 
 @WillNotThrowException
-fun getPluginResourceAsText(resourcePath: String): String?
+fun getPluginResourceAsText(resourcePath: String, logWarnIfNotExist: Boolean = true): String?
 {
     val inputStream = getPluginResourceAsStream(resourcePath)
     return if (inputStream == null)
     {
-        LOG.warn("[FRC] Could not find resource: $resourcePath")
+        if (logWarnIfNotExist) LOG.warn("[FRC] Could not find resource: $resourcePath")
         null
     }
     else

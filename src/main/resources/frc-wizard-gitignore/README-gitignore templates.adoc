@@ -1,6 +1,13 @@
-These files are the "heart" of the template outputs from https://www.toptal.com/developers/gitignore/api/{template} We do however remove the two header lines and the single footer line. This is so we can combine them into a single output adding the header and footer lines for the entire output.
 
-For example, https://www.toptal.com/developers/gitignore/api/foo might generate:
+= `.gitignore` Template Files
+
+The FRC Project wizard provides an option to generate a `.gitigonre` file. The users can select various "types" to include in the 
+`.gitignore` file, with a "type:" representing a programming language, tool, IDE, OS, etc. The wizard will, by default, attempt to 
+live fetch the a `.gitignore` file's content from the Toptal gitignore API for the selected types. However, if desired, or as a fallback 
+option, cached files can be used. These cached files are contained in the same directory as this readme. **The file names must match the 
+corresponding .gitignore API type name.** They contain the outputs  from `https://www.toptal.com/developers/gitignore/api/<template>` 
+endpoint. We do however remove the two header lines and the single footer line. This is so we can combine them into a single output 
+adding the header and footer lines for the entire output. For example, `https://www.toptal.com/developers/gitignore/api/foo` might generate:
 
 [source, .gitignore]
 ----
@@ -32,3 +39,34 @@ bar.*
 # Log files
 *.log
 ----
+
+== The wpilib.txt` file
+
+Since the gitignore API does not support WPILib as a type, those entries are always read from the cache file or `wpilib.txt`. This file is
+created via examining the `<vscode-wpilib-ProjectRoot-or-extractedSourcesDir>/vscode-wpilib/resources/gradle/shared/.gitignore` file. 
+If an entry in the file from `vscode-wpilib`  is specific to another type, we add it to a `<typeName>-additionalCustom.txt` file as 
+discussed in the next section.See  "Part 2 Update the Gradle templates and other files from the `vscode-wpilib` project" in the
+`README-frc-wizard-templates.adoc`file for more information.
+
+== `additionalCustom` Files
+
+Any .gitignore type specific entry that either the WPI Lib developers add in the
+`<vscode-wpilib-ProjectRoot-or-extractedSourcesDir>/vscode-wpilib/resources/gradle/shared/.gitignore` file, or that we wish to add
+are placed in a `<typeName>-additionalCustom.txt` file. These are then appended into the generated .gitignore` file near the end.
+ 
+
+== List of Types we directly support and cache:
+
+* https://www.toptal.com/developers/gitignore/api/c++
+* https://www.toptal.com/developers/gitignore/api/eclipse
+* https://www.toptal.com/developers/gitignore/api/gradle
+* https://www.toptal.com/developers/gitignore/api/intellij+all
+* https://www.toptal.com/developers/gitignore/api/intellij+iml
+* https://www.toptal.com/developers/gitignore/api/java
+* https://www.toptal.com/developers/gitignore/api/kotlin <-- currently an alias for java
+* https://www.toptal.com/developers/gitignore/api/linux
+* https://www.toptal.com/developers/gitignore/api/macos
+* https://www.toptal.com/developers/gitignore/api/netbeans
+* https://www.toptal.com/developers/gitignore/api/visualstudiocode
+* https://www.toptal.com/developers/gitignore/api/windows
+

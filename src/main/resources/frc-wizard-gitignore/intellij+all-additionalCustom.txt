@@ -1,0 +1,2 @@
+# JetBrains Fleet IDE
+.fleet

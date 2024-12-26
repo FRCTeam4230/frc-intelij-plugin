@@ -68,6 +68,11 @@ There are multiple `wpilibsuite` projects we need to reference. The `vscode-wpil
 [NOTE]
 The default files directory uses a name of `-DEFAULT-FILES-` so that is stands among the numerous directories, and so that it is sorted to the top of the list of directories. It contains both shared, and default file templates used by all the templates.
 
+
+.My Note Title
+[NOTE]
+The `javadt` files are for creating "desktop" projects. As far as I can tell from looking through the `vscode-wpilib` project, when `data.desltop` is active (vs `data.roni` or `data.xrp` ) the `java` files still get used. ASLl that happens is that `includeDesktopSupport` is set to `true`. So it doesn't look lie the files in `javadt` are used. So any if there are differences between `java` and `javadt`, use `java`. 
+
 === Part 0: Prerequisites
 * In the project's `build.gradle.kts` file, make sure `frc.show.betas.in.new.project.wizard` is set to `true` in the `systemProperties` map in the `runIde` block. This will allow you to run the plugin and create pending year robots while the actual WPI Lib is still in beta.
 * You will likely want to download and install the beta version of the pending year WPI Lib. We primarily want VS Code installed so that we can create projects from the pending templates.
@@ -82,7 +87,7 @@ The default files directory uses a name of `-DEFAULT-FILES-` so that is stands a
 === Part 2 Update the Gradle templates and other files from the `vscode-wpilib` project
 
 . Update the gradle version used in the templates:
-    ** In the `vscode-wpilib` project, check the `vscode-wpilib/resources/gradle/shared/gradle/wrapper/gradle-wrapper.properties` file for its version, and update the `gradleDistributionUrl` `val` in `FrcProjectWizardData`
+    ** In the `vscode-wpilib` project, check the `vscode-wpilib/resources/gradle/shared/gradle/wrapper/gradle-wrapper.properties` file for its version, and update the getter for the `gradleDistributionUrl` `val` in `FrcProjectWizardData`. Also update the default `else` branch to match.
     ** Copy the two gradle wrapper scripts -- `gradlew` and `gradlew.bat` over from `vscode-wpilib/resources/gradle/shared` to `20xx/-DEFAULT-FILES-/gradle/gradle-wrapper/gradle`. This ensures true parity with the official templates, and scripts that will be in use world-wide.
 . In the `vscode-wpilib` project, copy the entire contents of the `vscode-wpilib/resources/gradle/shared/settings.gradle` file to the clipboard. Then open our `src/main/resources/frc-wizard-templates/20xx/-DEFAULT-FILES-/gradle/groovy-dsl/settings.gradle.ftl` file, and diff it to the clipboard. Make the necessary updates/changes.
     .. NOTE: In our template, the `frcYear` is set dynamically. So do *not* replace the `${data.frcYearString}`
@@ -93,12 +98,16 @@ The default files directory uses a name of `-DEFAULT-FILES-` so that is stands a
     ** Update the `when` clause in `projectTemplateDefinitionsFor(Int)` function to add the current year, and "point" the else clause to the current year
     ** Update the `when` clause in `exampleTemplateDefinitionsFor(Int)` function to add the current year, and "point" the else clause to the current year
 . The `build.gradle.ftl` and `build.gradle.kts.ftl` templates need to be updated. There is no one "easy" way to do this. The `vscode-wpilib` project uses several  files -- in the `java`, `javadt`, `javaromi`, and `javaxrt` directories -- whereas our project uses a single template file with `if` conditions and blocks. Ways to check and make updates:
-    ** Download the `sources.zip` from https://github.com/wpilibsuite/vscode-wpilib/releases[vscode-wpilib/releases], for the current year beta and the previous year's release (ideally the first official release to catch any minor changes in the previous year). Extract the file and then diff the `build.gradle` files in the `java`, `javadt`, `javaromi`, and `javaxrt` sub-directories of the `vscode-wpilib/resources/gradle` directory.
+    ** Download the `sources.zip` from https://github.com/wpilibsuite/vscode-wpilib/releases[vscode-wpilib/releases], for the current year beta and the previous year's release (ideally the first official release to catch any minor changes in the previous year). Extract the file and then diff the `build.gradle` files in the `java`, `javadt`, `javaromi`, and `javaxrt` sub-directories of the ``<extractedSourcesDir>/vscode-wpilib/resources/gradle` directory. (See the information Note above for notes about the `javadt` directory. In a nutshell, favor `java` and not `javadt`.)
     ** Look at the commit history for the various `build.gradle` files in the `vscode-wpilib` project.
     ** Diff sections of the various `build.gradle` files in the `vscode-wpilib` project to the corresponding `if` blocks in our template
     ** Generate a project via VS Code and the WPI plugin and our project wizard and compare/diff the results.
 . Check the various `wpilib_preferences.json` files in the `vscode-wpilib` project and update our `frc-wizard-templates/20xx/-DEFAULT-FILES-/configs/.wpilib/wpilib_preferences.json.ftl` template file.
 . Check the various `.vscode/settings.json` files in the `vscode-wpilib` project and update our `frc-wizard-templates/20xx/-DEFAULT-FILES-/extras/vs-code-configs/.vscode/settings.json.ftl` template file.
+. In the `vscode-wpilib` project, as a sibling to the `java, `javaromi`, etc. directories, there is a `shared` directory (`<extractedSourcesDir>/vscode-wpilib/resources/gradle/shared`) that has additional files -- e.g. settings.gradle, WPILib-License.md -- that should be che ked for updating.
+    ** *UPDATE .gitignore:* 
+        *** The values from the `.gitignore` file of `vscode-wpilib` are placed in the various files within the `resources/frc-wizard-gitignore/` directory. Most of our `gitignore` files we update via the results of the gitignore API. But some we need to maintain from the `.gitignore` template file from the `vscode-wpilib` project. In particular, we need to maintain the `wpilib-simulation.txt`, and `visualstudiocode-additionalCustom.txt` files. (`visualstudiocode-additionalCustom.txt` entries are values found in the `.gitignore` template file from the `vscode-wpilib` project, but not in the entries returned by the gitignore API which are found in the TODO-FINISH-ME file.)
+        *** See the README in our `resources/frc-wizard-gitignore/` directory for more information.
 
 === Part 3: Update common `-DEFAULT-FILES-` Freemarker templates and data
 

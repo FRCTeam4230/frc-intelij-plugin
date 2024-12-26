@@ -111,6 +111,7 @@ import javax.swing.Icon
 
 private const val gitignoreIoUrl = "https://www.toptal.com/developers/gitignore"
 private const val frcWizardGitignoreDirName = "frc-wizard-gitignore"
+private const val additionalCustomSuffix = "additionalCustom"
 
 @Service(Service.Level.PROJECT)
 @Suppress("NonDefaultConstructor")
@@ -858,6 +859,15 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                 content.clear()
                 content.appendLine(generateGitIgnoreSiteContentFromCachedFiles(toptalTemplates, config.additionalGitignoreTemplates))
             }
+
+            // Add any additionalCustom content in bulk
+            content.appendLine()
+            content.appendLine("# Additional custom WPI Specific entries for previous types")
+            toptalTemplates.forEach { templateName ->
+                writeTemplateToContentBuilder("$frcWizardGitignoreDirName/$templateName-${additionalCustomSuffix}.txt", content, logWarnIfNotExist = false)
+            }
+            content.appendLine("# End of additional custom WPI Specific entries")
+            content.appendLine()
         }
         
         if (manualEntries.isNotBlank())
@@ -875,7 +885,6 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         {
             content.appendLine("# === Entries from WPI Lib team ===")
             content.appendLine("# The following gitignore entries have been specially created by the WPI Lib development team.")
-            content.appendLine("# If you remove items from this file, intellisense might break.")
             content.appendLine()
             wpilibTemplates.processTemplateList(content)
             content.appendLine("# End entries from WPI Lib team")
@@ -908,17 +917,16 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     private fun List<String>.processTemplateList(content: StringBuilder)
     {
         forEach { templateName ->
-            val path = "$frcWizardGitignoreDirName/$templateName.txt"
-            path.writeTemplateToContentBuilder(content)
+            writeTemplateToContentBuilder("$frcWizardGitignoreDirName/$templateName.txt", content, logWarnIfNotExist = true)
         }
     }
 
-    private fun String.writeTemplateToContentBuilder(content: StringBuilder)
+    private fun writeTemplateToContentBuilder(templatePath: String, content: StringBuilder, logWarnIfNotExist: Boolean = true)
     {
-        val inputStream = getPluginResourceAsStream(this)
+        val inputStream = getPluginResourceAsStream(templatePath)
         if (inputStream == null)
         {
-            ourLogger.warn("[FRC] could not find gitignore cached template '${this}' in plugin resources")
+            if (logWarnIfNotExist) ourLogger.warn("[FRC] could not find gitignore cached template '${templatePath}' in plugin resources")
         }
         else
         {
@@ -944,8 +952,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         val toptalTemplates = mutableListOf<String>()
         val wpilibTemplates = mutableListOf<String>()
 
-        if (config.java) toptalTemplates.add("java") //else if (config.wpilib) wpilibTemplates.add("wpilib-java")
-        if (config.gradle) toptalTemplates.add("gradle") //else if (config.wpilib) wpilibTemplates.add("wpilib-gradle")
+        if (config.java) toptalTemplates.add("java") 
+        if (config.gradle) toptalTemplates.add("gradle")
 
 
         when (config.intellij)
@@ -959,13 +967,23 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         when (config.vscode)
         {
             IdeConfigOption.Share   -> toptalTemplates.add("visualstudiocode")
-            IdeConfigOption.Ignore  ->
-                manualEntries.append(
-                    """
-                        ### VisualStudioCode ###
-                        # Ignores the whole .vscode folder 
-                        .vscode/
-                        """.trimIndent())
+            IdeConfigOption.Ignore  -> {
+                val inputStream = getPluginResourceAsStream("$frcWizardGitignoreDirName/visualstudiocode.txt")
+                if (inputStream == null)
+                {
+                    ourLogger.warn("[FRC] could not find the '$frcWizardGitignoreDirName/visualstudiocode.txt' file in plugin resources")
+                }
+                else
+                {
+                    inputStream.use { innerStream ->
+                        val reader = BufferedReader(InputStreamReader(innerStream, Charsets.UTF_8))
+                        reader
+                            .lines()
+                            .filter{  line -> !line.startsWith("!.vscode/") }
+                            .forEach{  manualEntries.appendLine(it) }
+                    }
+                }
+            }
             IdeConfigOption.NoEntry -> {
                 //if (config.wpilib) wpilibTemplates.add("wpilib-java")
             }
@@ -974,14 +992,13 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         //For now, we are using boolean checkboxes for Eclipse and NetBeans rather than selecting as an IdeConfigOption
         if (config.eclipse.asBoolean()) toptalTemplates.add("eclipse")
         if (config.netbeans.asBoolean()) toptalTemplates.add("netbeans")
-        if (config.linux) toptalTemplates.add("linux") //else if (config.wpilib) wpilibTemplates.add("wpilib-linux")
-        if (config.macOS) toptalTemplates.add("macos") //else if (config.wpilib) wpilibTemplates.add("wpilib-macos")
-        if (config.windows) toptalTemplates.add("windows") //else if (config.wpilib) wpilibTemplates.add("wpilib-windows")
-        if (config.cpp) toptalTemplates.add("c++") //else if (config.wpilib) wpilibTemplates.add("wpilib-c++")
+        if (config.linux) toptalTemplates.add("linux")
+        if (config.macOS) toptalTemplates.add("macos")
+        if (config.windows) toptalTemplates.add("windows")
+        if (config.cpp) toptalTemplates.add("c++")
 
         if (config.wpilib) {
-            wpilibTemplates.add("wpilib-vscode-additional")
-            wpilibTemplates.add("wpilib-simulation-gui")
+            wpilibTemplates.add("wpilib")
         }
 
         toptalTemplates.addAll(config.additionalGitignoreTemplates)

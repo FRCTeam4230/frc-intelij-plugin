@@ -12,6 +12,18 @@
 * *When committing Freemarker Template changes, do not allow IntelliJ IDEA to "Optimize Imports"* (via said option in the commit dialog) as it will cause issues with the Freemarker templates with Java as the Template Data Language (reported via https://youtrack.jetbrains.com/issue/IDEA-226072[IDEA-226072])
 * *Changes not picked up:* Sometimes after making a template change, upon testing, the change is not present. The template file does seem to change in both the `build` output and in the `.sandbox\plugins\FRC`. Nevertheless, the change does not (always) appear even after two restarts (i.e. two reruns of `clean build runIde`). Deleting IDEA's cache, by deleting the directory `.sandbox/system` seems to solve the issue. So it appears IDEA caches the resource and reuses the old version. More testing is needed to  confirm. And this may be resolved in newer versions of the `org.jetbrains.intellij` gradle plugin.
 
+Because our Java templates place the package statement in an if block and uses a placeholder for the base package, IntelliJ IDEA will highlight an error (on the class name) saying "Missing package statement". We can suppress this for the file with a comment at the very top of the file just after the `<#ftl>` root tag. For example:
+
+[source]
+----
+<#ftl output_format="plainText" encoding="UTF-8">
+<#--noinspection WrongPackageStatement-->
+----
+
+.My Tip Title
+[IMPORTANT]
+See the "IntelliJ IDEA Project Template Data Language" section below on important information on how to configure IntelliJ IDEA's "Template Data Languages" to make editing the Freemarker files easier, and to prevent false warnings.
+
 ==== WPI Lib Projects of note
 * `allwpilib` : https://github.com/wpilibsuite/allwpilib
     - The primary project for the Java and C WPILib libraries.
@@ -48,15 +60,67 @@ It will see the `<String>` as an "Unknown html tag 'String'". It will also have 
 
 We can do this on a per-file basis, a per-directory basis, as well as changing the default for the project from HTML to Java. Given that most of our templates are Java, it is generally easier to make the default for the project "Java" and then specify specific Data Template Languages for some directories and files. For example the "frc-wizard-templates/-DEFAULT-FILES-/gradle/groovy-dsl" directory can be set to "Groovy" and the "frc-wizard-templates/-DEFAULT-FILES-/gradle/kotlin-dsl" directory to "Kotlin". Note that you will need to do this for each year's templates.
 
-You can make these settings in **__File | Settings | Languages & Frameworks | Template Data Languages__** For an individual file, you can quickly get to this setting by putting your cursor on a highlighted error (such as `<String>` in the above example) and open the Quick Fix window via `Alt+Enter` and selecting the "__Change HTML template data language to…__" option. This will open the "Template Data Language" settings dialog with the path to the file prepopulated. Finally, even when the default Data Language is set to "<None>" in the "Template Data Language" settings, it seems like IntelliJ IDEA still uses HTML as the Data Language. **__Alternatively__**, you can edit the `.idea/templateLanguages.xml` file. Copy an existing year's settings, paste, and replace the year in the pasted values.
+====  Configuring Template Data Languages
 
-Because our Java templates place the package statement in an if block and uses a placeholder for the base package, IntelliJ IDEA will highlight an error (on the class name) saying "Missing package statement". We can suppress this for the file with a comment at the very top of the file just after the `<#ftl>` root tag. For example:
+You can make these settings in **__File | Settings | Languages & Frameworks | Template Data Languages__**.
 
-[source]
+NOTE: Even when the default Data Language is set to "<None>" in the "Template Data Language" settings, it seems like IntelliJ IDEA still uses HTML as the Data Language.
+
+
+==== For an individual file
+
+For an individual file, you can quickly get to this setting by putting your cursor on a highlighted error (such as `<String>` in the above example) and open the Quick Fix window via `Alt+Enter` and selecting the "__Change HTML template data language to…__" option. This will open the "Template Data Language" settings dialog with the path to the file prepopulated. 
+
+== Bulk Setting for a new season
+
+You can edit the `.idea/templateLanguages.xml` file. To do this:
+. Close the project
+. Open the `.idea/templateLanguages.xml` file in a plain text editor, or in IntelliJ IDEA with another project open.
+. Copy an existing year's settings from within the file
+    ** Or see snippet below
+. Paste, and replace the year in the pasted values
+. Reopen the project.
+
+[source,xml]
 ----
-<#ftl output_format="plainText" encoding="UTF-8">
-<#--noinspection WrongPackageStatement-->
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="TemplateDataLanguageMappings">
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates" dialect="JAVA" />
+    <!-- === START COPY ON NEXT LINE FOR ANNUAL UPDATE == -->
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/-DEFAULT-FILES-/code/common-code/WPILib-License.md.ftl" dialect="Markdown" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/-DEFAULT-FILES-/code/common-code/src/main/deploy/example.txt.ftl" dialect="TEXT" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/-DEFAULT-FILES-/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/-DEFAULT-FILES-/configs/.wpilib/wpilib_preferences.json.ftl" dialect="JSON" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/-DEFAULT-FILES-/configs/vendordeps" dialect="JSON" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/-DEFAULT-FILES-/extras/project-auto-gen-readme" dialect="Markdown" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/-DEFAULT-FILES-/extras/vs-code-configs/.vscode" dialect="JSON" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/-DEFAULT-FILES-/gradle/gradle-wrapper/gradle/wrapper/gradle-wrapper.properties.ftl" dialect="Properties" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/-DEFAULT-FILES-/gradle/groovy-dsl" dialect="Declarative" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/-DEFAULT-FILES-/gradle/kotlin-dsl" dialect="Declarative" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/commandBased/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/commandBasedSkeleton/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/educational/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/robotBaseSkeleton/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/romiCommand/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/romiEducational/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/romiReference/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/romiTimed/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/timeSlice/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/timeSliceSkeleton/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/timed/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/timedSkeleton/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/xrpCommandBased/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/xrpEducational/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/xrpReference/code/kotlin-code" dialect="kotlin" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/xrpTimed/code/kotlin-code" dialect="kotlin" />
+    <!-- === END COPY == -->
+    <file url="PROJECT" dialect="JAVA" />
+  </component>
+</project>
 ----
+
+
 
 == Updating/Creating Templates for new Season
 
@@ -69,7 +133,7 @@ There are multiple `wpilibsuite` projects we need to reference. The `vscode-wpil
 The default files directory uses a name of `-DEFAULT-FILES-` so that is stands among the numerous directories, and so that it is sorted to the top of the list of directories. It contains both shared, and default file templates used by all the templates.
 
 
-.My Note Title
+.`javadt` vs `java` files
 [NOTE]
 The `javadt` files are for creating "desktop" projects. As far as I can tell from looking through the `vscode-wpilib` project, when `data.desltop` is active (vs `data.roni` or `data.xrp` ) the `java` files still get used. ASLl that happens is that `includeDesktopSupport` is set to `true`. So it doesn't look lie the files in `javadt` are used. So any if there are differences between `java` and `javadt`, use `java`. 
 
@@ -83,6 +147,11 @@ The `javadt` files are for creating "desktop" projects. As far as I can tell fro
 . In this project, update the `develop` branch and then create a `20xx-templates` branch from it.
 . In this project, copy the previous year's templates `20xx` directory to the new year's name. You can use the copy refactoring (F5).
     ** `src/main/resources/frc-wizard-templates/20xx`
+
+
+.Template Data Languages
+[NOTE]
+After copying the files, see the "IntelliJ IDEA Project Template Data Language" section above on important information on how to configure IntelliJ IDEA's "Template Data Languages" to make editing the Freemarker files easier, and to prevent false warnings.
 
 === Part 2 Update the Gradle templates and other files from the `vscode-wpilib` project
 
@@ -98,7 +167,7 @@ The `javadt` files are for creating "desktop" projects. As far as I can tell fro
     ** Update the `when` clause in `projectTemplateDefinitionsFor(Int)` function to add the current year, and "point" the else clause to the current year
     ** Update the `when` clause in `exampleTemplateDefinitionsFor(Int)` function to add the current year, and "point" the else clause to the current year
 . The `build.gradle.ftl` and `build.gradle.kts.ftl` templates need to be updated. There is no one "easy" way to do this. The `vscode-wpilib` project uses several  files -- in the `java`, `javadt`, `javaromi`, and `javaxrt` directories -- whereas our project uses a single template file with `if` conditions and blocks. Ways to check and make updates:
-    ** Download the `sources.zip` from https://github.com/wpilibsuite/vscode-wpilib/releases[vscode-wpilib/releases], for the current year beta and the previous year's release (ideally the first official release to catch any minor changes in the previous year). Extract the file and then diff the `build.gradle` files in the `java`, `javadt`, `javaromi`, and `javaxrt` sub-directories of the ``<extractedSourcesDir>/vscode-wpilib/resources/gradle` directory. (See the information Note above for notes about the `javadt` directory. In a nutshell, favor `java` and not `javadt`.)
+    ** Download the `sources.zip` from https://github.com/wpilibsuite/vscode-wpilib/releases[vscode-wpilib/releases], for the current year beta and the previous year's release (ideally the first official release to catch any minor changes in the previous year). Extract the file and then diff the `build.gradle` files in the `java`, `javadt`, `javaromi`, and `javaxrt` sub-directories of the `<extractedSourcesDir>/vscode-wpilib/resources/gradle` directory. (See the information Note above for notes about the `javadt` directory. In a nutshell, favor `java` and not `javadt`.)
     ** Look at the commit history for the various `build.gradle` files in the `vscode-wpilib` project.
     ** Diff sections of the various `build.gradle` files in the `vscode-wpilib` project to the corresponding `if` blocks in our template
     ** Generate a project via VS Code and the WPI plugin and our project wizard and compare/diff the results.
@@ -112,9 +181,12 @@ The `javadt` files are for creating "desktop" projects. As far as I can tell fro
 
 * In `FrcProjectWizardData`, update:
 ** `gradleDistributionUrl` if not done in Part 1
-** `copyright` if needed
+** `copyright` if needed.
+    *** To check for the need to update, inspect any WPI Lib "official" template file in the `allwpilib` project. For example `<allwpilibProjectRoot>/wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/templates/timed/Main.java`.
 ** `junit5Version` (until Enhancement #80 is implemented)
+    *** The version being used by the Official WPI Lib project templates is defined in `<vscode-wpilib-projectRoot-or-extractedSourcesDir>/vscode-wpilib/resources/gradle/java/build.gradle` file via the `testImplementation  'org.junit.jupiter:junit-jupiter:<VERSION>' declaration.
 * Update `WPILibNewCommands.json.ftl` file
+    ** See `<allwpilibProjectRoot>/wpilibNewCommands/WPILibNewCommands.json`
 ** Diff, from the `allwpilib` project, the `wpilibNewCommands/WPILibNewCommands.json` file to our `frc-wizard-templates/2024/-DEFAULT-FILES-/configs/vendordeps/WPILibNewCommands.json.ftl` file.
 * Update the `WPILib-license.md` file
 ** Copy the contents of: `vscode-wpilib/resources/gradle/shared/WPILib-License.md`
@@ -190,10 +262,7 @@ TODO: Write up info on installing *Hungarian Notation Cleanup* Plugin
 Since there are no "official" Kotlin templates, we generally need to just see what has changed in the Java templates and apply them to the Kotlin templates. This can be done by doing a diff between the previous year's and the current year's Java templates, and/or by looking at the commit history on the templates in the `allwpilib` project.
 
 == Update IntelliJ IDEA "Template Data Languages" settings
-* File | Settings | Languages & Frameworks | Template Data Languages
-* jetbrains://idea/settings?name=Languages+%26+Frameworks--Template+Data+Languages
-* Can update in `.idea/templateLanguages.xml`
-** Be sure to close project and then do the copy
+See the "IntelliJ IDEA Project Template Data Language" section above on important information on how to configure IntelliJ IDEA's "Template Data Languages" to make editing the Freemarker files easier, and to prevent false warnings.
 
 .When doing commit
 [IMPORTANT]

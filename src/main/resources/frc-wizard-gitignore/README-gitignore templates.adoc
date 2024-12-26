@@ -59,7 +59,7 @@ discussed in the next section.See  "Part 2 Update the Gradle templates and other
 === `additionalCustom` Files
 
 Any .gitignore type specific entry that either the WPI Lib developers add in the
-`<vscode-wpilib-ProjectRoot-or-extractedSourcesDir>/vscode-wpilib/resources/gradle/shared/.gitignore` file, or that we wish to add
+`<vscode-wpilib-projectRoot-or-extractedSourcesDir>/vscode-wpilib/resources/gradle/shared/.gitignore` file, or that we wish to add
 are placed in a `<typeName>-additionalCustom.txt` file. These are then appended into the generated .gitignore` file near the end.
  
 

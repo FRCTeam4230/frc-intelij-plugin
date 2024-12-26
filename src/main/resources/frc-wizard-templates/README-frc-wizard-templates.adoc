@@ -105,9 +105,8 @@ The `javadt` files are for creating "desktop" projects. As far as I can tell fro
 . Check the various `wpilib_preferences.json` files in the `vscode-wpilib` project and update our `frc-wizard-templates/20xx/-DEFAULT-FILES-/configs/.wpilib/wpilib_preferences.json.ftl` template file.
 . Check the various `.vscode/settings.json` files in the `vscode-wpilib` project and update our `frc-wizard-templates/20xx/-DEFAULT-FILES-/extras/vs-code-configs/.vscode/settings.json.ftl` template file.
 . In the `vscode-wpilib` project, as a sibling to the `java, `javaromi`, etc. directories, there is a `shared` directory (`<extractedSourcesDir>/vscode-wpilib/resources/gradle/shared`) that has additional files -- e.g. settings.gradle, WPILib-License.md -- that should be che ked for updating.
-    ** *UPDATE .gitignore:* 
-        *** The values from the `.gitignore` file of `vscode-wpilib` are placed in the various files within the `resources/frc-wizard-gitignore/` directory. Most of our `gitignore` files we update via the results of the gitignore API. But some we need to maintain from the `.gitignore` template file from the `vscode-wpilib` project. In particular, we need to maintain the `wpilib-simulation.txt`, and `visualstudiocode-additionalCustom.txt` files. (`visualstudiocode-additionalCustom.txt` entries are values found in the `.gitignore` template file from the `vscode-wpilib` project, but not in the entries returned by the gitignore API which are found in the TODO-FINISH-ME file.)
-        *** See the README in our `resources/frc-wizard-gitignore/` directory for more information.
+. Update `.gitignore` templates 
+    ** See the readme in the `resources/frc-wizard-gitignore` directory for information on how we generate the `.gitignore` file, and how to maintain our gitignore template files.
 
 === Part 3: Update common `-DEFAULT-FILES-` Freemarker templates and data
 

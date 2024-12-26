@@ -184,10 +184,11 @@ After copying the files, see the "IntelliJ IDEA Project Template Data Language" 
 ** `copyright` if needed.
     *** To check for the need to update, inspect any WPI Lib "official" template file in the `allwpilib` project. For example `<allwpilibProjectRoot>/wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/templates/timed/Main.java`.
 ** `junit5Version` (until Enhancement #80 is implemented)
-    *** The version being used by the Official WPI Lib project templates is defined in `<vscode-wpilib-projectRoot-or-extractedSourcesDir>/vscode-wpilib/resources/gradle/java/build.gradle` file via the `testImplementation  'org.junit.jupiter:junit-jupiter:<VERSION>' declaration.
+    *** The version being used by the Official WPI Lib project templates is defined in `<vscode-wpilib-projectRoot-or-extractedSourcesDir>/vscode-wpilib/resources/gradle/java/build.gradle` file via the `testImplementation  'org.junit.jupiter:junit-jupiter:<VERSION>'` declaration. That said, we typically update our value to the latest version as the WPI Lib team often fails to update this version.
 * Update `WPILibNewCommands.json.ftl` file
     ** See `<allwpilibProjectRoot>/wpilibNewCommands/WPILibNewCommands.json`
-** Diff, from the `allwpilib` project, the `wpilibNewCommands/WPILibNewCommands.json` file to our `frc-wizard-templates/2024/-DEFAULT-FILES-/configs/vendordeps/WPILibNewCommands.json.ftl` file.
+    ** Diff, from the `allwpilib` project, the `wpilibNewCommands/WPILibNewCommands.json` file to our `frc-wizard-templates/2024/-DEFAULT-FILES-/configs/vendordeps/WPILibNewCommands.json.ftl` file.
+    ** *Often times, the only difference is the year. So be sure not to accidentally miss updarting it.*
 * Update the `WPILib-license.md` file
 ** Copy the contents of: `vscode-wpilib/resources/gradle/shared/WPILib-License.md`
 ** and diff against:  `resources/frc-wizard-templates/20xx/-DEFAULT-FILES-/code/common-code/WPILib-License.md.ftl`

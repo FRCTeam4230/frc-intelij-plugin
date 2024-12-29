@@ -217,10 +217,10 @@ TODO: Write up info on installing *Hungarian Notation Cleanup* Plugin
 *** Wait for the dialog to be replaced with one with a "TODO" note
 *** It can take up to several minutes to complete (especially for the `example` dir).
 *** Do _not_ interact with any of the "Refactoring Preview" tabs in the "Find" tool window until after the "TODO" window comes up. See steps below.
-*** If a "Rename Parameter" dialog opens, just clok "OK" without selecting any parameters.
+*** If a "Rename Parameter" dialog opens, just click "OK" without selecting any parameters.
 .. After it initially runs -- which may take several minutes -- there will be a large "TODO" balloon pop-up summarizing the following needed actions:
-... In the "Find"Tool window, for each open "Refactoring Preview" tab, click the "Do Refactor" button.
-... If presented with a popup about changed files, click the "Rerun search" button, and then click "Do Refactor" in the same tab again. The tab should then close. Sometimes you will need to run "Rerun search" 2 or 3 times for a tab.
+... In the "Find"Tool window, for each open "Refactoring Preview" tab, click the "Refactor" button ("Do Refactor in older versions).
+... If presented with a popup about changed files, click the "Rerun search" button, and then click "Refactor" in the same tab again. The tab should then close. Sometimes you will need to run "Rerun search" 2 or 3 times for a tab.
 ... Repeat for each open tab. There may be numerous ones.
 .. For the directory, from the context menu, run "Reformat Code", and then make sure to select "Include subdirectories" and "Optimize Imports" options.
 .. **Complete the above for both the `templates` and `examples` directories before proceeding.**

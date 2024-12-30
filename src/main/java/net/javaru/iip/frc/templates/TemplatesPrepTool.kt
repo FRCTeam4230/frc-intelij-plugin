@@ -170,7 +170,11 @@ fun copyJavaFile(currentWpiTemplateName: String, wpiTemplateGroupName: String, s
                     {
                         if (trimmedLine.startsWith("*") || trimmedLine.startsWith("/*") || trimmedLine.startsWith("//"))
                         {
-                            if (line.contains("This function is run"))
+                            if (line.contains("This function is run when the robot is first started up and should be used for any"))
+                            {
+                                line.replace("This function is run when the robot is first started up and should be used for any", "This constructor is run when the robot is first started up and should be used for any")
+                            }
+                            else if (line.contains("This function is run"))
                             {
                                 line.replace("This function is run", "This method is run")
                             }
@@ -178,13 +182,25 @@ fun copyJavaFile(currentWpiTemplateName: String, wpiTemplateGroupName: String, s
                             {
                                 line.replace("This function is called", "This method is called")
                             }
-                            else if (line.contains("the run() function"))
+                            else if (line.contains("run() function")) // handles both "The and the 
                             {
-                                line.replace("the run() function", "the run() method")
+                                line.replace("run() function", "run() method")
                             }
-                            else if (line.contains("The RobotPeriodic function is called"))
+                            else if (line.contains("RobotPeriodic function"))
                             {
-                                line.replace("The RobotPeriodic function is called", "The RobotPeriodic method is called")
+                                line.replace("RobotPeriodic function", "RobotPeriodic method")
+                            }
+                            else if (line.contains("robot periodic function"))
+                            {
+                                line.replace("robot periodic function", "robot periodic method")
+                            }
+                            else if (line.contains("robot periodic() function"))
+                            {
+                                line.replace("robot periodic() function", "robot periodic() method")
+                            }
+                            else if (line.contains("teleop periodic function"))
+                            {
+                                line.replace("teleop periodic function", "teleop periodic method")
                             }
                             else if (line.contains("call the functions corresponding"))
                             {
@@ -197,6 +213,22 @@ fun copyJavaFile(currentWpiTemplateName: String, wpiTemplateGroupName: String, s
                             else if (line.contains("specific periodic functions,"))
                             {
                                 line.replace("specific periodic functions,", "specific periodic methods,")
+                            }
+                            else if (line.contains("This function exists solely for"))
+                            {
+                                line.replace("This function exists solely for", "This method exists solely for")
+                            }
+                            else if (line.contains("This function is supported only on the PH"))
+                            {
+                                line.replace("This function is supported only on the PH", "This method is supported only on the PH")
+                            }
+                            else if (line.contains("On a PCM, this function will return 0"))
+                            {
+                                line.replace("On a PCM, this function will return 0", "On a PCM, this method will return 0")
+                            }
+                            else if (line.contains("after first controller function"))
+                            {
+                                line.replace("after first controller function", "after first controller method")
                             }
                             else
                             {
@@ -284,12 +316,13 @@ private fun findOutputDir(): Path
     val resource = TemplatesPrepTool::class.java.classLoader.getResource(FRC_WIZARD_TEMPLATES) ?: throw IllegalStateException("Could not find 'frc-wizard-templates' directory as classpath resource")
     // file:/{projectRoot}/out/production/resources/frc-wizard-templates
     var dir = Path.of(resource.toURI())
-    while (dir.parent != null && dir.fileName.toString() != "out")
+    println("Looking for out dir starting with: $dir")
+    while (dir.parent != null && (dir.fileName.toString() != "out" && dir.fileName.toString() != "build") )
     {
         dir = dir.parent
     }
 
-
+    println("dir set to: $dir")
     val retval =  dir.parent.resolve("src/main/resources/$FRC_WIZARD_TEMPLATES")
     println("$FRC_WIZARD_TEMPLATES dir calculated to be: $retval")
     if (Files.notExists(retval))
@@ -297,6 +330,7 @@ private fun findOutputDir(): Path
         throw IllegalStateException("Calculated $FRC_WIZARD_TEMPLATES dir does not exist: $retval")
     }
 
+    println("Returning: $retval")
     return retval
 }
 
@@ -338,10 +372,10 @@ fun createExamplesDirMapping() = mapOf(
     "apriltagsvision" to "aprilTagsVision",
     "arcadedrive" to "arcadeDrive",
     "arcadedrivexboxcontroller" to "arcadeDriveXboxController",
-    "armbot" to "armBot",
-    "armbotoffboard" to "armBotOffboard",
+//    "armbot" to "armBot",
+//    "armbotoffboard" to "armBotOffboard",
     "armsimulation" to "armSimulation",
-    "axiscamera" to "axisCameraSample",
+//    "axiscamera" to "axisCameraSample",
     "canpdp" to "canPDP",
     "differentialdrivebot" to "differentialDriveBot",
     "differentialdriveposeestimator" to "DifferentialDrivePoseEstimator",
@@ -358,15 +392,16 @@ fun createExamplesDirMapping() = mapOf(
     "encoder" to "encoder",
     "eventloop" to "eventLoop",
     "flywheelbangbangcontroller" to "flywheelBangBangController",
-    "frisbeebot" to "frisbeeBot",
-    "gearsbot" to "gearsBot",
+//    "frisbeebot" to "frisbeeBot",
+//    "gearsbot" to "gearsBot",
     "gettingstarted" to "gettingStarted",
     "gyro" to "gyro",
-    "gyrodrivecommands" to "gyroDriveCommands",
+//    "gyrodrivecommands" to "gyroDriveCommands",
     "gyromecanum" to "gyroMecanum",
     "hatchbotinlined" to "hatchBotInlined",
     "hatchbottraditional" to "hatchBotTraditional",
     "hidrumble" to "HIDRumble",
+    "httpcamera" to "httpCamera",
     "i2ccommunication" to "I2CCommunication",
     "intermediatevision" to "intermediateVision",
     "mechanism2d" to "Mechanism2D",
@@ -379,8 +414,8 @@ fun createExamplesDirMapping() = mapOf(
 //    "pacgoat" to "pacGoat",
     "potentiometerpid" to "potentiometerPID",
     "quickvision" to "quickVision",
-    "ramsetecommand" to "ramseteCommand",
-    "ramsetecontroller" to "ramseteController",
+//    "ramsetecommand" to "ramseteCommand",
+//    "ramsetecontroller" to "ramseteController",
     "rapidreactcommandbot" to "RapidReactCommandBot",
     "relay" to "relay",
     "romireference" to "romiReference",
@@ -390,13 +425,14 @@ fun createExamplesDirMapping() = mapOf(
     "simpledifferentialdrivesimulation" to "simpleDifferentialDriveSimulation",
     "solenoid" to "solenoids",
     "statespacearm" to "stateSpaceArm",
-    "statespacedifferentialdrivesimulation" to "stateSpaceDifferentialDriveSimulation",
+//    "statespacedifferentialdrivesimulation" to "stateSpaceDifferentialDriveSimulation",
     "statespaceelevator" to "stateSpaceElevator",
     "statespaceflywheel" to "stateSpaceFlywheel",
     "statespaceflywheelsysid" to "stateSpaceFlywheelSysId",
     "swervebot" to "swerveBot",
     "swervecontrollercommand" to "swerveControllerCommand",
     "swervedriveposeestimator" to "swerveDrivePoseEstimator",
+    "sysidroutine" to "sysIdRoutine",
     "tankdrive" to "tankDrive",
     "tankdrivexboxcontroller" to "tankDriveXboxController",
     "ultrasonic" to "ultrasonic",

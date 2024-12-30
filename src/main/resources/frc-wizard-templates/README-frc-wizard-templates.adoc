@@ -222,7 +222,7 @@ TODO: Write up info on installing *Hungarian Notation Cleanup* Plugin
 ... In the "Find"Tool window, for each open "Refactoring Preview" tab, click the "Refactor" button ("Do Refactor in older versions).
 ... If presented with a popup about changed files, click the "Rerun search" button, and then click "Refactor" in the same tab again. The tab should then close. Sometimes you will need to run "Rerun search" 2 or 3 times for a tab.
 ... Repeat for each open tab. There may be numerous ones.
-.. For the directory, from the context menu, run "Reformat Code", and then make sure to select "Include subdirectories" and "Optimize Imports" options.
+.. For the directory, from the context menu, *run "Reformat Code"*, and then make sure to select "Include subdirectories" and "Optimize Imports" options.
 .. **Complete the above for both the `templates` and `examples` directories before proceeding.**
 . In `TemplatesPrepTool` (in this project at `src/main/java/net/javaru/iip/frc/templates/TemplatesPrepTool.kt`)
 .. Set `IS_DRY_RUN` to `true`
@@ -232,7 +232,7 @@ TODO: Write up info on installing *Hungarian Notation Cleanup* Plugin
 .. If there are any mapping issues reported:
 ... update the appropriate `dirMapping` Map in the `TemplatesPrepTool` (The tool needs to be improved so this map is not manually maintained)
 ... **Update the Template Definition enums** as appropriate
-... Add an empty dir in the `resources/frc-wizard-templates/20xx` dir
+... Add an empty dir in the `resources/frc-wizard-templates/20xx` dir for new templates/examples
 *** This finds any deleted and/or added templates
 *** You can also run a git history on the `templates` and `examples` directories to confirm any addition and deletions
 *** When updating the enums, you can get the description from the `templates.json` and `examples.json` files.

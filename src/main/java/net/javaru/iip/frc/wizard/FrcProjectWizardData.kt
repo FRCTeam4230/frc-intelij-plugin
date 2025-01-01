@@ -56,7 +56,7 @@ class FrcProjectWizardData(
 {
 
     /**
-     * The `projectYear` used in the `wpilib_preferences.json` file. Typically it is just the year such as `2020`, but it may be an alternate 
+     * The `projectYear` used in the `wpilib_preferences.json` file. Typically, it is just the year such as `2020`, but it may be an alternate 
      * value during the beta releases, such as `Beta2020` or `Beta2020-2`. There doesn't appear to be any pattern to it as in the WPI repo, it 
      * is a hard coded value in [https://github.com/wpilibsuite/vscode-wpilib/blob/master/vscode-wpilib/resources/gradle/java/.wpilib/wpilib_preferences.json]
      * and the change from `Beta2020` to `Beta2020-2` did not correlate to a WpiLib version/release.

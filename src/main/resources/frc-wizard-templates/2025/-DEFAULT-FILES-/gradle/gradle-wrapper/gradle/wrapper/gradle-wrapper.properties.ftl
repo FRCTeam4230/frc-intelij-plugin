@@ -10,5 +10,7 @@
 distributionBase=GRADLE_USER_HOME
 distributionPath=permwrapper/dists
 distributionUrl=${data.gradleDistributionUrl}
+networkTimeout=10000
+validateDistributionUrl=true
 zipStoreBase=GRADLE_USER_HOME
 zipStorePath=permwrapper/dists

@@ -42,7 +42,7 @@ import icons.FrcIcons
 import icons.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.facet.isFrcFacetedProject
-import net.javaru.iip.frc.net.FrcPseudoRestService
+import net.javaru.iip.frc.net.FrcPseudoRestServiceHelper
 import net.javaru.iip.frc.notify.FrcNotifyType
 import net.javaru.iip.frc.run.RunDebugConfigsCreationData
 import net.javaru.iip.frc.run.createAllRunDebugConfigurations
@@ -229,7 +229,7 @@ class FetchPredefinedRestResource: AbstractFrcInternalAction()
             override fun run(indicator: ProgressIndicator)
             {
                 val resourcePath = "license.txt"
-                val resource = FrcPseudoRestService.getResource(resourcePath) ?: "Was Null (i.e. not found)"
+                val resource = FrcPseudoRestServiceHelper.getInstance().getResource(resourcePath) ?: "Was Null (i.e. not found)"
                 FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON.builder()
                     .withContent("<html><h2>The following was retrieved from '$resourcePath'</h2><br/><pre>$resource</pre></html>")
                     .withFrcTitle()
@@ -260,7 +260,7 @@ class FetchSpecifiedRestResource: AbstractFrcInternalAction()
                     override fun run(indicator: ProgressIndicator)
                     {
 
-                        val resource = FrcPseudoRestService.getResource(resourcePath) ?: "Was Null (i.e. not found)"
+                        val resource = FrcPseudoRestServiceHelper.getInstance().getResource(resourcePath) ?: "Was Null (i.e. not found)"
                         FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON
                             .withContent("<html><h2>The following was retrieved from '$resourcePath'</h2><br/><pre>$resource</pre></html>")
                             .notifyAllProjectsViaBalloon(notifyFrcProjectsOnly = true)

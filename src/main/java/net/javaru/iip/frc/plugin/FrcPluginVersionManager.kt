@@ -33,7 +33,7 @@ import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.util.BuildNumber
 import com.intellij.util.xmlb.XmlSerializerUtil
 import net.javaru.iip.frc.facet.isFrcFacetedProject
-import net.javaru.iip.frc.net.FrcPseudoRestService
+import net.javaru.iip.frc.net.FrcPseudoRestServiceHelper
 import net.javaru.iip.frc.notify.FrcNotificationsBuilder
 import net.javaru.iip.frc.notify.FrcNotifyType
 import net.javaru.iip.frc.util.runBackgroundTask
@@ -80,7 +80,7 @@ class FrcPluginVersionManagerApplicationService : Disposable
         try
         {
             val resourcePath = "dynamic-notifications/eol.properties"
-            val resource = FrcPseudoRestService.getResource(resourcePath) ?: "oldestSupportedBaseBuild=202"
+            val resource = FrcPseudoRestServiceHelper.getInstance().getResource(resourcePath) ?: "oldestSupportedBaseBuild=202"
             val properties = Properties()
             properties.load(StringReader(resource))
             val oldestSupportedBaseBuild = properties["oldestSupportedBaseBuild"]?.toString()?.toInt() ?: 202

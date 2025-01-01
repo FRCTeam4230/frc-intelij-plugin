@@ -29,11 +29,11 @@ const val gitBaseRawUrl = "https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/
  * A Pseudo REST Service that can fetch basic resources (basically just files) from the project's git code repository.
  * This is a hackish way to get current data without the hassle/expense of setting up a web server or REST serve somewhere.
  * It is primarily meant to check for notifications we want to "broadcast" to users.
+ * 
+ * To obtain an instance, use
  */
-object FrcPseudoRestService
+class FrcPseudoRestService
 {
-    // IN the Plugin.xml we make this an application service so in the future we can potentially add some caching and/or synchronization, etc.
-    fun getInstance(): FrcPseudoRestService = service()
 
     /**
      * Gets a (raw) resource from the project's source control repo, from the `rest-v`` branch by default.
@@ -42,8 +42,7 @@ object FrcPseudoRestService
      * *Do NOT call from EDT or inside a read action*
      *
      * To call from a `StartupActivity`, call in a `Task.Backgroundable`, Task.modal`, or `Task.ConditionalModal`,
-     * being sure to not
-     * to forget to call the `queue()` method to queue it up. For example:
+     * being sure to not forget to call the `queue()` method to queue it up. For example:
      *
      * ```
      * object : Task.Backgroundable(project, "My Task Name")
@@ -81,6 +80,7 @@ object FrcPseudoRestService
      * @param defaultToBundled if true, if the resource could not be obtained from the server, the resource bundled/included
      *                         in the plugin will be read from the classpath and used if available.
      */
+    @Suppress("unused")
     @JvmOverloads
     fun getResource(resourcePath: String,
                     basePath: String? = "src/main/resources",
@@ -114,6 +114,10 @@ object FrcPseudoRestService
 }
 
 
-
+object FrcPseudoRestServiceHelper
+{
+    // In the Plugin.xml we make this an application service so in the future we can potentially add some caching and/or synchronization, etc.
+    fun getInstance(): FrcPseudoRestService = service()
+}
 
 

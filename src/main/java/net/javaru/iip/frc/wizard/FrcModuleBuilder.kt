@@ -373,10 +373,23 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
             }
         }
         val timer = Timer("Verify run/debug config creation timer")
-        // The first 2 should almost assuredly work, but we add a third one after a good solid 3 minutes to catch any lingering issues, but do not reimport as the user may be coding by then
-        timer.schedule(CreateTimeTask(1, doReimport = true), TimeUnit.SECONDS.toMillis(30))
-        timer.schedule(CreateTimeTask(2, doReimport = true), TimeUnit.MINUTES.toMillis(1))
-        timer.schedule(CreateTimeTask(3, doReimport = false), TimeUnit.MINUTES.toMillis(3))
+        // The first 2 should almost assuredly work, but we run additional to catch any lingering issues, but do not reimport as the user may be coding by then
+        timer.schedule(CreateTimeTask( 1, doReimport = false),  TimeUnit.SECONDS.toMillis(30))
+        timer.schedule(CreateTimeTask( 2, doReimport = false),  TimeUnit.SECONDS.toMillis(45))
+        timer.schedule(CreateTimeTask( 3, doReimport = false),  TimeUnit.MINUTES.toMillis(1))
+        timer.schedule(CreateTimeTask( 4, doReimport = false),  TimeUnit.MINUTES.toMillis(1) + TimeUnit.SECONDS.toMillis(15))
+        timer.schedule(CreateTimeTask( 5, doReimport = false),  TimeUnit.MINUTES.toMillis(1) + TimeUnit.SECONDS.toMillis(30))
+        timer.schedule(CreateTimeTask( 6, doReimport = false),  TimeUnit.MINUTES.toMillis(1) + TimeUnit.SECONDS.toMillis(45))
+        timer.schedule(CreateTimeTask( 7, doReimport = false),  TimeUnit.MINUTES.toMillis(2))
+        timer.schedule(CreateTimeTask( 8, doReimport = false), TimeUnit.MINUTES.toMillis(2) + TimeUnit.SECONDS.toMillis(15))
+        timer.schedule(CreateTimeTask( 9, doReimport = false), TimeUnit.MINUTES.toMillis(2) + TimeUnit.SECONDS.toMillis(30))
+        timer.schedule(CreateTimeTask(10, doReimport = false), TimeUnit.MINUTES.toMillis(2) + TimeUnit.SECONDS.toMillis(45))
+        timer.schedule(CreateTimeTask(11, doReimport = false), TimeUnit.MINUTES.toMillis(3))
+        timer.schedule(CreateTimeTask(12, doReimport = false), TimeUnit.MINUTES.toMillis(3) + TimeUnit.SECONDS.toMillis(15))
+        timer.schedule(CreateTimeTask(13, doReimport = false), TimeUnit.MINUTES.toMillis(3) + TimeUnit.SECONDS.toMillis(30))
+        timer.schedule(CreateTimeTask(14, doReimport = false), TimeUnit.MINUTES.toMillis(3) + TimeUnit.SECONDS.toMillis(45))
+        timer.schedule(CreateTimeTask(15, doReimport = false), TimeUnit.MINUTES.toMillis(4))
+        timer.schedule(CreateTimeTask(16, doReimport = false), TimeUnit.MINUTES.toMillis(5))
     }
 
 

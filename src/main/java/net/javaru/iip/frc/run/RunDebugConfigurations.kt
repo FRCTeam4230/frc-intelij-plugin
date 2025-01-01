@@ -430,7 +430,7 @@ fun createDebuggingRunConfiguration(project: Project, teamNumber: Int = project.
             
             // TODO: we should prompt user and ask if they want to create the duplicate, or pass it in as an option
             if (existing.isNotEmpty()) {
-                logger.info("[FRC] Run/Debug configuration named '$baseName' already exists and will not be recreated.")
+                logger.debug("[FRC] Run/Debug configuration named '$baseName' already exists and will not be recreated.")
                 return
             }
             

@@ -37,7 +37,7 @@ import com.intellij.openapi.roots.ProjectModelExternalSource
 import com.intellij.openapi.util.ThrowableComputable
 import io.sentry.Attachment
 import net.javaru.iip.frc.facet.FrcFacet.Companion.FACET_TYPE_ID
-import net.javaru.iip.frc.services.FrcErrorReportSubmitter
+import net.javaru.iip.frc.services.FrcErrorReportSubmitterSentryWorker
 import net.javaru.iip.frc.services.ReportableEvent
 import net.javaru.iip.frc.wpilib.gradlePluginRepo.logger
 import org.jetbrains.annotations.Contract
@@ -130,7 +130,7 @@ private fun getOrAddFrcFacetImpl(
                         }
                         Attachment(it.toByteArray(), "ModuleAddStackTraces.txt")
                     }
-                    FrcErrorReportSubmitter.submitReportableEvent(
+                    FrcErrorReportSubmitterSentryWorker.submitReportableEvent(
                         ReportableEvent(
                             "FrcFacet.getOrAddFrcFacet",
                             project = module.project,
@@ -138,7 +138,7 @@ private fun getOrAddFrcFacetImpl(
                             throwable = ex,
                             attachments = listOf(attachment)
                                        )
-                                                                 )
+                                                                             )
                     throw ex
 
                 }

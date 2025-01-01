@@ -43,7 +43,7 @@ import com.intellij.openapi.util.Computable
 import com.intellij.util.concurrency.AppExecutorUtil
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.isUnitTestMode
-import net.javaru.iip.frc.services.FrcErrorReportSubmitter
+import net.javaru.iip.frc.services.FrcErrorReportSubmitterSentryWorker
 import net.javaru.iip.frc.services.FrcPluginProjectDisposable
 import net.javaru.iip.frc.services.ReportableEvent
 import org.jetbrains.annotations.Contract
@@ -195,7 +195,7 @@ fun Project.runBackgroundTask(
                                               {
                                                   try
                                                   {
-                                                      FrcErrorReportSubmitter.submitReportableEvent(ReportableEvent(
+                                                      FrcErrorReportSubmitterSentryWorker.submitReportableEvent(ReportableEvent(
                                                           correlationId = "Task: $name",
                                                           project = this@runBackgroundTask,
                                                           throwable = t,
@@ -236,7 +236,7 @@ fun Project?.runSafely(correlationId: String, debuggingData: Map<String, Any?>? 
     {
         try
         {
-            FrcErrorReportSubmitter.submitReportableEvent(
+            FrcErrorReportSubmitterSentryWorker.submitReportableEvent(
                 ReportableEvent(
                     correlationId = "Task: $correlationId",
                     project = this,
@@ -244,7 +244,7 @@ fun Project?.runSafely(correlationId: String, debuggingData: Map<String, Any?>? 
                     lastActionId = IdeaLogger.ourLastActionId,
                     additionalData = debuggingData
                                )
-                                                             )
+                                                                               )
         }
         catch (t: Throwable)
         {
@@ -263,7 +263,7 @@ fun <R> Project?.runSafelyWithResult(correlationId: String, debuggingData: Map<S
     {
         try
         {
-            FrcErrorReportSubmitter.submitReportableEvent(
+            FrcErrorReportSubmitterSentryWorker.submitReportableEvent(
                 ReportableEvent(
                     correlationId = "Task: $correlationId",
                     project = this,

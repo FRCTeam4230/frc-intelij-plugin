@@ -33,7 +33,7 @@ import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
-import net.javaru.iip.frc.services.FrcErrorReportSubmitter
+import net.javaru.iip.frc.services.FrcErrorReportSubmitterSentryWorker
 import net.javaru.iip.frc.services.ReportableEvent
 import org.jetbrains.plugins.gradle.GradleManager
 import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataCache
@@ -153,7 +153,7 @@ fun Project.markGradleProjectAsNeedingReimport(scheduleForAutoReimport: Boolean 
     result.onFailure {
         try
         {
-            FrcErrorReportSubmitter.submitReportableEvent(ReportableEvent("markGradleProjectAsNeedingReimport-Full", project, it))
+            FrcErrorReportSubmitterSentryWorker.submitReportableEvent(ReportableEvent("markGradleProjectAsNeedingReimport-Full", project, it))
         }
         catch (t: Throwable)
         {

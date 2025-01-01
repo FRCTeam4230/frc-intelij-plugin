@@ -534,14 +534,20 @@ private fun shareRunConfiguration(project: Project, settings: RunnerAndConfigura
     if (baseDir == null)
     {
         logger.warn("[FRC] Can't share run configurations because project.basePath was null")
+        settings.storeInDotIdeaFolder()
     }
     else
     {
-        val dirPath = "$baseDir/.run"
-        val fileName = createRunConfigFileName(settings.name)
-        val filePath = "$dirPath/$fileName"
-        logger.debug{"[FRC] run config path set to: $filePath"}
-        settings.storeInArbitraryFileInProject(filePath)
+        // Switching to storing in `{baseDir}/.idea/runConfigurations`. When stored in `{baseDir}/.run`
+        // they disappear form the Run/Debug drop down (and Gradle toolk window) upon a gradle reimport.
+        // They are still present in the `{baseDir}/.run` directory, Burt do not show up in the menu.
+        // This is an apparent bug in IDEA. Storing them in  `{baseDir}/.idea/runConfigurations` resolves this issue.
+//        val dirPath = "$baseDir/.run"
+//        val fileName = createRunConfigFileName(settings.name)
+//        val filePath = "$dirPath/$fileName"
+//        logger.debug{"[FRC] run config path set to: $filePath"}
+//        settings.storeInArbitraryFileInProject(filePath)
+        settings.storeInDotIdeaFolder()
     }
 }
 

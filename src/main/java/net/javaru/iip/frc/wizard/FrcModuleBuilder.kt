@@ -875,11 +875,11 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
 
             // Add any additionalCustom content in bulk
             content.appendLine()
-            content.appendLine("# Additional custom WPI Specific entries for previous types")
+            content.appendLine("# Additional entries for previous types")
             toptalTemplates.forEach { templateName ->
                 writeTemplateToContentBuilder("$frcWizardGitignoreDirName/$templateName-${additionalCustomSuffix}.txt", content, logWarnIfNotExist = false)
             }
-            content.appendLine("# End of additional custom WPI Specific entries")
+            content.appendLine("# End of additional entries")
             content.appendLine()
         }
         

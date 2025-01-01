@@ -53,12 +53,13 @@
 
     <change-notes><![CDATA[
         <strong>vNEXT-VERSION</strong> <br>
-        &nbsp;&nbsp;&bull; Added support for 2024 season, including project templates.
-        &nbsp;&nbsp;&bull; New Project Wizard: Added option for Gradle build files to use Kotlin DSL (for 2024 or later robot projects). Thanks to Tyler Lowrey for an example Kotlin DSL file that helped during implementation. 
+        &nbsp;&nbsp;&bull; Added support for 2025 season, including project templates.<br>
+        &nbsp;&nbsp;&bull; New Project Wizard: Added option for Gradle build files to use Kotlin DSL (for 2024 or later robot projects). Thanks to Tyler Lowrey for an example Kotlin DSL file that helped during implementation.<br>
+        &nbsp;&nbsp;&bull; Moved saving of run configurations from <tt>{projectRoot}/.run</tt> to <tt>{projectRoot}/.idea/runConfigurations</tt> as a workaround for a bug in IntelliJ IDEA that causes the configurations to disappear from the run/debug menu upon a Gradle reimport when saved in a custom directory, despite custom directories being supported.<br>
         &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/159'>issue #159</a> &quot;'frcYear' in vendordep JSON files can also be a string&quot; Thanks to <em>Noah Andrews</em> for reporting.<br>
-        &nbsp;&nbsp;&bull; Improves FRC Framework detection when opening externally created projects
-        &nbsp;&nbsp;&bull; Various internal modifications to conform to latest IntelliJ IDEA Plugin API changes
-        &nbsp;&nbsp;&bull; Support for IntelliJ IDEA versions older than 2024.1 dropped. (Significant IntelliJ IDEA Plugin API changes made in 2023.3, as well as more changes in 2024.1 make supporting older versions too time-consuming.)
+        &nbsp;&nbsp;&bull; Improves FRC Framework detection when opening externally created projects<br>
+        &nbsp;&nbsp;&bull; Various internal modifications to conform to latest IntelliJ IDEA Plugin API changes<br>
+        &nbsp;&nbsp;&bull; Support for IntelliJ IDEA versions older than 2024.1 dropped. (Significant IntelliJ IDEA Plugin API changes made in 2023.3, as well as more changes in 2024.1 make supporting older versions too time-consuming.)<br>
         <br>
         <strong>v4.0.1</strong> <br>
         &nbsp;&nbsp;&bull; Resolves <a href='https://gitlab.com/Javaru/frc-intellij-idea-plugin/issues/150'>issue #150</a> &quot;Command class generation using deprecated (in WpiLib v2024) CommandBase&quot; Thanks to <em>logan hollowood</em> for reporting.<br>

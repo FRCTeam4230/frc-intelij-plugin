@@ -40,15 +40,15 @@ import [=data.basePackage].subsystems.ExampleSubsystem
  */
 object RobotContainer
 {
+    // Replace with CommandPS4Controller or CommandJoystick if needed
+    private val driverController = CommandXboxController(OperatorConstants.DRIVER_CONTROLLER_PORT)
+        
     init
     {
         configureBindings()
         // Reference the Autos object so that it is initialized, placing the chooser on the dashboard
         Autos
     }
-
-    // Replace with CommandPS4Controller or CommandJoystick if needed
-    private val driverController = CommandXboxController(OperatorConstants.DRIVER_CONTROLLER_PORT)
 
     /**
      * Use this method to define your `trigger->command` mappings. Triggers can be created via the

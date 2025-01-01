@@ -30,6 +30,7 @@ import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.progress.PerformInBackgroundOption
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
@@ -449,6 +450,10 @@ class VendordepsService private constructor(val project: Project): Disposable
             return virtualFiles.firstOrNull {
                 it.parent?.path?.toCommonSeparatorPath() == commonParentDir
             } as PsiDirectory?
+        }
+        catch (e: ProcessCanceledException)
+        {
+            throw e
         }
         catch (e: Throwable)
         {

@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.services
 
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
@@ -54,10 +55,33 @@ class FrcGradleService private constructor(val project: Project)
         val rio = gradleService.hasRoborioDeployTarget()
         val xrp = if (rio == true) false else gradleService.isXrpProject()
         val romi = if (rio == true || xrp == true) false else gradleService.isRomiProject()
-        val desk = gradleService.isIncludeDesktopSupport()
+        val desk: Boolean? =  ReadAction.compute<Boolean?, Throwable> {
+            gradleService.isIncludeDesktopSupport()
+        }
         return RobotProjectTypeInfo(rio, romi, xrp, desk)
     }
 
+    /**
+     * This must be run in a ReadAction:
+     * ```kotlin
+     * val includeDesktopSupport = ReadAction.compute<Boolean?, Throwable> {
+     *    FrcGradleService.getInstance(project).isIncludeDesktopSupport()
+     * }
+     * 
+     * // or for non-nullable result 
+     * 
+     * val includeDesktopSupport = ReadAction.compute<Boolean, Throwable> {
+     *     FrcGradleService.getInstance(project).isIncludeDesktopSupport() ?: false
+     *  }
+     * ```    
+     * 
+     * ```java
+     * // Java
+     * 
+     * @Nullable
+     * Boolean includeDesktopSupport = ReadAction.compute( () -> FrcGradleService.Companion.getInstance(myProject).isIncludeDesktopSupport());
+     * ```
+     */
     fun isIncludeDesktopSupport(): Boolean?
     {
         var result: Boolean? = null
@@ -97,6 +121,7 @@ class FrcGradleService private constructor(val project: Project)
         {
             logger.info("[FRC] an exception occurred when checking includeDesktopSupport setting: $e")
         }
+        logger.debug("[FRC] isIncludeDesktopSupport returning: $result")
         return result
     }
 

@@ -21,6 +21,7 @@ import com.intellij.facet.Facet
 import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetManagerListener
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.debug
@@ -83,7 +84,10 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
             RioLogProjectService.getInstance(project).update()
 
             // TODO Move into the RioLogProjectService so the update method takes a setting if we should open or not
-            val includeDesktopSupport = FrcGradleService.getInstance(project).isIncludeDesktopSupport() ?: false
+            val includeDesktopSupport = ReadAction.compute<Boolean, Throwable> {
+                FrcGradleService.getInstance(project).isIncludeDesktopSupport() ?: false
+            }
+            logger.info("[FRC] includeDesktopSupport for project '$project' is: $includeDesktopSupport ")
             if (includeDesktopSupport)
             {
                 invokeLater {

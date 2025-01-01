@@ -26,6 +26,8 @@ import com.intellij.execution.jar.JarApplicationConfigurationType
 import com.intellij.execution.remote.RemoteConfiguration
 import com.intellij.execution.remote.RemoteConfigurationType
 import com.intellij.ide.SaveAndSyncHandler
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
@@ -116,7 +118,9 @@ fun createAllRunDebugConfigurations(configsData: RunDebugConfigsCreationData)
 {
     logger.debug("[FRC] Running createAllRunDebugConfigurations")
     val project = configsData.project
-    FileDocumentManager.getInstance().saveAllDocuments()
+    ApplicationManager.getApplication().invokeAndWait {
+        WriteAction.run<Throwable> { FileDocumentManager.getInstance().saveAllDocuments() }
+    }
     SaveAndSyncHandler.getInstance().scheduleProjectSave(project)
     val isRoboRioTemplate = configsData.robotProjectTypeInfo.isRoboRIOProject ?: true
     if (isRoboRioTemplate)
@@ -152,7 +156,9 @@ fun createAllRunDebugConfigurations(configsData: RunDebugConfigsCreationData)
     }
     
     // We need to do a Save here or the run config files are not created, which then causes all sorts of issues (to say the least)
-    FileDocumentManager.getInstance().saveAllDocuments()
+    ApplicationManager.getApplication().invokeAndWait {
+        WriteAction.run<Throwable> { FileDocumentManager.getInstance().saveAllDocuments() }
+    }
     SaveAndSyncHandler.getInstance().scheduleProjectSave(project)
     logger.debug("[FRC] Completed createAllRunDebugConfigurations")
 }

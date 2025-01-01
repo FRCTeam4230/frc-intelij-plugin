@@ -27,6 +27,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.LangDataKeys
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.progress.ProgressIndicator
@@ -291,7 +292,7 @@ class CheckIncludeDesktopSupportSetting : AbstractFrcInternalAction()
     override fun actionPerformed(actionEvent: AnActionEvent)
     {
         executeIfProjectNotNull(actionEvent, actionName = "Check Include Desktop Support Setting") { project: Project ->
-            val result = FrcGradleService.getInstance(project).isIncludeDesktopSupport()
+            val result = ReadAction.compute<Boolean?, Throwable> { FrcGradleService.getInstance(project).isIncludeDesktopSupport() }
             FrcNotifyType.ACTIONABLE_INFO_WITH_FRC_ICON
                 .withContent("includeDesktopSupport: $result")
                 .notify(project)

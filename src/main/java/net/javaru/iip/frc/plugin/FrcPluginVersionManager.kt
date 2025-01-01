@@ -85,7 +85,7 @@ class FrcPluginVersionManagerApplicationService : Disposable
             properties.load(StringReader(resource))
             val oldestSupportedBaseBuild = properties["oldestSupportedBaseBuild"]?.toString()?.toInt() ?: 202
             
-            val appInfo = ApplicationInfoEx.getInstanceEx() as ApplicationInfoImpl
+            val appInfo = ApplicationInfoEx.getInstanceEx()
             val build: BuildNumber = appInfo.build
             val runningInstanceBaselineVersion = build.baselineVersion
 

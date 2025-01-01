@@ -54,8 +54,10 @@ import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actions.ScrollToTheEndToolbarAction;
@@ -133,11 +135,15 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
     private JComponent createConsolePanel(ConsoleView view, ActionGroup actions)
     {
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(); 
         panel.setLayout(new BorderLayout());
-        panel.add(view.getComponent(), BorderLayout.CENTER);
-        actionToolbar = createToolbar(actions);
-        panel.add(actionToolbar.getComponent(), BorderLayout.WEST);
+        ApplicationManager.getApplication().invokeAndWait(() -> {
+            WriteAction.run(() -> {
+                panel.add(view.getComponent(), BorderLayout.CENTER);
+                actionToolbar = createToolbar(actions);
+                panel.add(actionToolbar.getComponent(), BorderLayout.WEST);
+            });
+        } );
         return panel;
     }
 
@@ -175,7 +181,10 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         // Implementation based on com.intellij.execution.RunContentExecutor
         // When reworking, look at com.intellij.build.BuildContentManagerImpl which is a more up to date ContentExecutor implementation  
         
-        FileDocumentManager.getInstance().saveAllDocuments();
+        ApplicationManager.getApplication().invokeLater(() -> {
+            WriteAction.run(() -> FileDocumentManager.getInstance().saveAllDocuments());
+        } );
+        
 
         rioLogMonitorProcess = isFreshActivation ? createAnnouncementRioLogMonitoringProcess() : createRioLogMonitoringProcess();
 
@@ -231,27 +240,33 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         addActionsToActionGroup(actions);
     
     
-        RunContentManager.getInstance(myProject).showRunContent(myExecutor, myRunContentDescriptor);
-
-        if (myActivateToolWindow)
-        {
-            activateRioLogConsoleSafely();
-        }
-
-        if (myAfterCompletionRunnable != null)
-        {
-            myProcessHandler.addProcessListener(new ProcessAdapter()
-            {
-                @Override
-                public void processTerminated(@NotNull ProcessEvent event)
+        ApplicationManager.getApplication().invokeLater(() -> {
+            WriteAction.run(() -> {
+                RunContentManager.getInstance(myProject).showRunContent(myExecutor, myRunContentDescriptor);
+                
+                if (myActivateToolWindow)
                 {
-                    SwingUtilities.invokeLater(myAfterCompletionRunnable);
+                    activateRioLogConsoleSafely();
                 }
+                
+                if (myAfterCompletionRunnable != null)
+                {
+                    myProcessHandler.addProcessListener(new ProcessAdapter()
+                    {
+                        @Override
+                        public void processTerminated(@NotNull ProcessEvent event)
+                        {
+                            ApplicationManager.getApplication().invokeLater(myAfterCompletionRunnable);
+                        }
+                    });
+                }
+                
+                rioLogMonitorProcess.start();
+                myProcessHandler.startNotify();
             });
-        }
-
-        rioLogMonitorProcess.start();
-        myProcessHandler.startNotify();
+            
+        });
+        
     }
 
 
@@ -463,21 +478,12 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
      */
     public void invokeStop()
     {
-        // As recommended by Dmitry Jemerov in https://devnet.jetbrains.com/message/5281469#5195728
-        //     Indicates an example of programmatically triggering AnAction can be found in
-        //     com.intellij.openapi.actionSystem.ex.CheckboxAction.createCustomComponent()
         if (actionToolbar != null && rioLogStopAction != null)
         {
-            // Issue #92 - need to wrap in invokeLater to prevent exception: Access is allowed from event dispatch thread with IW lock only.
             ApplicationManager.getApplication().invokeLater(() -> {
                 final DataContext dataContext = actionToolbar.getToolbarDataContext();
-                rioLogStopAction.actionPerformed(new AnActionEvent(null,
-                                                                   dataContext,
-                                                                   ActionPlaces.UNKNOWN,
-                                                                   rioLogStopAction.getTemplatePresentation(),
-                                                                   ActionManager.getInstance(),
-                                                                   0));
-            }, ModalityState.any());
+                ActionUtil.invokeAction(rioLogStopAction, dataContext, ActionPlaces.UNKNOWN, null, null);
+            });
         }
         else
         {
@@ -616,7 +622,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                 .append("\n")
                 .append(FrcBundle.message("frc.riolog.first.start.message.tcp.line2"))
                 .append("\n");
-        Boolean includeDesktopSupport = FrcGradleService.Companion.getInstance(myProject).isIncludeDesktopSupport();
+        @Nullable
+        Boolean includeDesktopSupport = ReadAction.compute( () -> FrcGradleService.Companion.getInstance(myProject).isIncludeDesktopSupport());
         if (includeDesktopSupport != null && includeDesktopSupport)
         {
             message.append(FrcBundle.message("frc.riolog.first.start.message.tcp.line3")).append("\n");
@@ -734,8 +741,13 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         @Override
         public void update(AnActionEvent event)
         {
-            event.getPresentation().setVisible(true);
-            event.getPresentation().setEnabled(myStopEnabled != null && myStopEnabled.compute());
+            final Presentation presentation = event.getPresentation();
+            if (presentation.isTemplate()) {
+                LOG.info("[FRC] Can not preform update as presentation is a template");
+            } else {
+                presentation.setVisible(true);
+                presentation.setEnabled(myStopEnabled != null && myStopEnabled.compute());
+            }
         }
     
     

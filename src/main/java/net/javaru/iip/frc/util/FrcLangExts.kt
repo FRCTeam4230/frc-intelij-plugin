@@ -18,6 +18,7 @@
 
 package net.javaru.iip.frc.util
 
+import com.intellij.openapi.progress.ProcessCanceledException
 import org.jetbrains.annotations.Contract
 import java.util.*
 
@@ -36,56 +37,77 @@ enum class EOL(
 }
 
 @Deprecated("Use tryQuietly", ReplaceWith("tryQuietly(block)") /* We keep around for discovery purposes*/ )
-fun trySafely( block: () -> Unit ) = tryQuietly  { block() }
+fun trySafely(throwProcessCanceledExceptions: Boolean = true,  block: () -> Unit ) = tryQuietly(throwProcessCanceledExceptions)  { block() }
 
 /**
- * Runs the block of code, catching and ignoring any exceptions.
+ * Runs the block of code, catching and ignoring any exceptions, except for `ProcessCanceledException`s which are 
+ * re-thrown by default since they should not be caught.
+ * 
+ * @param throwProcessCanceledExceptions if `ProcessCanceledException`s should be re-thrown if they occur. `true` by default.
+ * @param block the block of code to run
  * 
  * @see letSafely
  * @see tryQuietlyIf
  */
-fun tryQuietly( block: () -> Unit )
+fun tryQuietly(throwProcessCanceledExceptions: Boolean = true,  block: () -> Unit )
 {
     // @formatter:off
-    try { block() } catch (ignore: Throwable) { }
+    try { block() } catch (t: Throwable) { if (t is ProcessCanceledException && throwProcessCanceledExceptions) { throw t} }
     // @formatter:on
 }
 
 /**
- * Runs the block of code if the `predicate` evaluates to `true`, catching and ignoring any exceptions, both
- * when evaluating the `predicate` and the `block`.
+ * Runs the block of code if the `predicate` evaluates to `true`, catching and ignoring any exceptions -- except for `ProcessCanceledException`s which are
+ * re-thrown by default since they should not be caught -- both when evaluating the `predicate` and the `block`.
+ * 
+ * ```kotlin
+ * tryQuietlyIf( predicate = { myList.isNotEmpty()} ) {
+ *     createAll(project)
+ * }
+ * ```
+ * 
+ *  @param throwProcessCanceledExceptions if `ProcessCanceledException`s should be re-thrown if they occur. `true` by default.
+ *  @param predicate the predicate to evaluate to determine if the block should be executed
+ *  @param block the block of code to run
  *
  * @see tryQuietly
  * @see letSafely
  */
-fun tryQuietlyIf(predicate: ()-> Boolean, block: () -> Unit )
+fun tryQuietlyIf(throwProcessCanceledExceptions: Boolean = true,  predicate: ()-> Boolean, block: () -> Unit )
 {
     // @formatter:off
-    try { if (predicate()) block() } catch (ignore: Throwable) { }
+    try { if (predicate()) block() } catch (t: Throwable) { if (t is ProcessCanceledException && throwProcessCanceledExceptions) { throw t} }
     // @formatter:on
 }
 
 @Deprecated("Use letSafely", ReplaceWith("letSafely(block)") /* We keep around for discovery purposes*/ )
-inline fun <T, R> T?.trySafely(block: (T) -> R): R? = this.letSafely(block)
+inline fun <T, R> T?.trySafely(throwProcessCanceledExceptions: Boolean = true,  block: (T) -> R): R? = this.letSafely(throwProcessCanceledExceptions, block)
 
 /**
  * A safe implementation of the standard [let] scope function that only runs the block if the receiver is non-null, and 
- * returns `null` in the event an exception occurs in the execution of the provided block. For example: 
+ * returns `null` in the event an exception occurs in the execution of the provided block, except for `ProcessCanceledException`s
+ * which are re-thrown by default since they should not be caught.
+ * 
+ * For example: 
  * `val uuid: UUID? = uuidString.letSafely { UUID.fromString(it) }`
  * will return `null` in the event `uuidString` is null or is not a valid UUID.
  * 
+ * @param throwProcessCanceledExceptions if `ProcessCanceledException`s should be re-thrown if they occur. `true` by default.
+ * @param block the block of code to run
+ *  
  * @return the result of the block, or `null` if the receiver is `null` or an exception occurs during the execution of the block.
  * 
  * @see tryQuietly
  */
-inline fun <T, R> T?.letSafely(block: (T) -> R): R?
+inline fun <T, R> T?.letSafely(throwProcessCanceledExceptions: Boolean = true,  block: (T) -> R): R?
 {
     return try
     {
        this?.let(block)
     }
-    catch (ignore: Throwable)
+    catch (t: Throwable)
     {
+        if (t is ProcessCanceledException && throwProcessCanceledExceptions) { throw t}
         null
     }
 }

@@ -70,7 +70,7 @@ abstract class AbstractWpiLibLibraryFrcFrameworkDetector(detectorId: String, det
             if (it.isEmpty()) detectViaRobotSubclass(project, newFiles, context) else it
         }*/
         
-        tryQuietlyIf( { detectedFrameworks.isNotEmpty()} ) { 
+        tryQuietlyIf( predicate = { detectedFrameworks.isNotEmpty()} ) { 
             logger.debug("[FRC] Creating FRC run/debug Configurations for detected FRC framework")
             createAllRunDebugConfigurations(project)
         }

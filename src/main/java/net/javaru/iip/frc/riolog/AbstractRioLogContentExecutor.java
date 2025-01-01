@@ -141,6 +141,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
             WriteAction.run(() -> {
                 panel.add(view.getComponent(), BorderLayout.CENTER);
                 actionToolbar = createToolbar(actions);
+                actionToolbar.setTargetComponent(panel);
                 panel.add(actionToolbar.getComponent(), BorderLayout.WEST);
             });
         } );
@@ -688,7 +689,12 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                 else
                 {
                     presentation.setEnabled(true);
-                    myConsole.performWhenNoDeferredOutput(() -> update(event));
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        WriteAction.run(() -> {
+                            myConsole.performWhenNoDeferredOutput(() -> update(event));
+                        });
+                        
+                    });
                 }
             }
         }

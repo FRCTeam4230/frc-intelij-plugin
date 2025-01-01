@@ -26,6 +26,9 @@ import java.util.*
 
 val frcPluginBaseVersion: String by project
 val ideaMajorVersion: String by project
+val ideaVersionPlain: String by project
+val ideaSinceBuild: String by project
+val ideaUntilBuild: String by project
 val frcPluginEapDesignator: String by project
 val frcPluginVersion = "$frcPluginBaseVersion-$ideaMajorVersion$frcPluginEapDesignator" // ex: v1.3.0-2019.2,  1.3.1-2020.1-eap.1
 val javaVersion: JavaVersion = JavaVersion.VERSION_17 // IJ v2022.2+ requires Java 17; IJ v2020.3+ requires Java 11
@@ -44,12 +47,14 @@ plugins {
     // List of Kotlin versions bundled with the IDE by version: https://plugins.jetbrains.com/docs/intellij/kotlin.html#kotlin-standard-library
     // v2023.3+ requires Kotlin 1.9.x
     kotlin("jvm") version "1.9.21"
-    // gradle plugin-for writing IntelliJ plugins:
-    //     Docs: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
+    // IntelliJ Platform Gradle Plugin: gradle plugin-for writing IntelliJ plugins
+    //     Docs: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
     //           Last version of docs on GitHub before migration: https://github.com/JetBrains/gradle-intellij-plugin/blob/e819958cdc4e593738cd96e230edd5ca66481b3b/README.md
     //     Info: https://lp.jetbrains.com/gradle-intellij-plugin/
     //     Src:  https://github.com/JetBrains/gradle-intellij-plugin
-    id("org.jetbrains.intellij") version "1.17.3"
+    id("org.jetbrains.intellij.platform") version "2.2.1"
+    id("org.jetbrains.intellij.platform.migration") version "2.2.1" // Honors v1.x settings in intellij {} block while migrating to intellijPlatform {} block
+
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
     //    https://github.com/jetbrains/gradle-idea-ext-plugin
@@ -69,30 +74,129 @@ java {
     }
 }
 
-intellij {
-    // The Gradle plugin for writing intellij plugins
-    pluginName.set("FRC")
-    // IntelliJ IDEA dependency
-    version.setViaProjectProperty("ideaVersion")
-    // Bundled plugin dependencies - comma separated list. Should use 'com.intellij.java' rather than 'java' per https://jetbrains-platform.slack.com/archives/C5U8BM1MK/p1647535621287459?thread_ts=1647509674.185739&cid=C5U8BM1MK
-    plugins.set(listOf("com.intellij.java", "gradle", "Groovy", "org.jetbrains.kotlin", "com.jetbrains.sh"))  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
-    plugins.set(listOf(
-        "com.intellij.java", // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
-        "gradle",
-        "Groovy",
-        "org.jetbrains.kotlin",
-        "com.jetbrains.sh",
-                      ))
-    sandboxDir.set(sandboxPath)
-    updateSinceUntilBuild.set(true)
-    sameSinceUntilBuild.set(false)
-    downloadSources.set(true)
+intellijPlatform {
+    
+    pluginConfiguration {
+        ideaVersion {
+            sinceBuild = ideaSinceBuild
+            untilBuild = ideaUntilBuild
+        }    
+        
+//        vendor { 
+//            name = "Mark Vedder"
+//            url = "https://gitlab.com/Javaru/frc-intellij-idea-plugin"
+//        }
+    }
+    
+    
+    
+    sandboxContainer.set(File(sandboxPath))
+    
+    pluginVerification {
+        // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-extension.html#intellijPlatform-pluginVerification
+        // TODO - configure pluginVerification
+    }
+    
+    // TODO:
+    //    Downloading sources is managed by the Plugin DevKit plugin in version 2024.1+. Not finding that setting https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-migration.html#intellijdownloadsources
 }
 
+//tasks {
+//    
+//    runIde {
+//        maxHeapSize = "1024m"
+//        this.systemProperties.putAll(
+//            mapOf(
+//                //"key" to "value",
+//                //systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, ".sandbox", "log.xml")),
+//                // As of v2022.1, changed from using log4j to JUL
+//                //    See https://blog.jetbrains.com/platform/2022/02/removing-log4j-from-the-intellij-platform/
+//                //        https://docs.oracle.com/en/java/javase/11/docs/api/java.logging/java/util/logging/LogManager.html
+//                //systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, "idea-sandbox-log4j-config.xml")),
+//                systemPropertyGetOrDefault("idea.log.config.properties.file", resolvePathFromProjectRootAsString("idea-sandbox-logging.properties")),
+//                systemPropertyGetOrDefault("frc.show.betas.in.new.project.wizard", "true"),
+//                // Turn on frc.i10n to see a notification character appended to all localized messages to aid in testing/debugging of message bundles and localization needs
+//                systemPropertyGetOrDefault("frc.i10n", "false"),
+//                systemPropertyGetOrDefault("frc.is.internal", "true"),
+//                systemPropertyGetOrDefault("frc.rest.use.qa", "true"),
+//                systemPropertyGetOrDefault("frc.error.report.submitter.use.qa", "true"),
+//                //systemPropertyGetOrDefault("frc.experimental.gradleDslSelection", "true"),
+//                systemPropertyGetOrDefault("frc.wizard.always.update.wpilib.versions", "true"),
+//                systemPropertyGetOrDefault("frc.always.create.romi.tail.run.config", "false"),
+//                // Legacy Ant based robot project system properties
+//                //systemPropertyGetOrDefault("frc.simulated.log.service.enabled", "false"),
+//                //systemPropertyGetOrDefault("frc.simulated.log.service.use.configured.port", "false"),
+//                //systemPropertyGetOrDefault("frc.use.wpilib.beta.site", "false"),
+//                //systemPropertyGetOrDefault("frc.alt.wpilib.base.dir", ""),
+//                //systemPropertyGetOrDefault("wpilib.base.dir", ""),
+//            )
+//                                    )
+//    }
+//
+//    signPlugin {
+//        // signPlugin runs automatically before the publishPlugin if the signPlugin privateKey (or privateKeyFile) and certificateChain (or certificateChainFile) properties are specified
+//        // Use JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE unless overridden by the more specific FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE
+//        val ourCertChainFileSetting =
+//            System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE") ?:
+//            System.getenv("JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE")
+//        val ourPrivateKeyFileSetting =
+//            System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE") ?:
+//            System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE")
+//
+//        doFirst {
+//            if (ourCertChainFileSetting == null) {
+//                logger.warn("No code signing certificate chain file configured.")
+//                logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE' not set.")
+//            }
+//            else {
+//                logger.lifecycle("Using code signing certificate chain file: $ourPrivateKeyFileSetting")
+//            }
+//            if (ourPrivateKeyFileSetting == null) {
+//                logger.warn("No code signing private key file configured.")
+//                logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE' not set.")
+//            }
+//            else {
+//                logger.lifecycle("Using code signing private key file: $ourPrivateKeyFileSetting")
+//                if ((System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD") ?: System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD")) == null) {
+//                    logger.warn("Code signing password is not configured.")
+//                    logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD' not set.")
+//                } 
+//            }
+//        }
+//        if (ourPrivateKeyFileSetting != null && ourCertChainFileSetting != null)
+//        {
+//            privateKeyFile.set(Path.of(ourPrivateKeyFileSetting).toFile())
+//            certificateChainFile.set(Path.of(ourCertChainFileSetting).toFile())
+//            password.set(System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD") ?: System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD"))
+//        }
+//    }
+//}
+
+
+//intellij {
+//    // The Gradle plugin for writing intellij plugins
+//    pluginName.set("FRC")
+//    // IntelliJ IDEA dependency
+//    version.setViaProjectProperty("ideaVersion")
+//    // Bundled plugin dependencies - comma separated list. Should use 'com.intellij.java' rather than 'java' per https://jetbrains-platform.slack.com/archives/C5U8BM1MK/p1647535621287459?thread_ts=1647509674.185739&cid=C5U8BM1MK
+//    plugins.set(listOf("com.intellij.java", "gradle", "Groovy", "org.jetbrains.kotlin", "com.jetbrains.sh"))  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
+//    plugins.set(listOf(
+//        "com.intellij.java", // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
+//        "gradle",
+//        "Groovy",
+//        "org.jetbrains.kotlin",
+//        "com.jetbrains.sh",
+//                      ))
+//    sandboxDir.set(sandboxPath)
+//    updateSinceUntilBuild.set(true)
+//    sameSinceUntilBuild.set(false)
+//    downloadSources.set(true)
+//}
+//
 // Section to configure tasks specific to intellij plugin tasks
 tasks {
     patchPluginXml {
-        version.set(frcPluginVersion)
+//        version.set(frcPluginVersion)
         sinceBuild.setViaProjectProperty("ideaSinceBuild")
         untilBuild.setViaProjectProperty("ideaUntilBuild")
         val ppxTask = this
@@ -108,22 +212,25 @@ tasks {
                     logger.error(message)
                     error(message)
                 }
-                logger.warn("WARNING: ErrorSubmitter DSN is not configured for build. Commenting out <errorHandler .../> entry in plugin.xml file.")
-                val dir = ppxTask.destinationDir.get()
-                val originalFile = dir.file("plugin.xml").asFile
-                val filteredFile = dir.file("plugin-FILTERED.xml").asFile
-                filteredFile.printWriter().use { pw: PrintWriter ->
-                    originalFile.readLines().forEach {
-                        val line = if (it.contains("<errorHandler")) "<!-- $it -->" else it
-                        pw.println(line)
-                    }
-                }
-                filteredFile.copyTo(originalFile, overwrite = true)
-                filteredFile.delete()
+                
+                error("ErrorSubmitter DSN is not configured for build")
+                // TODO: Determine how to do this in the v2.x plugin
+//                logger.warn("WARNING: ErrorSubmitter DSN is not configured for build. Commenting out <errorHandler .../> entry in plugin.xml file.")
+//                val dir = ppxTask.destinationDir.get()
+//                val originalFile = dir.file("plugin.xml").asFile
+//                val filteredFile = dir.file("plugin-FILTERED.xml").asFile
+//                filteredFile.printWriter().use { pw: PrintWriter ->
+//                    originalFile.readLines().forEach {
+//                        val line = if (it.contains("<errorHandler")) "<!-- $it -->" else it
+//                        pw.println(line)
+//                    }
+//                }
+//                filteredFile.copyTo(originalFile, overwrite = true)
+//                filteredFile.delete()
             }
         }
     }
-    
+
     runIde {
         jvmArgs = listOf("-Xms512m", "-Xmx1g")
         systemProperties = mapOf(
@@ -151,13 +258,13 @@ tasks {
             //systemPropertyGetOrDefault("wpilib.base.dir", "")
                                 )
     }
-    
-    runPluginVerifier {
-        // Reports appear in ${project.buildDir}/reports/pluginVerifier by default. Set `verificationReportsDirectory` to change
-        val baseDir = File(projectProperty("verifierLocalIdesBaseDir").replace("~", System.getProperty("user.home")))
-        localPaths.set(projectPropertyList("verifierLocalIdes").map { File(baseDir, it) })
-        ideVersions.set(projectPropertyList("verifierIdeVersions")) 
-    }
+
+//    runPluginVerifier {
+//        // Reports appear in ${project.buildDir}/reports/pluginVerifier by default. Set `verificationReportsDirectory` to change
+//        val baseDir = File(projectProperty("verifierLocalIdesBaseDir").replace("~", System.getProperty("user.home")))
+//        localPaths.set(projectPropertyList("verifierLocalIdes").map { File(baseDir, it) })
+//        ideVersions.set(projectPropertyList("verifierIdeVersions")) 
+//    }
 
     signPlugin {
         // signPlugin runs automatically before the publishPlugin if the signPlugin privateKey (or privateKeyFile) and certificateChain (or certificateChainFile) properties are specified
@@ -282,6 +389,9 @@ tasks {
 repositories {
     mavenCentral()
     flatDir { dirs("lib") }
+    intellijPlatform {
+        defaultRepositories()
+    }
     maven {
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
         mavenContent {
@@ -329,6 +439,21 @@ dependencyManagement {
 
 @Suppress("SpellCheckingInspection")
 dependencies {
+    intellijPlatform {
+        intellijIdeaCommunity(ideaVersionPlain)
+
+        bundledPlugin("com.intellij.java")
+        bundledPlugin("com.intellij.gradle")
+        bundledPlugin("org.intellij.groovy")
+        bundledPlugin("org.jetbrains.kotlin")
+        bundledPlugin("com.jetbrains.sh")
+
+        pluginVerifier()
+        zipSigner()
+
+    }
+    
+    
     implementation("io.javaru.iip.common:javaru-iip-common")
     // For Kotlin dependencies, you can use shorthand for a dependency on a Kotlin module, for example, kotlin("test-junit5") for "org.jetbrains.kotlin:kotlin-test-junit5".
     implementation(kotlin("stdlib-jdk8"))

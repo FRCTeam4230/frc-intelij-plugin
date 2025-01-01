@@ -563,8 +563,8 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
         paths.frcWizardTemplatesBaseDirPath.asPluginResourceVF()?.refresh(false, true)
         when(dataModel.gradleDslOption)
         {
-            FrcProjectWizardData.GradleDslOption.GroovyDSL -> copyAllResourcesToModuleRoot("grade - groovy DSL", modelContentRootDir, paths.gradleGroovyDslResourceBasePath)
-            FrcProjectWizardData.GradleDslOption.KotlinDSL -> copyAllResourcesToModuleRoot("grade - kotlin DSL", modelContentRootDir, paths.gradleKotlinDslResourceBasePath)
+            FrcProjectWizardData.GradleDslOption.GroovyDSL -> copyAllResourcesToModuleRoot("gradle - groovy DSL", modelContentRootDir, paths.gradleGroovyDslResourceBasePath)
+            FrcProjectWizardData.GradleDslOption.KotlinDSL -> copyAllResourcesToModuleRoot("gradle - kotlin DSL", modelContentRootDir, paths.gradleKotlinDslResourceBasePath)
         }
         copyAllResourcesToModuleRoot("gradle wrapper", modelContentRootDir, paths.gradleWrapperResourceBasePath)
 

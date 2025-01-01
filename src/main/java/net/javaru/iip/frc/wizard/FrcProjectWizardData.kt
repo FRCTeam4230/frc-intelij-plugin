@@ -209,14 +209,16 @@ class FrcProjectWizardData(
                 {
                     // https://search.maven.org/artifact/org.jetbrains.kotlin/kotlin-bom
                     // https://plugins.jetbrains.com/plugin/6954-kotlin/versions
+                    //    This link is no longer a valid way to see what version of Kotlin a plugin supports for a particular version of IDEA
+                    //    Need to see if I can find a replacement link.
                     211           -> KotlinVersion(1, 6, 21) // 1.6.21
                     212           -> KotlinVersion(1, 7, 10) // 1.7.10
                     213, 221      -> KotlinVersion(1, 8, 10) // 1.8.10
                     222           -> KotlinVersion(1, 8, 21) // 1.8.21
                     223           -> KotlinVersion(1, 9, 10) // 1.9.10
-                    231, 232, 233 -> KotlinVersion(1, 9, 22) // 1.9.22
-                    241           -> KotlinVersion(1, 9, 23) // 1.9.23
-                    else          -> KotlinVersion(1, 9, 23) // 1.9.23
+                    231, 232, 233 -> KotlinVersion(1, 9, 24) // 1.9.24
+                    241, 242, 243 -> KotlinVersion(2, 1, 0)  // 2.1.0
+                    else          -> KotlinVersion(2, 1, 0)  // 2.1.0
                 }
     }
 }

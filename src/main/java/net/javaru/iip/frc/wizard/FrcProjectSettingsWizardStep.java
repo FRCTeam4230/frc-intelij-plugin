@@ -20,7 +20,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import javax.swing.*;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -118,13 +117,14 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     private JBLabel kotlinDslRadioButtonLabel;
     private JPanel groovyDslSupportOptionPanel;
     private JPanel kotlinDslSupportOptionPanel;
-    private JPanel kotlinOptionOutterPanel;
+    private JPanel kotlinOptionOuterPanel;
     private JPanel includeKotlinSupportOptionPanel;
     private JBCheckBox includeKotlinSupportCheckBox;
     private JBLabel includeKotlinSupportCheckBoxLabel;
     private ContextHelpLabel includeKotlinSupportContextHelpLabel;
     private JBLabel kotlinRequiredForTemplateLabel;
     private JBLabel junitRequiredForTemplateLabel;
+    private ContextHelpLabel kotlinDslContextHelpLabel;
     
     
     private ButtonAndLabelSynchronizer<JBCheckBox> enableDesktopSupportOption;
@@ -185,9 +185,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         
         includeJunitSupportCheckBox.setSelected(dataModel.getIncludeJUnitSupport());
     
-        includeJunitSupportCheckBox.addChangeListener(e -> {
-            dataModel.setIncludeJUnitSupport(includeJunitSupportCheckBox.isSelected());
-        });
+        includeJunitSupportCheckBox.addChangeListener(e -> dataModel.setIncludeJUnitSupport(includeJunitSupportCheckBox.isSelected()));
     
     
         groovyDslRadioButton.setActionCommand(GradleDslOption.GroovyDSL.name());
@@ -227,10 +225,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         });
         
         
-        // REMOVE ONCE NO LONGER IN DEVELOPMENT/EXPERIMENTAL
-        gradlePanel.setVisible(BooleanUtils.toBoolean(System.getProperty("frc.experimental.gradleDslSelection", "false")));
-        
-        LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.initComponents()");
+        LOG.trace("[FRC] Exiting FrcProjectSettingsWizardStep.initComponents()");
     }
     
     
@@ -288,7 +283,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         catch (Exception e)
         {
             teamNumberWarningIconLabel.setVisible(false);         
-            LOG.warn("[FRC] could not update team number warning icon visibility due to an exception: " + e.toString());
+            LOG.warn("[FRC] could not update team number warning icon visibility due to an exception: " + e);
         }
         if ("0".equals(teamNumberTextField.getText()))
         {
@@ -442,9 +437,8 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         // For the most part, the language level is not too critical for validating a valid package name has been entered.
         // So we set a default level in the event we can not set it more explicitly
         JavaVersion javaVersion = FrcPluginGlobals.DEFAULT_MIN_REQUIRED_JAVA_VERSION;
-        if (sdk instanceof ProjectJdkImpl)
+        if (sdk instanceof ProjectJdkImpl jdk)
         {
-            ProjectJdkImpl jdk = (ProjectJdkImpl) sdk;
             JavaVersion parsedJavaVersion = JavaVersion.tryParse(jdk.getVersionString());
             if (parsedJavaVersion != null)
             {
@@ -460,12 +454,22 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     {
         // Called whenever the step is shown. Good for updating things that may change by the user going back and them coming forward again
         LOG.trace("[FRC] Entering FrcProjectSettingsWizardStep.updateStep()");
-//        ProjectData parentProject = myParentProjectForm.getParentProject();
-//        ProjectId projectId = myBuilder.getProjectId();
+        // If needed:  ProjectData parentProject = myParentProjectForm.getParentProject();
+        // If needed:  ProjectId projectId = myBuilder.getProjectId();
         
-        FrcUiUtilsKt.setTextIfEmpty(teamNumberTextField, myBuilder.getDataModel().getTeamNumberAsStringOrEmptyString());
+        final FrcProjectWizardData dataModel = myBuilder.getDataModel();
+        
+        FrcUiUtilsKt.setTextIfEmpty(teamNumberTextField, dataModel.getTeamNumberAsStringOrEmptyString());
         updateIncludeKotlinSupportOptionVisibility();
         updateJUnitOption();
+        
+        //gradlePanel.setVisible(BooleanUtils.toBoolean(System.getProperty("frc.experimental.gradleDslSelection", "false")));
+        gradlePanel.setVisible(dataModel.getFrcYear() >= 2024);
+        if (dataModel.getFrcYear()< 2024) 
+        {
+            kotlinDslRadioButton.setSelected(false);
+            groovyDslRadioButton.setSelected(true);
+        }
         
         updateComponents();
         LOG.trace("[FRC] Exiting FrcProjectSettingsWizardStep.updateStep()");
@@ -491,7 +495,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     {
         final FrcProjectWizardData dataModel = myBuilder.getDataModel();
         final boolean isKotlinTemplate = dataModel.getTemplateLanguageOption() == TemplateLanguageOption.Kotlin;
-        kotlinOptionOutterPanel.setVisible(dataModel.getFrcYear() >= 2022);
+        kotlinOptionOuterPanel.setVisible(dataModel.getFrcYear() >= 2022);
         // TODO need to make it so option goes "back" to user's previous selection
         includeKotlinSupportCheckBox.setSelected(includeKotlinSupportCheckBox.isSelected() || isKotlinTemplate);
         // We have a change listener that does not allow the option to de deselected if it is a Kotlin Template
@@ -596,9 +600,13 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
     
     private void createUIComponents()
     {
+        // *** I M P O R T A N T ***
+        // *** I M P O R T A N T ***
+        // *** I M P O R T A N T ***
+        // *** I M P O R T A N T ***
         // NOTE: when creating text for ContextHelpLabels: you need to have some additional tags inside the
         //       <html> tags or the text does not wrap on the popup, and instead you get just one super long
-        //        box. As a trick, just wrap an period or comma in <em> tags
+        //        box. As a trick, just wrap a period or comma in <em> tags
         
         // When titles are added, the main content shows in a lighter colored font. Since the titles aren't really needed, we are commenting them out… at least for now
         desktopSupportContextHelpLabel = ContextHelpLabel.create(
@@ -610,6 +618,20 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
             message("frc.ui.wizard.projectSettingsStep.includeVsCodeConfigs.contextHelpLabel.text"));
         
         includeKotlinSupportContextHelpLabel = ContextHelpLabel.create(
-        message("frc.ui.wizard.projectSettingsStep.includeKotlin.contextHelpLabel.text", message("frc.new.project.wizard.kotlin.disclaimer")));
+            message("frc.ui.wizard.projectSettingsStep.includeKotlin.contextHelpLabel.text", message("frc.new.project.wizard.kotlin.disclaimer")));
+        
+        kotlinDslContextHelpLabel = ContextHelpLabel.create(
+            message("frc.ui.wizard.projectSettingsStep.kotlinDsl.contextHelpLabel.title"),    
+            message("frc.ui.wizard.projectSettingsStep.kotlinDsl.contextHelpLabel.text")
+        );
+        
+        // *** I M P O R T A N T ***
+        // *** I M P O R T A N T ***
+        // *** I M P O R T A N T ***
+        // *** I M P O R T A N T ***
+        // NOTE: when creating text for ContextHelpLabels: you need to have some additional tags inside the
+        //       <html> tags or the text does not wrap on the popup, and instead you get just one super long
+        //        box. As a trick, just wrap a period or comma in <em> tags
+        
     }
 }

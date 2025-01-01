@@ -140,7 +140,7 @@ tasks {
             systemPropertyGetOrDefault("frc.is.internal", "true"),
             systemPropertyGetOrDefault("frc.rest.use.qa", "true"),
             systemPropertyGetOrDefault("frc.error.report.submitter.use.qa", "true"),
-            systemPropertyGetOrDefault("frc.experimental.gradleDslSelection", "true"),
+            //systemPropertyGetOrDefault("frc.experimental.gradleDslSelection", "true"),
             systemPropertyGetOrDefault("frc.wizard.always.update.wpilib.versions", "true"),
             systemPropertyGetOrDefault("frc.always.create.romi.tail.run.config", "false"),
             // Legacy Ant based robot project system properties

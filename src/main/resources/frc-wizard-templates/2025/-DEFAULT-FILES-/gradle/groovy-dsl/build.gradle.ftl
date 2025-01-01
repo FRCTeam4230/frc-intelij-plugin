@@ -8,6 +8,10 @@
 <#--  To DEBUG templates, set system property 'frc.freemarker.debug' to true when launching the testing instance of IntelliJ IDEA -->
 </#compress>
 
+<#if data.getIncludeKotlinSupport()>
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+</#if>
 plugins {
     id "java"
 <#if data.getIncludeKotlinSupport()>
@@ -18,7 +22,7 @@ plugins {
 }
 
 def javaVersion = JavaVersion.VERSION_17
-<#if data.getIncludeKotlinSupport() && data.kotlinVersion.isAtLeast(1, 8)>
+<#if data.getIncludeKotlinSupport()>
 def kotlinJvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.@Companion.fromTarget(javaVersion.toString())
 </#if>
 
@@ -68,33 +72,22 @@ wpi.java.debugJni = false
 </#if>
 
 // Set this to true to enable desktop support.
+//noinspection GroovyUnusedAssignment
 def includeDesktopSupport = ${data.getIncludeDesktopSupportGradleSetting()}
 
 dependencies {
-<#if data.isRomiTemplate() || data.isXrpTemplate()>
     annotationProcessor wpi.java.deps.wpilibAnnotations()
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
-
-    nativeDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.desktop)
-    nativeDebug wpi.java.vendor.jniDebug(wpi.platforms.desktop)
-    simulationDebug wpi.sim.enableDebug()
-
-    nativeRelease wpi.java.deps.wpilibJniRelease(wpi.platforms.desktop)
-    nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
-    simulationRelease wpi.sim.enableRelease()
-</#if>
 <#if data.isRoboRioRobotTemplate()>
-    annotationProcessor wpi.java.deps.wpilibAnnotations()
-    implementation wpi.java.deps.wpilib()
-    implementation wpi.java.vendor.java()
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
     roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)
 
     roborioRelease wpi.java.deps.wpilibJniRelease(wpi.platforms.roborio)
     roborioRelease wpi.java.vendor.jniRelease(wpi.platforms.roborio)
-
+</#if>
+    
     nativeDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.desktop)
     nativeDebug wpi.java.vendor.jniDebug(wpi.platforms.desktop)
     simulationDebug wpi.sim.enableDebug()
@@ -102,11 +95,7 @@ dependencies {
     nativeRelease wpi.java.deps.wpilibJniRelease(wpi.platforms.desktop)
     nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
     simulationRelease wpi.sim.enableRelease()
-</#if>
-<#if data.getIncludeKotlinSupport()>
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-</#if>
 <#if data.junitUseJUnitPlatform()>
 
     testImplementation platform("org.junit:junit-bom:${data.junit5Version}")
@@ -165,7 +154,6 @@ tasks.withType(JavaCompile) {
 }
 
 <#if data.getIncludeKotlinSupport()>
-<#if data.kotlinVersion.isAtLeast(1, 9)>
 kotlin {
     compilerOptions {
         jvmTarget.set(kotlinJvmTarget)
@@ -173,31 +161,8 @@ kotlin {
         jvmToolchain(Integer.valueOf(javaVersion.toString()))
     }
 }
-<#elseif data.kotlinVersion.isAtLeast(1, 8)>
-tasks.named("compileKotlin", org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask.class) {
-    compilerOptions {
-        jvmTarget.set(kotlinJvmTarget)
-    }
-}
-tasks.named("compileTestKotlin", org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask.class) {
-    compilerOptions {
-        jvmTarget.set(kotlinJvmTarget)
-    }
-}
-<#else>
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = javaVersion.toString()
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = javaVersion.toString()
-    }
-}
 </#if>
 
-</#if>
 idea {
     project {
         // The project.sourceCompatibility setting is not always picked up, so we set explicitly
@@ -207,7 +172,8 @@ idea {
         // Improve development & (especially) debugging experience (and IDEA's capabilities) by having libraries' source & javadoc attached
         downloadJavadoc = true
         downloadSources = true
-        // Exclude the .vscode directory from indexing and search
+        // Exclude the following from indexing and search
+        excludeDirs+=file(".run" )
         excludeDirs+=file(".vscode" )
     }
 }

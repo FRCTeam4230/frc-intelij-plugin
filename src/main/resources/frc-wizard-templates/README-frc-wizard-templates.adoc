@@ -97,7 +97,7 @@ You can edit the `.idea/templateLanguages.xml` file. To do this:
     <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/-DEFAULT-FILES-/extras/vs-code-configs/.vscode" dialect="JSON" />
     <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/-DEFAULT-FILES-/gradle/gradle-wrapper/gradle/wrapper/gradle-wrapper.properties.ftl" dialect="Properties" />
     <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/-DEFAULT-FILES-/gradle/groovy-dsl" dialect="Declarative" />
-    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/-DEFAULT-FILES-/gradle/kotlin-dsl" dialect="Declarative" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/-DEFAULT-FILES-/gradle/kotlin-dsl" dialect="kotlin" />
     <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/commandBased/code/kotlin-code" dialect="kotlin" />
     <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/commandBasedSkeleton/code/kotlin-code" dialect="kotlin" />
     <file url="file://$PROJECT_DIR$/src/main/resources/frc-wizard-templates/2025/educational/code/kotlin-code" dialect="kotlin" />

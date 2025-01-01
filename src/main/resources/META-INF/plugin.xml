@@ -382,7 +382,6 @@
             Module type ID must match that defined in the FrcModuleType class.
         -->
         <!--suppress DeprecatedClassUsageInspection -->
-        <moduleType id="FRC_Module" implementationClass="net.javaru.iip.frc.wizard.FrcModuleType" order="first" />
         <moduleBuilder id="FrcModuleBuilder" builderClass="net.javaru.iip.frc.wizard.FrcModuleBuilder" order="last" />
 
         <externalProjectDataService id="FrcDependencyDataService" implementation="net.javaru.iip.frc.facet.importer.FrcDependencyDataService" />

@@ -26,13 +26,13 @@ import org.jetbrains.annotations.Contract
 import java.awt.Point
 
 
-val mapper: ObjectMapper = ObjectMapper().registerKotlinModule().registerModule(GuavaModule())//.registerModule(JodaModule())!!
+val objectMapper: ObjectMapper = ObjectMapper().registerKotlinModule().registerModule(GuavaModule())//.registerModule(JodaModule())!!
 
 /**
  * @sample SerializationExamples.prettyPrintWriterExample
  *
  */
-val prettyPrintWriter: ObjectWriter = mapper.writerWithDefaultPrettyPrinter()
+val prettyPrintWriter: ObjectWriter = objectMapper.writerWithDefaultPrettyPrinter()
 
 /**
  * Returns the receiver object as JSON. If pretty printing is uses, system line ending are used.
@@ -44,7 +44,7 @@ val prettyPrintWriter: ObjectWriter = mapper.writerWithDefaultPrettyPrinter()
 @Language("JSON")
 fun Any.toJson(prettyPrinted: Boolean = false): String
 {
-    val writer: ObjectWriter = if (prettyPrinted) prettyPrintWriter else mapper.writer()
+    val writer: ObjectWriter = if (prettyPrinted) prettyPrintWriter else objectMapper.writer()
     return writer.writeValueAsString(this)
 }
 
@@ -61,11 +61,11 @@ fun Any?.toJsonOrNull(prettyPrinted: Boolean = false): String? = this?.toJson(pr
 
 
 /** @sample SerializationExamples.fromJsonExample */
-inline fun <reified T> String.fromJson(): T = mapper.readValue<T>(this)
+inline fun <reified T> String.fromJson(): T = objectMapper.readValue<T>(this)
 
 /** @sample SerializationExamples.fromJsonOrNullExample */
 @Contract("null -> null, !null -> !null")
-inline fun <reified T> String?.fromJsonOrNull(): T? = if (this == null) null else mapper.readValue<T>(this)
+inline fun <reified T> String?.fromJsonOrNull(): T? = if (this == null) null else objectMapper.readValue<T>(this)
 
 
 
@@ -85,7 +85,7 @@ internal object SerializationExamples
         val json1 = prettyPrintWriter.writeValueAsString(someObject)
 
         // With a prettyPrint option
-        val writer: ObjectWriter = if (prettyPrint) prettyPrintWriter else mapper.writer()
+        val writer: ObjectWriter = if (prettyPrint) prettyPrintWriter else objectMapper.writer()
         @Language("JSON")
         val json2 = writer.writeValueAsString(someObject)
     }

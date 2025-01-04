@@ -636,7 +636,7 @@ fun determineSandboxDir(): String
         }
 
     val sandboxDir = Path.of(project.rootDir.canonicalPath).resolve(".sandboxes").resolve(".sandbox-$sandboxSuffix").toString()
-    logger.info(">>>sandboxDir set to: $sandboxDir")
+    logger.lifecycle(">>>sandboxDir set to: $sandboxDir")
     return sandboxDir
 }
 
@@ -655,7 +655,7 @@ fun determineJvmVendor(@Suppress("UnstableApiUsage") defaultFallbackSpec: JvmVen
         .requireNoNulls()
         .flatten()
         .toList()
-    logger.debug("Found jbr JDKs:  $jbrList")
+    logger.info("Found jbr JDKs:  $jbrList")
     val spec = if (jbrList.isNotEmpty()) JvmVendorSpec.matching("JetBrains") else defaultFallbackSpec
     println("Using JvmVendorSpec '$spec' for Gradle Java Toolchain")
     return spec
@@ -705,7 +705,7 @@ fun loadTokenReplacements():MutableMap<String, Any>
         }
         if (isEmpty)
         {
-            logger.info("Using stand-in values for built time token replacements")
+            logger.lifecycle("Using stand-in values for built time token replacements")
             // If the stand-in value changes at all, be sure to update the filtering code in the patchPluginXml
             put("SENTRY_DSN_TEST_AND_QA", "https://example.com/stand-in/value")
             put("SENTRY_DSN_PROD", "https://example.com/stand-in/value")

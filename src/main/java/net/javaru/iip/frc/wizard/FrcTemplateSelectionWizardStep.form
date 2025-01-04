@@ -152,7 +152,7 @@
                             </constraints>
                             <properties>
                               <icon value="icons/technologies/java/java.png"/>
-                              <text value="&amp;Java" noi18n="true"/>
+                              <text value="Java" noi18n="true"/>
                               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.templateSelectionStep.languageOption.java.tooltip"/>
                             </properties>
                           </component>
@@ -178,7 +178,7 @@
                             </constraints>
                             <properties>
                               <icon value="icons/technologies/kotlin/modern/fullColor/kotlin.png"/>
-                              <text value="&amp;Kotlin" noi18n="true"/>
+                              <text value="Kotlin" noi18n="true"/>
                               <toolTipText resource-bundle="i18n/FrcBundle" key="frc.ui.wizard.templateSelectionStep.languageOption.kotlin.tooltip"/>
                             </properties>
                           </component>

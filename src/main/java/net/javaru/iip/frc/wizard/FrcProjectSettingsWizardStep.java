@@ -385,6 +385,7 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
             {
                 LOG.warn("[FRC] Could not parse configured team number of '" + teamNumberTextField.getText() + "' despite it having just passed validation.");
             }
+            
             final TeamNumberDialogWrapper dialogWrapper = new TeamNumberDialogWrapper(rootPanel, projectTeamNumber);
             final boolean ok = dialogWrapper.showAndGet();
             if (ok)
@@ -408,6 +409,164 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
         {
             throw new ConfigurationException(message("frc.ui.wizard.projectSettingsStep.validate.invalidPackageName.message", basePackageName),
                                              message("frc.ui.wizard.projectSettingsStep.validate.invalidPackageName.title"));
+        }
+        
+        if (kotlinDslRadioButton.isSelected())
+        {
+            // NOTE: I tried usoing various Messages.show dialogs and the TwoStepConfirmationDialog
+            // but they would not wrap the text and create super wide dialogs. So 
+            final KotlinDslUseAcknowledgementDialogWrapper kotDslDialog = new KotlinDslUseAcknowledgementDialogWrapper(rootPanel);
+            final boolean isOk = kotDslDialog.showAndGet();
+            
+            // checkBoxSelected && dialogWasOkExitCode ? OK_EXIT_CODE : CANCEL_EXIT_CODE;
+           
+            if (isOk && kotDslDialog.isAcknowledged())
+            {
+                LOG.info("[FRC] Gradle Kotlin DSL use WAS acknowledged.");
+            }
+            else
+            {
+                LOG.info("[FRC] Gradle Kotlin DSL use was NOT acknowledged.");
+                return false;
+            }
+        }
+        
+        
+        /*
+        final int answer = Messages.showYesNoDialog(
+                    getComponent(),
+                    message("frc.ui.wizard.templateSelectionStep.validate.deprecatedTemplate.message", selectedTemplate.getDisplayName()),
+                    message("frc.ui.wizard.templateSelectionStep.validate.deprecatedTemplate.title"),
+                    Messages.getWarningIcon());
+            if (answer == Messages.YES)
+            {
+                return false;
+            }
+         */
+                
+        if (kotlinDslRadioButton.isSelected()) 
+        {
+//            final int isAcknowledged = Messages.showTwoStepConfirmationDialog(
+//                    message("frc.ui.wizard.projectSettingsStep.kotlinDsl.disclaimer.text"),
+//                    message("frc.ui.wizard.projectSettingsStep.kotlinDsl.disclaimer.title"),
+//                    "I acknowledge",
+//                    Messages.getQuestionIcon()
+//            );
+//            LOG.info("isAcknowledged: " + isAcknowledged);
+//            
+//            final Pair<String, Boolean> pair = Messages.showInputDialogWithCheckBox(
+//                    message("frc.ui.wizard.projectSettingsStep.kotlinDsl.disclaimer.text"),
+//                    message("frc.ui.wizard.projectSettingsStep.kotlinDsl.disclaimer.title"),
+//                    "I acknowledge",
+//                    false,
+//                    true,
+//                    Messages.getQuestionIcon(),
+//                    "initial Value",
+//                    null
+//            );
+//
+//            LOG.info("pair: " + pair + "    pair.first: " + pair.first  + "    pair.second: " + pair.second );
+            
+            
+            
+            
+            /*
+            
+            public static int showTwoStepConfirmationDialog(
+                                                  @DialogMessage String message,
+                                                  @DialogTitle String title,
+                                                  @NlsContexts.Checkbox String checkboxText,
+                                                  Icon icon) {
+                                                  
+    return showCheckboxMessageDialog(             message = message, 
+                                                  title= title, 
+                                                  Button [] options = new String[]{getOkButton()}, 
+                                                  String checkboxText = checkboxText, 
+                                                  boolean checked = true, 
+                                                  defaultOptionIndex = -1, 
+                                                  focusedOptionIndex = -1, 
+                                                  icon, 
+                                                  PairFunction<? super Integer, ? super JCheckBox, Integer> exitFunc = null);
+  }
+            
+            public static int showCheckboxMessageDialog(
+                                              @DialogMessage String message,
+                                              @DialogTitle String title,
+                                              String @NotNull @NlsContexts.Button [] options,
+                                              @NlsContexts.Checkbox String checkboxText,
+                                              final boolean checked,
+                                              final int defaultOptionIndex,
+                                              final int focusedOptionIndex,
+                                              Icon icon,
+                                              final @Nullable PairFunction<? super Integer, ? super JCheckBox, Integer> exitFunc) {
+    return showCheckboxMessageDialog(message, title, options, checkboxText, checked, defaultOptionIndex, focusedOptionIndex, icon,
+                                     (BiFunction<? super Integer, ? super JCheckBox, Integer>)exitFunc);
+  }
+            
+            
+            public static int showCheckboxMessageDialog(
+                                              @DialogMessage String message,
+                                              @DialogTitle String title,
+                                              String @NotNull @NlsContexts.Button [] options,
+                                              @NlsContexts.Checkbox String checkboxText,
+                                              final boolean checked,
+                                              final int defaultOptionIndex,
+                                              final int focusedOptionIndex,
+                                              Icon icon,
+                                              final @Nullable BiFunction<? super Integer, ? super JCheckBox, Integer> exitFunc) {
+    return MessagesService.getInstance()
+      .showTwoStepConfirmationDialog(message, title, options, checkboxText, checked, defaultOptionIndex, focusedOptionIndex, icon,
+                                     exitFunc);
+  }
+             */
+            
+            // java.util.function.BiFunction
+            
+//            new BiFunction<Integer, JCheckBox, Integer>() {}
+//            
+            // This ultimately creates a TwoStepConfirmationDialog
+            // If desired, we can pass in a BiFunction<Integer, JCheckBox, Integer>() that will receive the exitCode of 
+            //    the dialog (DialogWrapper.OK_EXIT_CODE or DialogWrapper.CANCEL_EXIT_CODE) and the checkBox
+            // If we do not pass in a BiFunction, we ultimately get returned:
+            //    checkBoxSelected && dialogWasOkExitCode ? OK_EXIT_CODE : CANCEL_EXIT_CODE;
+//            final int kotDslExitCode = Messages.showCheckboxMessageDialog(
+//                    message("frc.ui.wizard.projectSettingsStep.kotlinDsl.disclaimerMessageDialog.text"),
+//                    message("frc.ui.wizard.projectSettingsStep.kotlinDsl.disclaimer.title"),
+//                    new String[] {Messages.getOkButton(), Messages.getCancelButton()},
+//                    message("frc.ui.common.acknowledged"),
+//                    false,
+//                    -1,
+//                    -1,
+//                    Messages.getWarningIcon(),
+//                    null
+//            
+//            );
+//            // kotDslExitCode will be: checkBoxSelected && dialogWasOkExitCode ? OK_EXIT_CODE : CANCEL_EXIT_CODE; 
+//            
+//            if (kotDslExitCode == DialogWrapper.CANCEL_EXIT_CODE) {
+//                return false;
+//            }
+            
+            
+//            TwoStepConfirmationDialog kotDslDialog = new TwoStepConfirmationDialog(
+//                    message("frc.ui.wizard.projectSettingsStep.kotlinDsl.disclaimerMessageDialog.text"),
+//                    message("frc.ui.wizard.projectSettingsStep.kotlinDsl.disclaimer.title"),
+//                    new String[] {Messages.getOkButton(), Messages.getCancelButton()},
+//                    message("frc.ui.common.acknowledged"),
+//                    false,
+//                    -1,
+//                    -1,
+//                    Messages.getWarningIcon(),
+//                    null
+//            
+//            );
+//            
+//            kotDslDialog.setSize(200, 200);
+//            kotDslDialog.show();
+//            
+//            if (kotDslDialog.getExitCode() == DialogWrapper.CANCEL_EXIT_CODE) {
+//                return false;
+//            }
         }
         LOG.trace("[FRC] Exiting FrcProjectSettingsWizardStep.validate() (Gracefully with no validation errors)");
         return true;
@@ -621,8 +780,8 @@ public class FrcProjectSettingsWizardStep extends ModuleWizardStep implements Te
             message("frc.ui.wizard.projectSettingsStep.includeKotlin.contextHelpLabel.text", message("frc.new.project.wizard.kotlin.disclaimer")));
         
         kotlinDslContextHelpLabel = ContextHelpLabel.create(
-            message("frc.ui.wizard.projectSettingsStep.kotlinDsl.contextHelpLabel.title"),    
-            message("frc.ui.wizard.projectSettingsStep.kotlinDsl.contextHelpLabel.text")
+            message("frc.ui.wizard.projectSettingsStep.kotlinDsl.disclaimer.title"),    
+            message("frc.ui.wizard.projectSettingsStep.kotlinDsl.disclaimer.text")
         );
         
         // *** I M P O R T A N T ***

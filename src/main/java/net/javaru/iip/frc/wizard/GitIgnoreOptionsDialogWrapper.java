@@ -70,7 +70,7 @@ public class GitIgnoreOptionsDialogWrapper extends DialogWrapper
         // www.jetbrains.org/intellij/sdk/docs/user_interface_components/dialog_wrapper.html
         super(parent, true);
         this.configuration = gitIgnoreConfiguration;
-        init();
+        super.init();
         setTitle(FrcBundle.message("frc.ui.wizard.projectSettingsStep.gitignore.optionsDialog.title"));
         initComponents();
     }

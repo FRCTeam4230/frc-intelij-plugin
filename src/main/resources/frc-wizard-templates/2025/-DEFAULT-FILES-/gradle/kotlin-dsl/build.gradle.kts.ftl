@@ -28,6 +28,15 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 </#if>
 import java.net.URI
 
+/*
+    == D I S C L A I M E R ==
+    Using Kotlin DSL for Gradle builds is not officially supported by FRC/WPILib.
+    As such, by using the Kotlin DSL, you acknowledge that you will not receive any support from the WPI Lib team,
+    and support from the community will likely be very limited. There are known issues with using Kotlin DSL Gradle
+    files in VS Code. As such, if you have team members using VS Code, use of the Kotlin DSL is not recommended.
+    The use of Kotlin DSL is only recommend for developers experienced with the Gradle Kotlin DSL.
+ */
+        
 plugins {
     java
 <#if data.getIncludeKotlinSupport()>

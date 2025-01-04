@@ -39,6 +39,7 @@ import com.intellij.openapi.ui.InputValidator
 import com.intellij.openapi.ui.Messages
 import com.intellij.psi.PsiDirectory
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.util.io.HttpRequests
 import icons.FrcIcons
 import icons.FrcIcons.FRC
 import net.javaru.iip.frc.FrcPluginGlobals
@@ -514,8 +515,11 @@ class DownloadVendorDeps: AbstractFrcInternalAction()
                         .withContent("Downloaded to: $it")
                         .notify(project)
                 }.onFailure {
+                    if (it is HttpRequests.HttpStatusException) {
+                        logger.info("[FRC] HttpRequest failed with ${it.statusCode} : ${it.message} for url ${it.url} ")
+                    }
                     FrcNotifyType.ACTIONABLE_ERROR
-                        .withContent("Could not download Vendordeps file, Reason: ${it.message}")
+                        .withContent("Could not download Vendordeps file, Reason: ${it.message})" )
                         .notify(project)
                 }
             }

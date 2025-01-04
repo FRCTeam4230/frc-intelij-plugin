@@ -501,6 +501,10 @@ class VendordepsService private constructor(val project: Project): Disposable
         }
         catch (e: Exception)
         {
+            if (e is HttpRequests.HttpStatusException)
+            {
+                logger.debug("[FRC] HttpRequest failed with ${e.statusCode} : ${e.message} for url ${e.url} ")
+            }
             Err(e)
         }
     }

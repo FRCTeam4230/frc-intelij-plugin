@@ -24,7 +24,7 @@ runtime\.properties$
 .sandboxes/
 .sandbox/
 .sandbox-*/
-
+/.intellijPlatform/
 
 syntax: glob
 # Exclude IDE files

@@ -44,8 +44,8 @@ version = frcPluginVersion
 plugins {
     base
     java
-    // List of Kotlin versions bundled with the IDE by version: https://plugins.jetbrains.com/docs/intellij/kotlin.html#kotlin-standard-library
-    // v2023.3+ requires Kotlin 1.9.x
+    // List of Kotlin versions bundled with the IDE by version: 
+    // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#stdlib-miscellaneous
     kotlin("jvm") version "1.9.21"
     // IntelliJ Platform Gradle Plugin: gradle plugin-for writing IntelliJ plugins
     //     Docs: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html

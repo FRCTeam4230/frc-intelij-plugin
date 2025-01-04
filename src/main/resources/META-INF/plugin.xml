@@ -52,6 +52,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <strong>v5.0.1</strong> <br>
+        &nbsp;&nbsp;&bull; Enables K2 Mode Support<br>
+        <br>
         <strong>v5.0.0</strong> <br>
         &nbsp;&nbsp;&bull; Added support for 2025 season, including project templates.<br>
         &nbsp;&nbsp;&bull; New Project Wizard: Added option for Gradle build files to use Kotlin DSL (for 2024 or later robot projects). Thanks to Tyler Lowrey for an example Kotlin DSL file that helped during implementation.<br>

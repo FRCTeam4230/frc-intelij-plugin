@@ -203,40 +203,76 @@ public final class FrcIcons
     public static class WpiLib
     {
         /** An SVG file of the new (2019+) WpiLib 'official' icon.  */
-        public static final Icon WPI_LIB = loadIcon("icons/wpi/wpilib.svg");
+        public static final Icon WPI_LIB = loadIcon("icons/wpi/wpilib-2025+icon.svg");
         
         /** A WpiLib ico Icon file with 16x16 through 256x256 icons of the new (2019+) WpiLib 'official' icon.  */
-        public static final Icon WPI_LIB_ICO_16_THRU_256 = loadIcon("icons/wpi/wpilib-256.ico");
+        public static final Icon WPI_LIB_ICO_16_THRU_256 = loadIcon("icons/wpi/wpilib-2025+icon.ico");
         
         /** A 16x16 Icon of the new (2019+) WpiLib 'official' icon.  */
-        public static final Icon WPI_LIB_16 = loadIcon("icons/wpi/wpilib-16.png");
+        public static final Icon WPI_LIB_16 = loadIcon("icons/wpi/wpilib-2025+icon-16.png");
         
         /** A 24x24 Icon of the new (2019+) WpiLib 'official' icon.  */
-        public static final Icon WPI_LIB_24 = loadIcon("icons/wpi/wpilib-24.png");
+        public static final Icon WPI_LIB_24 = loadIcon("icons/wpi/wpilib-2025+icon-24.png");
         
         /** A 32x32 Icon of the new (2019+) WpiLib 'official' icon.  */
-        public static final Icon WPI_LIB_32 = loadIcon("icons/wpi/wpilib-32.png");
+        public static final Icon WPI_LIB_32 = loadIcon("icons/wpi/wpilib-2025+icon-32.png");
         
         /** A 40x40 Icon of the new (2019+) WpiLib 'official' icon.  */
-        public static final Icon WPI_LIB_40 = loadIcon("icons/wpi/wpilib-40.png");
+        public static final Icon WPI_LIB_40 = loadIcon("icons/wpi/wpilib-2025+icon-40.png");
         
         /** A 48x48 Icon of the new (2019+) WpiLib 'official' icon.  */
-        public static final Icon WPI_LIB_48 = loadIcon("icons/wpi/wpilib-48.png");
+        public static final Icon WPI_LIB_48 = loadIcon("icons/wpi/wpilib-2025+icon-48.png");
         
         /** A 64x64 Icon of the new (2019+) WpiLib 'official' icon.  */
-        public static final Icon WPI_LIB_64 = loadIcon("icons/wpi/wpilib-64.png");
+        public static final Icon WPI_LIB_64 = loadIcon("icons/wpi/wpilib-2025+icon-64.png");
         
         /** A 96x96 Icon of the new (2019+) WpiLib 'official' icon.  */
-        public static final Icon WPI_LIB_96 = loadIcon("icons/wpi/wpilib-96.png");
+        public static final Icon WPI_LIB_96 = loadIcon("icons/wpi/wpilib-2025+icon-96.png");
         
         /** A 128x128 Icon of the new (2019+) WpiLib 'official' icon.  */
-        public static final Icon WPI_LIB_128 = loadIcon("icons/wpi/wpilib-128.png");
+        public static final Icon WPI_LIB_128 = loadIcon("icons/wpi/wpilib-2025+icon-128.png");
         
         /** A 192x192 Icon of the new (2019+) WpiLib 'official' icon.  */
-        public static final Icon WPI_LIB_192 = loadIcon("icons/wpi/wpilib-192.png");
+        public static final Icon WPI_LIB_192 = loadIcon("icons/wpi/wpilib-2025+icon-192.png");
         
         /** A 256x256 Icon of the new (2019+) WpiLib 'official' icon.  */
-        public static final Icon WPI_LIB_256 = loadIcon("icons/wpi/wpilib-256.png");
+        public static final Icon WPI_LIB_256 = loadIcon("icons/wpi/wpilib-2025+icon-256.png");
+        
+        /** An SVG file of the classic (2019-2024) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_CLASSIC = loadIcon("icons/wpi/wpilib.svg");
+        
+        /** A WpiLib ico Icon file with 16x16 through 256x256 icons of the classic (2019-2024) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_CLASSIC_ICO_16_THRU_256 = loadIcon("icons/wpi/wpilib-256.ico");
+        
+        /** A 16x16 Icon of the classic (2019-2024) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_CLASSIC_16 = loadIcon("icons/wpi/wpilib-16.png");
+        
+        /** A 24x24 Icon of the classic (2019-2024) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_CLASSIC_24 = loadIcon("icons/wpi/wpilib-24.png");
+        
+        /** A 32x32 Icon of the classic (2019-2024) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_CLASSIC_32 = loadIcon("icons/wpi/wpilib-32.png");
+        
+        /** A 40x40 Icon of the classic (2019-2024) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_CLASSIC_40 = loadIcon("icons/wpi/wpilib-40.png");
+        
+        /** A 48x48 Icon of the classic (2019-2024) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_CLASSIC_48 = loadIcon("icons/wpi/wpilib-48.png");
+        
+        /** A 64x64 Icon of the classic (2019-2024) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_CLASSIC_64 = loadIcon("icons/wpi/wpilib-64.png");
+        
+        /** A 96x96 Icon of the classic (2019-2024) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_CLASSIC_96 = loadIcon("icons/wpi/wpilib-96.png");
+        
+        /** A 128x128 Icon of the classic (2019-2024) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_CLASSIC_128 = loadIcon("icons/wpi/wpilib-128.png");
+        
+        /** A 192x192 Icon of the classic (2019-2024) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_CLASSIC_192 = loadIcon("icons/wpi/wpilib-192.png");
+        
+        /** A 256x256 Icon of the classic (2019-2024) WpiLib 'official' icon.  */
+        public static final Icon WPI_LIB_CLASSIC_256 = loadIcon("icons/wpi/wpilib-256.png");
         
         /** A 16x16 Icon of the legacy (i.e. pre 2019) Wpi 'official' icon.  */
         public static final Icon WPI_LIB_LEGACY_16 = loadIcon("icons/wpi/wpi-16.png");

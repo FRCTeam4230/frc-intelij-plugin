@@ -52,8 +52,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <strong>v5.0.1</strong> <br>
+        <strong>v5.1.0</strong> <br>
         &nbsp;&nbsp;&bull; Enables K2 Mode Support<br>
+        &nbsp;&nbsp;&bull; Improves Gradle Kotlin DSL file. Big thanks to <em>@doinkythederp</em> for the improvements.<br>
+        &nbsp;&nbsp;&bull; Updates WPI Lib logo/icon to new 2025 design<br>
         <br>
         <strong>v5.0.0</strong> <br>
         &nbsp;&nbsp;&bull; Added support for 2025 season, including project templates.<br>

@@ -24,18 +24,16 @@ pluginManagement {
         gradlePluginPortal()
         val frcYear = "[=data.frcYearString]"
         val frcHome = if (System.getProperty("os.name").contains("windows", ignoreCase = true)) {
-            val publicFolder = System.getenv("PUBLIC") ?: """C:\Users\Public"""
-            val homeRoot = File(publicFolder, "wpilib")
-            File(homeRoot, frcYear)
+            file(System.getenv("PUBLIC") ?: """C:\Users\Public""")
         } else {
-            val userFolder = System.getProperty("user.home")
-            val homeRoot = File(userFolder, "wpilib")
-            File(homeRoot, frcYear)
+            file(System.getProperty("user.home"))
         }
-        val frcHomeMaven = File(frcHome, "maven")
+            .resolve("wpilib")
+            .resolve(frcYear)
+
         maven {
             name = "frcHome"
-            setUrl(frcHomeMaven)
+            url = uri(frcHome.resolve("maven"))
         }
     }
 }

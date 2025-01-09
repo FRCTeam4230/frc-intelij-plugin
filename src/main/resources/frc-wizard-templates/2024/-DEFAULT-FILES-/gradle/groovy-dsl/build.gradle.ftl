@@ -204,6 +204,6 @@ idea {
         downloadJavadoc = true
         downloadSources = true
         // Exclude the .vscode directory from indexing and search
-        excludeDirs+=file(".vscode" )
+        excludeDirs+=file(".vscode")
     }
 }

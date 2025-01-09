@@ -371,14 +371,20 @@ tasks {
     }
 
     register<Delete>("cleanPluginFromSandbox") {
-        delete(File("$sandboxPath/plugins/${rootProject.name}"))
+        delete(
+            File("$sandboxPath/IC-${ideaVersionPlain}/plugins/${rootProject.name}"),
+            
+              )
     }
 
     register<Delete>("cleanIdeCaches") {
         dependsOn("cleanPluginFromSandbox")
         // Delete indexes & cache to resolve issues of new project templates being read from cache
         delete(
-            File("$sandboxPath/system/caches"), File("$sandboxPath/system/index")
+            File("$sandboxPath/IC-${ideaVersionPlain}/system/caches"), 
+            File("$sandboxPath/IC-${ideaVersionPlain}/system/index"),
+            File("$sandboxPath/IU-${ideaVersionPlain}/system/caches"), 
+            File("$sandboxPath/IU-${ideaVersionPlain}/system/index"),
               )
 //    File("$sandboxPath/plugins/${rootProject.name}").deleteRecursively()
 //    File("$sandboxPath/system/caches").deleteRecursively()

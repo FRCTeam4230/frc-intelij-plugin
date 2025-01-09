@@ -3,6 +3,7 @@ ahrs
 allwpilib
 andymark
 appname
+autodetection
 autonomous
 canbus
 canivore
@@ -20,6 +21,7 @@ digilent
 drivebase
 drivetrain
 driverstation
+Dstring
 euclidian
 endlocal
 errorlevel

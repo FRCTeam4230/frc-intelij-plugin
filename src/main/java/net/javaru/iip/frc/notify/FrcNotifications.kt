@@ -166,19 +166,24 @@ object FrcNotifications
     const val FrcTitle = "FRC"
 
     @JvmStatic
-    val FRC_GENERAL_NOTIFICATION_GROUP = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/"FRC General Notifications")!!
+    val FRC_GENERAL_NOTIFICATION_GROUP 
+        get () = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/"FRC General Notifications")!!
 
     @JvmStatic
-    val FRC_ACTIONABLE_NOTIFICATION_GROUP = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/ "FRC Important or Actionable Notifications")!!
+    val FRC_ACTIONABLE_NOTIFICATION_GROUP
+        get () = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/ "FRC Important or Actionable Notifications")!!
 
     @JvmStatic
-    val FRC_ERROR_REPORT_NOTIFICATION_GROUP = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/ "FRC Error Submitter Notifications")!!
+    val FRC_ERROR_REPORT_NOTIFICATION_GROUP
+        get () =NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/ "FRC Error Submitter Notifications")!!
 
     @JvmStatic
-    val FRC_BUILD_TOOL_WINDOW_GROUP = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/ "FRC Build Tool Window Notifications")!!
+    val FRC_BUILD_TOOL_WINDOW_GROUP
+        get () = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/ "FRC Build Tool Window Notifications")!!
 
     @JvmStatic
-    val FRC_RUN_TOOL_WINDOW_GROUP = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/ "FRC Run Tool Window Notifications")!!
+    val FRC_RUN_TOOL_WINDOW_GROUP
+        get () = NotificationGroupManager.getInstance().getNotificationGroup(/*id from plugin.xml notificationsGroup extension point*/ "FRC Run Tool Window Notifications")!!
 
     @JvmStatic
     val IconInfo: Icon = AllIcons.General.BalloonInformation

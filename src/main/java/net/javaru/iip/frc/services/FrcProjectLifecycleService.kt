@@ -20,6 +20,7 @@ import com.intellij.ProjectTopics
 import com.intellij.facet.Facet
 import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetManagerListener
+import com.intellij.ide.util.RunOnceUtil
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.application.invokeLater
@@ -31,19 +32,25 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.ModuleListener
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.roots.ModuleRootListener
 import com.intellij.openapi.startup.ProjectActivity
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.util.messages.MessageBusConnection
 import net.javaru.iip.frc.facet.isFrcFacet
 import net.javaru.iip.frc.facet.isFrcFacetedModule
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.notify.FrcNotificationsTracker
+import net.javaru.iip.frc.notify.FrcNotifyType
 import net.javaru.iip.frc.notify.notifyToConfigureTeamNumIfNecessary
 import net.javaru.iip.frc.riolog.RioLogProjectService
 import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService
 import net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor
 import net.javaru.iip.frc.settings.FrcProjectTeamNumberService
+import javax.annotation.CheckForNull
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.readText
 
 
 // Do NOT make a StartupActivity.Background since we want indexing to be complete
@@ -115,6 +122,8 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
             notifyToConfigureTeamNumIfNecessary(project, true)
 
             checkProjectFrcStatus(project, knownFacetedProject = true, checkTeamNumConfigStatus = false)
+
+            checkForOldKotlinDslFile()
         }
     }
 
@@ -194,6 +203,36 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
             {
                 notifyToConfigureTeamNumIfNecessary(project, knownFacetedProject)
             }
+        }
+    }
+    
+    fun checkForOldKotlinDslFile() {
+        try
+        {
+//            RunOnceUtil.runOnceForProject(project, "FRC-CheckForOldKotlinDslFile") {
+                DumbService.getInstance(project).runWhenSmart {
+                    project.guessProjectDir()?.let { projectDir ->
+                        projectDir.findChild("build.gradle.kts")?.let { gradleBuild ->
+                            val buildFileAsPath = gradleBuild.toNioPath()
+                            if (buildFileAsPath.isRegularFile()) {
+                                if (buildFileAsPath.readText().contains("artifactory")) {
+                                    FrcNotifyType.ACTIONABLE_WARN.builder()
+                                        .withContent("You are using a Kotlin DSL Gradle build file created via an older template. " +
+                                                             "The template has since been greatly improved. It is highly recommended you create " +
+                                                             "a new project and replace the Gradle Build file in this project with the one created " +
+                                                             "in the new project.")
+                                        .withFrcPrefixedTitle("Recommended update")
+                                        .notify(project)
+                                }
+                            }
+                        }
+                    }
+                }
+//            }
+        }
+        catch (e: Exception)
+        {
+            logger.warn("[FRC] Could not check Kotlin DSL file for legacy template due to exception: $e", e)
         }
     }
 

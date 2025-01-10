@@ -130,11 +130,6 @@ wpi {
 // Set this to true to enable desktop support.
 val includeDesktopSupport = [=data.getIncludeDesktopSupportGradleSetting()]
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
-
 dependencies {
     implementation(wpi.java.deps.wpilib())
     implementation(wpi.java.vendor.java())

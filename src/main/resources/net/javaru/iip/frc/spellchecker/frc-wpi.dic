@@ -8,6 +8,8 @@ autonomous
 canbus
 canivore
 canutils
+choreo
+choreolib
 copperforge
 crio
 cscore
@@ -61,11 +63,13 @@ libcu
 libcufrc
 librobotsupport
 linuxaarch
+linuxarm
 linuxathena
 linuxraspbian
 linuxx
 logitech
 lvuser
+maplesim
 mecanum
 mjpeg
 mjpg
@@ -88,6 +92,7 @@ omnimount
 omniwheel
 opencv
 osx
+osxuniversal
 osxx
 pathplan
 pathplanner
@@ -104,6 +109,8 @@ qelms
 ramsete
 relm
 relms
+reduxlib
+reduxrobotics
 revrobotics
 rio
 riolog
@@ -122,6 +129,7 @@ setpoints
 shmem
 shuffleboard
 smartdashboard
+studica
 subsystem
 subtable
 telemanipulator
@@ -130,11 +138,15 @@ teleoperate
 teleoperated
 teleoperator
 teleoperation
+thethriftybot
+thriftybot
+Thriftylib
 Timeslice
 timeslice
 Timesliced
 timesliced
 toolsuite
+urcl
 usb
 usfirst
 vbus
@@ -162,6 +174,7 @@ xaxis
 xbox
 xpeed
 xstick
+yagsl
 yaxis
 yspeed
 ystick

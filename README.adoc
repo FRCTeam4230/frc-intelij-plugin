@@ -28,7 +28,7 @@ More information available at the https://plugins.jetbrains.com/plugin/9405-frc[
 
 Please report any issues or feature requests via the https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues[Project's Issue Tracker].
 Please note, that I use GitLab to host the project. You can https://gitlab.com/users/sign_in[log into] GiLab using your GitHub, Bitbucket, Twitter, or Google credentials if desired.
-THis project is developed and maintained by an FRC Team mentor, hi 👋. Please do not contact _FIRST_ or the WPI Lib maintainers for support or issues. Submit an
+This project is developed and maintained by an FRC Team mentor, hi 👋. Please do not contact _FIRST_ or the WPI Lib maintainers for support or issues. Submit an
 issue at the above link and I will happily address it. Thanks.
 
 === Known Issues

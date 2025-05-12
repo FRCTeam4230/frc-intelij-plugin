@@ -112,9 +112,22 @@ As of v2.x, the major version will increase for each FRC build season. Thus:
 
 == Developing the Plugin
 
+=== IntelliJ IDEA Configurations & Settings
+
+==== Download Gradle Sources
+
+To attach IntelliJ Platform sources in the IDE, the Download sources setting has to be enabled. This option respects the plugin's https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-gradle-properties.html#downloadSources[downloadSources] property, which is enabled by default.
+
+To enable the settings, in IntelliJ IDEA, navigate to _Settings > Advanced Settings_. In the "Build Tools, Gradle" section, enable "Download Sources". After closing settings, invoke the "Reload All Gradle Projects" action from the Gradle tool window. For more information, see https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html#attaching-sources-in-the-ide[Attaching Sources in the IDE] in the IntelliJ Platform Plugin SDK documentation.
+
+=== Environment Settings
+
+[TIP]
 REMINDER: You must restart IntelliJ IDEA after setting or updating any environment variables.
 
-The plugin uses some secrets and keys that can't be committed to source control. These values are loaded from a properties file. To allow for a token file to be 
+==== Sentry Service
+
+The plugin uses some secrets and keys for interacting with the Sentry Service, used by the Error Submitter. These keys  can't be committed to source control. These values are loaded from a properties file. To allow for a token file to be 
 shared across multiple project clones and to be optimally placed for security, the file's location is not predefined. Instead, it's location must be defined, as
 a path, in the environment variable `FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE`. This file must contain the keys:
 
@@ -124,7 +137,7 @@ a path, in the environment variable `FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERT
 If you wish to develop the plugin locally for your own use, you can bypass the need to define these keys, and thus the properties file, by setting the 
 `frcPluginEapDesignator` property in the `gradle.properties` file to a value of `-UNOFFICIAL` (or alternatively `-SNAPSHOT`). 
 
-== Code Signing
+==== Code Signing
 
 When building an official distribution, the following environment variables must be set, either on the syst4em.user level, or via the run/debug configuration
 used to build the plugin for a release. The values provided are example values.

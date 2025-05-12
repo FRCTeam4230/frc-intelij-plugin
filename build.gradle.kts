@@ -101,98 +101,7 @@ intellijPlatform {
     //    Downloading sources is managed by the Plugin DevKit plugin in version 2024.1+. Not finding that setting https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-migration.html#intellijdownloadsources
 }
 
-//tasks {
-//    
-//    runIde {
-//        maxHeapSize = "1024m"
-//        this.systemProperties.putAll(
-//            mapOf(
-//                //"key" to "value",
-//                //systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, ".sandbox", "log.xml")),
-//                // As of v2022.1, changed from using log4j to JUL
-//                //    See https://blog.jetbrains.com/platform/2022/02/removing-log4j-from-the-intellij-platform/
-//                //        https://docs.oracle.com/en/java/javase/11/docs/api/java.logging/java/util/logging/LogManager.html
-//                //systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, "idea-sandbox-log4j-config.xml")),
-//                systemPropertyGetOrDefault("idea.log.config.properties.file", resolvePathFromProjectRootAsString("idea-sandbox-logging.properties")),
-//                systemPropertyGetOrDefault("frc.show.betas.in.new.project.wizard", "true"),
-//                // Turn on frc.i10n to see a notification character appended to all localized messages to aid in testing/debugging of message bundles and localization needs
-//                systemPropertyGetOrDefault("frc.i10n", "false"),
-//                systemPropertyGetOrDefault("frc.is.internal", "true"),
-//                systemPropertyGetOrDefault("frc.rest.use.qa", "true"),
-//                systemPropertyGetOrDefault("frc.error.report.submitter.use.qa", "true"),
-//                //systemPropertyGetOrDefault("frc.experimental.gradleDslSelection", "true"),
-//                systemPropertyGetOrDefault("frc.wizard.always.update.wpilib.versions", "true"),
-//                systemPropertyGetOrDefault("frc.always.create.romi.tail.run.config", "false"),
-//                // Legacy Ant based robot project system properties
-//                //systemPropertyGetOrDefault("frc.simulated.log.service.enabled", "false"),
-//                //systemPropertyGetOrDefault("frc.simulated.log.service.use.configured.port", "false"),
-//                //systemPropertyGetOrDefault("frc.use.wpilib.beta.site", "false"),
-//                //systemPropertyGetOrDefault("frc.alt.wpilib.base.dir", ""),
-//                //systemPropertyGetOrDefault("wpilib.base.dir", ""),
-//            )
-//                                    )
-//    }
-//
-//    signPlugin {
-//        // signPlugin runs automatically before the publishPlugin if the signPlugin privateKey (or privateKeyFile) and certificateChain (or certificateChainFile) properties are specified
-//        // Use JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE unless overridden by the more specific FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE
-//        val ourCertChainFileSetting =
-//            System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE") ?:
-//            System.getenv("JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE")
-//        val ourPrivateKeyFileSetting =
-//            System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE") ?:
-//            System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE")
-//
-//        doFirst {
-//            if (ourCertChainFileSetting == null) {
-//                logger.warn("No code signing certificate chain file configured.")
-//                logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE' not set.")
-//            }
-//            else {
-//                logger.lifecycle("Using code signing certificate chain file: $ourPrivateKeyFileSetting")
-//            }
-//            if (ourPrivateKeyFileSetting == null) {
-//                logger.warn("No code signing private key file configured.")
-//                logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_FILE' not set.")
-//            }
-//            else {
-//                logger.lifecycle("Using code signing private key file: $ourPrivateKeyFileSetting")
-//                if ((System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD") ?: System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD")) == null) {
-//                    logger.warn("Code signing password is not configured.")
-//                    logger.warn("environment variable 'JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD' not set.")
-//                } 
-//            }
-//        }
-//        if (ourPrivateKeyFileSetting != null && ourCertChainFileSetting != null)
-//        {
-//            privateKeyFile.set(Path.of(ourPrivateKeyFileSetting).toFile())
-//            certificateChainFile.set(Path.of(ourCertChainFileSetting).toFile())
-//            password.set(System.getenv("FRC_PLUGIN_JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD") ?: System.getenv("JETBRAINS_MARKETPLACE_SIGNING_PRIVATE_KEY_PASSWORD"))
-//        }
-//    }
-//}
 
-
-//intellij {
-//    // The Gradle plugin for writing intellij plugins
-//    pluginName.set("FRC")
-//    // IntelliJ IDEA dependency
-//    version.setViaProjectProperty("ideaVersion")
-//    // Bundled plugin dependencies - comma separated list. Should use 'com.intellij.java' rather than 'java' per https://jetbrains-platform.slack.com/archives/C5U8BM1MK/p1647535621287459?thread_ts=1647509674.185739&cid=C5U8BM1MK
-//    plugins.set(listOf("com.intellij.java", "gradle", "Groovy", "org.jetbrains.kotlin", "com.jetbrains.sh"))  // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
-//    plugins.set(listOf(
-//        "com.intellij.java", // Java required to be declared as of v2019.2, but will not work with older builds. See, including the first 4 comments, https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/
-//        "gradle",
-//        "Groovy",
-//        "org.jetbrains.kotlin",
-//        "com.jetbrains.sh",
-//                      ))
-//    sandboxDir.set(sandboxPath)
-//    updateSinceUntilBuild.set(true)
-//    sameSinceUntilBuild.set(false)
-//    downloadSources.set(true)
-//}
-//
 // Section to configure tasks specific to intellij plugin tasks
 tasks {
     patchPluginXml {
@@ -555,22 +464,6 @@ idea {
                     transparentNativeToAsciiConversion = true
                 }
             }
-
-
-            // EXAMPLE OF CREATING A RUN CONFIGURATION from: https://github.com/JetBrains/gradle-idea-ext-plugin/issues/44#issuecomment-471340778
-            // For available RunConfigurations, see https://github.com/JetBrains/gradle-idea-ext-plugin/blob/master/src/main/groovy/org/jetbrains/gradle/ext/RunConfigurations.groovy
-            //     All potential configs "extends BaseRunConfiguration"
-            //     They are as of v0.7:  Application, TestNG, JUnit, Remote, Gradle
-
-//            configure<NamedDomainObjectContainer<org.jetbrains.gradle.ext.RunConfiguration>> {
-//                this as PolymorphicDomainObjectContainer<org.jetbrains.gradle.ext.RunConfiguration>
-//                create("MyApplication", org.jetbrains.gradle.ext.Application::class) {
-//                    this.mainClass = "com.example.MyApplication"
-//                    this.workingDirectory = "./core/assets/"
-//                    this.moduleName = "FRC.main"
-//                }
-//            }
-
         }
     }
 }

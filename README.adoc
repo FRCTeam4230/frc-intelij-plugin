@@ -21,13 +21,13 @@ endif::[]
 
 An IntelliJ IDEA plugin for *https://www.firstinspires.org/[_FIRST_] Robotics Competition (https://www.firstinspires.org/robotics/frc[FRC])* robot development
 in Java and Kotlin. This plugin works with either the free open-source Community Edition or Education Edition, or the licensed Ultimate Edition of IntelliJ IDEA.
-More information available at the https://plugins.jetbrains.com/plugin/9405-frc[plugin's page] of the JetBrains Marketplace (formerly the JetBrains Plugin Repository.)
+More information is available at the https://plugins.jetbrains.com/plugin/9405-frc[plugin's page] of the JetBrains Marketplace.
 
 
 == Issues
 
 Please report any issues or feature requests via the https://gitlab.com/Javaru/frc-intellij-idea-plugin/-/issues[Project's Issue Tracker].
-Please note, that I use GitLab to host the project. You can https://gitlab.com/users/sign_in[log into] GiLab using your GitHub, Bitbucket, Twitter, or Google credentials if desired.
+Please note that I use GitLab to host the project. You can https://gitlab.com/users/sign_in[log into] GiLab using your GitHub, Bitbucket, Twitter, or Google credentials if desired.
 This project is developed and maintained by an FRC Team mentor, hi 👋. Please do not contact _FIRST_ or the WPI Lib maintainers for support or issues. Submit an
 issue at the above link and I will happily address it. Thanks.
 
@@ -139,7 +139,7 @@ If you wish to develop the plugin locally for your own use, you can bypass the n
 
 ==== Code Signing
 
-When building an official distribution, the following environment variables must be set, either on the syst4em.user level, or via the run/debug configuration
+When building an official distribution, the following environment variables must be set, either at the system user level or via the run/debug configuration
 used to build the plugin for a release. The values provided are example values.
 
   - `JETBRAINS_MARKETPLACE_SIGNING_CERTIFICATE_CHAIN_FILE` -> C:\Users\USERNAME\AppData\Roaming\gnupg\Code-Signing-Keys\chain-2021-10-31--2022-10-30.crt

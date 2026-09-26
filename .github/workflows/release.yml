@@ -1,0 +1,119 @@
+name: Release
+
+# Creates a GitHub release when a version tag is pushed. The tag must match 'frcPluginBaseVersion' in gradle.properties:
+#   git tag v5.1.0        && git push origin v5.1.0          -> release 5.1.0-2026.2
+#   git tag v5.1.0-beta.1 && git push origin v5.1.0-beta.1   -> pre-release 5.1.0-2026.2-beta.1
+on:
+  push:
+    tags: [ 'v*' ]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # Full history, so the release notes can list the changes since the previous release
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Determine version
+        id: version
+        run: |
+          prop() { grep -E "^$1=" gradle.properties | cut -d= -f2- | tr -d '\r'; }
+          tag="${GITHUB_REF_NAME}"
+          base="$(prop frcPluginBaseVersion)"
+          # Anything after the base version (e.g. '-beta.1') becomes the EAP designator, and marks the release as a pre-release
+          case "$tag" in
+            "v${base}")   suffix="" ;;
+            "v${base}-"*) suffix="${tag#v${base}}" ;;
+            *) echo "::error::Tag '$tag' does not match frcPluginBaseVersion '$base' in gradle.properties. Use 'v$base' or 'v$base-<suffix>'."; exit 1 ;;
+          esac
+          {
+            echo "suffix=$suffix"
+            echo "prerelease=$([ -n "$suffix" ] && echo true || echo false)"
+            echo "version=${base}-$(prop ideaMajorVersion)${suffix}"
+            echo "ide_version=$(prop ideaMajorVersion)"
+            echo "since_build=$(prop ideaSinceBuild)"
+            echo "until_build=$(prop ideaUntilBuild)"
+          } >> "$GITHUB_OUTPUT"
+
+      # If the FRC_PLUGIN_BUILD_TOKENS secret is set (the contents of the build token replacements properties file,
+      # e.g. the Sentry DSNs), it is used for the build. Otherwise, stand-in values are used.
+      - name: Configure build tokens
+        env:
+          BUILD_TOKENS: ${{ secrets.FRC_PLUGIN_BUILD_TOKENS }}
+        run: |
+          if [ -n "$BUILD_TOKENS" ]; then
+            printf '%s\n' "$BUILD_TOKENS" > "$RUNNER_TEMP/frc-plugin-tokens.properties"
+            echo "FRC_PLUGIN_BUILD_REPLACEMENT_TOKENS_PROPERTIES_FILE=$RUNNER_TEMP/frc-plugin-tokens.properties" >> "$GITHUB_ENV"
+          else
+            echo "::notice::FRC_PLUGIN_BUILD_TOKENS secret is not set. Building with stand-in values (error reporting will not be configured)."
+          fi
+
+      - name: Build plugin
+        run: ./gradlew -Pis.ci.build=true "-PfrcPluginEapDesignator=${{ steps.version.outputs.suffix }}" -x buildSearchableOptions buildPlugin check
+
+      - name: Prepare release assets
+        id: assets
+        run: |
+          zip_path="$(ls build/distributions/*.zip)"
+          zip_name="$(basename "$zip_path")"
+          expected="FRC-${{ steps.version.outputs.version }}.zip"
+          if [ "$zip_name" != "$expected" ]; then echo "::error::Built '$zip_name' but expected '$expected'"; exit 1; fi
+          (cd build/distributions && sha256sum "$zip_name" > "$zip_name.sha256")
+          sed -e "s|{{ZIP_NAME}}|$zip_name|g" \
+              -e "s|{{IDE_VERSION}}|${{ steps.version.outputs.ide_version }}|g" \
+              -e "s|{{SINCE_BUILD}}|${{ steps.version.outputs.since_build }}|g" \
+              -e "s|{{UNTIL_BUILD}}|${{ steps.version.outputs.until_build }}|g" \
+              .github/release-install-instructions.md > "$RUNNER_TEMP/release-notes.md"
+          echo "zip_path=$zip_path" >> "$GITHUB_OUTPUT"
+
+      # Lists the commits since the previous GitHub release. The previous release is looked up via the GitHub releases
+      # (rather than tags) as the repository also contains old tags from before the move to GitHub.
+      - name: Add changes to release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes="$RUNNER_TEMP/release-notes.md"
+          previous="$(gh release list --exclude-drafts --limit 1 --json tagName --jq '.[0].tagName // empty')"
+          {
+            echo
+            echo "## What's changed"
+            echo
+            if [ -n "$previous" ]; then
+              git log --no-merges --format='- %s (%h)' "$previous..$GITHUB_REF_NAME"
+              echo
+              echo "**Full changelog**: https://github.com/$GITHUB_REPOSITORY/compare/$previous...$GITHUB_REF_NAME"
+            elif git fetch --quiet https://gitlab.com/Javaru/frc-intellij-idea-plugin.git main 2>/dev/null; then
+              # First release: list the changes made since this fork of the original project
+              echo "Changes since the original [FRC plugin](https://gitlab.com/Javaru/frc-intellij-idea-plugin):"
+              echo
+              git log --no-merges --format='- %s (%h)' "FETCH_HEAD..$GITHUB_REF_NAME"
+            else
+              git log --no-merges --format='- %s (%h)' -n 20 "$GITHUB_REF_NAME"
+            fi
+          } >> "$notes"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "${{ steps.assets.outputs.zip_path }}" \
+            "${{ steps.assets.outputs.zip_path }}.sha256" \
+            --title "FRC Plugin ${{ steps.version.outputs.version }}" \
+            --notes-file "$RUNNER_TEMP/release-notes.md" \
+            --verify-tag \
+            $([ "${{ steps.version.outputs.prerelease }}" = "true" ] && echo "--prerelease")

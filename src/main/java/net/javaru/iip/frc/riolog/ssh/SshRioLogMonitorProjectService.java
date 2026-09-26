@@ -53,8 +53,8 @@ public class SshRioLogMonitorProjectService extends AbstractRioLogMonitorProject
 
 
     @NotNull
-    protected AbstractRioLogContentExecutor createRioLogContentExecutor(boolean useRunWindow)
+    protected AbstractRioLogContentExecutor createRioLogContentExecutor()
     {
-        return useRunWindow ? new SshRioLogRunWindowContentExecutor(myProject, true) : new SshRioLogFrcWindowContentExecutor(myProject, true);
+        return new SshRioLogFrcWindowContentExecutor(myProject, true);
     }
 }

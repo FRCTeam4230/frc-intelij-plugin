@@ -247,7 +247,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                 
                 if (myActivateToolWindow)
                 {
-                    activateRioLogConsoleSafely();
+                    activateRioLogConsole();
                 }
                 
                 if (myAfterCompletionRunnable != null)
@@ -373,18 +373,6 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
 
     protected abstract Executor createExecutor();
 
-
-    @Deprecated
-    public void activateRioLogConsoleNow()
-    {
-        ApplicationManager.getApplication().invokeLater(new ActivateRioLogConsoleRunnable());
-    }
-
-    @Deprecated
-    public void activateRioLogConsoleSafely()
-    {
-        ApplicationManager.getApplication().invokeLater(new ActivateRioLogConsoleRunnable(), o -> myProject.isInitialized() && myProject.isOpen());
-    }
 
     public void activateRioLogConsole()
     {

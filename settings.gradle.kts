@@ -14,4 +14,9 @@
  *     limitations under the License.
  */
 
+plugins {
+    // Allows Gradle to auto-download a matching JVM Toolchain (e.g. Java 25) if one isn't already installed locally.
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
 rootProject.name = "FRC"

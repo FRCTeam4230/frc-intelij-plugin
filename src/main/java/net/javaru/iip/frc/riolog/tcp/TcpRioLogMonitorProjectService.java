@@ -51,8 +51,8 @@ public class TcpRioLogMonitorProjectService extends AbstractRioLogMonitorProject
 
 
     @NotNull
-    protected AbstractRioLogContentExecutor createRioLogContentExecutor(boolean useRunWindow)
+    protected AbstractRioLogContentExecutor createRioLogContentExecutor()
     {
-        return useRunWindow ? new TcpRioLogRunWindowContentExecutor(myProject, true) : new TcpRioLogFrcWindowContentExecutor(myProject, true);
+        return new TcpRioLogFrcWindowContentExecutor(myProject, true);
     }
 }

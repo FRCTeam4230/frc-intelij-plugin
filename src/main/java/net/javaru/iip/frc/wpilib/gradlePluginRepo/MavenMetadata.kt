@@ -347,21 +347,15 @@ fun fetchLatestMavenMetadata(metadataURI: URI): MavenMetadata?
     return try
     {
         logger.debug {"[FRC] Checking for MavenMetadata update from: $metadataURI"}
-        val mavenMetadataDocument = net.javaru.iip.frc.net.FrcHttpClient.fetchXmlResourceAsDocument(metadataURI)
-        parseMavenMetadata(mavenMetadataDocument)
+        // HttpRequests (rather than a plain HTTP client) is used so the IDE's proxy settings are honored. See Issue #69
+        val mavenMetadataXml = com.intellij.util.io.HttpRequests.request(metadataURI.toString()).readString()
+        parseMavenMetadata(mavenMetadataXml)
     }
     catch (e: Exception)
     {
         logger.warn("[FRC] Could not complete a check for maven metadata update from $metadataURI due to an exception: $e", e)
         null
     }
-}
-
-fun internalConvertXmlToJson(): String
-{
-    val json = parseMavenMetadata(xmlMetaDataForConversion)?.toJson(prettyPrinted = true) ?: "<WAS NULL>"
-    println(json)
-    return json
 }
 
 @Language("JSON")
@@ -377,174 +371,3 @@ val defaultMavenMetadataJson =
   "lastUpdated" : "20250101064932"
 }
         """.trimIndent()
-@Language("XML")
-private val xmlMetaDataForConversion =
-    """
-<metadata>
-    <groupId>edu.wpi.first.GradleRIO</groupId>
-    <artifactId>edu.wpi.first.GradleRIO.gradle.plugin</artifactId>
-    <version>2025.1.1</version>
-    <versioning>
-        <latest>2025.1.1</latest>
-        <release>2025.1.1</release>
-        <versions>
-            <version>2018.06.21</version>
-            <version>2019.0.0-alpha-1</version>
-            <version>2019.0.0-alpha-2</version>
-            <version>2019.0.0-alpha-3</version>
-            <version>2019.0.0-beta0-pre1</version>
-            <version>2019.0.0-beta0-pre3</version>
-            <version>2019.0.0-beta0-pre4</version>
-            <version>2019.0.0-beta0-pre5</version>
-            <version>2019.0.0-beta0-pre6</version>
-            <version>2019.1.1-beta-1</version>
-            <version>2019.1.1-beta-2a</version>
-            <version>2019.1.1-beta-3</version>
-            <version>2019.1.1-beta-3a</version>
-            <version>2019.1.1-beta-3-p-2</version>
-            <version>2019.1.1-beta-3-pre3</version>
-            <version>2019.1.1-beta-3-pre4</version>
-            <version>2019.1.1-beta-3-pre5</version>
-            <version>2019.1.1-beta-3-pre6</version>
-            <version>2019.1.1-beta-3-pre7</version>
-            <version>2019.1.1-beta-3-pre8</version>
-            <version>2019.1.1-beta-3-pre9</version>
-            <version>2019.1.1-beta-4</version>
-            <version>2019.1.1-beta-4a</version>
-            <version>2019.1.1-beta-4b</version>
-            <version>2019.1.1-beta-4c</version>
-            <version>2019.1.1-beta-4-pre1</version>
-            <version>2019.1.1-beta-4-pre2</version>
-            <version>2019.1.1-beta-4-pre4</version>
-            <version>2019.1.1-rc-1</version>
-            <version>2019.1.1</version>
-            <version>2019.2.1</version>
-            <version>2019.3.1</version>
-            <version>2019.3.2</version>
-            <version>2019.4.1</version>
-            <version>2020.1.1-beta-1</version>
-            <version>2020.1.1-beta-2</version>
-            <version>2020.1.1-beta-3</version>
-            <version>2020.1.1-beta-3a</version>
-            <version>2020.1.1-beta-4</version>
-            <version>2020.1.1-beta-5</version>
-            <version>2020.1.1</version>
-            <version>2020.1.2</version>
-            <version>2020.2.1</version>
-            <version>2020.2.2</version>
-            <version>2020.3.1</version>
-            <version>2020.3.2</version>
-            <version>2021.1.1-alpha-1</version>
-            <version>2021.1.1-beta-1</version>
-            <version>2021.1.1-beta-2</version>
-            <version>2021.1.1-beta-3</version>
-            <version>2021.1.1-beta-4</version>
-            <version>2021.1.1-beta-5</version>
-            <version>2021.1.2</version>
-            <version>2021.2.1</version>
-            <version>2021.2.2</version>
-            <version>2021.3.1</version>
-            <version>2022.0.0-alpha-2</version>
-            <version>2022.1.1-alpha-1</version>
-            <version>2022.1.1-alpha-2</version>
-            <version>2022.1.1-alpha-3</version>
-            <version>2022.1.1-beta-1</version>
-            <version>2022.1.1-beta-2</version>
-            <version>2022.1.1-beta-3</version>
-            <version>2022.1.1-beta-4</version>
-            <version>2022.1.1-rc-1</version>
-            <version>2022.1.1</version>
-            <version>2022.2.1</version>
-            <version>2022.3.1</version>
-            <version>2022.4.1</version>
-            <version>2023.0.0-alpha-1</version>
-            <version>2023.1.1-alpha-1</version>
-            <version>2023.1.1-beta-1</version>
-            <version>2023.1.1-beta-2</version>
-            <version>2023.1.1-beta-3</version>
-            <version>2023.1.1-beta-4</version>
-            <version>2023.1.1-beta-5</version>
-            <version>2023.1.1-beta-6</version>
-            <version>2023.1.1-beta-7</version>
-            <version>2023.1.1</version>
-            <version>2023.2.1</version>
-            <version>2023.3.1</version>
-            <version>2023.3.2</version>
-            <version>2023.4.1</version>
-            <version>2023.4.2</version>
-            <version>2023.4.3</version>
-            <version>2024.0.0-alpha-1</version>
-            <version>2024.1.1-beta-1</version>
-            <version>2024.1.1-beta-2</version>
-            <version>2024.1.1-beta-3</version>
-            <version>2024.1.1-beta-4</version>
-            <version>2024.1.1</version>
-            <version>2024.2.1</version>
-            <version>2024.3.1</version>
-            <version>2024.3.2</version>
-            <version>2025.0.0-alpha-2</version>
-            <version>2025.1.1-beta-1</version>
-            <version>2025.1.1-beta-2</version>
-            <version>2025.1.1-beta-3</version>
-            <version>2025.1.1</version>
-        </versions>
-        <lastUpdated>20250101064932</lastUpdated>
-    </versioning>
-</metadata>
-
-    """.trimIndent()
-
-/*
-<?xml version='1.0' encoding='US-ASCII'?>
-<metadata>
-    <groupId>edu.wpi.first.GradleRIO</groupId>
-    <artifactId>edu.wpi.first.GradleRIO.gradle.plugin</artifactId>
-    <version>2020.1.1-beta-3a</version>
-    <versioning>
-        <latest>2020.1.1-beta-3a</latest>
-        <release>2020.1.1-beta-3a</release>
-        <versions>
-            <version>2018.06.21</version>
-            <version>2019.0.0-alpha-1</version>
-            <version>2019.0.0-alpha-2</version>
-            <version>2019.0.0-alpha-3</version>
-            <version>2019.0.0-beta0-pre1</version>
-            <version>2019.0.0-beta0-pre3</version>
-            <version>2019.0.0-beta0-pre4</version>
-            <version>2019.0.0-beta0-pre5</version>
-            <version>2019.0.0-beta0-pre6</version>
-            <version>2019.1.1-beta-1</version>
-            <version>2019.1.1-beta-2a</version>
-            <version>2019.1.1-beta-3</version>
-            <version>2019.1.1-beta-3a</version>
-            <version>2019.1.1-beta-3-p-2</version>
-            <version>2019.1.1-beta-3-pre3</version>
-            <version>2019.1.1-beta-3-pre4</version>
-            <version>2019.1.1-beta-3-pre5</version>
-            <version>2019.1.1-beta-3-pre6</version>
-            <version>2019.1.1-beta-3-pre7</version>
-            <version>2019.1.1-beta-3-pre8</version>
-            <version>2019.1.1-beta-3-pre9</version>
-            <version>2019.1.1-beta-4</version>
-            <version>2019.1.1-beta-4a</version>
-            <version>2019.1.1-beta-4b</version>
-            <version>2019.1.1-beta-4c</version>
-            <version>2019.1.1-beta-4-pre1</version>
-            <version>2019.1.1-beta-4-pre2</version>
-            <version>2019.1.1-beta-4-pre4</version>
-            <version>2019.1.1-rc-1</version>
-            <version>2019.1.1</version>
-            <version>2019.2.1</version>
-            <version>2019.3.1</version>
-            <version>2019.3.2</version>
-            <version>2019.4.1</version>
-            <version>2020.1.1-beta-1</version>
-            <version>2020.1.1-beta-2</version>
-            <version>2020.1.1-beta-3</version>
-            <version>2020.1.1-beta-3a</version>
-        </versions>
-        <lastUpdated>20191123193733</lastUpdated>
-    </versioning>
-</metadata>
- */
-

@@ -36,9 +36,6 @@ enum class EOL(
     SYSTEM(System.lineSeparator())
 }
 
-@Deprecated("Use tryQuietly", ReplaceWith("tryQuietly(block)") /* We keep around for discovery purposes*/ )
-fun trySafely(throwProcessCanceledExceptions: Boolean = true,  block: () -> Unit ) = tryQuietly(throwProcessCanceledExceptions)  { block() }
-
 /**
  * Runs the block of code, catching and ignoring any exceptions, except for `ProcessCanceledException`s which are 
  * re-thrown by default since they should not be caught.
@@ -79,9 +76,6 @@ fun tryQuietlyIf(throwProcessCanceledExceptions: Boolean = true,  predicate: ()-
     try { if (predicate()) block() } catch (t: Throwable) { if (t is ProcessCanceledException && throwProcessCanceledExceptions) { throw t} }
     // @formatter:on
 }
-
-@Deprecated("Use letSafely", ReplaceWith("letSafely(block)") /* We keep around for discovery purposes*/ )
-inline fun <T, R> T?.trySafely(throwProcessCanceledExceptions: Boolean = true,  block: (T) -> R): R? = this.letSafely(throwProcessCanceledExceptions, block)
 
 /**
  * A safe implementation of the standard [let] scope function that only runs the block if the receiver is non-null, and 

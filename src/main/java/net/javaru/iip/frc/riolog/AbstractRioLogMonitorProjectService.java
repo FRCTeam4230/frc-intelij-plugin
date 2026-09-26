@@ -16,23 +16,17 @@
 
 package net.javaru.iip.frc.riolog;
 
-import java.util.Collection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.intellij.facet.FacetManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowId;
 import com.intellij.openapi.wm.ToolWindowManager;
 
-import net.javaru.iip.frc.facet.FrcFacet;
-import net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor;
 import net.javaru.iip.frc.settings.FrcApplicationSettings;
+import net.javaru.iip.frc.wpilib.WpiLibProjectDetectionKt;
 
 
 
@@ -44,11 +38,7 @@ public abstract class AbstractRioLogMonitorProjectService
 
     // TODO: This class needs a some refactoring/rework. 
     //       It's kind of grown into a mess as it was written when first starting 
-    //       out with less understanding of the IntelliJ IDEA plugin API. And the
-    //       idea of having an option to appear in the Run Tool Window as an option
-    //       isn't really adding much as a feature since in normal robot dev work
-    //       you are not doing much in the run window. _Maybe_ an option to have
-    //       it as a tab in the debug window might be cool... but a low priority
+    //       out with less understanding of the IntelliJ IDEA plugin API.
     //       Also, its not acting as a ProjectService but more an ApplicationService
     //       We need to fix that and have better cross project support in the event 
     //       multiple FRC projects are open
@@ -64,20 +54,11 @@ public abstract class AbstractRioLogMonitorProjectService
 
     public synchronized void update()
     {
-        final Module[] modules = ModuleManager.getInstance(myProject).getModules();
-
-        boolean needConsole = false;
-        for (Module module : modules)
-        {
-            if (moduleHasFrcFacet(module))
-            {
-                needConsole = true;
-                break;
-            }
-        }
+        // The console is always shown for a WPILib project. This includes projects detected by their file layout (a Gradle build file,
+        // '.wpilib' directory and 'vendordeps' directory) so it is shown as soon as the project is opened, before the Gradle import adds the FRC facet
+        final boolean needConsole = WpiLibProjectDetectionKt.isWpiLibProject(myProject);
 
         final FrcApplicationSettings frcSettings = FrcApplicationSettings.getInstance();
-        final boolean useRunWindow = false; // Hard coding to false pending its removal from the code.
         
         final int configuredPort = frcSettings.getRioLogUdpPort();
         final int currentPort = determineCurrentlyMonitoredPort();
@@ -89,7 +70,6 @@ public abstract class AbstractRioLogMonitorProjectService
         LOG.debug("[FRC]     Current thread:   " + currentThread.getId() + " :: " + currentThread.getName());
         LOG.debug("[FRC]     needConsole:      " + needConsole);
         LOG.debug("[FRC]     haveConsole:      " + haveConsole);
-        LOG.debug("[FRC]     useRunWindow:     " + useRunWindow);
         LOG.debug("[FRC]     configuredPort:   " + configuredPort);
         LOG.debug("[FRC]     currentPort:      " + currentPort);
         LOG.debug("[FRC]     portBounceNeeded: " + portBounceNeeded);
@@ -97,40 +77,20 @@ public abstract class AbstractRioLogMonitorProjectService
 
         if (needConsole && haveConsole && contentExecutor.getRioLogMonitorProcess() != null && contentExecutor.getRioLogMonitorProcess().isEnabled())
         {
-            // Case 1 - we have and need it, but we need to check if we have the right type (i.e. settings change)
-            LOG.debug("[FRC] Case 1: have console and need it. Checking if correct type & port. Project is: " + myProject.getName());
+            // Case 1 - we have and need it, but we need to check if it is listening on the right port (i.e. settings change)
+            LOG.debug("[FRC] Case 1: have console and need it. Checking if correct port. Project is: " + myProject.getName());
 
-            //do we have the right console?
-            if (useRunWindow && FrcRioLogToolWindowExecutor.FRC_RIO_LOG_TOOL_WINDOW_ID.equals(contentExecutor.getToolWindowId()))
+            if (portBounceNeeded)
             {
-                //We have a FRC Tool Window, but need a Run Window
-                LOG.debug("[FRC] Case 1.1: have a FRC Tool Window, but need a Run Tab. Closing FRC Tool Window and creating Run tab. Project is: "
+                LOG.debug("[FRC] Case 1.3A: have console, need it, and it is the right type, but port has changed. Triggering 'reRun' action. Project is: "
                           + myProject.getName());
-                closeContentExecutor();
-                initContentExecutor(true, false);
-            }
-            else if (!useRunWindow && ToolWindowId.RUN.equals(contentExecutor.getToolWindowId()))
-            {
-                //We have a run window, but need a FRC tool window
-                LOG.debug("[FRC] Case 1.2: have a Run tab, but need a FRC Tool Window. Closing Run tab and creating FRC Tool Window. Project is: "
-                          + myProject.getName());
-                closeContentExecutor();
-                initContentExecutor(false, false);
+                if (contentExecutor != null) {contentExecutor.reRun();}
             }
             else
             {
-                if (portBounceNeeded)
-                {
-                    LOG.debug("[FRC] Case 1.3A: have console, need it, and it is the right type, but port has changed. Triggering 'reRun' action. Project is: "
-                              + myProject.getName());
-                    if (contentExecutor != null) {contentExecutor.reRun();}
-                }
-                else
-                {
-                    LOG.debug("[FRC] Case 1.3B: have console, need it, and it is the right type, listening on the correct port. Just need to activate it. Project is: "
-                              + myProject.getName());
-                    activate();
-                }
+                LOG.debug("[FRC] Case 1.3B: have console, need it, and it is the right type, listening on the correct port. Just need to activate it. Project is: "
+                          + myProject.getName());
+                activate();
             }
         }
         else if (needConsole && haveConsole && contentExecutor.getRioLogMonitorProcess() != null && !contentExecutor.getRioLogMonitorProcess().isEnabled())
@@ -143,7 +103,7 @@ public abstract class AbstractRioLogMonitorProjectService
         {
             // Case 3 - we need it, but don't have it
             LOG.debug("[FRC] Case 3: need a console, but we don't have one. Creating one. Project is: " + myProject.getName());
-            initContentExecutor(useRunWindow, true);
+            initContentExecutor(true);
         }
         else if (haveConsole)
         {
@@ -230,12 +190,12 @@ public abstract class AbstractRioLogMonitorProjectService
     }
 
 
-    private void initContentExecutor(final boolean useRunWindow, final boolean isFreshActivation)
+    private void initContentExecutor(final boolean isFreshActivation)
     {
-        LOG.debug("[FRC] Creating AbstractRioLogContentExecutor: useRunWindow=" + useRunWindow +  " isFreshActivation=" + isFreshActivation);
+        LOG.debug("[FRC] Creating AbstractRioLogContentExecutor: isFreshActivation=" + isFreshActivation);
         try
         {
-            contentExecutor = createRioLogContentExecutor(useRunWindow);
+            contentExecutor = createRioLogContentExecutor();
             Disposer.register(myProject, contentExecutor);
             contentExecutor.run(isFreshActivation);
         }
@@ -252,30 +212,6 @@ public abstract class AbstractRioLogMonitorProjectService
 
 
     @NotNull
-    protected abstract AbstractRioLogContentExecutor createRioLogContentExecutor(boolean useRunWindow);
+    protected abstract AbstractRioLogContentExecutor createRioLogContentExecutor();
 
-
-    private boolean moduleHasFrcFacet(@NotNull Module module)
-    {
-        final FrcFacet frcFacet = checkForFrcFacet(module);
-        final boolean moduleHasFrcFacet = frcFacet != null;
-        LOG.debug("[FRC] The module " + module.getName() + " has FRC Facet: " + frcFacet);
-        return moduleHasFrcFacet;
-    }
-
-
-    @Nullable
-    private FrcFacet checkForFrcFacet(@NotNull Module module)
-    {
-        final FacetManager facetManager = FacetManager.getInstance(module);
-        final Collection<FrcFacet> facetsByType = facetManager.getFacetsByType(FrcFacet.Companion.getFACET_TYPE_ID());
-        if (facetsByType.isEmpty())
-        {
-            return null;
-        }
-        else
-        {
-            return facetsByType.iterator().next();
-        }
-    }
 }

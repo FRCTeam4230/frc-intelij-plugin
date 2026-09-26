@@ -49,7 +49,9 @@ import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.io.HttpRequests
-import net.javaru.iip.frc.facet.isFrcFacetedProject
+import com.intellij.util.messages.Topic
+import net.javaru.iip.frc.wpilib.findWpiLibProjectRootDirs
+import net.javaru.iip.frc.wpilib.isWpiLibProject
 import net.javaru.iip.frc.i18n.FrcBundle.message
 import net.javaru.iip.frc.i18n.FrcMessageKey
 import net.javaru.iip.frc.isUnitTestMode
@@ -163,20 +165,19 @@ fun PsiFile?.isVendordepsJsonFile(project: Project): Boolean = (this is JsonFile
 
 /**
  * Determines if the `VirtualFile` is a `vendordeps.json` file, returning false if the `VirtualFile` is null.
- * If a project is provided (i.e. not null), then the file must exist within the project's content, and it must be an FRC Faceted project.
+ * If a project is provided (i.e. not null), then the file must exist within the project's content, and it must be a WPILib project
+ * (i.e. an FRC Faceted project, or one with a WPILib project layout that has not yet been imported).
  */
 @Contract("null,_ -> false")
 fun VirtualFile?.isVendordepsJsonFile(project: Project?): Boolean
 {
     if (this == null) return false
-    val isWithinProject =
-        if (project == null)
-            true
-        else
-            project.isFrcFacetedProject() && ProjectFileIndex.getInstance(project).isInContent(this)
-    return isWithinProject &&
-        this.parent?.name == vendordepsDirName &&
-        this.name.endsWith(".json", ignoreCase = true)
+    // The cheap name checks are done first, since this is called for every VFS change event
+    if (this.parent?.name != vendordepsDirName || !this.name.endsWith(".json", ignoreCase = true)) return false
+    if (project == null) return true
+    if (!project.isWpiLibProject()) return false
+    // Before the Gradle import completes, the project may not have any modules, so the file will not yet be in the project's content
+    return ProjectFileIndex.getInstance(project).isInContent(this) || project.findWpiLibProjectRootDirs().any { it == this.parent?.parent }
 }
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
@@ -206,6 +207,11 @@ data class VendordepsProjectFilesListing(val vendordepsProjectFileList: List<Ven
 }
 
 
+fun interface VendordepsListingListener
+{
+    fun listingUpdated(listing: VendordepsProjectFilesListing)
+}
+
 class VendordepsService private constructor(val project: Project): Disposable
 {
     private val logger = logger<VendordepsService>()
@@ -234,9 +240,17 @@ class VendordepsService private constructor(val project: Project): Disposable
     {
         @JvmStatic
         fun getInstance(project: Project) = project.service<VendordepsService>()
+
+        /** Topic, on the project message bus, notified whenever the [vendordepsProjectFilesListing] is updated. */
+        @JvmField
+        val LISTING_UPDATED_TOPIC: Topic<VendordepsListingListener> = Topic.create("FRC Vendordeps Listing Updated", VendordepsListingListener::class.java)
     }
 
-   
+    private fun publishListingUpdated()
+    {
+        if (!project.isDisposed) project.messageBus.syncPublisher(LISTING_UPDATED_TOPIC).listingUpdated(vendordepsProjectFilesListing)
+    }
+
 
     /**
      * Runs, via a non-blocking read action in smart mode, a process to update and then
@@ -275,6 +289,7 @@ class VendordepsService private constructor(val project: Project): Disposable
     {
         if (isUnitTestMode()) {
             vendordepsProjectFilesListing = updateVendordepsListingWork()
+            publishListingUpdated()
             if (notifyOnDuplicates) { notifyAboutDuplicatesIfAny() }
         }
         else {
@@ -284,6 +299,7 @@ class VendordepsService private constructor(val project: Project): Disposable
                 .expireWith(this)
                 .finishOnUiThread(ModalityState.nonModal()) { result ->
                     vendordepsProjectFilesListing = result
+                    publishListingUpdated()
                     if (notifyOnDuplicates) { notifyAboutDuplicatesIfAny() }
                 }
                 // Common Executor examples are
@@ -410,7 +426,12 @@ class VendordepsService private constructor(val project: Project): Disposable
                     it.isDirectory
                 }
 
-            if (virtualFiles.isEmpty()) return null
+            // Before the Gradle import completes, the project may not have any content (and thus nothing is indexed), so we fall back
+            // to the vendordeps directory in the directory with a WPILib project layout
+            if (virtualFiles.isEmpty())
+            {
+                return project.findWpiLibProjectRootDirs().firstNotNullOfOrNull { it.findChild(vendordepsDirName) }?.findPsiDirectory(project)
+            }
 
             // 99% use case should be handled here
             if (virtualFiles.size == 1)
@@ -534,7 +555,7 @@ class VendordepsServicesStartupActivity : ProjectActivity
     private val logger = logger<VendordepsServicesStartupActivity>()
     override suspend fun execute(project: Project)
     {
-        if (project.isFrcFacetedProject())
+        if (project.isWpiLibProject())
         {
             logger.debug{ "[FRC] Scheduling Vendordeps Services Startup Activities for project: $project" }
             StartupManager.getInstance(project).runAfterOpened {

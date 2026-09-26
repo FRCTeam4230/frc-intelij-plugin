@@ -20,6 +20,7 @@ import com.intellij.diagnostic.IdeErrorsDialog
 import com.intellij.diagnostic.IdeaReportingEvent
 import com.intellij.diagnostic.LogMessage
 import com.intellij.ide.DataManager
+import com.intellij.ide.plugins.PluginUtil
 import com.intellij.idea.IdeaLogger
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.application.ApplicationInfo
@@ -201,8 +202,9 @@ object FrcErrorReportSubmitterSentryWorker
                             scope.setExtraSafely("submission.methodology", "User Dialog (i.e. ErrorReportSubmitter)")
                             // Set the last action ID as it might be useful for debugging
                             scope.setExtraSafely("last.action", lastActionId)
-                            scope.setExtraSafely("plugin.name", IdeErrorsDialog.getPlugin(ideaEvent)?.name)
-                            scope.setExtraSafely("plugin.id", IdeErrorsDialog.getPlugin(ideaEvent)?.pluginId?.idString)
+                            val pluginId = PluginUtil.getInstance().findPluginId(ideaEvent.throwable)
+                            scope.setExtraSafely("plugin.name", pluginId?.let { PluginUtil.getInstance().findPluginName(it) })
+                            scope.setExtraSafely("plugin.id", pluginId?.idString)
                             scope.setExtraSafely("event.type", "ErrorReportSubmitter")
                             val throwable: Throwable? = if (ideaEvent is IdeaReportingEvent)
                             {

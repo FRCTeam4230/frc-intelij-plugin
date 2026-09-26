@@ -51,8 +51,8 @@ public class UdpRioLogMonitorProjectService extends AbstractRioLogMonitorProject
 
 
     @NotNull
-    protected AbstractRioLogContentExecutor createRioLogContentExecutor(boolean useRunWindow)
+    protected AbstractRioLogContentExecutor createRioLogContentExecutor()
     {
-        return useRunWindow ? new UdpRioLogRunWindowContentExecutor(myProject, true) : new UdpRioLogFrcWindowContentExecutor(myProject, true);
+        return new UdpRioLogFrcWindowContentExecutor(myProject, true);
     }
 }

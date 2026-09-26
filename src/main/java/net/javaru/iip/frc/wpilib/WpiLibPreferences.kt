@@ -180,7 +180,7 @@ fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
                             val wpiLibDirScope = GlobalSearchScopesCore.directoryScope(wpiLibDirPsiDir, false)
                             val files = FilenameIndex.getVirtualFilesByName(wpiLibPreferencesFileName, true, wpiLibDirScope)
                             if (LOG.isTraceEnabled) files.forEach { LOG.trace { "[FRC] Found: ${it.path}" } }
-                            foundFiles.addAll(files.map { it.findPsiFile(project) })
+                            foundFiles.addAll(files.mapNotNull { it.findPsiFile(project) })
                         }
                     }
                 }

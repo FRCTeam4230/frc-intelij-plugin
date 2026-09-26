@@ -24,18 +24,18 @@ import java.nio.file.Path
 import java.util.*
 
 
-val frcPluginBaseVersion: String by project
-val ideaMajorVersion: String by project
-val ideaVersionPlain: String by project
-val ideaSinceBuild: String by project
-val ideaUntilBuild: String by project
-val frcPluginEapDesignator: String by project
+val frcPluginBaseVersion: String = project.property("frcPluginBaseVersion").toString()
+val ideaMajorVersion: String = project.property("ideaMajorVersion").toString()
+val ideaVersionPlain: String = project.property("ideaVersionPlain").toString()
+val ideaSinceBuild: String = project.property("ideaSinceBuild").toString()
+val ideaUntilBuild: String = project.property("ideaUntilBuild").toString()
+val frcPluginEapDesignator: String = project.property("frcPluginEapDesignator").toString()
 val frcPluginVersion = "$frcPluginBaseVersion-$ideaMajorVersion$frcPluginEapDesignator" // ex: v1.3.0-2019.2,  1.3.1-2020.1-eap.1
-val javaVersion: JavaVersion = JavaVersion.VERSION_17 // IJ v2022.2+ requires Java 17; IJ v2020.3+ requires Java 11
-val kotlinVersion by extra { project.getKotlinPluginVersion() }
+val javaVersion: JavaVersion = JavaVersion.VERSION_25 // IJ v2026.2+ requires Java 25; IJ v2024.2+ requires Java 21; IJ v2022.2+ requires Java 17; IJ v2020.3+ requires Java 11
+val kotlinVersion = project.getKotlinPluginVersion()
 val sandboxPath = determineSandboxDir()
 val tokenReplacements by lazy { loadTokenReplacements() }
-val isCiBuild = if (project.hasProperty("is.ci.build")) project.properties["is.ci.build"].toString().toBoolean() else false
+val isCiBuild = project.findProperty("is.ci.build")?.toString()?.toBoolean() ?: false
 val userHomeDir: Path by lazy { Path.of(System.getProperty("user.home")) }
 
 group = "net.javaru.iip.frc"
@@ -44,16 +44,15 @@ version = frcPluginVersion
 plugins {
     base
     java
-    // List of Kotlin versions bundled with the IDE by version: 
+    // List of Kotlin versions bundled with the IDE by version:
     // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#stdlib-miscellaneous
-    kotlin("jvm") version "1.9.21"
+    kotlin("jvm") version "2.4.0"
     // IntelliJ Platform Gradle Plugin: gradle plugin-for writing IntelliJ plugins
     //     Docs: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
     //           Last version of docs on GitHub before migration: https://github.com/JetBrains/gradle-intellij-plugin/blob/e819958cdc4e593738cd96e230edd5ca66481b3b/README.md
     //     Info: https://lp.jetbrains.com/gradle-intellij-plugin/
     //     Src:  https://github.com/JetBrains/gradle-intellij-plugin
-    id("org.jetbrains.intellij.platform") version "2.2.1"
-    id("org.jetbrains.intellij.platform.migration") version "2.2.1" // Honors v1.x settings in intellij {} block while migrating to intellijPlatform {} block
+    id("org.jetbrains.intellij.platform") version "2.19.0"
 
 
     // Extends the Gradle's "idea" DSL with specific settings: code style, facets, run configurations etc.
@@ -62,7 +61,7 @@ plugins {
     //    v0.10+ requires IDEA 2020.2+   v0.6.1+ requires IntelliJ IDEA 2019.2
     id("org.jetbrains.gradle.plugin.idea-ext") version "0.10"
     // https://docs.spring.io/dependency-management-plugin/docs/current/reference/html/
-    id("io.spring.dependency-management") version "1.1.0"
+    id("io.spring.dependency-management") version "1.1.7"
 }
 
 java {
@@ -122,7 +121,7 @@ tasks {
                     error(message)
                 }
                 
-                error("ErrorSubmitter DSN is not configured for build")
+                logger.warn("WARNING: ErrorSubmitter DSN is not configured for build. Error reports from this build will not be submitted.")
                 // TODO: Determine how to do this in the v2.x plugin
 //                logger.warn("WARNING: ErrorSubmitter DSN is not configured for build. Commenting out <errorHandler .../> entry in plugin.xml file.")
 //                val dir = ppxTask.destinationDir.get()
@@ -142,6 +141,17 @@ tasks {
 
     runIde {
         jvmArgs = listOf("-Xms512m", "-Xmx1g")
+        // The IDE's classpath is too long for the Windows command line, so Gradle falls back to a "pathing jar" whose manifest
+        // holds the Class-Path. The IDE's system class loader (com.intellij.util.lang.PathClassLoader) reads java.class.path
+        // directly and ignores manifest Class-Path entries, so the IDE fails with "ClassNotFoundException: com.intellij.idea.Main"
+        // (or for the coroutines debug agent). Passing the classpath via a Java @argfile avoids the pathing jar.
+        doFirst {
+            val cpArgFile = temporaryDir.resolve("classpath.argfile")
+            // Forward slashes, since backslashes are escape characters in quoted argfile values
+            cpArgFile.writeText("-cp \"" + classpath.files.joinToString(File.pathSeparator) { it.absolutePath.replace('\\', '/') } + "\"")
+            classpath = files()
+            jvmArgs("@${cpArgFile.absolutePath}")
+        }
         systemProperties = mapOf(
             //"key" to "value",
             //systemPropertyGetOrDefault("idea.log.config.file", resolvePath(project.rootDir.canonicalPath, ".sandbox", "log.xml")),
@@ -255,9 +265,9 @@ tasks {
 
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         all {
-            kotlinOptions {
-                jvmTarget = javaVersion.toString()
-                javaParameters = true
+            compilerOptions {
+                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(javaVersion.toString()))
+                javaParameters.set(true)
                 //noReflect = false
             }
         }
@@ -355,13 +365,14 @@ dependencyManagement {
 @Suppress("SpellCheckingInspection")
 dependencies {
     intellijPlatform {
-        intellijIdeaCommunity(ideaVersionPlain)
+        intellijIdea(ideaVersionPlain)
 
         bundledPlugin("com.intellij.java")
         bundledPlugin("com.intellij.gradle")
         bundledPlugin("org.intellij.groovy")
         bundledPlugin("org.jetbrains.kotlin")
         bundledPlugin("com.jetbrains.sh")
+        bundledPlugin("com.intellij.modules.json")
 
         pluginVerifier()
         zipSigner()
@@ -468,8 +479,7 @@ idea {
     }
 }
 
-// region == Utility functions 
-inline fun <reified T : Task> task(noinline configuration: T.() -> Unit) = tasks.creating(T::class, configuration)
+// region == Utility functions
 
 // allows for the standard task syntax after declaring something like:  val publishPlugin: PublishTask by tasks
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
@@ -518,7 +528,7 @@ fun resolvePathFromProjectRoot(vararg children: String): Path
 
 fun determineSandboxDir(): String
 {
-    val ideaVersion = project.properties["ideaVersion"]?.toString() ?: "UNKNOWN"
+    val ideaVersion = project.findProperty("ideaVersion")?.toString() ?: "UNKNOWN"
     val sandboxSuffix =
         when
         {

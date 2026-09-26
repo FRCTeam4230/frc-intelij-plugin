@@ -15,13 +15,9 @@
  */
 package net.javaru.iip.frc.util
 
-import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
-import org.apache.commons.lang3.StringUtils
 import java.net.URI
-import java.net.URISyntaxException
 import java.net.URL
-import java.nio.file.Paths
 
 private object UriUtils
 private val LOG = logger<UriUtils>()
@@ -126,51 +122,6 @@ fun java.net.URI.toIdeaUrl(): com.intellij.util.Url?
         null
     }
 }
-/**
- * Resolves a sibling URI, paying attention to whether a relative or absolute siblingResource is passed in.
- * For example given a `receiver` URI of `https://example.com/data/foo.txt`:
- * - Relative: `uri.resolveSiblingResource("images/chart.png")`  -->  https://example.com/data/images/chart.png
- * - Absolute: `uri.resolveSiblingResource("/images/chart.png")` -->  https://example.com/images/chart.png
- */
-@Deprecated("Use URI.resolve() instead", ReplaceWith("URI.resolve(siblingResource)"), level = DeprecationLevel.ERROR)
-@Throws(RuntimeException::class)
-fun URI.resolveSiblingResource(siblingResource: String): URI
-{
-    return try
-    {
-        LOG.debug {"    [FRC] uri =          $this"}
-        val pathString = path
-        val path = Paths.get(pathString)
-        LOG.debug {"    [FRC] path =         $path"}
-        LOG.debug {"    [FRC] host =         $host"}
-        //The File System wil "normalize" to the proper forward or back slash
-        val rootPath = Paths.get("/")
-        val siblingUri: URI
-        siblingUri = if (rootPath == path || StringUtils.isBlank(path.toString()))
-        {
-            URI(scheme,
-                host, "/$siblingResource",
-                null)
-        }
-        else
-        {
-            val sibling = path.resolveSibling(siblingResource)
-            URI(scheme,
-                host,
-                sibling.toString().replace('\\', '/'),
-                null)
-        }
-        LOG.debug {"    [FRC] siblingUri =   $siblingUri"}
-        siblingUri
-    }
-    catch (e: URISyntaxException)
-    {
-        val baseMsg = "Could not resolve sibling URI '$siblingResource' for URI '$this' due to the exception: $e."
-        LOG.warn("[FRC] $baseMsg")
-        throw RuntimeException(baseMsg, e)
-    }
-}
-
 
 
 fun extractResourceName(uri: URI): String?

@@ -28,6 +28,7 @@ import net.javaru.iip.frc.util.letSafely
 import net.javaru.iip.frc.util.tryIt
 import net.javaru.iip.frc.util.uri
 import net.javaru.iip.frc.util.urisList
+import net.javaru.iip.frc.wpilib.extractProjectYear
 import java.io.InputStream
 import java.io.Reader
 import java.io.StringReader
@@ -80,7 +81,8 @@ data class Vendordeps(
             catch (t: ClassCastException)
             {
                 // frcYear should be an int. But just in case a vendor enters it as a String, we want to handle it.
-                json.string("frcYear")?.toInt()
+                // Beta/alpha vendordeps use values such as "2026beta", so we extract just the year in such cases.
+                json.string("frcYear")?.let { it.trim().toIntOrNull() ?: extractProjectYear(it) }
             }
             val fileName = json.string("fileName")?.trim() ?: ""
             val jsonUrl = json.uri("jsonUrl")

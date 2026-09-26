@@ -268,7 +268,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
     override fun getModuleType(): ModuleType<*>? = StdModuleTypes.JAVA
     override fun getBuilderId(): String? = javaClass.name // This is critical since the default is to return the ModuleType's ID, which then results in the Java Wizard steps being used as our createWizardSteps() is never called.
 
-    override fun createProject(name: String?, path: String?): Project?
+    override fun createProject(name: String, path: String): Project?
     {
         ourLogger.trace {"[FRC] FrcModuleBuilder.createProject() called with name: $name and path: $path"}
         val project = super.createProject(name, path)

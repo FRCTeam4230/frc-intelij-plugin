@@ -203,10 +203,10 @@ enum class FrcWizard2019ProjectTemplateDefinition(
 
 
     override val description: String
-        @get:Language("HTML") get() = "<html>$_description</html>"
+        @Language("HTML") get() = "<html>$_description</html>"
 
     override val displayNameAndDescription: String
-        @get:Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
+        @Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
@@ -249,10 +249,10 @@ enum class FrcWizard2019ExampleTemplateDefinition(
 
 
     override val description: String
-        @get:Language("HTML") get() = "<html>$_description</html>"
+        @Language("HTML") get() = "<html>$_description</html>"
 
     override val displayNameAndDescription: String
-        @get:Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
+        @Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
@@ -304,10 +304,10 @@ enum class FrcWizard2020ProjectTemplateDefinition(
 
 
     override val description: String
-        @get:Language("HTML") get() = "<html>$_description</html>"
+        @Language("HTML") get() = "<html>$_description</html>"
 
     override val displayNameAndDescription: String
-        @get:Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
+        @Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
@@ -377,10 +377,10 @@ enum class FrcWizard2020ExampleTemplateDefinition(
 
 
     override val description: String
-        @get:Language("HTML") get() = "<html>$_description</html>"
+        @Language("HTML") get() = "<html>$_description</html>"
 
     override val displayNameAndDescription: String
-        @get:Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
+        @Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
@@ -453,10 +453,10 @@ enum class FrcWizard2021ProjectTemplateDefinition(
 
 
     override val description: String
-        @get:Language("HTML") get() = "<html>$_description</html>"
+        @Language("HTML") get() = "<html>$_description</html>"
 
     override val displayNameAndDescription: String
-        @get:Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
+        @Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
@@ -575,10 +575,10 @@ enum class FrcWizard2021ExampleTemplateDefinition(
 
 
     override val description: String
-        @get:Language("HTML") get() = "<html>$_description</html>"
+        @Language("HTML") get() = "<html>$_description</html>"
 
     override val displayNameAndDescription: String
-        @get:Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
+        @Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
@@ -668,10 +668,10 @@ enum class FrcWizard2022ProjectTemplateDefinition(
 
 
     override val description: String
-        @get:Language("HTML") get() = "<html>$_description</html>"
+        @Language("HTML") get() = "<html>$_description</html>"
 
     override val displayNameAndDescription: String
-        @get:Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
+        @Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
@@ -785,10 +785,10 @@ enum class FrcWizard2022ExampleTemplateDefinition(
 
 
     override val description: String
-        @get:Language("HTML") get() = "<html>$_description</html>"
+        @Language("HTML") get() = "<html>$_description</html>"
 
     override val displayNameAndDescription: String
-        @get:Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
+        @Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
@@ -887,10 +887,10 @@ enum class FrcWizard2023ProjectTemplateDefinition(
 
 
     override val description: String
-        @get:Language("HTML") get() = "<html>$_description</html>"
+        @Language("HTML") get() = "<html>$_description</html>"
 
     override val displayNameAndDescription: String
-        @get:Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
+        @Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
@@ -1010,10 +1010,10 @@ enum class FrcWizard2023ExampleTemplateDefinition(
 
 
     override val description: String
-        @get:Language("HTML") get() = "<html>$_description</html>"
+        @Language("HTML") get() = "<html>$_description</html>"
 
     override val displayNameAndDescription: String
-        @get:Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
+        @Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
@@ -1151,10 +1151,10 @@ enum class FrcWizard2024ProjectTemplateDefinition(
 
 
     override val description: String
-        @get:Language("HTML") get() = "<html>$_description</html>"
+        @Language("HTML") get() = "<html>$_description</html>"
 
     override val displayNameAndDescription: String
-        @get:Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
+        @Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
@@ -1283,10 +1283,10 @@ enum class FrcWizard2024ExampleTemplateDefinition(
 
 
     override val description: String
-        @get:Language("HTML") get() = "<html>$_description</html>"
+        @Language("HTML") get() = "<html>$_description</html>"
 
     override val displayNameAndDescription: String
-        @get:Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
+        @Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 
@@ -1424,10 +1424,10 @@ enum class FrcWizard2025ProjectTemplateDefinition(
 
 
     override val description: String
-        @get:Language("HTML") get() = "<html>$_description</html>"
+        @Language("HTML") get() = "<html>$_description</html>"
 
     override val displayNameAndDescription: String
-        @get:Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
+        @Language("HTML") get() = "<html><strong>$displayName</strong> : ${_description}${createDeprecationNotice(this)}</html>"
 
     override fun toString(): String = "${displayName}${if (this.isDeprecated) " (Deprecated)" else ""}"
 

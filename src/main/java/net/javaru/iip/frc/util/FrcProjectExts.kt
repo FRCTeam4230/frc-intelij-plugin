@@ -211,21 +211,6 @@ fun Project.runBackgroundTask(
                                       })
 }
 
-@Deprecated(message = "Use runBackgroundTask instead. If background is 'true', use PerformInBackgroundOption.ALWAYS_BACKGROUND, if 'false' use PerformInBackgroundOption.DEAF",
-            replaceWith = ReplaceWith("Project.runBackgroundTask(name, indeterminate, cancellable, (if (background) PerformInBackgroundOption.ALWAYS_BACKGROUND else PerformInBackgroundOption.DEAF), callback)"),
-            level = DeprecationLevel.WARNING)
-fun Project.backgroundTask(
-    name: String,
-    indeterminate: Boolean = true,
-    cancellable: Boolean = false,
-    background: Boolean = false,
-    callback: (indicator: ProgressIndicator) -> Unit
-                          )
-{
-    val backgroundOption = if (background) PerformInBackgroundOption.ALWAYS_BACKGROUND else PerformInBackgroundOption.DEAF
-    this.runBackgroundTask(name, indeterminate, cancellable, backgroundOption, action = callback)
-}
-
 fun Project?.runSafely(correlationId: String, debuggingData: Map<String, Any?>? = null, action: () -> Unit)
 {
     try

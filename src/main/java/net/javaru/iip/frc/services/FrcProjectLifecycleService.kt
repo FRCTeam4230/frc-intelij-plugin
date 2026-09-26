@@ -22,8 +22,6 @@ import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetManagerListener
 import com.intellij.ide.util.RunOnceUtil
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.ReadAction
-import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
@@ -36,7 +34,6 @@ import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.roots.ModuleRootListener
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.util.messages.MessageBusConnection
 import net.javaru.iip.frc.facet.isFrcFacet
 import net.javaru.iip.frc.facet.isFrcFacetedModule
@@ -46,8 +43,9 @@ import net.javaru.iip.frc.notify.FrcNotifyType
 import net.javaru.iip.frc.notify.notifyToConfigureTeamNumIfNecessary
 import net.javaru.iip.frc.riolog.RioLogProjectService
 import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService
-import net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor
 import net.javaru.iip.frc.settings.FrcProjectTeamNumberService
+import net.javaru.iip.frc.toolWindow.VendordepsToolWindowFactory
+import net.javaru.iip.frc.wpilib.isWpiLibProject
 import javax.annotation.CheckForNull
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
@@ -83,38 +81,15 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
     internal fun runFrcProjectStartupActivities(project: Project)
     {
         // Projects should be fully initialized at this point (per JavaDoc in StartupActivity)
+        // The RioLog is always shown for WPILib projects, including those detected by their file layout before the Gradle import adds the FRC facet
+        if (project.isOpen && !project.isDisposed && project.isWpiLibProject())
+        {
+            RioLogProjectService.getInstance(project).update()
+        }
+
         if (project.isOpen && project.isFrcFacetedProject() && !project.isDisposed)
         {
             // FYI: The FrcPluginVersionManagerStartupActivity also does some notification work
-
-            //RioLogProjectService.getInstance(project).activateTcp()
-            RioLogProjectService.getInstance(project).update()
-
-            // TODO Move into the RioLogProjectService so the update method takes a setting if we should open or not
-            val includeDesktopSupport = ReadAction.compute<Boolean, Throwable> {
-                FrcGradleService.getInstance(project).isIncludeDesktopSupport() ?: false
-            }
-            logger.info("[FRC] includeDesktopSupport for project '$project' is: $includeDesktopSupport ")
-            if (includeDesktopSupport)
-            {
-                invokeLater {
-                    // Issue #114 - AlreadyDisposedException was happening when then runnable was invoked.
-                    if (project.isOpen && !project.isDisposed) {
-                        try
-                        {
-                            val toolWindow = ToolWindowManager.getInstance(project).getToolWindow(FrcRioLogToolWindowExecutor.FRC_RIO_LOG_TOOL_WINDOW_ID)
-                            if (toolWindow != null && !toolWindow.isDisposed)
-                            {
-                                toolWindow.hide()
-                            }
-                        }
-                        catch (e: com.intellij.serviceContainer.AlreadyDisposedException)
-                        {
-                            logger.warn("[FRC] Cannot access FRC Tool Window as it is already disposed: $e", e)
-                        }
-                    }
-                }
-            }
 
             // initialize the registering of the VFS Change Listener so we can detect changes to the project team number
             FrcProjectTeamNumberService.getInstance(project)
@@ -177,6 +152,7 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
         {
             val theProject = facet.module.project
             RioLogProjectService.getInstance(theProject).update()
+            VendordepsToolWindowFactory.updateAvailability(theProject)
             checkProjectFrcStatus(theProject, knownFacetedProject = true, checkTeamNumConfigStatus = true)
         }
     }

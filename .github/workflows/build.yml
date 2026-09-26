@@ -1,0 +1,52 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # IntelliJ IDEA 2026.2+ requires Java 25. This also satisfies the Gradle daemon JVM criteria
+      # (gradle/gradle-daemon-jvm.properties) and the Adoptium toolchain configured in build.gradle.kts
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 25
+
+      # Caches the Gradle dependencies, including the (large) IntelliJ Platform download
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      # 'is.ci.build' allows building without the (secret) build token replacements, e.g. the Sentry DSNs.
+      # 'buildSearchableOptions' is skipped as it launches the IDE and is only needed for release builds.
+      - name: Build plugin
+        run: ./gradlew -Pis.ci.build=true -x buildSearchableOptions buildPlugin
+
+      - name: Run tests
+        run: ./gradlew -Pis.ci.build=true -x buildSearchableOptions check
+
+      - name: Upload plugin
+        uses: actions/upload-artifact@v7
+        with:
+          name: frc-plugin
+          path: build/distributions/*.zip
+          if-no-files-found: error
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports
+          path: build/reports/tests/

@@ -23,7 +23,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.LangDataKeys
 import com.intellij.openapi.project.Project
-import net.javaru.iip.frc.facet.isFrcFacetedProject
+import net.javaru.iip.frc.wpilib.isWpiLibProject
 import net.javaru.iip.frc.util.isKotlinFacetedModule
 
 
@@ -35,7 +35,7 @@ abstract class AbstractFrcActionGroup : DefaultActionGroup()
         e.presentation.isVisible =
             project != null &&
                 !project.isDisposed &&
-                project.isFrcFacetedProject() &&
+                project.isWpiLibProject() &&
                 additionalVisibilityCriteria(project, e)
     }
 

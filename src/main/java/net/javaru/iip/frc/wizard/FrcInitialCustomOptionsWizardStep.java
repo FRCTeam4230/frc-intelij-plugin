@@ -16,6 +16,7 @@
 
 package net.javaru.iip.frc.wizard;
 
+import com.intellij.openapi.application.ApplicationManager;
 import java.awt.*;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -176,13 +177,21 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
         //  c) have a UI option to show/hide betas (off by default)
         // ✔d) make modifications so that the FrcProjectWizardData.wpilibVersion defaults to the latest and then that the selected item (below) matches
     
-        SwingUtilities.invokeLater(() -> {
+        // Checking for newer versions is a network call, which must not be done on the EDT, so it is done on a pooled thread
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final Duration maxAge = calcMaxAgeDurationToUse();
+            final List<WpiLibVersion> versionList = GradleRioMavenMetadataState.getInstance(maxAge).getWpiLibMavenMetadata().getWpiLibVersionsDescending();
+            SwingUtilities.invokeLater(() -> initWpiLibVersionComboBox(versionList));
+        });
+    }
+
+    private void initWpiLibVersionComboBox(final List<WpiLibVersion> versionList)
+    {
         // IMPORTANT: No PSI or VirtualFile work should be done inside the SwingUtilities.invokeLater block. It MUST be limited to UI work
         //            ApplicationManager.getApplication().invokeLater does not work here as it apparently waits until the wizard dialog is closed
         //            See the ModalityState class documentation for more information about using SwingUtilities.invokeLater
+        {
             LOG.debug("[FRC] initWpiLibVersionComboBox invokeLater block is running");
-            final Duration maxAge = calcMaxAgeDurationToUse();
-            final List<WpiLibVersion> versionList = GradleRioMavenMetadataState.getInstance(maxAge).getWpiLibMavenMetadata().getWpiLibVersionsDescending();
             // Filter the list to include only releases, and the latest one if it is a release candidate or beta (for an unreleased version)
             final List<WpiLibVersion> filteredList = WpiLibVersionFiltersKt.filterToDefaultListing(versionList);
             final WpiLibVersion[] versions = filteredList.toArray(new WpiLibVersion[0]);
@@ -204,7 +213,7 @@ public class FrcInitialCustomOptionsWizardStep extends ModuleWizardStep implemen
                 updateInvalidSdkLabel();
             });
             LOG.debug("[FRC] initWpiLibVersionComboBox invokeLater block has completed");
-        });
+        }
     }
     
     private void initCardPanel()

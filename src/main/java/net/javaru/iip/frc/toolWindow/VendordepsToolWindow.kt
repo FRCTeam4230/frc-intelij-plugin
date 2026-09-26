@@ -54,6 +54,9 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.ui.PopupHandler
+import com.intellij.json.JsonFileType
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.TitledSeparator
 import java.awt.FlowLayout
 import javax.swing.JButton
@@ -77,6 +80,7 @@ import net.javaru.iip.frc.wpilib.vendordeps.VendordepsProjectFile
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsProjectFilesListing
 import net.javaru.iip.frc.wpilib.vendordeps.VendordepsService
 import net.javaru.iip.frc.wpilib.vendordeps.compareVersionText
+import net.javaru.iip.frc.wpilib.vendordeps.hasCommandsVersionConflict
 import net.javaru.iip.frc.wpilib.vendordeps.vendordepsDirName
 import java.awt.BorderLayout
 import java.awt.Component
@@ -149,6 +153,9 @@ class VendordepsToolWindowPanel(private val project: Project) : SimpleToolWindow
     private val listModel = DefaultListModel<VendordepsRow>()
     private val list = JBList(listModel)
     private val headerLabel = JBLabel()
+    private val commandsConflictLabel = JBLabel(
+        "<html>Commands v2 and Commands v3 are both installed. Remove one of them; the build will fail until you do.</html>",
+        AllIcons.General.Warning, JBLabel.LEFT)
     private val installButton = JButton("Install", AllIcons.Actions.Download)
     private val updateButton = JButton("Update", AllIcons.Actions.Refresh)
     private val removeButton = JButton("Remove", AllIcons.General.Remove)
@@ -184,7 +191,7 @@ class VendordepsToolWindowPanel(private val project: Project) : SimpleToolWindow
                                   override fun mouseClicked(e: MouseEvent)
                                   {
                                       if (e.clickCount == 2 && SwingUtilities.isLeftMouseButton(e))
-                                          selectedRow()?.let { if (it.library != null && (!it.isInstalled || it.isUpdateAvailable)) installOrUpdate(it) }
+                                          selectedRow()?.let { openVendordepsJson(it) }
                                   }
 
                                   override fun mousePressed(e: MouseEvent)
@@ -206,8 +213,14 @@ class VendordepsToolWindowPanel(private val project: Project) : SimpleToolWindow
 
         headerLabel.border = JBUI.Borders.empty(4, 6)
         headerLabel.foreground = UIUtil.getContextHelpForeground()
+        commandsConflictLabel.border = JBUI.Borders.empty(2, 6, 4, 6)
+        commandsConflictLabel.foreground = JBColor.RED
+        commandsConflictLabel.isVisible = false
+        val headerPanel = JPanel(BorderLayout())
+        headerPanel.add(headerLabel, BorderLayout.NORTH)
+        headerPanel.add(commandsConflictLabel, BorderLayout.CENTER)
         val contentPanel = JPanel(BorderLayout())
-        contentPanel.add(headerLabel, BorderLayout.NORTH)
+        contentPanel.add(headerPanel, BorderLayout.NORTH)
         contentPanel.add(ScrollPaneFactory.createScrollPane(list, true), BorderLayout.CENTER)
         contentPanel.add(createButtonsPanel(), BorderLayout.SOUTH)
         setContent(contentPanel)
@@ -353,6 +366,7 @@ class VendordepsToolWindowPanel(private val project: Project) : SimpleToolWindow
     /** Rebuilds the rows by combining the repo libraries with the vendordeps currently installed in the project. Must be called on the EDT. */
     private fun rebuildRows(listing: VendordepsProjectFilesListing)
     {
+        commandsConflictLabel.isVisible = listing.hasCommandsVersionConflict()
         val selectedName = selectedRow()?.name
         val installedByUuid = listing.vendordepsProjectFileMap
         val libraries = repoLibraries ?: emptyList()
@@ -451,6 +465,32 @@ class VendordepsToolWindowPanel(private val project: Project) : SimpleToolWindow
                     VfsUtil.saveText(file, vendordepsDownload.content)
                 }
             }
+        }
+    }
+
+    /**
+     * Opens the vendordeps JSON for the row in an editor: the installed file for an installed library, otherwise
+     * a read-only preview of the latest version's JSON from the vendor repository.
+     */
+    private fun openVendordepsJson(row: VendordepsRow)
+    {
+        val installedFile = row.installed.maxWithOrNull { a, b -> compareVersionText(a.vendordeps.version.asText, b.vendordeps.version.asText) }?.virtualFile
+        if (installedFile != null && installedFile.isValid)
+        {
+            FileEditorManager.getInstance(project).openFile(installedFile, true)
+            return
+        }
+        val library = row.library ?: return
+        project.runBackgroundTask("Downloading ${library.name} vendordeps JSON", cancellable = true) { indicator ->
+            VendorJsonRepoService.getInstance().downloadVendordeps(library.downloadUrl, indicator)
+                .onSuccess { download ->
+                    invokeLater {
+                        val previewFile = LightVirtualFile(download.fileName, JsonFileType.INSTANCE, download.content)
+                        previewFile.isWritable = false
+                        FileEditorManager.getInstance(project).openFile(previewFile, true)
+                    }
+                }
+                .onFailure { e -> invokeLater { Messages.showErrorDialog(project, "Could not download ${library.name}: ${e.message}", "Vendordeps") } }
         }
     }
 

@@ -180,6 +180,15 @@ fun VirtualFile?.isVendordepsJsonFile(project: Project?): Boolean
     return ProjectFileIndex.getInstance(project).isInContent(this) || project.findWpiLibProjectRootDirs().any { it == this.parent?.parent }
 }
 
+/** The UUID of WPILib's Commands v2 vendordeps (`CommandsV2.json`, formerly `WPILibNewCommands.json`). */
+val commandsV2Uuid: UUID = UUID.fromString("111e20f7-815e-48f8-9dd6-e675ce75b266")
+/** The UUID of WPILib's Commands v3 vendordeps (`CommandsV3.json`). */
+val commandsV3Uuid: UUID = UUID.fromString("4decdc05-a056-46cf-9561-39449bbb0130")
+
+/** If both the Commands v2 and Commands v3 vendordeps are installed, which GradleRIO does not allow. */
+fun VendordepsProjectFilesListing.hasCommandsVersionConflict(): Boolean =
+    vendordepsProjectFileMap.containsKey(commandsV2Uuid) && vendordepsProjectFileMap.containsKey(commandsV3Uuid)
+
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 data class VendordepsProjectFilesListing(val vendordepsProjectFileList: List<VendordepsProjectFile>,
                                     val vendordepsProjectFileMap: Map<UUID, List<VendordepsProjectFile>>,
@@ -249,6 +258,39 @@ class VendordepsService private constructor(val project: Project): Disposable
     private fun publishListingUpdated()
     {
         if (!project.isDisposed) project.messageBus.syncPublisher(LISTING_UPDATED_TOPIC).listingUpdated(vendordepsProjectFilesListing)
+        notifyAboutCommandsVersionConflictIfAny()
+    }
+
+    /** If the last check found both Commands v2 and v3 installed, so the user is only notified when the conflict first occurs. */
+    private var hadCommandsVersionConflict = false
+
+    /**
+     * Warns the user if both the Commands v2 and Commands v3 vendordeps are installed, as GradleRIO fails the build
+     * ("Users can not have both Commands v2 and Commands v3 vendordeps in their robot program").
+     */
+    private fun notifyAboutCommandsVersionConflictIfAny()
+    {
+        val listing = vendordepsProjectFilesListing
+        val hasConflict = listing.hasCommandsVersionConflict()
+        if (hasConflict && !hadCommandsVersionConflict && !project.isDisposed)
+        {
+            fun removeAction(uuid: UUID): (com.intellij.openapi.actionSystem.AnActionEvent) -> Unit = {
+                val files = listing.vendordepsProjectFileMap[uuid] ?: emptyList()
+                com.intellij.openapi.command.WriteCommandAction.writeCommandAction(project).withName("Remove Vendordeps").run<Exception> {
+                    files.filter { it.virtualFile.isValid }.forEach { it.virtualFile.delete(this) }
+                }
+            }
+            FrcNotifyType.ACTIONABLE_WARN.builder()
+                .withContent("Both the Commands v2 and Commands v3 vendor libraries are installed. The robot program can only use one of them, " +
+                                 "and the Gradle build will fail until one is removed.")
+                .withFrcPrefixedTitle("Conflicting Commands Libraries")
+                .withNoSubTitle()
+                .withActionBasic("Remove Commands v2", expiring = true, action = removeAction(commandsV2Uuid))
+                .withActionBasic("Remove Commands v3", expiring = true, action = removeAction(commandsV3Uuid))
+                .noMoreActions()
+                .notify(project)
+        }
+        hadCommandsVersionConflict = hasConflict
     }
 
 

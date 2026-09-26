@@ -31,7 +31,9 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.ModuleListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.roots.ModuleRootEvent
 import com.intellij.openapi.roots.ModuleRootListener
+import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.messages.MessageBusConnection
@@ -42,10 +44,19 @@ import net.javaru.iip.frc.notify.FrcNotificationsTracker
 import net.javaru.iip.frc.notify.FrcNotifyType
 import net.javaru.iip.frc.notify.notifyToConfigureTeamNumIfNecessary
 import net.javaru.iip.frc.riolog.RioLogProjectService
+import net.javaru.iip.frc.run.ensureRunDebugConfigurationsCreated
+import net.javaru.iip.frc.run.ensureWpiLibSimulationRunConfigurations
 import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService
 import net.javaru.iip.frc.settings.FrcProjectTeamNumberService
 import net.javaru.iip.frc.toolWindow.VendordepsToolWindowFactory
 import net.javaru.iip.frc.wpilib.isWpiLibProject
+import net.javaru.iip.frc.wpilib.isWpiLibProjectLayoutPath
+import net.javaru.iip.frc.wpilib.syncFrcFacetWithWpiLibDetection
+import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataImportListener
+import net.javaru.iip.frc.util.getMainModule
+import com.intellij.openapi.vfs.newvfs.BulkFileListener
+import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import javax.annotation.CheckForNull
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
@@ -74,6 +85,39 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
         connection.subscribe(ProjectTopics.MODULES, this)
         connection.subscribe(ProjectTopics.PROJECT_ROOTS, this)
         connection.subscribe(FacetManager.FACETS_TOPIC, this)
+        // A project's WPILib status is determined solely by its '.wpilib/wpilib_preferences.json' file, so react to that file being created or deleted
+        // The FRC facet is added once the Gradle import completes, since the import replaces the modules
+        connection.subscribe(ProjectDataImportListener.TOPIC, object : ProjectDataImportListener
+        {
+            override fun onImportFinished(projectPath: String?)
+            {
+                invokeLater { onWpiLibProjectStatusMaybeChanged() }
+            }
+        })
+        connection.subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener
+        {
+            override fun after(events: List<VFileEvent>)
+            {
+                if (events.any { isWpiLibProjectLayoutPath(it.path) }) invokeLater { onWpiLibProjectStatusMaybeChanged() }
+            }
+        })
+    }
+
+    /**
+     * Updates everything that depends on whether the project is a WPILib project: the FRC facet, the RioLog console, the
+     * Vendordeps tool window, and the run configurations. Must be called on the EDT.
+     */
+    private fun onWpiLibProjectStatusMaybeChanged()
+    {
+        if (!project.isOpen || project.isDisposed) return
+        project.syncFrcFacetWithWpiLibDetection()
+        RioLogProjectService.getInstance(project).update()
+        VendordepsToolWindowFactory.updateAvailability(project)
+        if (project.isWpiLibProject())
+        {
+            ensureRunDebugConfigurationsCreated(project)
+            ensureWpiLibSimulationRunConfigurations(project)
+        }
     }
 
 
@@ -82,9 +126,13 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
     {
         // Projects should be fully initialized at this point (per JavaDoc in StartupActivity)
         // The RioLog is always shown for WPILib projects, including those detected by their file layout before the Gradle import adds the FRC facet
+        // For a project that has already been imported (otherwise the facet is added when the Gradle import completes)
+        invokeLater { if (project.isOpen && !project.isDisposed && project.getMainModule() != null) project.syncFrcFacetWithWpiLibDetection() }
         if (project.isOpen && !project.isDisposed && project.isWpiLibProject())
         {
             RioLogProjectService.getInstance(project).update()
+            ensureRunDebugConfigurationsCreated(project)
+            ensureWpiLibSimulationRunConfigurations(project)
         }
 
         if (project.isOpen && project.isFrcFacetedProject() && !project.isDisposed)
@@ -107,6 +155,24 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
         logger.trace {"[FRC] FrcProjectLifecycleService.dispose() called for project '$project'"}
         FrcNotificationsTracker.clearAllForProject(project)
         service<RioLogUdpSocketManagerApplicationService>().deregister(project)
+    }
+
+    /**
+     * Once a WPILib project's modules exist (e.g. after the Gradle import), creates the simulation run configurations if needed.
+     * This is not tied to the FRC facet, which may not be added for some projects (e.g. 2027 projects).
+     */
+    override fun rootsChanged(event: ModuleRootEvent)
+    {
+        invokeLater {
+            if (project.isOpen && !project.isDisposed)
+            {
+                if (project.isWpiLibProject())
+                {
+                    ensureRunDebugConfigurationsCreated(project)
+                    ensureWpiLibSimulationRunConfigurations(project)
+                }
+            }
+        }
     }
 
     override fun modulesAdded(project: Project, modules: MutableList<out Module>)

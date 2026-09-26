@@ -20,7 +20,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.project.Project
-import net.javaru.iip.frc.facet.isFrcFacetedProject
+import net.javaru.iip.frc.wpilib.isWpiLibProject
 import javax.swing.Icon
 
 abstract class AbstractFrcToolsAction : AnAction
@@ -39,7 +39,7 @@ abstract class AbstractFrcToolsAction : AnAction
     override fun update(e: AnActionEvent)
     {
         val project = e.getData(CommonDataKeys.PROJECT)
-        e.presentation.isVisible = project != null && !project.isDisposed && project.isFrcFacetedProject() && additionalIsVisibleChecks(project, e)
+        e.presentation.isVisible = project != null && !project.isDisposed && project.isWpiLibProject() && additionalIsVisibleChecks(project, e)
     }
 
     /**

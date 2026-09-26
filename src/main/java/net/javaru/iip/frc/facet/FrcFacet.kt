@@ -37,6 +37,8 @@ import com.intellij.openapi.roots.ProjectModelExternalSource
 import com.intellij.openapi.util.ThrowableComputable
 import io.sentry.Attachment
 import net.javaru.iip.frc.facet.FrcFacet.Companion.FACET_TYPE_ID
+import net.javaru.iip.frc.wpilib.isWpiLibModule
+import net.javaru.iip.frc.wpilib.isWpiLibProject
 import net.javaru.iip.frc.services.FrcErrorReportSubmitterSentryWorker
 import net.javaru.iip.frc.services.ReportableEvent
 import net.javaru.iip.frc.wpilib.gradlePluginRepo.logger
@@ -244,35 +246,22 @@ fun Project?.getAllFrcFacetsForProject(): ImmutableList<FrcFacet>
 fun Project?.getFrcFacetedModules(): List<Module>
 {
     return if (this == null) emptyList()
-    else ModuleManager.getInstance(this).modules.filter { it.isFrcFacetedModule() }
+    else ModuleManager.getInstance(this).modules.filter { !it.isDisposed && FacetManager.getInstance(it).getFacetByType(FACET_TYPE_ID) != null }
 }
 
 fun Facet<*>?.isFrcFacet(): Boolean = this is FrcFacet
 
 @Contract("null -> false")
-fun Module?.isFrcFacetedModule(): Boolean
-{
-    if (this == null || this.isDisposed)
-    {
-        return false
-    }
-    val frcFacet = FacetManager.getInstance(this).getFacetByType(FACET_TYPE_ID)
-    return frcFacet != null
-}
+/**
+ * Determines if the module is part of an FRC (i.e. WPILib) project. Detection is based solely on the presence of the
+ * `.wpilib/wpilib_preferences.json` file (see [isWpiLibModule]), not on whether the FRC facet has been added to the module.
+ */
+fun Module?.isFrcFacetedModule(): Boolean = this.isWpiLibModule()
 
+/**
+ * Determines if the project is an FRC (i.e. WPILib) project. Detection is based solely on the presence of the
+ * `.wpilib/wpilib_preferences.json` file (see [isWpiLibProject]), so this is accurate as soon as the project is opened,
+ * before the Gradle import has created the modules and the FRC facet has been added.
+ */
 @Contract("null -> false")
-fun Project?.isFrcFacetedProject(): Boolean
-{
-    if (this != null && !this.isDisposed)
-    {
-        val modules = ModuleManager.getInstance(this).modules
-        for (module in modules)
-        {
-            if (module.isFrcFacetedModule())
-            {
-                return true
-            }
-        }
-    }
-    return false
-}
+fun Project?.isFrcFacetedProject(): Boolean = this.isWpiLibProject()

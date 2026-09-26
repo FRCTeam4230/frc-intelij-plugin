@@ -18,6 +18,7 @@ package net.javaru.iip.frc.run
 
 import com.intellij.configurationStore.MODERN_NAME_CONVERTER
 import com.intellij.execution.RunManager
+import com.intellij.ide.util.PropertiesComponent
 import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.configurations.ConfigurationType
 import com.intellij.execution.impl.RunManagerImpl
@@ -41,6 +42,7 @@ import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.settings.FrcRoboRioSettings
 import net.javaru.iip.frc.settings.RoboRioAddressType
 import net.javaru.iip.frc.settings.getProjectTeamNumber
+import net.javaru.iip.frc.util.runBackgroundTask
 import net.javaru.iip.frc.util.FrcSystemConfigs
 import net.javaru.iip.frc.util.asDate
 import net.javaru.iip.frc.util.classIsAvailable
@@ -108,6 +110,23 @@ data class RunDebugConfigsCreationData (
     }
 }
 
+private const val runDebugConfigurationsCreatedKey = "FRC.runDebugConfigurationsCreated"
+
+/**
+ * Creates all the run/debug configurations once for a WPILib project, once its modules exist (i.e. after the Gradle import).
+ * Normally the configurations are created when the FRC facet is detected, but that does not happen for all projects
+ * (e.g. 2027 projects). Does nothing if they have already been created, including by an earlier plugin version.
+ */
+fun ensureRunDebugConfigurationsCreated(project: Project)
+{
+    if (project.isDisposed || project.getMainModule() == null) return
+    val properties = PropertiesComponent.getInstance(project)
+    if (properties.getBoolean(runDebugConfigurationsCreatedKey)) return
+    properties.setValue(runDebugConfigurationsCreatedKey, true)
+    if (RunManager.getInstance(project).findConfigurationByName(FrcBundle.message("frc.wizard.run.configuration.buildAndDeploy.name")) != null) return
+    project.runBackgroundTask("Creating FRC run configurations") { createAllRunDebugConfigurations(project) }
+}
+
 fun createAllRunDebugConfigurations(project: Project?) {
     if (project != null) {
         createAllRunDebugConfigurations(RunDebugConfigsCreationData.create(project))
@@ -118,6 +137,7 @@ fun createAllRunDebugConfigurations(configsData: RunDebugConfigsCreationData)
 {
     logger.debug("[FRC] Running createAllRunDebugConfigurations")
     val project = configsData.project
+    PropertiesComponent.getInstance(project).setValue(runDebugConfigurationsCreatedKey, true)
     ApplicationManager.getApplication().invokeAndWait {
         WriteAction.run<Throwable> { FileDocumentManager.getInstance().saveAllDocuments() }
     }
@@ -146,6 +166,8 @@ fun createAllRunDebugConfigurations(configsData: RunDebugConfigsCreationData)
             createLaunchSmartDashboardRunConfiguration(project, configsData.wpilibVersion)
         }
     }
+
+    ensureWpiLibSimulationRunConfigurations(project)
 
     val runManager = RunManager.getInstance(project)
     if (runManager is RunManagerImpl)

@@ -322,6 +322,8 @@
         <iconProvider id="FRC.FrcIconProvider" order="first" implementation="net.javaru.iip.frc.services.FrcIconProvider" />
         <fileIconProvider id="FRC.FrcFIleIconProvider" order="first"  implementation="net.javaru.iip.frc.services.FrcIconProvider" />
 
+        <stepsBeforeRunProvider implementation="net.javaru.iip.frc.run.WpiLibSimulateExternalBeforeRunTaskProvider" />
+        <configurationType implementation="net.javaru.iip.frc.run.WpiLibSimulationConfigurationType" />
         <executor id="FrcRioLogToolWindowExecutor" implementation="net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor" />
 
         <spellchecker.bundledDictionaryProvider implementation="net.javaru.iip.frc.spellchecker.FrcBundledDictionaryProvider" />
@@ -394,11 +396,6 @@
         <!--suppress DeprecatedClassUsageInspection -->
         <moduleBuilder id="FrcModuleBuilder" builderClass="net.javaru.iip.frc.wizard.FrcModuleBuilder" order="last" />
 
-        <externalProjectDataService id="FrcDependencyDataService" implementation="net.javaru.iip.frc.facet.importer.FrcDependencyDataService" />
-
-<!--        <framework.detector implementation="net.javaru.iip.frc.facet.framework.detector.RobotSubclassFrcFrameworkDetector" />-->
-        <framework.detector implementation="net.javaru.iip.frc.facet.framework.detector.JavaWpiLibLibraryFrcFrameworkDetector" />
-        <framework.detector implementation="net.javaru.iip.frc.facet.framework.detector.KotlinWpiLibLibraryFrcFrameworkDetector" />
         
         <!-- dependencySupport: Notifies users that a plugin supporting a particular dependency is available and asks if they want to install it -->
         <dependencySupport displayName="FRC WPILib"     kind="java" coordinate="edu.wpi.first.wpilibj:wpilibj-java" />

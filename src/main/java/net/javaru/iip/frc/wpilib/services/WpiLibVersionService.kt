@@ -414,11 +414,13 @@ class WpiLibVersionService private constructor(private val project: Project) : P
     {
         logger.debug {"[FRC] getWpiLibVersionStatus() called. Will perform work in runReadActionInSmartMode"}
         var versionStatus: WpiLibVersionStatus? = null
+        // Checking the Gradle plugin repository for newer versions is a network call, which must not be done inside a read action (or on the EDT)
+        if (!project.isDisposed && project.isFrcFacetedProject()) GradleRioMavenMetadataState.getInstance(true)
         DumbService.getInstance(project).runReadActionInSmartMode {
             if (!project.isDisposed && project.isFrcFacetedProject())
             {
                 logger.debug {"[FRC] getWpiLibVersionStatus() : runReadActionInSmartMode has started."}
-                val state = GradleRioMavenMetadataState.getInstance(true)
+                val state = GradleRioMavenMetadataState.getInstance()
                 val latestAvailableVersion = state.wpiLibMavenMetadata.latestAsWpiLibVersion
 
                 val attachedVersion = project.getAttachedWpiLibVersion()

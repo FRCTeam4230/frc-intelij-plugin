@@ -241,9 +241,25 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         addActionsToActionGroup(actions);
     
     
+        // Capture the instances created by this invocation. If run() is called again before this lambda executes,
+        // the fields will point at the newer instances; reading the fields here would cause startNotify() to be
+        // called twice on the same handler ("startNotify called already") and leave this invocation's handler orphaned.
+        final ProcessHandler processHandler = myProcessHandler;
+        final AbstractRioLogMonitorProcess monitorProcess = rioLogMonitorProcess;
+        final RunContentDescriptor runContentDescriptor = myRunContentDescriptor;
+        final Executor executor = myExecutor;
+
         ApplicationManager.getApplication().invokeLater(() -> {
+            if (processHandler != myProcessHandler)
+            {
+                // Superseded by a later run() call; that call will show its own content and start its own process
+                LOG.debug("[FRC] RioLog run superseded before it was started; discarding stale process handler");
+                processHandler.destroyProcess();
+                return;
+            }
+
             WriteAction.run(() -> {
-                RunContentManager.getInstance(myProject).showRunContent(myExecutor, myRunContentDescriptor);
+                RunContentManager.getInstance(myProject).showRunContent(executor, runContentDescriptor);
                 
                 if (myActivateToolWindow)
                 {
@@ -252,7 +268,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                 
                 if (myAfterCompletionRunnable != null)
                 {
-                    myProcessHandler.addProcessListener(new ProcessAdapter()
+                    processHandler.addProcessListener(new ProcessAdapter()
                     {
                         @Override
                         public void processTerminated(@NotNull ProcessEvent event)
@@ -262,8 +278,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                     });
                 }
                 
-                rioLogMonitorProcess.start();
-                myProcessHandler.startNotify();
+                monitorProcess.start();
+                processHandler.startNotify();
             });
             
         });

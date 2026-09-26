@@ -67,7 +67,9 @@ fun Project.getGradleBuildIoFile(): File?
 
 fun Project.getGradleBuildNioPath(): Path? = this.getGradleBuildIoFile()?.toPath()
 
-fun Project.getGradleBuildVirtualFile(): VirtualFile? = this.getGradleBuildIoFile()?.findVirtualFile(true)
+// A synchronous VFS refresh (to find a file not yet in the VFS) is not allowed while holding the read lock
+fun Project.getGradleBuildVirtualFile(): VirtualFile? =
+    this.getGradleBuildIoFile()?.findVirtualFile(refreshIfNeeded = !com.intellij.openapi.application.ApplicationManager.getApplication().isReadAccessAllowed)
 
 fun Project.getGradleBuildPsiFile(): PsiFile? = this.getGradleBuildVirtualFile()?.findPsiFile(this)
 

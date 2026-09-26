@@ -80,9 +80,16 @@ import javax.swing.JComponent
 private object WpiLibSimulation
 private val logger = logger<WpiLibSimulation>()
 
-const val simulateRobotCodeRunConfigName = "Simulate Robot Code"
-const val simulateRobotCodeHwSimRunConfigName = "Simulate Robot Code (Hardware Sim)"
+// Simulation always builds the robot code first (the simulateExternalJava Gradle task compiles it), which the names make clear
+const val simulateRobotCodeRunConfigName = "Build & Simulate Robot Code"
+const val simulateRobotCodeHwSimRunConfigName = "Build & Simulate Robot Code (Hardware Sim)"
 const val cleanBuildAndSimulateRobotCodeRunConfigName = "Clean Build & Simulate Robot Code"
+
+/** Names used by earlier versions of the plugin, mapped to the current names, so existing configurations are renamed. */
+private val legacySimulationRunConfigNames = mapOf(
+    "Simulate Robot Code" to simulateRobotCodeRunConfigName,
+    "Simulate Robot Code (Hardware Sim)" to simulateRobotCodeHwSimRunConfigName,
+                                                  )
 
 private const val simulateExternalJavaGradleTask = "simulateExternalJava"
 private const val hwSimArgument = "-PhwSim"
@@ -162,9 +169,23 @@ fun simulationVmOptions(existingOptions: List<String>, libraryDir: String?): Lis
 fun ensureWpiLibSimulationRunConfigurations(project: Project)
 {
     if (project.isDisposed || project.getMainModule() == null) return
+    renameLegacySimulationRunConfigurations(project)
     createSimulationRunConfiguration(project, simulateRobotCodeRunConfigName, hwSim = false, clean = false)
     createSimulationRunConfiguration(project, simulateRobotCodeHwSimRunConfigName, hwSim = true, clean = false)
     createSimulationRunConfiguration(project, cleanBuildAndSimulateRobotCodeRunConfigName, hwSim = false, clean = true)
+}
+
+private fun renameLegacySimulationRunConfigurations(project: Project)
+{
+    val runManager = RunManager.getInstance(project)
+    legacySimulationRunConfigNames.forEach { (legacyName, currentName) ->
+        val legacy = runManager.findConfigurationByName(legacyName) ?: return@forEach
+        if (legacy.configuration is WpiLibSimulationRunConfiguration && runManager.findConfigurationByName(currentName) == null)
+        {
+            legacy.name = currentName
+            logger.info("[FRC] Renamed the '$legacyName' run configuration to '$currentName' for project '${project.name}'")
+        }
+    }
 }
 
 private fun createSimulationRunConfiguration(project: Project, name: String, hwSim: Boolean, clean: Boolean)
@@ -272,6 +293,12 @@ class WpiLibSimulationRunConfiguration(project: Project, factory: ConfigurationF
     override fun checkConfiguration()
     {
         if (configurationModule.module == null) throw RuntimeConfigurationError("The module is not specified. Select the robot project's 'main' module.")
+        // The simulation must always be of freshly built code, so the build (simulateExternalJava) step cannot be removed
+        if (beforeRunTasks.none { it is WpiLibSimulateExternalBeforeRunTask && it.isEnabled })
+        {
+            throw RuntimeConfigurationError("The '${WpiLibSimulateExternalBeforeRunTaskProvider.NAME}' before launch step is required, as it builds the robot code for the simulation.",
+                                            Runnable { beforeRunTasks = beforeRunTasks + WpiLibSimulateExternalBeforeRunTask() })
+        }
     }
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> = WpiLibSimulationSettingsEditor(project)
@@ -283,8 +310,10 @@ class WpiLibSimulationRunConfiguration(project: Project, factory: ConfigurationF
         {
             override fun createJavaParameters(): JavaParameters
             {
+                // The launch info is only used for the launch it was prepared (i.e. built) for, so a simulation is never of stale code
                 val info = launchInfo ?: throw ExecutionException(
-                    "The simulation has not been prepared. The '${WpiLibSimulateExternalBeforeRunTaskProvider.NAME}' before launch task is required.")
+                    "The robot code has not been built for the simulation. The '${WpiLibSimulateExternalBeforeRunTaskProvider.NAME}' before launch step is required.")
+                launchInfo = null
                 val parameters = JavaParameters()
                 parameters.configureByModule(module, JavaParameters.JDK_AND_CLASSES)
                 parameters.jdk = JavaSdk.getInstance().createJdk("WPILib JDK", info.jdkHome.toString(), false)
@@ -369,7 +398,7 @@ class WpiLibSimulateExternalBeforeRunTaskProvider : BeforeRunTaskProvider<WpiLib
     {
         @JvmField
         val ID: Key<WpiLibSimulateExternalBeforeRunTask> = Key.create("FRC.WpiLibSimulateExternal")
-        const val NAME = "WPILib: Prepare Simulation ($simulateExternalJavaGradleTask)"
+        const val NAME = "WPILib: Build Robot Code for Simulation ($simulateExternalJavaGradleTask)"
     }
 
     override fun getId(): Key<WpiLibSimulateExternalBeforeRunTask> = ID

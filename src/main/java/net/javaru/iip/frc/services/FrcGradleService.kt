@@ -55,9 +55,7 @@ class FrcGradleService private constructor(val project: Project)
         val rio = gradleService.hasRoborioDeployTarget()
         val xrp = if (rio == true) false else gradleService.isXrpProject()
         val romi = if (rio == true || xrp == true) false else gradleService.isRomiProject()
-        val desk: Boolean? =  ReadAction.compute<Boolean?, Throwable> {
-            gradleService.isIncludeDesktopSupport()
-        }
+        val desk: Boolean? = gradleService.isIncludeDesktopSupport()
         return RobotProjectTypeInfo(rio, romi, xrp, desk)
     }
 
@@ -82,7 +80,9 @@ class FrcGradleService private constructor(val project: Project)
      * Boolean includeDesktopSupport = ReadAction.compute( () -> FrcGradleService.Companion.getInstance(myProject).isIncludeDesktopSupport());
      * ```
      */
-    fun isIncludeDesktopSupport(): Boolean?
+    fun isIncludeDesktopSupport(): Boolean? = ReadAction.computeBlocking<Boolean?, Throwable> { isIncludeDesktopSupportImpl() }
+
+    private fun isIncludeDesktopSupportImpl(): Boolean?
     {
         var result: Boolean? = null
         try
@@ -135,7 +135,11 @@ class FrcGradleService private constructor(val project: Project)
 
     fun isRomiProject(): Boolean? = gradleFileHasTextReferenceOf("10.0.0.2", true)
 
-    private fun gradleFileHasTextReferenceOf(targetText: String, useContains: Boolean): Boolean?
+    // The build file's PSI must be read in a read action. The (nested) read action makes this safe to call from any thread.
+    private fun gradleFileHasTextReferenceOf(targetText: String, useContains: Boolean): Boolean? =
+        ReadAction.computeBlocking<Boolean?, Throwable> { gradleFileHasTextReferenceOfImpl(targetText, useContains) }
+
+    private fun gradleFileHasTextReferenceOfImpl(targetText: String, useContains: Boolean): Boolean?
     {
         var result: Boolean? = null
         try

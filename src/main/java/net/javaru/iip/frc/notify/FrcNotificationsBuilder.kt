@@ -132,7 +132,7 @@ object FrcNotificationsBuilder
             }
             
             return Notification(
-                /* groupId = */ type.group.displayId,
+                /* groupId = */ type.groupId,
                 /* title =   */ normalizedTitle,
                 /* content = */ content ?: "",
                 /* type =    */ type.notificationType

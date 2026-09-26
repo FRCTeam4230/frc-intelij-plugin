@@ -18,6 +18,9 @@ package net.javaru.iip.frc.riolog;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -126,31 +129,54 @@ public class RioLogProjectService implements FrcProjectTeamNumberChangeListener,
      * Updates the RioLog Console view creating/opening, destroying/closing, or moving it as needed, or moving it
      * as needed based on the state of the UI and the current configuration of the project and the presence of any FRC facets.
      */
-    public synchronized void update()
+    public void update()
     {
         //For now, we are only going to update the primary console
-        tcpRioLogConsoleProjectService.update();
+        runOnEdt(tcpRioLogConsoleProjectService::update);
     }
 
     @SuppressWarnings("unused")
-    public synchronized void updateAll()
+    public void updateAll()
     {
-        sshRioLogConsoleProjectService.update();
-        udpRioLogConsoleProjectService.update();
-        tcpRioLogConsoleProjectService.update();
+        runOnEdt(() -> {
+            sshRioLogConsoleProjectService.update();
+            udpRioLogConsoleProjectService.update();
+            tcpRioLogConsoleProjectService.update();
+        });
     }
 
-    public synchronized void updateUdp()
+    public void updateUdp()
     {
-        udpRioLogConsoleProjectService.update();
+        runOnEdt(udpRioLogConsoleProjectService::update);
     }
 
-    public synchronized void updateSsh()
+    public void updateSsh()
     {
-        sshRioLogConsoleProjectService.update();
+        runOnEdt(sshRioLogConsoleProjectService::update);
     }
 
-    public synchronized void updateTcp() { tcpRioLogConsoleProjectService.update(); }
+    public void updateTcp() { runOnEdt(tcpRioLogConsoleProjectService::update); }
+
+    /**
+     * Runs the (console) update on the EDT: immediately if already on the EDT, otherwise later. Updates create UI (and wait on
+     * the EDT to do so), so they are confined to the EDT. Previously they were synchronized and called from both the EDT (e.g.
+     * when the FRC facet is added) and background threads (e.g. the startup activity), which could deadlock: the background thread
+     * holding the lock while waiting on the EDT, and the EDT waiting for the lock.
+     */
+    private void runOnEdt(@NotNull Runnable update)
+    {
+        final Application application = ApplicationManager.getApplication();
+        if (application.isDispatchThread())
+        {
+            update.run();
+        }
+        else
+        {
+            application.invokeLater(() -> {
+                if (!myProject.isDisposed()) update.run();
+            }, ModalityState.nonModal());
+        }
+    }
     
     
     @Override

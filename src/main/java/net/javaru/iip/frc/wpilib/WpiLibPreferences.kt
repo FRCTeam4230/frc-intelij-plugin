@@ -16,7 +16,12 @@
 
 package net.javaru.iip.frc.wpilib
 
+import com.beust.klaxon.JsonObject
+import com.beust.klaxon.Parser
 import com.intellij.json.psi.JsonFile
+import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
@@ -227,9 +232,10 @@ fun Project.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask(taskN
  */
 fun Project.getTeamNumberConfiguredInWpiLibPreferencesFile(): Int
 {
-    return runReadAction {
-        findLikelyWpiLibPreferencesPsiFileAsJsonFile(this)?.getIntPropertyValue(teamNumberPropertyName) ?: FrcApplicationSettings.getInstance().teamNumber
+    val teamNumber = readWpiLibPreferences()?.let { prefs ->
+        prefs[teamNumberPropertyName]?.let { it as? Int ?: it.toString().trim().toIntOrNull() }
     }
+    return teamNumber ?: FrcApplicationSettings.getInstance().teamNumber
 }
 
 fun Project.getConfiguredProjectYearAsBackgroundTask(taskName: String = "Determining FRC project year", resultCallback: (projectYear:String?) -> Unit)
@@ -248,10 +254,26 @@ fun Project.getConfiguredProjectYearAsBackgroundTask(taskName: String = "Determi
  * The call(s) to `FilenameIndex.getVirtualFilesByName` (called by functions used byt this one) are slow operations.
  * Use [getConfiguredProjectYearAsBackgroundTask] for easy background use.
  */
-fun Project.getConfiguredProjectYear(): String?
+fun Project.getConfiguredProjectYear(): String? = readWpiLibPreferences()?.get(projectYearPropertyName)?.toString()?.trim()?.ifBlank { null }
+
+/**
+ * Reads the project's `.wpilib/wpilib_preferences.json` file, i.e. the one that identifies the project as a WPILib project
+ * (see [findWpiLibProjectRootDirs]). The file is read directly (including any unsaved changes in an open editor), so no
+ * indexes are needed and there is no need to wait for indexing to complete. Returns `null` if the file does not exist or
+ * is not valid JSON.
+ */
+fun Project.readWpiLibPreferences(): JsonObject?
 {
-    return runReadAction {
-        findLikelyWpiLibPreferencesPsiFileAsJsonFile(this)?.getStringPropertyValue(projectYearPropertyName)
+    val file = findWpiLibProjectRootDirs().firstOrNull()?.findChild(wpiLibDirName)?.findChild(wpiLibPreferencesFileName) ?: return null
+    return try
+    {
+        val text = ReadAction.computeBlocking<String?, Throwable> { FileDocumentManager.getInstance().getCachedDocument(file)?.text } ?: VfsUtilCore.loadText(file)
+        Parser.default().parse(StringBuilder(text)) as? JsonObject
+    }
+    catch (e: Exception)
+    {
+        LOG.info("[FRC] Could not read ${file.path}. Cause: $e")
+        null
     }
 }
 

@@ -71,7 +71,7 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import net.javaru.iip.frc.wpilib.isWpiLibProject
 import net.javaru.iip.frc.util.runBackgroundTask
-import net.javaru.iip.frc.wpilib.findLikelyWpiLibPreferencesPsiFile
+import net.javaru.iip.frc.wpilib.findWpiLibProjectRootDirs
 import net.javaru.iip.frc.wpilib.getConfiguredProjectYear
 import net.javaru.iip.frc.wpilib.vendordeps.VendorJsonRepoService
 import net.javaru.iip.frc.wpilib.vendordeps.VendorRepoLibrary
@@ -388,7 +388,7 @@ class VendordepsToolWindowPanel(private val project: Project) : SimpleToolWindow
     private fun findOrDetermineVendordepsParentDir(): VirtualFile?
     {
         val installedDir = VendordepsService.getInstance(project).vendordepsProjectFilesListing.vendordepsProjectFileList.firstOrNull()?.virtualFile?.parent?.parent
-        return installedDir ?: findLikelyWpiLibPreferencesPsiFile(project)?.virtualFile?.parent?.parent ?: project.guessProjectDir()
+        return installedDir ?: project.findWpiLibProjectRootDirs().firstOrNull() ?: project.guessProjectDir()
     }
 
     private fun installOrUpdate(row: VendordepsRow)

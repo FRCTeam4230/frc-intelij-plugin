@@ -21,7 +21,6 @@ import com.github.michaelbull.result.onSuccess
 import com.intellij.icons.AllIcons
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -207,9 +206,12 @@ class VendordepsToolWindowPanel(private val project: Project) : SimpleToolWindow
         PopupHandler.installPopupMenu(list, DefaultActionGroup(InstallAction(), UpdateAction(), InstallBetaAction(), RemoveAction(), Separator.getInstance(), OpenWebsiteAction()),
                                       "FRC.VendordepsToolWindow.Popup")
 
-        val toolbar = ActionManager.getInstance().createActionToolbar("FRC.VendordepsToolWindow", DefaultActionGroup(InstallFromUrlAction()), true)
-        toolbar.targetComponent = this
-        setToolbar(toolbar.component)
+        val installFromUrlButton = JButton("Install from URL", AllIcons.Actions.AddFile)
+        installFromUrlButton.toolTipText = "Install a vendordeps JSON file from a URL into the vendordeps directory"
+        installFromUrlButton.addActionListener { installFromUrl() }
+        val toolbarPanel = JPanel(FlowLayout(FlowLayout.LEFT, JBUI.scale(6), JBUI.scale(4)))
+        toolbarPanel.add(installFromUrlButton)
+        setToolbar(toolbarPanel)
 
         headerLabel.border = JBUI.Borders.empty(4, 6)
         headerLabel.foreground = UIUtil.getContextHelpForeground()
@@ -560,12 +562,6 @@ class VendordepsToolWindowPanel(private val project: Project) : SimpleToolWindow
             e.presentation.text = if (row?.isBetaAvailable == true) "Install Beta ${row.beta!!.vendordeps.version.asText}" else "Install Beta"
         }
 
-        override fun getActionUpdateThread() = ActionUpdateThread.EDT
-    }
-
-    private inner class InstallFromUrlAction : DumbAwareAction("Install from URL…", "Install a vendordeps JSON file from a URL into the vendordeps directory", AllIcons.Actions.AddFile)
-    {
-        override fun actionPerformed(e: AnActionEvent) = installFromUrl()
         override fun getActionUpdateThread() = ActionUpdateThread.EDT
     }
 

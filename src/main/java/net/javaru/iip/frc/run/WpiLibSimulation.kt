@@ -173,6 +173,23 @@ fun ensureWpiLibSimulationRunConfigurations(project: Project)
     createSimulationRunConfiguration(project, simulateRobotCodeRunConfigName, hwSim = false, clean = false)
     createSimulationRunConfiguration(project, simulateRobotCodeHwSimRunConfigName, hwSim = true, clean = false)
     createSimulationRunConfiguration(project, cleanBuildAndSimulateRobotCodeRunConfigName, hwSim = false, clean = true)
+    repairSimulationRunConfigurationModules(project)
+}
+
+/**
+ * Sets the main module on any simulation run configuration whose module is not set or no longer exists. This happens when the
+ * project was copied or renamed, or the Gradle root project name changed, since the configuration stores the old module name.
+ */
+private fun repairSimulationRunConfigurationModules(project: Project)
+{
+    val mainModule = project.getMainModule() ?: return
+    RunManager.getInstance(project).getConfigurationsList(WpiLibSimulationConfigurationType.getInstance())
+        .filterIsInstance<WpiLibSimulationRunConfiguration>()
+        .filter { it.configurationModule.module == null }
+        .forEach {
+            it.setModule(mainModule)
+            logger.info("[FRC] Set the module of the '${it.name}' run configuration to '${mainModule.name}' for project '${project.name}'")
+        }
 }
 
 private fun renameLegacySimulationRunConfigurations(project: Project)
@@ -289,6 +306,13 @@ class WpiLibSimulationRunConfiguration(project: Project, factory: ConfigurationF
         set(value) { options.vmOptions = value }
 
     override fun getValidModules(): Collection<Module> = ModuleManager.getInstance(project).modules.toList()
+
+    /** Defaults the module of a configuration the user adds (e.g. via the Run/Debug Configurations dialog) to the main module. */
+    override fun onNewConfigurationCreated()
+    {
+        super.onNewConfigurationCreated()
+        if (configurationModule.module == null) project.getMainModule()?.let { setModule(it) }
+    }
 
     override fun checkConfiguration()
     {

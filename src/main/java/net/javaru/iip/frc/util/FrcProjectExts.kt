@@ -26,6 +26,7 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.PerformInBackgroundOption
@@ -40,6 +41,7 @@ import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Computable
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.concurrency.AppExecutorUtil
 import net.javaru.iip.frc.facet.isFrcFacetedProject
 import net.javaru.iip.frc.isUnitTestMode
@@ -275,10 +277,26 @@ fun Project?.getModules(): Array<Module>
     return modules ?: emptyArray()
 }
 
-/** Returns the 'main' Gradle module, i.e. `projectName.main` , or null if it cannot be found. */
-fun Project?.getMainModule(): Module? = this.getModules().firstOrNull { module -> module.name.endsWith(".main") }
-/** Returns the 'test' Gradle module, i.e. `projectName.test` , or null if it cannot be found. */
-fun Project?.getTestModule(): Module? = this.getModules().firstOrNull { module -> module.name.endsWith(".test") }
+/** Returns the root Gradle project's 'main' module, i.e. `projectName.main` , or null if it cannot be found. */
+fun Project?.getMainModule(): Module? = this.getRootProjectSourceSetModule("main")
+/** Returns the root Gradle project's 'test' module, i.e. `projectName.test` , or null if it cannot be found. */
+fun Project?.getTestModule(): Module? = this.getRootProjectSourceSetModule("test")
+
+/**
+ * Returns the module for the source set of the root Gradle project. A project's `buildSrc` and subprojects have source set
+ * modules too (e.g. `projectName.buildSrc.main`), so the module linked to the root Gradle project is used. If that cannot be
+ * determined (e.g. before the Gradle import), the least nested source set module is used.
+ */
+private fun Project?.getRootProjectSourceSetModule(sourceSetName: String): Module?
+{
+    if (this == null) return null
+    val candidates = getModules().filter { it.name.endsWith(".$sourceSetName") }
+    val rootProjectPaths = GradleSettings.getInstance(this).linkedProjectsSettings.mapNotNull { it.externalProjectPath }
+    return candidates.firstOrNull { module ->
+        val modulePath = ExternalSystemApiUtil.getExternalProjectPath(module)
+        modulePath != null && rootProjectPaths.any { FileUtil.pathsEqual(it, modulePath) }
+    } ?: candidates.minByOrNull { module -> module.name.count { it == '.' } }
+}
 
 fun Project.getProjectJdk(): ProjectJdkImpl?
 {

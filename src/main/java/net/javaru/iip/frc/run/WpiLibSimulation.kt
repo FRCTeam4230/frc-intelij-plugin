@@ -20,10 +20,13 @@ import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import com.intellij.application.options.ModulesComboBox
+import com.intellij.compiler.options.CompileStepBeforeRun
 import com.intellij.execution.BeforeRunTask
 import com.intellij.execution.BeforeRunTaskProvider
+import com.intellij.execution.CommonJavaRunConfigurationParameters
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.Executor
+import com.intellij.execution.JavaRunConfigurationExtensionManager
 import com.intellij.execution.RunManager
 import com.intellij.execution.application.ApplicationConfiguration
 import com.intellij.execution.configurations.ConfigurationFactory
@@ -38,6 +41,7 @@ import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.configurations.RuntimeConfigurationError
 import com.intellij.execution.process.CapturingProcessHandler
+import com.intellij.execution.process.OSProcessHandler
 import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.runners.ExecutionEnvironment
@@ -50,6 +54,7 @@ import com.intellij.openapi.fileTypes.PlainTextFileType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.options.SettingsEditor
+import com.intellij.openapi.options.SettingsEditorGroup
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
@@ -119,6 +124,30 @@ private fun Path.hasJavaExecutable(): Boolean = Files.isRegularFile(resolve("bin
 
 // endregion
 
+// region Simulation Gradle task
+
+/** The first WPILib year whose GradleRIO has a single `simulateExternalJava` task, rather than Debug and Release variants of it. */
+private const val singleSimulateExternalJavaTaskYear = 2027
+
+/** A GradleRIO task that builds the robot code for the simulation, and the file (in `build`) of launch details that it generates. */
+data class SimulateExternalJavaTask(val name: String, val simConfigFile: String)
+
+/**
+ * Returns the task that builds the robot code for the simulation, which depends on the project year's GradleRIO version:
+ * * 2027+: `simulateExternalJava`, which generates `sim/java.json` (the JNI build is selected via `wpi.java.runSimWithDebugJni`)
+ * * 2026 and earlier: `simulateExternalJavaRelease` (or `...Debug`, which is only needed to debug the JNI code), which generates `sim/release_java.json`
+ *
+ * The WPILib VS Code extension also uses the release variant.
+ */
+fun simulateExternalJavaTask(projectYear: String?): SimulateExternalJavaTask
+{
+    val year = extractProjectYear(projectYear) ?: Year.now().value
+    return if (year >= singleSimulateExternalJavaTaskYear) SimulateExternalJavaTask(simulateExternalJavaGradleTask, "sim/java.json")
+    else SimulateExternalJavaTask("${simulateExternalJavaGradleTask}Release", "sim/release_java.json")
+}
+
+// endregion
+
 // region VM options
 
 private const val libraryPathVmOption = "-Djava.library.path="
@@ -174,18 +203,36 @@ fun ensureWpiLibSimulationRunConfigurations(project: Project)
     createSimulationRunConfiguration(project, simulateRobotCodeHwSimRunConfigName, hwSim = true, clean = false)
     createSimulationRunConfiguration(project, cleanBuildAndSimulateRobotCodeRunConfigName, hwSim = false, clean = true)
     repairSimulationRunConfigurationModules(project)
+    removeBuildBeforeLaunchTasks(project)
+}
+
+/**
+ * Removes the IDE's 'Build' before launch task, which earlier versions of the plugin added (by default) to the simulation run
+ * configurations. See [WpiLibSimulationRunConfiguration.isBuildBeforeLaunchAddedByDefault].
+ */
+private fun removeBuildBeforeLaunchTasks(project: Project)
+{
+    RunManager.getInstance(project).getConfigurationsList(WpiLibSimulationConfigurationType.getInstance())
+        .filterIsInstance<WpiLibSimulationRunConfiguration>()
+        .filter { configuration -> configuration.beforeRunTasks.any { it.providerId == CompileStepBeforeRun.ID } }
+        .forEach { configuration ->
+            configuration.beforeRunTasks = configuration.beforeRunTasks.filterNot { it.providerId == CompileStepBeforeRun.ID }
+            logger.info("[FRC] Removed the 'Build' before launch task from the '${configuration.name}' run configuration for project '${project.name}'")
+        }
 }
 
 /**
  * Sets the main module on any simulation run configuration whose module is not set or no longer exists. This happens when the
  * project was copied or renamed, or the Gradle root project name changed, since the configuration stores the old module name.
+ * It is also set when the module is the main module of the `buildSrc` or a subproject (e.g. `projectName.buildSrc.main`),
+ * which earlier versions of the plugin could select, as the simulation is of the root project's robot code.
  */
 private fun repairSimulationRunConfigurationModules(project: Project)
 {
     val mainModule = project.getMainModule() ?: return
     RunManager.getInstance(project).getConfigurationsList(WpiLibSimulationConfigurationType.getInstance())
         .filterIsInstance<WpiLibSimulationRunConfiguration>()
-        .filter { it.configurationModule.module == null }
+        .filter { it.configurationModule.module.let { module -> module == null || (module != mainModule && module.name.endsWith(".main")) } }
         .forEach {
             it.setModule(mainModule)
             logger.info("[FRC] Set the module of the '${it.name}' run configuration to '${mainModule.name}' for project '${project.name}'")
@@ -269,7 +316,7 @@ class WpiLibSimulationOptions : ModuleBasedConfigurationOptions()
     var vmOptions by string()
 }
 
-/** The simulation launch details, determined by the before run task from the generated `build/sim/java.json`. */
+/** The simulation launch details, determined by the before run task from the file generated by the [SimulateExternalJavaTask] (e.g. `build/sim/java.json`). */
 data class WpiLibSimulationLaunchInfo(
     val jdkHome: Path,
     val projectRoot: Path,
@@ -282,10 +329,16 @@ data class WpiLibSimulationLaunchInfo(
 /**
  * Runs the robot program in the WPILib simulator, as the WPILib VS Code extension does: the [WpiLibSimulateExternalBeforeRunTask]
  * runs the `simulateExternalJava` Gradle task, which generates the simulation launch details, and then the robot program is run
- * with the WPILib JDK, the simulation extensions (e.g. the Sim GUI), and the simulation's native libraries. Run and Debug are supported.
+ * with the WPILib JDK, the simulation extensions (e.g. the Sim GUI), and the simulation's native libraries.
+ *
+ * Run, Debug, Run with Coverage, and Profile are supported. Coverage and the profilers only support run configurations that are
+ * [CommonJavaRunConfigurationParameters], and are applied, via the [JavaRunConfigurationExtensionManager], as they are for an
+ * Application run configuration. The main class, working directory, and environment are determined by the WPILib build, so
+ * those parameters are read-only.
  */
 class WpiLibSimulationRunConfiguration(project: Project, factory: ConfigurationFactory, name: String) :
-    ModuleBasedConfiguration<JavaRunConfigurationModule, Element>(name, JavaRunConfigurationModule(project, false), factory)
+    ModuleBasedConfiguration<JavaRunConfigurationModule, Element>(name, JavaRunConfigurationModule(project, false), factory),
+    CommonJavaRunConfigurationParameters
 {
     /** Set by the before run task for the run being launched. */
     @Transient
@@ -307,6 +360,48 @@ class WpiLibSimulationRunConfiguration(project: Project, factory: ConfigurationF
 
     override fun getValidModules(): Collection<Module> = ModuleManager.getInstance(project).modules.toList()
 
+    /**
+     * The [WpiLibSimulateExternalBeforeRunTask] builds the robot code, with the WPILib JDK, so the IDE's 'Build' before launch
+     * task is not needed. It would also build with the project's Gradle JVM, which fails if it is older than the Java version
+     * the robot code requires (e.g. Java 25 for 2027).
+     */
+    override fun isBuildBeforeLaunchAddedByDefault(): Boolean = false
+
+    // region CommonJavaRunConfigurationParameters
+
+    override fun getVMParameters(): String? = vmOptions
+    override fun setVMParameters(value: String?) { vmOptions = value?.ifBlank { null } }
+    // The simulation is always run with the WPILib JDK, which is determined when it is launched
+    override fun isAlternativeJrePathEnabled(): Boolean = false
+    override fun setAlternativeJrePathEnabled(enabled: Boolean) {}
+    override fun getAlternativeJrePath(): String? = null
+    override fun setAlternativeJrePath(path: String?) {}
+    override fun getRunClass(): String? = null
+    override fun getPackage(): String? = null
+    override fun getProgramParameters(): String? = null
+    override fun setProgramParameters(value: String?) {}
+    override fun getWorkingDirectory(): String? = project.basePath
+    override fun setWorkingDirectory(value: String?) {}
+    override fun getEnvs(): Map<String, String> = emptyMap()
+    override fun setEnvs(envs: Map<String, String>) {}
+    override fun isPassParentEnvs(): Boolean = true
+    override fun setPassParentEnvs(passParentEnvs: Boolean) {}
+
+    // endregion
+
+    // The settings of the run configuration extensions (e.g. the coverage settings) are not part of the options
+    override fun readExternal(element: Element)
+    {
+        super.readExternal(element)
+        JavaRunConfigurationExtensionManager.instance.readExternal(this, element)
+    }
+
+    override fun writeExternal(element: Element)
+    {
+        super.writeExternal(element)
+        JavaRunConfigurationExtensionManager.instance.writeExternal(this, element)
+    }
+
     /** Defaults the module of a configuration the user adds (e.g. via the Run/Debug Configurations dialog) to the main module. */
     override fun onNewConfigurationCreated()
     {
@@ -323,9 +418,14 @@ class WpiLibSimulationRunConfiguration(project: Project, factory: ConfigurationF
             throw RuntimeConfigurationError("The '${WpiLibSimulateExternalBeforeRunTaskProvider.NAME}' before launch step is required, as it builds the robot code for the simulation.",
                                             Runnable { beforeRunTasks = beforeRunTasks + WpiLibSimulateExternalBeforeRunTask() })
         }
+        JavaRunConfigurationExtensionManager.checkConfigurationIsValid(this)
     }
 
-    override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> = WpiLibSimulationSettingsEditor(project)
+    // Includes the editors of the run configuration extensions, such as the Code Coverage settings (e.g. which classes to include)
+    override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> = SettingsEditorGroup<WpiLibSimulationRunConfiguration>().apply {
+        addEditor("Configuration", WpiLibSimulationSettingsEditor(project))
+        JavaRunConfigurationExtensionManager.instance.appendEditors(this@WpiLibSimulationRunConfiguration, this)
+    }
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState
     {
@@ -360,7 +460,17 @@ class WpiLibSimulationRunConfiguration(project: Project, factory: ConfigurationF
                 }
                 parameters.env = env
                 parameters.isPassParentEnvs = true
+                // Adds, for example, the coverage or profiler agent when run with coverage or profiled
+                JavaRunConfigurationExtensionManager.instance.updateJavaParameters(this@WpiLibSimulationRunConfiguration, parameters, runnerSettings, executor)
                 return parameters
+            }
+
+            override fun startProcess(): OSProcessHandler
+            {
+                val handler = super.startProcess()
+                // Collects, for example, the coverage data or profiler snapshot when the simulation ends
+                JavaRunConfigurationExtensionManager.instance.attachExtensionsToProcess(this@WpiLibSimulationRunConfiguration, handler, runnerSettings)
+                return handler
             }
         }
     }
@@ -403,7 +513,7 @@ private class WpiLibSimulationSettingsEditor(project: Project) : SettingsEditor<
 
 // region Before run task
 
-/** A before run task, for [WpiLibSimulationRunConfiguration]s, that runs WPILib's `simulateExternalJava` Gradle task. */
+/** A before run task, for [WpiLibSimulationRunConfiguration]s, that runs WPILib's `simulateExternalJava` (or, before 2027, `simulateExternalJavaRelease`) Gradle task. */
 class WpiLibSimulateExternalBeforeRunTask : BeforeRunTask<WpiLibSimulateExternalBeforeRunTask>(WpiLibSimulateExternalBeforeRunTaskProvider.ID)
 {
     init
@@ -413,8 +523,9 @@ class WpiLibSimulateExternalBeforeRunTask : BeforeRunTask<WpiLibSimulateExternal
 }
 
 /**
- * Runs `gradlew [clean] simulateExternalJava [-PhwSim] -Dorg.gradle.java.home=<WPILib JDK>`, as the WPILib VS Code extension
- * does, then reads the generated `build/sim/java.json` to determine how to launch the simulation.
+ * Runs `gradlew [clean] <simulateExternalJava task> [-PhwSim] -Dorg.gradle.java.home=<WPILib JDK>`, as the WPILib VS Code extension
+ * does, then reads the launch details it generates (e.g. `build/sim/java.json`) to determine how to launch the simulation.
+ * See [simulateExternalJavaTask].
  */
 class WpiLibSimulateExternalBeforeRunTaskProvider : BeforeRunTaskProvider<WpiLibSimulateExternalBeforeRunTask>()
 {
@@ -449,13 +560,14 @@ class WpiLibSimulateExternalBeforeRunTaskProvider : BeforeRunTaskProvider<WpiLib
             ?: return failed(project, "The WPILib JDK for '${projectYear ?: "the project year"}' was not found. Looked in: " +
                 wpiLibJdkHomeCandidates(projectYear).joinToString(", ") + ". Install WPILib for the project's year, or update the project's year.")
 
+        val simTask = simulateExternalJavaTask(projectYear)
         val gradlew = projectRoot.resolve(if (SystemInfo.isWindows) "gradlew.bat" else "gradlew")
         if (!Files.isRegularFile(gradlew)) return failed(project, "The Gradle wrapper ($gradlew) was not found.")
         if (!SystemInfo.isWindows) gradlew.toFile().setExecutable(true)
 
         val commandLine = GeneralCommandLine(gradlew.toString())
             .apply { if (simConfiguration.clean) addParameter("clean") }
-            .withParameters(simulateExternalJavaGradleTask)
+            .withParameters(simTask.name)
             .apply { if (simConfiguration.hwSim) addParameter(hwSimArgument) }
             .withParameters("-Dorg.gradle.java.home=$jdkHome")
             .withWorkDirectory(projectRoot.toFile())
@@ -465,7 +577,7 @@ class WpiLibSimulateExternalBeforeRunTaskProvider : BeforeRunTaskProvider<WpiLib
 
         logger.info("[FRC] Running: ${commandLine.commandLineString}")
         val indicator = ProgressManager.getInstance().progressIndicator
-        indicator?.text = "Running $simulateExternalJavaGradleTask" + if (simConfiguration.hwSim) " (hardware simulation)" else ""
+        indicator?.text = "Running ${simTask.name}" + if (simConfiguration.hwSim) " (hardware simulation)" else ""
         val handler = CapturingProcessHandler(commandLine)
         handler.addProcessListener(object : ProcessListener
                                    {
@@ -479,10 +591,10 @@ class WpiLibSimulateExternalBeforeRunTaskProvider : BeforeRunTaskProvider<WpiLib
         if (output.exitCode != 0)
         {
             val fullOutput = "> ${commandLine.commandLineString}\n\n${output.stdout}\n${output.stderr}"
-            return failed(project, "'$simulateExternalJavaGradleTask' failed (exit code ${output.exitCode}).", fullOutput)
+            return failed(project, "'${simTask.name}' failed (exit code ${output.exitCode}).", fullOutput)
         }
 
-        val simConfigFile = projectRoot.resolve("build").resolve("sim").resolve("java.json")
+        val simConfigFile = projectRoot.resolve("build").resolve(simTask.simConfigFile)
         val simConfig = try
         {
             (Files.newBufferedReader(simConfigFile).use { Parser.default().parse(it) } as JsonArray<*>)

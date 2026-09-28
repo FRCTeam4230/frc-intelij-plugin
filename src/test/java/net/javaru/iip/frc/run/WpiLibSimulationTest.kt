@@ -59,4 +59,19 @@ internal class WpiLibSimulationTest
         assertEquals(1, secondRun.count { it.startsWith("-Djava.library.path=") })
         assertEquals(1, secondRun.count { it == "java.base/jdk.internal.vm=ALL-UNNAMED" })
     }
+
+    @Test
+    fun `2027 and later projects use the simulateExternalJava task`()
+    {
+        assertEquals(SimulateExternalJavaTask("simulateExternalJava", "sim/java.json"), simulateExternalJavaTask("2027_alpha7"))
+        assertEquals(SimulateExternalJavaTask("simulateExternalJava", "sim/java.json"), simulateExternalJavaTask("2028"))
+    }
+
+    @Test
+    fun `2026 and earlier projects use the simulateExternalJavaRelease task`()
+    {
+        // GradleRIO 2026 has only Debug and Release variants, so 'simulateExternalJava' is ambiguous
+        assertEquals(SimulateExternalJavaTask("simulateExternalJavaRelease", "sim/release_java.json"), simulateExternalJavaTask("2026"))
+        assertEquals(SimulateExternalJavaTask("simulateExternalJavaRelease", "sim/release_java.json"), simulateExternalJavaTask("2025"))
+    }
 }

@@ -18,7 +18,6 @@ package net.javaru.iip.frc.wpilib
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.VfsUtil
@@ -28,6 +27,7 @@ import com.intellij.util.lang.JavaVersion
 import net.javaru.iip.frc.FrcPluginGlobals
 import net.javaru.iip.frc.i18n.FrcMessageKey
 import net.javaru.iip.frc.notify.FrcNotifyType
+import net.javaru.iip.frc.util.computeInSmartReadAction
 import net.javaru.iip.frc.util.findClass
 import net.javaru.iip.frc.util.warnWhenNotInTestMode
 import net.javaru.iip.frc.wpilib.version.WpiLibVersion
@@ -301,7 +301,7 @@ fun getWpiLibJdkReleaseJavaFeatureVersion(year: Int, project: Project? = null): 
 fun Project.getAttachedWpiLibVersionInSmartReadAction(): WpiLibVersion?
 {
     var version: WpiLibVersion? = null
-    DumbService.getInstance(this).runReadActionInSmartMode() {
+    computeInSmartReadAction {
         version = getAttachedWpiLibVersion()
     }
     return version
@@ -326,7 +326,7 @@ fun Project.getAttachedWpiLibVersion(): WpiLibVersion?
 fun Project.getAttachedWpiLibVersionStringInSmartReadAction(): String?
 {
     var version: String? = null
-    DumbService.getInstance(this).runReadActionInSmartMode() {
+    computeInSmartReadAction {
         version = this.getAttachedWpiLibVersionString()
     }
     return version

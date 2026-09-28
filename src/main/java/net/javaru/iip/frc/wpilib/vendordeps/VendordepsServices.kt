@@ -29,7 +29,6 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
-import com.intellij.openapi.progress.PerformInBackgroundOption
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
@@ -542,7 +541,6 @@ class VendordepsService private constructor(val project: Project): Disposable
         project.runBackgroundTask(
             "Download Vendordeps File",
             cancellable = true,
-            background = PerformInBackgroundOption.ALWAYS_BACKGROUND
                                  ) { indicator: ProgressIndicator ->
             val result = downloadVendordepsToTempFile(url, indicator)
             resultProcessor.invoke(result)

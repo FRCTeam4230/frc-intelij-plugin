@@ -22,20 +22,20 @@ import com.intellij.json.psi.JsonFile
 import com.intellij.json.psi.JsonNumberLiteral
 import com.intellij.json.psi.JsonObject
 import com.intellij.json.psi.JsonStringLiteral
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.runReadActionBlocking
 import com.intellij.util.ObjectUtils
 
 
 fun <T : JsonElement?> JsonFile?.getPropertyValueOfType(name: String, jsonElementClazz: Class<T>): T?
 {
-    return runReadAction {
+    return runReadActionBlocking {
         JsonUtil.getTopLevelObject(this).getPropertyValueOfType(name, jsonElementClazz)
     }
 }
 
 fun <T : JsonElement?> JsonObject?.getPropertyValueOfType(name: String, jsonElementClazz: Class<T>): T?
 {
-    return runReadAction {
+    return runReadActionBlocking {
         val property = this?.findProperty(name)
         if (property == null)
             null
@@ -46,7 +46,7 @@ fun <T : JsonElement?> JsonObject?.getPropertyValueOfType(name: String, jsonElem
 
 fun JsonFile?.getIntPropertyValue(name: String): Int?
 {
-    return runReadAction {
+    return runReadActionBlocking {
         val jsonLiteral = this.getPropertyValueOfType(name, JsonNumberLiteral::class.java)
         jsonLiteral?.value?.toInt()
     }
@@ -54,7 +54,7 @@ fun JsonFile?.getIntPropertyValue(name: String): Int?
 
 fun JsonObject?.getIntPropertyValue(name: String): Int?
 {
-    return runReadAction {
+    return runReadActionBlocking {
         val jsonLiteral = this.getPropertyValueOfType(name, JsonNumberLiteral::class.java)
         jsonLiteral?.value?.toInt()
     }
@@ -62,7 +62,7 @@ fun JsonObject?.getIntPropertyValue(name: String): Int?
 
 fun JsonFile?.getStringPropertyValue(name: String): String?
 {
-    return runReadAction {
+    return runReadActionBlocking {
         val jsonLiteral = this.getPropertyValueOfType(name, JsonStringLiteral::class.java)
         jsonLiteral?.value
     }
@@ -70,7 +70,7 @@ fun JsonFile?.getStringPropertyValue(name: String): String?
 
 fun JsonObject?.getStringPropertyValue(name: String): String?
 {
-    return runReadAction {
+    return runReadActionBlocking {
         val jsonLiteral = this.getPropertyValueOfType(name, JsonStringLiteral::class.java)
         jsonLiteral?.value
     }

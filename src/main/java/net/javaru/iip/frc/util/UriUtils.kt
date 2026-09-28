@@ -54,7 +54,7 @@ fun createUrl(url: String): URL
 {
     return try
     {
-        URL(url)
+        URI(url).toURL()
     }
     catch (e: Exception)
     {
@@ -99,7 +99,7 @@ fun createUrlSafely(uri: String?):URL?
     {
         return try
         {
-            URL(uri)
+            URI(uri).toURL()
         } catch (e: Exception)
         {
             LOG.warn("[FRC] Could not create a URL object from the URL path '$uri' due to the exception: $e")

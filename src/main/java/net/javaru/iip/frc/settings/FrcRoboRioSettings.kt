@@ -328,6 +328,7 @@ data class FrcRoboRioSettings @JvmOverloads constructor(
     fun isRoboRioHostTheDefault_USB(): Boolean = USE_DEFAULT_HOST_PLACEHOLDER == roboRioHostRawUsb
 }
 
+@ConsistentCopyVisibility
 data class ImmutableFrcRoboRioSettings internal constructor(val roboRioHostRawMDns: String,
                                                             val roboRioHostRawDns: String,
                                                             val roboRioHostRawIp: String,

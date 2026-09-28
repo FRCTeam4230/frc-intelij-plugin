@@ -20,10 +20,10 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import net.javaru.iip.frc.run.createLaunchShuffleboardRunConfiguration
 import net.javaru.iip.frc.run.createLaunchSmartDashboardRunConfiguration
+import net.javaru.iip.frc.util.computeInSmartReadAction
 import net.javaru.iip.frc.wpilib.getAttachedWpiLibVersion
 
 abstract class AbstractCreateRunConfigurationAction(): AnAction()
@@ -33,7 +33,7 @@ abstract class AbstractCreateRunConfigurationAction(): AnAction()
         val project = e.getData(CommonDataKeys.PROJECT)
         if (project != null)
         {
-            DumbService.getInstance(project).runReadActionInSmartMode() {
+            project.computeInSmartReadAction {
                 doCreation(project, e)
             }
         }

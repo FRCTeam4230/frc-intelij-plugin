@@ -16,13 +16,13 @@
 
 package net.javaru.iip.frc.util
 
-import com.intellij.lang.java.lexer.JavaLexer
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.LanguageLevelProjectExtension
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.pom.java.LanguageLevel
+import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.PsiNameHelper
 import com.intellij.util.lang.JavaVersion
 import net.javaru.iip.frc.FrcPluginGlobals
@@ -83,7 +83,7 @@ class FrcPsiNameHelper(_languageLevel: LanguageLevel?) : PsiNameHelper()
      */
     override fun isIdentifier(text: String?, languageLevel: LanguageLevel): Boolean
     {
-        return text != null && StringUtil.isJavaIdentifier(text) && !JavaLexer.isKeyword(text, languageLevel)
+        return text != null && StringUtil.isJavaIdentifier(text) && !PsiUtil.isKeyword(text, languageLevel)
     }
 
     /**
@@ -96,7 +96,7 @@ class FrcPsiNameHelper(_languageLevel: LanguageLevel?) : PsiNameHelper()
      */
     override fun isKeyword(text: String?): Boolean
     {
-        return text != null && JavaLexer.isKeyword(text, languageLevel)
+        return text != null && PsiUtil.isKeyword(text, languageLevel)
     }
 
     /**

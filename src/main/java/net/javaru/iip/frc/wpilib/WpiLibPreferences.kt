@@ -27,7 +27,6 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.rootManager
@@ -39,6 +38,7 @@ import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScopesCore
 import com.intellij.util.SmartList
 import net.javaru.iip.frc.settings.FrcApplicationSettings
+import net.javaru.iip.frc.util.computeInSmartReadAction
 import net.javaru.iip.frc.util.findPsiDirectory
 import net.javaru.iip.frc.util.findPsiFile
 import net.javaru.iip.frc.util.getIntPropertyValue
@@ -126,7 +126,7 @@ fun findWpiLibPreferencesPsiFiles(project: Project, filter: (module: Module) -> 
 
     try
     {
-        DumbService.getInstance(project).runReadActionInSmartMode {
+        project.computeInSmartReadAction {
             val modules = project.getModules()
             modules.filter { filter.invoke(it) }.forEach { module: Module ->
                 foundFiles.addAll(findWpiLibPreferencesPsiFiles(module))
@@ -166,7 +166,7 @@ fun findWpiLibPreferencesPsiFiles(module: Module): List<PsiFile>
 
     try
     {
-        DumbService.getInstance(project).runReadActionInSmartMode {
+        project.computeInSmartReadAction {
             val psiManager = PsiManager.getInstance(project)
             val rootManager = module.rootManager
             val contentRoots = rootManager.contentRoots

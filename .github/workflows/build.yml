@@ -6,6 +6,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Gradle's native library loading is a restricted method on Java 25, which otherwise prints a warning at the start of every build
+env:
+  GRADLE_OPTS: --enable-native-access=ALL-UNNAMED
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

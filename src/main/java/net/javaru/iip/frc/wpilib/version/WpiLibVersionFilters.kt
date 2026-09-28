@@ -100,7 +100,6 @@ fun Iterable<WpiLibVersion>.filterOutAllButLatestForYear(year: Int, preReleaseIn
                 PreReleaseInclusion.All -> allowedForYear.add(latestRelease)
                 PreReleaseInclusion.RcAndOrBeta -> if (latestRelease.isBetaOrReleaseCandidate()) allowedForYear.add(latestRelease)
                 PreReleaseInclusion.RcOnly -> if (latestRelease.isReleaseCandidate()) allowedForYear.add(latestRelease)
-                else -> {}
             }
         }
     }

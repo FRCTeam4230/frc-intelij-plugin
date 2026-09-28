@@ -20,6 +20,10 @@ on:
   push:
     tags: [ 'v*' ]
 
+# Gradle's native library loading is a restricted method on Java 25, which otherwise prints a warning at the start of every build
+env:
+  GRADLE_OPTS: --enable-native-access=ALL-UNNAMED
+
 permissions:
   contents: write
 
@@ -128,18 +132,35 @@ jobs:
               .github/release-install-instructions.md > "$RUNNER_TEMP/release-notes.md"
           echo "zip_path=$zip_path" >> "$GITHUB_OUTPUT"
 
-      # Only done once the build and tests have passed, so a failed release does not leave a version change behind
+      # Only done once the build and tests have passed, so a failed release does not leave a version change behind.
+      # The release is of the version change commit, as that is what was built. Its tag is pushed first, which also makes
+      # the commit available on GitHub, so the release does not depend on the branch update. Commits may have been pushed
+      # to the branch while the release was building, in which case the version change is rebased onto them.
       - name: Commit version change
+        id: bump
         if: steps.version.outputs.bump == 'true'
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          BASE: ${{ steps.version.outputs.base }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Release ${{ steps.version.outputs.base }}" -- gradle.properties
-          git push origin "HEAD:$GITHUB_REF_NAME"
+          git commit -m "Release $BASE" -- gradle.properties
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          git tag "$TAG" HEAD
+          git push origin "refs/tags/$TAG"
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:$GITHUB_REF_NAME"; then exit 0; fi
+            git fetch origin "$GITHUB_REF_NAME"
+            if ! git rebase "origin/$GITHUB_REF_NAME"; then git rebase --abort; break; fi
+          done
+          echo "::warning::Could not push the version change to '$GITHUB_REF_NAME'. Set frcPluginBaseVersion=$BASE in gradle.properties manually."
 
       - name: Determine release commit
         id: target
-        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+        env:
+          BUMP_SHA: ${{ steps.bump.outputs.sha }}
+        run: echo "sha=${BUMP_SHA:-$(git rev-parse HEAD)}" >> "$GITHUB_OUTPUT"
 
       # Lists the commits since the previous GitHub release. The previous release is looked up via the GitHub releases
       # (rather than tags) as the repository also contains old tags from before the move to GitHub. A full release lists

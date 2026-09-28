@@ -30,7 +30,6 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.service.project.ExternalProjectRefreshCallback
-import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.startup.StartupManager
@@ -42,6 +41,7 @@ import net.javaru.iip.frc.i18n.FrcMessageKey
 import net.javaru.iip.frc.notify.FrcNotifyType
 import net.javaru.iip.frc.settings.FrcApplicationSettings
 import net.javaru.iip.frc.util.asDate
+import net.javaru.iip.frc.util.computeInSmartReadAction
 import net.javaru.iip.frc.util.getGradleBuildPsiFile
 import net.javaru.iip.frc.util.lastCheckedDateTimeFormatter
 import net.javaru.iip.frc.util.reimportGradleProject
@@ -416,7 +416,7 @@ class WpiLibVersionService private constructor(private val project: Project) : P
         var versionStatus: WpiLibVersionStatus? = null
         // Checking the Gradle plugin repository for newer versions is a network call, which must not be done inside a read action (or on the EDT)
         if (!project.isDisposed && project.isFrcFacetedProject()) GradleRioMavenMetadataState.getInstance(true)
-        DumbService.getInstance(project).runReadActionInSmartMode {
+        project.computeInSmartReadAction {
             if (!project.isDisposed && project.isFrcFacetedProject())
             {
                 logger.debug {"[FRC] getWpiLibVersionStatus() : runReadActionInSmartMode has started."}

@@ -17,10 +17,10 @@
 package net.javaru.iip.frc.inspections
 
 import com.intellij.codeInspection.CleanupLocalInspectionTool
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.psi.PsiField
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import com.siyeh.ig.InspectionGadgetsFix
 import com.siyeh.ig.fixes.RenameFix
 import net.javaru.iip.frc.i18n.FrcInspectionsBundle
 import net.javaru.iip.frc.util.capitalize2
@@ -52,7 +52,7 @@ class HungarianNotationMemberVariablesInspection: BaseInspection(), CleanupLocal
         }
     }
 
-    override fun buildFix(vararg infos: Any): InspectionGadgetsFix
+    override fun buildFix(vararg infos: Any): LocalQuickFix
     {
         val field = infos[0] as PsiField
         val targetName = field.createNewName()

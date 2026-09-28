@@ -40,7 +40,6 @@ import com.intellij.openapi.module.JavaModuleType
 import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleType
-import com.intellij.openapi.module.StdModuleTypes
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbService
@@ -265,7 +264,7 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
      * We'll use 0 and get placed at the bottom, which I think is more consistent in the long run.
      */
     override fun getWeight(): Int = 0
-    override fun getModuleType(): ModuleType<*>? = StdModuleTypes.JAVA
+    override fun getModuleType(): ModuleType<*>? = JavaModuleType.getModuleType()
     override fun getBuilderId(): String? = javaClass.name // This is critical since the default is to return the ModuleType's ID, which then results in the Java Wizard steps being used as our createWizardSteps() is never called.
 
     override fun createProject(name: String, path: String): Project?

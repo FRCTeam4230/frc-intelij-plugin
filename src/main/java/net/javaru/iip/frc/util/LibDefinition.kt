@@ -21,6 +21,7 @@ import java.nio.file.Path
 
 
 @Suppress("DataClassPrivateConstructor")
+@ConsistentCopyVisibility
 data class LibDef internal constructor(val module: Module, val libName: String, val binDirs: Set<Path>, val srcDirs: Set<Path>, val docDirs: Set<Path>)
 
 class LibDefBuilder(val module: Module, val libName: String)

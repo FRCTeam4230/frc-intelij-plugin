@@ -17,18 +17,17 @@
 package net.javaru.iip.frc.inspections
 
 import com.intellij.codeInspection.CleanupLocalInspectionTool
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiModifier
 import com.intellij.util.text.NameUtilCore
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import com.siyeh.ig.InspectionGadgetsFix
 import com.siyeh.ig.fixes.RenameFix
 import net.javaru.iip.frc.i18n.FrcInspectionsBundle
 import net.javaru.iip.frc.util.capitalize2
 import java.util.*
-import java.util.stream.Collectors
 
 
 class HungarianNotationConstantsInspection: BaseInspection(), CleanupLocalInspectionTool
@@ -58,7 +57,7 @@ class HungarianNotationConstantsInspection: BaseInspection(), CleanupLocalInspec
         }
     }
 
-    override fun buildFix(vararg infos: Any): InspectionGadgetsFix
+    override fun buildFix(vararg infos: Any): LocalQuickFix
     {
         val field = infos[0] as PsiField
         val targetName = field.createNewName()
@@ -72,10 +71,7 @@ class HungarianNotationConstantsInspection: BaseInspection(), CleanupLocalInspec
         }
         else {
             // Based on com.intellij.refactoring.rename.JavaNameSuggestionProvider#suggestProperlyCasedName() : if (kind == VariableKind.STATIC_FINAL_FIELD) clause
-            val words = NameUtilCore.splitNameIntoWords(name.substring(1))
-            return Arrays.stream(words).map { s: String ->
-                StringUtil.toUpperCase(s)
-            }.collect(Collectors.joining("_"))
+            NameUtilCore.splitNameIntoWordList(name.substring(1)).joinToString("_") { StringUtil.toUpperCase(it) }
         }
     }
 }

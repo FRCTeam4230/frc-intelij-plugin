@@ -115,7 +115,7 @@ fun Project.reimportGradleProject(callback: ExternalProjectRefreshCallback? = nu
         ExternalSystemUtil.refreshProjects(
             ImportSpecBuilder(this, GradleConstants.SYSTEM_ID)
                 .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
-                .callback(callback))
+                .apply { if (callback != null) withCallback(callback) })
     }
 }
 

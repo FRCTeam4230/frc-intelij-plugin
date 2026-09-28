@@ -17,7 +17,6 @@
 package net.javaru.iip.frc.services
 
 import com.intellij.diagnostic.IdeErrorsDialog
-import com.intellij.diagnostic.IdeaReportingEvent
 import com.intellij.diagnostic.LogMessage
 import com.intellij.ide.DataManager
 import com.intellij.ide.plugins.PluginUtil
@@ -35,8 +34,9 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task.Backgroundable
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.SystemInfo
 import com.intellij.psi.PsiFile
+import com.intellij.util.system.LowLevelLocalMachineAccess
+import com.intellij.util.system.OS
 import io.sentry.Attachment
 import io.sentry.Scope
 import io.sentry.Sentry
@@ -152,7 +152,7 @@ object FrcErrorReportSubmitterSentryWorker
                     Sentry.setTag("ide.version", ApplicationInfo.getInstance().fullVersion)
                     Sentry.setTag("ide.code", ApplicationInfo.getInstance().build.productCode)
                     Sentry.setTag("ide.name", "${ApplicationInfo.getInstance().fullApplicationName} ${ApplicationNamesInfo.getInstance().editionName}")
-                    Sentry.setTag("os", SystemInfo.getOsNameAndVersion())
+                    Sentry.setTag("os", osNameAndVersion())
                     val frcApplicationSettings = FrcApplicationSettings.getInstance()
                     Sentry.setTag("frc.team", frcApplicationSettings.teamNumber.toString())
                     val niid = frcApplicationSettings.niid
@@ -206,15 +206,7 @@ object FrcErrorReportSubmitterSentryWorker
                             scope.setExtraSafely("plugin.name", pluginId?.let { PluginUtil.getInstance().findPluginName(it) })
                             scope.setExtraSafely("plugin.id", pluginId?.idString)
                             scope.setExtraSafely("event.type", "ErrorReportSubmitter")
-                            val throwable: Throwable? = if (ideaEvent is IdeaReportingEvent)
-                            {
-                                scope.addThrowableAsAttachment(ideaEvent.throwable, "ideaEvent.throwable.txt")
-                                ideaEvent.data.throwable
-                            }
-                            else
-                            {
-                                ideaEvent.throwable
-                            }
+                            val throwable: Throwable? = ideaEvent.throwable
                             scope.addThrowableAsAttachment(throwable)
                             val sentryEvent = SentryEvent(throwable)
                             sentryEvent.level = SentryLevel.ERROR
@@ -451,15 +443,6 @@ object FrcErrorReportSubmitterSentryWorker
         sb.append("\u2022 IDEA Logging Event Message: ${ideaEvent.message}\n")
         sb.append("\u2022 Additional Info / User Comments:  $additionalInfoClean\n")
 
-        if (ideaEvent is IdeaReportingEvent)
-        {
-            if (ideaEvent.message != ideaEvent.originalMessage)
-            {
-                sb.append("\u2022 Original Message: ${ideaEvent.originalMessage}\n")
-            }
-
-            scope.addAttachment(Attachment(ideaEvent.originalThrowableText.toByteArray(), "originalCausingThrowableStacktrace.txt"))
-        }
         sb.addThrowableInfo(throwable)
         return this.setMessageSafely(scope, sb.toString())
     }
@@ -548,3 +531,10 @@ data class ReportableEvent(
     val additionalData: Map<String, Any?>? = emptyMap(),
     val attachments: Collection<Attachment>? = emptyList()
                           )
+
+/**
+ * The name and version of the OS the IDE (or with remote development, the IDE backend) is running on, which is the machine the
+ * error occurred on, as the (deprecated) `SystemInfo.getOsNameAndVersion` returned.
+ */
+@OptIn(LowLevelLocalMachineAccess::class)
+private fun osNameAndVersion(): String = "${OS.CURRENT.name} ${OS.CURRENT.version()}"

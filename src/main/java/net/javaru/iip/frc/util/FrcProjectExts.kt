@@ -22,6 +22,7 @@ import com.github.michaelbull.result.Result
 import com.intellij.facet.FacetManager
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.idea.IdeaLogger
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.diagnostic.Logger
@@ -29,7 +30,6 @@ import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
-import com.intellij.openapi.progress.PerformInBackgroundOption
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
@@ -41,6 +41,7 @@ import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Computable
+import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.concurrency.AppExecutorUtil
 import net.javaru.iip.frc.facet.isFrcFacetedProject
@@ -91,7 +92,32 @@ fun Project.runWhenSmart(action:() -> Unit)
     }
 }
 
-/** Convenience Extension function for [DumbService.runReadActionInSmartMode]. */
+/**
+ * Runs the [computable] in a read action once the project is in smart mode (i.e. is not indexing), returning its result. This
+ * is the behavior of the deprecated `DumbService.runReadActionInSmartMode`: when called within a read action, it is run
+ * immediately (as waiting for smart mode would deadlock), otherwise it waits for smart mode, and if indexing restarts before
+ * the read action starts, waits again.
+ */
+fun <T> Project.computeInSmartReadAction(computable: () -> T): T
+{
+    if (ApplicationManager.getApplication().isReadAccessAllowed) return computable()
+    val dumbService = DumbService.getInstance(this)
+    while (true)
+    {
+        dumbService.waitForSmartMode()
+        val result = ReadAction.computeBlocking<Ref<T>?, Throwable> {
+            when
+            {
+                isDisposed -> throw ProcessCanceledException()
+                dumbService.isDumb -> null
+                else -> Ref.create(computable())
+            }
+        }
+        if (result != null) return result.get()
+    }
+}
+
+/** Runs the [action] in a read action once the project is in smart mode. See [computeInSmartReadAction]. */
 fun Project.runReadActionInSmartMode(action:() -> Unit)
 {
     if (isUnitTestMode())
@@ -99,7 +125,7 @@ fun Project.runReadActionInSmartMode(action:() -> Unit)
        action()
     }
     else if (!this.isDisposed) {
-        DumbService.getInstance(this).runReadActionInSmartMode {
+        computeInSmartReadAction {
             if (this.isDisposed)
                 LOG.debug { "[FRC] read action will not run as project is disposed." }
             else
@@ -115,8 +141,8 @@ fun <T> Project.runReadActionInSmartModeWithReturn(action: () -> T): T = runRead
     }
 })
 
-/** Convenience Extension function for [DumbService.runReadActionInSmartMode]. */
-fun <T> Project.runReadActionInSmartMode(computable: Computable<T>): T = DumbService.getInstance(this).runReadActionInSmartMode(computable)
+/** Runs the [computable] in a read action once the project is in smart mode. See [computeInSmartReadAction]. */
+fun <T> Project.runReadActionInSmartMode(computable: Computable<T>): T = computeInSmartReadAction { computable.compute() }
 
 
 inline fun <R> Project.runNonBlockingReadActionInSmartMode(crossinline action: () -> R, crossinline uiContinuation: (R) -> Unit, uiContinuationModalityState: ModalityState = ModalityState.nonModal())
@@ -175,12 +201,11 @@ fun Project.runBackgroundTask(
     name: String,
     indeterminate: Boolean = true,
     cancellable: Boolean = false,
-    background: PerformInBackgroundOption = PerformInBackgroundOption.ALWAYS_BACKGROUND,
     debuggingData: Map<String, String?>? = null,
     action: (indicator: ProgressIndicator) -> Unit
                           )
 {
-    ProgressManager.getInstance().run(object : Task.Backgroundable(this, name, cancellable, background)
+    ProgressManager.getInstance().run(object : Task.Backgroundable(this, name, cancellable)
                                       {
                                           override fun run(indicator: ProgressIndicator)
                                           {

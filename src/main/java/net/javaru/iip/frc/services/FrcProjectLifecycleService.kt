@@ -16,7 +16,6 @@
 
 package net.javaru.iip.frc.services
 
-import com.intellij.ProjectTopics
 import com.intellij.facet.Facet
 import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetManagerListener
@@ -82,8 +81,8 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
     {
         logger.trace {"[FRC] FrcProjectLifecycleService.registerListeners() called for project '$project'"}
         val connection: MessageBusConnection = project.messageBus.connect()
-        connection.subscribe(ProjectTopics.MODULES, this)
-        connection.subscribe(ProjectTopics.PROJECT_ROOTS, this)
+        connection.subscribe(ModuleListener.TOPIC, this)
+        connection.subscribe(ModuleRootListener.TOPIC, this)
         connection.subscribe(FacetManager.FACETS_TOPIC, this)
         // A project's WPILib status is determined solely by its '.wpilib/wpilib_preferences.json' file, so react to that file being created or deleted
         // The FRC facet is added once the Gradle import completes, since the import replaces the modules

@@ -69,6 +69,7 @@ data class FrcSshSettings @JvmOverloads constructor(
     }
 }
 
+@ConsistentCopyVisibility
 data class ImmutableFrcSshSettings internal constructor(val sshUsername: String,
                                                         val sshPassword: String,
                                                         val sshTailCommand: String) 

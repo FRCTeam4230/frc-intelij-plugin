@@ -505,12 +505,6 @@ public class TcpRioLogMonitorProcess extends AbstractRioLogMonitorProcess
         }
 
 
-        @Override
-        protected void finalize()
-        {
-            stop();
-        }
-        
         public void stop()
         {
             cleanup.set(true);

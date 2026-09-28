@@ -142,15 +142,19 @@ jobs:
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       # Lists the commits since the previous GitHub release. The previous release is looked up via the GitHub releases
-      # (rather than tags) as the repository also contains old tags from before the move to GitHub.
+      # (rather than tags) as the repository also contains old tags from before the move to GitHub. A full release lists
+      # all the changes since the previous full release (i.e. including those in any pre-releases since then), while a
+      # pre-release lists the changes since the previous release of either kind.
       - name: Add changes to release notes
         env:
           GH_TOKEN: ${{ github.token }}
           TARGET: ${{ steps.target.outputs.sha }}
           TAG: ${{ steps.version.outputs.tag }}
+          PRERELEASE: ${{ steps.version.outputs.prerelease }}
         run: |
           notes="$RUNNER_TEMP/release-notes.md"
-          previous="$(gh release list --exclude-drafts --limit 1 --json tagName --jq '.[0].tagName // empty')"
+          exclude_prereleases="$([ "$PRERELEASE" = "true" ] || echo "--exclude-pre-releases")"
+          previous="$(gh release list --exclude-drafts $exclude_prereleases --limit 1 --json tagName --jq '.[0].tagName // empty')"
           {
             echo
             echo "## What's changed"

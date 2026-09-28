@@ -274,6 +274,7 @@
     <depends>com.intellij.gradle</depends>
     <depends>org.intellij.groovy</depends>
     <depends>org.jetbrains.kotlin</depends>
+    <depends>com.intellij.modules.json</depends>
     <depends optional="true" config-file="shellScriptOptionalPlugin.xml">com.jetbrains.sh</depends>
     <!--<depends>AntSupport</depends>-->
 

@@ -325,6 +325,8 @@
 
         <stepsBeforeRunProvider implementation="net.javaru.iip.frc.run.WpiLibSimulateExternalBeforeRunTaskProvider" />
         <configurationType implementation="net.javaru.iip.frc.run.WpiLibSimulationConfigurationType" />
+        <executor id="FrcProfileRobot" implementation="net.javaru.iip.frc.run.FrcProfileRobotExecutor" />
+        <programRunner implementation="net.javaru.iip.frc.run.FrcRobotProfilingProgramRunner" />
         <executor id="FrcRioLogToolWindowExecutor" implementation="net.javaru.iip.frc.riolog.ui.FrcRioLogToolWindowExecutor" />
 
         <spellchecker.bundledDictionaryProvider implementation="net.javaru.iip.frc.spellchecker.FrcBundledDictionaryProvider" />

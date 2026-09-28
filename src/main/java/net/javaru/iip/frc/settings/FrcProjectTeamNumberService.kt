@@ -17,11 +17,9 @@
 package net.javaru.iip.frc.settings
 
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.debug
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.messages.Topic
-import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask
+import net.javaru.iip.frc.wpilib.getTeamNumberConfiguredInWpiLibPreferencesFile
 import java.util.*
 
 /**
@@ -36,41 +34,14 @@ import java.util.*
  */
 class FrcProjectTeamNumberService private constructor(val project:Project)
 {
-    private val logger = logger<FrcProjectTeamNumberService>()
-    
-    var teamNumber = FrcApplicationSettings.getInstance().teamNumber // default value, but then is set in the init block in the event it is different
-        private set
-                
-    
-    init
-    {
-        logger.debug {"[FRC] Initializing FrcProjectTeamNumberService for project $project"}
-        project.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask { foundTeamNumber -> 
-            teamNumber = foundTeamNumber
-        }
-        // Examples: com/intellij/openapi/externalSystem/service/project/manage/SourceFolderManagerImpl.kt:115
-        //           schemeManager/SchemeManagerFactoryImpl.kt:133  along with  com.intellij.configurationStore.schemeManager.SchemeFileTracker
-        // As noted in https://www.jetbrains.org/intellij/sdk/docs/basics/virtual_file_system.html#virtual-file-system-events
-        //      "VFS listeners are application level and will receive events for changes happening in all the projects opened by the user. 
-        //       You may need to filter out events that aren't relevant to your task (e.g., via ProjectFileIndex#isInContent())."
-        // TODO: Commenting this out as a temp fix for issue #60, but need to resolve (keep in mind the line number in the stacktrace in the issue are off by 1 with this comment present
-//        project.messageBus.connect().subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener{
-//            override fun after(events: List<VFileEvent>)
-//            {
-//                events.forEach { event: VFileEvent ->
-//                    val file = event.file
-//                    if (file != null && ProjectFileIndex.getInstance(project).isInContent(file) && file.name == wpiLibPreferencesFileName)
-//                    {
-//                        val previousTeamNumber = teamNumber
-//                        teamNumber = project.getTeamNumberConfiguredInWpiLibPreferencesFile()
-//                        // teamNumberChangeDispatcher.multicaster.onTeamNumberChange(previousTeamNumber, teamNumber)
-//                        project.messageBus.syncPublisher(PROJECT_TEAM_NUMBER_CHANGES).onTeamNumberChange(project, previousTeamNumber, teamNumber)
-//                    }
-//                }
-//            }
-//        })
-    }
-    
+    /**
+     * The team number configured in the project's `.wpilib/wpilib_preferences.json` file, or if it is not configured there, the
+     * team number in the application settings. The (small) file is read each time, rather than cached when the service is
+     * created, so the team number is available as soon as the project is opened (e.g. to RIOLog), and changes to it are used.
+     */
+    val teamNumber: Int
+        get() = if (project.isDisposed) FrcApplicationSettings.getInstance().teamNumber else project.getTeamNumberConfiguredInWpiLibPreferencesFile()
+
     companion object
     {
         @JvmStatic

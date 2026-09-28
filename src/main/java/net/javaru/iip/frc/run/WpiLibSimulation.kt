@@ -55,6 +55,7 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.options.SettingsEditorGroup
+import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
@@ -120,7 +121,7 @@ fun wpiLibJdkHomeCandidates(projectYear: String?): List<Path>
         .map { wpiLibBaseDir.resolve(it).resolve("jdk") }
 }
 
-private fun Path.hasJavaExecutable(): Boolean = Files.isRegularFile(resolve("bin").resolve(if (SystemInfo.isWindows) "java.exe" else "java"))
+internal fun Path.hasJavaExecutable(): Boolean = Files.isRegularFile(resolve("bin").resolve(if (SystemInfo.isWindows) "java.exe" else "java"))
 
 // endregion
 
@@ -280,7 +281,7 @@ private fun createSimulationRunConfiguration(project: Project, name: String, hwS
     }
 }
 
-private fun Project.wpiLibProjectRoot(): Path? = (findWpiLibProjectRootDirs().firstOrNull() ?: guessProjectDir())?.toNioPath()
+internal fun Project.wpiLibProjectRoot(): Path? = (findWpiLibProjectRootDirs().firstOrNull() ?: guessProjectDir())?.toNioPath()
 
 // endregion
 
@@ -557,41 +558,16 @@ class WpiLibSimulateExternalBeforeRunTaskProvider : BeforeRunTaskProvider<WpiLib
 
         val projectYear = project.getConfiguredProjectYear()
         val jdkHome = wpiLibJdkHomeCandidates(projectYear).firstOrNull { it.hasJavaExecutable() }
-            ?: return failed(project, "The WPILib JDK for '${projectYear ?: "the project year"}' was not found. Looked in: " +
-                wpiLibJdkHomeCandidates(projectYear).joinToString(", ") + ". Install WPILib for the project's year, or update the project's year.")
+            ?: return failed(project, wpiLibJdkNotFoundMessage(projectYear))
 
         val simTask = simulateExternalJavaTask(projectYear)
-        val gradlew = projectRoot.resolve(if (SystemInfo.isWindows) "gradlew.bat" else "gradlew")
-        if (!Files.isRegularFile(gradlew)) return failed(project, "The Gradle wrapper ($gradlew) was not found.")
-        if (!SystemInfo.isWindows) gradlew.toFile().setExecutable(true)
-
-        val commandLine = GeneralCommandLine(gradlew.toString())
-            .apply { if (simConfiguration.clean) addParameter("clean") }
-            .withParameters(simTask.name)
-            .apply { if (simConfiguration.hwSim) addParameter(hwSimArgument) }
-            .withParameters("-Dorg.gradle.java.home=$jdkHome")
-            .withWorkDirectory(projectRoot.toFile())
-            .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
-            // The wrapper script launches Gradle with JAVA_HOME
-            .withEnvironment("JAVA_HOME", jdkHome.toString())
-
-        logger.info("[FRC] Running: ${commandLine.commandLineString}")
-        val indicator = ProgressManager.getInstance().progressIndicator
-        indicator?.text = "Running ${simTask.name}" + if (simConfiguration.hwSim) " (hardware simulation)" else ""
-        val handler = CapturingProcessHandler(commandLine)
-        handler.addProcessListener(object : ProcessListener
-                                   {
-                                       override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>)
-                                       {
-                                           event.text.trim().takeIf { it.isNotEmpty() }?.let { indicator?.text2 = it }
-                                       }
-                                   })
-        val output = if (indicator != null) handler.runProcessWithProgressIndicator(indicator) else handler.runProcess()
-        if (output.isCancelled) return false
-        if (output.exitCode != 0)
+        val parameters = listOfNotNull(if (simConfiguration.clean) "clean" else null, simTask.name, if (simConfiguration.hwSim) hwSimArgument else null)
+        val progressText = "Running ${simTask.name}" + if (simConfiguration.hwSim) " (hardware simulation)" else ""
+        when (val result = runGradleWrapperWithWpiLibJdk(projectRoot, jdkHome, parameters, progressText))
         {
-            val fullOutput = "> ${commandLine.commandLineString}\n\n${output.stdout}\n${output.stderr}"
-            return failed(project, "'${simTask.name}' failed (exit code ${output.exitCode}).", fullOutput)
+            WpiLibGradleResult.Succeeded -> {}
+            WpiLibGradleResult.Cancelled -> return false
+            is WpiLibGradleResult.Failed -> return failed(project, result.message, result.output)
         }
 
         val simConfigFile = projectRoot.resolve("build").resolve(simTask.simConfigFile)
@@ -629,30 +605,97 @@ class WpiLibSimulateExternalBeforeRunTaskProvider : BeforeRunTaskProvider<WpiLib
     private fun failed(project: Project, message: String, output: String? = null): Boolean
     {
         logger.warn("[FRC] WPILib simulation could not be started: $message")
-        val builder = FrcNotifyType.ACTIONABLE_ERROR.builder()
-            .withContent(message)
-            .withFrcPrefixedTitle("Robot Simulation Failed")
-            .withNoSubTitle()
-        val withActions = if (output != null)
-        {
-            builder.withActionBasic("Show Gradle output") {
-                ApplicationManager.getApplication().invokeLater({
-                    if (!project.isDisposed)
-                    {
-                        val outputFile = LightVirtualFile("simulateExternalJava-output.log", PlainTextFileType.INSTANCE, output)
-                        outputFile.isWritable = false
-                        FileEditorManager.getInstance(project).openFile(outputFile, true)
-                    }
-                }, ModalityState.nonModal())
-            }.noMoreActions()
-        }
-        else
-        {
-            builder.withNoActions()
-        }
-        withActions.notify(project)
+        notifyWpiLibGradleTaskFailure(project, "Robot Simulation Failed", message, output, "simulateExternalJava-output.log")
         return false
     }
+}
+
+// endregion
+
+// region Gradle wrapper
+
+internal fun wpiLibJdkNotFoundMessage(projectYear: String?): String =
+    "The WPILib JDK for '${projectYear ?: "the project year"}' was not found. Looked in: " +
+    wpiLibJdkHomeCandidates(projectYear).joinToString(", ") + ". Install WPILib for the project's year, or update the project's year."
+
+internal sealed interface WpiLibGradleResult
+{
+    object Succeeded : WpiLibGradleResult
+    object Cancelled : WpiLibGradleResult
+    class Failed(val message: String, val output: String? = null) : WpiLibGradleResult
+}
+
+/**
+ * Runs `gradlew <parameters> -Dorg.gradle.java.home=<WPILib JDK>` in the project root, as the WPILib VS Code extension does,
+ * showing the progress in the [indicator] (by default, the current one, if any). Using the WPILib JDK, rather than the project's
+ * Gradle JVM, ensures the robot code is built with the Java version it requires. The [outputListener], if provided, receives
+ * the Gradle output as it is produced.
+ */
+internal fun runGradleWrapperWithWpiLibJdk(projectRoot: Path,
+                                           jdkHome: Path,
+                                           parameters: List<String>,
+                                           progressText: String,
+                                           indicator: ProgressIndicator? = ProgressManager.getInstance().progressIndicator,
+                                           outputListener: ((text: String, outputType: Key<*>) -> Unit)? = null): WpiLibGradleResult
+{
+    val gradlew = projectRoot.resolve(if (SystemInfo.isWindows) "gradlew.bat" else "gradlew")
+    if (!Files.isRegularFile(gradlew)) return WpiLibGradleResult.Failed("The Gradle wrapper ($gradlew) was not found.")
+    if (!SystemInfo.isWindows) gradlew.toFile().setExecutable(true)
+
+    val commandLine = GeneralCommandLine(gradlew.toString())
+        .withParameters(parameters)
+        .withParameters("-Dorg.gradle.java.home=$jdkHome")
+        .withWorkDirectory(projectRoot.toFile())
+        .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+        // The wrapper script launches Gradle with JAVA_HOME
+        .withEnvironment("JAVA_HOME", jdkHome.toString())
+
+    logger.info("[FRC] Running: ${commandLine.commandLineString}")
+    indicator?.text = progressText
+    val handler = CapturingProcessHandler(commandLine)
+    handler.addProcessListener(object : ProcessListener
+                               {
+                                   override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>)
+                                   {
+                                       event.text.trim().takeIf { it.isNotEmpty() }?.let { indicator?.text2 = it }
+                                       outputListener?.invoke(event.text, outputType)
+                                   }
+                               })
+    val output = if (indicator != null) handler.runProcessWithProgressIndicator(indicator) else handler.runProcess()
+    if (output.isCancelled) return WpiLibGradleResult.Cancelled
+    if (output.exitCode != 0)
+    {
+        val fullOutput = "> ${commandLine.commandLineString}\n\n${output.stdout}\n${output.stderr}"
+        return WpiLibGradleResult.Failed("'${parameters.joinToString(" ")}' failed (exit code ${output.exitCode}).", fullOutput)
+    }
+    return WpiLibGradleResult.Succeeded
+}
+
+/** Shows an error notification, with an action to show the Gradle output, if there is any. */
+internal fun notifyWpiLibGradleTaskFailure(project: Project, title: String, message: String, output: String?, outputFileName: String)
+{
+    val builder = FrcNotifyType.ACTIONABLE_ERROR.builder()
+        .withContent(message)
+        .withFrcPrefixedTitle(title)
+        .withNoSubTitle()
+    val withActions = if (output != null)
+    {
+        builder.withActionBasic("Show Gradle output") {
+            ApplicationManager.getApplication().invokeLater({
+                if (!project.isDisposed)
+                {
+                    val outputFile = LightVirtualFile(outputFileName, PlainTextFileType.INSTANCE, output)
+                    outputFile.isWritable = false
+                    FileEditorManager.getInstance(project).openFile(outputFile, true)
+                }
+            }, ModalityState.nonModal())
+        }.noMoreActions()
+    }
+    else
+    {
+        builder.withNoActions()
+    }
+    withActions.notify(project)
 }
 
 // endregion

@@ -221,10 +221,7 @@ fun Project.getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask(taskN
  * **Generally, this function is meant for use solely by the `FrcProjectTeamNumberService`. Other services and code should use
  * the [Project.getProjectTeamNumber()] extension function available in the `FrcProjectTeamNumberService` file.**
  * 
- * This function needs to be run via a background task to prevent a `SlowOperations` exceptions.
- * See Javadoc for [com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed].
- * The call(s) to `FilenameIndex.getVirtualFilesByName` (called by functions used byt this one) are slow operations.
- * Use [getTeamNumberConfiguredInWpiLibPreferencesFileAsBackgroundTask] for easy background use.
+ * It reads the file directly (via the VFS), rather than via the file index, so it can be called from any thread.
  * 
  * Returns the configured teamNumber in the `wpilib_preferences.json` file, or the team number configured in the application settings,
  * which may be `UN_CONFIGURED_TEAM_NUMBER` (i.e. 0), if the file is not found, the `teamNumber` key is not in the JSON file, or its 

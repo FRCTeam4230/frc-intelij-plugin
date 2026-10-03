@@ -35,7 +35,7 @@ private object WpiLibGradleJvm
 private val logger = logger<WpiLibGradleJvm>()
 
 /** The WPILib JDK that the Gradle JVM was last set to, so it is only set once for each JDK. */
-private const val gradleJvmSetToWpiLibJdkKey = "FRC.gradleJvmSetToWpiLibJdk"
+private const val gradleJvmSetToWpiLibJdkKey = "FRC.gradleJvmWpiLibJdk"
 
 /**
  * Sets the Gradle JVM in the IDE's Gradle settings (Settings | Build, Execution, Deployment | Build Tools | Gradle) of a WPILib
@@ -68,12 +68,17 @@ private fun setGradleJvm(project: Project, jdkHome: Path, jdkHomePath: String)
     PropertiesComponent.getInstance(project).setValue(gradleJvmSetToWpiLibJdkKey, jdkHomePath)
 }
 
-/** Finds the IDE's JDK for the WPILib JDK home, adding it, named for the WPILib install (e.g. 'WPILib 2026 JDK'), if there is none. */
+/**
+ * Finds the IDE's JDK, named for the WPILib install (e.g. 'WPILib 2026 JDK'), for the WPILib JDK home, adding it if there is none.
+ * A JDK the user added for the same home under another name (e.g. '25') is not used, so the WPILib JDK is clearly identified.
+ */
 private fun findOrAddJdk(jdkHome: Path, jdkHomePath: String): Sdk
 {
     val jdkTable = ProjectJdkTable.getInstance()
-    jdkTable.allJdks.firstOrNull { it.sdkType is JavaSdk && it.homePath != null && FileUtil.pathsEqual(it.homePath, jdkHomePath) }?.let { return it }
-    val name = SdkConfigurationUtil.createUniqueSdkName("WPILib ${jdkHome.parent.fileName} JDK", jdkTable.allJdks.toList())
+    val baseName = "WPILib ${jdkHome.parent.fileName} JDK"
+    jdkTable.allJdks.firstOrNull { it.sdkType is JavaSdk && it.name.startsWith(baseName) && it.homePath != null && FileUtil.pathsEqual(it.homePath, jdkHomePath) }
+        ?.let { return it }
+    val name = SdkConfigurationUtil.createUniqueSdkName(baseName, jdkTable.allJdks.toList())
     val jdk = JavaSdk.getInstance().createJdk(name, jdkHomePath, false)
     WriteAction.run<Throwable> { jdkTable.addJdk(jdk) }
     logger.info("[FRC] Added the WPILib JDK '$name' ($jdkHomePath)")

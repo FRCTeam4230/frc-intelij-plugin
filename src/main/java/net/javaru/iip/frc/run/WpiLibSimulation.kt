@@ -68,6 +68,7 @@ import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NotNullLazyValue
 import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.RawCommandLineEditor
 import com.intellij.util.execution.ParametersListUtil
@@ -80,6 +81,7 @@ import net.javaru.iip.frc.wpilib.findWpiLibProjectRootDirs
 import net.javaru.iip.frc.wpilib.getConfiguredProjectYear
 import net.javaru.iip.frc.wpilib.getDefaultWpiLibRootPath
 import org.jdom.Element
+import org.jetbrains.plugins.gradle.settings.GradleSettings
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import java.io.File
 import java.nio.file.Files
@@ -636,7 +638,8 @@ class WpiLibSimulateExternalBeforeRunTaskProvider : BeforeRunTaskProvider<WpiLib
         }
         val settings = ExternalSystemTaskExecutionSettings().apply {
             externalSystemIdString = GradleConstants.SYSTEM_ID.id
-            externalProjectPath = projectRoot.toString()
+            // Must match the linked Gradle project's path (e.g. forward slashes on Windows), or its settings, such as the Gradle JVM, are not used
+            externalProjectPath = linkedGradleProjectPath(project, projectRoot)
             taskNames = listOfNotNull(if (configuration.clean) "clean" else null, simulateJavaGradleTask(debug))
             scriptParameters = if (configuration.hwSim) hwSimArgument else ""
         }
@@ -647,6 +650,14 @@ class WpiLibSimulateExternalBeforeRunTaskProvider : BeforeRunTaskProvider<WpiLib
                 ExternalSystemUtil.runTask(settings, executor.id, project, GradleConstants.SYSTEM_ID, null, ProgressExecutionMode.IN_BACKGROUND_ASYNC, true)
             }
         }, ModalityState.nonModal())
+    }
+
+    /** The path of the linked Gradle project for the project root, as it is in the Gradle settings. */
+    private fun linkedGradleProjectPath(project: Project, projectRoot: Path): String
+    {
+        val projectRootPath = FileUtil.toSystemIndependentName(projectRoot.toString())
+        return GradleSettings.getInstance(project).linkedProjectsSettings.mapNotNull { it.externalProjectPath }.firstOrNull { FileUtil.pathsEqual(it, projectRootPath) }
+               ?: projectRootPath
     }
 
     private fun failed(project: Project, message: String, output: String? = null): Boolean

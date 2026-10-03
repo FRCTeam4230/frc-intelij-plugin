@@ -48,6 +48,7 @@ import net.javaru.iip.frc.run.ensureWpiLibSimulationRunConfigurations
 import net.javaru.iip.frc.riolog.udp.RioLogUdpSocketManagerApplicationService
 import net.javaru.iip.frc.settings.FrcProjectTeamNumberService
 import net.javaru.iip.frc.toolWindow.VendordepsToolWindowFactory
+import net.javaru.iip.frc.wpilib.ensureGradleJvmIsWpiLibJdk
 import net.javaru.iip.frc.wpilib.isWpiLibProject
 import net.javaru.iip.frc.wpilib.isWpiLibProjectLayoutPath
 import net.javaru.iip.frc.wpilib.syncFrcFacetWithWpiLibDetection
@@ -116,6 +117,7 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
         {
             ensureRunDebugConfigurationsCreated(project)
             ensureWpiLibSimulationRunConfigurations(project)
+            ensureGradleJvmIsWpiLibJdk(project)
         }
     }
 
@@ -132,6 +134,7 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
             RioLogProjectService.getInstance(project).update()
             ensureRunDebugConfigurationsCreated(project)
             ensureWpiLibSimulationRunConfigurations(project)
+            ensureGradleJvmIsWpiLibJdk(project)
         }
 
         if (project.isOpen && project.isFrcFacetedProject() && !project.isDisposed)
@@ -169,6 +172,7 @@ class FrcProjectLifecycleService private constructor(val project: Project) : Mod
                 {
                     ensureRunDebugConfigurationsCreated(project)
                     ensureWpiLibSimulationRunConfigurations(project)
+                    ensureGradleJvmIsWpiLibJdk(project)
                 }
             }
         }

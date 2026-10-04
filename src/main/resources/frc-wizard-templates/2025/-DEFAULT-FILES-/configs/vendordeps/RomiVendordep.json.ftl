@@ -1,25 +1,25 @@
 {
-  "fileName": "XRPVendordep.json",
-  "name": "XRP-Vendordep",
+  "fileName": "RomiVendordep.json",
+  "name": "Romi-Vendordep",
   "version": "1.0.0",
-  "uuid": "1571a1a5-ed3f-4f07-b7eb-b2beb17394e0",
+  "uuid": "1010372a-b446-46f4-b229-61e53a26a7dc",
   "frcYear": "2025",
   "mavenUrls": [],
   "jsonUrl": "",
   "javaDependencies": [
     {
-      "groupId": "edu.wpi.first.xrpVendordep",
-      "artifactId": "xrpVendordep-java",
+      "groupId": "edu.wpi.first.romiVendordep",
+      "artifactId": "romiVendordep-java",
       "version": "wpilib"
     }
   ],
   "jniDependencies": [],
   "cppDependencies": [
     {
-      "groupId": "edu.wpi.first.xrpVendordep",
-      "artifactId": "xrpVendordep-cpp",
+      "groupId": "edu.wpi.first.romiVendordep",
+      "artifactId": "romiVendordep-cpp",
       "version": "wpilib",
-      "libName": "xrpVendordep",
+      "libName": "romiVendordep",
       "headerClassifier": "headers",
       "sourcesClassifier": "sources",
       "sharedLibrary": true,

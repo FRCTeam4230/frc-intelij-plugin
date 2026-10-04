@@ -16,6 +16,7 @@
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.gradle.ext.ProjectSettings
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import java.io.FileNotFoundException
 import java.io.PrintWriter
@@ -93,7 +94,15 @@ intellijPlatform {
     
     pluginVerification {
         // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-extension.html#intellijPlatform-pluginVerification
-        // TODO - configure pluginVerification
+        // Reports appear in build/reports/pluginVerifier by default. Set `verificationReportsDirectory` to change
+        ides {
+            create {
+                // v2025.3 switched to the unified distribution model of IntelliJ IDEA: https://blog.jetbrains.com/idea/2025/07/intellij-idea-unified-distribution-plan/
+                type = IntelliJPlatformType.IntellijIdea
+                version = ideaVersionPlain
+                useInstaller = false
+            }
+        }
     }
     
     // TODO:

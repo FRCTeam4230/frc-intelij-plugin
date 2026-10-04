@@ -15,9 +15,7 @@
  */
 package net.javaru.iip.frc
 
-import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.extensions.PluginDescriptor
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.pom.java.LanguageLevel
 import org.apache.commons.lang3.BooleanUtils
@@ -27,11 +25,11 @@ object FrcPluginGlobals
     /**
      * Gets the string representing the plugin ID.
      * To get a [PluginId] instance, use [net.javaru.iip.frc.util.pluginId].
-     * To get [IdeaPluginDescriptor] (a sub-interface of a [PluginDescriptor]) use
-     * [net.javaru.iip.frc.util.pluginDescriptor].
+     * For plugin metadata (such as the version), use [com.intellij.ide.plugins.PluginDetailsService]
+     * or [net.javaru.iip.frc.util.frcPluginVersion].
      *
      * @see net.javaru.iip.frc.util.pluginId
-     * @see net.javaru.iip.frc.util.pluginDescriptor
+     * @see net.javaru.iip.frc.util.frcPluginVersion
      */
     const val FRC_PLUGIN_ID_STRING = "net.javaru.idea.frc"
     const val FRC_PLUGIN_NAME = "FRC"

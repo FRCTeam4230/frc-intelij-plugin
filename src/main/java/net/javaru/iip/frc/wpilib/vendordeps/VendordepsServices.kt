@@ -34,7 +34,6 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.startup.ProjectActivity
-import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -233,14 +232,14 @@ class VendordepsService private constructor(val project: Project): Disposable
     
     init
     {
-        logger.debug{"[FRC] Scheduling VendordepsService initialization for project: $project"}
-        StartupManager.getInstance(project).runAfterOpened {
-            logger.debug { "[FRC] Scheduling VendordepsService read action for project: $project" }
-            project.runNonBlockingReadActionInSmartMode {
-                logger.debug { "[FRC] VendordepsService initializing for project: $project" }
-                updateVendordepsListing()
-                notifyAboutDuplicatesIfAny()
-            }
+        // The service is created by VendordepsServicesStartupActivity, the Vendordeps tool window, or later by user
+        // actions/file events. The non-blocking read action waits for smart mode and expires with the project, so no
+        // further deferral (i.e. the internal StartupManager.runAfterOpened API) is needed.
+        logger.debug { "[FRC] Scheduling VendordepsService read action for project: $project" }
+        project.runNonBlockingReadActionInSmartMode {
+            logger.debug { "[FRC] VendordepsService initializing for project: $project" }
+            updateVendordepsListing()
+            notifyAboutDuplicatesIfAny()
         }
     }
     
@@ -597,12 +596,11 @@ class VendordepsServicesStartupActivity : ProjectActivity
     {
         if (project.isWpiLibProject())
         {
-            logger.debug{ "[FRC] Scheduling Vendordeps Services Startup Activities for project: $project" }
-            StartupManager.getInstance(project).runAfterOpened {
-                logger.debug { "[FRC] Running Vendordeps Services Startup Activities for project: $project" }
-                VendordepsFileListener.getInstance(project)
-                VendordepsService.getInstance(project)
-            }
+            // A ProjectActivity runs after the project is opened, so no further deferral (i.e. the internal
+            // StartupManager.runAfterOpened API) is needed.
+            logger.debug { "[FRC] Running Vendordeps Services Startup Activities for project: $project" }
+            VendordepsFileListener.getInstance(project)
+            VendordepsService.getInstance(project)
         }
     }
 }

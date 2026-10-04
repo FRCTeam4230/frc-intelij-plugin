@@ -32,7 +32,6 @@ import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.service.project.ExternalProjectRefreshCallback
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
-import com.intellij.openapi.startup.StartupManager
 import com.intellij.psi.PsiElement
 import com.intellij.util.DocumentUtil
 import net.javaru.iip.frc.facet.isFrcFacetedProject
@@ -76,16 +75,16 @@ class WpiLibVersionStartupActivity : ProjectActivity
     {
         if (project.isFrcFacetedProject())
         {
-            StartupManager.getInstance(project).runAfterOpened {
-                // We need to run as a BackgroundTask as it is a slow operation.
-                // See Javadoc for com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed
-                project.runBackgroundTask("Initializing WPI Lib version service") {
-                    val versionService = WpiLibVersionService.getInstance(project)
-                    if (FrcApplicationSettings.getInstance().checkWpiLibStatusOnProjectStartup)
-                        versionService.checkWpiLibStatusAndAlertIfNeeded()
-                    else
-                        versionService.scheduleStatusCheck()
-                }
+            // A ProjectActivity runs after the project is opened, so no further deferral (i.e. the internal
+            // StartupManager.runAfterOpened API) is needed.
+            // We need to run as a BackgroundTask as it is a slow operation.
+            // See Javadoc for com.intellij.util.SlowOperations.assertSlowOperationsAreAllowed
+            project.runBackgroundTask("Initializing WPI Lib version service") {
+                val versionService = WpiLibVersionService.getInstance(project)
+                if (FrcApplicationSettings.getInstance().checkWpiLibStatusOnProjectStartup)
+                    versionService.checkWpiLibStatusAndAlertIfNeeded()
+                else
+                    versionService.scheduleStatusCheck()
             }
         }
     }

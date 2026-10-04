@@ -17,7 +17,6 @@
 package net.javaru.iip.frc.services
 
 import com.intellij.diagnostic.IdeErrorsDialog
-import com.intellij.diagnostic.LogMessage
 import com.intellij.ide.DataManager
 import com.intellij.ide.plugins.PluginUtil
 import com.intellij.idea.IdeaLogger
@@ -212,15 +211,13 @@ object FrcErrorReportSubmitterSentryWorker
                             sentryEvent.level = SentryLevel.ERROR
                             sentryEvent.setMessageSafely(scope, ideaEvent, throwable, additionalInfo)
                             sentryEvent.setStacktraceHashes(throwable)
+                            // IdeaLoggingEvent.attachments holds the attachments the user chose to include in the
+                            // report in the IDE Errors dialog. (Previously we used the internal LogMessage.allAttachments
+                            // API, which also included attachments the user had deselected.)
+                            // Note: Max attachment size is 20 MB
                             try
                             {
-                                // For some reason calling
-                                //     if (ideaEventData is LogMessage)
-                                // always returns false, even when it is a LogMessage. So we just do the
-                                // cast, and catch any exception since in most cases it is a LogMessage
-                                val ideaEventData = ideaEvent.data
-                                // Note: Max attachment size is 20 MB
-                                (ideaEventData as LogMessage).allAttachments.forEach{
+                                ideaEvent.attachments.forEach {
                                     scope.addIdeaAttachment(it, "eventAttachment-")
                                 }
                             }

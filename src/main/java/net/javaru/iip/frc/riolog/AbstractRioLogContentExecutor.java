@@ -36,6 +36,7 @@ import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.execution.ui.RunContentManager;
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.ActivityTracker;
 import com.intellij.ide.CommonActionsManager;
 import com.intellij.ide.OccurenceNavigator;
 import com.intellij.openapi.Disposable;
@@ -665,7 +666,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
         public void setSelected(final @NotNull AnActionEvent event, final boolean flag)
         {
             myConsole.setOutputPaused(flag);
-            ApplicationManager.getApplication().invokeLater(() -> update(event));
+            // AnAction.update() is @OverrideOnly; ask the action system to re-run update() on the toolbar actions instead
+            ActivityTracker.getInstance().inc();
         }
 
 
@@ -695,7 +697,7 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                     presentation.setEnabled(true);
                     ApplicationManager.getApplication().invokeLater(() -> {
                         WriteAction.run(() -> {
-                            myConsole.performWhenNoDeferredOutput(() -> update(event));
+                            myConsole.performWhenNoDeferredOutput(() -> ActivityTracker.getInstance().inc());
                         });
                         
                     });
@@ -741,7 +743,8 @@ public abstract class AbstractRioLogContentExecutor implements Disposable
                                                                 {
                                                                     getRioLogMonitorProcess().monitoringStopped();
                                                                 }
-                                                                update(event);
+                                                                // AnAction.update() is @OverrideOnly; ask the action system to refresh the toolbar actions instead
+                                                                ActivityTracker.getInstance().inc();
                                                                 // Commenting out for now as it is causing issues
                                                                 //ensureContentIsPinned();
                                                             });

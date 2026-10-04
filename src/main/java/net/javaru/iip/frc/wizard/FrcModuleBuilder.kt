@@ -334,7 +334,12 @@ class FrcModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener
                FrcModuleBuilder.importGradleProject()
          */
 
-        StartupManager.getInstance(project).runAfterOpened {
+        // runAfterOpened is internal API (it was used here previously). For non-DumbAware runnables, the public
+        // runWhenProjectIsInitialized is implemented by the platform as runAfterOpened { DumbService.runWhenSmart(...) },
+        // so the timing is effectively unchanged. It is deprecated (in favor of ProjectActivity, which doesn't fit this
+        // new-project-wizard use case), but not scheduled for removal.
+        @Suppress("DEPRECATION")
+        StartupManager.getInstance(project).runWhenProjectIsInitialized {
             DumbService.getInstance(project).smartInvokeLater {
                 // I've tried 'runWriteAction' and 'invokeLater' here, both outside and inside 'runWhenSmart'.
                 // But the issue persisted. The smartInvokeLater has reduced its occurrence, but it still occurs occasionally.

@@ -16,8 +16,7 @@
 
 package net.javaru.iip.frc.util
 
-import com.intellij.ide.plugins.IdeaPluginDescriptor
-import com.intellij.ide.plugins.PluginManagerCore
+import com.intellij.ide.plugins.PluginDetailsService
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
@@ -40,9 +39,11 @@ private object FrcPluginUtils
 private val LOG = logger<FrcPluginUtils>()
 
 val pluginId: PluginId = PluginId.getId(FRC_PLUGIN_ID_STRING)
-val pluginDescriptor: IdeaPluginDescriptor = PluginManagerCore.getPlugin(pluginId)!!
-val frcPluginVersion: String? = pluginDescriptor.version
-val frcPluginPrimaryVersion : String? = run {
+// As of 2026.2, PluginManagerCore.getPlugin() is internal API. PluginDetailsService is the platform's recommended replacement for reading plugin metadata.
+// Lazy so the (application level) service is not looked up during class initialization.
+@Suppress("UnstableApiUsage")
+val frcPluginVersion: String? by lazy { PluginDetailsService.getInstance().findDetails(pluginId)?.version }
+val frcPluginPrimaryVersion : String? by lazy {
     // remove IDEA version and any -eap or - S N A P S H O T  or such designator
     val index = frcPluginVersion?.indexOf('-') ?: -1
     if (index == -1) frcPluginVersion else frcPluginVersion?.substring(0, index)
